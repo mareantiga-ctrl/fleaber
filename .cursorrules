@@ -1,0 +1,30 @@
+# Regra BATATA (Fleaber)
+
+- **Não remover, desactivar nem substituir funcionalidades** sem o utilizador pedir explicitamente.
+- **NUNCA mudar/apagar funcionalidades sem autorização explícita do utilizador** (sem atalhos).
+- Podes **sugerir** melhorias ou simplificações; não as implementes por conta própria para "atalhar".
+- Alterações devem ser **mínimas** e focadas no pedido.
+- Layout/UI do player live, carrossel de artigos na Arena, e fluxos Mux/LiveKit: não alterar sem combinar (ver também `.cursor/rules/live-streaming.mdc`).
+
+## Bottom sheet «Criar» (DRY)
+
+- O sheet glass «Criar» (Novo Anúncio / Novo Direto) vive **só** em `lib/widgets/fleaber_create_sheet.dart` — `FleaberCreateSheet.show(context)`.
+- **Não** duplicar `showModalBottomSheet`, blur 14, radius 20, handle 44×4 nem `ListTile`s noutros ecrãs (Home, Mensagens, Perfil, etc.).
+- Qualquer tweak visual ou de navegação (rotas, ícones, textos) → editar **apenas** `FleaberCreateSheet`; nos ecrãs manter só `FleaberCreateSheet.show(context)` (ou delegate de um método local).
+- Constantes de referência no widget: `_blurSigma = 14`, `_radius = 20`, handle `44×4`, `_sheetColor = 0xCC101518`, accent `0xFF00A3AD`.
+
+## CTA principal (FleaberPrimaryButton)
+
+- CTAs teal críticos (login, registo, produto, wallet, confirmações chat, etc.) → `lib/widgets/fleaber_primary_button.dart` — `FleaberPrimaryButton`.
+- Padrão: altura **48**, radius **16**, cor `0xFF007782`, loading inline via `loading:`.
+- Chip compacto (ex. «Seguir» live) → `FleaberPrimaryButton.compact`.
+- Altura/radius diferentes por contexto → passar `height` / `borderRadius` no construtor (não duplicar `FilledButton.styleFrom` com teal).
+- `FFButtonWidget` mantém-se para secundários (Google, links); não substituir botões outline/circle/icon-only.
+
+## Sombras (FFShadows / FleaberElevation)
+
+- Tokens em `lib/utils/fleaber_elevation.dart`; expostos também em `FlutterFlowTheme.of(context).shadow` (`FFShadows`).
+- **elevation-sm** → `FleaberElevation.sm` (chips/badges) ou `smNav` (bottom nav, offset `(0,-4)`).
+- **elevation-md** → `FleaberElevation.md` (live cards, cards destacados) ou `mdFab` (FAB teal Home).
+- Badge teal produto → `FleaberElevation.smAccent(cor)`.
+- Não duplicar `BoxShadow(blurRadius: …)` inline; usar os tokens acima.

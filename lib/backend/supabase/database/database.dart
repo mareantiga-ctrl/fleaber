@@ -1,0 +1,31 @@
+export '../../../flutter_flow/lat_lng.dart';
+export 'package:supabase_flutter/supabase_flutter.dart' hide Provider;
+
+export '../supabase.dart';
+export 'row.dart';
+export 'table.dart';
+
+export 'tables/app_logs.dart';
+export 'tables/chat_messages.dart';
+export 'tables/chats.dart';
+export 'tables/favorites.dart';
+export 'tables/fleaber_commissions.dart';
+export 'tables/follows.dart';
+export 'tables/live_items.dart';
+export 'tables/live_item_show_events.dart';
+export 'tables/live_reservation_requests.dart';
+export 'tables/lives.dart';
+export 'tables/order_dispute_replies.dart';
+export 'tables/order_disputes.dart';
+export 'tables/orders.dart';
+export 'tables/products.dart';
+export 'tables/product_offers.dart';
+export 'tables/profiles.dart';
+export 'tables/user_notifications.dart';
+export 'tables/reviews.dart';
+export 'tables/reviews_gerais.dart';
+export 'tables/seller_helpers.dart';
+export 'tables/staff_action_logs.dart';
+export 'tables/v_seguidores_stats.dart';
+export 'tables/wallet_transactions.dart';
+export 'tables/wallets.dart';

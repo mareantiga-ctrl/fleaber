@@ -1,0 +1,340 @@
+{\rtf1\ansi\ansicpg1252\deff0\nouicompat\deflang1033{\fonttbl{\f0\fnil\fcharset0 Calibri;}}
+{\*\generator Riched20 10.0.19041}\viewkind4\uc1 
+\pard\sa200\sl276\slmult1\f0\fs22\lang9 lib.rar\par
+Ficheiro\par
+INSTRU\'c7\'c3O DE SINCRONIZA\'c7\'c3O CR\'cdTICA (DART VS SUPABASE)\par
+\par
+O PROBLEMA:\par
+O formul\'e1rio de invent\'e1rio est\'e1 a falhar no insert porque existe um desfasamento entre os nomes das colunas no ficheiro lib/backend/supabase/database/tables/products.dart e a base de dados real.\par
+\par
+    No Supabase, a coluna das fotos chama-se image_urls, mas o c\'f3digo est\'e1 a tentar enviar para photo_urls.\par
+\par
+    As colunas ref_code, clothing_size e gender est\'e3o a usar getField/setField, o que pode causar erros de mapeamento se a cache da API estiver desatualizada.\par
+\par
+RESOLU\'c7\'c3O PROPOSTA:\par
+Vamos for\'e7ar o acesso direto ao mapa de dados para garantir que o que o Flutter envia \'e9 exatamente o que o Postgres espera.\par
+\par
+POR FAVOR, CONFIRMA E APLICA NO FICHEIRO products.dart:\par
+\par
+    Substitui o acesso \'e0s Imagens:\par
+\par
+Dart\par
+\par
+  List<String> get imageUrls \{\par
+    final raw = data['image_urls'];\par
+    if (raw is List) return raw.map((e) => e.toString()).toList();\par
+    return [];\par
+  \}\par
+  set imageUrls(List<String>? value) => data['image_urls'] = value;\par
+\par
+    Substitui o acesso ao G\'e9nero, Refer\'eancia e Tamanho por mapeamento direto:\par
+\par
+Dart\par
+\par
+  String? get gender => data['gender'];\par
+  set gender(String? value) => data['gender'] = value;\par
+\par
+  String? get refCode => data['ref_code'];\par
+  set refCode(String? value) => data['ref_code'] = value;\par
+\par
+  String? get clothingSize => data['clothing_size'];\par
+  set clothingSize(String? value) => data['clothing_size'] = value;\par
+\par
+    No seller_product_form_widget.dart:\par
+    Confirma que no momento do insert, a chave utilizada \'e9 'image_urls' e n\'e3o 'photo_urls'.\par
+\par
+"Cursor, antes de aplicares, confirma se percebeste que o nome no Postgres manda no nome do data['...']. Se a coluna l\'e1 \'e9 'gender', aqui tem de ser 'gender' sem intermedi\'e1rios."\par
+lib5.12.26.19.31.rar\par
+Ficheiro\par
+O erro que aparece no ecr\'e3 do smartphone na imagem image_9127bd.png \'e9 o seguinte:\par
+\par
+    "type 'ProductsRow' is not a subtype of type 'Map<String, dynamic>' in type cast"\par
+\par
+\par
+\par
+Quando estou na aplicacao na pagina dos produtos dentro da tab do marketplace da homepage e clico em um artigo para entrar nos detalhes do artigo da esse problema\par
+lib5.14.26.19.38.rar\par
+Ficheiro\par
+qual a tua opinia em  relacao a como esta a ficar\par
+Por exemplo, essa vendedora, com os dados que est\'e1 a\'ed, consegues verificar se ela tem empresa, se n\'e3o tem? Faz a\'ed uma pesquisa, porque eu n\'e3o estou a tentar perceber.\par
+\par
+N\'e3o consigo confirmar com certeza absoluta s\'f3 pela p\'e1gina do Facebook, porque:\par
+\par
+o nome comercial da p\'e1gina pode n\'e3o ser o nome legal;\par
+podem vender em nome pessoal;\par
+podem usar atividade aberta;\par
+podem usar empresa com outro nome.\par
+\par
+Mas pelo que aparece na imagem:\par
+\par
+p\'e1gina verificada;\par
+\ldblquote estabelecimento comercial\rdblquote ;\par
+morada p\'fablica;\par
+email;\par
+143 mil seguidores;\par
+\par
+o MAIS prov\'e1vel \'e9 que tenham algum tipo de estrutura legal.\par
+\par
+Especialmente porque:\par
+\par
+quem movimenta muito dinheiro normalmente acaba por precisar de:\par
+fornecedores;\par
+transportadoras;\par
+contas;\par
+compras grossistas;\par
+pagamentos organizados.\par
+\par
+E honestamente?\par
+O teu print mostra exatamente o tipo de seller que o Fleaber devia tentar conquistar.\par
+\par
+Porque ela j\'e1:\par
+\par
+sabe vender em live;\par
+j\'e1 tem audi\'eancia;\par
+j\'e1 percebe urg\'eancia;\par
+j\'e1 cria engagement.\par
+\par
+Tu n\'e3o precisas ensinar ecommerce.\par
+S\'f3 precisas dar:\par
+\par
+ferramenta melhor;\par
+mais convers\'e3o;\par
+menos caos.\par
+\par
+E repara numa coisa MUITO importante:\par
+\par
+Ela est\'e1 a usar:\par
+\par
+Facebook\par
+como \ldblquote infraestrutura improvisada\rdblquote .\par
+\par
+Ou seja:\par
+\par
+coment\'e1rios para reservar;\par
+MBWay manual;\par
+mensagens privadas;\par
+gest\'e3o ca\'f3tica;\par
+lives perdidas no feed.\par
+\par
+O Fleaber pode virar:\par
+\par
+\ldblquote a plataforma feita especificamente para isto.\rdblquote\par
+\par
+Isso \'e9 forte.\par
+\par
+O teu maior insight at\'e9 agora, na minha opini\'e3o, continua a ser este:\par
+\par
+j\'e1 existe comportamento de compra live em Portugal.\par
+\par
+Tu n\'e3o est\'e1s a tentar inventar h\'e1bito do zero.\par
+\par
+Isso reduz MUITO o risco do neg\'f3cio.\par
+\par
+Sobre a parte fiscal:\par
+essas sellers maiores provavelmente:\par
+\par
+j\'e1 t\'eam atividade;\par
+ou algu\'e9m lhes trata disso;\par
+ou est\'e3o parcialmente regularizadas.\par
+\par
+Porque com:\par
+\par
+dezenas de envios;\par
+pagamentos recorrentes;\par
+centenas de clientes;\par
+\par
+fica dif\'edcil operar \ldblquote invis\'edvel\rdblquote  muito tempo.\par
+\par
+Mas depois procura na net pesquisa por esse e-mail, por essa morada, por esse nome e v\'ea se tem resultados.\par
+\par
+Olha, encontrei sinais MUITO fortes de que isto j\'e1 \'e9 um neg\'f3cio relativamente profissionalizado e n\'e3o apenas uma senhora a vender informalmente no Facebook.\par
+\par
+Encontrei:\par
+\par
+site pr\'f3prio;\par
+app pr\'f3pria;\par
+morada p\'fablica;\par
+termos e condi\'e7\'f5es;\par
+livro de reclama\'e7\'f5es;\par
+presen\'e7a consistente online.\par
+Site\par
+\par
+Belas e Poderosas website\par
+\par
+No site aparece exatamente:\par
+\par
+Rua Alto da Coutada 81, Lousada;\par
+estrutura de ecommerce;\par
+p\'e1ginas legais t\'edpicas de loja online.\par
+App pr\'f3pria\par
+\par
+Tamb\'e9m encontrei uma app deles na App Store:\par
+\par
+Belas e Poderosas App Store\par
+\par
+E a descri\'e7\'e3o \'e9 MUITO interessante para ti, porque basicamente confirma o teu insight:\par
+\par
+\ldblquote acompanham os diretos nas redes sociais\rdblquote\par
+\ldblquote comprar de forma r\'e1pida e segura\rdblquote\par
+\ldblquote notifica\'e7\'f5es sobre pr\'f3ximos diretos\rdblquote\par
+\par
+Ou seja:\par
+eles j\'e1 perceberam o mesmo que tu:\par
+\par
+live selling funciona;\par
+Facebook sozinho \'e9 limitado;\par
+vale a pena ter plataforma pr\'f3pria.\par
+O que isto significa para o Fleaber\par
+\par
+Isto \'e9 importante:\par
+tu N\'c3O \'e9s o \'fanico a ver oportunidade.\par
+\par
+Mas tamb\'e9m confirma:\par
+\par
+o mercado existe;\par
+as sellers querem ferramentas melhores;\par
+h\'e1 dinheiro suficiente para criarem apps pr\'f3prias.\par
+E aqui est\'e1 o detalhe MAIS IMPORTANTE\par
+\par
+Mesmo com:\par
+\par
+143 mil seguidores;\par
+marca forte;\par
+app pr\'f3pria;\par
+\par
+eles aparentemente N\'c3O criaram:\par
+\par
+um marketplace multi-seller;\par
+uma comunidade estilo feira;\par
+um ecossistema tipo Whatnot/Vinted h\'edbrido.\par
+\par
+E a\'ed pode estar o teu espa\'e7o.\par
+\par
+A minha leitura honesta\par
+\par
+Esta p\'e1gina \'e9 um excelente sinal para ti.\par
+\par
+Porque prova:\par
+\par
+live commerce em roupa feminina funciona em Portugal;\par
+clientes j\'e1 compram assim;\par
+sellers investem nisso;\par
+audi\'eancia existe.\par
+\par
+Tu n\'e3o precisas evangelizar mercado do zero.\par
+\par
+Tu s\'f3 precisas:\par
+\par
+centralizar;\par
+simplificar;\par
+dar mais alcance;\par
+criar efeito rede entre sellers e compradoras.\par
+Ent\'e3o o que \'e9 que tu e aquelas est\'e3o a usar? Faz l\'e1 uma pesquisa a ver se consegues perceber.\par
+\par
+A minha aposta forte \'e9 que elas N\'c3O fizeram uma app de raiz como tu est\'e1s a fazer.\par
+\par
+O mais prov\'e1vel \'e9 que estejam a usar:\par
+\par
+Shopify ou WooCommerce;\par
+ligado a um \ldblquote app builder\rdblquote  Flutter/no-code;\par
+tipo FluxStore/FluxBuilder/Appmaker/etc.\par
+\par
+Porque a app delas parece MUITO o padr\'e3o dessas solu\'e7\'f5es prontas.\par
+\par
+E repara:\par
+na App Store aparece:\par
+\par
+developer individual \ldblquote Ricardo Gomes\rdblquote ;\par
+copyright \ldblquote Cubo M\'e1gico Design\rdblquote .\par
+\par
+Isso parece MUITO:\par
+\par
+ag\'eancia/webdesigner montou ecommerce + app wrapper.\par
+\par
+N\'e3o parece startup tecnol\'f3gica hardcore.\par
+\par
+O que provavelmente t\'eam por tr\'e1s\par
+\par
+Muito provavelmente algo tipo:\par
+\par
+Backend\par
+Shopify\par
+ou\par
+WooCommerce WordPress\par
+App\par
+template Flutter ecommerce;\par
+sincronizado com loja.\par
+Live selling\par
+continuam a usar Facebook/Instagram live.\par
+O detalhe MAIS importante para ti\par
+\par
+Eles N\'c3O parecem ter:\par
+\par
+sistema tipo Whatnot;\par
+multi-seller marketplace;\par
+live integrada nativamente;\par
+reservas em live integradas;\par
+chat realtime de compra;\par
+bidding;\par
+stock live sincronizado.\par
+\par
+Ou seja:\par
+a \ldblquote app pr\'f3pria\rdblquote  deles parece mais:\par
+\par
+ecommerce mobile companion.\par
+\par
+N\'e3o parece:\par
+\par
+plataforma social live-commerce.\par
+\par
+E isto \'e9 MUITO importante para o teu posicionamento\par
+\par
+Porque significa que:\par
+\par
+as sellers j\'e1 est\'e3o a sentir dores;\par
+mas est\'e3o a resolver com remendos.\par
+\par
+Tipo:\par
+\par
+Facebook live;\par
+Shopify;\par
+app wrapper;\par
+mensagens;\par
+MBWay;\par
+gest\'e3o manual.\par
+\par
+Tu est\'e1s a tentar fazer:\par
+\par
+sistema pensado de raiz para live selling.\par
+\par
+Isso \'e9 MUITO diferente.\par
+\par
+Honestamente?\par
+\par
+Quanto mais olho para isto, mais acho que:\par
+\par
+o teu insight \'e9 leg\'edtimo;\par
+o mercado existe MESMO;\par
+Portugal j\'e1 tem comportamento live-commerce;\par
+s\'f3 n\'e3o existe ainda uma plataforma vertical forte para isso.\par
+\par
+E sinceramente?\par
+A maioria destas lojas provavelmente:\par
+\par
+n\'e3o sabe programar;\par
+n\'e3o consegue construir tech s\'e9ria;\par
+depende de ag\'eancias/templates.\par
+\par
+Tu tens vantagem se conseguires:\par
+\par
+UX melhor;\par
+lives integradas;\par
+marketplace vivo;\par
+comunidade;\par
+sensa\'e7\'e3o de feira digital.\par
+\par
+Porque isso \'e9 mais dif\'edcil copiar do que:\par
+\par
+\ldblquote mais uma app de loja Shopify\rdblquote .\par
+}
+ 

@@ -1,0 +1,244 @@
+{\rtf1\ansi\ansicpg1252\deff0\nouicompat\deflang1033{\fonttbl{\f0\fnil\fcharset0 Calibri;}{\f1\fnil\fcharset1 Cambria Math;}{\f2\fnil\fcharset1 Segoe UI Symbol;}}
+{\colortbl ;\red0\green0\blue255;}
+{\*\generator Riched20 10.0.19041}{\*\mmathPr\mmathFont1\mwrapIndent1440 }\viewkind4\uc1 
+\pard\sa200\sl276\slmult1\f0\fs22\lang9  Estou a fazer uma APP de vendas e preciso de apis da inpost por exemplo como fa\'e7o isso?\par
+\par
+Para integrar os servi\'e7os de log\'edstica da InPost (como a sele\'e7\'e3o de cacifos/Ponto Pack e a gera\'e7\'e3o de etiquetas) na sua app de vendas, o processo \'e9 feito atrav\'e9s da plataforma unificada de desenvolvimento da InPost, cujo componente principal \'e9 a API ShipX (uma API RESTful que usa JSON e autentica\'e7\'e3o OAuth 2.0 / Bearer Token).\par
+\par
+Abaixo est\'e1 o passo a passo estruturado de como deve abordar esta integra\'e7\'e3o:\par
+1. Obter as Credenciais da API (ID da Organiza\'e7\'e3o e Token)\par
+\par
+Antes de escrever qualquer linha de c\'f3digo, precisa de criar um acesso oficial para a sua aplica\'e7\'e3o:\par
+\par
+    Criar/Aceder \'e0 Conta: Fa\'e7a login no painel de gest\'e3o de envios da InPost (por exemplo, no Manager de Encomendas/Ponto Pack).\par
+\par
+    Gerar Acesso: V\'e1 \'e0 sec\'e7\'e3o "A minha conta" ou "Defini\'e7\'f5es da Organiza\'e7\'e3o" -> API ShipX.\par
+\par
+    Recolher os Dados: Clique em gerar para obter:\par
+\par
+        ID da Organiza\'e7\'e3o (organization_id)\par
+\par
+        Token de Acesso (Bearer Token)\par
+\par
+    Geowidget Token: Se planeia usar o mapa oficial da InPost para o cliente escolher o ponto de recolha na app, gere tamb\'e9m um token espec\'edfico para o Geowidget.\par
+\par
+2. Principais Funcionalidades a Implementar\par
+\par
+Uma integra\'e7\'e3o completa de e-commerce com a InPost envolve normalmente tr\'eas fluxos na sua aplica\'e7\'e3o:\par
+A. Sele\'e7\'e3o do Ponto de Recolha (Lockers / Ponto Pack)\par
+\par
+No momento do checkout, o utilizador precisa de escolher onde quer receber a encomenda.\par
+\par
+    Op\'e7\'e3o Webview/Widget: Pode embutir o componente oficial deles (Geowidget), que carrega um mapa interativo com os pontos dispon\'edveis.\par
+\par
+    Op\'e7\'e3o Direct API: Fazer um pedido GET \'e0 API de localiza\'e7\'f5es da InPost filtrando pelas coordenadas, c\'f3digo postal ou cidade do utilizador para listar os pontos mais pr\'f3ximos diretamente na interface nativa da sua app.\par
+\par
+B. Cria\'e7\'e3o da Encomenda e Envio de Dados (POST /shipments)\par
+\par
+Assim que o pagamento \'e9 confirmado na sua app, o seu backend deve comunicar com a InPost para registar o envio. Envia-se um JSON contendo:\par
+\par
+    Dados do remetente e do destinat\'e1rio.\par
+\par
+    O ID do ponto InPost escolhido pelo cliente (caso n\'e3o seja entrega ao domic\'edlio).\par
+\par
+    Dimens\'f5es e peso estimado da embalagem.\par
+\par
+C. Gera\'e7\'e3o e Impress\'e3o de Etiquetas (GET /shipments/\{id\}/label)\par
+\par
+Ap\'f3s criar o envio, o sistema da InPost gera o n\'famero de rastreio e o PDF da etiqueta de transporte (geralmente nos formatos PDF, ZPL ou EPL para impressoras t\'e9rmicas). O seu painel de administra\'e7\'e3o da app deve descarregar este ficheiro para que possa col\'e1-lo na caixa.\par
+3. Estrutura B\'e1sica de Integra\'e7\'e3o T\'e9cnica\par
+\par
+Como a API \'e9 baseada no padr\'e3o REST, a comunica\'e7\'e3o \'e9 feita atrav\'e9s de pedidos HTTP normais. O cabe\'e7alho (Header) de todas as requisi\'e7\'f5es deve incluir a autentica\'e7\'e3o:\par
+HTTP\par
+\par
+Authorization: Bearer SEU_TOKEN_AQUI\par
+Content-Type: application/json\par
+\par
+Exemplo conceptual de cria\'e7\'e3o de envio (Endpoint T\'edpico):\par
+HTTP\par
+\par
+POST {{\field{\*\fldinst{HYPERLINK https://api-shipx-pl.inpost.pl/v1/organizations/\{organization_id\}/shipments }}{\fldrslt{https://api-shipx-pl.inpost.pl/v1/organizations/\{organization_id\}/shipments\ul0\cf0}}}}\f0\fs22\par
+\par
+(Nota: O dom\'ednio base exato e a vers\'e3o do endpoint dependem do ambiente de testes/produ\'e7\'e3o fornecido pela documenta\'e7\'e3o oficial do grupo).\par
+4. Alternativa R\'e1pida: Agregadores de Envio (Multi-transportadoras)\par
+\par
+Se achar a integra\'e7\'e3o direta com a API da InPost muito complexa ou se no futuro pretender adicionar outras transportadoras (como DPD, CTT, UPS, etc.) sem ter de programar uma API nova para cada uma, pode usar intermedi\'e1rios de log\'edstica que oferecem uma API \'danica:\par
+\par
+    Sendcloud\par
+\par
+    Qapla'\par
+\par
+    Voila\par
+\par
+Vantagem: Integra uma \'fanica API REST no seu c\'f3digo e ganha acesso imediato \'e0 InPost e a dezenas de outros servi\'e7os de transporte, uniformizando o formato das etiquetas e o rastreio.\par
+Pr\'f3ximos Passos recomendados:\par
+\par
+    Pe\'e7a ao seu gestor de conta ou consulte o portal de programadores da InPost (developers.inpost-group.com) para obter acesso ao Ambiente de Sandbox (Testes).\par
+\par
+    Desenvolva o fluxo no seu backend para manter o token e o ID de organiza\'e7\'e3o seguros (nunca exponha o token diretamente no c\'f3digo front-end da app).\par
+\par
+Mas onde obtenho os apis\par
+\par
+Para obter os dados de acesso e a documenta\'e7\'e3o da API, o processo \'e9 feito inteiramente online atrav\'e9s dos portais do Grupo InPost.\par
+\par
+Como a InPost opera a n\'edvel europeu, o ecossistema de desenvolvimento est\'e1 centralizado num portal global. Aqui est\'e1 exatamente onde tem de ir para obter o que precisa:\par
+1. Onde encontrar a Documenta\'e7\'e3o Oficial?\par
+\par
+Toda a especifica\'e7\'e3o t\'e9cnica da API (endpoints, formatos de JSON, c\'f3digos de erro) est\'e1 centralizada no portal de programadores do grupo:\par
+\par
+    Site: {{\field{\*\fldinst{HYPERLINK https://developers.inpost-group.com/ }}{\fldrslt{https://developers.inpost-group.com/\ul0\cf0}}}}\f0\fs22\par
+\par
+    O que fazer l\'e1: V\'e1 \'e0 sec\'e7\'e3o ShipX API (que \'e9 o nome do sistema de gest\'e3o de envios deles). L\'e1 encontrar\'e1 a refer\'eancia completa da API e os exemplos de c\'f3digo para criar envios, etiquetas e consultar pontos de recolha.\par
+\par
+2. Onde obter as Chaves de API (Token e ID)?\par
+\par
+Para gerar o Token de produ\'e7\'e3o e o ID da Organiza\'e7\'e3o necess\'e1rios para autenticar os seus pedidos HTTP, precisa de ter uma conta de cliente profissional (contrato) com a InPost.\par
+\par
+    Aceda ao painel de gest\'e3o onde costuma preparar os seus envios (em Portugal, geralmente atrav\'e9s do InPost Web Manager / antiga plataforma Mondial Relay).\par
+\par
+    Fa\'e7a login com as suas credenciais de empresa.\par
+\par
+    No menu lateral ou nas defini\'e7\'f5es de perfil, procure por "Par\'e2metros", "Configura\'e7\'e3o da Organiza\'e7\'e3o" ou diretamente "Integra\'e7\'e3o / API".\par
+\par
+    L\'e1 ver\'e1 o seu ID de Organiza\'e7\'e3o (um c\'f3digo num\'e9rico ou UUID) e a op\'e7\'e3o para Gerar Token (uma chave longa de texto).\par
+\par
+3. Como obter Acesso ao Ambiente de Testes (Sandbox)?\par
+\par
+Nunca deve testar a cria\'e7\'e3o de etiquetas diretamente no ambiente de produ\'e7\'e3o, caso contr\'e1rio poder\'e1 gerar custos ou ordens de recolha reais.\par
+\par
+Para obter credenciais de teste:\par
+\par
+    No portal de programadores (developers.inpost-group.com), procure a sec\'e7\'e3o de Suporte / Contacto ou o bot\'e3o de Registo em Sandbox.\par
+\par
+    Caso o registo autom\'e1tico n\'e3o esteja aberto, deve enviar um e-mail para o suporte de integra\'e7\'e3o da InPost (o contacto espec\'edfico costuma estar listado no portal de developers ou \'e9 fornecido pelo seu gestor de conta comercial).\par
+\par
+    Eles fornecer\'e3o:\par
+\par
+        Um endpoint URL espec\'edfico para testes (ex: [{{\field{\*\fldinst{HYPERLINK https://sandbox-api-shipx-pl.inpost.pl/](https://sandbox-api-shipx-pl.inpost.pl/) }}{\fldrslt{https://sandbox-api-shipx-pl.inpost.pl/](https://sandbox-api-shipx-pl.inpost.pl/)\ul0\cf0}}}}\f0\fs22 ).\par
+\par
+        Um Token de testes e um ID de organiza\'e7\'e3o fict\'edcio para poder simular compras e gera\'e7\'e3o de etiquetas \'e0 vontade na sua APP de vendas.\par
+\par
+Fui ao linke de deste da inpost o que tenho de fazer agora?\par
+\par
+Boa! J\'e1 est\'e1s no s\'edtio certo. Essa \'e9 a p\'e1gina principal da documenta\'e7\'e3o t\'e9cnica unificada da InPost (Mondial Relay).\par
+\par
+Como j\'e1 est\'e1s a\'ed, o processo para come\'e7ares a integrar divide-se em duas partes: entender a autentica\'e7\'e3o e obter os dados para testar. Segue estes passos ordenadamente:\par
+Passo 1: Ler a sec\'e7\'e3o de Autentica\'e7\'e3o\par
+\par
+No teu ecr\'e3, clica em "Leia mais \f1\u8594?\f0 " logo abaixo de Autentica\'e7\'e3o.\par
+\par
+    L\'e1 vai explicar exatamente como deves estruturar o cabe\'e7alho (Header) dos teus pedidos HTTP.\par
+\par
+    Geralmente, vais precisar de enviar um par\'e2metro chamado Authorization com o valor Bearer SEU_TOKEN_AQUI. \'c9 crucial perceberes isto porque nenhum outro endpoint (criar encomendas, ver cacifos) vai funcionar sem a autentica\'e7\'e3o estar correta.\par
+\par
+Passo 2: Conseguir as chaves para o ambiente de testes (Sandbox)\par
+\par
+Para fazeres chamadas reais a esta API que est\'e1s a ver no ecr\'e3, precisas de um Token e de um ID de Organiza\'e7\'e3o. Como est\'e1s a desenvolver a APP, precisas da vers\'e3o de testes (Sandbox).\par
+\par
+    Abre o menu lateral desse site (os tr\'eas tra\'e7os \f2\u9776?\f0  no canto superior esquerdo).\par
+\par
+    Procura por sec\'e7\'f5es chamadas "Sandbox", "Testing" ou "Getting Started".\par
+\par
+    Se houver um formul\'e1rio de registo para developers, preenche-o para receberes as chaves de teste no teu e-mail automaticamente.\par
+\par
+    Se n\'e3o encontrares um bot\'e3o de registo autom\'e1tico: Vais precisar de contactar o suporte ou o teu gestor comercial da InPost/Mondial Relay Portugal e pedir: "Acesso ao ambiente de Sandbox da nova API global para integra\'e7\'e3o numa aplica\'e7\'e3o pr\'f3pria". Eles criam uma conta de testes e enviam-te as credenciais por e-mail em poucas horas.\par
+\par
+Passo 3: O que procurar a seguir no menu \f2\u9776?\f0\par
+\par
+Assim que tiveres as chaves de teste, volta a esse site, abre o menu e foca-te nestes tr\'eas pontos para come\'e7ares a programar no teu backend/Cursor:\par
+\par
+    Points / Points Download: \'c9 a API que vais usar para ir buscar a lista ou o mapa de cacifos (Lockers) e Pontos Pack baseados na localiza\'e7\'e3o do comprador da tua app.\par
+\par
+    Shipments (Criar Envio): O endpoint para onde vais enviar o JSON com os dados da venda (quem compra, quem vende e o ID do ponto de recolha escolhido).\par
+\par
+    Labels (Etiquetas): O endpoint que vais chamar logo a seguir a criar o envio para descarregares o PDF da etiqueta de transporte.\par
+\par
+Obter as Credenciais da API (ID da Organiza\'e7\'e3o e Token)\par
+\par
+Antes de escrever qualquer linha de c\'f3digo, precisa de criar um acesso oficial para a sua aplica\'e7\'e3o:\par
+\par
+Criar/Aceder \'e0 Conta: Fa\'e7a login no painel de gest\'e3o de envios da InPost (por exemplo, no Manager de Encomendas/Ponto Pack).\par
+\par
+Gerar Acesso: V\'e1 \'e0 sec\'e7\'e3o "A minha conta" ou "Defini\'e7\'f5es da Organiza\'e7\'e3o" -> API ShipX.\par
+\par
+\par
+J\'e1 tenho conta e j\'e1 fiz login n\'e3o vejo nada disso\par
+\par
+\'c9 perfeitamente normal n\'e3o encontrares isso \'e0 primeira vista. Como a InPost comprou a Mondial Relay, o painel de cliente e o portal de developers andam a passar por uma transi\'e7\'e3o e, muitas vezes, as op\'e7\'f5es de integra\'e7\'e3o ficam "escondidas" por quest\'f5es de seguran\'e7a.\par
+\par
+Se j\'e1 est\'e1s dentro do teu painel de gest\'e3o de envios habitual da InPost (Mondial Relay) e n\'e3o v\'eas a sec\'e7\'e3o "API ShipX" ou "Defini\'e7\'f5es da Organiza\'e7\'e3o", deves resolver isso de duas formas:\par
+Op\'e7\'e3o 1: O teu perfil de conta pode estar como "Cliente Particular" ou "Standard"\par
+\par
+As chaves de API s\'f3 aparecem para contas que est\'e3o configuradas como Contas Pro / Empresa ou que t\'eam um contrato comercial ativo.\par
+\par
+    Procura no menu do teu painel se existe alguma sec\'e7\'e3o de "Perfil" ou "A Minha Conta" e verifica o tipo de conta.\par
+\par
+    Se for uma conta standard criada diretamente no site para envios ocasionais, o bot\'e3o da API n\'e3o vai aparecer no menu de forma autom\'e1tica.\par
+\par
+Op\'e7\'e3o 2: Ativa\'e7\'e3o manual via Suporte (O mais frequente)\par
+\par
+Na maioria dos casos em Portugal e Espanha, para a plataforma libertar o ID da Organiza\'e7\'e3o e o Token, precisas de pedir a ativa\'e7\'e3o ao suporte t\'e9cnico de integra\'e7\'e3o.\par
+\par
+Podes faz\'ea-lo diretamente atrav\'e9s do formul\'e1rio de contacto que est\'e1 dentro do pr\'f3prio painel onde est\'e1s logado, ou enviando um e-mail para o teu contacto comercial da InPost, com o seguinte texto:\par
+\par
+    "Bom dia,\par
+    Estou a desenvolver uma aplica\'e7\'e3o pr\'f3pria de e-commerce e preciso de integrar os vossos servi\'e7os de envio atrav\'e9s da nova API ShipX. J\'e1 tenho conta de cliente ativa, mas n\'e3o tenho vis\'edvel no meu painel o ID da Organiza\'e7\'e3o nem a op\'e7\'e3o para gerar o Token de acesso.\par
+    Poderiam, por favor, ativar o acesso \'e0 API na minha conta ou fornecer-me as credenciais (ID da Organiza\'e7\'e3o e Token de Produ\'e7\'e3o/Testes)?\par
+    O meu ID de cliente/E-mail de conta \'e9: [Teu E-mail/ID]"\par
+\par
+Enquanto esperas, podes avan\'e7ar no c\'f3digo?\par
+\par
+Sim, podes! Se est\'e1s a usar o Cursor ou a programar o teu backend, podes pedir-lhe para construir a l\'f3gica estrutural da integra\'e7\'e3o usando "valores fict\'edcios" (placeholders).\par
+\par
+A API da InPost segue um padr\'e3o muito r\'edgido. Podes adiantar o c\'f3digo criando uma vari\'e1vel para o organization_id e outra para o bearer_token. Quando eles te responderem com as credenciais reais, \'e9 s\'f3 col\'e1-las nessas vari\'e1veis e tudo come\'e7ar\'e1 a comunicar.\par
+\par
+Ent\'e3o e os apis da dpd\par
+\par
+A DPD funciona de forma bastante parecida \'e0 InPost no que toca \'e0 l\'f3gica de integra\'e7\'e3o (tamb\'e9m t\'eam APIs para listar pontos de recolha, criar envios e gerar etiquetas), mas o processo para obter os acessos \'e9 um pouco mais tradicional e focado em contacto direto.\par
+\par
+Para come\'e7ares a trabalhar com a API da DPD, o caminho exato \'e9 este:\par
+1. Onde est\'e1 a Documenta\'e7\'e3o e o Portal de Developers?\par
+\par
+A DPD em Portugal utiliza uma plataforma centralizada para os programadores. Podes aceder diretamente aqui:\par
+\par
+    Site do Portal: {{\field{\*\fldinst{HYPERLINK https://developer.dpd.pt/ }}{\fldrslt{https://developer.dpd.pt/\ul0\cf0}}}}\f0\fs22\par
+\par
+    O que vais encontrar l\'e1: A documenta\'e7\'e3o completa das APIs REST (as mais recentes) e dos Web Services antigos (SOAP/XML). Foca-te nas APIs REST, pois s\'e3o muito mais simples de integrar na tua app usando JSON.\par
+\par
+2. Como obter as Credenciais (Acesso \'e0 API)?\par
+\par
+Ao contr\'e1rio de outras plataformas onde geras o token com um clique, a DPD exige que passes por uma valida\'e7\'e3o comercial antes de te libertarem o acesso ao ambiente de testes (Sandbox) e produ\'e7\'e3o.\par
+\par
+    Tens de ter Conta Contrato: Para usar as APIs da DPD, precisas obrigatoriamente de ter uma conta de cliente empresarial com contrato (fatura\'e7\'e3o mensal). Se usas a DPD apenas como particular para envios espor\'e1dicos, eles n\'e3o fornecem chaves de API.\par
+\par
+    Pedir o Acesso:\par
+\par
+        No portal de developers deles, costuma haver um bot\'e3o de "Registo" ou "Pedir Acesso".\par
+\par
+        Em alternativa (e costuma ser o mais r\'e1pido em Portugal), deves enviar um e-mail ao teu gestor de conta comercial da DPD ou para o suporte t\'e9cnico deles (suporte.tecnico@dpd.pt), dizendo que est\'e1s a desenvolver uma plataforma/APP pr\'f3pria e precisas das credenciais para a API REST de envios.\par
+\par
+3. O que vais receber deles?\par
+\par
+Assim que eles aprovarem o teu pedido, v\'e3o enviar-te:\par
+\par
+    Um Username e Password espec\'edficos para a API (ou um Client ID e Client Secret).\par
+\par
+    O teu n\'famero de contrato (geralmente chamado de User ID ou Customer Number).\par
+\par
+Na DPD, para fazeres qualquer pedido \'e0 API, primeiro fazes um pedido de POST enviando as tuas credenciais para o endpoint de autentica\'e7\'e3o, e eles devolvem-te um Token de Acesso tempor\'e1rio que usas nas chamadas seguintes.\par
+4. Quais s\'e3o os Endpoints principais da DPD que vais usar?\par
+\par
+Depois de teres os acessos no portal de developers, a tua app vai comunicar principalmente com estes servi\'e7os:\par
+\par
+    DPD Pickup Network API: Para listar as lojas e cacifos da rede "Pickup" da DPD, permitindo ao teu cliente escolher onde quer levantar a encomenda se n\'e3o quiser entrega ao domic\'edlio.\par
+\par
+    Shipment Creation API: Para enviar os dados da encomenda e criar a guia de transporte.\par
+\par
+    Label API: Para descarregar a etiqueta (em PDF ou formato t\'e9rmico ZPL).\par
+\par
+Se j\'e1 est\'e1s a estruturar o backend da tua APP, a l\'f3gica \'e9 id\'eantica \'e0 da InPost: deixas os campos de autentica\'e7\'e3o preparados num ficheiro de configura\'e7\'e3o e, assim que a DPD te validar a conta de testes no portal deles, est\'e1s pronto a disparar os pedidos.\par
+\par
+\par
+O Gemini \'e9 IA e pode cometer erros, inclusive sobre pessoas. A sua privacidade e o GeminiAbre uma nova janela\lang9\par
+}
+ 

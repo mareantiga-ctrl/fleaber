@@ -1,0 +1,73 @@
+---
+description: Regras BATATA para operações live (saco, checkout, esgotado, pagamentos vendedor). Ler ANTES de editar estes ficheiros.
+globs:
+  - lib/fleaber_live_player/**
+  - lib/widgets/live_bag_checkout_sheet.dart
+  - lib/widgets/live_vendor_studio_panel.dart
+  - lib/widgets/live_vendor_ops_ui.dart
+  - lib/widgets/live_vendor_catalog_card.dart
+  - lib/utils/live_reservation_queue_service.dart
+  - lib/utils/live_in_stream_checkout.dart
+  - lib/utils/live_room_service.dart
+  - supabase/sql/live_ops_hotfix_batata.sql
+  - docs/live-ops-testes-batata.md
+---
+
+# Live ops — regras BATATA (não repetir no chat)
+
+## Regra principal
+
+- **Não apagar, desactivar nem substituir funcionalidades** sem autorização explícita do utilizador.
+- Alterações **mínimas** e focadas no pedido.
+- Se achares que precisas mudar comportamento existente, **explica o porquê** e espera decisão.
+
+## Documento de testes (obrigatório)
+
+- Ficheiro único: `docs/live-ops-testes-batata.md`
+- **Só** entradas por validar (⬜ ou ❌). Apagar do documento o que o utilizador marcar ✅.
+- Testes **sempre numerados** (1, 2, 3…), sem secções A/B duplicadas.
+- Registar pedidos novos do utilizador neste ficheiro + regras aqui, para não repetir no chat.
+- Antes de cada alteração nesta área: ler este ficheiro + o doc de testes.
+
+## Esgotado / indisponível
+
+- Badge **ESGOTADO** (`reserved_full`) **só** após reserva **aceite** a cobrir stock — **nunca** só por `pending`.
+- Reservas permitidas com fila cheia / vendido (lista de espera).
+- `isSoldOut` **não** usar só `available_qty <= 0`.
+
+## Checkout comprador
+
+- Checkout no **player live** — não navegar para página do artigo.
+- Saco multi-ref: **um** Stripe; mesma ref: uma linha, qty agregada.
+- **Portes no checkout live** (sempre visíveis):
+  - Transportadora: **3,50 €** fixos (`Envio Transportadora (€3.50)`).
+  - Entrega em mão: **0 €**.
+  - Seguro Fleaber (pagamento na app): **0,65 € + 5%** sobre (valor artigos + portes).
+  - Mostrar breakdown: artigos + portes + seguro + total.
+
+## Reservas canceladas (vendedora)
+
+- Comprador cancela (`bag_removed` / `rejected`): **sem** Aceitar/Recusar na fila, operações nem actividade «adicionou ao saco».
+- Aceites cancelados: fora da aba Aceites; em Pagamentos → «Cancelados pelo comprador».
+
+## Chat vendedora
+
+- Nome no chat = **`profiles.full_name`** (username na app), incluindo mensagens da própria vendedora.
+
+## Stock após «vendido»
+
+- Editar quantidade no catálogo deve **repor stock** e badge (SQL `batata_live_item_stock` + `batata_recompute`).
+- Barra de acções do artigo activo (**Mostrar / vendido / etc.**) **activa** quando há stock disponível.
+
+## Pagamentos vendedor
+
+- Stripe `pago` → `live_id`, valor vendido, tab Pagamentos.
+
+## Logging
+
+- Studio: só `live_vendor_studio_logs` — não `app_logs` genérico.
+
+## UI fixa (não alterar sem combinar)
+
+- Layout player live, Mux/LiveKit — `live-streaming.mdc`.
+- `FleaberCreateSheet`, `FleaberPrimaryButton`.

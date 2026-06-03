@@ -1,0 +1,68 @@
+---
+description: Diretos Mux / HaishinKit — convenções Fleaber
+globs:
+  - lib/vendedor/**
+  - lib/fleaber_live_player/**
+  - lib/widgets/home_*live*
+  - lib/web/lives_web_dashboard_widget.dart
+  - supabase/functions/create-mux-live/**
+  - supabase/functions/livekit-mux-publish/**
+  - supabase/sql/live_streaming_mux_batata.sql
+  - supabase/sql/live_streaming_livekit_batata.sql
+  - lib/utils/live_publish_config.dart
+  - lib/vendedor/livekit_*
+---
+
+# Live streaming (Mux + HaishinKit / LiveKit POC)
+
+## LiveKit POC (MTK — aditivo, BATATA)
+- Flag: `lib/utils/live_publish_config.dart` → `kLivePublishBackend`.
+- **livekit_mux**: telemóvel publica WebRTC (`livekit_client`); servidor faz egress RTMP → Mux (`livekit-mux-publish`).
+- **Viewers / Home / player**: inalterados — continuam `MuxUrls.playbackHls` + `FleaberLivePlayerWidget`.
+- Edge Function `livekit-mux-publish`: `step=token` | `step=egress`. Secrets: `LIVEKIT_URL`, `LIVEKIT_API_KEY`, `LIVEKIT_API_SECRET`.
+- SQL: `live_streaming_livekit_batata.sql` (colunas `publish_backend`, `livekit_room_name`, `livekit_egress_id`).
+- Ramo **HaishinKit RTMP** mantido em `criar_directo_page_widget.dart` quando `kLivePublishBackend == muxRtmp`.
+
+# Live streaming (Mux + HaishinKit)
+
+## Regra BATATA (layout)
+- **Não remover nem alterar layout/UI** do player, perfil ou Home sem combinar com o utilizador.
+- O carrossel de **cards de artigos** no fundo do `FleaberLivePlayerWidget` é obrigatório.
+- Um card visível de cada vez (`PageView`); indicação subtil «Desliza →» se houver mais cards.
+- Cache local do catálogo: `LiveCatalogCache` (SharedPreferences).
+
+## Dados Supabase (`lives`)
+- Colunas Mux: `mux_playback_id`, `mux_stream_key`, `status` (`live` | `ended`), `is_active`.
+- A Home lista apenas `status = live` e `is_active = true`.
+- Credenciais Mux só na Edge Function `create-mux-live`, nunca no cliente.
+
+## Publicar (vendedor) — causa raiz áudio-sem-vídeo
+- **Nunca** usar o pacote `camera` na mesma página que HaishinKit: no Android o RTMP liga com **só AAC** (track vídeo vazia).
+- **Só HaishinKit** em `CriarDirectoPageWidget`, como o exemplo oficial `publish_page.dart`.
+- **Ao abrir:** `MediaMixer` + `attachVideo` + `startRunning` + `StreamSession` preview (sem `connect`); textura só quando `_haishinPreviewReady`.
+- **Ao «Iniciar Direto»:** `create-mux-live` → fechar sessão preview → `StreamSession.create` com stream key → `videoSettings` → `connect()`; **manter o mesmo mixer**.
+- RTMP Mux: `rtmp://global-live.mux.com:5222/app/{stream_key}`.
+- Vídeo Mux: H.264 + AAC; `720×1280`, ~2,5 Mbps, keyframe ~2 s (`VideoCodecSettings` default baseline).
+- `CaptureSessionMode.multi` (exemplo HaishinKit).
+- Iniciar em `addPostFrameCallback`; esperar ~900 ms após `startRunning` antes da sessão/textura.
+- Evitar `BackdropFilter` na página de transmitir (GPU).
+- Ao terminar: `close()` da sessão publish, update `lives`, `pop`.
+
+## Ver direto (comprador)
+- HLS: `MuxUrls.playbackHls` → `…m3u8?reduced_latency=true`.
+- Vídeo em ecrã cheio: `Positioned.fill` + `FlutterFlowVideoPlayer` (layout BATATA intacto).
+- Áudio: `startMuted: false` em mobile.
+
+## Home
+- Feed em **grelha 2 colunas** (`HomeLiveFeedGrid`), lazy load com `.range(from, to)`.
+- Thumbnails portrait: `MuxUrls.portraitThumbnail` (width ~200 na Home).
+- `AutomaticKeepAliveClientMixin` — não refazer fetch ao mudar tab Marketplace↔Diretos.
+- Refresh só via `requestLiveFeedRefresh()` / pesquisa, não em cada tab switch.
+
+## Perfil (aba Diretos)
+- `ProfileLivesTab`: `status=live` (hero) + `status=ended` (grelha «Diretos anteriores»).
+- Home: `status=live` primeiro (recente→antigo), depois até 50 `status=ended` (badge GRAVADO); gravações ficam na Home após terminar.
+- Cards: toque no card → player; nome → `PerfilVendedor` (aba diretos); estrelas → `PerfilVendedor` (`initialTab=opinioes`).
+
+## Web
+- Painel: `/diretos-web` — filtros **antes** de `.order()` / `.limit()` no Postgrest.

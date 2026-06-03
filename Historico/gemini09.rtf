@@ -1,0 +1,211 @@
+{\rtf1\fbidis\ansi\ansicpg1252\deff0\nouicompat\deflang1033{\fonttbl{\f0\fnil\fcharset0 Calibri;}{\f1\fnil Calibri;}{\f2\fnil\fcharset1 Segoe UI Symbol;}{\f3\fnil\fcharset1 Cambria Math;}{\f4\fnil\fcharset1 Segoe UI Emoji;}}
+{\*\generator Riched20 10.0.19041}{\*\mmathPr\mmathFont3\mwrapIndent1440 }\viewkind4\uc1 
+\pard\sa200\sl276\slmult1\f0\fs22\lang9  D\'e1 para iniciar um direto no Facebook sem que as outras pessoas me vejam\par
+\par
+N\'e3o d\'e1 para fazer uma transmiss\'e3o em direto (Live) no Facebook onde as pessoas assistam mas n\'e3o consigam ver a tua imagem ou o teu ecr\'e3, porque o prop\'f3sito do "direto" \'e9 precisamente a transmiss\'e3o de v\'eddeo em tempo real.\par
+\par
+No entanto, dependendo do teu objetivo secund\'e1rio, existem tr\'eas alternativas que podes usar para contornar isso:\par
+1. Fazer um direto apenas com \'c1udio (Live Audio)\par
+\par
+O Facebook permite iniciar uma transmiss\'e3o em direto onde apenas o som \'e9 transmitido. Em vez de v\'eddeo, as pessoas v\'e3o ver a tua foto de perfil e uma onda sonora no ecr\'e3.\par
+\par
+    Como fazer: Ao abrir a op\'e7\'e3o de "Direto" na app do telem\'f3vel, procura pelas op\'e7\'f5es de configura\'e7\'e3o (nos tr\'eas pontos ou no menu de formato) e seleciona "Emitir apenas \'e1udio" ou o \'edcone de um microfone.\par
+\par
+2. Mudar a privacidade para fazer testes (Ningu\'e9m te v\'ea)\par
+\par
+Se queres iniciar um direto em v\'eddeo mas n\'e3o queres que absolutamente ningu\'e9m te veja (por exemplo, para testar a c\'e2mara, o som ou a liga\'e7\'e3o), podes alterar o p\'fablico da transmiss\'e3o.\par
+\par
+    Como fazer: Antes de clicar em "Iniciar v\'eddeo ao vivo", muda a privacidade de "P\'fablico" ou "Amigos" para "Apenas eu". O direto come\'e7ar\'e1, mas ficar\'e1 totalmente invis\'edvel para os outros.\par
+\par
+3. Transmitir o ecr\'e3 do telem\'f3vel/PC (Em vez da tua cara)\par
+\par
+Se queres mostrar um jogo, uma aplica\'e7\'e3o ou um documento sem aparecer a tua cara, podes partilhar o ecr\'e3 do teu dispositivo.\par
+\par
+    No PC: Usando o Facebook Live Studio, podes escolher partilhar uma janela ou o ecr\'e3 inteiro.\par
+\par
+    No Telem\'f3vel: Ao iniciar o direto, procura a op\'e7\'e3o de "Partilhar Ecr\'e3". Assim, o teu p\'fablico ver\'e1 o que est\'e1s a fazer no telem\'f3vel, mas a tua c\'e2mara frontal fica desligada.\par
+\par
+Qual destas op\'e7\'f5es se adequa melhor ao que est\'e1s a tentar fazer?\par
+\par
+N\'e3o est\'fapido, quero iniciar um direto s\'f3 para experimentar mas n\'e3o quero que os meus amigos vejam e saibam que estou em direto\par
+\par
+Para fazer esse teste sem que ningu\'e9m receba qualquer notifica\'e7\'e3o ou veja que est\'e1s em direto, a solu\'e7\'e3o \'e9 alterar a defini\'e7\'e3o de privacidade antes de iniciar:\par
+\par
+    Abre a c\'e2mara para o direto no Facebook.\par
+\par
+    Antes de carregar no bot\'e3o azul de "Iniciar v\'eddeo ao vivo", procura a op\'e7\'e3o que diz "P\'fablico" (ou "Amigos").\par
+\par
+    Clica a\'ed e seleciona "Apenas eu" (ou "S\'f3 eu").\par
+\par
+    Agora, ao iniciar o direto, o Facebook n\'e3o envia notifica\'e7\'f5es aos teus amigos e ningu\'e9m conseguir\'e1 ver a transmiss\'e3o, nem no feed nem na tua p\'e1gina.\par
+\par
+Desta forma, podes testar \'e0 vontade, ver como o \'e1udio e a imagem ficam, sem que ningu\'e9m saiba que est\'e1s a transmitir. Depois de terminares, basta apagar o v\'eddeo que ficar\'e1 guardado no teu perfil (e que, como est\'e1 privado, s\'f3 tu podes ver).\par
+\par
+Investigando como a verifica\'e7\'e3o por telem\'f3vel est\'e1 implementada e o que falta configurar para os SMS chegarem.\par
+\par
+\par
+A parte da app j\'e1 est\'e1 feita; o que falta para o SMS chegar ao telem\'f3vel n\'e3o se resolve s\'f3 com c\'f3digo \f1\emdash  tens de configurar o provedor SMS no Supabase (ou dar-me credenciais Twilio para eu documentar o passo a passo exacto). Eu n\f0\'e3o consigo ligar Twilio \'e0 tua conta Supabase daqui sem acesso ao teu painel.\par
+\par
+O que j\'e1 existe no projeto\par
+\par
+Pe\'e7aEstadoRegisto guarda phone no perfil\par
+\par
+\f2\u9989?\f1  \f0 registo_widget.dart\par
+\par
+Bottom sheet SMS ap\'f3s registo\par
+\par
+\f2\u9989?\f1  \f0 phone_verify_sheet.dart\par
+\par
+Envio/valida\'e7\'e3o OTP\par
+\par
+\f2\u9989?\f1  \f0 PhoneVerificationService \f3\u8594?\f1  \f0 Supabase Auth (updateUser + resend + verifyOTP tipo phoneChange)\par
+\par
+Coluna phone_verified_at\par
+\par
+\f2\u9989?\f1  \f0 SQL supabase/sql/profiles_phone_verified_batata.sql\par
+\par
+N\'e3o h\'e1 edge function Fleaber a enviar SMS \f1\emdash  \f0\'e9 s\'f3 Supabase Auth.\par
+\par
+Porque o telem\'f3vel n\'e3o recebe o c\'f3digo\par
+\par
+No projeto hosted (fxdknzrqjenzqcvnwqqq), por defeito n\'e3o h\'e1 SMS real at\'e9 configurares um provider (quase sempre Twilio).\par
+\par
+Sem isso a app pode:\par
+\par
+mostrar erro vermelho no sheet (ex. \f1\ldblquote\f0 SMS provider not configured\f1\rdblquote\f0 ), ou\par
+\par
+parecer que \f1\ldblquote\f0 enviou\f1\rdblquote  \f0 mas nenhum SMS sai.\par
+\par
+O que tens de fazer tu (painel Supabase)\par
+\par
+SQL (se ainda n\'e3o correste): no SQL Editor, executar supabase/sql/profiles_phone_verified_batata.sql.\par
+\par
+Supabase Dashboard \f3\u8594?\f1  \f0 projeto Fleaber \f3\u8594?\f1  \f0 Authentication \f3\u8594?\f1  \f0 Providers (ou Phone):\par
+\par
+Activar confirma\'e7\'e3o de telem\'f3vel / phone change (conforme o painel actual).\par
+\par
+Em SMS / Twilio: preencher Account SID, Auth Token, e Messaging Service SID ou n\'famero From (E.164, ex. +351\f1\'85\f0 ).\par
+\par
+Conta Twilio (twilio.com):\par
+\par
+Trial: SMS s\'f3 para n\'fameros que verificares na Twilio.\par
+\par
+Produ\'e7\'e3o: conta paga + n\'famero/sender para Portugal (+351).\par
+\par
+Teste: registo com telem\'f3vel 9XXXXXXXX (a app converte para +3519XXXXXXXX).\par
+\par
+Se aparecer erro no sheet, copia a mensagem \f1\emdash  ajuda a ver rate limit, n\f0\'famero inv\'e1lido, etc.\par
+\par
+O que eu posso fazer depois\par
+\par
+Melhorar mensagens de erro / logs em app_logs quando o SMS falha.\par
+\par
+Ajustar o fluxo OTP se o Supabase responder com erro concreto.\par
+\par
+N\'e3o consigo: criar conta Twilio, pagar, nem guardar secrets no teu Supabase sem tu o fazeres no dashboard.\par
+\par
+Resumo\par
+\par
+QuemO qu\'eaTu\par
+\par
+Twilio + credenciais no Supabase + SQL profiles_phone_verified_batata.sql\par
+\par
+App (j\'e1 feita)\par
+\par
+UI + chamadas Auth\par
+\par
+Eu\par
+\par
+S\'f3 c\'f3digo/SQL se algo falhar depois do provider estar ligado\par
+\par
+Quando tiveres Twilio ligado no Supabase, testa outro registo. Se o sheet mostrar erro ou continuar sem SMS, manda o texto do erro (ou screenshot) e tratamos do lado c\'f3digo.\par
+\par
+\par
+\par
+tenho de usar qual, qt custa, nao ha tao bom e mais barato\par
+\par
+Para o mercado em Portugal, o custo do SMS n\'e3o \'e9 t\'e3o linear como nos EUA devido \'e0s taxas de termina\'e7\'e3o das operadoras locais (MEO, NOS, Vodafone).\par
+\par
+Como est\'e1s a usar o Supabase, est\'e1s limitado aos providers que eles j\'e1 t\'eam integrados diretamente no painel de "Auth -> Providers -> Phone" para n\'e3o teres de escrever c\'f3digo extra (Edge Functions).\par
+\par
+Aqui tens as contas feitas para a nossa realidade:\par
+Quanto custa na Twilio (O padr\'e3o do Supabase)\par
+\par
+A Twilio \'e9 o provedor mais f\'e1cil de ligar ao Supabase, mas Portugal \'e9 caro na tabela deles.\par
+\par
+    Pre\'e7o por SMS enviado (PT): Cerca de \'800,046 ($0.0501).\par
+\par
+    Em pratos limpos: 1.000 SMS de verifica\'e7\'e3o v\'e3o custar-te cerca de \'8046,00.\par
+\par
+    Aluguer de N\'famero: Se quiseres um n\'famero fixo/m\'f3vel deles para enviar, cobram uma mensalidade alta, mas para Portugal podes usar um Alphanumeric Sender ID (enviar com o nome "Fleaber" em vez de um n\'famero), que \'e9 gr\'e1tis na Twilio.\par
+\par
+H\'e1 "t\'e3o bom e mais barato"? (Alternativas no Supabase)\par
+\par
+O Supabase suporta nativamente outros providers nas defini\'e7\'f5es. Duas alternativas europeias muito fortes que costumam ter rotas mais baratas para Portugal s\'e3o a MessageBird (Bird) e a Sinch.\par
+\par
+Fazendo as contas a plataformas concorrentes com suporte direto ou f\'e1cil:\par
+Provedor\tab Pre\'e7o M\'e9dio por SMS (Portugal)\tab Integra\'e7\'e3o Supabase\tab Vantagem / Desvantagem\par
+Twilio\tab ~ \'800,046\tab\f2\u9989?\f1  \f0 Direta (Nativa)\tab Super est\'e1vel, mas mais caro em PT.\par
+MessageBird (Bird)\tab ~ \'800,035\tab\f2\u9989?\f1  \f0 Direta (Nativa)\tab Sede na Europa, rotas locais costumam ser mais baratas.\par
+BulkGate / Gateway Local\tab ~ \'800,014 a \'800,020\tab\f2\u10060?\f1  \f0 Requer C\'f3digo\tab Muito mais barato, mas obrigava-nos a criar uma Edge Function no Supabase s\'f3 para disparar o SMS (perdes a configura\'e7\'e3o direta do painel).\par
+\par
+\f1     \f4\u9888?\u-497?\f1  \f0 Nota importante sobre fraudes (SMS Pumping): O "barato" \'e0s vezes sai caro se n\'e3o limitares os envios na app. H\'e1 bots que atacam formul\'e1rios de registo para esgotar o saldo de SMS das empresas (fazendo o teu sistema enviar milhares de c\'f3digos para n\'fameros internacionais). Independentemente de escolheres Twilio ou outro, no Supabase tens de ativar o Rate Limit (ex: m\'e1ximo 1 SMS por minuto por IP/telefone).\par
+\par
+O meu conselho para o Fleaber\par
+\par
+Para a fase de desenvolvimento e lan\'e7amento (Beta), avan\'e7a com a Twilio:\par
+\par
+    Crias a conta e eles d\'e3o-te logo uns $15 de saldo gr\'e1tis (Trial) para testares.\par
+\par
+    N\'e3o perdes tempo a programar rotas alternativas de SMS; focas o esfor\'e7o no funcionamento da app.\par
+\par
+    Se o Fleaber escalar e come\'e7ares a disparar 5.000 ou 10.000 SMS por m\'eas, a\'ed sim, pegamos num provedor low-cost (como BulkGate ou Vonage) e eu altero o c\'f3digo para bater nessa API por fora.\par
+\par
+Queres que te guie para criar a conta Trial na Twilio e extrair as chaves (SID e Token), ou preferes ver as op\'e7\'f5es do MessageBird no painel do Supabase?\par
+\par
+BulkGate / Gateway Local como faco para instalar esse,mesmo assim ~e caro, quanto custa 1000\par
+\par
+Para Portugal, a BulkGate \'e9 imbat\'edvel no pre\'e7o do SMS comparada com os gigantes americanos. Vamos \'e0s contas exatas e a como funciona a "instala\'e7\'e3o" no teu projeto do Fleaber com Supabase.\par
+1. Quanto custa 1.000 SMS na BulkGate?\par
+\par
+O pre\'e7o base da BulkGate para as operadoras em Portugal (MEO, NOS, Vodafone, Digi) \'e9 de \'800,014 por SMS.\par
+\par
+    Pre\'e7o por 1.000 SMS: \'8014,00\par
+\par
+    Compara\'e7\'e3o: Na Twilio, os mesmos 1.000 SMS custam cerca de \'8046,00.\par
+\par
+Poupas mais de 60% logo \'e0 partida. Mesmo sendo \'8014,00, em Portugal o SMS \'e9 sempre taxado de forma pesada pelas operadoras nacionais, por isso dificilmente encontras rotas est\'e1veis mais baratas do que isto para mensagens de autentica\'e7\'e3o (OTP).\par
+2. Como se "instala" a BulkGate no Supabase?\par
+\par
+Como a BulkGate n\'e3o tem um bot\'e3o direto no painel do Supabase (ao contr\'e1rio da Twilio), a instala\'e7\'e3o exige uma altera\'e7\'e3o na arquitetura do c\'f3digo.\par
+\par
+N\'e3o consegues resolver isto apenas colando as credenciais no painel "Auth" do Supabase. A l\'f3gica funciona assim:\par
+O Fluxo de Instala\'e7\'e3o:\par
+\par
+Em vez de deixar o Supabase Auth disparar o SMS sozinho, n\'f3s interceptamos o processo.\par
+\par
+    Criar conta na BulkGate: Crias a conta deles, geras um Application ID e um Application Token no menu de programadores da BulkGate.\par
+\par
+    Criar uma Supabase Edge Function: Eu crio um pequeno script em TypeScript (uma Edge Function no teu Supabase) chamado send-otp-bulkgate.\par
+\par
+    Mudar o fluxo na App Flutter: Quando o teu utilizador clica em "Registar/Verificar", a app do Fleaber deixa de chamar o m\'e9todo direto do Supabase e passa a chamar esta nossa Edge Function via HTTP POST, enviando o n\'famero de telem\'f3vel.\par
+\par
+    Disparo e Gera\'e7\'e3o: A Edge Function gera o c\'f3digo de 6 d\'edgitos, guarda-o temporariamente na tua base de dados Supabase (com uma validade de 5 minutos) e faz um pedido \'e0 API da BulkGate para entregar o SMS ao telem\'f3vel do cliente.\par
+\par
+O c\'f3digo que a Edge Function envia para a BulkGate segue este formato JSON:\par
+JSON\par
+\par
+\{\par
+  "application_id": "O_TEU_ID",\par
+  "application_token": "O_TEU_TOKEN",\par
+  "number": "3519XXXXXXXX",\par
+  "text": "Fleaber: O teu codigo de verificacao e <codigo>"\par
+\}\par
+\par
+O que queres fazer?\par
+\par
+D\'e1 mais trabalho de c\'f3digo (cerca de 1 a 2 horas para eu estruturar a Edge Function e atualizar o teu PhoneVerificationService no Flutter), mas o custo cai para um ter\'e7o.\par
+\par
+Se quiseres avan\'e7ar com a BulkGate para poupar guito desde o primeiro dia, o teu primeiro passo \'e9 criar a conta no portal da BulkGate. Avisa-me quando tiveres o ID e o Token criados para eu te dar o c\'f3digo da Edge Function.\lang9\par
+}
+ 

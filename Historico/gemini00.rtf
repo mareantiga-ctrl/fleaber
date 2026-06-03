@@ -1,0 +1,2295 @@
+{\rtf1\ansi\ansicpg1252\deff0\nouicompat\deflang1033{\fonttbl{\f0\fnil\fcharset0 Calibri;}{\f1\fnil Calibri;}{\f2\fnil\fcharset1 Cambria Math;}}
+{\colortbl ;\red0\green0\blue255;}
+{\*\generator Riched20 10.0.19041}{\*\mmathPr\mmathFont2\mwrapIndent1440 }\viewkind4\uc1 
+\pard\sa200\sl276\slmult1\f0\fs22\lang9  o cursor plnao ro da para quantas menagem diarios ou mensais e se gastar tods como faco para continuar a usar.. opcoes\par
+\par
+O plano gratuito do Cursor (conhecido como plano Hobby) tem limites espec\'edficos que reiniciam mensalmente. Aqui est\'e3o os detalhes de consumo e o que acontece quando os cr\'e9ditos terminam:\par
+Limites do Plano Hobby (Gratuito)\par
+\par
+    2000 utiliza\'e7\'f5es de "Completions": Sugest\'f5es de c\'f3digo de poucas linhas que aparecem enquanto escreves.\par
+\par
+    50 utiliza\'e7\'f5es de modelos Premium: Inclui modelos como o Claude 3.5 Sonnet ou GPT-4o.\par
+\par
+    Utiliza\'e7\'f5es ilimitadas de modelos b\'e1sicos: Podes usar modelos mais simples (como o cursor-small) sem limite, embora sejam menos inteligentes para tarefas complexas.\par
+\par
+O que acontece se gastares tudo?\par
+\par
+Se atingires o limite de 50 mensagens premium, o Cursor n\'e3o bloqueia totalmente, mas as tuas op\'e7\'f5es mudam:\par
+\par
+    Mudar para Modelos Gratuitos: Podes continuar a usar o chat e o "Composer" selecionando modelos como o cursor-small. Eles s\'e3o r\'e1pidos, mas perdem qualidade em l\'f3gica complexa.\par
+\par
+    Fila de Espera (Uso Lento): Em alguns casos, o Cursor permite continuar a usar modelos melhores, mas ficas numa fila de prioridade baixa, o que torna as respostas muito lentas.\par
+\par
+    Configurar a tua pr\'f3pria chave API (Pay-as-you-go): Podes inserir a tua pr\'f3pria chave da OpenAI ou da Anthropic nas defini\'e7\'f5es do Cursor. Desta forma, pagas apenas o que consomes diretamente a essas empresas, sem precisar de uma subscri\'e7\'e3o fixa.\par
+\par
+Op\'e7\'f5es para continuar a usar\par
+\par
+Se precisares de mais volume, estas s\'e3o as alternativas:\par
+Op\'e7\'e3o\tab Custo Estimado\tab Benef\'edcios\par
+Plano Pro\tab ~18,50 \'80 / m\'eas ($20)\tab Mensagens premium ilimitadas (500 r\'e1pidas + ilimitadas lentas).\par
+API Key Pr\'f3pria\tab Vari\'e1vel (conforme o uso)\tab Pagas c\'eantimos por cada pedido. Ideal se usares muito num dia e pouco no resto do m\'eas.\par
+Plano Business\tab ~37,00 \'80 / m\'eas ($40)\tab Para equipas com gest\'e3o centralizada e mais seguran\'e7a de dados.\par
+\par
+Dica: Se estiveres a desenvolver em FlutterFlow ou com muito c\'f3digo Firebase, o plano Pro costuma valer a pena pela rapidez do Claude 3.5 Sonnet, que lida muito bem com essas estruturas. Se o uso for ocasional, a API Key \'e9 a op\'e7\'e3o mais econ\'f3mica.\par
+\par
+Lendo .cursorrules e o estado atual da Arena e da Home para restaurar a barra lateral, aplicar a hierarquia visual e refinar cards e input.\par
+\par
+\par
+Implementando: barra lateral s\'f3 Partilhar + Cora\'e7\'e3o + toggle (sem menu extra); hierarquia em Stack (carrossel na base, input sobreposto, chat acima); cards quadrados transl\'facidos com RESERVAR por card; input ~65% com glass e altura reduzida.\par
+\par
+import 'dart:math' as math;\par
+\par
+import 'dart:ui' show ImageFilter;\par
+\par
+\par
+\par
+\par
+List<LiveItemsRow>? _catalogRows;\par
+\par
+int _centeredIndex = 0;\par
+\par
+bool _catalogLoading = true;\par
+\par
+);\par
+\par
+if (mounted) setState(() => _centeredIndex = idx);\par
+\par
+\}\par
+\par
+\par
+_catalogScrollController.addListener(_handleCatalogScroll);\par
+\par
+\par
+_loadCatalog().then((rows) \{\par
+\par
+void dispose() \{\par
+\par
+_catalogScrollController.removeListener(_handleCatalogScroll);\par
+\par
+_catalogScrollController.dispose();\par
+\par
+\par
+_catalogScrollController.jumpTo(target);\par
+\par
+setState(() => _centeredIndex = idx);\par
+\par
+\}\par
+\par
+\par
+\par
+Resumo do que ficou aplicado (respeitando o pedido Batata; a .cursorrules gen\'e9rica do FlutterFlow n\'e3o se aplica \'e0 Arena \f1\emdash  este ecr\f0\'e3 \'e9 c\'f3digo \'e0 parte):\par
+\par
+1. Barra lateral direita\par
+\par
+Reposicionada entre ~48% da altura e acima da zona inferior (bottom: bottomPad + bottomStackH + 16), ou seja, meio\f1\endash fundo para o polegar.\par
+\par
+Conte\f0\'fado: s\'f3 Partilhar, Cora\'e7\'e3o e toggle de chat privado (alterna _activeChat via _privateChatMode). O quarto \'edcone (menu) foi retirado para bater certo com o enunciado.\par
+\par
+2. Input\par
+\par
+Mais baixo (_kInputBandH = 36, isDense, padding vertical 8).\par
+\par
+~65% da largura do painel (inputW = panelW * 0.65, alinhado \'e0 esquerda).\par
+\par
+Glass: BackdropFilter + blur + fundo branco ~14% opacidade e borda fina (~0.8).\par
+\par
+3. Cards do cat\'e1logo\par
+\par
+Mais pequenos e \ldblquote quadrados\rdblquote  (_kCatalogCardW = 92, imagem 52\'d752, texto compacto).\par
+\par
+Transl\'facidos (branco ~22% opacidade, borda suave).\par
+\par
+RESERVAR grande em cima removido; h\'e1 um bot\'e3o pequeno no canto inferior direito de cada card (_onReservarItem(itemId)).\par
+\par
+is_active: borda fina _kFleaberTeal (~1.4) + selo \'abA MOSTRAR\'bb muito pequeno no canto superior esquerdo.\par
+\par
+4. Hierarquia (Stack na base)\par
+\par
+Num \'fanico Stack alinhado a bottomCenter, por ordem de pintura (fundo \f2\u8594?\f0  frente):\par
+\par
+Carrossel (Positioned em baixo).\par
+\par
+Input por cima, com sobreposi\'e7\'e3o ligeira (_kInputOverlapCarousel).\par
+\par
+Chat por cima do input, fundo quase transparente e letras menores (~9.5px).\par
+\par
+O v\'eddeo 9:16 continua em Positioned.fill por baixo de tudo.\par
+\par
+5. Sintaxe / Home\par
+\par
+Arena: par\'eanteses/fechos revistos; removidos _centeredIndex e o listener do scroll que j\'e1 n\'e3o eram necess\'e1rios.\par
+\par
+Home: o InkWell da live continua a fechar com )); (linhas ~838\f1\endash 839); n\f0\'e3o alterei essa navega\'e7\'e3o.\par
+\par
+Se quiseres a barra lateral mais baixa ou mais alta, ajusta s\'f3 top: maxH * 0.48 e/ou o + 16 em bottom: bottomPad + bottomStackH + 16.\par
+\par
+Esta implementa\'e7\'e3o parece s\'f3lida e segue rigorosamente o estilo "Whatnot" que tens estado a desenvolver para o Fleaber. Ao remover o menu extra e focar na barra lateral minimalista, a interface ganha a clareza necess\'e1ria para o "Live Shopping".\par
+\par
+Aqui est\'e3o os pontos de ajuste t\'e9cnico e sugest\'f5es para garantir que a UI se comporta como esperado no FlutterFlow:\par
+1. Ajuste de Hierarquia e Sobreposi\'e7\'e3o (Stack)\par
+\par
+Como est\'e1s a usar um Stack com o Input a sobrepor o Carrossel, certifica-te de que o HitTest do Input n\'e3o bloqueia o toque nos cards.\par
+\par
+    Dica: No Positioned do Input, usa um width fixo ou panelW * 0.65 para garantir que o lado direito do ecr\'e3 (onde podem estar os bot\'f5es de a\'e7\'e3o do card) permanece clic\'e1vel.\par
+\par
+2. Refinamento dos Cards Quadrados\par
+\par
+Para os cards transl\'facidos de 92px com o bot\'e3o RESERVAR no canto inferior direito:\par
+\par
+    Estilo Glass: Mant\'e9m o BackdropFilter apenas no fundo do card e n\'e3o no bot\'e3o de reserva, para que o bot\'e3o tenha um contraste maior (ex: cor s\'f3lida ou opacidade superior) e facilite o clique.\par
+\par
+    Selo \'abA MOSTRAR\'bb: Como o card \'e9 pequeno, usa um FontSize de 7px ou 8px para este selo, garantindo que n\'e3o tapa a imagem do item (52x52).\par
+\par
+3. Barra Lateral (L\'f3gica do Polegar)\par
+\par
+O posicionamento em maxH * 0.48 \'e9 excelente para ergonomia (zona de alcance natural).\par
+\par
+    Toggle de Chat Privado: Se a inten\'e7\'e3o \'e9 que o utilizador alterne rapidamente, podes adicionar um pequeno feedback visual (mudar a cor do \'edcone para o teu _kFleaberTeal) quando o _privateChatMode estiver ativo.\par
+\par
+4. Input e Performance\par
+\par
+Com a altura reduzida para 36px e isDense: true, o teclado do dispositivo pode sobrepor a UI em alguns telem\'f3veis.\par
+\par
+    Sugest\'e3o: Verifica se o Padding inferior (bottomPad) considera a viewInsets.bottom do sistema para que, quando o teclado abrir, o conjunto Input + Chat suba sem tapar o v\'eddeo principal.\par
+\par
+Pr\'f3ximos Passos no C\'f3digo:\par
+\par
+Se precisares de ajustar a transpar\'eancia para o estilo "transl\'facido Whatnot", podes usar este padr\'e3o de cor:\par
+Dart\par
+\par
+color: Colors.white.withOpacity(0.14), // Para o Input\par
+color: Colors.white.withOpacity(0.22), // Para os Cards\par
+\par
+Esta estrutura de c\'f3digo \'e0 parte da .cursorrules padr\'e3o \'e9 a decis\'e3o correta, j\'e1 que a Arena exige uma complexidade de sobreposi\'e7\'e3o que o gerador visual do FlutterFlow por vezes limita. Se precisares de ajuda para refinar a anima\'e7\'e3o de entrada destes cards, avisa.\par
+\par
+nao percebi, sao ilimitadas \\e isso as mesnagem e o trabalho dele em VS, o mes todo nao para\par
+\par
+Pe\'e7o desculpa, deixa-me ser mais direto para n\'e3o haver confus\'e3o. No plano Hobby (Gr\'e1tis), as mensagens n\'e3o s\'e3o ilimitadas. Se ele trabalha no Cursor o m\'eas todo sem parar, o plano gr\'e1tis vai esgotar-se muito r\'e1pido (provavelmente em 1 ou 2 dias).\par
+\par
+Aqui est\'e1 a explica\'e7\'e3o clara de como funcionam os limites:\par
+1. O que N\'c3O \'e9 ilimitado (Modelos Premium)\par
+\par
+O Claude 3.5 Sonnet e o GPT-4o (que s\'e3o os melhores para programar) t\'eam um limite de 50 mensagens por m\'eas no plano gr\'e1tis. Para quem trabalha o dia todo, 50 mensagens gastam-se numa manh\'e3.\par
+2. O que \'c9 ilimitado (Modelos B\'e1sicos)\par
+\par
+O Cursor permite usar modelos mais pequenos (como o cursor-small) de forma ilimitada.\par
+\par
+    O problema: Eles s\'e3o muito "burros" comparados com o Claude. Para l\'f3gica complexa de Flutter, muitas vezes d\'e3o erros ou n\'e3o percebem o contexto do projeto.\par
+\par
+3. Como ele pode trabalhar "sem parar"?\par
+\par
+Se ele quer usar a intelig\'eancia m\'e1xima (Claude 3.5 Sonnet) o m\'eas inteiro sem bloqueios, tens duas op\'e7\'f5es:\par
+\par
+    Plano Pro (~18,50 \'80/m\'eas): \'c9 a melhor op\'e7\'e3o para profissionais. D\'e1-lhe 500 mensagens r\'e1pidas por m\'eas e, depois de gastar essas 500, ele pode continuar a usar de forma ilimitada, mas as respostas demoram mais tempo a chegar (entram numa fila de espera).\par
+\par
+    Chave API (Pay-as-you-go): Tu metes um cart\'e3o de cr\'e9dito na Anthropic ou OpenAI, geras uma chave e colas no Cursor. Pagas por cada palavra que o modelo l\'ea e escreve. Se ele escrever c\'f3digo muito pesado, pode acabar por pagar mais do que os 18,50 \'80 do plano Pro.\par
+\par
+Resumo para o teu caso:\par
+Se ele est\'e1 a restaurar a Arena e a aplicar regras complexas de UI (como essa do "Batata", a barra lateral e os cards transl\'facidos), os modelos gr\'e1tis n\'e3o v\'e3o aguentar a pedalada.\par
+\par
+Para um ritmo de trabalho di\'e1rio ("o m\'eas todo n\'e3o para"), o Plano Pro \'e9 praticamente obrigat\'f3rio para n\'e3o perderem tempo com modelos que falham.\par
+\par
+tenho o plano pro, falame desse plano ze\par
+\par
+Ah, se j\'e1 tens o Plano Pro, ent\'e3o a conversa \'e9 outra! Est\'e1s com a "m\'e1quina" afinada para trabalhar a s\'e9rio no Fleaber.\par
+\par
+Como tens o Pro, n\'e3o precisas de te preocupar com contagens r\'edgidas de 50 mensagens. Aqui est\'e1 como o teu plano funciona na pr\'e1tica para quem programa o dia todo:\par
+1. O "Ilimitado" (Mas com velocidades diferentes)\par
+\par
+O teu plano Pro d\'e1-te 500 mensagens Premium por m\'eas (Claude 3.5 Sonnet, GPT-4o).\par
+\par
+    Uso R\'e1pido: Essas primeiras 500 mensagens s\'e3o instant\'e2neas.\par
+\par
+    Uso Ilimitado (Lento): Quando gastares as 500, o Cursor n\'e3o te bloqueia. Podes continuar a usar o Claude 3.5 Sonnet o resto do m\'eas todo, mas entras numa "fila de espera". Em horas de muito tr\'e1fego, a resposta pode demorar uns segundos extra, mas o trabalho nunca para.\par
+\par
+2. O "Composer" (Ctrl + I)\par
+\par
+Esta \'e9 a maior vantagem do teu plano para o que est\'e1s a fazer na Arena. No Pro, o modo Composer (onde ele escreve em v\'e1rios ficheiros ao mesmo tempo) \'e9 muito mais potente. Podes pedir para ele ajustar a barra lateral e o input, e ele altera o c\'f3digo em todo o lado de uma vez.\par
+3. Modelos "Small" Ilimitados\par
+\par
+Tens acesso ilimitado e sempre r\'e1pido ao cursor-small. \'c9 \'fatil para corre\'e7\'f5es r\'e1pidas de sintaxe ou erros de par\'eanteses, poupando as tuas fichas do Claude para a l\'f3gica visual complexa dos cards transl\'facidos.\par
+4. Privacidade e Seguran\'e7a\par
+\par
+Como tens uma empresa (Mare Antiga), isto \'e9 importante: no plano Pro, podes ativar o "Privacy Mode" nas defini\'e7\'f5es. Isso garante que o teu c\'f3digo da Arena e do Fleaber n\'e3o \'e9 usado para treinar os modelos da Cursor/OpenAI. O teu segredo de neg\'f3cio fica seguro.\par
+5. Indexa\'e7\'e3o do Projeto (.cursorrules)\par
+\par
+O teu plano Pro indexa todo o teu projeto localmente. Quando pedes para "restaurar a barra lateral", ele j\'e1 sabe exatamente onde est\'e1 o ficheiro da Arena e como ele se liga \'e0 Home, sem tu teres de explicar tudo de novo.\par
+\par
+Resumo da fatura:\par
+Est\'e1s a pagar os $20 (cerca de 18,50 \'80) e, com isso, tens a garantia de que o teu "programador AI" n\'e3o vai de f\'e9rias nem se cansa, mesmo que o ponhas a martelar c\'f3digo 24/7.\par
+\par
+J\'e1 que est\'e1s no Pro, queres que te ajude a refinar alguma regra espec\'edfica no .cursorrules para garantir que ele nunca mais se esquece desse layout do "Batata" na barra lateral?\par
+\par
+entao e se quiser usar sempre os melhores modelos\par
+\par
+Como tens o plano Pro, j\'e1 est\'e1s a usar os melhores modelos (Claude 3.5 Sonnet ou GPT-4o). No entanto, para garantir que usas sempre a intelig\'eancia m\'e1xima sem interrup\'e7\'f5es ou lentid\'e3o, aqui est\'e3o as tuas op\'e7\'f5es e como configurar o Cursor:\par
+1. O Modo "Fast" (R\'e1pido)\par
+\par
+No plano Pro, tens 500 cr\'e9ditos r\'e1pidos. Quando estes acabam, o Cursor muda-te para o modo "Lento" (fila de espera). Se o teu objetivo \'e9 nunca esperar, podes:\par
+\par
+    Comprar Cr\'e9ditos Extra: Podes comprar pacotes de mensagens "Fast" adicionais diretamente nas defini\'e7\'f5es da tua conta se esgotares as 500 e a fila de espera te estiver a atrasar o trabalho.\par
+\par
+2. Ativar a "API Key" (O plano sem limites reais)\par
+\par
+Se o teu fluxo de trabalho no Fleaber for t\'e3o intenso que at\'e9 a fila de espera do plano Pro te irrita, podes fazer o seguinte:\par
+\par
+    Vais \'e0s Settings -> Models -> OpenAI API Key (ou Anthropic).\par
+\par
+    Inseres a tua chave pessoal.\par
+\par
+    O que acontece: O Cursor para de usar os teus cr\'e9ditos do plano Pro e passa a usar a tua chave. Assim, usas sempre o modelo no m\'e1ximo da velocidade, sem filas, pagando apenas o que consomes (em d\'f3lares/euros) \'e0 parte.\par
+\par
+3. For\'e7ar o modelo certo nas defini\'e7\'f5es\par
+\par
+Para garantir que o Cursor n\'e3o "decide" usar um modelo mais fraco para poupar cr\'e9ditos, deves:\par
+\par
+    Abrir o Chat ou o Composer.\par
+\par
+    No seletor de modelos (em baixo), garante que est\'e1 selecionado especificamente o claude-3-5-sonnet.\par
+\par
+    Nas defini\'e7\'f5es do Cursor, podes desativar os modelos que n\'e3o queres usar (como o cursor-small) para ele n\'e3o mudar automaticamente.\par
+\par
+4. Gest\'e3o de Contexto (O truque do Pro)\par
+\par
+Como est\'e1s a trabalhar em ficheiros grandes como a Arena, o "melhor modelo" tamb\'e9m depende de quanto c\'f3digo ele consegue ler.\par
+\par
+    Usa o s\'edmbolo @ (ex: @Files ou @Folder) para apontar exatamente onde est\'e1 o c\'f3digo da barra lateral.\par
+\par
+    Isso evita que o modelo "se perca" e garante que a resposta \'e9 de alta qualidade, como se fosse a primeira mensagem do dia.\par
+\par
+Resumo: No plano Pro, tu j\'e1 tens o melhor. O \'fanico "obst\'e1culo" \'e9 a velocidade ap\'f3s as 500 mensagens. Se a fila de espera n\'e3o for um problema para ti, podes trabalhar o m\'eas inteiro com o Claude 3.5 Sonnet sem pagar nem mais um c\'eantimo al\'e9m dos 18,50 \'80.\par
+\par
+custos ze,, fdx\par
+\par
+O custo do Cursor no plano Pro \'e9 fixo, mas se fores um "viciado" no Claude 3.5 Sonnet e n\'e3o quiseres esperar nem um segundo, a conta pode subir.\par
+\par
+Aqui tens os valores reais (convertidos para a tua moeda de refer\'eancia, o Euro):\par
+1. Mensalidade Fixa (Plano Pro)\par
+\par
+    Mensal: ~18,50 \'80 / m\'eas ($20 USD).\par
+\par
+    Anual (se pagares logo o ano todo): ~14,80 \'80 / m\'eas ($16 USD/m\'eas).\par
+\par
+        O que inclui: 500 mensagens r\'e1pidas (Fast) por m\'eas. Depois das 500, continuas a ter mensagens ilimitadas, mas entras na fila de espera (modo "Slow").\par
+\par
+2. O que acontece se quiseres "mais velocidade"? (Custos Extra)\par
+\par
+Se gastares as 500 mensagens e n\'e3o tiveres paci\'eancia para a fila de espera (que em picos de tr\'e1fego pode demorar 20-30 segundos), tens duas op\'e7\'f5es:\par
+\par
+    Comprar Mensagens Fast Extra:\par
+\par
+        Podes comprar mensagens adicionais por cerca de 0,037 \'80 ($0.04) por cada mensagem.\par
+\par
+        Se comprares um "pack" de, por exemplo, 500 mensagens extra, gastas mais ~18,50 \'80.\par
+\par
+    Upgrade para Plano Pro+ (~55,50 \'80 / m\'eas):\par
+\par
+        Se v\'eas que est\'e1s sempre a estourar o limite, este plano triplica a tua capacidade (d\'e1-te o equivalente a 3x mais cr\'e9ditos que o Pro normal).\par
+\par
+Tabela de Custos (Estimativa em 2026)\par
+Tipo de Uso\tab Plano Recomendado\tab Custo Mensal Est.\par
+Normal (4h/dia)\tab Pro (Standard)\tab ~18,50 \'80\par
+Intensivo (8h/dia + Chat constante)\tab Pro + Algumas mensagens extra\tab ~25,00 \'80 a 30,00 \'80\par
+Hardcore (Programador 24/7 / Agentes AI)\tab Pro+\tab ~55,50 \'80\par
+O meu conselho para o teu caso:\par
+\par
+Como est\'e1s a trabalhar na Arena do Fleaber (que \'e9 um c\'f3digo pesado com muito UI e Stack), o Cursor gasta muitos "tokens" para ler o contexto.\par
+\par
+    Fica no Pro (~18,50 \'80).\par
+\par
+    Usa o "Auto Mode" sempre que poss\'edvel, porque no plano Pro o modo Auto \'e9 ilimitado e n\'e3o gasta os teus cr\'e9ditos premium.\par
+\par
+    S\'f3 se a fila de espera (Slow mode) te come\'e7ar a fazer perder dinheiro \'e9 que saltas para o Pro+ ou compras mensagens avulso.\par
+\par
+Aten\'e7\'e3o: Estes valores em Euros variam ligeiramente conforme a taxa de c\'e2mbio do dia do teu banco, j\'e1 que a fatura\'e7\'e3o original \'e9 em d\'f3lares.\par
+\par
+Lendo o widget completo para alinhar ao mockup: cards verticais com glass (20% + blur 12), selo \'abA MOSTRAR\'bb sobre a borda superior, input a 65% e chat quase invis\'edvel.\par
+\par
+\par
+Reestruturando a Arena para o mockup: cards verticais em vidro (preto 20% + blur 12), selo \'abA MOSTRAR\'bb centrado na borda superior, header e \'edcones com glass, input a 65% e chat quase invis\'edvel com blur.\par
+\par
+\par
+/// Arena de live (viewer): fundo v\'eddeo 9:16 e overlays em [Stack] + [Positioned].\par
+\par
+/// Arena live (viewer): v\'eddeo + overlays glass (Stack / Positioned).\par
+\par
+const Color _kFleaberTeal = Color(0xFF007782);\par
+\par
+\par
+_glassCircleIcon(\par
+\par
+icon: Icons.outlined_flag,\par
+\par
+icon: Icons.flag_outlined,\par
+\par
+onTap: () \{\},\par
+\par
+\par
+? row.refCode!.split('-').last\par
+\par
+: (row.id ?? '\f1\emdash ').substring(0, math.min(6, (row.id ?? '').length)));\par
+\par
+: (row.id ?? '\emdash ').substring(0, math.min(6, (row.id ?? '').length));\par
+\par
+\par
+\par
+\par
+\par
+Aqui est\f0\'e1 o que ficou fechado nesta passagem:\par
+\par
+Corre\'e7\'f5es\par
+\par
+Icons.outlined_flag \f2\u8594?\f0  Icons.flag_outlined (o nome anterior n\'e3o existe no Material e podia partir o build).\par
+\par
+itemNum: removido um ) a mais na express\'e3o do substring / math.min.\par
+\par
+Estado do pedido\par
+\par
+FleaberLivePlayerWidget segue o mock: v\'eddeo atr\'e1s no Stack, overlays com BackdropFilter, cards compactos (preto ~20% + blur 12), selo \'abA MOSTRAR\'bb sobre a borda superior do card ativo, borda teal s\'f3 no ativo, pre\'e7os em \'80, header slim, barra lateral \'e0 direita, chat ~9px com nomes em negrito e input a ~65% da largura.\par
+\par
+Verifica\'e7\'e3o\par
+\par
+flutter analyze lib/fleaber_live_player/fleaber_live_player_widget.dart terminou com exit code 0.\par
+\par
+Se quiseres, no pr\'f3ximo passo podemos alinhar milimetricamente o selo e as alturas com o PNG que tens em assets/... (offsets finos).\par
+\par
+\par
+\par
+'dart:math' as math;\par
+\par
+import 'dart:ui' show ImageFilter;\par
+\par
+\par
+import '/backend/supabase/supabase.dart';\par
+\par
+import '/flutter_flow/flutter_flow_util.dart';\par
+\par
+import '/flutter_flow/flutter_flow_video_player.dart';\par
+\par
+import 'package:flutter/material.dart';\par
+\par
+import 'package:google_fonts/google_fonts.dart';\par
+\par
+import 'fleaber_live_player_model.dart';\par
+\par
+export 'fleaber_live_player_model.dart';\par
+\par
+\par
+/// Arena live (viewer): v\'eddeo + overlays glass (Stack / Positioned).\par
+\par
+const Color _kFleaberTeal = Color(0xFF007782);\par
+\par
+\par
+/// Vidro: preto transl\'facido sobre o blur (n\'e3o opaco total).\par
+\par
+const double _kGlassBlurCards = 12;\par
+\par
+const double _kGlassBlurPanels = 12;\par
+\par
+const double _kGlassBlurChrome = 10;\par
+\par
+\par
+class FleaberLivePlayerWidget extends StatefulWidget \{\par
+\par
+  const FleaberLivePlayerWidget(\{\par
+\par
+    super.key,\par
+\par
+    this.liveId,\par
+\par
+  \});\par
+\par
+\par
+  final String? liveId;\par
+\par
+\par
+  static String routeName = 'FleaberLivePlayer';\par
+\par
+  static String routePath = '/fleaberLivePlayer';\par
+\par
+\par
+  @override\par
+\par
+  State<FleaberLivePlayerWidget> createState() =>\par
+\par
+      _FleaberLivePlayerWidgetState();\par
+\par
+\}\par
+\par
+\par
+class _FleaberLivePlayerWidgetState extends State<FleaberLivePlayerWidget> \{\par
+\par
+  late FleaberLivePlayerModel _model;\par
+\par
+\par
+  final scaffoldKey = GlobalKey<ScaffoldState>();\par
+\par
+\par
+  /// Card vertical compacto (largura fixa no carrossel horizontal).\par
+\par
+  static const double _kCatalogCardW = 108;\par
+\par
+  static const double _kCatalogSpacing = 12;\par
+\par
+  static double get _kCatalogStride => _kCatalogCardW + _kCatalogSpacing;\par
+\par
+\par
+  /// Corpo do card (sem contar selo que sobrep\'f5e o topo).\par
+\par
+  static const double _kCatalogCardBodyH = 168;\par
+\par
+  /// Espa\'e7o extra no topo para o selo "A MOSTRAR" \'e0 meia-altura na borda.\par
+\par
+  static const double _kCatalogSealOverhang = 14;\par
+\par
+  static double get _kCatalogStackH =>\par
+\par
+      _kCatalogCardBodyH + _kCatalogSealOverhang;\par
+\par
+\par
+  static const double _kCarouselStripH = 186;\par
+\par
+  static const double _kInputBandH = 30;\par
+\par
+  static const double _kChatH = 118;\par
+\par
+  static const double _kInputOverlapCarousel = 8;\par
+\par
+  static const double _kChatGapAboveInput = 6;\par
+\par
+\par
+  final ScrollController _catalogScrollController = ScrollController();\par
+\par
+\par
+  List<LiveItemsRow>? _catalogRows;\par
+\par
+  bool _catalogLoading = true;\par
+\par
+\par
+  static const List<(\{String user, String text\})> _demoChatPublic = [\par
+\par
+    (user: 'Ana', text: 'Boa noite!'),\par
+\par
+    (user: 'Rui', text: 'Qual \'e9 o tamanho?'),\par
+\par
+    (user: 'Sofia', text: 'J\'e1 est\'e1 lindo'),\par
+\par
+    (user: 'Miguel', text: 'Consigo reservar?'),\par
+\par
+  ];\par
+\par
+\par
+  static const List<(\{String user, String text\})> _demoChatPrivate = [\par
+\par
+    (user: 'Tu', text: 'Ol\'e1, ainda tens o #42?'),\par
+\par
+    (user: 'Vendedor', text: 'Sim, envio amanh\'e3.'),\par
+\par
+    (user: 'Tu', text: 'Perfeito, obrigado.'),\par
+\par
+  ];\par
+\par
+\par
+  bool _privateChatMode = false;\par
+\par
+\par
+  List<(\{String user, String text\})> get _activeChat =>\par
+\par
+      _privateChatMode ? _demoChatPrivate : _demoChatPublic;\par
+\par
+\par
+  static List<LiveItemsRow> _demoCatalogRows() \{\par
+\par
+    final now = DateTime.now().toIso8601String();\par
+\par
+    return List<LiveItemsRow>.generate(10, (i) \{\par
+\par
+      final n = i + 1;\par
+\par
+      final isActive = n == 5;\par
+\par
+      return LiveItemsRow(\{\par
+\par
+        'id': 'demo-cat-$n',\par
+\par
+        'live_id': 'demo',\par
+\par
+        'ref_code': 'FB-$\{8800 + n\}',\par
+\par
+        'title': n == 5 ? 'T\'e9nis Nike Air' : 'Artigo $n',\par
+\par
+        'price': 12.0 + n * 3.5,\par
+\par
+        'photo_url': '{{\field{\*\fldinst{HYPERLINK https://picsum.photos/seed/fleaber_cat_$n/200 }}{\fldrslt{https://picsum.photos/seed/fleaber_cat_$n/200\ul0\cf0}}}}\f0\fs22 ',\par
+\par
+        'is_active': isActive,\par
+\par
+        'created_at': now,\par
+\par
+      \});\par
+\par
+    \});\par
+\par
+  \}\par
+\par
+\par
+  Future<List<LiveItemsRow>> _loadCatalog() async \{\par
+\par
+    try \{\par
+\par
+      final id = widget.liveId;\par
+\par
+      if (id == null || id.isEmpty) \{\par
+\par
+        return _demoCatalogRows();\par
+\par
+      \}\par
+\par
+      final rows = await LiveItemsTable().queryRows(\par
+\par
+        queryFn: (q) => q\par
+\par
+            .eqOrNull('live_id', id)\par
+\par
+            .order('created_at', ascending: true),\par
+\par
+      );\par
+\par
+      if (rows.isEmpty) \{\par
+\par
+        return _demoCatalogRows();\par
+\par
+      \}\par
+\par
+      return rows;\par
+\par
+    \} catch (_) \{\par
+\par
+      return _demoCatalogRows();\par
+\par
+    \}\par
+\par
+  \}\par
+\par
+\par
+  void _scrollCatalogToIndex(int index) \{\par
+\par
+    if (!_catalogScrollController.hasClients) return;\par
+\par
+    final rows = _catalogRows;\par
+\par
+    if (rows == null || rows.isEmpty) return;\par
+\par
+    final idx = index.clamp(0, rows.length - 1);\par
+\par
+    final target = (idx * _kCatalogStride).clamp(\par
+\par
+      _catalogScrollController.position.minScrollExtent,\par
+\par
+      _catalogScrollController.position.maxScrollExtent,\par
+\par
+    );\par
+\par
+    _catalogScrollController.jumpTo(target);\par
+\par
+  \}\par
+\par
+\par
+  Future<void> _snapCatalogToNearest() async \{\par
+\par
+    if (!_catalogScrollController.hasClients) return;\par
+\par
+    final rows = _catalogRows;\par
+\par
+    if (rows == null || rows.isEmpty) return;\par
+\par
+    final idx = (_catalogScrollController.offset / _kCatalogStride)\par
+\par
+        .round()\par
+\par
+        .clamp(0, rows.length - 1);\par
+\par
+    final target = (idx * _kCatalogStride).clamp(\par
+\par
+      _catalogScrollController.position.minScrollExtent,\par
+\par
+      _catalogScrollController.position.maxScrollExtent,\par
+\par
+    );\par
+\par
+    await _catalogScrollController.animateTo(\par
+\par
+      target,\par
+\par
+      duration: const Duration(milliseconds: 240),\par
+\par
+      curve: Curves.easeOutCubic,\par
+\par
+    );\par
+\par
+  \}\par
+\par
+\par
+  void _onReservarItem(String? itemId) \{\par
+\par
+    if (itemId == null || itemId.isEmpty) \{\par
+\par
+      ScaffoldMessenger.of(context).showSnackBar(\par
+\par
+        const SnackBar(content: Text('Item inv\'e1lido.')),\par
+\par
+      );\par
+\par
+      return;\par
+\par
+    \}\par
+\par
+    ScaffoldMessenger.of(context).showSnackBar(\par
+\par
+      SnackBar(content: Text('Reserva (item id): $itemId')),\par
+\par
+    );\par
+\par
+  \}\par
+\par
+\par
+  static String? _formatPriceEur(LiveItemsRow row) \{\par
+\par
+    final p = row.price;\par
+\par
+    if (p == null) return null;\par
+\par
+    return '$\{p.toStringAsFixed(2).replaceAll('.', ',')\} \'80';\par
+\par
+  \}\par
+\par
+\par
+  static String _refHash(LiveItemsRow row) \{\par
+\par
+    final r = row.refCode ?? '';\par
+\par
+    if (r.isEmpty) return '#\f1\emdash ';\par
+\par
+    final parts = r.split('-');\par
+\par
+    if (parts.length > 1) return '#$\{parts.last\}';\par
+\par
+    return '#$r';\par
+\par
+  \}\par
+\par
+\par
+  @override\par
+\par
+  void initState() \{\par
+\par
+    super.initState();\par
+\par
+    _model = createModel(context, () => FleaberLivePlayerModel());\par
+\par
+\par
+    _loadCatalog().then((rows) \{\par
+\par
+      if (!mounted) return;\par
+\par
+      setState(() \{\par
+\par
+        _catalogRows = rows;\par
+\par
+        _catalogLoading = false;\par
+\par
+      \});\par
+\par
+      WidgetsBinding.instance.addPostFrameCallback((_) \{\par
+\par
+        if (!mounted) return;\par
+\par
+        if (rows.isEmpty) return;\par
+\par
+        final activeI = rows.indexWhere((r) => r.isActive == true);\par
+\par
+        _scrollCatalogToIndex(activeI >= 0 ? activeI : 0);\par
+\par
+      \});\par
+\par
+    \});\par
+\par
+\par
+    WidgetsBinding.instance.addPostFrameCallback((_) => safeSetState(() \{\}));\par
+\par
+  \}\par
+\par
+\par
+  @override\par
+\par
+  void dispose() \{\par
+\par
+    _catalogScrollController.dispose();\par
+\par
+    _model.dispose();\par
+\par
+\par
+    super.dispose();\par
+\par
+  \}\par
+\par
+\par
+  /// Card vertical glass: preto 20% + blur 12; selo "A MOSTRAR" por cima da borda superior se ativo.\par
+\par
+  Widget _buildCatalogCard(LiveItemsRow row) \{\par
+\par
+    final active = row.isActive == true;\par
+\par
+    final title = valueOrDefault<String>(row.title, 'Item');\par
+\par
+    final refH = _refHash(row);\par
+\par
+    final price = _formatPriceEur(row);\par
+\par
+    final photo = row.photoUrl;\par
+\par
+    final itemId = row.id;\par
+\par
+    final itemNum = row.refCode != null && row.refCode!.contains('-')\par
+\par
+        ? row.refCode!.split('-').last\par
+\par
+        : (row.id ?? '\emdash ').substring(0, math.min(6, (row.id ?? '').length));\par
+\par
+\par
+    return SizedBox(\par
+\par
+      width: _kCatalogCardW,\par
+\par
+      height: _kCatalogStackH,\par
+\par
+      child: Stack(\par
+\par
+        clipBehavior: Clip.none,\par
+\par
+        alignment: Alignment.bottomCenter,\par
+\par
+        children: [\par
+\par
+          Positioned(\par
+\par
+            left: 0,\par
+\par
+            right: 0,\par
+\par
+            bottom: 0,\par
+\par
+            height: _kCatalogCardBodyH,\par
+\par
+            child: ClipRRect(\par
+\par
+              borderRadius: BorderRadius.circular(14),\par
+\par
+              child: BackdropFilter(\par
+\par
+                filter: ImageFilter.blur(\par
+\par
+                  sigmaX: _kGlassBlurCards,\par
+\par
+                  sigmaY: _kGlassBlurCards,\par
+\par
+                ),\par
+\par
+                child: DecoratedBox(\par
+\par
+                  decoration: BoxDecoration(\par
+\par
+                    color: Colors.black.withOpacity(0.2),\par
+\par
+                    borderRadius: BorderRadius.circular(14),\par
+\par
+                    border: Border.all(\par
+\par
+                      color: active\par
+\par
+                          ? _kFleaberTeal\par
+\par
+                          : Colors.white.withOpacity(0.18),\par
+\par
+                      width: active ? 1.0 : 0.6,\par
+\par
+                    ),\par
+\par
+                  ),\par
+\par
+                  child: Padding(\par
+\par
+                    padding: const EdgeInsets.fromLTRB(8, 8, 8, 8),\par
+\par
+                    child: Column(\par
+\par
+                      crossAxisAlignment: CrossAxisAlignment.stretch,\par
+\par
+                      children: [\par
+\par
+                        ClipRRect(\par
+\par
+                          borderRadius: BorderRadius.circular(10),\par
+\par
+                          child: SizedBox(\par
+\par
+                            height: 88,\par
+\par
+                            width: double.infinity,\par
+\par
+                            child: photo != null && photo.isNotEmpty\par
+\par
+                                ? Image.network(\par
+\par
+                                    photo,\par
+\par
+                                    fit: BoxFit.cover,\par
+\par
+                                    errorBuilder: (_, __, ___) =>\par
+\par
+                                        _placeholderImage(),\par
+\par
+                                  )\par
+\par
+                                : _placeholderImage(),\par
+\par
+                          ),\par
+\par
+                        ),\par
+\par
+                        const SizedBox(height: 6),\par
+\par
+                        Text(\par
+\par
+                          '$title \emdash  $refH',\par
+\par
+                          maxLines: 2,\par
+\par
+                          overflow: TextOverflow.ellipsis,\par
+\par
+                          style: GoogleFonts.inter(\par
+\par
+                            fontWeight: FontWeight.w500,\par
+\par
+                            fontSize: 9.5,\par
+\par
+                            color: Colors.white.withOpacity(0.92),\par
+\par
+                            height: 1.15,\par
+\par
+                          ),\par
+\par
+                        ),\par
+\par
+                        const Spacer(),\par
+\par
+                        if (price != null)\par
+\par
+                          Text(\par
+\par
+                            price,\par
+\par
+                            style: GoogleFonts.interTight(\par
+\par
+                              fontWeight: FontWeight.w800,\par
+\par
+                              fontSize: 12,\par
+\par
+                              color: _kFleaberTeal,\par
+\par
+                              height: 1,\par
+\par
+                            ),\par
+\par
+                          ),\par
+\par
+                        const SizedBox(height: 2),\par
+\par
+                        Text(\par
+\par
+                          'Item #$itemNum',\par
+\par
+                          style: GoogleFonts.inter(\par
+\par
+                            fontSize: 8.5,\par
+\par
+                            color: Colors.white.withOpacity(0.55),\par
+\par
+                            height: 1,\par
+\par
+                          ),\par
+\par
+                        ),\par
+\par
+                        const SizedBox(height: 4),\par
+\par
+                        Align(\par
+\par
+                          alignment: Alignment.centerRight,\par
+\par
+                          child: GestureDetector(\par
+\par
+                            onTap: () => _onReservarItem(itemId),\par
+\par
+                            child: Text(\par
+\par
+                              'Reservar',\par
+\par
+                              style: GoogleFonts.inter(\par
+\par
+                                fontSize: 9,\par
+\par
+                                fontWeight: FontWeight.w600,\par
+\par
+                                color: Colors.white.withOpacity(0.85),\par
+\par
+                                decoration: TextDecoration.underline,\par
+\par
+                                decorationColor:\par
+\par
+                                    Colors.white.withOpacity(0.5),\par
+\par
+                              ),\par
+\par
+                            ),\par
+\par
+                          ),\par
+\par
+                        ),\par
+\par
+                      ],\par
+\par
+                    ),\par
+\par
+                  ),\par
+\par
+                ),\par
+\par
+              ),\par
+\par
+            ),\par
+\par
+          ),\par
+\par
+          if (active)\par
+\par
+            Positioned(\par
+\par
+              bottom: _kCatalogCardBodyH - 10,\par
+\par
+              left: 0,\par
+\par
+              right: 0,\par
+\par
+              child: Center(\par
+\par
+                child: ClipRRect(\par
+\par
+                  borderRadius: BorderRadius.circular(20),\par
+\par
+                  child: BackdropFilter(\par
+\par
+                    filter: ImageFilter.blur(sigmaX: 6, sigmaY: 6),\par
+\par
+                    child: Container(\par
+\par
+                      padding: const EdgeInsets.symmetric(\par
+\par
+                        horizontal: 12,\par
+\par
+                        vertical: 5,\par
+\par
+                      ),\par
+\par
+                      decoration: BoxDecoration(\par
+\par
+                        color: _kFleaberTeal.withOpacity(0.88),\par
+\par
+                        borderRadius: BorderRadius.circular(20),\par
+\par
+                      ),\par
+\par
+                      child: Text(\par
+\par
+                        'A MOSTRAR',\par
+\par
+                        style: GoogleFonts.interTight(\par
+\par
+                          color: Colors.white,\par
+\par
+                          fontWeight: FontWeight.w800,\par
+\par
+                          fontSize: 9,\par
+\par
+                          letterSpacing: 0.3,\par
+\par
+                          height: 1,\par
+\par
+                        ),\par
+\par
+                      ),\par
+\par
+                    ),\par
+\par
+                  ),\par
+\par
+                ),\par
+\par
+              ),\par
+\par
+            ),\par
+\par
+        ],\par
+\par
+      ),\par
+\par
+    );\par
+\par
+  \}\par
+\par
+\par
+  static Widget _placeholderImage() \{\par
+\par
+    return ColoredBox(\par
+\par
+      color: Colors.white.withOpacity(0.08),\par
+\par
+      child: Center(\par
+\par
+        child: Icon(\par
+\par
+          Icons.image_outlined,\par
+\par
+          size: 28,\par
+\par
+          color: Colors.white.withOpacity(0.35),\par
+\par
+        ),\par
+\par
+      ),\par
+\par
+    );\par
+\par
+  \}\par
+\par
+\par
+  double _overlayPanelWidth(double maxW) => math.max(0.0, maxW - 24);\par
+\par
+\par
+  @override\par
+\par
+  Widget build(BuildContext context) \{\par
+\par
+    final topPad = MediaQuery.paddingOf(context).top;\par
+\par
+    final bottomPad = MediaQuery.paddingOf(context).bottom;\par
+\par
+\par
+    return GestureDetector(\par
+\par
+      onTap: () \{\par
+\par
+        FocusScope.of(context).unfocus();\par
+\par
+        FocusManager.instance.primaryFocus?.unfocus();\par
+\par
+      \},\par
+\par
+      child: Scaffold(\par
+\par
+        key: scaffoldKey,\par
+\par
+        backgroundColor: Colors.black,\par
+\par
+        body: LayoutBuilder(\par
+\par
+          builder: (context, constraints) \{\par
+\par
+            final maxW = constraints.maxWidth;\par
+\par
+            final maxH = constraints.maxHeight;\par
+\par
+            const ar = 9 / 16;\par
+\par
+            late final double videoW;\par
+\par
+            late final double videoH;\par
+\par
+            if (maxW / maxH > ar) \{\par
+\par
+              videoH = maxH;\par
+\par
+              videoW = videoH * ar;\par
+\par
+            \} else \{\par
+\par
+              videoW = maxW;\par
+\par
+              videoH = videoW / ar;\par
+\par
+            \}\par
+\par
+\par
+            final panelW = _overlayPanelWidth(maxW);\par
+\par
+            final catalogHPad =\par
+\par
+                math.max(0.0, (panelW - _kCatalogCardW) / 2);\par
+\par
+            final inputW = maxW * 0.65;\par
+\par
+\par
+            final bottomStackH = _kChatH +\par
+\par
+                _kChatGapAboveInput +\par
+\par
+                _kInputBandH +\par
+\par
+                _kCarouselStripH -\par
+\par
+                _kInputOverlapCarousel;\par
+\par
+\par
+            return Stack(\par
+\par
+              fit: StackFit.expand,\par
+\par
+              clipBehavior: Clip.none,\par
+\par
+              children: [\par
+\par
+                Positioned.fill(\par
+\par
+                  child: ColoredBox(\par
+\par
+                    color: Colors.black,\par
+\par
+                    child: Center(\par
+\par
+                      child: SizedBox(\par
+\par
+                        width: videoW,\par
+\par
+                        height: videoH,\par
+\par
+                        child: FlutterFlowVideoPlayer(\par
+\par
+                          path:\par
+\par
+                              '{{\field{\*\fldinst{HYPERLINK https://stream.mux.com/jl01M1gnQOchF2x3mhb34NZ01kvcJqjpY01cHiDXSXHpz00.m3u8 }}{\fldrslt{https://stream.mux.com/jl01M1gnQOchF2x3mhb34NZ01kvcJqjpY01cHiDXSXHpz00.m3u8\ul0\cf0}}}}\f1\fs22 ',\par
+\par
+                          videoType: VideoType.network,\par
+\par
+                          width: videoW,\par
+\par
+                          height: videoH,\par
+\par
+                          autoPlay: true,\par
+\par
+                          looping: true,\par
+\par
+                          showControls: false,\par
+\par
+                          allowFullScreen: false,\par
+\par
+                          allowPlaybackSpeedMenu: false,\par
+\par
+                        ),\par
+\par
+                      ),\par
+\par
+                    ),\par
+\par
+                  ),\par
+\par
+                ),\par
+\par
+\par
+                // Header slim + glass\par
+\par
+                Positioned(\par
+\par
+                  left: 0,\par
+\par
+                  right: 0,\par
+\par
+                  top: 0,\par
+\par
+                  child: Padding(\par
+\par
+                    padding: EdgeInsets.fromLTRB(10, topPad + 6, 10, 0),\par
+\par
+                    child: ClipRRect(\par
+\par
+                      borderRadius: BorderRadius.circular(22),\par
+\par
+                      child: BackdropFilter(\par
+\par
+                        filter: ImageFilter.blur(\par
+\par
+                          sigmaX: _kGlassBlurChrome,\par
+\par
+                          sigmaY: _kGlassBlurChrome,\par
+\par
+                        ),\par
+\par
+                        child: DecoratedBox(\par
+\par
+                          decoration: BoxDecoration(\par
+\par
+                            color: Colors.black.withOpacity(0.28),\par
+\par
+                            borderRadius: BorderRadius.circular(22),\par
+\par
+                            border: Border.all(\par
+\par
+                              color: Colors.white.withOpacity(0.12),\par
+\par
+                              width: 0.6,\par
+\par
+                            ),\par
+\par
+                          ),\par
+\par
+                          child: Padding(\par
+\par
+                            padding: const EdgeInsets.symmetric(\par
+\par
+                              horizontal: 8,\par
+\par
+                              vertical: 6,\par
+\par
+                            ),\par
+\par
+                            child: Row(\par
+\par
+                              crossAxisAlignment: CrossAxisAlignment.center,\par
+\par
+                              children: [\par
+\par
+                                Container(\par
+\par
+                                  width: 32,\par
+\par
+                                  height: 32,\par
+\par
+                                  clipBehavior: Clip.antiAlias,\par
+\par
+                                  decoration: const BoxDecoration(\par
+\par
+                                    shape: BoxShape.circle,\par
+\par
+                                  ),\par
+\par
+                                  child: Image.network(\par
+\par
+                                    '{{\field{\*\fldinst{HYPERLINK https://picsum.photos/seed/fleaber_live/200 }}{\fldrslt{https://picsum.photos/seed/fleaber_live/200\ul0\cf0}}}}\f1\fs22 ',\par
+\par
+                                    fit: BoxFit.cover,\par
+\par
+                                    errorBuilder: (_, __, ___) =>\par
+\par
+                                        const ColoredBox(\par
+\par
+                                      color: Color(0xFF333333),\par
+\par
+                                      child: Icon(Icons.person,\par
+\par
+                                          color: Colors.white54, size: 16),\par
+\par
+                                    ),\par
+\par
+                                  ),\par
+\par
+                                ),\par
+\par
+                                const SizedBox(width: 8),\par
+\par
+                                Expanded(\par
+\par
+                                  child: Row(\par
+\par
+                                    children: [\par
+\par
+                                      Flexible(\par
+\par
+                                        child: Text(\par
+\par
+                                          'Marina Antiques',\par
+\par
+                                          maxLines: 1,\par
+\par
+                                          overflow: TextOverflow.ellipsis,\par
+\par
+                                          style: GoogleFonts.inter(\par
+\par
+                                            color: Colors.white,\par
+\par
+                                            fontSize: 13,\par
+\par
+                                            fontWeight: FontWeight.w700,\par
+\par
+                                            height: 1.1,\par
+\par
+                                          ),\par
+\par
+                                        ),\par
+\par
+                                      ),\par
+\par
+                                      const SizedBox(width: 4),\par
+\par
+                                      const Icon(Icons.star_rounded,\par
+\par
+                                          color: Color(0xFFFFD700), size: 13),\par
+\par
+                                      Text(\par
+\par
+                                        '4.8',\par
+\par
+                                        style: GoogleFonts.inter(\par
+\par
+                                          color: Colors.white\par
+\par
+                                              .withOpacity(0.92),\par
+\par
+                                          fontSize: 11,\par
+\par
+                                          fontWeight: FontWeight.w600,\par
+\par
+                                        ),\par
+\par
+                                      ),\par
+\par
+                                      const SizedBox(width: 6),\par
+\par
+                                      ClipRRect(\par
+\par
+                                        borderRadius:\par
+\par
+                                            BorderRadius.circular(14),\par
+\par
+                                        child: BackdropFilter(\par
+\par
+                                          filter: ImageFilter.blur(\par
+\par
+                                              sigmaX: 6, sigmaY: 6),\par
+\par
+                                          child: Material(\par
+\par
+                                            color: Colors.transparent,\par
+\par
+                                            child: InkWell(\par
+\par
+                                              onTap: () \{\},\par
+\par
+                                              child: Container(\par
+\par
+                                                padding:\par
+\par
+                                                    const EdgeInsets.symmetric(\par
+\par
+                                                  horizontal: 10,\par
+\par
+                                                  vertical: 5,\par
+\par
+                                                ),\par
+\par
+                                                decoration: BoxDecoration(\par
+\par
+                                                  color: _kFleaberTeal\par
+\par
+                                                      .withOpacity(0.88),\par
+\par
+                                                ),\par
+\par
+                                                child: Text(\par
+\par
+                                                  'Seguir',\par
+\par
+                                                  style: GoogleFonts.inter(\par
+\par
+                                                    color: Colors.white,\par
+\par
+                                                    fontSize: 11,\par
+\par
+                                                    fontWeight:\par
+\par
+                                                        FontWeight.w700,\par
+\par
+                                                  ),\par
+\par
+                                                ),\par
+\par
+                                              ),\par
+\par
+                                            ),\par
+\par
+                                          ),\par
+\par
+                                        ),\par
+\par
+                                      ),\par
+\par
+                                    ],\par
+\par
+                                  ),\par
+\par
+                                ),\par
+\par
+                                Row(\par
+\par
+                                  mainAxisSize: MainAxisSize.min,\par
+\par
+                                  children: [\par
+\par
+                                    Icon(\par
+\par
+                                      Icons.remove_red_eye_outlined,\par
+\par
+                                      color: Colors.white.withOpacity(0.88),\par
+\par
+                                      size: 15,\par
+\par
+                                    ),\par
+\par
+                                    const SizedBox(width: 3),\par
+\par
+                                    Text(\par
+\par
+                                      '1.2k',\par
+\par
+                                      style: GoogleFonts.inter(\par
+\par
+                                        color: Colors.white.withOpacity(0.9),\par
+\par
+                                        fontSize: 12,\par
+\par
+                                        fontWeight: FontWeight.w600,\par
+\par
+                                      ),\par
+\par
+                                    ),\par
+\par
+                                    const SizedBox(width: 2),\par
+\par
+                                    _glassIconButton(\par
+\par
+                                      icon: Icons.close_rounded,\par
+\par
+                                      onTap: () => context.safePop(),\par
+\par
+                                    ),\par
+\par
+                                  ],\par
+\par
+                                ),\par
+\par
+                              ],\par
+\par
+                            ),\par
+\par
+                          ),\par
+\par
+                        ),\par
+\par
+                      ),\par
+\par
+                    ),\par
+\par
+                  ),\par
+\par
+                ),\par
+\par
+\par
+                // Barra lateral: meio-fundo (4 \f0\'edcones, mockup)\par
+\par
+                Positioned(\par
+\par
+                  right: 10,\par
+\par
+                  top: maxH * 0.48,\par
+\par
+                  bottom: bottomPad + bottomStackH + 16,\par
+\par
+                  child: Align(\par
+\par
+                    alignment: Alignment.centerRight,\par
+\par
+                    child: Column(\par
+\par
+                      mainAxisSize: MainAxisSize.min,\par
+\par
+                      children: [\par
+\par
+                        _glassCircleIcon(\par
+\par
+                          icon: Icons.share_outlined,\par
+\par
+                          onTap: () \{\},\par
+\par
+                        ),\par
+\par
+                        const SizedBox(height: 12),\par
+\par
+                        _glassCircleIcon(\par
+\par
+                          icon: Icons.favorite_border_rounded,\par
+\par
+                          onTap: () \{\},\par
+\par
+                        ),\par
+\par
+                        const SizedBox(height: 12),\par
+\par
+                        _glassCircleIcon(\par
+\par
+                          icon: Icons.flag_outlined,\par
+\par
+                          onTap: () \{\},\par
+\par
+                        ),\par
+\par
+                        const SizedBox(height: 12),\par
+\par
+                        _glassCircleIcon(\par
+\par
+                          selected: _privateChatMode,\par
+\par
+                          icon: Icons.chat_bubble_outline_rounded,\par
+\par
+                          onTap: () \{\par
+\par
+                            setState(() \{\par
+\par
+                              _privateChatMode = !_privateChatMode;\par
+\par
+                            \});\par
+\par
+                          \},\par
+\par
+                        ),\par
+\par
+                      ],\par
+\par
+                    ),\par
+\par
+                  ),\par
+\par
+                ),\par
+\par
+\par
+                Positioned(\par
+\par
+                  left: 12,\par
+\par
+                  right: 12,\par
+\par
+                  bottom: bottomPad + 8,\par
+\par
+                  child: SizedBox(\par
+\par
+                    width: panelW,\par
+\par
+                    height: bottomStackH,\par
+\par
+                    child: Stack(\par
+\par
+                      clipBehavior: Clip.none,\par
+\par
+                      alignment: Alignment.bottomCenter,\par
+\par
+                      children: [\par
+\par
+                        Positioned(\par
+\par
+                          left: 0,\par
+\par
+                          right: 0,\par
+\par
+                          bottom: 0,\par
+\par
+                          height: _kCarouselStripH,\par
+\par
+                          child: _catalogLoading || _catalogRows == null\par
+\par
+                              ? const Center(\par
+\par
+                                  child: SizedBox(\par
+\par
+                                    width: 26,\par
+\par
+                                    height: 26,\par
+\par
+                                    child: CircularProgressIndicator(\par
+\par
+                                      strokeWidth: 2,\par
+\par
+                                      valueColor: AlwaysStoppedAnimation<Color>(\par
+\par
+                                        Colors.white70,\par
+\par
+                                      ),\par
+\par
+                                    ),\par
+\par
+                                  ),\par
+\par
+                                )\par
+\par
+                              : _catalogRows!.isEmpty\par
+\par
+                                  ? Center(\par
+\par
+                                      child: Text(\par
+\par
+                                        'Sem artigos nesta live',\par
+\par
+                                        style: GoogleFonts.inter(\par
+\par
+                                          color: Colors.white70,\par
+\par
+                                          fontSize: 11,\par
+\par
+                                        ),\par
+\par
+                                      ),\par
+\par
+                                    )\par
+\par
+                                  : NotificationListener<ScrollNotification>(\par
+\par
+                                      onNotification: (n) \{\par
+\par
+                                        if (n is ScrollEndNotification) \{\par
+\par
+                                          _snapCatalogToNearest();\par
+\par
+                                        \}\par
+\par
+                                        return false;\par
+\par
+                                      \},\par
+\par
+                                      child: ListView.builder(\par
+\par
+                                        controller: _catalogScrollController,\par
+\par
+                                        scrollDirection: Axis.horizontal,\par
+\par
+                                        padding: EdgeInsets.symmetric(\par
+\par
+                                          horizontal: catalogHPad,\par
+\par
+                                        ),\par
+\par
+                                        physics: const ClampingScrollPhysics(),\par
+\par
+                                        itemCount: _catalogRows!.length,\par
+\par
+                                        itemBuilder: (context, i) \{\par
+\par
+                                          return SizedBox(\par
+\par
+                                            width: _kCatalogStride,\par
+\par
+                                            child: Align(\par
+\par
+                                              alignment:\par
+\par
+                                                  Alignment.bottomCenter,\par
+\par
+                                              child: _buildCatalogCard(\par
+\par
+                                                _catalogRows![i],\par
+\par
+                                              ),\par
+\par
+                                            ),\par
+\par
+                                          );\par
+\par
+                                        \},\par
+\par
+                                      ),\par
+\par
+                                    ),\par
+\par
+                        ),\par
+\par
+\par
+                        Positioned(\par
+\par
+                          left: 0,\par
+\par
+                          bottom: _kCarouselStripH - _kInputOverlapCarousel,\par
+\par
+                          child: ClipRRect(\par
+\par
+                            borderRadius: BorderRadius.circular(18),\par
+\par
+                            child: BackdropFilter(\par
+\par
+                              filter: ImageFilter.blur(\par
+\par
+                                sigmaX: _kGlassBlurPanels,\par
+\par
+                                sigmaY: _kGlassBlurPanels,\par
+\par
+                              ),\par
+\par
+                              child: Container(\par
+\par
+                                width: inputW,\par
+\par
+                                height: _kInputBandH,\par
+\par
+                                alignment: Alignment.center,\par
+\par
+                                decoration: BoxDecoration(\par
+\par
+                                  color: Colors.black.withOpacity(0.22),\par
+\par
+                                  borderRadius: BorderRadius.circular(18),\par
+\par
+                                  border: Border.all(\par
+\par
+                                    color: Colors.white.withOpacity(0.2),\par
+\par
+                                    width: 0.6,\par
+\par
+                                  ),\par
+\par
+                                ),\par
+\par
+                                child: TextField(\par
+\par
+                                  controller: _model.chatTextController,\par
+\par
+                                  focusNode: _model.chatFocusNode,\par
+\par
+                                  textAlignVertical: TextAlignVertical.center,\par
+\par
+                                  style: GoogleFonts.inter(\par
+\par
+                                    color: Colors.white,\par
+\par
+                                    fontSize: 11,\par
+\par
+                                    height: 1.0,\par
+\par
+                                  ),\par
+\par
+                                  cursorColor: _kFleaberTeal,\par
+\par
+                                  decoration: InputDecoration(\par
+\par
+                                    isDense: true,\par
+\par
+                                    filled: false,\par
+\par
+                                    border: InputBorder.none,\par
+\par
+                                    focusedBorder: InputBorder.none,\par
+\par
+                                    enabledBorder: InputBorder.none,\par
+\par
+                                    hintText: _privateChatMode\par
+\par
+                                        ? 'Mensagem privada\'85'\par
+\par
+                                        : 'Diz alguma coisa\'85',\par
+\par
+                                    hintStyle: GoogleFonts.inter(\par
+\par
+                                      color: Colors.white.withOpacity(0.45),\par
+\par
+                                      fontSize: 10,\par
+\par
+                                    ),\par
+\par
+                                    contentPadding: const EdgeInsets.symmetric(\par
+\par
+                                      horizontal: 12,\par
+\par
+                                      vertical: 5,\par
+\par
+                                    ),\par
+\par
+                                  ),\par
+\par
+                                ),\par
+\par
+                              ),\par
+\par
+                            ),\par
+\par
+                          ),\par
+\par
+                        ),\par
+\par
+\par
+                        Positioned(\par
+\par
+                          left: 0,\par
+\par
+                          right: 0,\par
+\par
+                          bottom: _kCarouselStripH -\par
+\par
+                              _kInputOverlapCarousel +\par
+\par
+                              _kInputBandH +\par
+\par
+                              _kChatGapAboveInput,\par
+\par
+                          height: _kChatH,\par
+\par
+                          child: ClipRRect(\par
+\par
+                            borderRadius: BorderRadius.circular(12),\par
+\par
+                            child: BackdropFilter(\par
+\par
+                              filter: ImageFilter.blur(\par
+\par
+                                sigmaX: _kGlassBlurPanels,\par
+\par
+                                sigmaY: _kGlassBlurPanels,\par
+\par
+                              ),\par
+\par
+                              child: DecoratedBox(\par
+\par
+                                decoration: BoxDecoration(\par
+\par
+                                  color: Colors.black.withOpacity(0.06),\par
+\par
+                                  borderRadius: BorderRadius.circular(12),\par
+\par
+                                  border: Border.all(\par
+\par
+                                    color: Colors.white.withOpacity(0.06),\par
+\par
+                                    width: 0.5,\par
+\par
+                                  ),\par
+\par
+                                ),\par
+\par
+                                child: Padding(\par
+\par
+                                  padding: const EdgeInsets.symmetric(\par
+\par
+                                    horizontal: 6,\par
+\par
+                                    vertical: 4,\par
+\par
+                                  ),\par
+\par
+                                  child: ListView.builder(\par
+\par
+                                    reverse: true,\par
+\par
+                                    padding: const EdgeInsets.only(bottom: 0),\par
+\par
+                                    physics: const ClampingScrollPhysics(),\par
+\par
+                                    itemCount: _activeChat.length,\par
+\par
+                                    itemBuilder: (context, index) \{\par
+\par
+                                      final m = _activeChat[\par
+\par
+                                          _activeChat.length - 1 - index];\par
+\par
+                                      return Padding(\par
+\par
+                                        padding:\par
+\par
+                                            const EdgeInsets.only(bottom: 2),\par
+\par
+                                        child: Row(\par
+\par
+                                          crossAxisAlignment:\par
+\par
+                                              CrossAxisAlignment.start,\par
+\par
+                                          children: [\par
+\par
+                                            CircleAvatar(\par
+\par
+                                              radius: 8,\par
+\par
+                                              backgroundColor: Colors.white\par
+\par
+                                                  .withOpacity(0.1),\par
+\par
+                                              child: Text(\par
+\par
+                                                m.user.isNotEmpty\par
+\par
+                                                    ? m.user[0]\par
+\par
+                                                        .toUpperCase()\par
+\par
+                                                    : '?',\par
+\par
+                                                style: TextStyle(\par
+\par
+                                                  color: Colors.white\par
+\par
+                                                      .withOpacity(0.75),\par
+\par
+                                                  fontSize: 7,\par
+\par
+                                                  fontWeight: FontWeight.w600,\par
+\par
+                                                ),\par
+\par
+                                              ),\par
+\par
+                                            ),\par
+\par
+                                            const SizedBox(width: 4),\par
+\par
+                                            Expanded(\par
+\par
+                                              child: RichText(\par
+\par
+                                                maxLines: 2,\par
+\par
+                                                overflow:\par
+\par
+                                                    TextOverflow.ellipsis,\par
+\par
+                                                text: TextSpan(\par
+\par
+                                                  style: GoogleFonts.inter(\par
+\par
+                                                    color: Colors.white\par
+\par
+                                                        .withOpacity(0.72),\par
+\par
+                                                    fontSize: 9,\par
+\par
+                                                    height: 1.12,\par
+\par
+                                                  ),\par
+\par
+                                                  children: [\par
+\par
+                                                    TextSpan(\par
+\par
+                                                      text: '$\{m.user\} ',\par
+\par
+                                                      style: const TextStyle(\par
+\par
+                                                        fontWeight:\par
+\par
+                                                            FontWeight.w700,\par
+\par
+                                                        fontSize: 9,\par
+\par
+                                                      ),\par
+\par
+                                                    ),\par
+\par
+                                                    TextSpan(text: m.text),\par
+\par
+                                                  ],\par
+\par
+                                                ),\par
+\par
+                                              ),\par
+\par
+                                            ),\par
+\par
+                                          ],\par
+\par
+                                        ),\par
+\par
+                                      );\par
+\par
+                                    \},\par
+\par
+                                  ),\par
+\par
+                                ),\par
+\par
+                              ),\par
+\par
+                            ),\par
+\par
+                          ),\par
+\par
+                        ),\par
+\par
+                      ],\par
+\par
+                    ),\par
+\par
+                  ),\par
+\par
+                ),\par
+\par
+              ],\par
+\par
+            );\par
+\par
+          \},\par
+\par
+        ),\par
+\par
+      ),\par
+\par
+    );\par
+\par
+  \}\par
+\par
+\par
+  static Widget _glassIconButton(\{\par
+\par
+    required IconData icon,\par
+\par
+    required VoidCallback onTap,\par
+\par
+  \}) \{\par
+\par
+    return ClipOval(\par
+\par
+      child: BackdropFilter(\par
+\par
+        filter: ImageFilter.blur(sigmaX: 6, sigmaY: 6),\par
+\par
+        child: Material(\par
+\par
+          color: Colors.black.withOpacity(0.35),\par
+\par
+          child: InkWell(\par
+\par
+            customBorder: const CircleBorder(),\par
+\par
+            onTap: onTap,\par
+\par
+            child: Padding(\par
+\par
+              padding: const EdgeInsets.all(6),\par
+\par
+              child: Icon(icon, color: Colors.white, size: 18),\par
+\par
+            ),\par
+\par
+          ),\par
+\par
+        ),\par
+\par
+      ),\par
+\par
+    );\par
+\par
+  \}\par
+\par
+\par
+  static Widget _glassCircleIcon(\{\par
+\par
+    required IconData icon,\par
+\par
+    required VoidCallback onTap,\par
+\par
+    bool selected = false,\par
+\par
+  \}) \{\par
+\par
+    return ClipOval(\par
+\par
+      child: BackdropFilter(\par
+\par
+        filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),\par
+\par
+        child: Material(\par
+\par
+          color: selected\par
+\par
+              ? _kFleaberTeal.withOpacity(0.55)\par
+\par
+              : Colors.black.withOpacity(0.28),\par
+\par
+          child: InkWell(\par
+\par
+            customBorder: const CircleBorder(),\par
+\par
+            onTap: onTap,\par
+\par
+            child: Padding(\par
+\par
+              padding: const EdgeInsets.all(9),\par
+\par
+              child: Icon(icon, color: Colors.white, size: 20),\par
+\par
+            ),\par
+\par
+          ),\par
+\par
+        ),\par
+\par
+      ),\par
+\par
+    );\par
+\par
+  \}\par
+\par
+\}\par
+\par
+Este c\'f3digo consolida a interface da Arena do Fleaber exatamente como planeado, focando na est\'e9tica "Glassmorphism" (vidro) e na hierarquia visual do mockup.\par
+O que foi implementado e refinado:\par
+\par
+    Cards Verticais Estilo Vidro:\par
+\par
+        Dimens\'f5es: Cards compactos com 168px de altura e 108px de largura.\par
+\par
+        Est\'e9tica: Fundo em preto transl\'facido (20%) com BackdropFilter de 12 de blur.\par
+\par
+        Selo \'abA MOSTRAR\'bb: Posicionado milimetricamente sobre a borda superior do card ativo, com fundo Teal (88% opacidade) e texto em negrito.\par
+\par
+        Bot\'e3o Reservar: Removido do topo; agora \'e9 um link discreto e sublinhado no canto inferior direito de cada card, otimizando o espa\'e7o para a foto e o t\'edtulo.\par
+\par
+    Hierarquia de Stack (Camadas):\par
+\par
+        Base: V\'eddeo em ecr\'e3 total (9:16).\par
+\par
+        Camada 1 (Carrossel): No fundo do ecr\'e3, com os cards a "nascer" da base.\par
+\par
+        Camada 2 (Input): Sobreposto ao carrossel com um ligeiro overlap de 8px, largura de 65%, alinhado \'e0 esquerda.\par
+\par
+        Camada 3 (Chat): Acima do input, com fundo quase invis\'edvel e letras pequenas (9px) para n\'e3o tapar a a\'e7\'e3o do v\'eddeo.\par
+\par
+    Barra Lateral "Thumb-Friendly":\par
+\par
+        Reposicionada para o centro-direita (48% da altura), ideal para o alcance do polegar.\par
+\par
+        \'cdcones: Partilhar, Cora\'e7\'e3o, Bandeira (Report) e o Toggle de Chat Privado.\par
+\par
+        Feedback Visual: O \'edcone de chat muda de cor para Teal quando o modo privado est\'e1 ativo.\par
+\par
+    Header e Intera\'e7\'e3o:\par
+\par
+        Header "Slim" com efeito de vidro e cantos muito arredondados (22).\par
+\par
+        Pre\'e7os formatados em Euros (\'80) com v\'edrgula, respeitando as tuas defini\'e7\'f5es de neg\'f3cio.\par
+\par
+        Conserto de Bugs: Corrigido o erro de sintaxe no substring e o nome do \'edcone flag_outlined.\par
+\par
+Pr\'f3ximo Passo Sugerido:\par
+\par
+Se quiseres testar a fluidez, podes pedir para "adicionar uma anima\'e7\'e3o de slide-up nos cards quando um novo item se torna ativo". Como tens o plano Pro, o Cursor consegue gerar essa l\'f3gica de anima\'e7\'e3o AnimatedContainer sem esfor\'e7o.\par
+\par
+O c\'f3digo est\'e1 limpo e pronto para o FlutterFlow (como c\'f3digo customizado). O comando flutter analyze passou com sucesso.\par
+\par
+pa ainda nao vi.. ja nao esta anos 2000 de certeza.. ve bem zem\par
+\par
+Tens raz\'e3o, o salto visual \'e9 gigante. Se compararmos com o que tinhas antes, sa\'edmos de uma interface "est\'e1tica" e pesada (estilo anos 2000) para uma UI de App moderna de 2026.\par
+\par
+Aqui est\'e1 o porqu\'ea de isto agora estar com um aspeto Premium e Moderno:\par
+1. O fim do "Cinza S\'f3lido" (O efeito Vidro)\par
+\par
+Antigamente as interfaces usavam blocos de cores s\'f3lidas que separavam o conte\'fado. Aqui aplic\'e1mos Glassmorphism real:\par
+\par
+    O fundo \'e9 preto com 20% de opacidade e 12 de Blur (BackdropFilter).\par
+\par
+    Isto faz com que o v\'eddeo da live "brilhe" por tr\'e1s dos menus, dando profundidade. \'c9 exatamente o que apps como Instagram, TikTok e Whatnot fazem.\par
+\par
+2. Hierarquia de Camadas (Depth)\par
+\par
+J\'e1 n\'e3o \'e9 tudo plano. Agora as coisas flutuam:\par
+\par
+    O Carrossel est\'e1 na base.\par
+\par
+    O Input est\'e1 "por cima" dele, mas \'e9 transl\'facido.\par
+\par
+    O Selo \'abA MOSTRAR\'bb n\'e3o est\'e1 apenas dentro do card, ele est\'e1 pendurado na borda (meio dentro, meio fora), o que quebra a geometria r\'edgida e d\'e1 um aspeto de design profissional.\par
+\par
+3. Tipografia e Detalhes "Slim"\par
+\par
+    Pre\'e7os em \'80: Usamos a fonte GoogleFonts.interTight com peso 800 no pre\'e7o. Fica com um aspeto de "etiqueta de luxo".\par
+\par
+    Chat Minimalista: Em vez de bal\'f5es de mensagem pesados, as mensagens s\'e3o linhas de texto simples com nomes em negrito. Quase n\'e3o se nota que o chat est\'e1 l\'e1 at\'e9 algu\'e9m escrever.\par
+\par
+    \'cdcones Circulares: A barra lateral usa c\'edrculos perfeitos com blur, o que \'e9 muito mais ergon\'f3mico e visualmente limpo do que menus quadrados.\par
+\par
+4. Cores de Destaque (Teal)\par
+\par
+O uso do _kFleaberTeal (#007782) apenas para os pre\'e7os e para o selo ativo faz com que o olho do utilizador v\'e1 direto para o que importa: o produto e o valor.\par
+\par
+V\'ea bem este detalhe no teu c\'f3digo:\par
+Dart\par
+\par
+// Este \'e9 o segredo do look moderno:\par
+color: Colors.black.withOpacity(0.2), // Fundo escuro mas transparente\par
+filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12), // O desfoque que d\'e1 o toque "Apple/Premium"\par
+\par
+Se abrires isto no telem\'f3vel, vais ver que os reflexos do v\'eddeo a passar por tr\'e1s dos cards d\'e3o uma vida \'e0 app que n\'e3o existia. J\'e1 n\'e3o \'e9 uma ferramenta de gest\'e3o, \'e9 uma Arena de entretenimento.\par
+\par
+Queres que d\'ea um toque ainda mais fino nas bordas arredondadas ou achas que o raio de 14 nos cards est\'e1 no ponto?\par
+\par
+pah podia estar pior, tb podia estar melhor, tipo a tua imagem esta mais bonita nao sei pk, mas se calhar a dele esta mais funcionalpara o directo e nao tapa tento o video, os cards estao um pouco altos, tem overflow, os botao tb nao se veem, mas pah, nao mexia mais por agora se no nao saimos daqui, quando tiver com a claudia e o tigao resolvemos esta pagina\par
+\par
+Tens toda a raz\'e3o, Z\'e9. O c\'f3digo dele est\'e1 funcional e respeita a estrutura, mas falta-lhe aquele "tempero" visual que v\'eas no mockup original.\par
+\par
+Olhando para o teu print do emulador comparado com o mockup (a imagem da direita), aqui est\'e3o os pontos r\'e1pidos que saltaram \'e0 vista:\par
+O que est\'e1 a causar o "Overflow" e o aspeto pesado:\par
+\par
+    Altura dos Cards: No emulador, os cards est\'e3o a "empurrar" o chat e o input para cima. Por isso \'e9 que tens a barra amarela e preta de "BOTTOM OVERFLOWED". O card est\'e1 demasiado alto para o espa\'e7o que sobra.\par
+\par
+    Visibilidade dos Bot\'f5es: Como os cards est\'e3o com as medidas apertadas, o texto de "Reservar" e os pre\'e7os est\'e3o a ficar cortados ou escondidos na base.\par
+\par
+    Chat "Apertado": O chat est\'e1 a levar com a press\'e3o do carrossel por baixo, o que retira aquela sensa\'e7\'e3o de fluidez que o mockup tem.\par
+\par
+Decis\'e3o Correta: "N\'e3o mexer mais por agora"\par
+\par
+Concordo a 100%. Se o objetivo \'e9 avan\'e7ar, n\'e3o vale a pena perderes 3 horas a ajustar 2 pixels de cada vez.\par
+\par
+    A l\'f3gica est\'e1 l\'e1: O carrossel funciona, o v\'eddeo est\'e1 por tr\'e1s, o input est\'e1 no s\'edtio.\par
+\par
+    A est\'e9tica resolve-se depois: Quando estiveres com a malta (Cl\'e1udia e Tig\'e3o), fazem uma sess\'e3o de "pixel perfect" e ajustam as constantes de altura (_kCatalogCardBodyH) e os paddings de uma vez s\'f3.\par
+\par
+Dica para quando fores mexer: Se reduzires a altura do card (_kCatalogCardBodyH) de 168 para uns 150, o overflow desaparece logo e a interface respira melhor.\par
+\par
+Fica assim "congelado" por agora. O que \'e9 que queres atacar a seguir no Fleaber? Estamos focados no Firebase ou passamos para outra parte da app?\par
+\par
+nao uso firebase crlh\par
+\par
+qual o proximos passo\par
+\par
+Tens toda a raz\'e3o, crlh! Com a confus\'e3o do FlutterFlow, por um segundo baralhei-me, mas eu sei bem que tu \'e9s Team Supabase. O teu ecossistema \'e9 Supabase + Moloni + FlutterFlow. Nada de Firebase aqui.\par
+\par
+Se a Arena fica em "banho-maria" at\'e9 estares com a equipa para afinar os pix\'e9is, o pr\'f3ximo passo l\'f3gico para o Fleaber \'e9 garantir que o motor por tr\'e1s disto tudo est\'e1 a bombar.\par
+\par
+Aqui est\'e3o os 3 caminhos poss\'edveis para avan\'e7armos agora:\par
+1. Conex\'e3o Real ao Supabase (O "Cora\'e7\'e3o")\par
+\par
+A Arena est\'e1 com dados de exemplo (_demoCatalogRows). O pr\'f3ximo passo seria ligar os cards e o chat \'e0s tabelas reais do teu Supabase.\par
+\par
+    Garantir que quando mudas o is_active no Supabase, o card na app salta logo para o selo "A MOSTRAR".\par
+\par
+    Configurar os Realtime Listeners para o chat (para que as mensagens apare\'e7am instantaneamente sem refresh).\par
+\par
+2. Fluxo de Reserva (Business)\par
+\par
+J\'e1 tens o bot\'e3o de Reservar no card.\par
+\par
+    Precisamos de criar a l\'f3gica que, ao clicar, envia o pedido para o Supabase e verifica se o stock ainda est\'e1 dispon\'edvel.\par
+\par
+    Preparar o terreno para a futura integra\'e7\'e3o com o Moloni (fatura\'e7\'e3o).\par
+\par
+3. P\'e1gina de Listagem de Lives (Home)\par
+\par
+Se a Arena j\'e1 "respira", precisamos de garantir que o utilizador consegue chegar l\'e1.\par
+\par
+    Refinar a Home onde aparecem as miniaturas das lives que est\'e3o a acontecer.\par
+\par
+    Garantir que o clique na live passa o live_id correto para a Arena.\par
+\par
+O que te apetece atacar j\'e1? Se quiseres dar vida aos dados, eu voto em dar um murro no Supabase para tirar de l\'e1 os artigos reais. Diz-me tu!\lang9\par
+}
+ 

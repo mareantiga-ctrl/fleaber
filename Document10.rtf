@@ -1,0 +1,578 @@
+{\rtf1\ansi\ansicpg1252\deff0\nouicompat\deflang1033{\fonttbl{\f0\fnil\fcharset0 Calibri;}{\f1\fnil Calibri;}}
+{\colortbl ;\red0\green0\blue255;}
+{\*\generator Riched20 10.0.19041}\viewkind4\uc1 
+\pard\sa200\sl276\slmult1\f0\fs22\lang9 website.rar\par
+Ficheiro\par
+ta ai o ficheiro\par
+as cores do fleaber sao assim, faz um prompt em conformidade e va la onde da para colocar uns icons para nao ser so texto, sem abusar, tudo funcional\par
+Documento sem nome.docx\par
+Documento\par
+Downloads.rar\par
+Ficheiro\par
+lib5.21.26.5.39.rar\par
+Ficheiro\par
+ja aparece o vedio, demorou dois prompt para o cursor colocar o cursor a bulir..\par
+\par
+agora topa ai o projecto e da me a tua vidao real sobre ele, nao que so paninhos quentes..\par
+Downloads(1).rar\par
+Ficheiro\par
+000a.rtf\par
+Ficheiro\par
+pa porque o video nao saio de landscape man\par
+ezyZip.zip\par
+Arquivo Zip\par
+o que achas do disaing e das cores\par
+Editar\par
+\par
+Isto \'e9 MUITO importante:\par
+\par
+o teu \'faltimo teste j\'e1 N\'c3O foi ParticipantEgress.\par
+\par
+Olha esta linha:\par
+\par
+"egress_mode":"track_composite"\par
+\par
+Ou seja:\par
+\par
+j\'e1 mudaste para TrackCompositeEgress\par
+j\'e1 est\'e1s a enviar video_track_id\par
+j\'e1 est\'e1s com preset:4\par
+e MESMO ASSIM continua errado\par
+\par
+Isso elimina oficialmente a teoria de que o problema era \ldblquote ParticipantEgress simples\rdblquote .\par
+\par
+E os logs continuam a provar exatamente o mesmo padr\'e3o:\par
+\par
+"webrtc_width":720,\par
+"webrtc_height":1280,\par
+"portrait_webrtc":true\par
+\par
+MAS depois:\par
+\par
+"width":540.0,\par
+"height":960.0,\par
+"portrait_meta":true\par
+\par
+e visualmente continua landscape + barras.\par
+\par
+Isso praticamente fecha o diagn\'f3stico:\par
+\par
+O problema est\'e1 no compositor/encoder do egress LiveKit no Android MTK/TCL\par
+\par
+Especialmente porque:\par
+\par
+"manual_quarter_turns":0\par
+"rotation_correction":0\par
+\par
+o player n\'e3o est\'e1 a rodar nada.\par
+\par
+E:\par
+\par
+"egress_video_track_id":"TR_VCegMEN58WqZ4u"\par
+\par
+significa que o track certo est\'e1 a ser usado.\par
+\par
+Portanto:\par
+\par
+captura est\'e1 correcta\par
+track est\'e1 correcta\par
+preset portrait est\'e1 correcto\par
+TrackComposite j\'e1 est\'e1 correcto\par
+player est\'e1 correcto\par
+\par
+e o v\'eddeo continua \ldblquote deitado dentro de portrait\rdblquote .\par
+\par
+Isso aponta MESMO para:\par
+\par
+rota\'e7\'e3o embebida no frame WebRTC Android\par
+compositor do LiveKit a ignorar transform/orientation metadata\par
+ou bug espec\'edfico MTK/TCL + egress pipeline\par
+\par
+Outra coisa importante:\par
+\par
+"egress_layout":null\par
+\par
+Isto \'e9 relevante.\par
+\par
+Porque no TrackCompositeEgress o LiveKit continua a usar um compositor interno default.\par
+\par
+E o default pode estar a fazer FIT/CONTAIN em vez de COVER.\par
+\par
+Ou seja:\par
+\par
+O pr\'f3ximo passo j\'e1 n\'e3o \'e9 \ldblquote trocar preset\rdblquote\par
+\par
+O pr\'f3ximo passo \'e9:\par
+\par
+testar RoomCompositeEgress com layout portrait custom\par
+\par
+Porque a\'ed consegues controlar CSS/layout do compositor.\par
+\par
+Tipo:\par
+\par
+canvas 720\'d71280\par
+v\'eddeo fill/cover\par
+object-fit: cover\par
+sem contain/letterbox\par
+\par
+Isso \'e9 MUITO diferente do TrackComposite.\par
+\par
+O TrackComposite ainda \'e9 \ldblquote pipeline autom\'e1tica\rdblquote .\par
+\par
+O RoomComposite j\'e1 \'e9 praticamente:\par
+\par
+browser headless\par
+HTML/CSS layout\par
+render controlado\par
+\par
+E honestamente?\par
+\par
+Neste momento acho MAIS prov\'e1vel resolveres com:\par
+\par
+RoomComposite custom portrait\par
+\par
+do que:\par
+\par
+MediaMTX\par
+voltar ao Haishin\par
+hacks no player\par
+\par
+Outra coisa importante nos teus logs:\par
+\par
+"active_egress_after_start":1\par
+\par
+e:\par
+\par
+"active_egress_before":0\par
+\par
+Excelente sinal.\par
+\par
+Significa que o problema dos egress \'f3rf\'e3os parece resolvido.\par
+\par
+E isto tamb\'e9m:\par
+\par
+"livekit.egress.stop.done"\par
+\par
+Portanto pelo menos j\'e1 n\'e3o est\'e1s a torrar minutos infinitos como antes.\par
+\par
+Agora outra bomba importante:\par
+\par
+LiveKit Exception:\par
+[NegotiationError]\par
+The order of m-lines in subsequent offer doesn't match\par
+\par
+Isto indica que:\par
+\par
+est\'e1s provavelmente a recriar/republicar tracks depois do preview\par
+ou reconnect r\'e1pido demais\par
+ou a mexer nas tracks ap\'f3s connect\par
+\par
+E isto pode estar relacionado com:\par
+\par
+"recreated_tracks_after_preview":true\par
+\par
+Esse erro pode causar comportamentos estranhos de SDP/transforms/orientation.\par
+\par
+Eu investigava ISSO tamb\'e9m.\par
+\par
+Porque o WebRTC pode estar:\par
+\par
+a renegociar\par
+a trocar sender/transceiver\par
+a perder metadata de orientation no segundo publish\par
+\par
+Isso \'e9 MUITO poss\'edvel.\par
+\par
+Portanto o meu diagn\'f3stico actualizado \'e9:\par
+\par
+MAIS prov\'e1vel neste momento\par
+1. Bug/limita\'e7\'e3o do compositor LiveKit + MTK orientation metadata\par
+\par
+OU\par
+\par
+2. A renegocia\'e7\'e3o WebRTC est\'e1 a estragar orientation/transforms antes do egress\par
+\par
+e n\'e3o:\par
+\par
+Mux\par
+player Flutter\par
+aspect ratio\par
+viewer HLS\par
+\par
+Sinceramente?\par
+\par
+Eu fazia EXACTAMENTE isto agora:\par
+\par
+PRIORIDADE 1\par
+\par
+Eliminar a renegocia\'e7\'e3o estranha:\par
+\par
+n\'e3o recriar tracks ap\'f3s preview\par
+n\'e3o reconnect r\'e1pido\par
+uma \'fanica track desde in\'edcio at\'e9 publish\par
+evitar recreated_tracks_after_preview:true\par
+\par
+Porque esse erro SDP n\'e3o devia existir.\par
+\par
+PRIORIDADE 2\par
+\par
+Testar RoomCompositeEgress portrait custom.\par
+\par
+PRIORIDADE 3\par
+\par
+S\'f3 depois considerar MediaMTX/SRS.\par
+\par
+Porque honestamente?\par
+\par
+J\'e1 est\'e1s MUITO perto.\par
+\par
+Os logs est\'e3o limpos.\par
+O publish funciona.\par
+O viewer funciona.\par
+O cleanup funciona.\par
+\par
+O \'fanico problema real agora \'e9:\par
+\par
+como o LiveKit est\'e1 a compor/renderizar o frame final.\par
+PS C:\\Users\\Casa\\Desktop\\Fleaber\\fleaber> \par
+Oops, something went wrong.  Please report this bug with the details below.Report on GitHub: {{\field{\*\fldinst{HYPERLINK https://github.com/lzybkr/PSReadLine/issues/new }}{\fldrslt{https://github.com/lzybkr/PSReadLine/issues/new\ul0\cf0}}}}\f0\fs22\par
+-----------------------------------------------------------------------\par
+Last 1 Keys:\par
+ Ctrl+v\par
+\par
+Exception:\par
+System.ArgumentOutOfRangeException: The value must be greater than or equal to zero and less than the console's buffer size in that dimension.\par
+Parameter name: top\par
+Actual value was -1.\par
+   at System.Console.SetCursorPosition(Int32 left, Int32 top)\par
+   at Microsoft.PowerShell.PSConsoleReadLine.ReallyRender(RenderData render\par
+   at Microsoft.PowerShell.PSConsoleReadLine.ForceRender()\par
+   at Microsoft.PowerShell.PSConsoleReadLine.Paste(Nullable1 key, Object arg)\par
+   at Microsoft.PowerShell.PSConsoleReadLine.ProcessOneKey(ConsoleKeyInfo key, Dictionary2 dispatchTable, Boolean ignoreIfNoAction, Object arg)\par
+   at Microsoft.PowerShell.PSConsoleReadLine.InputLoop()\par
+   at Microsoft.PowerShell.PSConsoleReadLine.ReadLine(Runspace runspace, EngineIntrinsics engineIntrinsics)\par
+PS C:\\Users\\Casa\\Desktop\\Fleaber\\fleaber> npx supabase functions deploy livekit-mux-publish\par
+WARNING: Docker is not running\par
+Uploading asset (livekit-mux-publish): supabase/functions/livekit-mux-publish/index.ts\par
+Uploading asset (livekit-mux-publish): supabase/functions/_shared/livekit_egress_helpers.ts\par
+Deployed Functions on project fxdknzrqjenzqcvnwqqq: livekit-mux-publish\par
+You can inspect your deployment in the Dashboard: {{\field{\*\fldinst{HYPERLINK https://supabase.com/dashboard/project/fxdknzrqjenzqcvnwqqq/functions }}{\fldrslt{https://supabase.com/dashboard/project/fxdknzrqjenzqcvnwqqq/functions\ul0\cf0}}}}\f0\fs22\par
+PS C:\\Users\\Casa\\Desktop\\Fleaber\\fleaber> flutter build apk --release\par
+Resolving dependencies... \par
+Downloading packages... \par
+  app_links 6.3.2 (7.0.0 available)\par
+  chewie 1.11.3 (1.14.1 available)\par
+  dbus 0.7.12 (0.7.13 available)\par
+  device_info_plus 12.4.0 (13.1.0 available)\par
+  device_info_plus_platform_interface 7.0.3 (8.1.0 available)\par
+  flutter_animate 4.5.0 (4.5.2 available)\par
+  flutter_lints 4.0.0 (6.0.0 available)\par
+  flutter_webrtc 1.4.0 (1.4.1 available)\par
+  font_awesome_flutter 10.7.0 (11.0.0 available)\par
+  freezed_annotation 2.4.4 (3.1.0 available)\par
+  functions_client 2.4.2 (2.5.0 available)\par
+  go_router 12.1.3 (17.2.3 available)\par
+  google_fonts 6.3.3 (8.1.0 available)\par
+  gotrue 2.12.0 (2.20.0 available)\par
+! http 1.4.0 (overridden) (1.6.0 available)\par
+  iregexp 0.1.2 (0.2.0 available)\par
+  json_path 0.7.2 (0.9.0 available)\par
+  lints 4.0.0 (6.1.0 available)\par
+  matcher 0.12.19 (0.12.20 available)\par
+  maybe_just_nothing 0.5.3 (0.6.0 available)\par
+  meta 1.17.0 (1.18.2 available)\par
+  package_info_plus 8.3.1 (10.1.0 available)\par
+  package_info_plus_platform_interface 3.2.1 (4.1.0 available)\par
+  page_transition 2.1.0 (2.2.2 available)\par
+  path_provider 2.1.4 (2.1.5 available)\par
+  path_provider_android 2.2.10 (2.3.1 available)\par
+  path_provider_foundation 2.4.0 (2.6.0 available)\par
+  petitparser 6.1.0 (7.0.2 available)\par
+  postgrest 2.4.2 (2.7.0 available)\par
+  provider 6.1.5 (6.1.5+1 available)\par
+  realtime_client 2.5.0 (2.7.3 available)\par
+! rxdart 0.27.7 (overridden) (0.28.0 available)\par
+  shared_preferences 2.5.3 (2.5.5 available)\par
+  shared_preferences_android 2.4.10 (2.4.23 available)\par
+  shared_preferences_foundation 2.5.4 (2.5.6 available)\par
+  shared_preferences_platform_interface 2.4.1 (2.4.2 available)\par
+  sign_in_with_apple 7.0.1 (8.0.0 available)\par
+  smooth_page_indicator 1.2.1 (2.0.1 available)\par
+  sqflite 2.3.3+1 (2.4.2+1 available)\par
+  sqflite_common 2.5.4+3 (2.5.8 available)\par
+  storage_client 2.4.0 (2.5.2 available)\par
+  supabase 2.7.0 (2.10.6 available)\par
+  supabase_flutter 2.9.0 (2.12.4 available)\par
+  test_api 0.7.10 (0.7.12 available)\par
+  url_launcher 6.3.1 (6.3.2 available)\par
+  url_launcher_android 6.3.16 (6.3.30 available)\par
+  url_launcher_ios 6.3.3 (6.4.1 available)\par
+  url_launcher_linux 3.2.1 (3.2.2 available)\par
+  url_launcher_macos 3.2.2 (3.2.5 available)\par
+  url_launcher_web 2.4.1 (2.4.3 available)\par
+  url_launcher_windows 3.1.4 (3.1.5 available)\par
+! uuid 4.5.3 (overridden)\par
+  vector_math 2.2.0 (2.3.0 available)\par
+  video_player 2.10.0 (2.11.1 available)\par
+  video_player_android 2.8.7 (2.9.5 available)\par
+  video_player_avfoundation 2.7.1 (2.9.7 available)\par
+  video_player_platform_interface 6.3.0 (6.7.0 available)\par
+  video_player_web 2.3.5 (2.4.0 available)\par
+  wakelock_plus 1.3.2 (1.6.1 available)\par
+  wakelock_plus_platform_interface 1.2.3 (1.5.1 available)\par
+  webview_flutter 4.13.0 (4.13.1 available)\par
+  webview_flutter_android 4.7.0 (4.12.0 available)\par
+  webview_flutter_platform_interface 2.13.1 (2.15.1 available)\par
+  webview_flutter_wkwebview 3.22.0 (3.25.1 available)\par
+  win32 5.15.0 (6.3.0 available)\par
+  win32_registry 2.1.0 (3.0.3 available)\par
+  xml 6.5.0 (7.0.1 available)\par
+Got dependencies!\par
+66 packages have newer versions incompatible with dependency constraints.\par
+Try flutter pub outdated for more information.\par
+lib/vendedor/livekit_preview_texture.dart:16:60: Error: The argument type 'VideoTrack' can't be assigned to the parameter type 'LocalVideoTrack'.\par
+ - 'VideoTrack' is from 'package:livekit_client/src/track/local/local.dart' ('../../../AppData/Local/Pub/Cache/hosted/pub.dev/livekit_client-2.7.0/lib/src/track/local/local.dart').\par
+ - 'LocalVideoTrack' is from 'package:livekit_client/src/track/local/video.dart' ('../../../AppData/Local/Pub/Cache/hosted/pub.dev/livekit_client-2.7.0/lib/src/track/local/video.dart').\par
+    final webrtc = FleaberLiveCapture.readWebRtcDimensions(track);\par
+                                                           ^\par
+Target kernel_snapshot_program failed: Exception\par
+\par
+\par
+FAILURE: Build failed with an exception.\par
+\par
+* What went wrong:\par
+Execution failed for task ':app:compileFlutterBuildRelease'.\par
+> Process 'command 'C:\\desenvolvimento\\flutter\\bin\\flutter.bat'' finished with non-zero exit value 1\par
+\par
+* Try:\par
+> Run with --stacktrace option to get the stack trace.\par
+> Run with --info or --debug option to get more log output.\par
+> Run with --scan to get full insights.\par
+> Get more help at {{\field{\*\fldinst{HYPERLINK https://help.gradle.org }}{\fldrslt{https://help.gradle.org\ul0\cf0}}}}\f0\fs22 .\par
+\par
+BUILD FAILED in 45s\par
+Running Gradle task 'assembleRelease'...                           45.8s\par
+Gradle task assembleRelease failed with exit \par
+\par
+Boa. Isto agora j\'e1 deu informa\'e7\'e3o MUITO importante.\par
+\par
+O teu deploy foi feito com sucesso. O problema agora \'e9 s\'f3 de compila\'e7\'e3o Flutter/types \f1\emdash  e os logs confirmam outra coisa importante:\par
+\par
+Tu j\f0\'e1 N\'c3O est\'e1s em ParticipantEgress.\par
+\par
+Est\'e1s em:\par
+\par
+"egress_mode":"track_composite"\par
+\par
+Ou seja:\par
+\par
+j\'e1 mudaste para TrackCompositeEgress\par
+j\'e1 est\'e1s a enviar video_track_id\par
+e mesmo assim continua letterboxed\par
+\par
+Isto elimina mais uma hip\'f3tese.\par
+\par
+E os logs continuam a confirmar o padr\'e3o:\par
+\par
+"webrtc_width":720,\par
+"webrtc_height":1280,\par
+"portrait_webrtc":true,\par
+"lk_pub_portrait":true\par
+\par
+mas depois:\par
+\par
+"width":540.0,\par
+"height":960.0,\par
+"portrait_meta":true\par
+\par
+e visualmente continua landscape dentro do portrait.\par
+\par
+Isto praticamente fecha o diagn\'f3stico:\par
+\par
+O compositor/renderer do egress LiveKit est\'e1 a encaixar o v\'eddeo em contain/fit em vez de cover/fill.\par
+\par
+E agora a build error:\par
+\par
+The argument type 'VideoTrack' can't be assigned to the parameter type 'LocalVideoTrack'\par
+\par
+Isto \'e9 s\'f3 tipagem do Dart.\par
+\par
+Tu tens provavelmente algo assim:\par
+\par
+FleaberLiveCapture.readWebRtcDimensions(track);\par
+\par
+mas o m\'e9todo espera:\par
+\par
+LocalVideoTrack\par
+\par
+e o track atual \'e9 VideoTrack.\par
+\par
+Provavelmente porque no preview est\'e1s a usar um tipo mais gen\'e9rico.\par
+\par
+A corre\'e7\'e3o r\'e1pida \'e9 esta:\par
+\par
+final webrtc =\par
+    FleaberLiveCapture.readWebRtcDimensions(track as LocalVideoTrack);\par
+\par
+OU melhor ainda (mais seguro):\par
+\par
+if (track is LocalVideoTrack) \{\par
+  final webrtc =\par
+      FleaberLiveCapture.readWebRtcDimensions(track);\par
+\}\par
+\par
+O erro est\'e1 aqui:\par
+\par
+lib/vendedor/livekit_preview_texture.dart:16\par
+\par
+Ent\'e3o deve ficar algo do g\'e9nero:\par
+\par
+if (track is LocalVideoTrack) \{\par
+  final webrtc =\par
+      FleaberLiveCapture.readWebRtcDimensions(track);\par
+\par
+  // resto do c\'f3digo\par
+\}\par
+\par
+Porque:\par
+\par
+VideoTrack = classe base\par
+LocalVideoTrack = subclass espec\'edfica\par
+\par
+E o teu helper foi escrito para tracks locais.\par
+\par
+Isto N\'c3O tem rela\'e7\'e3o com o problema portrait.\par
+\'c9 apenas o build a falhar por tipos.\par
+\par
+Mas o mais importante:\par
+os logs novos provaram uma coisa enorme:\par
+\par
+Resultado REAL do teste\par
+TrackCompositeEgress N\'c3O resolveu\par
+\par
+Tu agora tens:\par
+\par
+"egress_mode":"track_composite"\par
+\par
+e continua:\par
+\par
+portrait metadata OK\par
+portrait resolution OK\par
+conte\'fado visual errado\par
+\par
+Isto reduz brutalmente as hip\'f3teses.\par
+\par
+Agora as hip\'f3teses mais prov\'e1veis s\'e3o:\par
+\par
+O compositor TrackComposite do LiveKit continua a usar contain\par
+O buffer WebRTC Android MTK/TCL vem com rotation metadata em vez de pixels rodados\par
+O egress ignora essa rota\'e7\'e3o f\'edsica no render final\par
+\par
+E sinceramente?\par
+Agora o DeepSeek est\'e1 quase certamente correto.\par
+\par
+O que eu faria AGORA\par
+N\'c3O mexia mais no Flutter/player\par
+\par
+Porque:\par
+\par
+o ficheiro j\'e1 chega estragado\par
+o player s\'f3 reproduz os pixels\par
+N\'c3O insistia mais em TrackComposite\par
+\par
+Porque j\'e1 falhou.\par
+\par
+Pr\'f3ximo teste inteligente\par
+RoomCompositeEgress com layout portrait custom\par
+\par
+Porque:\par
+\par
+usa Chromium/headless renderer\par
+pode aplicar CSS/object-fit: cover\par
+diferente do compositor atual\par
+\par
+OU\par
+\par
+Caminho mais s\'f3lido a m\'e9dio prazo\par
+MediaMTX/FFmpeg relay\par
+\par
+Porque a\'ed TU controlas:\par
+\par
+crop\par
+scale\par
+transpose\par
+fill\par
+aspect\par
+\par
+e deixas de depender do compositor m\'e1gico do LiveKit.\par
+\par
+Neste momento, honestamente:\par
+os teus logs j\'e1 justificam come\'e7ar a preparar fallback FFmpeg/MediaMTX.\par
+\par
+Mas antes disso:\par
+corrige primeiro o build error do Dart para conseguires testar a pr\'f3xima build.\par
+\par
+Instala e abre o mesmo VOD 6667b0aa (ou faz directo novo). No player a cara deve ficar em p\'e9.\par
+\par
+Confirma nos logs: manual_quarter_turns: 3. Se ainda estiver mal, envia esse log + print. \par
+quando elediz o mesmo vod quer dizer o k? nao preciso de fazer nova flutter build apk? tenho de fazer o k entao\par
+\par
+Ele est\'e1 a referir-se ao VOD j\'e1 gravado no Mux (6667b0aa provavelmente \'e9 o ID abreviado do teste anterior).\par
+\par
+Mas aten\'e7\'e3o:\par
+se mudaste c\'f3digo Flutter (como manual_quarter_turns: 3 no player), ENT\'c3O SIM \f1\emdash  precisas de nova build APK e instalar essa APK no telem\f0\'f3vel.\par
+\par
+O fluxo correto agora \'e9:\par
+\par
+Corrigir o erro de build (LocalVideoTrack)\par
+Fazer:\par
+flutter build apk --release\par
+Instalar a nova APK no TCL\par
+Abrir:\par
+ou o mesmo VOD antigo\par
+ou fazer um novo directo\par
+\par
+Porque a altera\'e7\'e3o \'e9 no PLAYER, n\'e3o no v\'eddeo.\par
+\par
+Ou seja:\par
+\par
+o ficheiro Mux continua igual\par
+mas o teu player pode rodar visualmente o v\'eddeo\par
+\par
+Por isso ele disse \ldblquote abre o mesmo VOD\rdblquote .\par
+\par
+Isso serve para testar rapidamente sem precisares de fazer live nova.\par
+\par
+Neste momento o teu problema \'e9:\par
+a build falhou, portanto a APK nova nunca foi instalada.\par
+\par
+Ent\'e3o ainda est\'e1s a correr a vers\'e3o antiga da app.\par
+\par
+Primeiro faz isto:\par
+\par
+if (track is LocalVideoTrack) \{\par
+  final webrtc =\par
+      FleaberLiveCapture.readWebRtcDimensions(track);\par
+\}\par
+\par
+Depois:\par
+\par
+flutter build apk --release\par
+\par
+Depois instala a APK.\par
+\par
+Depois abre o VOD.\par
+\par
+Depois v\'ea os logs:\par
+\par
+"manual_quarter_turns": 3\par
+\par
+Se aparecer isso e a cara ficar direita:\par
+\par
+o problema era s\'f3 rota\'e7\'e3o visual no player\par
+\par
+Se aparecer isso MAS continuar com barras/zoom estranho:\par
+\par
+ent\'e3o o ficheiro vem realmente letterboxed do egress.\par
+}
+ 

@@ -29,6 +29,27 @@ class LiveOpsStagingClient {
         'Prefer': 'return=representation',
       };
 
+  Future<String> userIdForAccessToken(String accessToken) async {
+    final res = await http.get(
+      Uri.parse('$url/auth/v1/user'),
+      headers: {
+        'apikey': anonKey,
+        'Authorization': 'Bearer $accessToken',
+      },
+    );
+    if (res.statusCode < 200 || res.statusCode >= 300) {
+      throw HttpException(
+        'user ${res.statusCode}: ${res.body}',
+      );
+    }
+    final map = jsonDecode(res.body) as Map<String, dynamic>;
+    final id = map['id']?.toString() ?? '';
+    if (id.isEmpty) {
+      throw const HttpException('user: id em falta');
+    }
+    return id;
+  }
+
   Future<String> signIn({
     required String email,
     required String password,
@@ -173,6 +194,27 @@ Map<String, String> loadLiveOpsStagingEnv([String? path]) {
     out[t.substring(0, i).trim()] = t.substring(i + 1).trim();
   }
   return out;
+}
+
+/// Raiz do projeto: `https://xxx.supabase.co` (sem `/rest/v1`).
+final RegExp _uuidRe = RegExp(
+  r'^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$',
+  caseSensitive: false,
+);
+
+bool isUuid(String value) => _uuidRe.hasMatch(value.trim());
+
+String normalizeSupabaseProjectUrl(String raw) {
+  var u = raw.trim();
+  if (u.isEmpty) return u;
+  u = u.replaceAll(RegExp(r'/+$'), '');
+  for (final suffix in ['/rest/v1', '/auth/v1', '/functions/v1']) {
+    if (u.endsWith(suffix)) {
+      u = u.substring(0, u.length - suffix.length);
+      u = u.replaceAll(RegExp(r'/+$'), '');
+    }
+  }
+  return u;
 }
 
 String envRequire(Map<String, String> env, String key) {

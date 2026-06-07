@@ -14,6 +14,7 @@ import '/flutter_flow/flutter_flow_util.dart';
 import '/index.dart';
 import '/utils/fleaber_logger.dart';
 import '/utils/fleaber_stripe_checkout_context.dart';
+import '/utils/fleaber_stripe_tip_context.dart';
 import '/utils/live_reservation_queue_service.dart';
 
 export 'package:go_router/go_router.dart';
@@ -493,6 +494,7 @@ class _StripeReturnResolverState extends State<_StripeReturnResolver> {
     final sessionId = widget.sessionId?.trim() ?? '';
     if (sessionId.isNotEmpty) {
       await FleaberStripeCheckoutContext.settleCheckoutSession(sessionId);
+      await FleaberStripeTipContext.settleTipStripeSession(sessionId);
     }
 
     var liveId = widget.liveId?.trim() ?? '';
@@ -561,6 +563,29 @@ class _StripeReturnResolverState extends State<_StripeReturnResolver> {
           } catch (_) {}
         }
         await FleaberStripeCheckoutContext.loadAndClear();
+      }
+    }
+
+    final tipCtx = await FleaberStripeTipContext.peek();
+    if (tipCtx != null) {
+      final tipId = tipCtx['tip_id']?.toString().trim() ?? '';
+      if (tipId.isNotEmpty) {
+        final tipStatus = await FleaberStripeTipContext.tipStatus(tipId);
+        if (FleaberStripeTipContext.isTipSettled(tipStatus)) {
+          await FleaberStripeTipContext.clear();
+        }
+      }
+      if (liveId.isEmpty) {
+        liveId = tipCtx['live_id']?.toString().trim() ?? '';
+      }
+      if (playbackId.isEmpty) {
+        playbackId = tipCtx['playback_id']?.toString().trim() ?? '';
+      }
+      if (sellerId.isEmpty) {
+        sellerId = tipCtx['seller_id']?.toString().trim() ?? '';
+      }
+      if (isLive == null) {
+        isLive = tipCtx['is_live'] == true || tipCtx['is_live'] == 'true';
       }
     }
 

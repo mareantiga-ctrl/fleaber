@@ -1214,37 +1214,41 @@ class _HomePageWidgetState extends State<HomePageWidget>
                                   ].divide(SizedBox(height: 4.0)),
                                 ),
                               ),
-                              InkWell(
-                                splashColor: Colors.transparent,
-                                focusColor: Colors.transparent,
-                                hoverColor: Colors.transparent,
-                                highlightColor: Colors.transparent,
-                                onTap: () async {
-                                  await _showCreateBottomSheet();
-                                },
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Container(
-                                      width: 52.0,
-                                      height: 52.0,
-                                      decoration: BoxDecoration(
-                                        color: Color(0xFF007782),
-                                        shape: BoxShape.circle,
-                                        boxShadow: const [
-                                          FleaberElevation.mdFab,
-                                        ],
+                              Semantics(
+                                label: 'Fleaber criar',
+                                button: true,
+                                child: InkWell(
+                                  splashColor: Colors.transparent,
+                                  focusColor: Colors.transparent,
+                                  hoverColor: Colors.transparent,
+                                  highlightColor: Colors.transparent,
+                                  onTap: () async {
+                                    await _showCreateBottomSheet();
+                                  },
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Container(
+                                        width: 52.0,
+                                        height: 52.0,
+                                        decoration: BoxDecoration(
+                                          color: Color(0xFF007782),
+                                          shape: BoxShape.circle,
+                                          boxShadow: const [
+                                            FleaberElevation.mdFab,
+                                          ],
+                                        ),
+                                        child: Icon(
+                                          _homeTabIndex == 1
+                                              ? Icons.photo_camera_rounded
+                                              : Icons.videocam_rounded,
+                                          color: Colors.white,
+                                          size: 28.0,
+                                        ),
                                       ),
-                                      child: Icon(
-                                        _homeTabIndex == 1
-                                            ? Icons.photo_camera_rounded
-                                            : Icons.videocam_rounded,
-                                        color: Colors.white,
-                                        size: 28.0,
-                                      ),
-                                    ),
-                                  ],
+                                    ],
+                                  ),
                                 ),
                               ),
                               InkWell(

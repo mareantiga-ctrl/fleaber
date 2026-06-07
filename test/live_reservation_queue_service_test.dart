@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 
+import 'package:fleaber/utils/live_catalog_stock_service.dart';
 import 'package:fleaber/utils/live_reservation_queue_service.dart';
 
 void main() {
@@ -165,6 +166,55 @@ void main() {
         LiveReservationQueueService.isAcceptedAwaitingPayment(
           status: 'accepted',
           notes: 'bag_removed',
+        ),
+        isFalse,
+      );
+    });
+
+    test('needsUrgentQtyConfirmCard só com stock insuficiente', () {
+      const stockOk = LiveCatalogStockSnapshot(
+        liveItemId: 'i1',
+        liveId: 'l1',
+        itemKind: 'live_only',
+        totalQty: 5,
+        blockedQty: 0,
+        reservedAcceptedQty: 0,
+        pendingBagQty: 1,
+        soldConvertedQty: 0,
+        availableQty: 4,
+      );
+      expect(
+        LiveReservationQueueService.needsUrgentQtyConfirmCard(
+          requestedQty: 1,
+          stock: stockOk,
+          notesNeedQtyConfirm: true,
+        ),
+        isFalse,
+      );
+      const stockTight = LiveCatalogStockSnapshot(
+        liveItemId: 'i2',
+        liveId: 'l1',
+        itemKind: 'live_only',
+        totalQty: 2,
+        blockedQty: 0,
+        reservedAcceptedQty: 0,
+        pendingBagQty: 3,
+        soldConvertedQty: 0,
+        availableQty: 0,
+      );
+      expect(
+        LiveReservationQueueService.needsUrgentQtyConfirmCard(
+          requestedQty: 3,
+          stock: stockTight,
+          notesNeedQtyConfirm: true,
+        ),
+        isTrue,
+      );
+      expect(
+        LiveReservationQueueService.needsUrgentQtyConfirmCard(
+          requestedQty: 2,
+          stock: stockTight,
+          notesNeedQtyConfirm: false,
         ),
         isFalse,
       );

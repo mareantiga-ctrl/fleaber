@@ -15,7 +15,40 @@ type LiveTipCheckoutRequest = {
   message?: string;
   playback_id?: string;
   is_live?: boolean;
+  web_return_origin?: string;
 };
+
+function stripeReturnQuery(
+  sessionId: string,
+  options: {
+    liveId?: string;
+    playbackId?: string;
+    isLive?: string;
+    sellerId?: string;
+  },
+) {
+  const params = new URLSearchParams({ session_id: sessionId });
+  if (options.liveId) {
+    params.set("liveId", options.liveId);
+    params.set("live_id", options.liveId);
+  }
+  if (options.playbackId) params.set("playbackId", options.playbackId);
+  if (options.isLive) params.set("isLive", options.isLive);
+  if (options.sellerId) params.set("sellerId", options.sellerId);
+  return params;
+}
+
+function fleaberDeepLinkUrl(
+  sessionId: string,
+  options: {
+    liveId?: string;
+    playbackId?: string;
+    isLive?: string;
+    sellerId?: string;
+  },
+) {
+  return `fleaber://fleaber.com/stripe-success?${stripeReturnQuery(sessionId, options).toString()}`;
+}
 
 function textResponse(message: string, status = 200) {
   return new Response(message, {
@@ -45,13 +78,11 @@ function androidIntentUrl(
     liveId?: string;
     playbackId?: string;
     isLive?: string;
+    sellerId?: string;
   },
 ) {
-  const params = new URLSearchParams({ session_id: sessionId });
-  if (options.liveId) params.set("liveId", options.liveId);
-  if (options.playbackId) params.set("playbackId", options.playbackId);
-  if (options.isLive) params.set("isLive", options.isLive);
-  const deepLinkPath = `fleaber.com/stripe-success?${params.toString()}`;
+  const deepLinkPath =
+    `fleaber.com/stripe-success?${stripeReturnQuery(sessionId, options).toString()}`;
   const fallback = encodeURIComponent("https://fleaber.app");
   return `intent://${deepLinkPath}#Intent;scheme=fleaber;package=com.mycompany.fleaber;S.browser_fallback_url=${fallback};end`;
 }
@@ -91,11 +122,13 @@ Deno.serve(async (req) => {
       const liveId = session.metadata?.live_id ?? "";
       const playbackId = session.metadata?.playback_id ?? "";
       const isLive = session.metadata?.is_live ?? "true";
-      const successfulAppUrl = androidIntentUrl(sessionId, {
+      const sellerId = session.metadata?.seller_id ?? "";
+      const returnOptions = {
         liveId,
         playbackId,
         isLive,
-      });
+        sellerId,
+      };
 
       let settleError = "";
       if (
@@ -122,7 +155,19 @@ Deno.serve(async (req) => {
 
       const paid = session.payment_status === "paid";
       if (paid && settleError.length === 0) {
-        return intentRedirectResponse(successfulAppUrl);
+        const webAppUrl = (
+          Deno.env.get("FLEABER_WEB_APP_URL") ??
+          session.metadata?.web_return_origin ??
+          ""
+        ).trim();
+        if (webAppUrl.length > 0) {
+          const webReturn =
+            `${webAppUrl.replace(/\/$/, "")}/stripe-success?${stripeReturnQuery(sessionId, returnOptions).toString()}`;
+          return intentRedirectResponse(webReturn);
+        }
+        return intentRedirectResponse(
+          androidIntentUrl(sessionId, returnOptions),
+        );
       }
       if (paid && settleError.length > 0) {
         return textResponse(
@@ -169,6 +214,7 @@ Deno.serve(async (req) => {
     const message = body.message?.trim() || null;
     const playbackId = body.playback_id?.trim() || "";
     const isLive = body.is_live === false ? "false" : "true";
+    const webReturnOrigin = body.web_return_origin?.trim() || "";
 
     let tipId = body.tip_id?.trim();
     if (!tipId) {
@@ -214,6 +260,9 @@ Deno.serve(async (req) => {
         playback_id: playbackId,
         is_live: isLive,
         amount_eur: String(amountEur),
+        ...(webReturnOrigin.length > 0
+          ? { web_return_origin: webReturnOrigin }
+          : {}),
       },
     });
 

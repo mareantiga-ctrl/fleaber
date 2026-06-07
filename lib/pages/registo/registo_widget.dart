@@ -39,6 +39,7 @@ class _RegistoWidgetState extends State<RegistoWidget> {
   late RegistoModel _model;
 
   final scaffoldKey = GlobalKey<ScaffoldState>();
+  bool _creatingAccount = false;
 
   @override
   void initState() {
@@ -556,46 +557,99 @@ class _RegistoWidgetState extends State<RegistoWidget> {
                         width: double.infinity,
                         label: 'Criar Conta',
                         fontWeight: FontWeight.w600,
-                        onPressed: () async {
-                          if (_model.formKey.currentState == null ||
-                              !_model.formKey.currentState!.validate()) {
-                            return;
-                          }
-                          GoRouter.of(context).prepareAuthEvent();
+                        loading: _creatingAccount,
+                        onPressed: _creatingAccount
+                            ? null
+                            : () async {
+                                if (_model.formKey.currentState == null ||
+                                    !_model.formKey.currentState!.validate()) {
+                                  return;
+                                }
+                                setState(() => _creatingAccount = true);
+                                try {
+                                  GoRouter.of(context).prepareAuthEvent();
 
-                          final user = await authManager.createAccountWithEmail(
-                            context,
-                            _model.txtEmailTextController.text,
-                            _model.txtSenhaTextController.text,
-                          );
-                          if (user == null) {
-                            return;
-                          }
+                                  final email =
+                                      _model.txtEmailTextController.text.trim();
+                                  final password =
+                                      _model.txtSenhaTextController.text;
 
-                          final phoneRaw =
-                              _model.txtTelefoneTextController.text.trim();
+                                  final user =
+                                      await authManager.createAccountWithEmail(
+                                    context,
+                                    email,
+                                    password,
+                                  );
+                                  if (user == null) {
+                                    if (context.mounted) {
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
+                                        const SnackBar(
+                                          content: Text(
+                                            'Não foi possível concluir o registo. '
+                                            'Se o email pedir confirmação, verifica a caixa de entrada; '
+                                            'caso contrário, tenta Entrar.',
+                                          ),
+                                        ),
+                                      );
+                                    }
+                                    return;
+                                  }
 
-                          await ProfilesTable().insert({
-                            'id': currentUserUid,
-                            'full_name':
-                                _model.txtNomeTextController.text.trim(),
-                            'phone': phoneRaw,
-                            'user_type': 'vendedor',
-                          });
+                                  final phoneRaw =
+                                      _model.txtTelefoneTextController.text
+                                          .trim();
 
-                          if (phoneRaw.length >= 9 && context.mounted) {
-                            await showPhoneVerificationSheet(
-                              context,
-                              phoneRaw: phoneRaw,
-                            );
-                          }
+                                  final profilePayload = {
+                                    'id': currentUserUid,
+                                    'full_name': _model.txtNomeTextController
+                                        .text
+                                        .trim(),
+                                    'phone': phoneRaw,
+                                    'user_type': 'vendedor',
+                                  };
+                                  try {
+                                    await ProfilesTable().insert(profilePayload);
+                                  } on PostgrestException catch (e) {
+                                    if (e.code != '23505') rethrow;
+                                    await ProfilesTable().update(
+                                      data: {
+                                        'full_name': profilePayload['full_name'],
+                                        'phone': profilePayload['phone'],
+                                        'user_type': profilePayload['user_type'],
+                                      },
+                                      matchingRows: (q) =>
+                                          q.eq('id', currentUserUid),
+                                    );
+                                  }
 
-                          requestMarketplaceFeedRefresh();
+                                  if (phoneRaw.length >= 9 && context.mounted) {
+                                    await showPhoneVerificationSheet(
+                                      context,
+                                      phoneRaw: phoneRaw,
+                                    );
+                                  }
 
-                          if (!context.mounted) return;
-                          context.goNamedAuth(
-                              HomePageWidget.routeName, context.mounted);
-                        },
+                                  requestMarketplaceFeedRefresh();
+
+                                  AppStateNotifier.instance
+                                      .clearRedirectLocation();
+                                  await Future<void>.delayed(
+                                    const Duration(milliseconds: 400),
+                                  );
+
+                                  if (!context.mounted) return;
+                                  context.goNamedAuth(
+                                    HomePageWidget.routeName,
+                                    context.mounted,
+                                    ignoreRedirect: true,
+                                  );
+                                } finally {
+                                  if (mounted) {
+                                    setState(() => _creatingAccount = false);
+                                  }
+                                }
+                              },
                       ),
                       Row(
                         mainAxisSize: MainAxisSize.max,

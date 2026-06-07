@@ -1,106 +1,160 @@
-# Testes — Live ops (BATATA)
+# Testes Live — o que fazer agora
 
-**Como usar:** marca **Estado** com ✅ OK · ❌ falhou · ⬜ por testar.  
-**Regra:** quando um teste ficar ✅, apaga-o desta tabela e regista uma linha no **Histórico**.  
-**Última actualização código:** 2026-06-03 (fix checkout settle + realtime vendedor + filtros cancelados + barra stock)
+## Antes de testar
 
----
-
-## 0. Antes de repetir os testes (obrigatório)
-
-**Backlog automação (V0/V1/V2):** [live-ops-automacao-batata.md](./live-ops-automacao-batata.md)
-
-Faz **nesta ordem** — sem isto, os testes 6 e 7 podem falhar outra vez com código antigo:
-
-0. **V0 automático:** `flutter test` · configurar `tool/live_ops_staging.env` · `dart run tool/live_ops_staging_check.dart` — ver [live-ops-automacao-seed.md](./live-ops-automacao-seed.md).
-
-1. **Supabase SQL Editor:** executar o ficheiro completo  
-   `supabase/sql/live_ops_hotfix_batata.sql`  
-   (idempotente; inclui `batata_update_live_item` com recompute, reconcile multi-reserva, etc.)
-
-2. **Supabase:** redeploy da edge function  
-   `create-payment-intent`  
-   (metadata saco compacta: `bag_order_ids`, … — não `bag_orders_json` grande)
-
-3. **App:** nova **build/instalação** (APK ou run release) — obrigatório após alterações em:
-   - `lib/utils/live_in_stream_checkout.dart` (`afterStripeBrowserClosed`)
-   - `lib/widgets/live_vendor_studio_panel.dart` (realtime `seller_id`, barra stock, filtros fila)
-   - `supabase/functions/create-payment-intent/index.ts`
-
-4. **Live nova** (recomendado) ou mesma live: anota o `live_id` para os logs.
+1. SQL Editor → correr `supabase/sql/live_ops_hotfix_batata.sql` (ficheiro completo).
+2. Rebuild app → instalar no telemóvel (vendedora) e browser (comprador).
 
 ---
 
-## Testes em aberto (repetir agora)
+## Sessão `86fdbe82-…` (2026-06-04, após patch qty/R1/R32)
 
-| # | O quê validar | Estado | Passos | Critério de sucesso |
-|---|----------------|--------|--------|---------------------|
-| 3 | Stock em artigo **vendido** | ⬜ | 1) Vende 1 un. na live (ou marca vendido). 2) No painel vendedora, artigo activo → **Stock** ou editar qty (+5). 3) Barra do rodapé (Mostrar / vendido / …) deve estar **clicável**. | Badge deixa de ser só «Vendido» se há qty disponível; stock actualiza; barra responde. |
-| 4 | Comprador **cancela** reserva | ⬜ | 1) Comprador reserva no saco. 2) Comprador cancela (remove do saco). 3) Painel vendedora → fila / Pagamentos. | **Sem** botões Aceitar/Recusar para essa linha; aparece em **Cancelados pelo comprador** (secção Pagamentos), não em Pendentes/No saco. |
-| 6 | Saco **2+ referências** → Stripe | ⬜ | 1) Comprador: 2 refs diferentes no saco, aceites ou pendentes pagáveis. 2) Checkout saco → **Pagar**. | Abre browser **Stripe** (um único pagamento). Se falhar: SnackBar com erro (não ficar parado em silêncio). |
-| 7 | **1 referência** paga → vendedora vê € | ⬜ | 1) 1 ref no saco → pagar no checkout live. 2) Concluir Stripe e **fechar** o browser (volta ao directo). 3) Vendedora: aba **Pagamentos** + carteira/resumo. 4) Opcional: SQL abaixo. | Comprador: artigo vendido. Vendedora: valor em €, linha em Pagamentos, reserva **não** fica Aceitar/Recusar. Logs: `paid_count` > 0 ou `legacy_orders_scanned` > 0. |
+| # | Resultado | Notas |
+|---|-----------|-------|
+| R1 | **FAIL** | Card verde não apareceu após aceite |
+| R5 | **OK** | |
+| R6 / R6.1 | **FAIL** | Pedido mostrava 1 em vez de 2–3; saco/checkout 1 após aceite over-stock |
+| R20 | Parcial | Checkout OK; faltavam **fotos** nas linhas |
+| R32 | **FAIL** | Catálogo/carrossel Qtd 8; editor/comprador 10 |
 
----
+**Patch v2 (SQL + app):** Card urgente **só** após **Pagar** no saco (qty total > disponível); aceite SQL soma reservas irmãs no `requested_qty`; card verde **acima** do chat com foto; fotos no checkout (`LiveBagCheckoutSheet` + `LiveInStreamCheckout`).
 
-## Verificação rápida (SQL — opcional após teste 7)
+## Sessão `5e2d06d3-…` (2026-06-04, patch v3)
 
-Substitui `LIVE_ID` e corre no SQL Editor:
+| # | Resultado | Notas |
+|---|-----------|-------|
+| R6 | **FAIL** | Banner «aceite» com pedidos ainda `pending`; card verde ao 2.º pedido |
+| R6.1 | **OK** | |
+| R1 | **OK** | |
+| R20 | **FAIL** | Checkout com portes não abre |
 
-```sql
--- Encomendas recentes desta live / vendedor
-select id, status, live_id, live_item_id, product_id, price_total, created_at
-from orders
-where live_id = 'LIVE_ID'
-   or (seller_id = '69104e91-6a00-40d9-a7c9-b1571422ae43' and created_at > now() - interval '2 hours')
-order by created_at desc
-limit 15;
+**Patch v3:** Banner saco só `status=accepted`; 2.ª reserva incrementa qty (não duplica linha); gate R6 só soma **pending**; checkout abre com aceites (gate não bloqueia); card verde só em transição `accepted` (não a cada alteração do saco); logs `reservation.create` / `reservation.status` / `checkout.pay_qty_gate` em `live_vendor_studio_logs`.
 
--- Reservas
-select id, status, notes, live_item_id, updated_at
-from live_reservation_requests
-where live_id = 'LIVE_ID'
-order by updated_at desc
-limit 15;
-```
+## Sessão `75945a1a-…` (2026-06-05, patch v3 em produção)
 
-Esperado após pagamento OK: `orders.status = pago`, `live_id` preenchido; reserva `converted` ou notes com `stripe_paid:`.
+| # | Resultado | Notas |
+|---|-----------|-------|
+| R6 | **OK** | |
+| R20 | **OK** | **Não mexer mais no checkout** |
+| A1 | **FAIL** | Botão **Pagar** sumiu dos cards do saco |
+| A2 | **FAIL** | Vários artigos: só 1.ª posição; após aceite sumiram chips de fila/espera |
+| R1 | **FAIL** | Card verde só no saco, não no player |
 
----
+**Patch v4 (só app, sem SQL):** **Pagar** volta com `buyerCanPayBagReservation` (pendente + aceite); banner aceite mantém-se só em `accepted`; posições no saco com ordem global (#1, #2, #3) + label **Espera #N** quando sem stock; card verde no player via stream do saco + `_loadLiveBagCount` (sem reabrir em cada +1 pendente).
 
-## Logs vendedora (`live_vendor_studio_logs`)
+## Sessão `a345cd98-…` / `ec67f0d3-…` (2026-06-05, patch v4 em produção)
 
-Após abrir o painel e após um pagamento, procura `payments.refresh`:
+| # | Resultado | Notas |
+|---|-----------|-------|
+| A1 | **OK** | |
+| A2 | **FAIL** | Posições no saco ainda incompletas |
+| R1 | **OK** | |
+| A3 | **FAIL** | Catálogo mostra **total**; barra de fundo **disponível** — p.ex. puxadores Total 13 / Disp 1 após −27; puzzle 20 vs 19 (1 bloqueada noutro directo) |
 
-| Campo no `detail` | Significado |
-|-------------------|-------------|
-| `paid_count` / `paid_value_eur` | Carteira live (deve subir após #7) |
-| `orders_with_live_id` | Encomendas com `live_id` nesta live |
-| `catalog_product_ids` | Catálogo usado no fallback (deve ser ≥ 1) |
-| `legacy_orders_scanned` | Encomendas `pago` por `product_id` sem `live_id` |
-| `pago_with_live_id` | Quantas dessas têm status pago |
+**Patch v5 (só app):** Catálogo vendedora mostra **Total · Disp** quando diferem; sync `live_items.quantity` após stock adjust; saco mantém chip de posição em «aguarda confirmação»; waitlist usa posição global do saco; logs `stock.add`/`stock.remove` com `available_qty` + `blocked_qty`.
 
-Em `reservation.load`: `stale_reconciled` > 0 pode aparecer se havia pagamento antigo por reconciliar.
+## Sessão `0adb5c84-…` / `5f413f23-…` (2026-06-05, patch v5)
 
----
+| # | Resultado | Notas |
+|---|-----------|-------|
+| A2 | **FAIL** | Só #1 amarelo; +/- qty não cria posições; verde/âmbar errado |
+| A3 | **FAIL** | Puzzle catálogo 2 / fundo 1; puxadores catálogo 13 / disp 1; gravados não alinhados |
 
-## Histórico (já validado por ti — não repetir salvo regressão)
-
-| Data | Teste | Resultado |
-|------|--------|-----------|
-| 2026-06-03 | **#1** Portes / total no checkout live | ✅ OK |
-| 2026-06-03 | **#2** Chat vendedora com username | ✅ OK |
-| 2026-06-03 | **#8** Abrir painel reconcilia sessão antiga | ✅ OK |
-| 2026-06-03 | Deploy SQL + edge (uma vez) | ✅ SIM (repetir **build app** após último pull) |
-| 2026-05-28 | A4 multi-Stripe UI checkout · B3 reservar vitrine | ✅ OK |
-| 2026-06-03 | Regressão conhecida (antes do fix settle) | ❌ #6 Stripe saco · ❌ #7 € vendedora · ❌ #3 stock · ❌ #4 cancelados — **re-testar tabela acima** |
+**Patch v6 (app):** Ranking **por unidade** (qty=3 → #1 #2 #3); verde se unidade ≤ stock bruto do artigo (sem descontar o próprio pending); catálogo lidera com **Disp** = barra de fundo; **Reservas** inclui `blocked_qty` (noutros directos no mesmo produto).
 
 ---
 
-## O que mudou no código (para saberes o que estás a testar)
+## Sessão anterior (live `c2c555c1-…`, 2026-06-04)
 
-- Fechar browser Stripe → `afterStripeBrowserClosed` (settle edge + reconcile reservas).
-- Painel vendedora: realtime encomendas por **`seller_id`** (não só `live_id`).
-- Fila: cancelados (`bag_removed`) excluídos de Pendentes / No saco.
-- Barra rodapé: acções **sempre** clicáveis em artigo vendido (stock).
-- Edge saco: metadata Stripe compacta (limite 500 chars).
-- Testes automáticos Dart: `test/live_reservation_queue_service_test.dart` (helpers reserva; **não** substitui estes testes manuais).
+| # | Resultado | Notas |
+|---|-----------|-------|
+| R1 | **FAIL** | Card aceite ~30s–1min tarde; **dois** UIs (overlay + dialog) |
+| R5 | **FAIL** | KPI/carteira ~10 € (só artigo); logs `paid_value_eur` 14,83 OK |
+| R6 | **FAIL** | Card urgente: 0 na live, pedido 1 (comprador pediu 2) |
+| R20 / Checkout | **FAIL** | Sem UI saco (checkboxes, escolher linhas) |
+| R30 / Stock pós-aceite | **OK** | |
+| R31 / Pay qty over-stock | **FAIL** | Checkout mostrava 1 un. |
+| P14.3 | **OK** | |
+| P12 | OK (sessão anterior) | |
+
+**Patch aplicado após esta sessão** (rebuild obrigatório):
+
+- **R1:** Removido dialog; só card verde **por cima do input** (`bottom: chatPanelBottom + 10`); aceite imediato via realtime `accepted` (sem esperar scan do saco).
+- **R5:** KPI «valor vendido» usa total comprador (artigo + portes + proteção) nas convertidas; métricas de pagamentos refrescam **antes** de atualizar totais.
+- **R6:** Card urgente: **Na live / Livres / Pedido total** + reservas para este/outro cliente.
+- **R20 / R31:** **Pagar** no player e no saco abre `LiveBagCheckoutSheet` (checkboxes, qty real `requested_qty`).
+
+---
+
+## Checklist — retestar só o que falhou
+
+| # | Teste | Fazes | Confere |
+|---|-------|-------|---------|
+| **R1** | Card aceite no player | Aceitar reserva; comprador **na live** | **Um** card verde baixo (sem dialog); aparece em poucos segundos |
+| **R5** | Portes na carteira | Pagar 1 artigo (transportadora) | KPI + painel pagamentos ≈ total pago (~14 € se artigo 10 € + portes) |
+| **R6** | Card urgente qty | Reservar **2** com stock **1** → **Pagar** | **Na live: 1 · Livres: … · Pedido total: 2** + texto reservas se aplicável |
+| **R20** | UI checkout artigo | **Pagar** (card aceite ou saco) | Sheet com **checkboxes**, linhas do artigo, portes, totais |
+| **R31** | Pay qty over-stock | Aceitar pedido **2** com stock **1** → **Pagar** | Stepper / qty **2** no checkout |
+| **R32** | Qtd pós-venda | Artigo vendido → menu +10 un. | Catálogo/carrossel **Qtd: 10** (não 8) |
+| **R20 fotos** | Checkout | Pagar no saco | Linhas com **miniatura** do artigo |
+| **Stock** | Após aceite | Aceitar reserva | Catálogo: vendidos sobe; qtd desce (regressão R30) |
+| **P14.3** | Barra catálogo | 2× mesmo artigo → aceitar uma | Vendidos +1; reservas desce (regressão) |
+
+---
+
+## Checklist completo (regressão)
+
+### Regressões saco + comprador
+
+| # | Teste | Fazes | Confere |
+|---|-------|-------|---------|
+| **R1** | Card aceite no player | Ver tabela «retestar» acima | |
+| **R2** | Banner no saco | Abrir saco após aceite | Banner + chip **Aceite · pronto a pagar** |
+| **R3** | Botão Pagar | Saco pendente ou aceite | **Pagar** visível |
+| **R4** | +/- quantidade | 2 reservas no mesmo artigo | Stepper; qty persiste ao reabrir |
+| **R5** | Portes na carteira | Ver tabela «retestar» acima | |
+| **R6** | Finalizar compra sem stock | Sacó multi → qty **>** stock → Pagar | Dialog comprador; card urgente vendedora; sem `Erro: …` |
+
+### Checkout qty > stock
+
+| # | Teste | Fazes | Confere |
+|---|-------|-------|---------|
+| **T1** | Só ao pagar | Qty **>** stock → Pagar / checkout | Card vermelho vendedora; sem Stripe |
+| **T2** | Não ao reservar | Só **Reservar** | Sem card urgente |
+
+### P11 — Pagar após aceite over-stock
+
+| # | Teste | Fazes | Confere |
+|---|-------|-------|---------|
+| **P11** | Sem loop | T1 → **Aceita** → **Pagar** | Stripe; sem loop urgente |
+
+### P12 — Notificações
+
+| # | Teste | Fazes | Confere |
+|---|-------|-------|---------|
+| **P12a** | Recusa | T1 → **Recusa** | Chat + chip comprador |
+| **P12b** | Aceite | T1 → **Aceita** | R1 + R2 |
+
+### P14 — Catálogo vendedora
+
+| # | Teste | Fazes | Confere |
+|---|-------|-------|---------|
+| **P14.1** | Vendidos | Pagar artigo | Contador vendidos |
+| **P14.2** | Reservas | Pedido pendente | Contador reservas |
+| **P14.3** | Barra catálogo | Ver tabela «retestar» | |
+
+### P15 — Gorjetas
+
+| # | Teste | Fazes | Confere |
+|---|-------|-------|---------|
+| **P15** | Tip | Enviar gorjeta na live | Aparece no painel |
+
+---
+
+## Logs úteis (`live_vendor_studio_logs`)
+
+- `payments.refresh` → `paid_value_eur` deve bater certo com o que o comprador pagou.
+- `reservation.accept` → `reserved_qty`, `item_qty`.
+- `reservation.create` / `reservation.status` / `reservation.increment` / `checkout.pay_qty_gate` → diagnóstico R6/R20.
+- `stock.add` / `stock.remove` → `from_qty`, `to_qty`, `available_qty`, `blocked_qty` (A3: total vs disponível).
+- `reservation.load` com `error` → reportar stack (ex. null check).

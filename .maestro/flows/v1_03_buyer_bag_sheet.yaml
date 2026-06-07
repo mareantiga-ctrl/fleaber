@@ -1,0 +1,14 @@
+# V1.2c — Checkout saco visível (sem pagar Stripe)
+appId: com.mycompany.fleaber
+---
+- runFlow: ../subflows/login_buyer.yaml
+- openLink: ${MAESTRO_DEEP_LINK_BASE}/fleaberLivePlayer?liveId=${MAESTRO_LIVE_ID}
+- extendedWaitUntil:
+    visible: "Reservar"
+    timeout: 90000
+    optional: true
+- tapOn: "Saco da live"
+- extendedWaitUntil:
+    visible: "Pagar"
+    timeout: 30000
+- assertVisible: "Pagar"

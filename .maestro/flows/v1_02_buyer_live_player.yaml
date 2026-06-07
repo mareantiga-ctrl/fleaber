@@ -1,0 +1,14 @@
+# V1.2b — Comprador abre live player (deep link)
+appId: com.mycompany.fleaber
+---
+- runFlow: ../subflows/login_buyer.yaml
+- openLink: ${MAESTRO_DEEP_LINK_BASE}/fleaberLivePlayer?liveId=${MAESTRO_LIVE_ID}
+- extendedWaitUntil:
+    visible: "Reservar"
+    timeout: 90000
+    optional: true
+- tapOn: "Saco da live"
+- extendedWaitUntil:
+    visible: "Saco da live"
+    timeout: 15000
+- assertVisible: "Saco da live"

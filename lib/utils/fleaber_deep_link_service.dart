@@ -45,11 +45,11 @@ class FleaberDeepLinkService {
   }
 
   static void _scheduleNavigate(Uri uri, {required String source}) {
-    final path = _stripeSuccessGoLocation(uri);
+    final path = _goRouterLocation(uri);
     if (path == null) return;
     FleaberLogger.instance.info(
-      'stripe.return',
-      'deep_link $source → $path',
+      'deeplink',
+      '$source → $path',
     );
   Future.microtask(() {
       final router = _router;
@@ -67,6 +67,34 @@ class FleaberDeepLinkService {
 
   /// Devolve `/stripe-success?...` ou null se não for o nosso host/path.
   static String? stripeSuccessGoLocation(Uri uri) => _stripeSuccessGoLocation(uri);
+
+  static String? _goRouterLocation(Uri uri) {
+    return _stripeSuccessGoLocation(uri) ?? _maestroTestGoLocation(uri);
+  }
+
+  /// Rotas de teste / automação (`maestro openLink`, QA manual).
+  static String? _maestroTestGoLocation(Uri uri) {
+    final host = uri.host.toLowerCase();
+    if (host != 'fleaber.com') return null;
+    var path = uri.path;
+    if (path.isEmpty || path == '/') return null;
+    if (!path.startsWith('/')) path = '/$path';
+    final qp = Map<String, String>.from(uri.queryParameters);
+    if (path.startsWith('/fleaberLivePlayer')) {
+      final live = qp['liveId']?.trim().isNotEmpty == true
+          ? qp['liveId']!.trim()
+          : (qp['live_id']?.trim() ?? '');
+      if (live.isEmpty) return null;
+      qp['liveId'] = live;
+      qp.remove('live_id');
+      qp.putIfAbsent('isLive', () => 'true');
+      return '$path?${Uri(queryParameters: qp).query}';
+    }
+    if (path == '/criarDirecto' || path == '/prepararDirecto') {
+      return path;
+    }
+    return null;
+  }
 
   static String? _stripeSuccessGoLocation(Uri uri) {
     final host = uri.host.toLowerCase();

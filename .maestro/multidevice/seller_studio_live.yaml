@@ -1,0 +1,19 @@
+# V1.5 — Dispositivo A (seller): iniciar directo e abrir Operação → A tratar.
+# Correr com: run_maestro_flow.ps1 -Device $MAESTRO_DEVICE_SELLER -DriverHostPort 7001
+appId: com.mycompany.fleaber
+---
+- runFlow: ../subflows/login_seller.yaml
+- openLink: ${MAESTRO_DEEP_LINK_BASE}/criarDirecto
+- runFlow: ../subflows/dismiss_permissions.yaml
+- extendedWaitUntil:
+    visible: "Iniciar Direto"
+    timeout: 120000
+- tapOn: "Iniciar Direto"
+- extendedWaitUntil:
+    visible: "Operação"
+    timeout: 300000
+- tapOn: "Operação"
+- extendedWaitUntil:
+    visible: "A tratar"
+    timeout: 45000
+- tapOn: "A tratar"

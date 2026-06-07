@@ -75,7 +75,9 @@ begin
     into v_max
     from public.live_reservation_requests r
     where r.live_id = new.live_id
-      and r.live_item_id = new.live_item_id;
+      and r.live_item_id = new.live_item_id
+      and r.status = 'pending'
+      and r.source = 'fleaber_live';
 
     new.queue_position := v_max + 1;
   end if;
@@ -240,6 +242,15 @@ begin
     notes = coalesce(notes || ' | ', '') || 'bag_removed',
     updated_at = now()
   where id = v_req.id;
+
+  perform public.batata_recompact_reservation_queue(v_req.live_item_id);
+  perform public.batata_recompute_live_item_status(v_req.live_item_id);
+
+  perform public.batata_live_system_message(
+    v_req.live_id,
+    '↩ Reserva cancelada pelo comprador',
+    'Sistema'
+  );
 
   return jsonb_build_object('ok', true, 'request_id', v_req.id);
 end;

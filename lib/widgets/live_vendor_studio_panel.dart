@@ -25,6 +25,8 @@ import '/widgets/live_ref_chip_editor_sheet.dart';
 import '/utils/live_fomo_broadcaster.dart';
 import '/utils/fleaber_logger.dart';
 import '/order_cancel_eligibility.dart';
+import '/utils/fee_calculator.dart';
+import '/utils/live_in_stream_checkout.dart';
 
 enum _VendorChatFilter { all, questions, reservations, system }
 
@@ -326,11 +328,18 @@ class LiveVendorStudioPanelState extends State<LiveVendorStudioPanel> {
   bool _reservationLoading = true;
   int _opsActionsLastHour = 0;
   StreamSubscription<List<Map<String, dynamic>>>? _reservationRealtimeSub;
+  Timer? _reservationPollTimer;
+  final Set<String> _dismissedUrgentRequestIds = {};
   StreamSubscription<List<Map<String, dynamic>>>? _catalogRealtimeSub;
   StreamSubscription<List<Map<String, dynamic>>>? _ordersRealtimeSub;
   StreamSubscription<List<Map<String, dynamic>>>? _tipsRealtimeSub;
   int _livePaidOrdersCount = 0;
   double _livePaidOrdersValueEur = 0;
+  int _liveTipsCount = 0;
+  double _liveTipsValueEur = 0;
+  List<({String buyerLabel, double amountEur})> _liveTipPayments = const [];
+  double _lastWalletLogTotalEur = -1;
+  int _publicTipMsgCount = 0;
   Timer? _catalogReloadDebounce;
   final ScrollController _catalogListScroll = ScrollController();
   DateTime? _lastCatalogLoadLogUtc;
@@ -403,6 +412,12 @@ class LiveVendorStudioPanelState extends State<LiveVendorStudioPanel> {
       unawaited(_refreshTipContributors(msgs));
       _ingestSystemMessagesForActivity(msgs);
       _updatePublicChatUnread(msgs);
+      final tipCount =
+          msgs.where((m) => m.kind == LiveRoomMessageKind.tip).length;
+      if (tipCount != _publicTipMsgCount) {
+        _publicTipMsgCount = tipCount;
+        unawaited(_refreshLiveOrderMetrics());
+      }
     });
     unawaited(_loadCatalogRows());
     unawaited(_loadReservationQueue());
@@ -421,6 +436,10 @@ class LiveVendorStudioPanelState extends State<LiveVendorStudioPanel> {
       setState(() => _teamHelpersActive = helpers.length);
     }));
     _subscribeReservationRealtime();
+    _reservationPollTimer = Timer.periodic(const Duration(seconds: 4), (_) {
+      if (!mounted) return;
+      unawaited(_loadReservationQueue(refreshMetrics: false));
+    });
     _subscribeCatalogRealtime();
     _subscribeOrdersRealtime();
     _subscribeLiveTipsRealtime();
@@ -542,7 +561,10 @@ class LiveVendorStudioPanelState extends State<LiveVendorStudioPanel> {
       final before = _activityEvents.length;
       _maybeRecordLowStockActivity(
         liveItemId: itemId,
-        refLabel: _itemRefLabel(r),
+        refLabel: LiveVendorRefDisplay.itemDisplayName(
+          title: r.title,
+          refCode: r.refCode,
+        ),
         availableQty: snap.availableQty,
       );
       if (_activityEvents.length > before) activityChanged = true;
@@ -571,6 +593,24 @@ class LiveVendorStudioPanelState extends State<LiveVendorStudioPanel> {
     } catch (_) {}
   }
 
+  void _syncCatalogRowAfterStockChange(
+    String liveItemId,
+    LiveCatalogStockSnapshot snap,
+  ) {
+    final id = liveItemId.trim();
+    if (id.isEmpty) return;
+    for (final r in _catalogRows ?? const <LiveItemsRow>[]) {
+      if ((r.id ?? '').trim() != id) continue;
+      r.quantity = snap.totalQty;
+      if (snap.availableQty > 0) {
+        r.status = 'available';
+      } else if (snap.soldConvertedQty >= snap.totalQty) {
+        r.status = 'sold';
+      }
+      break;
+    }
+  }
+
   Future<void> _refreshStockCache([Iterable<String>? itemIds]) async {
     final rows = _catalogRows ?? const <LiveItemsRow>[];
     final ids = itemIds ??
@@ -593,40 +633,37 @@ class LiveVendorStudioPanelState extends State<LiveVendorStudioPanel> {
 
     var reservations = 0;
     var sold = 0;
-    var acceptedAwaitingPay = 0;
     for (final r in _reservationQueue) {
       if ((r.liveItemId ?? '').trim() != itemId) continue;
-      if (!LiveReservationQueueService.isOpenSellerTreatReservation(
-        status: r.status,
-        notes: r.notes,
-      )) {
-        continue;
-      }
       final q = r.requestedQty < 1 ? 1 : r.requestedQty;
       final st = r.status ?? '';
-      if (st == 'pending' || st == 'accepted') reservations += q;
-      if (st == 'accepted') acceptedAwaitingPay += q;
-      if (st == 'converted') sold += q;
+      if (st == 'pending' &&
+          LiveReservationQueueService.isOpenSellerTreatReservation(
+            status: r.status,
+            notes: r.notes,
+          )) {
+        reservations += q;
+      }
+      if (st == 'accepted' || st == 'converted') sold += q;
     }
 
     if (snap != null) {
       var soldCount = snap.soldConvertedQty > sold ? snap.soldConvertedQty : sold;
-      if (acceptedAwaitingPay > 0) {
-        soldCount = soldCount > acceptedAwaitingPay
-            ? soldCount
-            : acceptedAwaitingPay;
-      }
+      if (sold > soldCount) soldCount = sold;
       if (LiveVendorSellerCopy.isMarkedSold(row.status) &&
           soldCount < 1 &&
           snap.availableQty <= 0) {
         soldCount = 1;
       }
-      // Fila carregada = fonte de verdade; evita snap desactualizado após cancelamento.
-      final resCount = _reservationQueue.isEmpty
-          ? snap.pendingBagQty + snap.reservedAcceptedQty
+      // Reservas = fila deste directo + compromissos do mesmo produto noutros directos.
+      final localRes = _reservationQueue.isEmpty
+          ? snap.pendingBagQty
           : reservations;
+      final externalHolds = snap.blockedQty < 0 ? 0 : snap.blockedQty;
+      final resCount = localRes + externalHolds;
       return LiveVendorCatalogItemMetrics(
-        quantity: snap.availableQty,
+        quantity: snap.totalQty,
+        available: snap.availableQty,
         sold: soldCount,
         reservations: resCount,
       );
@@ -716,7 +753,7 @@ class LiveVendorStudioPanelState extends State<LiveVendorStudioPanel> {
     if (id.isEmpty) return;
 
     var snap = _stockByItemId[id] ?? await LiveCatalogStockService.fetch(id);
-    final current = snap?.totalQty ?? 1;
+    final current = (snap?.totalQty ?? 1).clamp(1, 9999);
     var removing = false;
     var selectedDelta = 1;
     final manualCtrl = TextEditingController(text: '1');
@@ -752,15 +789,25 @@ class LiveVendorStudioPanelState extends State<LiveVendorStudioPanel> {
                   quantity: next,
                 );
                 if (updated != null && mounted) {
-                  setState(() => _stockByItemId[id] = updated);
+                  setState(() {
+                    _stockByItemId[id] = updated;
+                    _syncCatalogRowAfterStockChange(id, updated);
+                  });
                 }
+                await _loadCatalogRows(silent: true);
                 await _loadCatalogSupportData();
+                await _refreshStockCache([id]);
                 await _refreshActiveOpsSnapshot(forceFetch: true);
                 if (ctx.mounted) Navigator.pop(ctx);
                 if (mounted) {
+                  final disp = updated?.availableQty ?? next;
                   ScaffoldMessenger.of(this.context).showSnackBar(
                     SnackBar(
-                      content: Text('Stock actualizado: $next un.'),
+                      content: Text(
+                        disp != next
+                            ? 'Stock na live: $next un. · Disponível: $disp un.'
+                            : 'Stock actualizado: $next un.',
+                      ),
                     ),
                   );
                 }
@@ -772,6 +819,10 @@ class LiveVendorStudioPanelState extends State<LiveVendorStudioPanel> {
                     'to_qty': next,
                     'delta': change,
                     'amount': amount,
+                    if (updated != null) ...{
+                      'available_qty': updated.availableQty,
+                      'blocked_qty': updated.blockedQty,
+                    },
                   },
                 );
                 final ref = _itemRefLabel(row);
@@ -789,7 +840,10 @@ class LiveVendorStudioPanelState extends State<LiveVendorStudioPanel> {
                 if (updated != null) {
                   _maybeRecordLowStockActivity(
                     liveItemId: id,
-                    refLabel: ref,
+                    refLabel: LiveVendorRefDisplay.itemDisplayName(
+                      title: row.title,
+                      refCode: row.refCode,
+                    ),
                     availableQty: updated.availableQty,
                   );
                 }
@@ -1173,7 +1227,10 @@ class LiveVendorStudioPanelState extends State<LiveVendorStudioPanel> {
           refCode: lockRef ? null : refCtrl.text.trim(),
         );
         if (updated != null && mounted) {
-          setState(() => _stockByItemId[id] = updated);
+          setState(() {
+            _stockByItemId[id] = updated;
+            _syncCatalogRowAfterStockChange(id, updated);
+          });
         } else {
           await _refreshStockCache([id]);
         }
@@ -1188,6 +1245,10 @@ class LiveVendorStudioPanelState extends State<LiveVendorStudioPanel> {
         await _loadCatalogRows(silent: true);
         if (mounted) {
           await _refreshStockCache([id]);
+          final snap = _stockByItemId[id];
+          if (snap != null) {
+            setState(() => _syncCatalogRowAfterStockChange(id, snap));
+          }
         }
         if (!mounted) return;
         Navigator.pop(context);
@@ -1386,8 +1447,11 @@ class LiveVendorStudioPanelState extends State<LiveVendorStudioPanel> {
     try {
       setState(() => _reservationLoading = true);
       final queue = LiveReservationQueueService();
-      final staleReconciled =
-          await queue.reconcileStalePaidReservationsForLive(liveId);
+      var staleReconciled = 0;
+      try {
+        staleReconciled =
+            await queue.reconcileStalePaidReservationsForLive(liveId);
+      } catch (_) {}
       var rows = await queue.queueForLive(
         liveId: liveId,
         includeHistory: true,
@@ -1433,9 +1497,8 @@ class LiveVendorStudioPanelState extends State<LiveVendorStudioPanel> {
           }
         }
       });
-      _notifyOpsTotals();
       if (refreshMetrics) {
-        unawaited(_refreshLiveOrderMetrics());
+        await _refreshLiveOrderMetrics();
         await _resolveBuyerNames(rows.map((r) => r.buyerId ?? ''));
         _syncBuyerCancelActivities(rows);
         unawaited(_refreshActiveOpsSnapshot(forceFetch: true));
@@ -1449,6 +1512,7 @@ class LiveVendorStudioPanelState extends State<LiveVendorStudioPanel> {
           unawaited(_loadCatalogRows(silent: true));
         }
       }
+      if (mounted) _notifyOpsTotals();
       var pending = 0;
       var accepted = 0;
       for (final r in rows) {
@@ -1472,7 +1536,20 @@ class LiveVendorStudioPanelState extends State<LiveVendorStudioPanel> {
   }
 
   void _notifyOpsTotals() {
-    widget.onOpsTotalsChanged?.call(_computeOpsTotals());
+    final totals = _computeOpsTotals();
+    _logStudio(
+      'wallet.kpi_compute',
+      data: {
+        'sales_value_eur': totals.salesValueEur,
+        'live_paid_orders_eur': _livePaidOrdersValueEur,
+        'live_tips_eur': _liveTipsValueEur,
+        'live_tips_count': _liveTipsCount,
+        'sales_count': totals.salesCount,
+        'operation_section': _operationSection.name,
+        'active_panel': widget.activePanel.name,
+      },
+    );
+    widget.onOpsTotalsChanged?.call(totals);
   }
 
   /// Garante entrada no histórico quando o comprador cancelou (mesmo sem transição em cache).
@@ -1610,9 +1687,10 @@ class LiveVendorStudioPanelState extends State<LiveVendorStudioPanel> {
       _activitySystemMsgIds.add(id);
 
       final body = m.body.trim();
-      if (body.contains('reservou')) {
+      if (body.contains('reservou') || body.contains('cancelou')) {
         unawaited(_loadReservationQueue());
         unawaited(_syncLiveOpsMetrics());
+        unawaited(_refreshActiveOpsSnapshot(forceFetch: true));
       }
 
       if (!_activitySystemReady) continue;
@@ -1744,10 +1822,13 @@ class LiveVendorStudioPanelState extends State<LiveVendorStudioPanel> {
   void _maybeRecordSoldOutActivity(LiveItemsRow row) {
     final id = row.id?.trim() ?? '';
     if (id.isEmpty) return;
-    final ref = _itemRefLabel(row);
+    final label = LiveVendorRefDisplay.itemDisplayName(
+      title: row.title,
+      refCode: row.refCode,
+    );
     _appendActivity(
       'sold-out-$id',
-      '🔴 $ref esgotado',
+      '🔴 $label esgotado',
       DateTime.now(),
       LiveOpsActivityKind.soldOut,
       id,
@@ -1757,7 +1838,7 @@ class LiveVendorStudioPanelState extends State<LiveVendorStudioPanel> {
     unawaited(
       _fomoBroadcaster.maybeSoldOut(
         liveItemId: id,
-        refLabel: ref,
+        refLabel: label,
       ),
     );
   }
@@ -1866,7 +1947,7 @@ class LiveVendorStudioPanelState extends State<LiveVendorStudioPanel> {
     final snap = itemId.isEmpty ? null : _stockByItemId[itemId];
     if (!LiveReservationQueueService.isWaitlistPosition(
       queuePosition: r.queuePosition,
-      availableQty: snap?.availableQty,
+      stock: snap,
     )) {
       return '';
     }
@@ -1882,6 +1963,20 @@ class LiveVendorStudioPanelState extends State<LiveVendorStudioPanel> {
       }
     }
     return 'item';
+  }
+
+  String _itemDisplayLabelForLiveItem(String? liveItemId) {
+    final id = (liveItemId ?? '').trim();
+    if (id.isEmpty) return 'Artigo';
+    for (final r in _catalogRows ?? const <LiveItemsRow>[]) {
+      if ((r.id ?? '').trim() == id) {
+        return LiveVendorRefDisplay.itemDisplayName(
+          title: r.title,
+          refCode: r.refCode,
+        );
+      }
+    }
+    return _refForLiveItem(liveItemId);
   }
 
   String? _staffLogToActivity(StaffActionLogsRow log) {
@@ -2087,20 +2182,45 @@ class LiveVendorStudioPanelState extends State<LiveVendorStudioPanel> {
       var count = 0;
       var value = 0.0;
 
-      double priceForOrder(OrdersRow o) {
-        var total = o.priceTotal ?? 0;
-        if (total > 0) return total;
+      double unitPriceForOrder(OrdersRow o) {
         final pid = o.productId?.trim() ?? '';
         if (pid.isEmpty) return 0;
         for (final row in _catalogRows ?? const <LiveItemsRow>[]) {
           if (row.productId?.trim() == pid ||
               row.checkoutProductId?.trim() == pid) {
-            final unit = row.price ?? 0;
-            final q = o.quantity < 1 ? 1 : o.quantity;
-            return unit * q;
+            return row.price ?? 0;
           }
         }
         return 0;
+      }
+
+      double priceForOrder(OrdersRow o) {
+        var total = o.priceTotal ?? 0;
+        final qty = o.quantity < 1 ? 1 : o.quantity;
+        final unit = unitPriceForOrder(o);
+        final shipping = LiveInStreamCheckout.shippingCostForMethod(
+          o.shippingMethod ?? '',
+        );
+        if (unit > 0) {
+          final lineItem = unit * qty;
+          if (shipping > 0) {
+            final withShipping = calculateFleaberBuyerTotal(
+              itemPriceEur: lineItem,
+              shippingEur: shipping,
+              includeProtectionFee: true,
+            );
+            if (total <= 0 || total < withShipping - 0.05) {
+              total = withShipping;
+            }
+          } else if (total <= 0) {
+            total = calculateFleaberBuyerTotal(
+              itemPriceEur: lineItem,
+              shippingEur: 0,
+              includeProtectionFee: true,
+            );
+          }
+        }
+        return total;
       }
 
       void absorb(OrdersRow o) {
@@ -2143,6 +2263,9 @@ class LiveVendorStudioPanelState extends State<LiveVendorStudioPanel> {
 
       var legacyRowsScanned = 0;
       var pagoWithLiveId = 0;
+      var legacyPagoNoLiveIdCount = 0;
+      var legacyPagoNoLiveIdEur = 0.0;
+      var legacyPagoOtherLiveIdCount = 0;
       for (final o in orders) {
         if (normalizeOrderStatusKey(o.status) == 'pago') pagoWithLiveId++;
       }
@@ -2155,31 +2278,108 @@ class LiveVendorStudioPanelState extends State<LiveVendorStudioPanel> {
         );
         legacyRowsScanned = legacy.length;
         for (final o in legacy) {
+          if (normalizeOrderStatusKey(o.status) != 'pago') continue;
+          final orderLiveId = o.liveId?.trim() ?? '';
+          final qty = o.quantity < 1 ? 1 : o.quantity;
+          final lineEur = priceForOrder(o);
+          if (orderLiveId.isEmpty) {
+            legacyPagoNoLiveIdCount += qty;
+            legacyPagoNoLiveIdEur += lineEur;
+            continue;
+          }
+          if (orderLiveId != liveId) {
+            legacyPagoOtherLiveIdCount += qty;
+            continue;
+          }
           absorb(o);
         }
       }
 
+      var tipCount = 0;
+      var tipValueEur = 0.0;
+      final tipPayments = <({String buyerLabel, double amountEur})>[];
       try {
         final tipRows = await SupaFlow.client
             .from('live_tips')
-            .select('amount_eur, status')
+            .select('id, buyer_id, seller_amount, amount, status')
             .eq('live_id', liveId)
-            .eq('status', 'paid');
+            .eq('status', 'completed');
+        final buyerIds = <String>{};
+        final tipEntries = <({String buyerId, double amountEur})>[];
+        final tipRowLog = <Map<String, dynamic>>[];
         for (final row in tipRows as List) {
           final map = Map<String, dynamic>.from(row as Map);
-          final amount = map['amount_eur'];
-          if (amount is num) {
-            value += amount.toDouble();
-            count += 1;
+          final sellerAmount = map['seller_amount'];
+          final gross = map['amount'];
+          num? amount;
+          if (sellerAmount is num) {
+            amount = sellerAmount;
+          } else if (gross is num) {
+            amount = gross;
+          }
+          if (amount == null) continue;
+          final buyerId = map['buyer_id']?.toString().trim() ?? '';
+          tipValueEur += amount.toDouble();
+          tipCount += 1;
+          tipEntries.add((buyerId: buyerId, amountEur: amount.toDouble()));
+          tipRowLog.add({
+            'id': map['id']?.toString(),
+            'seller_amount': sellerAmount,
+            'amount': gross,
+            'used_eur': amount.toDouble(),
+          });
+          if (buyerId.isNotEmpty) buyerIds.add(buyerId);
+        }
+        _logStudio(
+          'wallet.tips_query',
+          data: {
+            'rows_raw': (tipRows as List).length,
+            'rows_used': tipCount,
+            'tip_value_eur': tipValueEur,
+            'tips': tipRowLog,
+          },
+        );
+        final buyerNames = <String, String>{};
+        if (buyerIds.isNotEmpty) {
+          final profiles = await ProfilesTable().queryRows(
+            queryFn: (q) => q.inFilter('id', buyerIds.toList()),
+          );
+          for (final p in profiles) {
+            final id = p.id?.trim() ?? '';
+            if (id.isEmpty) continue;
+            buyerNames[id] = (p.fullName?.trim().isNotEmpty ?? false)
+                ? p.fullName!.trim()
+                : 'Utilizador';
           }
         }
-      } catch (_) {}
+        for (final entry in tipEntries) {
+          final label = entry.buyerId.isEmpty
+              ? 'Utilizador'
+              : (buyerNames[entry.buyerId] ?? 'Utilizador');
+          tipPayments.add((buyerLabel: label, amountEur: entry.amountEur));
+        }
+      } catch (e) {
+        _logStudio('wallet.tips_query', status: 'error', error: e);
+      }
 
       if (!mounted) return;
       setState(() {
         _livePaidOrdersCount = count;
         _livePaidOrdersValueEur = value;
+        _liveTipsCount = tipCount;
+        _liveTipsValueEur = tipValueEur;
+        _liveTipPayments = tipPayments;
       });
+      _logStudio(
+        'wallet.state_applied',
+        data: {
+          'paid_count': count,
+          'paid_value_eur': value,
+          'tips_count': tipCount,
+          'tips_value_eur': tipValueEur,
+          'wallet_total_eur': value + tipValueEur,
+        },
+      );
       _notifyOpsTotals();
       _logStudio(
         'payments.refresh',
@@ -2190,8 +2390,26 @@ class LiveVendorStudioPanelState extends State<LiveVendorStudioPanel> {
           'pago_with_live_id': pagoWithLiveId,
           'catalog_product_ids': productIds.length,
           'legacy_orders_scanned': legacyRowsScanned,
+          'legacy_pago_no_live_id_count': legacyPagoNoLiveIdCount,
+          'legacy_pago_no_live_id_eur': legacyPagoNoLiveIdEur,
+          'legacy_pago_other_live_id_count': legacyPagoOtherLiveIdCount,
+          'phantom_risk': legacyPagoNoLiveIdEur > 0.01,
+          'tips_completed_count': tipCount,
+          'tips_completed_eur': tipValueEur,
+          'live_wallet_total_eur': value + tipValueEur,
         },
       );
+      if (legacyPagoNoLiveIdEur > 0.01) {
+        _logStudio(
+          'payments.ghost_audit',
+          data: {
+            'live_id': liveId,
+            'would_be_phantom_eur': legacyPagoNoLiveIdEur,
+            'would_be_phantom_qty': legacyPagoNoLiveIdCount,
+            'panel_shows_eur': value,
+          },
+        );
+      }
     } catch (e) {
       _logStudio('payments.refresh', status: 'error', error: e);
     }
@@ -2298,8 +2516,15 @@ class LiveVendorStudioPanelState extends State<LiveVendorStudioPanel> {
     for (final r in converted) {
       final q = r.requestedQty < 1 ? 1 : r.requestedQty;
       salesCount += q;
-      final price = rowsById[r.liveItemId ?? '']?.price ?? 0;
-      salesValue += price * q;
+      final item = rowsById[(r.liveItemId ?? '').trim()];
+      final unit = item?.price ?? 0;
+      final lineItem = unit * q;
+      if (lineItem <= 0) continue;
+      salesValue += calculateFleaberBuyerTotal(
+        itemPriceEur: lineItem,
+        shippingEur: LiveInStreamCheckout.shippingCarrierEur,
+        includeProtectionFee: true,
+      );
     }
     if (_livePaidOrdersCount > salesCount) {
       salesCount = _livePaidOrdersCount;
@@ -2307,6 +2532,8 @@ class LiveVendorStudioPanelState extends State<LiveVendorStudioPanel> {
     if (_livePaidOrdersValueEur > salesValue) {
       salesValue = _livePaidOrdersValueEur;
     }
+    // Gorjetas concluídas (líquido vendedor) entram na carteira/KPI do directo.
+    salesValue += _liveTipsValueEur;
     var stalePending = 0;
     for (final r in pending) {
       if (_isReservationStale(r)) stalePending++;
@@ -2353,6 +2580,9 @@ class LiveVendorStudioPanelState extends State<LiveVendorStudioPanel> {
   ) {
     final copy = List<LiveReservationRequestsRow>.from(items);
     copy.sort((a, b) {
+      final qa = LiveReservationQueueService.notesNeedQtyConfirm(a.notes);
+      final qb = LiveReservationQueueService.notesNeedQtyConfirm(b.notes);
+      if (qa != qb) return qa ? -1 : 1;
       final sa = _isReservationStale(a);
       final sb = _isReservationStale(b);
       if (sa != sb) return sa ? -1 : 1;
@@ -2421,9 +2651,8 @@ class LiveVendorStudioPanelState extends State<LiveVendorStudioPanel> {
 
     var inBag = snap?.pendingBagQty ?? 0;
     var external = 0;
-    var interested = snap != null
-        ? snap.pendingBagQty + snap.reservedAcceptedQty
-        : 0;
+    var acceptedAwaitingPay = 0;
+    var interested = snap?.pendingBagQty ?? 0;
     if (snap == null) {
       final pending = _reservationQueue.where(
         (r) =>
@@ -2460,6 +2689,12 @@ class LiveVendorStudioPanelState extends State<LiveVendorStudioPanel> {
         }
       }
     }
+    for (final r in _reservationQueue) {
+      if ((r.liveItemId ?? '').trim() != itemId) continue;
+      if (r.status == 'accepted') {
+        acceptedAwaitingPay += r.requestedQty < 1 ? 1 : r.requestedQty;
+      }
+    }
     var sold = snap?.soldConvertedQty ??
         _reservationQueue
             .where((r) =>
@@ -2467,6 +2702,7 @@ class LiveVendorStudioPanelState extends State<LiveVendorStudioPanel> {
                 r.status == 'converted')
             .fold<int>(
                 0, (a, b) => a + (b.requestedQty < 1 ? 1 : b.requestedQty));
+    if (acceptedAwaitingPay > sold) sold = acceptedAwaitingPay;
     final activeRow = _activeCatalogRow;
     final availQty = snap?.availableQty;
     if (LiveVendorSellerCopy.isMarkedSold(activeRow?.status) &&
@@ -2475,15 +2711,18 @@ class LiveVendorStudioPanelState extends State<LiveVendorStudioPanel> {
       sold = 1;
     }
 
+    final metrics = _metricsForLiveItem(active);
+    final reservationsTotal = metrics.reservations;
+
     if (!mounted) return;
     setState(() {
       _activeOpsSnapshot = LiveItemOpsSnapshot(
-        available: availQty,
-        sold: sold,
+        available: metrics.available ?? availQty,
+        sold: metrics.sold > sold ? metrics.sold : sold,
         inBag: inBag,
-        interested: interested,
+        interested: reservationsTotal,
         externalRequests: external,
-        pendingPayments: interested,
+        pendingPayments: reservationsTotal,
       );
     });
     _notifyOpsTotals();
@@ -2726,6 +2965,7 @@ class LiveVendorStudioPanelState extends State<LiveVendorStudioPanel> {
     _catalogReloadDebounce?.cancel();
     _catalogListScroll.dispose();
     _reservationRealtimeSub?.cancel();
+    _reservationPollTimer?.cancel();
     _catalogRealtimeSub?.cancel();
     _ordersRealtimeSub?.cancel();
     _tipsRealtimeSub?.cancel();
@@ -2890,7 +3130,31 @@ class LiveVendorStudioPanelState extends State<LiveVendorStudioPanel> {
           'queue_position': row.queuePosition,
         },
       );
+      final liveId = row.liveId?.trim() ?? '';
+      final qtyConfirm =
+          LiveReservationQueueService.notesNeedQtyConfirm(row.notes);
+      if (qtyConfirm && liveId.isNotEmpty) {
+        final label = _itemDisplayLabelForLiveItem(row.liveItemId);
+        final q = row.requestedQty < 1 ? 1 : row.requestedQty;
+        if (action == 'accept') {
+          setState(() => _dismissedUrgentRequestIds.add(requestId));
+        } else if (action == 'reject' || action == 'skip') {
+          setState(() => _dismissedUrgentRequestIds.add(requestId));
+          await LiveReservationQueueService().postSystemMessage(
+            liveId: liveId,
+            body:
+                '❌ Recusaste o pedido de $q un. · $label (acima do stock na live)',
+            senderLabel: 'Sistema',
+          );
+        }
+      }
+      await _loadReservationQueue(refreshMetrics: true);
+      final itemId = row.liveItemId?.trim() ?? '';
+      if (itemId.isNotEmpty) {
+        await _refreshStockCache([itemId]);
+      }
       await _syncLiveOpsMetrics();
+      if (mounted) setState(() {});
     } catch (e) {
       _logStudio(
         'reservation.$action',
@@ -3471,6 +3735,18 @@ class LiveVendorStudioPanelState extends State<LiveVendorStudioPanel> {
                   initialData: room.viewerCount,
                   builder: (context, snap) =>
                       _statRow('Espectadores', '${snap.data ?? 0}'),
+                ),
+                _statRow(
+                  'Carteira (vendas)',
+                  '${_livePaidOrdersValueEur.toStringAsFixed(2).replaceAll('.', ',')} €',
+                ),
+                _statRow(
+                  'Gorjetas',
+                  '${_liveTipsValueEur.toStringAsFixed(2).replaceAll('.', ',')} €',
+                ),
+                _statRow(
+                  'Total carteira',
+                  '${(_livePaidOrdersValueEur + _liveTipsValueEur).toStringAsFixed(2).replaceAll('.', ',')} €',
                 ),
                 _statRow('Artigos no catálogo', '${widget.catalogItemCount}'),
                 _statRow('Mensagens privadas', '$_privateUnread por ler'),
@@ -4118,17 +4394,57 @@ class LiveVendorStudioPanelState extends State<LiveVendorStudioPanel> {
         accepted.isEmpty &&
         cancelledByBuyer.isEmpty &&
         converted.isEmpty &&
-        _livePaidOrdersCount <= 0) {
+        _livePaidOrdersCount <= 0 &&
+        _liveTipsCount <= 0) {
       return Text(
         'Ainda sem pagamentos — quando alguém pagar, aparece aqui.',
         style: GoogleFonts.inter(color: Colors.white70, fontSize: 11),
       );
     }
 
+    final walletTotal = _livePaidOrdersValueEur + _liveTipsValueEur;
+    if ((walletTotal - _lastWalletLogTotalEur).abs() > 0.001) {
+      _lastWalletLogTotalEur = walletTotal;
+      _logStudio(
+        'wallet.payments_render',
+        data: {
+          'wallet_total_eur': walletTotal,
+          'paid_eur': _livePaidOrdersValueEur,
+          'tips_eur': _liveTipsValueEur,
+          'tips_count': _liveTipsCount,
+          'shows_wallet_line': walletTotal > 0.009,
+        },
+      );
+    }
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       mainAxisSize: MainAxisSize.min,
       children: [
+        if (walletTotal > 0.009) ...[
+          Text(
+            'Carteira deste directo: '
+            '${walletTotal.toStringAsFixed(2).replaceAll('.', ',')} €',
+            style: GoogleFonts.inter(
+              color: const Color(0xFF6ED8DE),
+              fontWeight: FontWeight.w900,
+              fontSize: 12,
+            ),
+          ),
+          const SizedBox(height: 8),
+        ],
+        if (_liveTipPayments.isNotEmpty) ...[
+          Text(
+            'Gorjetas (${_liveTipsCount})',
+            style: GoogleFonts.inter(
+              color: const Color(0xFFFFB74D),
+              fontWeight: FontWeight.w800,
+              fontSize: 10,
+            ),
+          ),
+          const SizedBox(height: 4),
+          ..._liveTipPayments.take(8).map(_tipPaymentRow),
+          const SizedBox(height: 8),
+        ],
         if (_livePaidOrdersValueEur > 0) ...[
           Text(
             'Valor vendido neste directo: '
@@ -4223,6 +4539,22 @@ class LiveVendorStudioPanelState extends State<LiveVendorStudioPanel> {
               .map((r) => _paymentRow(r, paid: false)),
         ],
       ],
+    );
+  }
+
+  Widget _tipPaymentRow(({String buyerLabel, double amountEur}) tip) {
+    final amount =
+        tip.amountEur.toStringAsFixed(2).replaceAll('.', ',');
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 4),
+      child: Text(
+        '💛 Gorjeta recebida de ${tip.buyerLabel}: $amount €',
+        style: GoogleFonts.inter(
+          color: Colors.white.withValues(alpha: 0.9),
+          fontSize: 10,
+          height: 1.3,
+        ),
+      ),
     );
   }
 
@@ -4641,6 +4973,279 @@ class LiveVendorStudioPanelState extends State<LiveVendorStudioPanel> {
     );
   }
 
+  LiveReservationRequestsRow? _urgentReservationPrompt() {
+    final open = _sellerOpenPendingReservations()
+        .where(
+          (r) =>
+              r.source == 'fleaber_live' &&
+              r.status == 'pending' &&
+              LiveReservationQueueService.notesNeedQtyConfirm(r.notes) &&
+              !_dismissedUrgentRequestIds.contains((r.id ?? '').trim()),
+        )
+        .where(_reservationNeedsUrgentQtyConfirm)
+        .toList();
+    if (open.isEmpty) return null;
+    return _sortReservationsByUrgency(open).first;
+  }
+
+  bool _reservationNeedsUrgentQtyConfirm(LiveReservationRequestsRow r) {
+    final itemId = (r.liveItemId ?? '').trim();
+    final snap = itemId.isNotEmpty ? _stockByItemId[itemId] : null;
+    LiveItemsRow? itemRow;
+    for (final row in _catalogRows ?? const <LiveItemsRow>[]) {
+      if ((row.id ?? '').trim() == itemId) {
+        itemRow = row;
+        break;
+      }
+    }
+    final freeQty = snap?.availableQty ?? itemRow?.quantity ?? 0;
+    return LiveReservationQueueService.needsUrgentQtyConfirmCard(
+      requestedQty: r.requestedQty,
+      stock: snap,
+      notesNeedQtyConfirm: true,
+    );
+  }
+
+  Widget _buildUrgentReservationCard() {
+    final req = _urgentReservationPrompt();
+    if (req == null) return const SizedBox.shrink();
+    final id = req.id?.trim() ?? '';
+    if (id.isEmpty) return const SizedBox.shrink();
+    final name = _buyerNameLabel(req);
+    final itemId = (req.liveItemId ?? '').trim();
+    LiveItemsRow? itemRow;
+    for (final r in _catalogRows ?? const <LiveItemsRow>[]) {
+      if ((r.id ?? '').trim() == itemId) {
+        itemRow = r;
+        break;
+      }
+    }
+    final snap = itemId.isNotEmpty ? _stockByItemId[itemId] : null;
+    final totalOnLive = snap?.totalQty ?? itemRow?.quantity ?? 1;
+    final freeQty = snap?.availableQty ?? totalOnLive;
+    final wantedQty = req.requestedQty < 1 ? 1 : req.requestedQty;
+    final buyerId = (req.buyerId ?? '').trim();
+    var reservedThisBuyer = 0;
+    var reservedOthers = 0;
+    for (final r in _reservationQueue) {
+      if ((r.liveItemId ?? '').trim() != itemId) continue;
+      if (!LiveReservationQueueService.isAcceptedAwaitingPayment(
+        status: r.status,
+        notes: r.notes,
+      )) {
+        continue;
+      }
+      final q = r.requestedQty < 1 ? 1 : r.requestedQty;
+      if ((r.buyerId ?? '').trim() == buyerId) {
+        reservedThisBuyer += q;
+      } else {
+        reservedOthers += q;
+      }
+    }
+    final stockLines = <String>[
+      'Na live: $totalOnLive un. · Livres: ${freeQty < 0 ? 0 : freeQty} un.',
+      'Pedido total deste cliente: $wantedQty un.',
+    ];
+    if (reservedThisBuyer > 0) {
+      stockLines.add(
+        '$reservedThisBuyer un. já reservada(s) para este cliente (aguardam pagamento)',
+      );
+    }
+    if (reservedOthers > 0) {
+      stockLines.add(
+        '$reservedOthers un. reservada(s) para outro(s) cliente(s) (aguardam pagamento)',
+      );
+    }
+    final ref = LiveVendorRefDisplay.formatRef(
+      itemRow?.refCode ?? _refForLiveItem(req.liveItemId),
+    );
+    final title = itemRow == null
+        ? ref
+        : LiveVendorRefDisplay.itemDisplayName(
+            title: itemRow.title,
+            refCode: itemRow.refCode,
+          );
+    final price = itemRow?.price;
+    final priceLabel = price != null && price > 0
+        ? '${price.toStringAsFixed(2).replaceAll('.', ',')} €'
+        : null;
+    final size = itemRow?.clothingSize?.trim();
+    final color = itemRow?.gender?.trim();
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Material(
+        color: const Color(0xFFB71C1C).withValues(alpha: 0.92),
+        borderRadius: BorderRadius.circular(14),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(12, 10, 8, 10),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (itemRow?.photoUrl?.trim().isNotEmpty == true)
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(8),
+                      child: Image.network(
+                        itemRow!.photoUrl!.trim(),
+                        width: 48,
+                        height: 48,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  if (itemRow?.photoUrl?.trim().isNotEmpty == true)
+                    const SizedBox(width: 10),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Confirmar quantidade',
+                          style: GoogleFonts.inter(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w800,
+                            fontSize: 12,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          title,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: GoogleFonts.inter(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w800,
+                            fontSize: 11,
+                          ),
+                        ),
+                        if (priceLabel != null) ...[
+                          const SizedBox(height: 2),
+                          Text(
+                            priceLabel,
+                            style: GoogleFonts.inter(
+                              color: Colors.white.withValues(alpha: 0.95),
+                              fontWeight: FontWeight.w800,
+                              fontSize: 11,
+                            ),
+                          ),
+                        ],
+                        if (ref.isNotEmpty) ...[
+                          const SizedBox(height: 2),
+                          Text(
+                            'Ref. $ref',
+                            style: GoogleFonts.inter(
+                              color: Colors.white.withValues(alpha: 0.8),
+                              fontSize: 10,
+                            ),
+                          ),
+                        ],
+                        if (size != null && size.isNotEmpty)
+                          Text(
+                            'Tam: $size',
+                            style: GoogleFonts.inter(
+                              color: Colors.white.withValues(alpha: 0.75),
+                              fontSize: 9,
+                            ),
+                          ),
+                        if (color != null && color.isNotEmpty)
+                          Text(
+                            'Cor: $color',
+                            style: GoogleFonts.inter(
+                              color: Colors.white.withValues(alpha: 0.75),
+                              fontSize: 9,
+                            ),
+                          ),
+                        const SizedBox(height: 4),
+                        Text(
+                          name,
+                          style: GoogleFonts.inter(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w700,
+                            fontSize: 11,
+                          ),
+                        ),
+                        ...stockLines.map(
+                          (line) => Padding(
+                            padding: const EdgeInsets.only(top: 2),
+                            child: Text(
+                              line,
+                              style: GoogleFonts.inter(
+                                color: Colors.white.withValues(alpha: 0.92),
+                                fontSize: 10,
+                                height: 1.3,
+                              ),
+                            ),
+                          ),
+                        ),
+                        Text(
+                          'Stock insuficiente — aceita ou recusa',
+                          style: GoogleFonts.inter(
+                            color: Colors.white.withValues(alpha: 0.75),
+                            fontSize: 9,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  IconButton(
+                    visualDensity: VisualDensity.compact,
+                    onPressed: () {
+                      setState(() => _dismissedUrgentRequestIds.add(id));
+                    },
+                    icon: const Icon(Icons.close_rounded,
+                        color: Colors.white70, size: 20),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: () => _processReservation(req, 'reject'),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: Colors.white,
+                        side: const BorderSide(color: Colors.white54),
+                        padding: const EdgeInsets.symmetric(vertical: 8),
+                      ),
+                      child: Text(
+                        'Recusar',
+                        style: GoogleFonts.inter(
+                          fontWeight: FontWeight.w700,
+                          fontSize: 11,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: FilledButton(
+                      onPressed: () => _processReservation(req, 'accept'),
+                      style: FilledButton.styleFrom(
+                        backgroundColor: const Color(0xFF007782),
+                        padding: const EdgeInsets.symmetric(vertical: 8),
+                      ),
+                      child: Text(
+                        'Aceitar',
+                        style: GoogleFonts.inter(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w800,
+                          fontSize: 11,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _buildBottomProductChrome() {
     final activeRow = _activeCatalogRow;
     if (activeRow == null) return const SizedBox.shrink();
@@ -4652,22 +5257,26 @@ class LiveVendorStudioPanelState extends State<LiveVendorStudioPanel> {
           sold: 0,
           interested: 0,
         );
-    final hasStock = (snap?.availableQty ?? stats.available ?? 0) > 0;
-    final soldOut =
-        !hasStock && LiveVendorSellerCopy.isSoldOut(activeRow.status, stats);
+    final totalQty = snap?.totalQty ?? 1;
+    final avail = snap?.availableQty ?? stats.available ?? 0;
+    final hasStock = avail > 0;
+    final soldOut = !hasStock &&
+        ((snap != null && snap.soldConvertedQty >= totalQty) ||
+            LiveVendorSellerCopy.isSoldOut(activeRow.status, stats));
     // Barra sempre clicável (stock/show mesmo com artigo «vendido» — repor qty).
     final actionsEnabled = true;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       mainAxisSize: MainAxisSize.min,
       children: [
+        if (widget.sellerOverlayLayout) _buildUrgentReservationCard(),
         LiveVendorCompactProductCard(
           refLabel: _itemRefLabel(activeRow),
           title: _itemTitle(activeRow),
           priceLabel: _itemPriceLabel(activeRow),
           photoUrl: activeRow.photoUrl,
           stats: stats,
-          itemStatus: activeRow.status,
+          itemStatus: hasStock ? 'available' : activeRow.status,
           onReservationsTap: () => unawaited(_showItemReservationsDetailSheet()),
           onSoldTap: () => unawaited(_showItemSoldDetailSheet()),
         ),
@@ -4811,11 +5420,23 @@ class LiveVendorStudioPanelState extends State<LiveVendorStudioPanel> {
     return ' · Prazo: ${diff.inMinutes}min';
   }
 
+  List<LiveReservationRequestsRow> _sellerOpenPendingReservations() {
+    return _reservationQueue
+        .where(
+          (r) =>
+              r.status == 'pending' &&
+              LiveReservationQueueService.isOpenSellerTreatReservation(
+                status: r.status,
+                notes: r.notes,
+              ),
+        )
+        .toList();
+  }
+
   List<LiveReservationRequestsRow> _reservationsForCategory(
     _ReservationListCategory cat,
   ) {
-    final pending =
-        _reservationQueue.where((r) => r.status == 'pending').toList();
+    final pending = _sellerOpenPendingReservations();
     final accepted = _reservationQueue
         .where(
           (r) => LiveReservationQueueService.isAcceptedAwaitingPayment(
@@ -4856,8 +5477,12 @@ class LiveVendorStudioPanelState extends State<LiveVendorStudioPanel> {
           pending
               .where(
                 (r) =>
-                    r.source == 'facebook_manual' ||
-                    r.source == 'helper_manual',
+                    (r.source == 'facebook_manual' ||
+                        r.source == 'helper_manual') &&
+                    !LiveReservationQueueService.isBuyerCancelledReservation(
+                      status: r.status,
+                      notes: r.notes,
+                    ),
               )
               .toList(),
         );
@@ -4950,8 +5575,7 @@ class LiveVendorStudioPanelState extends State<LiveVendorStudioPanel> {
         child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
       );
     }
-    final pending =
-        _reservationQueue.where((r) => r.status == 'pending').toList();
+    final pending = _sellerOpenPendingReservations();
     final accepted = _reservationQueue
         .where(
           (r) => LiveReservationQueueService.isAcceptedAwaitingPayment(
@@ -5157,14 +5781,18 @@ class LiveVendorStudioPanelState extends State<LiveVendorStudioPanel> {
         final active = row.isActive == true;
         final itemId = row.id?.trim() ?? '';
         final snap = itemId.isNotEmpty ? _stockByItemId[itemId] : null;
-        final hasStock = (snap?.availableQty ?? 0) > 0;
+        final metrics = _metricsForLiveItem(row);
+        final totalQty = snap?.totalQty ?? 1;
+        final availQty = snap?.availableQty ?? metrics.quantity;
+        final hasStock = (availQty ?? 0) > 0;
+        final soldConverted = snap?.soldConvertedQty ?? metrics.sold;
         final sold = !hasStock &&
-            ((row.status ?? '').trim() == 'sold' ||
-                (row.status ?? '').trim() == 'reserved_full');
+            (soldConverted >= totalQty ||
+                LiveVendorSellerCopy.isMarkedSold(row.status) ||
+                LiveVendorSellerCopy.isReservedFull(row.status));
         final ref = LiveVendorRefDisplay.refLabel(row.refCode);
         final title = _itemTitle(row);
         final price = _itemPriceLabel(row);
-        final metrics = _metricsForLiveItem(row);
 
         return LiveVendorCatalogQueueCard(
           title: title,

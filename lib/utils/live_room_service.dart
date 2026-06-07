@@ -64,6 +64,8 @@ class LiveRoomService {
   Timer? _presenceTimer;
   Timer? _refreshTimer;
   int viewerCount = 0;
+  bool _loadingOlder = false;
+  bool _hasMoreOlder = true;
 
   final _messagesController = StreamController<List<LiveRoomMessage>>.broadcast();
   final _viewerCountController = StreamController<int>.broadcast();
@@ -106,7 +108,7 @@ class LiveRoomService {
         .select()
         .eq('live_id', liveId)
         .order('created_at', ascending: true)
-        .limit(120);
+        .limit(600);
     messages
       ..clear()
       ..addAll(
@@ -114,6 +116,7 @@ class LiveRoomService {
             .map((e) => LiveRoomMessage.fromRow(Map<String, dynamic>.from(e)))
             .where((m) => m.id.isNotEmpty),
       );
+    _hasMoreOlder = messages.length >= 600;
     _emitMessages();
   }
 
@@ -136,9 +139,6 @@ class LiveRoomService {
             if (msg.id.isEmpty) return;
             if (messages.any((m) => m.id == msg.id)) return;
             messages.add(msg);
-            if (messages.length > 150) {
-              messages.removeRange(0, messages.length - 150);
-            }
             _emitMessages();
           },
         )
@@ -218,8 +218,8 @@ class LiveRoomService {
       final msg = LiveRoomMessage.fromRow(Map<String, dynamic>.from(row));
       if (msg.id.isNotEmpty && !messages.any((m) => m.id == msg.id)) {
         messages.add(msg);
-        if (messages.length > 150) {
-          messages.removeRange(0, messages.length - 150);
+        if (messages.length > 600) {
+          messages.removeRange(0, messages.length - 600);
         }
         _emitMessages();
       }
@@ -236,6 +236,53 @@ class LiveRoomService {
     }
   }
 
+  /// Carrega mensagens mais antigas (scroll até à 1.ª mensagem).
+  Future<void> loadOlderMessages() async {
+    if (liveId.isEmpty || _loadingOlder || !_hasMoreOlder || messages.isEmpty) {
+      return;
+    }
+    _loadingOlder = true;
+    try {
+      final oldest = messages.first.createdAt;
+      if (oldest == null) {
+        _hasMoreOlder = false;
+        return;
+      }
+      final rows = await SupaFlow.client
+          .from('live_messages')
+          .select()
+          .eq('live_id', liveId)
+          .lt('created_at', oldest.toUtc().toIso8601String())
+          .order('created_at', ascending: false)
+          .limit(120);
+      final batch = (rows as List)
+          .map((e) => LiveRoomMessage.fromRow(Map<String, dynamic>.from(e)))
+          .where((m) => m.id.isNotEmpty)
+          .toList();
+      if (batch.isEmpty) {
+        _hasMoreOlder = false;
+        return;
+      }
+      batch.sort(
+        (a, b) => (a.createdAt ?? DateTime.fromMillisecondsSinceEpoch(0))
+            .compareTo(b.createdAt ?? DateTime.fromMillisecondsSinceEpoch(0)),
+      );
+      final existingIds = messages.map((m) => m.id).toSet();
+      final older =
+          batch.where((m) => !existingIds.contains(m.id)).toList(growable: false);
+      if (older.isEmpty) {
+        _hasMoreOlder = false;
+        return;
+      }
+      messages.insertAll(0, older);
+      if (batch.length < 120) _hasMoreOlder = false;
+      _emitMessages();
+    } catch (_) {
+    } finally {
+      _loadingOlder = false;
+    }
+  }
+
   /// Recarrega mensagens (fallback se Realtime não estiver activo).
   Future<void> refreshMessages() async {
     if (liveId.isEmpty) return;
@@ -245,7 +292,7 @@ class LiveRoomService {
           .select()
           .eq('live_id', liveId)
           .order('created_at', ascending: true)
-          .limit(120);
+          .limit(600);
       final next = (rows as List)
           .map((e) => LiveRoomMessage.fromRow(Map<String, dynamic>.from(e)))
           .where((m) => m.id.isNotEmpty)

@@ -16,12 +16,12 @@ void main(List<String> args) async {
   try {
     final env = loadLiveOpsStagingEnv();
     final client = LiveOpsStagingClient(
-      url: envRequire(env, 'SUPABASE_URL').replaceAll(RegExp(r'/$'), ''),
+      url: normalizeSupabaseProjectUrl(envRequire(env, 'SUPABASE_URL')),
       anonKey: envRequire(env, 'SUPABASE_ANON_KEY'),
       serviceRoleKey: envRequire(env, 'SUPABASE_SERVICE_ROLE_KEY'),
     );
-    final sellerId = envRequire(env, 'LIVE_OPS_TEST_SELLER_ID');
-    final buyerId = envRequire(env, 'LIVE_OPS_TEST_BUYER_ID');
+    var sellerId = env['LIVE_OPS_TEST_SELLER_ID']?.trim() ?? '';
+    var buyerId = env['LIVE_OPS_TEST_BUYER_ID']?.trim() ?? '';
     final buyerEmail = envRequire(env, 'LIVE_OPS_TEST_BUYER_EMAIL');
     final buyerPassword = envRequire(env, 'LIVE_OPS_TEST_BUYER_PASSWORD');
     final sellerEmail = envRequire(env, 'LIVE_OPS_TEST_SELLER_EMAIL');
@@ -40,29 +40,42 @@ void main(List<String> args) async {
       password: sellerPassword,
     );
 
+    if (!isUuid(buyerId)) {
+      buyerId = await client.userIdForAccessToken(buyerToken);
+      print(
+        'AVISO: LIVE_OPS_TEST_BUYER_ID inválido no .env — a usar UUID do login ($buyerId).',
+      );
+    }
+    if (!isUuid(sellerId)) {
+      sellerId = await client.userIdForAccessToken(sellerToken);
+      print(
+        'AVISO: LIVE_OPS_TEST_SELLER_ID inválido no .env — a usar UUID do login ($sellerId).',
+      );
+    }
+
     await _cleanup(client, sellerId);
 
-    results['V0.3c #4 cancelar reserva'] = await _scenarioCancel(
+    results['Doc #4 cancelar (RPC+BD)'] = await _scenarioCancel(
       client: client,
       sellerId: sellerId,
       buyerId: buyerId,
       buyerToken: buyerToken,
     );
 
-    results['V0.3a #7 reconcile pago'] = await _scenarioReconcile(
+    results['Doc #7 pagamento (RPC+BD)'] = await _scenarioReconcile(
       client: client,
       sellerId: sellerId,
       buyerId: buyerId,
       buyerToken: buyerToken,
     );
 
-    results['V0.3d #3 stock vendido'] = await _scenarioStock(
+    results['Doc #3 stock (RPC+BD)'] = await _scenarioStock(
       client: client,
       sellerId: sellerId,
       sellerToken: sellerToken,
     );
 
-    results['V0.3e #6 edge bag POST'] = await _scenarioBagEdgePost(
+    results['Doc #6 saco 2 refs (edge API)'] = await _scenarioBagEdgePost(
       client: client,
       sellerId: sellerId,
       buyerId: buyerId,
@@ -88,8 +101,14 @@ void main(List<String> args) async {
     exitCode = 1;
   } else {
     print('---');
-    print('Todos os cenários V0 staging PASS.');
+    print('Todos os cenários Doc #3/#4/#6/#7 (camada BD/RPC/edge) PASS.');
   }
+  print('');
+  print('Nota: isto NÃO abre a app nem o browser Stripe.');
+  print('  Doc #3 — barra rodapé clicável → só APK manual.');
+  print('  Doc #4 — painel vendedora UI → só APK manual.');
+  print('  Doc #6 — browser Stripe no telemóvel → só APK manual.');
+  print('  Doc #7 — aba Pagamentos € na app → só APK manual.');
 }
 
 Future<void> _cleanup(LiveOpsStagingClient client, String sellerId) async {
@@ -127,17 +146,6 @@ Future<Map<String, String>> _createLiveFixture({
   });
   final liveId = live['id']!.toString();
   final ref = '$_refPrefix-${DateTime.now().millisecondsSinceEpoch}';
-  final item = await client.insert('live_items', {
-    'live_id': liveId,
-    'ref_code': ref,
-    'title': 'V0 test item',
-    'price': 5,
-    'quantity': itemQty,
-    'is_active': true,
-    'status': itemStatus,
-    'item_kind': 'live_only',
-  });
-  final liveItemId = item['id']!.toString();
 
   final product = await client.insert('products', {
     'seller_id': sellerId,
@@ -147,16 +155,24 @@ Future<Map<String, String>> _createLiveFixture({
     'ref_code': ref,
     'list_on_marketplace': false,
     'available_for_live': true,
-    'is_sold': false,
+    'is_sold': itemStatus == 'sold',
     'image_urls': <String>[],
   });
   final productId = product['id']!.toString();
 
-  await client.patch(
-    'live_items',
-    'id=eq.$liveItemId',
-    {'checkout_product_id': productId, 'product_id': productId},
-  );
+  // live_items_kind_stock_chk: marketplace_product → product_id + quantity null
+  final item = await client.insert('live_items', {
+    'live_id': liveId,
+    'ref_code': ref,
+    'title': 'V0 test item',
+    'price': 5,
+    'is_active': true,
+    'status': itemStatus,
+    'item_kind': 'marketplace_product',
+    'product_id': productId,
+    'checkout_product_id': productId,
+  });
+  final liveItemId = item['id']!.toString();
 
   return {
     'live_id': liveId,
@@ -390,17 +406,6 @@ Future<bool> _scenarioBagEdgePost({
 
     Future<Map<String, String>> addItem(String refSuffix) async {
       final ref = '$_refPrefix-$refSuffix';
-      final item = await client.insert('live_items', {
-        'live_id': liveId,
-        'ref_code': ref,
-        'title': 'V0 bag $refSuffix',
-        'price': 5,
-        'quantity': 5,
-        'is_active': true,
-        'status': 'available',
-        'item_kind': 'live_only',
-      });
-      final liveItemId = item['id']!.toString();
       final product = await client.insert('products', {
         'seller_id': sellerId,
         'title': 'V0 bag prod $refSuffix',
@@ -413,11 +418,18 @@ Future<bool> _scenarioBagEdgePost({
         'image_urls': <String>[],
       });
       final productId = product['id']!.toString();
-      await client.patch(
-        'live_items',
-        'id=eq.$liveItemId',
-        {'checkout_product_id': productId, 'product_id': productId},
-      );
+      final item = await client.insert('live_items', {
+        'live_id': liveId,
+        'ref_code': ref,
+        'title': 'V0 bag $refSuffix',
+        'price': 5,
+        'is_active': true,
+        'status': 'available',
+        'item_kind': 'marketplace_product',
+        'product_id': productId,
+        'checkout_product_id': productId,
+      });
+      final liveItemId = item['id']!.toString();
       return {
         'live_item_id': liveItemId,
         'product_id': productId,

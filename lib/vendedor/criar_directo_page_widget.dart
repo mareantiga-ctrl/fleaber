@@ -17,6 +17,8 @@ import '/utils/fleaber_colors.dart';
 import '/utils/live_publish_config.dart';
 import '/vendedor/live_publish_debug.dart';
 import '/utils/live_publish_cleanup.dart';
+import '/utils/live_start_open_reservations_service.dart';
+import '/widgets/live_start_reservations_warning_sheet.dart';
 import '/widgets/live_vendor_ops_ui.dart';
 import '/widgets/live_vendor_studio_panel.dart';
 import '/index.dart';
@@ -610,6 +612,25 @@ class _CriarDirectoPageWidgetState extends State<CriarDirectoPageWidget>
         ),
       );
     }
+  }
+
+  /// V1: aviso de reservas em aberto — após catálogo sincronizado, antes de emitir.
+  Future<bool> _confirmOpenReservationsBeforeGoLive() async {
+    final liveId = _liveId?.trim() ?? '';
+    if (liveId.isEmpty) return true;
+
+    final report = await LiveStartOpenReservationsService.fetch(liveId);
+    if (report == null || !report.summary.hasOpen) return true;
+    if (!mounted) return false;
+
+    final proceed = await LiveStartReservationsWarningSheet.show(
+      context,
+      report: report,
+    );
+    if (!proceed && mounted) {
+      context.pop();
+    }
+    return proceed;
   }
 
   Future<void> _markLiveActiveInDb() async {
@@ -1222,6 +1243,9 @@ class _CriarDirectoPageWidgetState extends State<CriarDirectoPageWidget>
         await FleaberLogger.instance.uploadStep('startLive.post_mux_api');
       }
 
+      await _syncLiveCatalog();
+      if (!await _confirmOpenReservationsBeforeGoLive()) return;
+
       if (kPublishUsesLiveKit) {
         if (!_dbg.previewOnlyMode) {
           await FleaberLogger.instance.uploadStep('startLive.pre_livekit_publish');
@@ -1426,6 +1450,10 @@ class _CriarDirectoPageWidgetState extends State<CriarDirectoPageWidget>
 
   void _openArenaAfterLiveEnd(String liveId) {
     if (!mounted) return;
+    final id = liveId.trim();
+    if (id.isNotEmpty) {
+      unawaited(LivePublishCleanup.finalizeEnded(id, runBackendTeardown: false));
+    }
     requestLiveFeedRefresh();
     context.pushReplacementNamed(
       FleaberLivePlayerWidget.routeName,

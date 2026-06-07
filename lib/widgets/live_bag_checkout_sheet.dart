@@ -6,8 +6,10 @@ import 'package:google_fonts/google_fonts.dart';
 import '/backend/supabase/supabase.dart';
 import '/utils/fee_calculator.dart';
 import '/utils/fleaber_radius.dart';
+import '/utils/live_catalog_stock_service.dart';
 import '/utils/live_in_stream_checkout.dart';
 import '/utils/live_reservation_queue_service.dart';
+import '/widgets/batata_cached_image.dart';
 import '/widgets/live_vendor_ops_ui.dart';
 import '/widgets/fleaber_primary_button.dart';
 
@@ -22,6 +24,7 @@ class LiveBagCheckoutSheet extends StatefulWidget {
     required this.playbackId,
     required this.isLive,
     required this.liveSellerId,
+    this.onPaymentStarted,
   });
 
   final List<LiveReservationRequestsRow> rows;
@@ -31,6 +34,7 @@ class LiveBagCheckoutSheet extends StatefulWidget {
   final String? playbackId;
   final bool isLive;
   final String? liveSellerId;
+  final VoidCallback? onPaymentStarted;
 
   /// Uma linha de pagamento por artigo live (agrega vários pedidos da mesma ref.).
   static List<LiveReservationRequestsRow> mergePayableByLiveItem(
@@ -40,6 +44,7 @@ class LiveBagCheckoutSheet extends StatefulWidget {
         .where(
           (r) => LiveReservationQueueService.buyerCanPayBagReservation(
             r.status,
+            notes: r.notes,
           ),
         )
         .toList();
@@ -88,7 +93,8 @@ class LiveBagCheckoutSheet extends StatefulWidget {
     String? playbackId,
     required bool isLive,
     String? liveSellerId,
-  }) {
+    VoidCallback? onPaymentStarted,
+  }) async {
     final payable = mergePayableByLiveItem(rows);
     if (payable.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -96,12 +102,39 @@ class LiveBagCheckoutSheet extends StatefulWidget {
           content: Text('Não há artigos prontos para pagar no saco.'),
         ),
       );
-      return Future.value();
+      return;
+    }
+
+    final itemIds = <String>{
+      for (final r in payable)
+        if ((r.liveItemId ?? '').trim().isNotEmpty)
+          (r.liveItemId ?? '').trim(),
+    };
+    for (final itemId in itemIds) {
+      final stock = await LiveCatalogStockService.fetch(itemId);
+      final itemRow = catalogByItemId[itemId];
+      final pendingForItem = LiveReservationQueueService.buyerBagPendingPayRows(
+        rows.where((x) => (x.liveItemId ?? '').trim() == itemId),
+      );
+      if (pendingForItem.isEmpty) continue;
+      final ok = await LiveReservationQueueService.gateBagPayQtyOrPrompt(
+        context: context,
+        liveId: liveId,
+        liveItemId: itemId,
+        payRows: pendingForItem,
+        stock: stock,
+        refLabel: LiveVendorRefDisplay.itemDisplayName(
+          title: itemRow?.title,
+          refCode: itemRow?.refCode,
+        ),
+      );
+      if (!ok) return;
     }
 
     return showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
+      barrierColor: Colors.transparent,
       backgroundColor: const Color(0xFF11181C),
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(18)),
@@ -114,6 +147,7 @@ class LiveBagCheckoutSheet extends StatefulWidget {
         playbackId: playbackId,
         isLive: isLive,
         liveSellerId: liveSellerId,
+        onPaymentStarted: onPaymentStarted,
       ),
     );
   }
@@ -165,6 +199,7 @@ class _LiveBagCheckoutSheetState extends State<LiveBagCheckoutSheet> {
       if (toPay.isEmpty) return;
 
       if (!mounted) return;
+      final hostCtx = Navigator.of(context, rootNavigator: true).context;
       Navigator.pop(context);
 
       final payLines = <LiveBagCheckoutPayLine>[];
@@ -196,8 +231,8 @@ class _LiveBagCheckoutSheetState extends State<LiveBagCheckoutSheet> {
         );
       }
 
-      if (payLines.length > 1 && mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
+      if (payLines.length > 1 && hostCtx.mounted) {
+        ScaffoldMessenger.of(hostCtx).showSnackBar(
           SnackBar(
             content: Text(
               'A pagar ${payLines.length} artigos num único checkout Stripe.',
@@ -208,7 +243,7 @@ class _LiveBagCheckoutSheetState extends State<LiveBagCheckoutSheet> {
       }
 
       await LiveInStreamCheckout.payBagLines(
-        context: context,
+        context: hostCtx,
         lines: payLines,
         liveId: widget.liveId,
         playbackId: widget.playbackId,
@@ -216,6 +251,7 @@ class _LiveBagCheckoutSheetState extends State<LiveBagCheckoutSheet> {
         liveSellerId: widget.liveSellerId,
         shippingMethod: _shippingMethod,
         checkoutNotes: notesOrNull,
+        onPaymentStarted: widget.onPaymentStarted,
       );
     } finally {
       if (mounted) setState(() => _paying = false);
@@ -317,6 +353,21 @@ class _LiveBagCheckoutSheetState extends State<LiveBagCheckoutSheet> {
                               });
                             },
                           ),
+                          if (itemRow?.photoUrl?.trim().isNotEmpty == true) ...[
+                            ClipRRect(
+                              borderRadius: FleaberRadius.circularSm,
+                              child: SizedBox(
+                                width: 48,
+                                height: 48,
+                                child: BatataCachedNetworkImage(
+                                  imageUrl: itemRow!.photoUrl!.trim(),
+                                  fit: BoxFit.cover,
+                                  placeholderColor: const Color(0xFF222222),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                          ],
                           Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,

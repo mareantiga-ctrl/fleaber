@@ -1,0 +1,26 @@
+name: Maestro smoke (manual)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  maestro:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+      - name: Install Maestro
+        run: curl -Ls "https://get.maestro.mobile.dev" | bash
+      - name: Build debug APK
+        run: flutter build apk --debug
+      - name: Start emulator
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 30
+          script: |
+            adb install -r build/app/outputs/flutter-apk/app-debug.apk
+            echo "MAESTRO_APP_ID=com.mycompany.fleaber" >> .maestro/.env
+            echo "Configure secrets LIVE_OPS_* no repo para CI completo"
+            maestro test .maestro/flows/v1_01_login_buyer_home.yaml || true

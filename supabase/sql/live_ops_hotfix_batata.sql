@@ -285,19 +285,19 @@ declare
   v_total int;
 begin
   if TG_OP = 'INSERT' then
-    v_total := public.batata_live_item_total_qty(new.live_item_id);
-    new.requested_qty := greatest(
-      least(coalesce(new.requested_qty, 1), greatest(v_total, 1)),
-      1
-    );
+    -- Não capar ao stock: pedidos acima do disponível usam qty_confirm_needed (R6).
+    new.requested_qty := greatest(coalesce(new.requested_qty, 1), 1);
   end if;
 
   if new.queue_position is null then
+    -- Só pendentes contam: cancelados/rejeitados mantêm posição antiga na linha.
     select coalesce(max(r.queue_position), 0)
     into v_max
     from public.live_reservation_requests r
     where r.live_id = new.live_id
-      and r.live_item_id = new.live_item_id;
+      and r.live_item_id = new.live_item_id
+      and r.status = 'pending'
+      and r.source = 'fleaber_live';
 
     new.queue_position := v_max + 1;
   end if;
@@ -326,6 +326,8 @@ declare
   v_req public.live_reservation_requests%rowtype;
   v_item_qty int := 1;
   v_reserved_qty int := 0;
+  v_sibling_qty int := 0;
+  v_final_qty int := 1;
   v_next_status text;
   v_item_status text;
 begin
@@ -357,8 +359,40 @@ begin
     return jsonb_build_object('ok', false, 'error', 'not_allowed');
   end if;
 
+  -- Aceite: agregar qty de reservas irmãs do mesmo comprador/artigo e fechar duplicados.
+  if p_action = 'accept' then
+    select coalesce(sum(r.requested_qty), 0)::int
+    into v_sibling_qty
+    from public.live_reservation_requests r
+    where r.live_item_id = v_req.live_item_id
+      and r.live_id = v_req.live_id
+      and r.buyer_id = v_req.buyer_id
+      and r.id <> v_req.id
+      and r.status = 'pending';
+
+    update public.live_reservation_requests
+    set
+      status = 'rejected',
+      notes = trim(both ' |' from coalesce(notes, '') || ' | superseded:sibling_accept'),
+      updated_at = now()
+    where live_item_id = v_req.live_item_id
+      and live_id = v_req.live_id
+      and buyer_id = v_req.buyer_id
+      and id <> v_req.id
+      and status = 'pending';
+
+    v_final_qty := greatest(
+      coalesce(v_req.requested_qty, 1) + coalesce(v_sibling_qty, 0),
+      1
+    );
+  end if;
+
   update public.live_reservation_requests
   set
+    requested_qty = case
+      when p_action = 'accept' then v_final_qty
+      else requested_qty
+    end,
     status = case
       when p_action = 'accept' then 'accepted'
       when p_action = 'reject' then 'rejected'
@@ -371,6 +405,9 @@ begin
       else expires_at
     end,
     notes = case
+      when p_action = 'accept' then trim(both ' |' from regexp_replace(
+        regexp_replace(coalesce(notes, ''), 'qty_confirm_needed', '', 'gi'),
+        '\s*\|\s*\|', ' | ', 'g'))
       when p_action = 'skip' then coalesce('skip:' || p_notes, 'skip')
       else coalesce(p_notes, notes)
     end,
@@ -415,7 +452,8 @@ begin
     perform public.batata_live_reservation_accept_broadcast(
       v_req.live_id,
       v_req.buyer_id,
-      v_req.live_item_id
+      v_req.live_item_id,
+      v_final_qty
     );
   elsif p_action = 'convert' then
     perform public.batata_live_purchase_broadcast(
@@ -516,8 +554,15 @@ begin
   set
     status = 'rejected',
     notes = coalesce(notes || ' | ', '') || 'bag_removed',
+    queue_position = null,
     updated_at = now()
   where id = v_req.id;
+
+  perform public.batata_live_system_message(
+    v_req.live_id,
+    '↩ Reserva cancelada pelo comprador',
+    'Sistema'
+  );
 
   -- Repor estado do artigo (stock / reservas activas).
   select coalesce(p.quantity, 1)::int
@@ -557,6 +602,103 @@ $$;
 
 revoke all on function public.batata_live_bag_remove_request(uuid) from public;
 grant execute on function public.batata_live_bag_remove_request(uuid) to authenticated;
+
+-- Comprador altera quantidade no saco (pendente ou aceite, antes do pagamento).
+create or replace function public.batata_live_bag_update_qty(
+  p_request_id uuid,
+  p_qty int
+)
+returns jsonb
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_req public.live_reservation_requests%rowtype;
+  v_qty int;
+begin
+  select * into v_req
+  from public.live_reservation_requests
+  where id = p_request_id
+  for update;
+
+  if v_req.id is null then
+    return jsonb_build_object('ok', false, 'error', 'request_not_found');
+  end if;
+
+  v_qty := greatest(least(coalesce(p_qty, 1), 9999), 1);
+
+  if auth.uid() is null
+     or auth.uid() <> v_req.buyer_id
+     or v_req.source <> 'fleaber_live'
+     or v_req.status not in ('pending', 'accepted') then
+    return jsonb_build_object('ok', false, 'error', 'not_allowed');
+  end if;
+
+  update public.live_reservation_requests
+  set
+    requested_qty = v_qty,
+    updated_at = now()
+  where id = v_req.id;
+
+  return jsonb_build_object(
+    'ok', true,
+    'request_id', v_req.id,
+    'requested_qty', v_qty
+  );
+end;
+$$;
+
+revoke all on function public.batata_live_bag_update_qty(uuid, int) from public;
+grant execute on function public.batata_live_bag_update_qty(uuid, int) to authenticated;
+
+-- Comprador marca reserva após checkout com qty > stock (card urgente vendedora).
+create or replace function public.batata_live_mark_qty_confirm_needed(p_request_id uuid)
+returns jsonb
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_req public.live_reservation_requests%rowtype;
+  v_notes text;
+begin
+  select * into v_req
+  from public.live_reservation_requests
+  where id = p_request_id
+  for update;
+
+  if v_req.id is null then
+    return jsonb_build_object('ok', false, 'error', 'request_not_found');
+  end if;
+
+  if auth.uid() is null
+     or auth.uid() <> v_req.buyer_id
+     or v_req.source <> 'fleaber_live'
+     or v_req.status not in ('pending', 'accepted') then
+    return jsonb_build_object('ok', false, 'error', 'not_allowed');
+  end if;
+
+  v_notes := trim(coalesce(v_req.notes, ''));
+  if v_notes ilike '%qty_confirm_needed%' then
+    return jsonb_build_object('ok', true, 'request_id', v_req.id, 'already_marked', true);
+  end if;
+
+  update public.live_reservation_requests
+  set
+    notes = case
+      when v_notes = '' then 'qty_confirm_needed'
+      else v_notes || ' | qty_confirm_needed'
+    end,
+    updated_at = now()
+  where id = v_req.id;
+
+  return jsonb_build_object('ok', true, 'request_id', v_req.id, 'already_marked', false);
+end;
+$$;
+
+revoke all on function public.batata_live_mark_qty_confirm_needed(uuid) from public;
+grant execute on function public.batata_live_mark_qty_confirm_needed(uuid) to authenticated;
 
 -- C) Seller vê reservas da live mesmo se seller_id na linha divergir do auth.
 drop policy if exists live_reservation_requests_select on public.live_reservation_requests;
@@ -1193,10 +1335,13 @@ grant execute on function public.batata_sync_live_item_for_order(uuid) to authen
 grant execute on function public.batata_sync_live_item_for_order(uuid) to service_role;
 
 -- Chat: reserva aceite pelo vendedor (saco live).
+drop function if exists public.batata_live_reservation_accept_broadcast(uuid, uuid, uuid);
+
 create or replace function public.batata_live_reservation_accept_broadcast(
   p_live_id uuid,
   p_buyer_id uuid,
-  p_live_item_id uuid
+  p_live_item_id uuid,
+  p_requested_qty integer default 1
 )
 returns boolean
 language plpgsql
@@ -1209,6 +1354,7 @@ declare
   v_title text;
   v_label text;
   v_body text;
+  v_qty integer;
 begin
   if p_live_id is null or p_buyer_id is null or p_live_item_id is null then
     return false;
@@ -1226,15 +1372,22 @@ begin
   where id = p_live_item_id
   limit 1;
 
-  if v_ref <> '' then
-    v_label := 'Ref ' || v_ref;
-  elsif v_title <> '' then
+  if v_title <> '' then
     v_label := v_title;
+  elsif v_ref <> '' then
+    v_label := 'Ref ' || v_ref;
   else
     v_label := 'artigo';
   end if;
 
-  v_body := '🔒 Reserva aceite — ' || v_label || ' · ' || v_name || ' tem 5 dias para pagar';
+  v_qty := greatest(coalesce(p_requested_qty, 1), 1);
+  if v_qty > 1 then
+    v_body := '🔒 Reserva aceite — ' || v_qty || ' un. · ' || v_label
+      || ' · ' || v_name || ' tem 5 dias para pagar';
+  else
+    v_body := '🔒 Reserva aceite — ' || v_label || ' · ' || v_name
+      || ' tem 5 dias para pagar';
+  end if;
 
   if exists (
     select 1
@@ -1265,9 +1418,9 @@ begin
 end;
 $$;
 
-revoke all on function public.batata_live_reservation_accept_broadcast(uuid, uuid, uuid) from public;
-grant execute on function public.batata_live_reservation_accept_broadcast(uuid, uuid, uuid) to authenticated;
-grant execute on function public.batata_live_reservation_accept_broadcast(uuid, uuid, uuid) to service_role;
+revoke all on function public.batata_live_reservation_accept_broadcast(uuid, uuid, uuid, integer) from public;
+grant execute on function public.batata_live_reservation_accept_broadcast(uuid, uuid, uuid, integer) to authenticated;
+grant execute on function public.batata_live_reservation_accept_broadcast(uuid, uuid, uuid, integer) to service_role;
 
 -- Após editar quantidade no catálogo, repõe available / tira sold se houver stock.
 create or replace function public.batata_update_live_item(
@@ -1351,9 +1504,421 @@ begin
 
   perform public.batata_recompute_live_item_status(v_li.id);
 
+  if p_quantity is not null and v_li.product_id is not null then
+    update public.products
+    set is_sold = false, list_on_marketplace = true
+    where id = v_li.product_id
+      and is_sold = true
+      and exists (
+        select 1
+        from public.live_items li2
+        where li2.id = v_li.id
+          and coalesce(li2.status, '') <> 'sold'
+      );
+  end if;
+
   return public.batata_live_item_stock(v_li.id);
 end;
 $$;
 
 revoke all on function public.batata_update_live_item(uuid, integer, numeric, text, text, text, text) from public;
 grant execute on function public.batata_update_live_item(uuid, integer, numeric, text, text, text, text) to authenticated;
+
+-- Repor quantidade real mesmo com live_items.status = sold (edição pós-venda no catálogo).
+create or replace function public.batata_live_item_total_qty(p_live_item_id uuid)
+returns integer
+language plpgsql
+stable
+security definer
+set search_path = public
+as $$
+declare
+  v_li public.live_items%rowtype;
+  v_qty integer;
+begin
+  select * into v_li from public.live_items where id = p_live_item_id;
+  if v_li.id is null then
+    return 0;
+  end if;
+
+  if v_li.item_kind = 'marketplace_product' and v_li.product_id is not null then
+    select coalesce(p.quantity, 1) into v_qty
+    from public.products p
+    where p.id = v_li.product_id;
+    return greatest(coalesce(v_qty, 1), 1);
+  end if;
+
+  return greatest(coalesce(v_li.quantity, 1), 1);
+end;
+$$;
+
+revoke all on function public.batata_live_item_total_qty(uuid) from public;
+grant execute on function public.batata_live_item_total_qty(uuid) to authenticated;
+
+-- Logs DB: criar/alterar reserva (R6 diagnóstico; não depende do painel vendedora aberto).
+create or replace function public.batata_log_reservation_request_tg()
+returns trigger
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_event text;
+  v_detail jsonb;
+begin
+  if TG_OP = 'INSERT' then
+    v_event := 'reservation.create';
+    v_detail := jsonb_build_object(
+      'step', v_event,
+      'status', coalesce(new.status, 'pending'),
+      'requested_qty', coalesce(new.requested_qty, 1),
+      'queue_position', new.queue_position,
+      'buyer_id', new.buyer_id,
+      'source', coalesce(new.source, 'fleaber_live')
+    );
+  elsif TG_OP = 'UPDATE' and coalesce(old.status, '') is distinct from coalesce(new.status, '') then
+    v_event := 'reservation.status';
+    v_detail := jsonb_build_object(
+      'step', v_event,
+      'old_status', old.status,
+      'new_status', new.status,
+      'requested_qty', coalesce(new.requested_qty, 1),
+      'buyer_id', new.buyer_id
+    );
+  else
+    return new;
+  end if;
+
+  insert into public.live_vendor_studio_logs (
+    live_id,
+    seller_id,
+    actor_id,
+    live_item_id,
+    request_id,
+    event,
+    status,
+    detail
+  ) values (
+    new.live_id,
+    new.seller_id,
+    auth.uid(),
+    new.live_item_id,
+    new.id,
+    v_event,
+    'ok',
+    v_detail
+  );
+
+  return new;
+exception
+  when others then
+    return new;
+end;
+$$;
+
+drop trigger if exists batata_log_reservation_request_tg on public.live_reservation_requests;
+create trigger batata_log_reservation_request_tg
+  after insert or update of status, requested_qty on public.live_reservation_requests
+  for each row
+  execute function public.batata_log_reservation_request_tg();
+
+-- Chat: compra confirmada — título antes de referência (alinha com app).
+create or replace function public.batata_live_purchase_broadcast(
+  p_live_id uuid,
+  p_buyer_id uuid,
+  p_live_item_id uuid
+)
+returns boolean
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_name text;
+  v_ref text;
+  v_title text;
+  v_label text;
+  v_body text;
+begin
+  if p_live_id is null or p_buyer_id is null or p_live_item_id is null then
+    return false;
+  end if;
+
+  select coalesce(nullif(trim(full_name), ''), 'Comprador')
+  into v_name
+  from public.profiles
+  where id = p_buyer_id;
+
+  select coalesce(nullif(trim(ref_code), ''), ''),
+         coalesce(nullif(trim(title), ''), '')
+  into v_ref, v_title
+  from public.live_items
+  where id = p_live_item_id
+  limit 1;
+
+  if v_title <> '' then
+    v_label := v_title;
+  elsif v_ref <> '' then
+    v_label := 'Ref ' || v_ref;
+  else
+    v_label := 'artigo';
+  end if;
+
+  v_body := '✅ ' || v_name || ' comprou ' || v_label;
+
+  if exists (
+    select 1
+    from public.live_messages m
+    where m.live_id = p_live_id
+      and m.kind = 'system'
+      and m.user_id = p_buyer_id
+      and m.body = v_body
+      and m.created_at > now() - interval '15 minutes'
+  ) then
+    return false;
+  end if;
+
+  insert into public.live_messages (
+    live_id,
+    user_id,
+    kind,
+    body,
+    sender_label
+  ) values (
+    p_live_id,
+    p_buyer_id,
+    'system',
+    v_body,
+    v_name
+  );
+
+  return true;
+end;
+$$;
+
+revoke all on function public.batata_live_purchase_broadcast(uuid, uuid, uuid) from public;
+grant execute on function public.batata_live_purchase_broadcast(uuid, uuid, uuid) to authenticated;
+grant execute on function public.batata_live_purchase_broadcast(uuid, uuid, uuid) to service_role;
+
+-- V1: aviso antes de iniciar directo — reservas/pedidos em aberto.
+-- (cópia inline; ficheiro dedicado: live_start_open_reservations_batata.sql)
+
+create or replace function public.batata_live_start_open_reservations_check(p_live_id uuid)
+returns jsonb
+language plpgsql
+stable
+security definer
+set search_path = public
+as $$
+declare
+  v_seller uuid;
+  v_result jsonb;
+begin
+  if p_live_id is null then
+    return jsonb_build_object('ok', false, 'error', 'live_id_required');
+  end if;
+
+  select coalesce(l.seller_id, l.vendedor_id) into v_seller
+  from public.lives l
+  where l.id = p_live_id;
+
+  if v_seller is null then
+    return jsonb_build_object('ok', false, 'error', 'live_not_found');
+  end if;
+
+  if not (
+    auth.uid() = v_seller
+    or public.batata_staff_has_permission(v_seller, 'can_manage_reservations')
+    or public.batata_staff_has_permission(v_seller, 'can_view_live_dashboard')
+  ) then
+    return jsonb_build_object('ok', false, 'error', 'not_allowed');
+  end if;
+
+  with catalog as (
+    select li.*
+    from public.live_items li
+    where li.live_id = p_live_id
+  ),
+  matched_requests as (
+    select
+      ci.id as catalog_item_id,
+      r.id::text as entry_id,
+      'live_request'::text as kind,
+      r.buyer_id,
+      r.status,
+      greatest(coalesce(r.requested_qty, 1), 1) as quantity,
+      r.queue_position,
+      r.created_at,
+      r.live_id as source_live_id
+    from catalog ci
+    join public.live_reservation_requests r
+      on r.seller_id = v_seller
+     and r.status in ('pending', 'accepted')
+     and coalesce(lower(r.notes), '') not like '%bag_removed%'
+     and coalesce(lower(r.notes), '') not like '%bag_cancelled%'
+    join public.live_items li_src on li_src.id = r.live_item_id
+    where (
+      (ci.product_id is not null and li_src.product_id = ci.product_id)
+      or (
+        ci.checkout_product_id is not null
+        and li_src.checkout_product_id = ci.checkout_product_id
+      )
+      or (
+        public.batata_normalize_ref(ci.ref_code) <> ''
+        and public.batata_normalize_ref(li_src.ref_code)
+          = public.batata_normalize_ref(ci.ref_code)
+      )
+    )
+  ),
+  matched_orders as (
+    select
+      ci.id as catalog_item_id,
+      o.id::text as entry_id,
+      'order'::text as kind,
+      o.buyer_id,
+      o.status,
+      greatest(coalesce(o.quantity, 1), 1) as quantity,
+      null::int as queue_position,
+      o.created_at,
+      o.live_id as source_live_id
+    from catalog ci
+    join public.orders o
+      on o.seller_id = v_seller
+     and lower(trim(coalesce(o.status, ''))) in (
+       'reserva_pendente', 'reservado', 'aguarda_confirmacao', 'pendente'
+     )
+     and lower(trim(coalesce(o.status, ''))) not in (
+       'cancelado', 'cancelada', 'cancelled', 'canceled', 'anulado', 'anulada'
+     )
+    left join public.live_items li_src on li_src.id = o.live_item_id
+    where (
+      (ci.product_id is not null and o.product_id = ci.product_id)
+      or (
+        ci.checkout_product_id is not null
+        and o.product_id = ci.checkout_product_id
+      )
+      or (
+        public.batata_normalize_ref(ci.ref_code) <> ''
+        and public.batata_normalize_ref(coalesce(li_src.ref_code, ''))
+          = public.batata_normalize_ref(ci.ref_code)
+      )
+    )
+  ),
+  all_matched as (
+    select * from matched_requests
+    union all
+    select * from matched_orders
+  ),
+  with_meta as (
+    select
+      am.*,
+      coalesce(nullif(trim(p.full_name), ''), 'Comprador') as buyer_name,
+      nullif(trim(p.photo_url), '') as buyer_photo_url,
+      case
+        when am.source_live_id is null then 'Marketplace'
+        when exists (
+          select 1
+          from public.lives lv
+          where lv.id = am.source_live_id
+            and (
+              coalesce(lv.mux_vod_playback_id, lv.mux_playback_id, lv.playback_id, '')
+                <> ''
+              or lower(coalesce(lv.status, '')) in ('ended')
+            )
+        ) then 'Gravado'
+        when am.source_live_id = p_live_id then 'Este directo'
+        else 'Direto anterior'
+      end as origin_label
+    from all_matched am
+    left join public.profiles p on p.id = am.buyer_id
+  ),
+  item_rows as (
+    select
+      ci.id as catalog_item_id,
+      coalesce(nullif(trim(ci.title), ''), 'Artigo') as title,
+      coalesce(nullif(trim(ci.ref_code), ''), '') as ref_code,
+      nullif(trim(ci.photo_url), '') as photo_url,
+      coalesce((stk->>'available_qty')::int, coalesce(ci.quantity, 1)) as current_stock,
+      coalesce(agg.reservation_count, 0) as reservation_count,
+      coalesce(agg.reserved_units, 0) as reserved_units,
+      coalesce(agg.reservations, '[]'::jsonb) as reservations,
+      coalesce(agg.origins, '[]'::jsonb) as origins
+    from catalog ci
+    left join lateral (
+      select public.batata_live_item_stock(ci.id) as stk
+    ) s on true
+    left join lateral (
+      select
+        count(*)::int as reservation_count,
+        coalesce(sum(wm.quantity), 0)::int as reserved_units,
+        jsonb_agg(
+          jsonb_build_object(
+            'kind', wm.kind,
+            'id', wm.entry_id,
+            'buyer_id', wm.buyer_id,
+            'buyer_name', wm.buyer_name,
+            'buyer_photo_url', wm.buyer_photo_url,
+            'status', wm.status,
+            'quantity', wm.quantity,
+            'queue_position', wm.queue_position,
+            'created_at', wm.created_at,
+            'origin', wm.origin_label
+          )
+          order by wm.created_at asc nulls last
+        ) as reservations,
+        (
+          select coalesce(jsonb_agg(distinct o.origin_label order by o.origin_label), '[]'::jsonb)
+          from (select distinct wm2.origin_label from with_meta wm2 where wm2.catalog_item_id = ci.id) o
+        ) as origins
+      from with_meta wm
+      where wm.catalog_item_id = ci.id
+    ) agg on true
+    where coalesce(agg.reservation_count, 0) > 0
+  ),
+  summary as (
+    select
+      count(*)::int as items_with_open,
+      coalesce(sum(reservation_count), 0)::int as total_reservations,
+      coalesce(sum(reserved_units), 0)::int as total_units
+    from item_rows
+  )
+  select jsonb_build_object(
+    'ok', true,
+    'summary', jsonb_build_object(
+      'items_with_open', coalesce((select items_with_open from summary), 0),
+      'total_reservations', coalesce((select total_reservations from summary), 0),
+      'total_units', coalesce((select total_units from summary), 0)
+    ),
+    'items', coalesce(
+      (
+        select jsonb_agg(
+          jsonb_build_object(
+            'live_item_id', ir.catalog_item_id,
+            'title', ir.title,
+            'ref_code', ir.ref_code,
+            'photo_url', ir.photo_url,
+            'current_stock', ir.current_stock,
+            'reservation_count', ir.reservation_count,
+            'reserved_units', ir.reserved_units,
+            'stock_warning', ir.reserved_units >= greatest(ir.current_stock, 1),
+            'origins', ir.origins,
+            'reservations', ir.reservations
+          )
+          order by ir.reserved_units desc, ir.title asc
+        )
+        from item_rows ir
+      ),
+      '[]'::jsonb
+    )
+  )
+  into v_result;
+
+  return coalesce(v_result, jsonb_build_object('ok', true, 'summary', jsonb_build_object(
+    'items_with_open', 0, 'total_reservations', 0, 'total_units', 0
+  ), 'items', '[]'::jsonb));
+end;
+$$;
+
+revoke all on function public.batata_live_start_open_reservations_check(uuid) from public;
+grant execute on function public.batata_live_start_open_reservations_check(uuid) to authenticated;
+grant execute on function public.batata_live_start_open_reservations_check(uuid) to service_role;

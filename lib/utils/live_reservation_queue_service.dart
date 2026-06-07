@@ -1,13 +1,16 @@
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 
 import '/auth/supabase_auth/auth_util.dart';
 import '/backend/supabase/supabase.dart';
 import '/order_cancel_eligibility.dart';
 import '/utils/fleaber_logger.dart';
 import '/utils/live_catalog_stock_service.dart';
+import '/utils/live_in_stream_checkout.dart';
 import '/utils/seller_staff_service.dart';
+import '/widgets/live_vendor_ops_ui.dart';
 
 enum LiveReservationSource { fleaberLive, facebookManual, helperManual }
 
@@ -34,10 +37,47 @@ class LiveReservationQueueService {
 
     final bid = (buyerId ?? uid).trim();
 
-    var qty = requestedQty.clamp(1, 9999);
+    final qty = requestedQty.clamp(1, 9999);
     final snap = await LiveCatalogStockService.fetch(liveItemId);
-    if (snap != null && qty > snap.totalQty) {
-      qty = snap.totalQty.clamp(1, 9999);
+
+    // Uma linha pendente por comprador/artigo: 2.ª reserva incrementa qty (R6).
+    if (source == LiveReservationSource.fleaberLive) {
+      final existing = await LiveReservationRequestsTable().queryRows(
+        queryFn: (q) => q
+            .eqOrNull('live_id', liveId)
+            .eqOrNull('live_item_id', liveItemId)
+            .eqOrNull('buyer_id', bid)
+            .eqOrNull('source', 'fleaber_live')
+            .eqOrNull('status', 'pending'),
+        limit: 1,
+      );
+      if (existing.isNotEmpty) {
+        final row = existing.first;
+        final rid = row.id?.trim() ?? '';
+        if (rid.isNotEmpty) {
+          final nextQty = (row.requestedQty < 1 ? 1 : row.requestedQty) + qty;
+          await updateBagRequestQty(requestId: rid, qty: nextQty);
+          unawaited(
+            FleaberLogger.instance.logLiveVendorStudio(
+              'reservation.increment',
+              liveId: liveId,
+              sellerId: sellerId,
+              liveItemId: liveItemId,
+              requestId: rid,
+              data: {
+                'requested_qty': nextQty,
+                'added_qty': qty,
+                'available_qty': snap?.availableQty,
+              },
+            ),
+          );
+          final refreshed = await LiveReservationRequestsTable().queryRows(
+            queryFn: (q) => q.eqOrNull('id', rid),
+            limit: 1,
+          );
+          return refreshed.isEmpty ? row : refreshed.first;
+        }
+      }
     }
 
     try {
@@ -85,7 +125,224 @@ class LiveReservationQueueService {
           .order('created_at', ascending: false),
       limit: 1,
     );
-    return rows.isEmpty ? null : rows.first;
+    final created = rows.isEmpty ? null : rows.first;
+    if (created != null) {
+      unawaited(
+        FleaberLogger.instance.logLiveVendorStudio(
+          'reservation.create',
+          liveId: liveId,
+          sellerId: sellerId,
+          liveItemId: liveItemId,
+          requestId: created.id,
+          data: {
+            'requested_qty': created.requestedQty,
+            'status': created.status,
+            'queue_position': created.queuePosition,
+            'available_qty': snap?.availableQty,
+          },
+        ),
+      );
+    }
+    final itemId = liveItemId.trim();
+    if (itemId.isNotEmpty) {
+      try {
+        await SupaFlow.client.rpc(
+          'batata_recompact_reservation_queue',
+          params: {'p_live_item_id': itemId},
+        );
+      } catch (_) {}
+    }
+    return created;
+  }
+
+  /// Marca reserva quando o comprador pede quantidade acima do stock (card urgente vendedora).
+  static const qtyConfirmNeededNoteTag = 'qty_confirm_needed';
+
+  static bool notesNeedQtyConfirm(String? notes) =>
+      (notes ?? '').contains(qtyConfirmNeededNoteTag);
+
+  /// Card vermelho vendedora: só quando qty pedida excede stock físico na live.
+  static bool needsUrgentQtyConfirmCard({
+    required int requestedQty,
+    required LiveCatalogStockSnapshot? stock,
+    required bool notesNeedQtyConfirm,
+  }) {
+    if (!notesNeedQtyConfirm || stock == null) return false;
+    return stock.requestExceedsSellableCapacity(
+      requestedQty,
+      restorePendingQty: requestedQty,
+    );
+  }
+
+  /// Persiste tag `qty_confirm_needed` via RPC (comprador não tem RLS de update directo).
+  Future<bool> markQtyConfirmNeeded({required String requestId}) async {
+    final id = requestId.trim();
+    if (id.isEmpty) return false;
+    try {
+      final res = await SupaFlow.client.rpc(
+        'batata_live_mark_qty_confirm_needed',
+        params: {'p_request_id': id},
+      );
+      final map = res is Map ? Map<String, dynamic>.from(res) : null;
+      return map != null && map['ok'] == true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  Future<void> updateBagRequestQty({
+    required String requestId,
+    required int qty,
+    String? liveItemId,
+  }) async {
+    final id = requestId.trim();
+    if (id.isEmpty) return;
+    final clamped = qty.clamp(1, 9999);
+    final res = await SupaFlow.client.rpc(
+      'batata_live_bag_update_qty',
+      params: {'p_request_id': id, 'p_qty': clamped},
+    );
+    final map = res is Map ? Map<String, dynamic>.from(res) : null;
+    if (map != null && map['ok'] != true) {
+      throw StateError(map['error']?.toString() ?? 'bag_update_qty_failed');
+    }
+  }
+
+  /// Soma `requested_qty` das linhas a pagar do mesmo artigo.
+  static int sumPayQty(Iterable<LiveReservationRequestsRow> rows) {
+    var total = 0;
+    for (final r in rows) {
+      total += r.requestedQty < 1 ? 1 : r.requestedQty;
+    }
+    return total < 1 ? 1 : total;
+  }
+
+  /// Reservas já aceites pela vendedora (prontas a pagar).
+  static List<LiveReservationRequestsRow> buyerBagAcceptedRows(
+    Iterable<LiveReservationRequestsRow> rows,
+  ) {
+    return rows
+        .where(
+          (r) =>
+              (r.status ?? '') == 'accepted' &&
+              !isBuyerCancelledReservation(
+                status: r.status,
+                notes: r.notes,
+              ),
+        )
+        .toList();
+  }
+
+  /// Pedidos pendentes ainda não aceites (só estes contam para R6 no Pagar).
+  static List<LiveReservationRequestsRow> buyerBagPendingPayRows(
+    Iterable<LiveReservationRequestsRow> rows,
+  ) {
+    return rows
+        .where(
+          (r) =>
+              (r.status ?? '') == 'pending' &&
+              !isBuyerCancelledReservation(
+                status: r.status,
+                notes: r.notes,
+              ),
+        )
+        .toList();
+  }
+
+  /// Bloqueia pagamento e mostra card urgente à vendedora só ao carregar em Pagar.
+  static Future<bool> gateBagPayQtyOrPrompt({
+    required BuildContext context,
+    required String liveId,
+    required String liveItemId,
+    required List<LiveReservationRequestsRow> payRows,
+    required LiveCatalogStockSnapshot? stock,
+    String? refLabel,
+  }) async {
+    if (stock == null) return true;
+    final pending = buyerBagPendingPayRows(payRows);
+    if (pending.isEmpty) return true;
+    final payQty = sumPayQty(pending);
+    if (!stock.requestExceedsSellableCapacity(
+      payQty,
+      restorePendingQty: payQty,
+    )) {
+      return true;
+    }
+
+    final target = pending.isNotEmpty ? pending.first : payRows.first;
+    final rid = target.id?.trim() ?? '';
+    final lid = liveId.trim();
+    final iid = liveItemId.trim();
+    if (rid.isNotEmpty && lid.isNotEmpty && iid.isNotEmpty) {
+      unawaited(
+        FleaberLogger.instance.logLiveVendorStudio(
+          'checkout.pay_qty_gate',
+          liveId: lid,
+          sellerId: pending.first.sellerId,
+          liveItemId: iid,
+          requestId: rid,
+          data: {
+            'pay_qty': payQty,
+            'available_qty': stock.availableQty,
+            'pending_rows': pending.length,
+          },
+        ),
+      );
+      await LiveInStreamCheckout.notifySellerQtyConfirmationNeeded(
+        liveId: lid,
+        liveItemId: iid,
+        reservationRequestId: rid,
+        requestedQty: payQty,
+        availableQty: stock.availableQty,
+        refLabel: refLabel,
+      );
+    }
+    if (!context.mounted) return false;
+    unawaited(
+      FleaberLogger.instance.event('live.player.c8b_gate', {
+        'phase': 'pre_pop',
+        'pay_qty': payQty,
+        'available_qty': stock.availableQty,
+        ...LiveInStreamCheckout.c8bUiStackSnapshot(context),
+      }),
+    );
+    // Fechar só overlay (saco/sheet/dialog), nunca a rota do player.
+    final localNav = Navigator.of(context);
+    final rootCtx = Navigator.of(context, rootNavigator: true).context;
+    final overlayRoute = ModalRoute.of(context);
+    final didPop = localNav.canPop() && overlayRoute is PopupRoute;
+    if (didPop) {
+      localNav.pop();
+      await Future<void>.delayed(Duration.zero);
+    }
+    if (context.mounted) {
+      unawaited(
+        FleaberLogger.instance.event('live.player.c8b_gate', {
+          'phase': 'post_pop',
+          'did_pop_sheet': didPop,
+          'pay_qty': payQty,
+          ...LiveInStreamCheckout.c8bUiStackSnapshot(context),
+        }),
+      );
+    }
+    final dialogCtx = rootCtx.mounted ? rootCtx : context;
+    if (!dialogCtx.mounted) return false;
+    await LiveInStreamCheckout.showQtyNeedsSellerConfirmationDialog(
+      context: dialogCtx,
+      availableQty: stock.availableQty,
+      requestedQty: payQty,
+      trigger: 'bag_pay_gate',
+    );
+    if (dialogCtx.mounted) {
+      unawaited(
+        FleaberLogger.instance.event('live.player.c8b_gate', {
+          'phase': 'post_dialog',
+          'pay_qty': payQty,
+          ...LiveInStreamCheckout.c8bUiStackSnapshot(dialogCtx),
+        }),
+      );
+    }
+    return false;
   }
 
   Future<Map<String, dynamic>> processRequest({
@@ -222,16 +479,39 @@ class LiveReservationQueueService {
     return rows.length;
   }
 
+  /// Stock do artigo sem descontar o pending do próprio saco (ranking por unidade).
+  static int grossAvailForUnitRanking(LiveCatalogStockSnapshot? stock) {
+    if (stock == null) return 0;
+    final gross =
+        stock.totalQty - stock.blockedQty - stock.reservedAcceptedQty;
+    return gross < 0 ? 0 : gross;
+  }
+
+  /// Unidade N deste artigo está em lista de espera (verde se N ≤ stock bruto).
+  static bool isWaitlistUnit({
+    required int unitIndex,
+    LiveCatalogStockSnapshot? stock,
+  }) {
+    if (unitIndex < 1) return false;
+    final gross = grossAvailForUnitRanking(stock);
+    if (gross < 1) return true;
+    return unitIndex > gross;
+  }
+
   /// Posição na fila quando não há stock suficiente para esta posição.
   static bool isWaitlistPosition({
     required int? queuePosition,
     int? availableQty,
+    LiveCatalogStockSnapshot? stock,
   }) {
     final pos = queuePosition;
     if (pos == null || pos < 1) return false;
+    if (stock != null) {
+      return isWaitlistUnit(unitIndex: pos, stock: stock);
+    }
     final avail = availableQty;
     if (avail == null) return pos > 1;
-    if (avail < 1) return pos > 1;
+    if (avail < 1) return true;
     return pos > avail;
   }
 
@@ -278,7 +558,7 @@ class LiveReservationQueueService {
     }
     return switch (status) {
       'converted' => 'Comprado ✓',
-      'accepted' => 'Aceite · reservado 5 dias',
+      'accepted' => 'Aceite · pronto a pagar',
       'rejected' => buyerBagRejectedLabel(notes),
       'expired' => 'Expirado',
       _ => status,
@@ -461,9 +741,28 @@ class LiveReservationQueueService {
     );
   }
 
-  /// Pagamento no saco: pendente ou aceite (aceite = reserva 5 dias pelo vendedor).
-  static bool buyerCanPayBagReservation(String? status) =>
-      buyerBagIsActionable(status ?? '');
+  /// Pagamento no saco: pendente ou aceite (bloqueio qty_confirm é no checkout, não aqui).
+  static bool buyerCanPayBagReservation(String? status, {String? notes}) {
+    if (isBuyerCancelledReservation(status: status, notes: notes)) {
+      return false;
+    }
+    return buyerBagIsActionable(status ?? '');
+  }
+
+  static Future<String?> fetchRequestStatus(String requestId) async {
+    final id = requestId.trim();
+    if (id.isEmpty) return null;
+    try {
+      final rows = await LiveReservationRequestsTable().queryRows(
+        queryFn: (q) => q.eqOrNull('id', id),
+        limit: 1,
+      );
+      if (rows.isEmpty) return null;
+      return rows.first.status?.trim();
+    } catch (_) {
+      return null;
+    }
+  }
 
   /// Converte a reserva ligada à encomenda Stripe (fallback se a edge não o fez).
   Future<Map<String, dynamic>> reconcileStripePaidOrder({
@@ -557,11 +856,26 @@ class LiveReservationQueueService {
 
   Future<void> removeFromLiveBag({
     required String requestId,
+    String? liveItemId,
   }) async {
     final res = await SupaFlow.client.rpc(
       'batata_live_bag_remove_request',
       params: {'p_request_id': requestId},
     );
+    final map = res is Map ? Map<String, dynamic>.from(res) : null;
+    if (map != null && map['ok'] != true) {
+      throw StateError(map['error']?.toString() ?? 'bag_remove_failed');
+    }
+    final itemId =
+        liveItemId?.trim() ?? map?['live_item_id']?.toString().trim() ?? '';
+    if (itemId.isNotEmpty) {
+      try {
+        await SupaFlow.client.rpc(
+          'batata_recompact_reservation_queue',
+          params: {'p_live_item_id': itemId},
+        );
+      } catch (_) {}
+    }
     unawaited(
       FleaberLogger.instance.event('live.bag.remove_request', {
         'request_id': requestId,

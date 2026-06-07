@@ -105,10 +105,10 @@ begin
   where id = p_live_item_id
   limit 1;
 
-  if v_ref <> '' then
-    v_label := 'Ref ' || v_ref;
-  elsif v_title <> '' then
+  if v_title <> '' then
     v_label := v_title;
+  elsif v_ref <> '' then
+    v_label := 'Ref ' || v_ref;
   else
     v_label := 'artigo';
   end if;

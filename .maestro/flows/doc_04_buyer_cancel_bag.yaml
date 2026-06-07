@@ -1,0 +1,18 @@
+# Doc #4 (APK) — Comprador cancela reserva no saco (parcial: lado buyer).
+# Pre-requisito: dart run tool/maestro_prepare_live.dart (semear reserva pending).
+appId: com.mycompany.fleaber
+---
+- runFlow: ../subflows/login_buyer.yaml
+- openLink: ${MAESTRO_DEEP_LINK_BASE}/fleaberLivePlayer?liveId=${MAESTRO_LIVE_ID}
+- extendedWaitUntil:
+    visible: "Saco da live"
+    timeout: 90000
+- tapOn: "Saco da live"
+- extendedWaitUntil:
+    visible: "Cancelar"
+    timeout: 45000
+- tapOn: "Cancelar"
+- extendedWaitUntil:
+    notVisible: "Cancelar"
+    timeout: 30000
+    optional: true

@@ -1,0 +1,16 @@
+# V1.5 — Dispositivo B (buyer): reserva artigo na live activa (MAESTRO_LIVE_ID sincronizado).
+appId: com.mycompany.fleaber
+---
+- runFlow: ../subflows/login_buyer.yaml
+- openLink: ${MAESTRO_DEEP_LINK_BASE}/fleaberLivePlayer?liveId=${MAESTRO_LIVE_ID}
+- extendedWaitUntil:
+    visible: "Reservar"
+    timeout: 90000
+- tapOn:
+    text: "${MAESTRO_ITEM_TITLE}"
+    optional: true
+- tapOn: "Reservar"
+- extendedWaitUntil:
+    visible: "saco"
+    timeout: 30000
+    optional: true

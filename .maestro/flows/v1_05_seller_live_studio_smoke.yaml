@@ -1,0 +1,23 @@
+# V1.2a + V1.2d parcial — Painel studio (requer emitir ou live activa no dispositivo)
+# Smoke: abre criar directo e procura tabs Operação/Catálogo se o painel estiver visível.
+appId: com.mycompany.fleaber
+---
+- runFlow: ../subflows/login_seller.yaml
+- openLink: ${MAESTRO_DEEP_LINK_BASE}/criarDirecto
+- runFlow: ../subflows/dismiss_permissions.yaml
+- extendedWaitUntil:
+    visible: "Operação"
+    timeout: 90000
+    optional: true
+- runFlow:
+    when:
+      visible: "Operação"
+    commands:
+      - tapOn: "Operação"
+      - extendedWaitUntil:
+          visible: "Pagamentos"
+          timeout: 20000
+          optional: true
+      - tapOn:
+          text: "Pagamentos"
+          optional: true

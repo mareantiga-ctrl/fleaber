@@ -159,6 +159,7 @@ class _LiveTipSheetState extends State<_LiveTipSheet> {
         tipId: checkout.tipId,
         playbackId: widget.args.playbackId,
         isLive: widget.args.isLive,
+        checkoutSessionId: checkout.checkoutSessionId,
       );
       final uri = Uri.parse(checkout.checkoutUrl);
       final opened = await launchUrl(
@@ -175,6 +176,7 @@ class _LiveTipSheetState extends State<_LiveTipSheet> {
       Navigator.of(context).pop(
         LiveTipResult(success: false, amountEur: amount, message: _note),
       );
+      unawaited(FleaberStripeTipContext.trySettlePendingTip());
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(

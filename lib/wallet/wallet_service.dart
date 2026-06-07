@@ -1,3 +1,5 @@
+import 'package:flutter/foundation.dart';
+
 import '/backend/supabase/supabase.dart';
 
 class WalletService {
@@ -70,7 +72,9 @@ class WalletService {
     return result?.toString();
   }
 
-  static Future<({String checkoutUrl, String? tipId})> openLiveTipStripeCheckout({
+  static Future<
+      ({String checkoutUrl, String? tipId, String? checkoutSessionId})>
+      openLiveTipStripeCheckout({
     required String liveId,
     required String sellerId,
     required double amountEur,
@@ -78,16 +82,23 @@ class WalletService {
     String? playbackId,
     bool isLive = true,
   }) async {
+    final body = <String, dynamic>{
+      'live_id': liveId,
+      'seller_id': sellerId,
+      'amount_eur': amountEur,
+      'message': message,
+      'playback_id': playbackId,
+      'is_live': isLive,
+    };
+    if (kIsWeb) {
+      final origin = Uri.base.origin.trim();
+      if (origin.isNotEmpty) {
+        body['web_return_origin'] = origin;
+      }
+    }
     final response = await SupaFlow.client.functions.invoke(
       'create-live-tip-checkout',
-      body: {
-        'live_id': liveId,
-        'seller_id': sellerId,
-        'amount_eur': amountEur,
-        'message': message,
-        'playback_id': playbackId,
-        'is_live': isLive,
-      },
+      body: body,
     );
     final data = response.data;
     final checkoutUrl = data is Map ? data['checkoutUrl']?.toString() : null;
@@ -100,7 +111,13 @@ class WalletService {
       );
     }
     final tipId = data is Map ? data['tipId']?.toString() : null;
-    return (checkoutUrl: checkoutUrl, tipId: tipId);
+    final checkoutSessionId =
+        data is Map ? data['checkoutSessionId']?.toString() : null;
+    return (
+      checkoutUrl: checkoutUrl,
+      tipId: tipId,
+      checkoutSessionId: checkoutSessionId,
+    );
   }
 
   static Future<void> requestPayout({

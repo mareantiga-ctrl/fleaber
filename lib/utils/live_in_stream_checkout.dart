@@ -1,8 +1,11 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+
+import '/widgets/batata_cached_image.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '/auth/supabase_auth/auth_util.dart';
@@ -76,6 +79,204 @@ abstract final class LiveInStreamCheckout {
 
   static double shippingCostForMethod(String method) =>
       method == shippingCarrier ? shippingCarrierEur : 0.0;
+
+  /// Bloqueia checkout quando a quantidade pedida excede stock disponível
+  /// (reserva ainda não aceite pela vendedora).
+  static bool checkoutQtyExceedsAvailable({
+    required int selectedQuantity,
+    required LiveCatalogStockSnapshot? liveStock,
+    String? reservationStatus,
+  }) {
+    if (liveStock == null) return false;
+    if (reservationStatus == 'accepted') return false;
+    final sel = selectedQuantity < 1 ? 1 : selectedQuantity;
+    return liveStock.requestExceedsSellableCapacity(
+      sel,
+      restorePendingQty: sel,
+    );
+  }
+
+  /// Snapshot da pilha de navegação/modais (diagnóstico C8B — cinzento no web).
+  static Map<String, dynamic> c8bUiStackSnapshot(BuildContext context) {
+    try {
+      final localNav = Navigator.of(context);
+      final rootNav = Navigator.of(context, rootNavigator: true);
+      final modal = ModalRoute.of(context);
+      return {
+        'is_web': kIsWeb,
+        'local_can_pop': localNav.canPop(),
+        'root_can_pop': rootNav.canPop(),
+        'modal_is_current': modal?.isCurrent,
+        'modal_barrier_dismissible': modal?.barrierDismissible,
+        'modal_barrier_color': modal?.barrierColor?.toString(),
+      };
+    } catch (e) {
+      return {'is_web': kIsWeb, 'snapshot_error': e.toString()};
+    }
+  }
+
+  static Future<bool> showQtyNeedsSellerConfirmationDialog({
+    required BuildContext context,
+    required int availableQty,
+    required int requestedQty,
+    String trigger = 'unknown',
+  }) async {
+    final avail = availableQty < 0 ? 0 : availableQty;
+    final req = requestedQty < 1 ? 1 : requestedQty;
+    // Overlay sem ModalBarrier — no web o barrier do showDialog deixa cinzento
+    // por cima do HtmlElementView do vídeo.
+    unawaited(
+      FleaberLogger.instance.event('live.player.c8b_overlay', {
+        'phase': 'open',
+        'trigger': trigger,
+        'available_qty': avail,
+        'requested_qty': req,
+        ...c8bUiStackSnapshot(context),
+      }),
+    );
+    final overlay = Overlay.of(context, rootOverlay: true);
+    final closed = Completer<void>();
+
+    late OverlayEntry entry;
+    void dismiss() {
+      if (!closed.isCompleted) {
+        entry.remove();
+        unawaited(
+          FleaberLogger.instance.event('live.player.c8b_overlay', {
+            'phase': 'dismiss',
+            'trigger': trigger,
+            ...c8bUiStackSnapshot(context),
+          }),
+        );
+        closed.complete();
+      }
+    }
+
+    entry = OverlayEntry(
+      builder: (ctx) => Stack(
+        children: [
+          Positioned.fill(
+            child: GestureDetector(
+              onTap: dismiss,
+              behavior: HitTestBehavior.translucent,
+            ),
+          ),
+          Center(
+            child: Material(
+              color: const Color(0xFF1A2329),
+              borderRadius: BorderRadius.circular(16),
+              elevation: 8,
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 360),
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 18, 12, 8),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Text(
+                        'Quantidade a confirmar',
+                        style: GoogleFonts.inter(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w800,
+                          fontSize: 16,
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      Text(
+                        'O teu pedido de $req unidade${req == 1 ? '' : 's'} foi '
+                        'enviado à vendedora para confirmar a quantidade. Neste '
+                        'momento só há $avail unidade${avail == 1 ? '' : 's'} '
+                        'disponível${avail == 1 ? '' : 'eis'} na live — não podes '
+                        'seguir para o pagamento até ela aceitar.',
+                        style: GoogleFonts.inter(
+                          color: Colors.white.withValues(alpha: 0.88),
+                          fontSize: 13,
+                          height: 1.45,
+                        ),
+                      ),
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: TextButton(
+                          onPressed: dismiss,
+                          child: Text(
+                            'Percebi',
+                            style: GoogleFonts.inter(
+                              color: const Color(0xFF00A3AD),
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+
+    overlay.insert(entry);
+    await closed.future;
+    if (context.mounted) {
+      unawaited(
+        FleaberLogger.instance.event('live.player.c8b_overlay', {
+          'phase': 'closed',
+          'trigger': trigger,
+          ...c8bUiStackSnapshot(context),
+        }),
+      );
+    }
+    return false;
+  }
+
+  static Future<void> notifySellerQtyConfirmationNeeded({
+    required String liveId,
+    required String liveItemId,
+    required String reservationRequestId,
+    required int requestedQty,
+    required int availableQty,
+    String? refLabel,
+  }) async {
+    final lid = liveId.trim();
+    final iid = liveItemId.trim();
+    final rid = reservationRequestId.trim();
+    if (lid.isEmpty || iid.isEmpty || rid.isEmpty) return;
+    final req = requestedQty < 1 ? 1 : requestedQty;
+    final avail = availableQty < 0 ? 0 : availableQty;
+    try {
+      await LiveReservationQueueService().updateBagRequestQty(
+        requestId: rid,
+        qty: req,
+      );
+      var marked = false;
+      try {
+        marked = await LiveReservationQueueService().markQtyConfirmNeeded(
+          requestId: rid,
+        );
+      } catch (_) {}
+      unawaited(
+        FleaberLogger.instance.event('live.checkout.qty_confirm', {
+          'live_id': lid,
+          'live_item_id': iid,
+          'request_id': rid,
+          'requested_qty': req,
+          'available_qty': avail,
+          'marked_ok': marked,
+        }),
+      );
+    } catch (_) {}
+    final itemLabel = (refLabel ?? '').trim();
+    final labelBit = itemLabel.isEmpty ? '' : ' · $itemLabel';
+    await LiveReservationQueueService().postSystemMessage(
+      liveId: lid,
+      body:
+          '📋 Pedido de $req un.$labelBit — só $avail disponível${avail == 1 ? '' : 'eis'}; aguarda confirmação',
+      senderLabel: 'Sistema',
+    );
+  }
 
   /// Portes: 3,50 € transportadora ou 0 € entrega em mão. Seguro: 0,65 € + 5% sobre (artigo+portes).
   static Widget checkoutTotalsBreakdown({
@@ -154,11 +355,31 @@ abstract final class LiveInStreamCheckout {
     required bool isLive,
     required String? liveSellerId,
     String? reservationRequestId,
+    String? reservationStatus,
     int? initialPayQty,
     double? overrideItemPriceEur,
     String? checkoutNotes,
+    String? productPhotoUrl,
+    VoidCallback? onPaymentStarted,
   }) async {
     if (currentUserUid.isEmpty) return;
+
+    var resStatus = reservationStatus?.trim();
+    final reqId = reservationRequestId?.trim() ?? '';
+    var reservedRequestedQty = initialPayQty;
+    if (reqId.isNotEmpty) {
+      try {
+        final reqRows = await LiveReservationRequestsTable().queryRows(
+          queryFn: (q) => q.eqOrNull('id', reqId),
+          limit: 1,
+        );
+        if (reqRows.isNotEmpty) {
+          resStatus ??= reqRows.first.status;
+          final rq = reqRows.first.requestedQty;
+          if (rq > 0) reservedRequestedQty = rq;
+        }
+      } catch (_) {}
+    }
 
     const paymentInApp = 'Pagamento na App';
     const paymentDirect = 'Pagamento Direto ao Vendedor (MB WAY/Transf)';
@@ -185,27 +406,31 @@ abstract final class LiveInStreamCheckout {
     }
 
     var maxQuantity = product.quantity.clamp(1, 99);
+    final payQtyHint = (reservedRequestedQty ?? initialPayQty ?? 1).clamp(1, 99);
     if (liveStock != null) {
-      if (reservationRequestId != null &&
-          initialPayQty != null &&
-          initialPayQty > 0) {
-        maxQuantity = initialPayQty.clamp(1, liveStock.availableQty.clamp(1, 99));
+      final totalCap = liveStock.totalQty.clamp(1, 99);
+      final availCap = liveStock.availableQty.clamp(1, 99);
+      if (resStatus == 'accepted') {
+        // Aceite (incl. over-stock): quantidade acordada = pedido, não stock restante.
+        maxQuantity = payQtyHint;
+      } else if (reqId.isNotEmpty) {
+        // Pendente: permitir pedir acima do disponível; bloqueio só ao pagar.
+        maxQuantity = totalCap;
       } else {
-        maxQuantity = liveStock.availableQty.clamp(1, 99);
+        maxQuantity = availCap;
       }
-    } else if (initialPayQty != null && initialPayQty > 0) {
-      maxQuantity = initialPayQty.clamp(1, 99);
+    } else if (payQtyHint > 0) {
+      maxQuantity = payQtyHint;
     }
 
-    var selectedQuantity = initialPayQty != null && initialPayQty > 0
-        ? initialPayQty.clamp(1, maxQuantity)
-        : 1;
+    var selectedQuantity = payQtyHint.clamp(1, maxQuantity);
 
     if (!context.mounted) return;
 
     await showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
+      barrierColor: Colors.transparent,
       backgroundColor: const Color(0xFF11181C),
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(18)),
@@ -255,6 +480,42 @@ abstract final class LiveInStreamCheckout {
                       ),
                     ),
                     const SizedBox(height: 8),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        if (productPhotoUrl?.trim().isNotEmpty == true)
+                          Padding(
+                            padding: const EdgeInsets.only(right: 10),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(8),
+                              child: SizedBox(
+                                width: 56,
+                                height: 56,
+                                child: BatataCachedNetworkImage(
+                                  imageUrl: productPhotoUrl!.trim(),
+                                  fit: BoxFit.cover,
+                                  placeholderColor: const Color(0xFF222222),
+                                ),
+                              ),
+                            ),
+                          ),
+                        Expanded(
+                          child: Text(
+                            product.title?.trim().isNotEmpty == true
+                                ? product.title!.trim()
+                                : 'Artigo',
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: GoogleFonts.inter(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w700,
+                              fontSize: 14,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 6),
                     Text(
                       'Portes: 3,50 € com transportadora · 0 € em entrega em mão. '
                       'Seguro Fleaber: 0,65 € + 5% do valor protegido.',
@@ -358,6 +619,43 @@ abstract final class LiveInStreamCheckout {
                                 );
                                 return;
                               }
+                              var payResStatus = resStatus;
+                              if (reqId.isNotEmpty) {
+                                payResStatus =
+                                    await LiveReservationQueueService
+                                            .fetchRequestStatus(reqId) ??
+                                        payResStatus;
+                              }
+                              if (checkoutQtyExceedsAvailable(
+                                selectedQuantity: selectedQuantity,
+                                liveStock: liveStock,
+                                reservationStatus: payResStatus,
+                              )) {
+                                final iid = liveItemId?.trim() ?? '';
+                                if (reqId.isNotEmpty &&
+                                    iid.isNotEmpty &&
+                                    payResStatus != 'accepted') {
+                                  await notifySellerQtyConfirmationNeeded(
+                                    liveId: liveId,
+                                    liveItemId: iid,
+                                    reservationRequestId: reqId,
+                                    requestedQty: selectedQuantity,
+                                    availableQty: liveStock!.availableQty,
+                                    refLabel: LiveVendorRefDisplay.itemDisplayName(
+                                      title: product.title,
+                                      refCode: product.refCode,
+                                    ),
+                                  );
+                                }
+                                if (!ctx.mounted) return;
+                                await showQtyNeedsSellerConfirmationDialog(
+                                  context: ctx,
+                                  availableQty: liveStock!.availableQty,
+                                  requestedQty: selectedQuantity,
+                                  trigger: 'checkout_single_pay',
+                                );
+                                return;
+                              }
                               if (ProfileShippingRequirements
                                   .checkoutNeedsCompleteProfile(
                                 shippingMethod: selectedShipping,
@@ -368,9 +666,12 @@ abstract final class LiveInStreamCheckout {
                                         .ensureCheckoutReady(context);
                                 if (!ready) return;
                               }
+                              onPaymentStarted?.call();
+                              if (ctx.mounted) Navigator.pop(ctx);
+                              if (!context.mounted) return;
                               setModalState(() => checkoutProcessing = true);
                               final ok = await _submit(
-                                context: ctx,
+                                context: context,
                                 product: product,
                                 quantity: selectedQuantity,
                                 shippingMethod: selectedShipping,
@@ -387,10 +688,8 @@ abstract final class LiveInStreamCheckout {
                                 reservationRequestId: reservationRequestId,
                                 checkoutNotes: checkoutNotes,
                               );
-                              if (!ctx.mounted) return;
-                              if (ok) {
-                                Navigator.pop(ctx);
-                              } else {
+                              if (!context.mounted) return;
+                              if (!ok) {
                                 setModalState(
                                     () => checkoutProcessing = false);
                               }
@@ -664,10 +963,53 @@ abstract final class LiveInStreamCheckout {
     required String? liveSellerId,
     required String shippingMethod,
     String? checkoutNotes,
+    VoidCallback? onPaymentStarted,
   }) async {
     if (lines.isEmpty) return false;
+    onPaymentStarted?.call();
     final lid = liveId.trim();
     if (lid.isEmpty) return false;
+
+    for (final line in lines) {
+      final liid = line.itemRow?.id?.trim() ?? '';
+      if (liid.isEmpty) continue;
+      final snap = await LiveCatalogStockService.fetch(liid);
+      final rid = line.request.id?.trim() ?? '';
+      var resStatus = line.request.status?.trim();
+      if (rid.isNotEmpty) {
+        resStatus =
+            await LiveReservationQueueService.fetchRequestStatus(rid) ??
+                resStatus;
+      }
+      if (checkoutQtyExceedsAvailable(
+        selectedQuantity: line.payQty,
+        liveStock: snap,
+        reservationStatus: resStatus,
+      )) {
+        if (rid.isNotEmpty && resStatus != 'accepted') {
+          await notifySellerQtyConfirmationNeeded(
+            liveId: lid,
+            liveItemId: liid,
+            reservationRequestId: rid,
+            requestedQty: line.payQty,
+            availableQty: snap?.availableQty ?? 0,
+            refLabel: LiveVendorRefDisplay.itemDisplayName(
+              title: line.itemRow?.title,
+              refCode: line.itemRow?.refCode,
+            ),
+          );
+        }
+        if (context.mounted) {
+          await showQtyNeedsSellerConfirmationDialog(
+            context: context,
+            availableQty: snap?.availableQty ?? 0,
+            requestedQty: line.payQty,
+            trigger: 'bag_checkout_line',
+          );
+        }
+        return false;
+      }
+    }
 
     final shippingCost = shippingCostForMethod(shippingMethod);
     final sid = liveSellerId?.trim() ?? lines.first.product.sellerId?.trim() ?? '';

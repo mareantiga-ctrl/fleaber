@@ -110,10 +110,6 @@ begin
     return 0;
   end if;
 
-  if coalesce(v_li.status, '') = 'sold' then
-    return 0;
-  end if;
-
   if v_li.item_kind = 'marketplace_product' and v_li.product_id is not null then
     select coalesce(p.quantity, 1) into v_qty
     from public.products p

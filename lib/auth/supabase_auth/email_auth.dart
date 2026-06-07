@@ -13,12 +13,27 @@ Future<User?> emailCreateAccountFunc(
   String email,
   String password,
 ) async {
-  final AuthResponse res =
-      await SupaFlow.client.auth.signUp(email: email, password: password);
+  final trimmed = email.trim();
+  final AuthResponse res = await SupaFlow.client.auth.signUp(
+    email: trimmed,
+    password: password,
+  );
 
-  // If the Supabase project is configured to not let users sign in until the
-  // email has been confirmed, the user returned in the AuthResponse still has
-  // all the user info. But since the user shouldn't be able to sign in without
-  // their email verified, return a null User.
-  return res.user?.lastSignInAt == null ? null : res.user;
+  if (res.session != null && res.user != null) {
+    return res.user;
+  }
+
+  final created = res.user;
+  if (created == null) return null;
+
+  // SignUp pode criar o user sem sessão no objeto (SDK); tentar login em seguida.
+  try {
+    final signIn = await SupaFlow.client.auth.signInWithPassword(
+      email: trimmed,
+      password: password,
+    );
+    return signIn.user ?? created;
+  } catch (_) {
+    return created.emailConfirmedAt != null ? created : null;
+  }
 }

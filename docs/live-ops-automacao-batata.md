@@ -2,7 +2,7 @@
 
 **Objetivo:** reduzir o ciclo *alteração → APK → teste manual → bug* sem bloquear evolução do directo.  
 **Documento manual:** [live-ops-testes-batata.md](./live-ops-testes-batata.md) (checklist APK / staging).  
-**Estado:** **V0 implementado** — unitários + `tool/live_ops_staging_check.dart`. V1/V2 por fazer.
+**Estado:** **V0 implementado** · **V1 Maestro** (`.maestro/`, ver [maestro-batata.md](./maestro-batata.md)). V2 por fazer.
 
 **Última revisão:** 2026-06-03
 

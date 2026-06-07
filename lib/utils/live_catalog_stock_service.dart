@@ -42,6 +42,21 @@ class LiveCatalogStockSnapshot {
   String? get checkoutProductIdOrPrimary =>
       isMarketplaceProduct ? productId : (checkoutProductId ?? productId);
 
+  /// O pedido excede o stock físico na live (ignora a própria linha pendente).
+  bool requestExceedsSellableCapacity(
+    int requestedQty, {
+    int restorePendingQty = 0,
+  }) {
+    final req = requestedQty < 1 ? 1 : requestedQty;
+    final restore = restorePendingQty < 0 ? 0 : restorePendingQty;
+    final pendingOthers =
+        (pendingBagQty - restore).clamp(0, 99999);
+    final cap =
+        (totalQty - blockedQty - reservedAcceptedQty - pendingOthers)
+            .clamp(0, 99999);
+    return req > cap;
+  }
+
   factory LiveCatalogStockSnapshot.fromRpc(dynamic raw) {
     if (raw is! Map) {
       throw ArgumentError('Invalid stock RPC payload');

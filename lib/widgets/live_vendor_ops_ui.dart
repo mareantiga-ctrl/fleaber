@@ -613,7 +613,9 @@ class LiveVendorOperationKpiStrip extends StatelessWidget {
           Text(
             LiveOpsTotals.formatEuro(totals.salesValueEur),
             style: GoogleFonts.inter(
-              color: FleaberColors.teal,
+              color: totals.salesValueEur > 0
+                  ? FleaberColors.teal
+                  : Colors.white.withValues(alpha: 0.45),
               fontWeight: FontWeight.w900,
               fontSize: 20,
               height: 1,
@@ -621,7 +623,9 @@ class LiveVendorOperationKpiStrip extends StatelessWidget {
           ),
           const SizedBox(height: 2),
           Text(
-            'valor vendido neste directo',
+            totals.salesValueEur > 0
+                ? 'carteira deste directo (vendas + gorjetas)'
+                : 'carteira deste directo',
             style: GoogleFonts.inter(
               color: Colors.white.withValues(alpha: 0.55),
               fontSize: 9,

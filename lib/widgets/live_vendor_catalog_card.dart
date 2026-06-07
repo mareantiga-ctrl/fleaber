@@ -8,16 +8,32 @@ import '/utils/fleaber_radius.dart';
 class LiveVendorCatalogItemMetrics {
   const LiveVendorCatalogItemMetrics({
     this.quantity,
+    this.available,
     this.sold = 0,
     this.reservations = 0,
   });
 
+  /// Stock total na live (`live_items.quantity` / RPC `total_qty`).
   final int? quantity;
+  /// Unidades livres para vender agora (RPC `available_qty`).
+  final int? available;
   final int sold;
   final int reservations;
 
   String get quantityLabel =>
       quantity != null ? '$quantity' : '—';
+
+  String get metricsLine {
+    final total = quantity;
+    final disp = available ?? quantity;
+    final dispLabel = disp != null ? '$disp' : '—';
+    if (total != null && disp != null && total != disp) {
+      return 'Disp: $dispLabel · Total: $total · '
+          'Vendidos: $sold · Reservas: $reservations';
+    }
+    return 'Disp: $dispLabel · '
+        'Vendidos: $sold · Reservas: $reservations';
+  }
 }
 
 /// Card da fila de catálogo (venda ao vivo).
@@ -135,9 +151,7 @@ class LiveVendorCatalogQueueCard extends StatelessWidget {
                   ],
                   const SizedBox(height: 5),
                   Text(
-                    'Qtd: ${metrics.quantityLabel} · '
-                    'Vendidos: ${metrics.sold} · '
-                    'Reservas: ${metrics.reservations}',
+                    metrics.metricsLine,
                     style: GoogleFonts.inter(
                       color: Colors.white.withValues(alpha: 0.72),
                       fontSize: 9.5,

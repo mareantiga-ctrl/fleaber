@@ -10,6 +10,7 @@ import '/utils/fleaber_grid_spacing.dart';
 import '/utils/seller_vacation_mode.dart';
 import '/utils/mux_urls.dart';
 import '/utils/live_publish_cleanup.dart';
+import '/marketplace_feed_refresh.dart';
 import '/widgets/home_mux_live_card.dart';
 
 /// Grelha Home: diretos ao vivo primeiro, depois gravações (máx. 50), recente → antigo.
@@ -44,6 +45,7 @@ class HomeLiveFeedGridState extends State<HomeLiveFeedGrid> {
   int _endedPage = 0;
   String? _error;
   Timer? _liveStatusPoll;
+  VoidCallback? _liveFeedRefreshListener;
 
   /// Direto «ao vivo» só com status live + is_active na BD.
   static bool feedIsLiveStream(LivesRow live) {
@@ -64,7 +66,11 @@ class HomeLiveFeedGridState extends State<HomeLiveFeedGrid> {
   void initState() {
     super.initState();
     unawaited(_bootstrapFeed());
-    _liveStatusPoll = Timer.periodic(const Duration(seconds: 45), (_) {
+    _liveFeedRefreshListener = () {
+      if (mounted) unawaited(_loadFeed(reset: true));
+    };
+    liveFeedRefreshTick.addListener(_liveFeedRefreshListener!);
+    _liveStatusPoll = Timer.periodic(const Duration(seconds: 20), (_) {
       if (!mounted) return;
       final hasLive = _items.any((e) => e.isLiveStream);
       if (hasLive) {
@@ -75,6 +81,9 @@ class HomeLiveFeedGridState extends State<HomeLiveFeedGrid> {
 
   @override
   void dispose() {
+    if (_liveFeedRefreshListener != null) {
+      liveFeedRefreshTick.removeListener(_liveFeedRefreshListener!);
+    }
     _liveStatusPoll?.cancel();
     super.dispose();
   }

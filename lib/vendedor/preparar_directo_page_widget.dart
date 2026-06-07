@@ -12,8 +12,10 @@ import '/utils/live_prep_ref_details.dart';
 import '/utils/live_prep_refs.dart';
 import '/utils/live_catalog_prep_service.dart';
 import '/utils/live_catalog_stock_service.dart';
+import '/utils/live_ref_lineage_preview_service.dart';
 import '/utils/live_ref_scheme.dart';
 import '/widgets/live_ref_chip_editor_sheet.dart';
+import '/widgets/live_ref_lineage_sheet.dart';
 import '/widgets/batata_cached_image.dart';
 
 import '/utils/fleaber_colors.dart';
@@ -167,7 +169,32 @@ class _PrepararDirectoPageWidgetState extends State<PrepararDirectoPageWidget>
     if (saved == null || !mounted) return;
     await LivePrepRefDetails.save(key, saved.detail);
     try {
-      await LiveCatalogPrepService.ensureDraftLive();
+      final draftLiveId = await LiveCatalogPrepService.ensureDraftLive();
+      var lineageMode = 'new';
+      String? inheritLogicalId;
+
+      final preview = await LiveRefLineagePreviewService.fetch(
+        sellerId: currentUserUid,
+        refCode: label,
+        liveId: draftLiveId,
+      );
+      if (!mounted) return;
+
+      if (preview != null && preview.needsSheetForDraft) {
+        final decision = await LiveRefLineageSheet.show(
+          context,
+          report: preview,
+        );
+        if (!mounted || decision == null) return;
+        switch (decision) {
+          case LiveRefLineageInherit(:final logicalItemId):
+            lineageMode = 'inherit';
+            inheritLogicalId = logicalItemId;
+          case LiveRefLineageNewArticle():
+            lineageMode = 'new';
+        }
+      }
+
       await LiveCatalogStockService.upsertLiveOnlyItem(
         sellerId: currentUserUid,
         refCode: label,
@@ -176,6 +203,9 @@ class _PrepararDirectoPageWidgetState extends State<PrepararDirectoPageWidget>
         quantity: saved.detail.quantity,
         clothingSize:
             saved.detail.isClothing ? saved.detail.clothingSize : null,
+        liveId: draftLiveId,
+        lineageMode: lineageMode,
+        logicalItemId: inheritLogicalId,
       );
     } catch (e) {
       if (!mounted) return;

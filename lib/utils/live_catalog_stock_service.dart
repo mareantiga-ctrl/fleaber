@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 
 import '/backend/supabase/supabase.dart';
+import '/utils/live_ref_lineage_preview_service.dart';
 
 /// Snapshot de stock unificado (RPC `batata_live_item_stock`).
 class LiveCatalogStockSnapshot {
@@ -203,7 +204,7 @@ abstract final class LiveCatalogStockService {
     );
   }
 
-  static Future<String?> upsertLiveOnlyItem({
+  static Future<LiveOnlyUpsertResult?> upsertLiveOnlyItem({
     required String sellerId,
     required String refCode,
     String? title,
@@ -213,6 +214,8 @@ abstract final class LiveCatalogStockService {
     String? gender,
     String? photoUrl,
     String? liveId,
+    String lineageMode = 'new',
+    String? logicalItemId,
   }) async {
     try {
       final res = await SupaFlow.client.rpc(
@@ -228,9 +231,14 @@ abstract final class LiveCatalogStockService {
           if (photoUrl != null) 'p_photo_url': photoUrl,
           if (liveId != null && liveId.trim().isNotEmpty)
             'p_live_id': liveId.trim(),
+          'p_lineage_mode': lineageMode.trim(),
+          if (logicalItemId != null && logicalItemId.trim().isNotEmpty)
+            'p_logical_item_id': logicalItemId.trim(),
         },
       );
-      return res?.toString();
+      final parsed = LiveOnlyUpsertResult.fromRpc(res);
+      if (parsed.liveItemId.isEmpty) return null;
+      return parsed;
     } catch (e) {
       debugPrint('[LiveCatalogStock] upsertLiveOnly: $e');
       rethrow;

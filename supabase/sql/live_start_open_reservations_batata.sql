@@ -55,18 +55,7 @@ begin
      and coalesce(lower(r.notes), '') not like '%bag_removed%'
      and coalesce(lower(r.notes), '') not like '%bag_cancelled%'
     join public.live_items li_src on li_src.id = r.live_item_id
-    where (
-      (ci.product_id is not null and li_src.product_id = ci.product_id)
-      or (
-        ci.checkout_product_id is not null
-        and li_src.checkout_product_id = ci.checkout_product_id
-      )
-      or (
-        public.batata_normalize_ref(ci.ref_code) <> ''
-        and public.batata_normalize_ref(li_src.ref_code)
-          = public.batata_normalize_ref(ci.ref_code)
-      )
-    )
+    where public.batata_live_items_lineage_match(ci, li_src)
   ),
   matched_orders as (
     select
@@ -96,9 +85,8 @@ begin
         and o.product_id = ci.checkout_product_id
       )
       or (
-        public.batata_normalize_ref(ci.ref_code) <> ''
-        and public.batata_normalize_ref(coalesce(li_src.ref_code, ''))
-          = public.batata_normalize_ref(ci.ref_code)
+        li_src.id is not null
+        and public.batata_live_items_lineage_match(ci, li_src)
       )
     )
   ),

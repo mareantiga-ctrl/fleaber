@@ -392,6 +392,11 @@ $$;
 revoke all on function public.batata_remove_marketplace_live_item(uuid, uuid, uuid) from public;
 grant execute on function public.batata_remove_marketplace_live_item(uuid, uuid, uuid) to authenticated;
 
+-- batata_upsert_live_only_item (logical_item_id V1.5) — ver também live_logical_item_id_batata.sql
+drop function if exists public.batata_upsert_live_only_item(
+  uuid, text, text, numeric, integer, text, text, text, uuid
+);
+
 create or replace function public.batata_upsert_live_only_item(
   p_seller_id uuid,
   p_ref_code text,
@@ -401,9 +406,11 @@ create or replace function public.batata_upsert_live_only_item(
   p_clothing_size text default null,
   p_gender text default null,
   p_photo_url text default null,
-  p_live_id uuid default null
+  p_live_id uuid default null,
+  p_lineage_mode text default 'new',
+  p_logical_item_id uuid default null
 )
-returns uuid
+returns jsonb
 language plpgsql
 security definer
 set search_path = public
@@ -411,8 +418,11 @@ as $$
 declare
   v_live_id uuid;
   v_item_id uuid;
+  v_existing_logical uuid;
   v_ref text;
   v_norm text;
+  v_mode text;
+  v_new_logical uuid;
 begin
   if p_seller_id is null or auth.uid() is distinct from p_seller_id then
     raise exception 'not_allowed';
@@ -424,8 +434,10 @@ begin
   end if;
   v_norm := public.batata_normalize_ref(v_ref);
   v_live_id := coalesce(p_live_id, public.batata_ensure_draft_live(p_seller_id));
+  v_mode := lower(trim(coalesce(p_lineage_mode, 'new')));
 
-  select li.id into v_item_id
+  select li.id, li.logical_item_id
+  into v_item_id, v_existing_logical
   from public.live_items li
   where li.live_id = v_live_id
     and li.item_kind = 'live_only'
@@ -433,6 +445,48 @@ begin
   limit 1;
 
   if v_item_id is not null then
+    if v_existing_logical is not null then
+      update public.live_items
+      set
+        ref_code = v_ref,
+        title = coalesce(nullif(trim(p_title), ''), title),
+        price = coalesce(p_price, price),
+        quantity = greatest(coalesce(p_quantity, quantity, 1), 1),
+        clothing_size = coalesce(nullif(trim(p_clothing_size), ''), clothing_size),
+        gender = coalesce(nullif(trim(p_gender), ''), gender),
+        photo_url = coalesce(nullif(trim(p_photo_url), ''), photo_url),
+        updated_at = now()
+      where id = v_item_id;
+
+      return jsonb_build_object(
+        'ok', true,
+        'live_item_id', v_item_id,
+        'logical_item_id', v_existing_logical,
+        'lineage_mode', 'keep'
+      );
+    end if;
+
+    if v_mode = 'inherit' then
+      if p_logical_item_id is null then
+        raise exception 'logical_item_id_required';
+      end if;
+      if not exists (
+        select 1
+        from public.live_items li
+        join public.lives l on l.id = li.live_id
+        where li.logical_item_id = p_logical_item_id
+          and coalesce(l.seller_id, l.vendedor_id) = p_seller_id
+          and li.item_kind = 'live_only'
+      ) then
+        raise exception 'lineage_not_found';
+      end if;
+      v_new_logical := p_logical_item_id;
+    elsif v_mode = 'new' then
+      v_new_logical := gen_random_uuid();
+    else
+      raise exception 'lineage_mode_invalid';
+    end if;
+
     update public.live_items
     set
       ref_code = v_ref,
@@ -442,37 +496,75 @@ begin
       clothing_size = coalesce(nullif(trim(p_clothing_size), ''), clothing_size),
       gender = coalesce(nullif(trim(p_gender), ''), gender),
       photo_url = coalesce(nullif(trim(p_photo_url), ''), photo_url),
+      logical_item_id = v_new_logical,
       updated_at = now()
     where id = v_item_id;
-  else
-    insert into public.live_items (
-      live_id, item_kind, product_id, ref_code, title, price, photo_url,
-      quantity, clothing_size, gender, is_active, status, updated_at
-    )
-    values (
-      v_live_id,
-      'live_only',
-      null,
-      v_ref,
-      coalesce(nullif(trim(p_title), ''), v_ref),
-      p_price,
-      nullif(trim(p_photo_url), ''),
-      greatest(coalesce(p_quantity, 1), 1),
-      nullif(trim(p_clothing_size), ''),
-      nullif(trim(p_gender), ''),
-      false,
-      'available',
-      now()
-    )
-    returning id into v_item_id;
+
+    return jsonb_build_object(
+      'ok', true,
+      'live_item_id', v_item_id,
+      'logical_item_id', v_new_logical,
+      'lineage_mode', v_mode
+    );
   end if;
 
-  return v_item_id;
+  if v_mode = 'inherit' then
+    if p_logical_item_id is null then
+      raise exception 'logical_item_id_required';
+    end if;
+    if not exists (
+      select 1
+      from public.live_items li
+      join public.lives l on l.id = li.live_id
+      where li.logical_item_id = p_logical_item_id
+        and coalesce(l.seller_id, l.vendedor_id) = p_seller_id
+        and li.item_kind = 'live_only'
+    ) then
+      raise exception 'lineage_not_found';
+    end if;
+    v_new_logical := p_logical_item_id;
+  else
+    v_new_logical := gen_random_uuid();
+    v_mode := 'new';
+  end if;
+
+  insert into public.live_items (
+    live_id, item_kind, product_id, ref_code, title, price, photo_url,
+    quantity, clothing_size, gender, is_active, status, logical_item_id, updated_at
+  )
+  values (
+    v_live_id,
+    'live_only',
+    null,
+    v_ref,
+    coalesce(nullif(trim(p_title), ''), v_ref),
+    p_price,
+    nullif(trim(p_photo_url), ''),
+    greatest(coalesce(p_quantity, 1), 1),
+    nullif(trim(p_clothing_size), ''),
+    nullif(trim(p_gender), ''),
+    false,
+    'available',
+    v_new_logical,
+    now()
+  )
+  returning id into v_item_id;
+
+  return jsonb_build_object(
+    'ok', true,
+    'live_item_id', v_item_id,
+    'logical_item_id', v_new_logical,
+    'lineage_mode', v_mode
+  );
 end;
 $$;
 
-revoke all on function public.batata_upsert_live_only_item(uuid, text, text, numeric, integer, text, text, text, uuid) from public;
-grant execute on function public.batata_upsert_live_only_item(uuid, text, text, numeric, integer, text, text, text, uuid) to authenticated;
+revoke all on function public.batata_upsert_live_only_item(
+  uuid, text, text, numeric, integer, text, text, text, uuid, text, uuid
+) from public;
+grant execute on function public.batata_upsert_live_only_item(
+  uuid, text, text, numeric, integer, text, text, text, uuid, text, uuid
+) to authenticated;
 
 create or replace function public.batata_migrate_live_catalog(
   p_from_live_id uuid,

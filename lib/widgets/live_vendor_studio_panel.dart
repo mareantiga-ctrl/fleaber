@@ -1041,7 +1041,7 @@ class LiveVendorStudioPanelState extends State<LiveVendorStudioPanel> {
         : refLabel;
 
     try {
-      final itemId = await LiveCatalogStockService.upsertLiveOnlyItem(
+      final upsert = await LiveCatalogStockService.upsertLiveOnlyItem(
         sellerId: sellerId,
         refCode: refToUse,
         title: saved.detail.buildLiveItemTitle(refToUse),
@@ -1051,6 +1051,7 @@ class LiveVendorStudioPanelState extends State<LiveVendorStudioPanel> {
             saved.detail.isClothing ? saved.detail.clothingSize : null,
         liveId: liveId,
       );
+      final itemId = upsert?.liveItemId;
       final refKeyToSave =
           LivePrepRefDetails.normalizeRefKey(refToUse);
       await LivePrepRefDetails.save(refKeyToSave, saved.detail);

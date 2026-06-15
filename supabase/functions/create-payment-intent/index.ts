@@ -39,6 +39,71 @@ type PaymentIntentRequest = {
   bag_lines?: BagCheckoutLine[];
 };
 
+async function unitPriceEurForCheckout(
+  admin: ReturnType<typeof createClient>,
+  liveItemId?: string,
+  productId?: string,
+): Promise<number> {
+  let unit = 0;
+  const liid = liveItemId?.trim() ?? "";
+  const pid = productId?.trim() ?? "";
+  if (liid.length > 0) {
+    const { data, error } = await admin
+      .from("live_items")
+      .select("price")
+      .eq("id", liid)
+      .maybeSingle();
+    if (!error && data?.price != null) {
+      unit = Number(data.price);
+    }
+  }
+  if (unit <= 0 && pid.length > 0) {
+    const { data, error } = await admin
+      .from("products")
+      .select("price")
+      .eq("id", pid)
+      .maybeSingle();
+    if (!error && data?.price != null) {
+      unit = Number(data.price);
+    }
+  }
+  return unit;
+}
+
+async function assertCheckoutPricesPositive(
+  admin: ReturnType<typeof createClient>,
+  body: PaymentIntentRequest,
+  isBagCheckout: boolean,
+  bagLines: BagCheckoutLine[],
+): Promise<void> {
+  if (isBagCheckout) {
+    for (const line of bagLines) {
+      const unit = await unitPriceEurForCheckout(
+        admin,
+        line.live_item_id,
+        line.product_id,
+      );
+      if (!Number.isFinite(unit) || unit <= 0) {
+        throw new Error("Checkout blocked: item without price.");
+      }
+      const cents = Number(line.line_total_cents ?? 0);
+      if (!Number.isInteger(cents) || cents < 50) {
+        throw new Error("Invalid line amount.");
+      }
+    }
+    return;
+  }
+
+  const unit = await unitPriceEurForCheckout(
+    admin,
+    body.live_item_id,
+    body.product_id,
+  );
+  if (!Number.isFinite(unit) || unit <= 0) {
+    throw new Error("Checkout blocked: item without price.");
+  }
+}
+
 function parseBagCheckoutLines(
   sessionMetadata: Record<string, string> | null | undefined,
 ): BagCheckoutLine[] {
@@ -790,6 +855,14 @@ Deno.serve(async (req) => {
     if (userError || !user || user.id !== body.buyer_id) {
       throw new Error("Invalid checkout user.");
     }
+
+    const supabaseAdmin = createClient(supabaseUrl, serviceRoleKey);
+    await assertCheckoutPricesPositive(
+      supabaseAdmin,
+      body,
+      isBagCheckout,
+      bagLines,
+    );
 
     const functionUrl = `${supabaseUrl}/functions/v1/create-payment-intent`;
 

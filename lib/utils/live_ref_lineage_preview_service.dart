@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/foundation.dart';
 
 import '/backend/supabase/supabase.dart';
@@ -81,35 +83,72 @@ class LiveRefLineageEntry {
     required this.displayTitle,
     this.displayPhotoUrl,
     this.displayPrice,
+    this.displayQuantity,
     this.lastUsedAt,
     required this.lastOrigin,
     required this.openReservationCount,
     required this.openReservedUnits,
     required this.completedPurchaseCount,
     required this.completedUnits,
+    this.availableQuantity,
+    this.historyStatus = 'active',
+    this.liveCount = 0,
+    this.salesValueEur = 0,
+    this.canContinue = true,
   });
 
   final String logicalItemId;
   final String displayTitle;
   final String? displayPhotoUrl;
   final double? displayPrice;
+  final int? displayQuantity;
+  final int? availableQuantity;
   final DateTime? lastUsedAt;
   final String lastOrigin;
   final int openReservationCount;
   final int openReservedUnits;
   final int completedPurchaseCount;
   final int completedUnits;
+  final String historyStatus;
+  final int liveCount;
+  final double salesValueEur;
+  final bool canContinue;
 
   bool get hasOpen => openReservationCount > 0;
+  bool get isActive => historyStatus == 'active';
+
+  bool get showContinueButton => historyStatus == 'active' && canContinue;
+
+  LiveRefLineageEntry asClosed() => LiveRefLineageEntry(
+        logicalItemId: logicalItemId,
+        displayTitle: displayTitle,
+        displayPhotoUrl: displayPhotoUrl,
+        displayPrice: displayPrice,
+        displayQuantity: displayQuantity,
+        availableQuantity: availableQuantity,
+        lastUsedAt: lastUsedAt,
+        lastOrigin: lastOrigin,
+        openReservationCount: openReservationCount,
+        openReservedUnits: openReservedUnits,
+        completedPurchaseCount: completedPurchaseCount,
+        completedUnits: completedUnits,
+        historyStatus: 'closed',
+        liveCount: liveCount,
+        salesValueEur: salesValueEur,
+        canContinue: false,
+      );
 
   String badgeLabel() {
+    if (!isActive) return 'Histórico encerrado';
+    final parts = <String>[];
+    if (completedUnits > 0) {
+      parts.add('🟢 $completedUnits vendas globais');
+    }
     if (openReservationCount > 0) {
       final units = openReservedUnits > 0 ? ' · $openReservedUnits un.' : '';
-      return '🟠 $openReservationCount reservas abertas$units';
+      parts.add('🟠 $openReservationCount reservas abertas$units');
     }
-    if (completedPurchaseCount > 0) {
-      return '🟢 $completedPurchaseCount vendas concluídas';
-    }
+    if (parts.isNotEmpty) return parts.join(' · ');
     if (lastUsedAt != null) {
       return 'Última utilização: $lastOrigin';
     }
@@ -118,22 +157,33 @@ class LiveRefLineageEntry {
 
   factory LiveRefLineageEntry.fromJson(Map<String, dynamic> json) {
     return LiveRefLineageEntry(
-      logicalItemId: json['logical_item_id']?.toString() ?? '',
+      logicalItemId: json['logical_item_id']?.toString() ??
+          json['history_id']?.toString() ??
+          '',
       displayTitle: (json['display_title']?.toString() ?? 'Artigo').trim(),
       displayPhotoUrl: json['display_photo_url']?.toString(),
       displayPrice: _asDouble(json['display_price']),
+      displayQuantity: _asIntOpt(json['display_quantity']),
+      availableQuantity: _asIntOpt(json['available_quantity']),
       lastUsedAt: _parseDate(json['last_used_at']),
       lastOrigin: (json['last_origin']?.toString() ?? '').trim(),
       openReservationCount: _asInt(json['open_reservation_count']),
       openReservedUnits: _asInt(json['open_reserved_units']),
       completedPurchaseCount: _asInt(json['completed_purchase_count']),
       completedUnits: _asInt(json['completed_units']),
+      historyStatus: json['history_status']?.toString() ?? 'active',
+      liveCount: _asInt(json['live_count']),
+      salesValueEur: _asDouble(json['sales_value_eur']) ?? 0,
+      canContinue: json['can_continue'] == true &&
+          (json['history_status']?.toString() ?? 'active') == 'active',
     );
   }
 }
 
 class LiveRefLineagePreviewReport {
   const LiveRefLineagePreviewReport({
+    required this.isOk,
+    this.error,
     required this.refCode,
     required this.refNormalized,
     required this.usageWindowMonths,
@@ -144,6 +194,8 @@ class LiveRefLineagePreviewReport {
     required this.draft,
   });
 
+  final bool isOk;
+  final String? error;
   final String refCode;
   final String refNormalized;
   final int usageWindowMonths;
@@ -153,11 +205,25 @@ class LiveRefLineagePreviewReport {
   final List<LiveRefLineageEntry> lineages;
   final LiveRefLineageDraftState draft;
 
-  bool get needsSheetForDraft => draft.needsLineageDecision;
+  /// Espelha SQL: `needs_lineage_decision` + fallback client-side.
+  bool get needsSheetForDraft => shouldPromptLineageDecision;
+
+  /// Sheet quando há histórico relevante e o draft ainda não tem linhagem.
+  List<LiveRefLineageEntry> get continuableLineages =>
+      lineages.where((e) => e.canContinue && e.isActive).toList();
+
+  bool get shouldPromptLineageDecision {
+    if (!isOk) return false;
+    final existing = draft.logicalItemId?.trim() ?? '';
+    if (existing.isNotEmpty) return false;
+    return shouldShowSheet && lineages.isNotEmpty;
+  }
 
   factory LiveRefLineagePreviewReport.fromRpc(dynamic raw) {
     if (raw is! Map) {
       return const LiveRefLineagePreviewReport(
+        isOk: false,
+        error: 'invalid_response',
         refCode: '',
         refNormalized: '',
         usageWindowMonths: 12,
@@ -175,22 +241,24 @@ class LiveRefLineagePreviewReport {
       );
     }
     final map = Map<String, dynamic>.from(raw);
-    if (map['ok'] != true) {
-      return const LiveRefLineagePreviewReport(
+    if (!_asBool(map['ok'])) {
+      return LiveRefLineagePreviewReport(
+        isOk: false,
+        error: map['error']?.toString(),
         refCode: '',
         refNormalized: '',
         usageWindowMonths: 12,
         hasRelevantHistory: false,
         shouldShowSheet: false,
-        summary: LiveRefLineageSummary(
+        summary: const LiveRefLineageSummary(
           lineageCount: 0,
           openReservationCount: 0,
           openReservedUnits: 0,
           completedPurchaseCount: 0,
           completedUnits: 0,
         ),
-        lineages: [],
-        draft: LiveRefLineageDraftState(needsLineageDecision: false),
+        lineages: const [],
+        draft: const LiveRefLineageDraftState(needsLineageDecision: false),
       );
     }
 
@@ -210,11 +278,12 @@ class LiveRefLineagePreviewReport {
     }
 
     return LiveRefLineagePreviewReport(
+      isOk: true,
       refCode: map['ref_code']?.toString() ?? '',
       refNormalized: map['ref_normalized']?.toString() ?? '',
       usageWindowMonths: _asInt(map['usage_window_months'], 12),
-      hasRelevantHistory: map['has_relevant_history'] == true,
-      shouldShowSheet: map['should_show_sheet'] == true,
+      hasRelevantHistory: _asBool(map['has_relevant_history']),
+      shouldShowSheet: _asBool(map['should_show_sheet']),
       summary: summaryRaw is Map
           ? LiveRefLineageSummary.fromJson(
               Map<String, dynamic>.from(summaryRaw),
@@ -252,12 +321,17 @@ bool lineageEntryHasRelevantHistory({
   return !lastUsedAt.isBefore(cutoff);
 }
 
+int? _asIntOpt(dynamic v) {
+  if (v == null) return null;
+  return _asInt(v);
+}
+
 bool computeShouldShowSheetFromLineages(
   List<LiveRefLineageEntry> lineages, {
   DateTime? now,
   int usageWindowMonths = 12,
 }) {
-  for (final e in lineages) {
+  for (final e in lineages.where((x) => x.canContinue && x.isActive)) {
     if (lineageEntryHasRelevantHistory(
       openReservationCount: e.openReservationCount,
       completedPurchaseCount: e.completedPurchaseCount,
@@ -269,6 +343,36 @@ bool computeShouldShowSheetFromLineages(
     }
   }
   return false;
+}
+
+/// Parse robusto do array `lineages` (List, Map único, ou JSON string).
+List<LiveRefLineageEntry> parseLineagesFromRpc(dynamic raw) {
+  dynamic value = raw;
+  if (value is String) {
+    final trimmed = value.trim();
+    if (trimmed.isEmpty) return const [];
+    try {
+      value = jsonDecode(trimmed);
+    } catch (_) {
+      return const [];
+    }
+  }
+
+  if (value is Map) {
+    return [
+      LiveRefLineageEntry.fromJson(Map<String, dynamic>.from(value)),
+    ];
+  }
+
+  if (value is! List) return const [];
+
+  final out = <LiveRefLineageEntry>[];
+  for (final row in value) {
+    if (row is Map) {
+      out.add(LiveRefLineageEntry.fromJson(Map<String, dynamic>.from(row)));
+    }
+  }
+  return out;
 }
 
 abstract final class LiveRefLineagePreviewService {
@@ -297,6 +401,8 @@ abstract final class LiveRefLineagePreviewService {
     }
   }
 }
+
+bool _asBool(dynamic v) => v == true || v == 1 || '$v'.toLowerCase() == 'true';
 
 int _asInt(dynamic v, [int fallback = 0]) {
   if (v is int) return v;

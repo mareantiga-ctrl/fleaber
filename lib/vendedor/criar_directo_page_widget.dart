@@ -569,6 +569,7 @@ class _CriarDirectoPageWidgetState extends State<CriarDirectoPageWidget>
           limit: 1,
         );
         if (existing.isNotEmpty) {
+          await LiveCatalogSync.mergeForLive(liveId: id, sellerId: sid);
           final rows = await LiveItemsTable().queryRows(
             queryFn: (q) => q
                 .eqOrNull('live_id', id)

@@ -196,6 +196,14 @@ class _LiveRoomVendorPanelState extends State<LiveRoomVendorPanel> {
                           ),
                         );
                       }
+                      if (m.kind == LiveRoomMessageKind.system) {
+                        if (!LivePublicChatSystemLine.isVisibleInPublicChat(
+                          m.body,
+                        )) {
+                          return const SizedBox.shrink();
+                        }
+                        return LivePublicChatSystemLine.fromBody(m.body);
+                      }
                       final label = m.senderLabel?.trim().isNotEmpty == true
                           ? m.senderLabel!.trim()
                           : 'Utilizador';

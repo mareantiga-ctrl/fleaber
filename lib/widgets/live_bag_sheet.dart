@@ -7,6 +7,7 @@ import '/backend/supabase/supabase.dart';
 import '/utils/fleaber_radius.dart';
 import '/utils/live_catalog_stock_service.dart';
 import '/utils/live_in_stream_checkout.dart';
+import '/utils/live_item_price_gate.dart';
 import '/utils/live_reservation_queue_service.dart';
 import '/widgets/batata_cached_image.dart';
 import '/widgets/fleaber_primary_button.dart';
@@ -143,12 +144,14 @@ class _LiveBagSheetBodyState extends State<_LiveBagSheetBody> {
   bool _loading = true;
   bool _cancelledExpanded = false;
   final Map<String, LiveCatalogStockSnapshot?> _stockByItemId = {};
+  late Map<String, LiveItemsRow> _catalogByItemId;
 
   Timer? _refreshTimer;
 
   @override
   void initState() {
     super.initState();
+    _catalogByItemId = Map<String, LiveItemsRow>.from(widget.catalogByItemId);
     unawaited(_reload());
     _refreshTimer = Timer.periodic(const Duration(seconds: 5), (_) {
       if (mounted) unawaited(_reload(silent: true));
@@ -229,7 +232,7 @@ class _LiveBagSheetBodyState extends State<_LiveBagSheetBody> {
         groups.add(
           _LiveBagItemGroup(
             liveItemId: e.key,
-            catalogRow: widget.catalogByItemId[e.key],
+            catalogRow: _catalogByItemId[e.key],
             reservations: list,
           ),
         );
@@ -493,13 +496,44 @@ class _LiveBagSheetBodyState extends State<_LiveBagSheetBody> {
   }
 
   Future<void> _openPayPicker(_LiveBagItemGroup group) async {
-    final row = group.catalogRow;
+    final itemId = group.liveItemId.trim();
+    var row = group.catalogRow;
+    if (row == null && itemId.isEmpty) return;
+    if (itemId.isNotEmpty) {
+      row = await LiveCatalogStockService.fetchLiveItemById(itemId) ?? row;
+      if (row != null) _catalogByItemId[itemId] = row;
+    }
     if (row == null) return;
-    final product = await widget.resolveProduct(row);
-    if (product == null) {
+    final product = await LiveItemPriceGate.resolveProductForCheckout(
+      itemRow: row,
+      sellerId: widget.liveSellerId,
+      liveId: widget.liveId,
+      resolveProduct: widget.resolveProduct,
+    );
+    if (product == null ||
+        !await LiveItemPriceGate.hasFreshPayableUnitPrice(
+          liveItemId: itemId,
+          fallbackLiveItemPrice: row.price,
+          productPrice: product?.price,
+          sellerId: widget.liveSellerId,
+          liveId: widget.liveId,
+          itemRow: row,
+        )) {
+      LiveItemPriceGate.logCheckoutGate(
+        'bag_card_pay_blocked',
+        liveId: widget.liveId,
+        sellerId: widget.liveSellerId,
+        liveItemId: itemId,
+        productId: product?.id,
+        liveItemPrice: row.price,
+        productPrice: product?.price,
+        reason: product == null ? 'product_null' : 'unit_null',
+      );
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Este artigo ainda não tem preço definido.')),
+        const SnackBar(
+          content: Text(LiveItemPriceGate.pendingPriceLabel),
+        ),
       );
       return;
     }
@@ -663,9 +697,13 @@ void _showWaitlistInfoDialog(BuildContext context, int availableQty) {
 
 /// Banner destacado quando a vendedora aceitou (P13).
 class _LiveBagAcceptedBanner extends StatelessWidget {
-  const _LiveBagAcceptedBanner({required this.reservations});
+  const _LiveBagAcceptedBanner({
+    required this.reservations,
+    this.awaitingSellerPrice = false,
+  });
 
   final List<LiveReservationRequestsRow> reservations;
+  final bool awaitingSellerPrice;
 
   @override
   Widget build(BuildContext context) {
@@ -687,7 +725,9 @@ class _LiveBagAcceptedBanner extends StatelessWidget {
           const SizedBox(width: 8),
           Expanded(
             child: Text(
-              'Reserva aceite pela vendedora · $qty un. · tens 5 dias para pagar',
+              awaitingSellerPrice
+                  ? 'Reserva aceite · $qty un. · aguarda que a vendedora defina o preço'
+                  : 'Reserva aceite pela vendedora · $qty un. · tens 5 dias para pagar',
               style: GoogleFonts.inter(
                 color: _kLiveBagTeal,
                 fontSize: 11,
@@ -762,9 +802,22 @@ class _LiveBagItemCard extends StatelessWidget {
           );
     final ref = row?.refCode?.trim();
     final price = row?.price;
-    final priceLabel = price != null && price > 0
-        ? '${price.toStringAsFixed(2).replaceAll('.', ',')} €'
-        : null;
+    final hasPayablePrice = LiveItemPriceGate.hasPayableUnitPrice(
+      liveItemPrice: price,
+    );
+    final acceptedReservations =
+        LiveReservationQueueService.buyerBagAcceptedRows(
+      group.reservations,
+    );
+    final awaitingSellerPrice = !hasPayablePrice &&
+        acceptedReservations.isNotEmpty &&
+        !isCancelled &&
+        !isPurchased;
+    final priceLabel = hasPayablePrice
+        ? '${price!.toStringAsFixed(2).replaceAll('.', ',')} €'
+        : awaitingSellerPrice
+            ? LiveItemPriceGate.awaitingSellerPriceLabel
+            : LiveItemPriceGate.pendingPriceLabel;
     final size = row?.clothingSize?.trim();
     final color = row?.gender?.trim();
     final qtyTotal = group.reservations.fold<int>(
@@ -790,10 +843,6 @@ class _LiveBagItemCard extends StatelessWidget {
             ? _kLiveBagTeal
             : _kLiveBagGreen;
 
-    final acceptedReservations =
-        LiveReservationQueueService.buyerBagAcceptedRows(
-      group.reservations,
-    );
     final payCandidates = group.reservations
         .where(
           (r) => LiveReservationQueueService.buyerCanPayBagReservation(
@@ -805,6 +854,7 @@ class _LiveBagItemCard extends StatelessWidget {
     final showPay = onPay != null &&
         !isCancelled &&
         !isPurchased &&
+        hasPayablePrice &&
         payCandidates.isNotEmpty;
     final showManage = onManage != null &&
         !isCancelled &&
@@ -832,6 +882,7 @@ class _LiveBagItemCard extends StatelessWidget {
           if (acceptedReservations.isNotEmpty && !isCancelled && !isPurchased)
             _LiveBagAcceptedBanner(
               reservations: acceptedReservations,
+              awaitingSellerPrice: awaitingSellerPrice,
             ),
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -865,17 +916,17 @@ class _LiveBagItemCard extends StatelessWidget {
                         fontSize: 14,
                       ),
                     ),
-                    if (priceLabel != null) ...[
-                      const SizedBox(height: 2),
-                      Text(
-                        priceLabel,
-                        style: GoogleFonts.inter(
-                          color: accent,
-                          fontWeight: FontWeight.w800,
-                          fontSize: 13,
-                        ),
+                    const SizedBox(height: 2),
+                    Text(
+                      priceLabel,
+                      style: GoogleFonts.inter(
+                        color: hasPayablePrice
+                            ? accent
+                            : Colors.white.withValues(alpha: 0.55),
+                        fontWeight: FontWeight.w800,
+                        fontSize: hasPayablePrice ? 13 : 11,
                       ),
-                    ],
+                    ),
                     if (color != null && color.isNotEmpty) ...[
                       const SizedBox(height: 2),
                       Text(

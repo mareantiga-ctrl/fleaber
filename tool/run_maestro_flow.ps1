@@ -54,13 +54,21 @@ if (-not $SkipInstall) {
   $adb = "$env:LOCALAPPDATA\Android\Sdk\platform-tools\adb.exe"
   $apk = Join-Path $root "build\app\outputs\flutter-apk\app-debug.apk"
   if ((Test-Path $adb) -and (Test-Path $apk)) {
-    if ($Device -ne "") {
-      & $adb -s $Device install -r $apk 2>&1 | Out-Host
-    } else {
-      & $adb install -r $apk 2>&1 | Out-Host
-    }
-    if ($LASTEXITCODE -ne 0) {
-      Write-Host "AVISO: install APK falhou (ex. storage). A usar APK ja no dispositivo."
+    $prevEap = $ErrorActionPreference
+    $ErrorActionPreference = "Continue"
+    try {
+      if ($Device -ne "") {
+        $null = & $adb -s $Device install -r $apk 2>&1
+      } else {
+        $null = & $adb install -r $apk 2>&1
+      }
+      if ($LASTEXITCODE -ne 0) {
+        Write-Host "AVISO: install APK falhou (ex. storage). A usar APK ja no dispositivo."
+      }
+    } catch {
+      Write-Host "AVISO: install APK falhou. A usar APK ja no dispositivo."
+    } finally {
+      $ErrorActionPreference = $prevEap
     }
   }
 }

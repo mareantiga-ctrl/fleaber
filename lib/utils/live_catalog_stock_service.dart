@@ -18,7 +18,9 @@ class LiveCatalogStockSnapshot {
     required this.pendingBagQty,
     required this.soldConvertedQty,
     required this.availableQty,
+    this.crossReservedQty = 0,
     this.liveStatus,
+    this.liveItemPrice,
   });
 
   final String liveItemId;
@@ -33,15 +35,47 @@ class LiveCatalogStockSnapshot {
   final int pendingBagQty;
   final int soldConvertedQty;
   final int availableQty;
+  /// Reservas pendentes/aceites noutros directos (mesma ref, mesmo vendedor).
+  final int crossReservedQty;
   final String? liveStatus;
+  final double? liveItemPrice;
 
   bool get isMarketplaceProduct => itemKind == 'marketplace_product';
 
   bool get isLiveOnly => itemKind == 'live_only';
 
+  /// Reservas locais neste directo (saco pendente + aceites a pagar).
+  int get localReservedQty {
+    final pending = pendingBagQty < 0 ? 0 : pendingBagQty;
+    final accepted = reservedAcceptedQty < 0 ? 0 : reservedAcceptedQty;
+    return pending + accepted;
+  }
+
+  /// Reservas visíveis no card (local + outros directos/gravados com a mesma ref).
+  int get displayReservedQty {
+    final cross = crossReservedQty < 0 ? 0 : crossReservedQty;
+    return localReservedQty + cross;
+  }
+
   /// ID para checkout Stripe (TYPE A = product_id; TYPE B = checkout shadow).
   String? get checkoutProductIdOrPrimary =>
       isMarketplaceProduct ? productId : (checkoutProductId ?? productId);
+
+  /// Stock local deste artigo no directo (ignora bloqueios cross-live/ref).
+  int localDirectPayCapacity({int restorePendingQty = 0}) {
+    final restore = restorePendingQty < 0 ? 0 : restorePendingQty;
+    final pendingOthers = (pendingBagQty - restore).clamp(0, 99999);
+    return (totalQty - soldConvertedQty - reservedAcceptedQty - pendingOthers)
+        .clamp(0, 99999);
+  }
+
+  /// Prep com preço + stock local → compra directa sem aprovação da vendedora (Z6).
+  bool canDirectPayWithoutApproval(int requestedQty, {int restorePendingQty = 0}) {
+    final price = liveItemPrice;
+    if (price == null || price <= 0) return false;
+    final req = requestedQty < 1 ? 1 : requestedQty;
+    return req <= localDirectPayCapacity(restorePendingQty: restorePendingQty);
+  }
 
   /// O pedido excede o stock físico na live (ignora a própria linha pendente).
   bool requestExceedsSellableCapacity(
@@ -72,6 +106,12 @@ class LiveCatalogStockSnapshot {
       return int.tryParse('$v') ?? fallback;
     }
 
+    double? d(dynamic v) {
+      if (v == null) return null;
+      if (v is num) return v.toDouble();
+      return double.tryParse('$v'.replaceAll(',', '.'));
+    }
+
     return LiveCatalogStockSnapshot(
       liveItemId: m['live_item_id']?.toString() ?? '',
       liveId: m['live_id']?.toString() ?? '',
@@ -85,7 +125,9 @@ class LiveCatalogStockSnapshot {
       pendingBagQty: i(m['pending_bag_qty']),
       soldConvertedQty: i(m['sold_converted_qty']),
       availableQty: i(m['available_qty']),
+      crossReservedQty: i(m['cross_reserved_qty']),
       liveStatus: m['live_status']?.toString(),
+      liveItemPrice: d(m['price']),
     );
   }
 }
@@ -127,6 +169,9 @@ abstract final class LiveCatalogStockService {
     String? clothingSize,
     String? gender,
     String? refCode,
+    String? photoUrl,
+    String? description,
+    bool? listOnMarketplace,
   }) async {
     final id = liveItemId.trim();
     if (id.isEmpty) return null;
@@ -141,6 +186,10 @@ abstract final class LiveCatalogStockService {
           if (clothingSize != null) 'p_clothing_size': clothingSize,
           if (gender != null) 'p_gender': gender,
           if (refCode != null) 'p_ref_code': refCode,
+          if (photoUrl != null) 'p_photo_url': photoUrl,
+          if (description != null) 'p_description': description,
+          if (listOnMarketplace != null)
+            'p_list_on_marketplace': listOnMarketplace,
         },
       );
       if (res == null) return null;
@@ -283,6 +332,151 @@ abstract final class LiveCatalogStockService {
     }
   }
 
+  /// Produto Stripe para checkout live (RPC security definer + fallback local).
+  static Future<ProductsRow?> resolveCheckoutProduct(
+    String liveItemId, {
+    LiveItemsRow? itemRow,
+    String? sellerId,
+    String? liveId,
+  }) async {
+    final id = liveItemId.trim();
+    if (id.isEmpty) return null;
+
+    final fromRpc = await _resolveCheckoutProductRpc(id);
+    if (fromRpc != null) return fromRpc;
+
+    return synthesizeCheckoutProductRow(
+      liveItemId: id,
+      itemRow: itemRow,
+      sellerId: sellerId,
+      liveId: liveId,
+    );
+  }
+
+  /// Monta `ProductsRow` para Stripe sem ler `products` (RLS shadow).
+  static Future<ProductsRow?> synthesizeCheckoutProductRow({
+    required String liveItemId,
+    LiveItemsRow? itemRow,
+    String? sellerId,
+    String? liveId,
+  }) async {
+    final id = liveItemId.trim();
+    if (id.isEmpty) return null;
+
+    try {
+      var row = itemRow ?? await fetchLiveItemById(id);
+      String? ensureErr;
+      String? shadowId;
+      try {
+        shadowId = await ensureCheckoutProduct(id);
+      } catch (e) {
+        ensureErr = e.toString();
+      }
+      row = await fetchLiveItemById(id) ?? row;
+      shadowId = (shadowId != null && shadowId.trim().isNotEmpty)
+          ? shadowId.trim()
+          : row?.checkoutProductId?.trim();
+      if (shadowId == null || shadowId.isEmpty) {
+        debugPrint(
+          '[LiveCatalogStock] synthesize no shadow id'
+          '${ensureErr != null ? ': $ensureErr' : ''}',
+        );
+        return null;
+      }
+
+      final snap = await fetch(id);
+      final price = (snap?.liveItemPrice != null && snap!.liveItemPrice! > 0)
+          ? snap.liveItemPrice
+          : row?.price;
+      if (price == null || price <= 0) return null;
+
+      var sid = sellerId?.trim() ?? '';
+      if (sid.isEmpty) {
+        final lid = (liveId ?? row?.liveId ?? snap?.liveId ?? '').trim();
+        if (lid.isNotEmpty) {
+          final lives = await LivesTable().queryRows(
+            queryFn: (q) => q.eqOrNull('id', lid),
+            limit: 1,
+          );
+          if (lives.isNotEmpty) {
+            sid = lives.first.sellerId?.trim() ?? '';
+          }
+        }
+      }
+      if (sid.isEmpty) return null;
+
+      final photo = row?.photoUrl?.trim();
+      return ProductsRow({
+        'id': shadowId,
+        'seller_id': sid,
+        'title': row?.title?.trim().isNotEmpty == true
+            ? row!.title!.trim()
+            : 'Artigo live',
+        'price': price,
+        'ref_code': row?.refCode,
+        'image_urls': photo != null && photo.isNotEmpty ? [photo] : <String>[],
+        'list_on_marketplace': false,
+        'available_for_live': false,
+      });
+    } catch (e) {
+      debugPrint('[LiveCatalogStock] synthesizeCheckoutProductRow: $e');
+      return null;
+    }
+  }
+
+  static ProductsRow? _productRowFromCheckoutRpc(Map<String, dynamic> m) {
+    final pid = m['product_id']?.toString();
+    if (pid == null || pid.isEmpty) return null;
+    final imgs = m['image_urls'];
+    List<String> imageUrls = const [];
+    if (imgs is List) {
+      imageUrls = imgs.map((e) => e.toString()).toList();
+    }
+    double? price;
+    final rawPrice = m['price'];
+    if (rawPrice is num) {
+      price = rawPrice.toDouble();
+    } else if (rawPrice != null) {
+      price = double.tryParse('$rawPrice'.replaceAll(',', '.'));
+    }
+    final sellerId = m['seller_id']?.toString();
+    if (sellerId == null || sellerId.isEmpty) return null;
+    return ProductsRow({
+      'id': pid,
+      'seller_id': sellerId,
+      'title': m['title']?.toString() ?? 'Artigo live',
+      'price': price,
+      'ref_code': m['ref_code']?.toString(),
+      'image_urls': imageUrls,
+      'description': m['description']?.toString(),
+      'clothing_size': m['clothing_size']?.toString(),
+      'gender': m['gender']?.toString(),
+      'list_on_marketplace': false,
+      'available_for_live': false,
+    });
+  }
+
+  static Future<ProductsRow?> _resolveCheckoutProductRpc(String id) async {
+    try {
+      final res = await SupaFlow.client.rpc(
+        'batata_resolve_live_checkout_product',
+        params: {'p_live_item_id': id},
+      );
+      if (res is! Map) return null;
+      final m = Map<String, dynamic>.from(res);
+      if (m['ok'] != true) {
+        debugPrint(
+          '[LiveCatalogStock] resolveCheckoutProduct rpc: ${m['error']}',
+        );
+        return null;
+      }
+      return _productRowFromCheckoutRpc(m);
+    } catch (e) {
+      debugPrint('[LiveCatalogStock] resolveCheckoutProduct rpc miss: $e');
+      return null;
+    }
+  }
+
   static Future<LiveCatalogStockSnapshot?> markItemSold(String liveItemId) async {
     final id = liveItemId.trim();
     if (id.isEmpty) return null;
@@ -300,6 +494,59 @@ abstract final class LiveCatalogStockService {
     } catch (e) {
       debugPrint('[LiveCatalogStock] markItemSold failed: $e');
       rethrow;
+    }
+  }
+
+  /// Lê `live_items` fresco (preço/qty após editar no directo).
+  static Future<LiveItemsRow?> fetchLiveItemById(String liveItemId) async {
+    final id = liveItemId.trim();
+    if (id.isEmpty) return null;
+    try {
+      final rows = await LiveItemsTable().queryRows(
+        queryFn: (q) => q.eqOrNull('id', id),
+        limit: 1,
+      );
+      return rows.isEmpty ? null : rows.first;
+    } catch (e) {
+      debugPrint('[LiveCatalogStock] fetchLiveItemById: $e');
+      return null;
+    }
+  }
+
+  /// Actualiza entradas do mapa com dados actuais da BD.
+  static Future<Map<String, LiveItemsRow>> refreshCatalogByItemIds(
+    Map<String, LiveItemsRow> catalog,
+    Iterable<String> itemIds,
+  ) async {
+    final out = Map<String, LiveItemsRow>.from(catalog);
+    for (final raw in itemIds) {
+      final id = raw.trim();
+      if (id.isEmpty) continue;
+      final fresh = await fetchLiveItemById(id);
+      if (fresh != null) out[id] = fresh;
+    }
+    return out;
+  }
+
+  /// Draft válido em cache: existe, `status=draft` e pertence ao seller.
+  static Future<bool> isDraftLiveForSeller({
+    required String liveId,
+    required String sellerId,
+  }) async {
+    final id = liveId.trim();
+    final sid = sellerId.trim();
+    if (id.isEmpty || sid.isEmpty) return false;
+    try {
+      final rows = await LivesTable().queryRows(
+        queryFn: (q) => q
+            .eqOrNull('id', id)
+            .eqOrNull('status', 'draft')
+            .or('seller_id.eq.$sid,vendedor_id.eq.$sid'),
+        limit: 1,
+      );
+      return rows.isNotEmpty;
+    } catch (_) {
+      return false;
     }
   }
 
@@ -321,6 +568,49 @@ abstract final class LiveCatalogStockService {
       return null;
     } catch (_) {
       return null;
+    }
+  }
+
+  static Future<String?> findLatestSessionLiveId(String sellerId) async {
+    final sid = sellerId.trim();
+    if (sid.isEmpty) return null;
+    try {
+      final rows = await LivesTable().queryRows(
+        queryFn: (q) => q
+            .inFilter('status', ['live', 'ended'])
+            .order('created_at', ascending: false),
+        limit: 8,
+      );
+      for (final r in rows) {
+        final s = r.sellerId?.trim() ?? r.vendedorId?.trim() ?? '';
+        if (s == sid) return r.id;
+      }
+      return null;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  static Future<Set<String>> fetchLiveOnlyNormalizedRefs(String liveId) async {
+    final id = liveId.trim();
+    if (id.isEmpty) return {};
+    try {
+      final rows = await LiveItemsTable().queryRows(
+        queryFn: (q) =>
+            q.eqOrNull('live_id', id).eqOrNull('item_kind', 'live_only'),
+      );
+      final out = <String>{};
+      for (final r in rows) {
+        final raw = r.refCode?.trim() ?? '';
+        if (raw.isEmpty) continue;
+        var key = raw.toUpperCase();
+        if (key.startsWith('#')) key = key.substring(1);
+        key = key.replaceAll(RegExp(r'[^A-Z0-9]'), '');
+        if (key.isNotEmpty) out.add(key);
+      }
+      return out;
+    } catch (_) {
+      return {};
     }
   }
 }

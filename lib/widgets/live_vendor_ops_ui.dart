@@ -623,9 +623,7 @@ class LiveVendorOperationKpiStrip extends StatelessWidget {
           ),
           const SizedBox(height: 2),
           Text(
-            totals.salesValueEur > 0
-                ? 'carteira deste directo (vendas + gorjetas)'
-                : 'carteira deste directo',
+            'Ganhos desta live',
             style: GoogleFonts.inter(
               color: Colors.white.withValues(alpha: 0.55),
               fontSize: 9,
@@ -644,13 +642,13 @@ class LiveVendorOperationKpiStrip extends StatelessWidget {
                 onTap: onTapSales,
               ),
               _kpiChip(
-                label: 'A tratar',
+                label: 'Pendentes',
                 value: '${totals.actionPendingCount}',
                 highlight: totals.actionPendingCount > 0,
                 onTap: onTapPending,
               ),
               _kpiChip(
-                label: 'Pagamentos',
+                label: 'A receber',
                 value: '${totals.pendingCheckoutCount}',
                 highlight: totals.pendingCheckoutCount > 0,
                 onTap: onTapCheckout,
@@ -746,8 +744,8 @@ class LiveVendorOperationSectionTabs extends StatelessWidget {
   final int paymentsBadge;
 
   static const _tabs = <(SellerOperationSection, String)>[
-    (SellerOperationSection.queue, 'A tratar'),
-    (SellerOperationSection.payments, 'Pagamentos'),
+    (SellerOperationSection.queue, 'Pendentes'),
+    (SellerOperationSection.payments, 'A receber'),
     (SellerOperationSection.history, 'Histórico'),
   ];
 
@@ -920,12 +918,14 @@ class LiveVendorCurrentProductPill extends StatelessWidget {
     super.key,
     required this.refLabel,
     required this.title,
+    this.attributesLine,
     this.priceLabel,
     this.onTap,
   });
 
   final String refLabel;
   final String title;
+  final String? attributesLine;
   final String? priceLabel;
   final VoidCallback? onTap;
 
@@ -986,6 +986,19 @@ class LiveVendorCurrentProductPill extends StatelessWidget {
                         fontWeight: FontWeight.w600,
                       ),
                     ),
+                    if (attributesLine != null &&
+                        attributesLine!.isNotEmpty) ...[
+                      Text(
+                        attributesLine!,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: GoogleFonts.inter(
+                          color: Colors.white.withValues(alpha: 0.62),
+                          fontSize: 8.5,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
                   ],
                 ),
               ),
@@ -1344,6 +1357,7 @@ class LiveVendorCompactProductCard extends StatelessWidget {
     super.key,
     required this.refLabel,
     required this.title,
+    this.attributesLine,
     this.priceLabel,
     this.photoUrl,
     required this.stats,
@@ -1354,6 +1368,7 @@ class LiveVendorCompactProductCard extends StatelessWidget {
 
   final String refLabel;
   final String title;
+  final String? attributesLine;
   final String? priceLabel;
   final String? photoUrl;
   final LiveItemOpsSnapshot stats;
@@ -1413,6 +1428,19 @@ class LiveVendorCompactProductCard extends StatelessWidget {
                     height: 1.15,
                   ),
                 ),
+                if (attributesLine != null && attributesLine!.isNotEmpty) ...[
+                  const SizedBox(height: 2),
+                  Text(
+                    attributesLine!,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: GoogleFonts.inter(
+                      color: Colors.white.withValues(alpha: 0.62),
+                      fontSize: 9,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
                 if (priceLabel != null && priceLabel!.isNotEmpty) ...[
                   const SizedBox(height: 2),
                   Text(

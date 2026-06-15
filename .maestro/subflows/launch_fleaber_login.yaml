@@ -1,0 +1,28 @@
+# Arranque frio + retry se o emulador ficar no launcher (cold start lento).
+appId: com.mycompany.fleaber
+---
+- launchApp:
+    clearState: true
+- runFlow:
+    when:
+      visible: "isn't responding"
+    commands:
+      - tapOn: "Wait"
+- runFlow:
+    when:
+      visible: "not responding"
+    commands:
+      - tapOn: "Wait"
+- runFlow: dismiss_permissions.yaml
+- extendedWaitUntil:
+    visible: "Entrar"
+    timeout: 90000
+    optional: true
+- runFlow:
+    when:
+      notVisible: "Entrar"
+    commands:
+      - launchApp
+      - extendedWaitUntil:
+          visible: "Entrar"
+          timeout: 120000

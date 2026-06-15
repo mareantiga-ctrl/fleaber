@@ -360,6 +360,14 @@ class _PerfilWidgetState extends State<PerfilWidget> {
                       onTap: () =>
                           context.pushNamed(ModoFeriasPageWidget.routeName),
                     ),
+                  if (staff.isOwnerContext)
+                    _buildItem(
+                      context,
+                      'Gestão de referências',
+                      onTap: () => context.pushNamed(
+                        GestaoReferenciasPageWidget.routeName,
+                      ),
+                    ),
                   if (staff.isOwnerContext) ...[
                     _buildItem(
                       context,

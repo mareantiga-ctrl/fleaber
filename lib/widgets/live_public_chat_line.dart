@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '/utils/live_system_chat_humanizer.dart';
 import '/widgets/profile_avatar.dart';
 
 /// Linha de chat público no directo (com destaque opcional para a vendedora).
@@ -146,189 +147,77 @@ class LivePublicChatHumanRow extends StatelessWidget {
   }
 }
 
-/// Tom visual de eventos de sistema no chat público.
+/// Tom visual de eventos de sistema no chat público (legado — mapeado do humanizer).
 enum LivePublicChatSystemTone { success, pending, cancel, neutral }
 
-/// Notificação leve de sistema no chat público (evento compacto, sem cartão).
+/// Notificação leve de sistema no chat público (A2 — frase social, não ERP).
 class LivePublicChatSystemLine extends StatelessWidget {
   const LivePublicChatSystemLine({
     super.key,
-    required this.tone,
-    required this.line,
+    required this.parsed,
+    this.animateHighlight = false,
   });
 
-  final LivePublicChatSystemTone tone;
-  final String line;
+  final LiveSystemChatParsed parsed;
+  final bool animateHighlight;
 
   factory LivePublicChatSystemLine.fromBody(
     String raw, {
     String? Function(String labelSegment)? normalizeItemLabel,
     String? Function(String rawName)? resolveBuyerName,
+    bool animateHighlight = false,
   }) {
-    final parsed = compactFromBody(
+    final parsed = LiveSystemChatHumanizer.parse(
       raw,
       normalizeItemLabel: normalizeItemLabel,
       resolveBuyerName: resolveBuyerName,
     );
-    return LivePublicChatSystemLine(tone: parsed.tone, line: parsed.line);
+    return LivePublicChatSystemLine(
+      parsed: parsed,
+      animateHighlight: animateHighlight,
+    );
   }
 
+  /// Legado — devolve tom + linha humanizada (sem formato ERP).
   static ({LivePublicChatSystemTone tone, String line}) compactFromBody(
     String raw, {
     String? Function(String labelSegment)? normalizeItemLabel,
     String? Function(String rawName)? resolveBuyerName,
   }) {
-    final text = raw.trim().replaceAll(RegExp(r'\s+'), ' ');
-    if (text.isEmpty) {
+    final parsed = LiveSystemChatHumanizer.parse(
+      raw,
+      normalizeItemLabel: normalizeItemLabel,
+      resolveBuyerName: resolveBuyerName,
+    );
+    if (!parsed.showInPublicChat || parsed.line.isEmpty) {
       return (tone: LivePublicChatSystemTone.neutral, line: '');
     }
+    return (tone: _mapTone(parsed.tone), line: parsed.line);
+  }
 
-    String normLabel(String label) {
-      final trimmed = label.trim();
-      if (trimmed.isEmpty) return trimmed;
-      final mapped = normalizeItemLabel?.call(trimmed);
-      return (mapped != null && mapped.trim().isNotEmpty) ? mapped.trim() : trimmed;
-    }
+  /// Filtra mensagens que não devem aparecer no chat público.
+  static bool isVisibleInPublicChat(String raw) {
+    return LiveSystemChatHumanizer.parse(raw).showInPublicChat;
+  }
 
-    String buyerName(String raw) {
-      final trimmed = raw.trim();
-      final resolved = resolveBuyerName?.call(trimmed);
-      if (resolved != null && resolved.trim().isNotEmpty) {
-        return resolved.trim();
-      }
-      return trimmed.isEmpty ? 'Utilizador' : trimmed;
-    }
-
-    final acceptBroadcast = RegExp(
-      r'🔒\s*Reserva aceite\s*—\s*(?:(\d+)\s*un\.\s*·\s*)?(.+?)\s*·',
-      caseSensitive: false,
-    ).firstMatch(text);
-    if (acceptBroadcast != null) {
-      final qty = acceptBroadcast.group(1)?.trim();
-      final label = _short(normLabel(acceptBroadcast.group(2) ?? ''), 22);
-      if (qty != null && qty.isNotEmpty) {
-        return (
-          tone: LivePublicChatSystemTone.success,
-          line: _line('✅ Reserva aceite', '$qty un.', label),
-        );
-      }
-      return (
-        tone: LivePublicChatSystemTone.success,
-        line: _line('✅ Reserva aceite', label),
-      );
-    }
-
-    final soldOut = RegExp(
-      r'🔴\s*(.+?)\s+esgotado',
-      caseSensitive: false,
-    ).firstMatch(text);
-    if (soldOut != null) {
-      final label = _short(normLabel(soldOut.group(1) ?? ''), 22);
-      return (
-        tone: LivePublicChatSystemTone.cancel,
-        line: _line('🔴 Esgotado', label),
-      );
-    }
-
-    final sellerAccept = RegExp(
-      r'✅\s*Aceitaste vender (\d+)\s*un\.(?:\s*·\s*(.+?))?\s*—',
-      caseSensitive: false,
-    ).firstMatch(text);
-    if (sellerAccept != null) {
-      final qty = sellerAccept.group(1) ?? '1';
-      final rawLabel = (sellerAccept.group(2) ?? '').trim();
-      final label =
-          rawLabel.isEmpty ? null : _short(normLabel(rawLabel), 22);
-      return (
-        tone: LivePublicChatSystemTone.success,
-        line: label == null
-            ? _line('✅ Reserva aceite', '$qty un.')
-            : _line('✅ Reserva aceite', '$qty un.', label),
-      );
-    }
-
-    final pedidoQty = RegExp(
-      r'📋\s*Pedido de (\d+)\s*un\.(?:\s*·\s*(.+?))?\s*—',
-      caseSensitive: false,
-    ).firstMatch(text);
-    if (pedidoQty != null) {
-      final qty = pedidoQty.group(1) ?? '1';
-      final rawLabel = (pedidoQty.group(2) ?? '').trim();
-      final label =
-          rawLabel.isEmpty ? null : _short(normLabel(rawLabel), 22);
-      return (
-        tone: LivePublicChatSystemTone.pending,
-        line: label == null
-            ? _line('📦 Pedido criado', '$qty un.')
-            : _line('📦 Pedido criado', '$qty un.', label),
-      );
-    }
-
-    final reserve = RegExp(
-      r'^(?:🛍️\s*)?(.*?)\s+reservou\s+(.*)$',
-    ).firstMatch(text);
-    if (reserve != null) {
-      final name = _short(buyerName(reserve.group(1) ?? ''), 14);
-      final label = _short(
-        normLabel(
-          (reserve.group(2) ?? '').replaceAll('para o saco da live', '').trim(),
-        ),
-        22,
-      );
-      return (
-        tone: LivePublicChatSystemTone.pending,
-        line: label.isEmpty
-            ? _line('🛍️ Reserva', name)
-            : _line('🛍️ Reserva', label, name),
-      );
-    }
-
-    final bought = RegExp(r'^(?:✅\s*)?(.*?)\s+comprou\s+(.*)$').firstMatch(text);
-    if (bought != null) {
-      final name = _short(buyerName(bought.group(1) ?? ''), 14);
-      final label = _short(normLabel((bought.group(2) ?? '').trim()), 22);
-      return (
-        tone: LivePublicChatSystemTone.success,
-        line: label.isEmpty
-            ? _line('✅ Compra', name)
-            : _line('✅ Compra', label, name),
-      );
-    }
-
-    final accept = RegExp(
-      r'(?:reserva\s+)?aceite|aceitou',
-      caseSensitive: false,
-    ).hasMatch(text);
-    if (accept) {
-      return (
-        tone: LivePublicChatSystemTone.success,
-        line: _line('✅ Reserva aceite', _clean(text, 28)),
-      );
-    }
-
-    final cancel = RegExp(
-      r'cancel',
-      caseSensitive: false,
-    ).hasMatch(text);
-    if (cancel) {
-      return (
-        tone: LivePublicChatSystemTone.cancel,
-        line: _line('↩ Reserva cancelada', _clean(text, 28)),
-      );
-    }
-
-    final order = RegExp(r'pedido', caseSensitive: false).hasMatch(text);
-    if (order) {
-      return (
-        tone: LivePublicChatSystemTone.pending,
-        line: _line('📦 Pedido criado', _clean(text, 28)),
-      );
-    }
-
-    return (
-      tone: LivePublicChatSystemTone.neutral,
-      line: _short(_clean(text, 48), 52),
+  /// Evita duplicar a mesma notificação social (ex. duas linhas de compra).
+  static bool shouldRenderSystemMessage(
+    String raw, {
+    required Set<String> seenSocialKeys,
+    String? Function(String labelSegment)? normalizeItemLabel,
+    String? Function(String rawName)? resolveBuyerName,
+  }) {
+    final parsed = LiveSystemChatHumanizer.parse(
+      raw,
+      normalizeItemLabel: normalizeItemLabel,
+      resolveBuyerName: resolveBuyerName,
     );
+    if (!parsed.showInPublicChat || parsed.line.isEmpty) return false;
+    final key = liveSystemChatSocialDedupKey(parsed);
+    if (key == null) return true;
+    if (seenSocialKeys.contains(key)) return false;
+    seenSocialKeys.add(key);
+    return true;
   }
 
   /// Compat: testes/legado que ainda usam headline + detail.
@@ -337,68 +226,237 @@ class LivePublicChatSystemLine extends StatelessWidget {
     if (parsed.line.isEmpty) {
       return (headline: '', detail: '');
     }
-    final sep = parsed.line.indexOf(' · ');
-    if (sep < 0) {
-      return (headline: parsed.line, detail: '');
-    }
-    return (
-      headline: parsed.line.substring(0, sep),
-      detail: parsed.line.substring(sep + 3),
-    );
+    return (headline: parsed.line, detail: '');
   }
 
-  static String _line(String lead, [String? a, String? b]) {
-    final parts = <String>[
-      lead,
-      if (a != null && a.isNotEmpty) a,
-      if (b != null && b.isNotEmpty) b,
-    ];
-    return _short(parts.join(' · '), 52);
+  static LivePublicChatSystemTone _mapTone(LiveSystemChatTone tone) {
+    return switch (tone) {
+      LiveSystemChatTone.success => LivePublicChatSystemTone.success,
+      LiveSystemChatTone.pending => LivePublicChatSystemTone.pending,
+      LiveSystemChatTone.cancel => LivePublicChatSystemTone.cancel,
+      LiveSystemChatTone.neutral => LivePublicChatSystemTone.neutral,
+    };
   }
 
-  static String _short(String value, int max) {
-    final t = value.trim();
-    if (t.length <= max) return t;
-    return '${t.substring(0, max).trim()}…';
-  }
+  Color get _toneColor => switch (parsed.tone) {
+        LiveSystemChatTone.success => const Color(0xFFB8E6C8),
+        LiveSystemChatTone.pending => const Color(0xFFFFD9A8),
+        LiveSystemChatTone.cancel => const Color(0xFFC5CED6),
+        LiveSystemChatTone.neutral => const Color(0xCCFFFFFF),
+      };
 
-  static String _clean(String value, int max) {
-    final cleaned = value
-        .replaceAll(RegExp(r'[0-9a-fA-F]{8}-[0-9a-fA-F-]{20,}'), '')
-        .replaceAll(
-          RegExp(r'(?:reserva\s+)?aceite|aceitou', caseSensitive: false),
-          '',
-        )
-        .replaceAll(RegExp(r'\s+'), ' ')
-        .trim();
-    return _short(cleaned, max);
-  }
+  double get _fontSize => switch (parsed.emphasis) {
+        LiveSystemChatEmphasis.fomo => 13,
+        LiveSystemChatEmphasis.social => 12.5,
+        LiveSystemChatEmphasis.normal => 12,
+      };
 
-  Color get _toneColor => switch (tone) {
-        LivePublicChatSystemTone.success => const Color(0xFF8BCB9E),
-        LivePublicChatSystemTone.pending => const Color(0xFFFFCC80),
-        LivePublicChatSystemTone.cancel => const Color(0xFFB0BEC5),
-        LivePublicChatSystemTone.neutral => const Color(0x99FFFFFF),
+  FontWeight get _fontWeight => switch (parsed.emphasis) {
+        LiveSystemChatEmphasis.fomo => FontWeight.w700,
+        LiveSystemChatEmphasis.social => FontWeight.w600,
+        LiveSystemChatEmphasis.normal => FontWeight.w500,
       };
 
   @override
   Widget build(BuildContext context) {
-    if (line.isEmpty) return const SizedBox.shrink();
+    if (!parsed.showInPublicChat || parsed.line.isEmpty) {
+      return const SizedBox.shrink();
+    }
 
-    return Padding(
-      padding: const EdgeInsets.only(left: 2, bottom: 5),
-      child: Text(
-        line,
-        maxLines: 1,
-        overflow: TextOverflow.ellipsis,
-        style: GoogleFonts.inter(
-          color: _toneColor,
-          fontSize: 9.5,
-          fontWeight: FontWeight.w600,
-          height: 1.2,
-          shadows: LivePublicChatLine.kLegibilityShadow,
-        ),
+    final content = Padding(
+      padding: const EdgeInsets.only(left: 2, bottom: 6),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (parsed.icon != null) ...[
+            Icon(
+              parsed.icon,
+              size: parsed.emphasis == LiveSystemChatEmphasis.fomo ? 15 : 14,
+              color: _toneColor.withValues(alpha: 0.92),
+            ),
+            const SizedBox(width: 5),
+          ],
+          Expanded(child: _buildLineText()),
+        ],
       ),
+    );
+
+    if (!animateHighlight || parsed.highlightDuration == null) {
+      return content;
+    }
+    return LiveSystemChatHighlight(
+      duration: parsed.highlightDuration!,
+      color: _toneColor,
+      intensity: parsed.kind == LiveSystemChatEventKind.purchase ? 1.0 : 1.0,
+      child: content,
+    );
+  }
+
+  Widget _buildLineText() {
+    final name = parsed.personName?.trim() ?? '';
+    final item = parsed.itemLabel?.trim() ?? '';
+
+    if (name.isNotEmpty && item.isNotEmpty) {
+      final line = parsed.line;
+      final nameIdx = line.indexOf(name);
+      if (nameIdx >= 0) {
+        final before = line.substring(0, nameIdx);
+        final afterName = line.substring(nameIdx + name.length);
+        final itemIdx = afterName.indexOf(item);
+        if (itemIdx >= 0) {
+          final mid = afterName.substring(0, itemIdx);
+          final after = afterName.substring(itemIdx + item.length);
+          return RichText(
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            text: TextSpan(
+              style: GoogleFonts.inter(
+                color: _toneColor.withValues(alpha: 0.88),
+                fontSize: _fontSize,
+                fontWeight: _fontWeight,
+                height: 1.25,
+                shadows: LivePublicChatLine.kLegibilityShadow,
+              ),
+              children: [
+                if (before.isNotEmpty) TextSpan(text: before),
+                TextSpan(
+                  text: name,
+                  style: TextStyle(
+                    color: Colors.white.withValues(alpha: 0.96),
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                if (mid.isNotEmpty) TextSpan(text: mid),
+                TextSpan(
+                  text: item,
+                  style: TextStyle(
+                    color: _toneColor,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                if (after.isNotEmpty) TextSpan(text: after),
+              ],
+            ),
+          );
+        }
+      }
+    }
+
+    if (item.isNotEmpty && parsed.line.contains(item)) {
+      final idx = parsed.line.indexOf(item);
+      return RichText(
+        maxLines: 2,
+        overflow: TextOverflow.ellipsis,
+        text: TextSpan(
+          style: GoogleFonts.inter(
+            color: _toneColor.withValues(alpha: 0.88),
+            fontSize: _fontSize,
+            fontWeight: _fontWeight,
+            height: 1.25,
+            shadows: LivePublicChatLine.kLegibilityShadow,
+          ),
+          children: [
+            if (idx > 0) TextSpan(text: parsed.line.substring(0, idx)),
+            TextSpan(
+              text: item,
+              style: TextStyle(
+                color: _toneColor,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+            if (idx + item.length < parsed.line.length)
+              TextSpan(text: parsed.line.substring(idx + item.length)),
+          ],
+        ),
+      );
+    }
+
+    return Text(
+      parsed.line,
+      maxLines: 2,
+      overflow: TextOverflow.ellipsis,
+      style: GoogleFonts.inter(
+        color: _toneColor.withValues(alpha: 0.92),
+        fontSize: _fontSize,
+        fontWeight: _fontWeight,
+        height: 1.25,
+        shadows: LivePublicChatLine.kLegibilityShadow,
+      ),
+    );
+  }
+}
+
+/// Destaque temporário subtil para eventos sociais (compra, FOMO, gorjeta).
+class LiveSystemChatHighlight extends StatefulWidget {
+  const LiveSystemChatHighlight({
+    super.key,
+    required this.child,
+    required this.duration,
+    required this.color,
+    this.intensity = 1.0,
+  });
+
+  final Widget child;
+  final Duration duration;
+  final Color color;
+
+  /// 1.0 = compras; >1 = gorjetas (glow ligeiramente superior).
+  final double intensity;
+
+  @override
+  State<LiveSystemChatHighlight> createState() => _LiveSystemChatHighlightState();
+}
+
+class _LiveSystemChatHighlightState extends State<LiveSystemChatHighlight>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: widget.duration,
+    )..forward();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  double _glowStrength(double t) {
+    if (t < 0.14) {
+      return Curves.easeIn.transform(t / 0.14);
+    }
+    return 1.0 - Curves.easeOut.transform((t - 0.14) / 0.86);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _controller,
+      builder: (context, child) {
+        final fade = _glowStrength(_controller.value) * widget.intensity;
+        final bgAlpha = (0.12 * fade).clamp(0.0, 0.22);
+        final glowAlpha = (0.18 * fade).clamp(0.0, 0.32);
+        return DecoratedBox(
+          decoration: BoxDecoration(
+            color: widget.color.withValues(alpha: bgAlpha),
+            borderRadius: BorderRadius.circular(8),
+            boxShadow: [
+              BoxShadow(
+                color: widget.color.withValues(alpha: glowAlpha),
+                blurRadius: 10,
+                spreadRadius: 0,
+              ),
+            ],
+          ),
+          child: child,
+        );
+      },
+      child: widget.child,
     );
   }
 }

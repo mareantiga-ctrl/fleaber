@@ -11,14 +11,13 @@ import '/index.dart';
 import '/utils/live_prep_ref_details.dart';
 import '/utils/live_prep_refs.dart';
 import '/utils/live_catalog_prep_service.dart';
-import '/utils/live_catalog_stock_service.dart';
-import '/utils/live_ref_lineage_preview_service.dart';
+import '/utils/live_ref_lineage_prep_gate.dart';
 import '/utils/live_ref_scheme.dart';
 import '/widgets/live_ref_chip_editor_sheet.dart';
-import '/widgets/live_ref_lineage_sheet.dart';
 import '/widgets/batata_cached_image.dart';
 
 import '/utils/fleaber_colors.dart';
+import '/utils/fleaber_snack.dart';
 
 const _kTeal = Color(0xFF007782);
 
@@ -117,6 +116,7 @@ class _PrepararDirectoPageWidgetState extends State<PrepararDirectoPageWidget>
         final bt = b.createdAt ?? DateTime.fromMillisecondsSinceEpoch(0);
         return bt.compareTo(at);
       });
+      await LiveCatalogPrepService.purgePrepRefsFromLastSession(sellerId: uid);
       final schemes = await LivePrepRefs.readSchemes();
       final details = await LivePrepRefDetails.readAll();
       unawaited(LiveCatalogPrepService.ensureDraftLive(sellerId: uid));
@@ -168,51 +168,13 @@ class _PrepararDirectoPageWidgetState extends State<PrepararDirectoPageWidget>
     );
     if (saved == null || !mounted) return;
     await LivePrepRefDetails.save(key, saved.detail);
-    try {
-      final draftLiveId = await LiveCatalogPrepService.ensureDraftLive();
-      var lineageMode = 'new';
-      String? inheritLogicalId;
-
-      final preview = await LiveRefLineagePreviewService.fetch(
-        sellerId: currentUserUid,
-        refCode: label,
-        liveId: draftLiveId,
-      );
-      if (!mounted) return;
-
-      if (preview != null && preview.needsSheetForDraft) {
-        final decision = await LiveRefLineageSheet.show(
-          context,
-          report: preview,
-        );
-        if (!mounted || decision == null) return;
-        switch (decision) {
-          case LiveRefLineageInherit(:final logicalItemId):
-            lineageMode = 'inherit';
-            inheritLogicalId = logicalItemId;
-          case LiveRefLineageNewArticle():
-            lineageMode = 'new';
-        }
-      }
-
-      await LiveCatalogStockService.upsertLiveOnlyItem(
-        sellerId: currentUserUid,
-        refCode: label,
-        title: saved.detail.title,
-        price: saved.detail.price,
-        quantity: saved.detail.quantity,
-        clothingSize:
-            saved.detail.isClothing ? saved.detail.clothingSize : null,
-        liveId: draftLiveId,
-        lineageMode: lineageMode,
-        logicalItemId: inheritLogicalId,
-      );
-    } catch (e) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Gravado localmente; servidor: $e')),
-      );
-    }
+    final ok = await LiveRefLineagePrepGate.resolveRef(
+      context: context,
+      sellerId: currentUserUid,
+      refCode: label,
+      detail: saved.detail,
+    );
+    if (!ok || !mounted) return;
     final details = await LivePrepRefDetails.readAll();
     if (!mounted) return;
     setState(() => _refChipDetails = details);
@@ -454,8 +416,35 @@ class _PrepararDirectoPageWidgetState extends State<PrepararDirectoPageWidget>
       );
       return;
     }
+
+    final refsToResolve = LiveRefLineagePrepGate.refsFromSchemes(
+      schemes,
+      skipRef: (ref) => _productHasRefForPrep(ref),
+    );
+    if (refsToResolve.isNotEmpty) {
+      final details = await LivePrepRefDetails.readAll();
+      if (!mounted) return;
+      final resolved = await LiveRefLineagePrepGate.resolveRefsForPrep(
+        context: context,
+        sellerId: currentUserUid,
+        refCodes: refsToResolve,
+        refDetails: details,
+      );
+      if (!resolved || !mounted) return;
+    }
+
     if (!mounted) return;
     context.pushNamed(CriarDirectoPageWidget.routeName);
+  }
+
+  bool _productHasRefForPrep(String ref) {
+    final want = LivePrepRefDetails.normalizeRefKey(ref);
+    if (want.isEmpty) return false;
+    return _products.any(
+      (p) =>
+          p.availableForLive == true &&
+          LivePrepRefDetails.normalizeRefKey(p.refCode ?? '') == want,
+    );
   }
 
   Widget _compactRefField(String text, double? width) {
@@ -485,13 +474,7 @@ class _PrepararDirectoPageWidgetState extends State<PrepararDirectoPageWidget>
   }) {
     void showInfo() {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).hideCurrentSnackBar();
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('$label: $tooltip'),
-          duration: const Duration(seconds: 3),
-        ),
-      );
+      FleaberSnack.show(context, '$label: $tooltip');
     }
 
     final row = Row(

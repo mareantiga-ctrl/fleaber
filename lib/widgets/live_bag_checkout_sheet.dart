@@ -8,6 +8,7 @@ import '/utils/fee_calculator.dart';
 import '/utils/fleaber_radius.dart';
 import '/utils/live_catalog_stock_service.dart';
 import '/utils/live_in_stream_checkout.dart';
+import '/utils/live_item_price_gate.dart';
 import '/utils/live_reservation_queue_service.dart';
 import '/widgets/batata_cached_image.dart';
 import '/widgets/live_vendor_ops_ui.dart';
@@ -110,9 +111,13 @@ class LiveBagCheckoutSheet extends StatefulWidget {
         if ((r.liveItemId ?? '').trim().isNotEmpty)
           (r.liveItemId ?? '').trim(),
     };
+    final freshCatalog = await LiveCatalogStockService.refreshCatalogByItemIds(
+      catalogByItemId,
+      itemIds,
+    );
     for (final itemId in itemIds) {
       final stock = await LiveCatalogStockService.fetch(itemId);
-      final itemRow = catalogByItemId[itemId];
+      final itemRow = freshCatalog[itemId];
       final pendingForItem = LiveReservationQueueService.buyerBagPendingPayRows(
         rows.where((x) => (x.liveItemId ?? '').trim() == itemId),
       );
@@ -141,7 +146,7 @@ class LiveBagCheckoutSheet extends StatefulWidget {
       ),
       builder: (ctx) => LiveBagCheckoutSheet(
         rows: payable,
-        catalogByItemId: catalogByItemId,
+        catalogByItemId: freshCatalog,
         resolveProduct: resolveProduct,
         liveId: liveId,
         playbackId: playbackId,
@@ -184,6 +189,19 @@ class _LiveBagCheckoutSheetState extends State<LiveBagCheckoutSheet> {
     return r.requestedQty < 1 ? 1 : r.requestedQty;
   }
 
+  bool _selectionHasPayablePrice() {
+    if (_selectedIds.isEmpty) return false;
+    for (final r in widget.rows) {
+      final id = r.id?.trim() ?? '';
+      if (id.isEmpty || !_selectedIds.contains(id)) continue;
+      final itemRow = widget.catalogByItemId[(r.liveItemId ?? '').trim()];
+      if (!LiveItemPriceGate.hasPayableUnitPrice(liveItemPrice: itemRow?.price)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
   Future<void> _confirmPay() async {
     if (_paying || _selectedIds.isEmpty) return;
     setState(() => _paying = true);
@@ -204,20 +222,46 @@ class _LiveBagCheckoutSheetState extends State<LiveBagCheckoutSheet> {
 
       final payLines = <LiveBagCheckoutPayLine>[];
       for (final r in toPay) {
-        final itemRow = widget.catalogByItemId[(r.liveItemId ?? '').trim()];
-        final product = await widget.resolveProduct(itemRow);
-        if (product == null) {
-          if (!mounted) return;
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                'Sem preço para ${LiveVendorRefDisplay.itemDisplayName(
-                  title: itemRow?.title,
-                  refCode: itemRow?.refCode,
-                )}.',
-              ),
-            ),
+        final itemId = (r.liveItemId ?? '').trim();
+        var itemRow = widget.catalogByItemId[itemId];
+        if (itemId.isNotEmpty) {
+          itemRow =
+              await LiveCatalogStockService.fetchLiveItemById(itemId) ?? itemRow;
+        }
+        final product = await LiveItemPriceGate.resolveProductForCheckout(
+          itemRow: itemRow,
+          sellerId: widget.liveSellerId,
+          liveId: widget.liveId,
+          resolveProduct: (row) => widget.resolveProduct(row),
+        );
+        final unit = await LiveItemPriceGate.resolveFreshUnitPrice(
+          liveItemId: itemId,
+          fallbackLiveItemPrice: itemRow?.price,
+          productPrice: product?.price,
+          sellerId: widget.liveSellerId,
+          liveId: widget.liveId,
+          itemRow: itemRow,
+        );
+        if (product == null || unit == null) {
+          LiveItemPriceGate.logCheckoutGate(
+            'bag_confirm_pay_blocked',
+            liveId: widget.liveId,
+            sellerId: widget.liveSellerId,
+            liveItemId: itemId,
+            requestId: r.id,
+            productId: product?.id,
+            unit: unit,
+            liveItemPrice: itemRow?.price,
+            productPrice: product?.price,
+            reason: product == null ? 'product_null' : 'unit_null',
           );
+          if (hostCtx.mounted) {
+            ScaffoldMessenger.of(hostCtx).showSnackBar(
+              const SnackBar(
+                content: Text(LiveItemPriceGate.pendingPriceLabel),
+              ),
+            );
+          }
           return;
         }
         final id = r.id?.trim() ?? '';
@@ -264,7 +308,10 @@ class _LiveBagCheckoutSheetState extends State<LiveBagCheckoutSheet> {
       final id = r.id?.trim() ?? '';
       if (id.isEmpty || !_selectedIds.contains(id)) continue;
       final itemRow = widget.catalogByItemId[(r.liveItemId ?? '').trim()];
-      final unit = itemRow?.price ?? 0.0;
+      final unit = LiveItemPriceGate.effectiveUnitPrice(
+            liveItemPrice: itemRow?.price,
+          ) ??
+          0.0;
       final qty = (_payQtyByRequestId[id] ?? 1).clamp(1, 99);
       sum += unit * qty;
     }
@@ -511,8 +558,11 @@ class _LiveBagCheckoutSheetState extends State<LiveBagCheckoutSheet> {
             FleaberPrimaryButton(
               label: _paying ? 'A abrir pagamento…' : 'Pagar',
               loading: _paying,
-              onPressed:
-                  _selectedIds.isEmpty || _paying ? null : _confirmPay,
+              onPressed: _selectedIds.isEmpty ||
+                      _paying ||
+                      !_selectionHasPayablePrice()
+                  ? null
+                  : _confirmPay,
             ),
           ],
         ),

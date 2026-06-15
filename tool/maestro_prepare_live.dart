@@ -122,6 +122,25 @@ void main(List<String> args) async {
     'status': 'pending',
   });
 
+  String? raffleId;
+  try {
+    final raffleRes = await client.rpc(
+      'batata_create_live_raffle',
+      {
+        'p_live_id': liveId,
+        'p_title': 'Maestro raffle prize',
+        'p_activate': true,
+        'p_show_public_leaderboard': true,
+      },
+      accessToken: sellerToken,
+    );
+    if (raffleRes is Map) {
+      raffleId = raffleRes['raffle_id']?.toString();
+    }
+  } catch (e) {
+    stdout.writeln('AVISO: criar rifa Maestro falhou: $e');
+  }
+
   final maestroEnv = <String>[
     'MAESTRO_APP_ID=com.mycompany.fleaber',
     'MAESTRO_LIVE_ID=$liveId',
@@ -131,6 +150,7 @@ void main(List<String> args) async {
     'MAESTRO_SELLER_EMAIL=$sellerEmail',
     'MAESTRO_SELLER_PASSWORD=$sellerPassword',
     'MAESTRO_DEEP_LINK_BASE=fleaber://fleaber.com',
+    if (raffleId != null && raffleId.isNotEmpty) 'MAESTRO_RAFFLE_ID=$raffleId',
   ];
 
   final outFile = File('.maestro/.env');
@@ -141,10 +161,13 @@ void main(List<String> args) async {
   print('  live_id=$liveId');
   print('  seller_id=$sellerId');
   print('  ref=$ref');
+  if (raffleId != null && raffleId.isNotEmpty) {
+    print('  raffle_id=$raffleId');
+  }
   print('  wrote ${outFile.path}');
   print('');
-  print('Próximo: instalar Maestro CLI e correr:');
-  print('  maestro test .maestro/flows/');
+  print('Automação completa (sem Stripe):');
+  print('  powershell -File tool/run_maestro_automation.ps1');
 }
 
 Future<void> _cleanupOld(LiveOpsStagingClient client, String sellerId) async {
@@ -157,6 +180,7 @@ Future<void> _cleanupOld(LiveOpsStagingClient client, String sellerId) async {
     final liveId = live['id']?.toString() ?? '';
     if (liveId.isEmpty) continue;
     await client.deleteWhere('live_reservation_requests', 'live_id=eq.$liveId');
+    await client.deleteWhere('live_raffles', 'live_id=eq.$liveId');
     await client.deleteWhere('orders', 'live_id=eq.$liveId');
     await client.deleteWhere('live_items', 'live_id=eq.$liveId');
     await client.deleteWhere('lives', 'id=eq.$liveId');

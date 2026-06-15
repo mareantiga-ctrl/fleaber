@@ -76,4 +76,41 @@ abstract final class LivePrepRefs {
     await prefs.remove(_schemesKey);
     await prefs.remove(_legacyKey);
   }
+
+  /// Remove refs já usadas no último directo (normalizadas, sem #).
+  static Future<void> purgeNormalizedRefs(Set<String> normRefs) async {
+    if (normRefs.isEmpty) return;
+    final schemes = await readSchemes();
+    if (schemes.isEmpty) return;
+
+    final next = <LiveRefScheme>[];
+    for (final scheme in schemes) {
+      final skip = scheme.exclude.toSet();
+      for (var n = scheme.from; n <= scheme.to; n++) {
+        if (skip.contains(n)) continue;
+        final key = _normRefKey(scheme.formatRef(n));
+        if (normRefs.contains(key)) skip.add(n);
+      }
+      var remaining = 0;
+      for (var n = scheme.from; n <= scheme.to; n++) {
+        if (!skip.contains(n)) remaining++;
+      }
+      if (remaining <= 0) continue;
+      next.add(
+        LiveRefScheme(
+          prefix: scheme.prefix,
+          from: scheme.from,
+          to: scheme.to,
+          exclude: skip.toList()..sort(),
+        ),
+      );
+    }
+    await writeSchemes(next);
+  }
+
+  static String _normRefKey(String raw) {
+    var r = raw.trim().toUpperCase();
+    if (r.startsWith('#')) r = r.substring(1);
+    return r.replaceAll(RegExp(r'[^A-Z0-9]'), '');
+  }
 }

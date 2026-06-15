@@ -262,6 +262,12 @@ class LiveReservationQueueService {
     final pending = buyerBagPendingPayRows(payRows);
     if (pending.isEmpty) return true;
     final payQty = sumPayQty(pending);
+    if (stock.canDirectPayWithoutApproval(
+      payQty,
+      restorePendingQty: payQty,
+    )) {
+      return true;
+    }
     if (!stock.requestExceedsSellableCapacity(
       payQty,
       restorePendingQty: payQty,
@@ -295,6 +301,7 @@ class LiveReservationQueueService {
         requestedQty: payQty,
         availableQty: stock.availableQty,
         refLabel: refLabel,
+        snackbarContext: context,
       );
     }
     if (!context.mounted) return false;
@@ -479,11 +486,13 @@ class LiveReservationQueueService {
     return rows.length;
   }
 
-  /// Stock do artigo sem descontar o pending do próprio saco (ranking por unidade).
+  /// Slots físicos na fila (total − vendido − bloqueado − aceite). Não soma pending.
   static int grossAvailForUnitRanking(LiveCatalogStockSnapshot? stock) {
     if (stock == null) return 0;
-    final gross =
-        stock.totalQty - stock.blockedQty - stock.reservedAcceptedQty;
+    final gross = stock.totalQty -
+        stock.blockedQty -
+        stock.reservedAcceptedQty -
+        stock.soldConvertedQty;
     return gross < 0 ? 0 : gross;
   }
 

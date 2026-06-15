@@ -1,9 +1,24 @@
 # Testes Live — o que fazer agora
 
-## Antes de testar
+## Bateria L1–L18 (V1.5 linhagem) — ✅ FECHADA (Jun 2026)
 
-1. SQL Editor → correr `supabase/sql/live_ops_hotfix_batata.sql` (ficheiro completo).
-2. Rebuild app → instalar no telemóvel (vendedora) e browser (comprador).
+| Fonte | Resultado |
+| ----- | --------- |
+| `dart run tool/live_logical_item_id_check.dart` | **12 PASS · 0 FAIL · 6 SKIP** |
+| SKIP confirmados manualmente | L7, L8, L9, L12, L14, L15 |
+| Automático | L1–L6, L10, L11, L13, L16–L18 |
+
+Detalhe por teste: `docs/deploy-checklist-v1.5-price-pending.md` (secção «Estado da bateria L»).
+
+**Seguinte:** bateria **P1–P15** (preço pendente) — mesmo checklist, Parte C.
+
+---
+
+## Antes de testar (P)
+
+1. SQL Editor → `supabase/sql/live_ops_hotfix_batata.sql` (já aplicado para L).
+2. Edge **A3:** `npx supabase functions deploy create-payment-intent`.
+3. Rebuild **vendedora + comprador** (fix preço fresco no saco — A1/P5).
 
 ---
 

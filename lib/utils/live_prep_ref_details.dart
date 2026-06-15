@@ -11,6 +11,8 @@ class LiveRefChipDetail {
     this.clothingSize,
     this.clothingColor,
     this.isClothing = false,
+    this.quantityExplicit = false,
+    this.titleExplicit = false,
   });
 
   final String? title;
@@ -19,6 +21,9 @@ class LiveRefChipDetail {
   final String? clothingSize;
   final String? clothingColor;
   final bool isClothing;
+  /// Prep local explícito — ganha sobre herança no modo «Continuar histórico».
+  final bool quantityExplicit;
+  final bool titleExplicit;
 
   factory LiveRefChipDetail.fromJson(Map<String, dynamic> json) {
     final priceRaw = json['price'];
@@ -35,6 +40,9 @@ class LiveRefChipDetail {
       clothingSize: json['clothing_size']?.toString().trim(),
       clothingColor: json['clothing_color']?.toString().trim(),
       isClothing: json['is_clothing'] == true,
+      quantityExplicit: json.containsKey('quantity'),
+      titleExplicit: json.containsKey('title') &&
+          (json['title']?.toString().trim().isNotEmpty ?? false),
     );
   }
 
@@ -123,5 +131,24 @@ abstract final class LivePrepRefDetails {
   static Future<void> clear() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove(_key);
+  }
+
+  static Future<void> removeKeys(Set<String> normRefs) async {
+    if (normRefs.isEmpty) return;
+    final all = await readAll();
+    var changed = false;
+    for (final k in normRefs) {
+      if (all.remove(k) != null) changed = true;
+    }
+    if (!changed) return;
+    final prefs = await SharedPreferences.getInstance();
+    if (all.isEmpty) {
+      await prefs.remove(_key);
+      return;
+    }
+    await prefs.setString(
+      _key,
+      jsonEncode(all.map((k, v) => MapEntry(k, v.toJson()))),
+    );
   }
 }

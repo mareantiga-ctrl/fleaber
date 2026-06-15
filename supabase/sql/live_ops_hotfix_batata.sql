@@ -14,12 +14,16 @@ declare
   v_live public.lives%rowtype;
   v_total integer;
   v_blocked integer := 0;
+  v_blocked_orders integer := 0;
+  v_blocked_cross_res integer := 0;
   v_reserved_accepted integer := 0;
   v_pending_bag integer := 0;
   v_sold_converted integer := 0;
   v_sold_orders integer := 0;
   v_available integer;
   v_product_id uuid;
+  v_seller uuid;
+  v_unit_price numeric;
 begin
   select * into v_li from public.live_items where id = p_live_item_id;
   if v_li.id is null then
@@ -27,12 +31,13 @@ begin
   end if;
 
   select * into v_live from public.lives where id = v_li.live_id;
+  v_seller := coalesce(v_live.seller_id, v_live.vendedor_id);
 
   v_total := public.batata_live_item_total_qty(v_li.id);
   v_product_id := coalesce(v_li.product_id, v_li.checkout_product_id);
 
   if v_product_id is not null then
-    select coalesce(sum(o.quantity), 0)::int into v_blocked
+    select coalesce(sum(o.quantity), 0)::int into v_blocked_orders
     from public.orders o
     where o.product_id = v_product_id
       and coalesce(o.status, '') not in ('cancelado', 'cancelled', 'rejected', 'expired')
@@ -40,7 +45,27 @@ begin
         'pago', 'enviado', 'reservado', 'aguarda_confirmacao',
         'pendente', 'pedido_devolucao', 'em_devolucao'
       );
+
+    select coalesce(sum(r.requested_qty), 0)::int into v_blocked_cross_res
+    from public.live_reservation_requests r
+    join public.live_items li2 on li2.id = r.live_item_id
+    where r.status in ('pending', 'accepted')
+      and li2.id <> v_li.id
+      and coalesce(li2.product_id, li2.checkout_product_id) = v_product_id;
+  elsif v_seller is not null
+    and v_li.ref_code is not null
+    and trim(v_li.ref_code) <> '' then
+    select coalesce(sum(r.requested_qty), 0)::int into v_blocked_cross_res
+    from public.live_reservation_requests r
+    join public.live_items li2 on li2.id = r.live_item_id
+    join public.lives l2 on l2.id = li2.live_id
+    where r.status in ('pending', 'accepted')
+      and li2.id <> v_li.id
+      and lower(trim(li2.ref_code)) = lower(trim(v_li.ref_code))
+      and coalesce(l2.seller_id, l2.vendedor_id) = v_seller;
   end if;
+
+  v_blocked := v_blocked_orders + v_blocked_cross_res;
 
   select coalesce(sum(r.requested_qty), 0)::int into v_reserved_accepted
   from public.live_reservation_requests r
@@ -79,6 +104,14 @@ begin
     v_available := 0;
   end if;
 
+  if v_li.product_id is not null then
+    select coalesce(nullif(v_li.price, 0), p.price) into v_unit_price
+    from public.products p
+    where p.id = v_li.product_id;
+  else
+    v_unit_price := v_li.price;
+  end if;
+
   return jsonb_build_object(
     'ok', true,
     'live_item_id', v_li.id,
@@ -93,7 +126,8 @@ begin
     'pending_bag_qty', v_pending_bag,
     'sold_converted_qty', v_sold_converted,
     'available_qty', v_available,
-    'live_status', v_live.status
+    'live_status', v_live.status,
+    'price', v_unit_price
   );
 end;
 $$;
@@ -1422,6 +1456,104 @@ revoke all on function public.batata_live_reservation_accept_broadcast(uuid, uui
 grant execute on function public.batata_live_reservation_accept_broadcast(uuid, uuid, uuid, integer) to authenticated;
 grant execute on function public.batata_live_reservation_accept_broadcast(uuid, uuid, uuid, integer) to service_role;
 
+-- V1 price pending: lock pós-venda, broadcast preço definido.
+create or replace function public.batata_live_item_price_locked(p_live_item_id uuid)
+returns boolean
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  select exists (
+    select 1
+    from public.live_reservation_requests r
+    where r.live_item_id = p_live_item_id
+      and r.status = 'converted'
+  )
+  or exists (
+    select 1
+    from public.orders o
+    where o.live_item_id = p_live_item_id
+      and lower(trim(coalesce(o.status, ''))) in ('pago', 'paid')
+  );
+$$;
+
+create or replace function public.batata_live_price_defined_broadcast(
+  p_live_id uuid,
+  p_live_item_id uuid,
+  p_price numeric
+)
+returns boolean
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_title text;
+  v_ref text;
+  v_label text;
+  v_body text;
+  v_price_txt text;
+  v_uid uuid := auth.uid();
+begin
+  if p_live_id is null or p_live_item_id is null then
+    return false;
+  end if;
+  if p_price is null or p_price <= 0 then
+    return false;
+  end if;
+
+  select coalesce(nullif(trim(title), ''), ''),
+         coalesce(nullif(trim(ref_code), ''), '')
+  into v_title, v_ref
+  from public.live_items
+  where id = p_live_item_id
+  limit 1;
+
+  if v_title <> '' then
+    v_label := v_title;
+  elsif v_ref <> '' then
+    v_label := v_ref;
+  else
+    v_label := 'artigo';
+  end if;
+
+  v_price_txt := replace(trim(to_char(p_price, 'FM999999990.00')), '.', ',');
+  v_body := '💶 Preço definido · ' || v_label || ' · ' || v_price_txt || '€';
+
+  if exists (
+    select 1
+    from public.live_messages m
+    where m.live_id = p_live_id
+      and m.kind = 'system'
+      and m.body = v_body
+      and m.created_at > now() - interval '15 minutes'
+  ) then
+    return false;
+  end if;
+
+  insert into public.live_messages (
+    live_id,
+    user_id,
+    kind,
+    body,
+    sender_label
+  ) values (
+    p_live_id,
+    coalesce(v_uid, (select coalesce(l.seller_id, l.vendedor_id) from public.lives l where l.id = p_live_id)),
+    'system',
+    v_body,
+    'Sistema'
+  );
+
+  return true;
+end;
+$$;
+
+revoke all on function public.batata_live_price_defined_broadcast(uuid, uuid, numeric) from public;
+grant execute on function public.batata_live_price_defined_broadcast(uuid, uuid, numeric) to authenticated;
+grant execute on function public.batata_live_price_defined_broadcast(uuid, uuid, numeric) to service_role;
+
 -- Após editar quantidade no catálogo, repõe available / tira sold se houver stock.
 create or replace function public.batata_update_live_item(
   p_live_item_id uuid,
@@ -1442,7 +1574,9 @@ declare
   v_live public.lives%rowtype;
   v_seller uuid;
   v_qty integer;
-  v_stock jsonb;
+  v_old_price numeric;
+  v_new_price numeric;
+  v_should_broadcast boolean := false;
 begin
   select li.* into v_li
   from public.live_items li
@@ -1463,7 +1597,14 @@ begin
     return jsonb_build_object('ok', false, 'error', 'not_allowed');
   end if;
 
+  v_old_price := v_li.price;
   v_qty := greatest(coalesce(p_quantity, 1), 1);
+
+  if p_price is not null
+     and p_price is distinct from v_old_price
+     and public.batata_live_item_price_locked(p_live_item_id) then
+    return jsonb_build_object('ok', false, 'error', 'price_locked_after_sale');
+  end if;
 
   if v_li.item_kind = 'marketplace_product' and v_li.product_id is not null then
     update public.products
@@ -1495,9 +1636,12 @@ begin
       updated_at = now()
     where id = v_li.id;
 
-    if v_li.checkout_product_id is not null and p_quantity is not null then
+    if v_li.checkout_product_id is not null then
       update public.products
-      set quantity = v_qty
+      set
+        quantity = case when p_quantity is not null then v_qty else quantity end,
+        price = case when p_price is not null then p_price else price end,
+        title = coalesce(nullif(trim(p_title), ''), title)
       where id = v_li.checkout_product_id;
     end if;
   end if;
@@ -1515,6 +1659,26 @@ begin
         where li2.id = v_li.id
           and coalesce(li2.status, '') <> 'sold'
       );
+  end if;
+
+  select li.price into v_new_price
+  from public.live_items li
+  where li.id = p_live_item_id;
+
+  if p_price is not null and v_new_price is not null and v_new_price > 0 then
+    if coalesce(v_old_price, 0) <= 0 then
+      v_should_broadcast := true;
+    elsif v_old_price is distinct from v_new_price then
+      v_should_broadcast := true;
+    end if;
+  end if;
+
+  if v_should_broadcast then
+    perform public.batata_live_price_defined_broadcast(
+      v_li.live_id,
+      v_li.id,
+      v_new_price
+    );
   end if;
 
   return public.batata_live_item_stock(v_li.id);
@@ -2109,7 +2273,7 @@ begin
       'order'::text as kind,
       coalesce(nullif(trim(p.full_name), ''), 'Comprador') as buyer_name,
       greatest(coalesce(o.quantity, 1), 1) as quantity,
-      coalesce(o.updated_at, o.created_at) as completed_at,
+      o.created_at as completed_at,
       public.batata_live_origin_label(o.live_id) as origin
     from lineage_heads lh
     join lineage_item_ids lii on lii.lineage_id = lh.lineage_id
@@ -2304,6 +2468,7 @@ declare
   v_norm text;
   v_mode text;
   v_new_logical uuid;
+  v_resolved_price numeric;
 begin
   if p_seller_id is null or auth.uid() is distinct from p_seller_id then
     raise exception 'not_allowed';
@@ -2316,6 +2481,33 @@ begin
   v_norm := public.batata_normalize_ref(v_ref);
   v_live_id := coalesce(p_live_id, public.batata_ensure_draft_live(p_seller_id));
   v_mode := lower(trim(coalesce(p_lineage_mode, 'new')));
+
+  if p_price is not null and p_price > 0 then
+    v_resolved_price := p_price;
+  else
+    select li.price into v_resolved_price
+    from public.live_items li
+    join public.lives l on l.id = li.live_id
+    where coalesce(l.seller_id, l.vendedor_id) = p_seller_id
+      and li.item_kind = 'live_only'
+      and public.batata_normalize_ref(li.ref_code) = v_norm
+      and li.price is not null
+      and li.price > 0
+      and li.live_id is distinct from v_live_id
+    order by li.updated_at desc nulls last, li.created_at desc
+    limit 1;
+
+    if (v_resolved_price is null or v_resolved_price <= 0)
+       and p_logical_item_id is not null then
+      select li.price into v_resolved_price
+      from public.live_items li
+      where li.logical_item_id = p_logical_item_id
+        and li.price is not null
+        and li.price > 0
+      order by li.updated_at desc nulls last
+      limit 1;
+    end if;
+  end if;
 
   select li.id, li.logical_item_id
   into v_item_id, v_existing_logical
@@ -2331,7 +2523,10 @@ begin
       set
         ref_code = v_ref,
         title = coalesce(nullif(trim(p_title), ''), title),
-        price = coalesce(p_price, price),
+        price = coalesce(
+          nullif(p_price, 0),
+          case when coalesce(price, 0) <= 0 then v_resolved_price else price end
+        ),
         quantity = greatest(coalesce(p_quantity, quantity, 1), 1),
         clothing_size = coalesce(nullif(trim(p_clothing_size), ''), clothing_size),
         gender = coalesce(nullif(trim(p_gender), ''), gender),
@@ -2372,7 +2567,10 @@ begin
     set
       ref_code = v_ref,
       title = coalesce(nullif(trim(p_title), ''), title),
-      price = coalesce(p_price, price),
+      price = coalesce(
+        nullif(p_price, 0),
+        case when coalesce(price, 0) <= 0 then v_resolved_price else price end
+      ),
       quantity = greatest(coalesce(p_quantity, quantity, 1), 1),
       clothing_size = coalesce(nullif(trim(p_clothing_size), ''), clothing_size),
       gender = coalesce(nullif(trim(p_gender), ''), gender),
@@ -2419,7 +2617,7 @@ begin
     null,
     v_ref,
     coalesce(nullif(trim(p_title), ''), v_ref),
-    p_price,
+    v_resolved_price,
     nullif(trim(p_photo_url), ''),
     greatest(coalesce(p_quantity, 1), 1),
     nullif(trim(p_clothing_size), ''),
@@ -2446,5 +2644,220 @@ revoke all on function public.batata_upsert_live_only_item(
 grant execute on function public.batata_upsert_live_only_item(
   uuid, text, text, numeric, integer, text, text, text, uuid, text, uuid
 ) to authenticated;
+
+-- Colunas usadas pelo shadow live (se ainda não existirem).
+alter table public.products add column if not exists quantity integer default 1;
+alter table public.products add column if not exists is_sold boolean default false;
+
+-- Shadow Stripe: sincronizar preço quando já existe checkout_product_id.
+create or replace function public.batata_ensure_checkout_product(p_live_item_id uuid)
+returns uuid
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_li public.live_items%rowtype;
+  v_live public.lives%rowtype;
+  v_seller uuid;
+  v_pid uuid;
+  v_img_json jsonb;
+  v_img_text text[];
+  v_image_urls_udt text;
+begin
+  select * into v_li from public.live_items where id = p_live_item_id;
+  if v_li.id is null then
+    raise exception 'live_item_not_found';
+  end if;
+
+  if v_li.checkout_product_id is not null then
+    update public.products
+    set
+      price = case
+        when v_li.price is not null and v_li.price > 0 then v_li.price
+        else price
+      end,
+      title = coalesce(nullif(trim(v_li.title), ''), title),
+      quantity = greatest(coalesce(v_li.quantity, 1), 1)
+    where id = v_li.checkout_product_id;
+    return v_li.checkout_product_id;
+  end if;
+
+  if v_li.item_kind = 'marketplace_product' and v_li.product_id is not null then
+    return v_li.product_id;
+  end if;
+
+  select * into v_live from public.lives where id = v_li.live_id;
+  v_seller := coalesce(v_live.seller_id, v_live.vendedor_id);
+  if v_seller is null then
+    raise exception 'seller_missing';
+  end if;
+
+  v_img_json := case
+    when v_li.photo_url is not null and trim(v_li.photo_url) <> ''
+    then jsonb_build_array(trim(v_li.photo_url))
+    else '[]'::jsonb
+  end;
+  v_img_text := case
+    when v_li.photo_url is not null and trim(v_li.photo_url) <> ''
+    then array[trim(v_li.photo_url)]
+    else array[]::text[]
+  end;
+
+  select c.udt_name
+  into v_image_urls_udt
+  from information_schema.columns c
+  where c.table_schema = 'public'
+    and c.table_name = 'products'
+    and c.column_name = 'image_urls'
+  limit 1;
+
+  if v_image_urls_udt = '_text' then
+    insert into public.products (
+      seller_id, title, price, image_urls, ref_code,
+      list_on_marketplace, available_for_live, quantity, is_sold
+    )
+    values (
+      v_seller,
+      coalesce(nullif(trim(v_li.title), ''), 'Artigo live'),
+      coalesce(v_li.price, 0),
+      v_img_text,
+      coalesce(nullif(trim(v_li.ref_code), ''), 'LIVE-' || left(v_li.id::text, 8)),
+      false,
+      false,
+      greatest(coalesce(v_li.quantity, 1), 1),
+      false
+    )
+    returning id into v_pid;
+  else
+    insert into public.products (
+      seller_id, title, price, image_urls, ref_code,
+      list_on_marketplace, available_for_live, quantity, is_sold
+    )
+    values (
+      v_seller,
+      coalesce(nullif(trim(v_li.title), ''), 'Artigo live'),
+      coalesce(v_li.price, 0),
+      v_img_json,
+      coalesce(nullif(trim(v_li.ref_code), ''), 'LIVE-' || left(v_li.id::text, 8)),
+      false,
+      false,
+      greatest(coalesce(v_li.quantity, 1), 1),
+      false
+    )
+    returning id into v_pid;
+  end if;
+
+  update public.live_items
+  set checkout_product_id = v_pid, updated_at = now()
+  where id = v_li.id;
+
+  return v_pid;
+end;
+$$;
+
+revoke all on function public.batata_ensure_checkout_product(uuid) from public;
+grant execute on function public.batata_ensure_checkout_product(uuid) to authenticated;
+
+create or replace function public.batata_resolve_live_checkout_product(p_live_item_id uuid)
+returns jsonb
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_li public.live_items%rowtype;
+  v_p public.products%rowtype;
+  v_pid uuid;
+  v_unit_price numeric;
+  v_image_urls_json jsonb;
+  v_image_urls_udt text;
+begin
+  select * into v_li from public.live_items where id = p_live_item_id;
+  if v_li.id is null then
+    return jsonb_build_object('ok', false, 'error', 'live_item_not_found');
+  end if;
+
+  if v_li.item_kind = 'marketplace_product' and v_li.product_id is not null then
+    v_pid := v_li.product_id;
+  else
+    v_pid := public.batata_ensure_checkout_product(p_live_item_id);
+    select * into v_li from public.live_items where id = p_live_item_id;
+  end if;
+
+  select * into v_p from public.products where id = v_pid;
+  if v_p.id is null then
+    return jsonb_build_object('ok', false, 'error', 'product_not_found');
+  end if;
+
+  if coalesce(v_li.price, 0) > 0 then
+    v_unit_price := v_li.price;
+  elsif coalesce(v_p.price, 0) > 0 then
+    v_unit_price := v_p.price;
+  else
+    v_unit_price := null;
+  end if;
+
+  select c.udt_name
+  into v_image_urls_udt
+  from information_schema.columns c
+  where c.table_schema = 'public'
+    and c.table_name = 'products'
+    and c.column_name = 'image_urls'
+  limit 1;
+
+  if v_image_urls_udt = '_text' then
+    execute
+      'select to_jsonb(coalesce(image_urls, array[]::text[]))
+       from public.products where id = $1'
+    into v_image_urls_json
+    using v_pid;
+  else
+    v_image_urls_json := coalesce(v_p.image_urls, '[]'::jsonb);
+  end if;
+
+  return jsonb_build_object(
+    'ok', true,
+    'live_item_id', v_li.id,
+    'product_id', v_p.id,
+    'seller_id', v_p.seller_id,
+    'price', v_unit_price,
+    'live_item_price', v_li.price,
+    'product_price', v_p.price,
+    'title', coalesce(nullif(trim(v_li.title), ''), v_p.title),
+    'ref_code', coalesce(v_li.ref_code, v_p.ref_code),
+    'image_urls', v_image_urls_json,
+    'checkout_product_id', v_li.checkout_product_id,
+    'item_kind', v_li.item_kind
+  );
+end;
+$$;
+
+revoke all on function public.batata_resolve_live_checkout_product(uuid) from public;
+grant execute on function public.batata_resolve_live_checkout_product(uuid) to authenticated;
+
+drop policy if exists "products_select_live_checkout_shadow" on public.products;
+create policy "products_select_live_checkout_shadow"
+  on public.products
+  for select
+  to authenticated
+  using (
+    exists (
+      select 1
+      from public.live_items li
+      inner join public.lives l on l.id = li.live_id
+      where (
+        li.checkout_product_id = products.id
+        or li.product_id = products.id
+      )
+      and (
+        l.status in ('live', 'ended')
+        or l.is_active = true
+      )
+    )
+  );
+
+-- Gestão de referências (históricos, encerrar, juntar, Z5 upsert): correr também
+-- supabase/sql/ref_histories_batata.sql no SQL Editor (staging/prod).
 
 notify pgrst, 'reload schema';

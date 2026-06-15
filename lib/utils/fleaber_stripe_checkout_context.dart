@@ -9,6 +9,7 @@ import '/fleaber_live_player/fleaber_live_player_widget.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/order_cancel_eligibility.dart';
 import '/utils/fleaber_logger.dart';
+import '/utils/live_raffle_service.dart';
 import '/utils/live_reservation_queue_service.dart';
 
 /// Contexto de checkout Stripe iniciado no live — restaurado se o deep link perder query params.
@@ -241,6 +242,7 @@ class FleaberStripeCheckoutContext {
             'reconcile_bag_line',
             data: {'order_id': oid, 'live_id': liveId, 'result': res},
           );
+          await LiveRaffleService.tryAwardPurchaseBonus(oid);
         }
         return;
       } catch (_) {}
@@ -255,5 +257,6 @@ class FleaberStripeCheckoutContext {
       'reconcile',
       data: {'order_id': orderId, 'live_id': liveId, 'result': reconcile},
     );
+    await LiveRaffleService.tryAwardPurchaseBonus(orderId);
   }
 }

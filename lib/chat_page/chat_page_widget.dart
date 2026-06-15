@@ -197,11 +197,14 @@ class ChatPageWidget extends StatefulWidget {
     super.key,
     this.otherUserId,
     this.chatId,
+    this.orderId,
     this.requestCancelOnOpen = false,
   });
 
   final String? otherUserId;
   final String? chatId;
+  /// Encomenda concreta (ex. compra concluída no histórico de referências).
+  final String? orderId;
 
   /// Abrir o chat a partir das encomendas e enviar já o pedido de cancelamento (comprador).
   final bool requestCancelOnOpen;
@@ -356,7 +359,23 @@ class _ChatPageWidgetState extends State<ChatPageWidget> {
 
   Future<void> _loadOrderForChat(String productId) async {
     if (productId.isEmpty) return;
-    final otherId = widget.otherUserId;
+    final pinnedOrderId = widget.orderId?.trim() ?? '';
+    if (pinnedOrderId.isNotEmpty) {
+      final pinned = await OrdersTable().querySingleRow(
+        queryFn: (q) => q.eqOrNull('id', pinnedOrderId),
+      );
+      if (pinned.isNotEmpty) {
+        _orderForChat = pinned.first;
+        final loadedOrderId = _orderForChat?.id;
+        if (loadedOrderId != _disputeThreadOrderId) {
+          _disputeThreadOrderId = null;
+          _disputeThreadFuture = null;
+          _disputeThreadCache = null;
+        }
+        return;
+      }
+    }
+    final otherId = _resolvedOtherUserId();
     if (otherId == null || otherId.isEmpty || currentUserUid.isEmpty) return;
     final rows = await OrdersTable().queryRows(
       queryFn: (q) => q
@@ -6033,9 +6052,21 @@ class _ChatPageWidgetState extends State<ChatPageWidget> {
                               );
                               return;
                             }
+                            final receiverId = _resolvedOtherUserId();
+                            if (receiverId == null || receiverId.isEmpty) {
+                              if (!mounted) return;
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text(
+                                    'Não foi possível identificar o destinatário.',
+                                  ),
+                                ),
+                              );
+                              return;
+                            }
                             await ChatMessagesTable().insert({
                               'sender_id': currentUserUid,
-                              'receiver_id': widget.otherUserId,
+                              'receiver_id': receiverId,
                               'chat_id': widget.chatId,
                               'text': text,
                               'is_read': false,

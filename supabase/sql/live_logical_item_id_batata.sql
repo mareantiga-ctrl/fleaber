@@ -209,7 +209,7 @@ begin
       'order'::text as kind,
       coalesce(nullif(trim(p.full_name), ''), 'Comprador') as buyer_name,
       greatest(coalesce(o.quantity, 1), 1) as quantity,
-      coalesce(o.updated_at, o.created_at) as completed_at,
+      o.created_at as completed_at,
       public.batata_live_origin_label(o.live_id) as origin
     from lineage_heads lh
     join lineage_item_ids lii on lii.lineage_id = lh.lineage_id

@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '/auth/supabase_auth/auth_util.dart';
@@ -13,6 +14,7 @@ import '/utils/seller_staff_permissions.dart';
 import '/utils/seller_staff_service.dart';
 import '/utils/live_private_room_service.dart';
 import '/utils/live_room_service.dart';
+import '/utils/live_system_chat_humanizer.dart';
 import '/widgets/live_public_chat_line.dart';
 import '/widgets/live_tip_gift_bubble.dart';
 import '/widgets/live_vendor_catalog_card.dart';
@@ -20,13 +22,21 @@ import '/widgets/live_vendor_ops_ui.dart';
 import '/widgets/profile_avatar.dart';
 import '/utils/live_prep_ref_details.dart';
 import '/utils/live_prep_refs.dart';
+import '/utils/clothing_option_lists.dart';
 import '/utils/live_catalog_stock_service.dart';
+import '/utils/live_raffle_service.dart';
+import '/widgets/live_raffle_seller_sheet.dart';
+import '/widgets/live_raffle_seller_ops_bar.dart';
+import '/utils/live_item_price_gate.dart';
 import '/widgets/live_ref_chip_editor_sheet.dart';
 import '/utils/live_fomo_broadcaster.dart';
 import '/utils/fleaber_logger.dart';
+import '/utils/fleaber_snack.dart';
 import '/order_cancel_eligibility.dart';
 import '/utils/fee_calculator.dart';
 import '/utils/live_in_stream_checkout.dart';
+import '/utils/live_catalog_item_attributes.dart';
+import '/utils/fleaber_gallery_picker.dart';
 
 enum _VendorChatFilter { all, questions, reservations, system }
 
@@ -328,7 +338,9 @@ class LiveVendorStudioPanelState extends State<LiveVendorStudioPanel> {
   bool _reservationLoading = true;
   int _opsActionsLastHour = 0;
   StreamSubscription<List<Map<String, dynamic>>>? _reservationRealtimeSub;
+  StreamSubscription<List<Map<String, dynamic>>>? _sellerReservationRealtimeSub;
   Timer? _reservationPollTimer;
+  Timer? _catalogStockPollTimer;
   final Set<String> _dismissedUrgentRequestIds = {};
   StreamSubscription<List<Map<String, dynamic>>>? _catalogRealtimeSub;
   StreamSubscription<List<Map<String, dynamic>>>? _ordersRealtimeSub;
@@ -359,6 +371,12 @@ class LiveVendorStudioPanelState extends State<LiveVendorStudioPanel> {
   LiveItemOpsSnapshot? _activeOpsSnapshot;
   int _teamHelpersActive = 0;
   final Map<String, LiveCatalogStockSnapshot> _stockByItemId = {};
+  LiveRaffleState? _raffleState;
+  int? _raffleParticipantCount;
+  bool _raffleActionLoading = false;
+  Timer? _rafflePollTimer;
+  StreamSubscription<List<Map<String, dynamic>>>? _raffleEntriesRealtimeSub;
+  StreamSubscription<List<Map<String, dynamic>>>? _raffleRealtimeSub;
   /// Mantém o artigo da vitrine visível após vendido (is_active pode ficar false).
   String? _pinnedVitrineItemId;
   List<LiveOpsActivityEvent> _activityEvents = [];
@@ -368,6 +386,8 @@ class LiveVendorStudioPanelState extends State<LiveVendorStudioPanel> {
   final Set<String> _staffLogIdsSeen = {};
   final Map<String, String> _buyerNameCache = {};
   final Map<String, String> _chatUserNameCache = {};
+  final Set<String> _systemHighlightMsgIds = {};
+  bool _chatSystemEffectsPrimed = false;
   final Set<String> _chatUserNameFetchInFlight = {};
   final Map<String, String> _catalogStatusCache = {};
   final Map<String, String> _helperNameCache = {};
@@ -411,6 +431,7 @@ class LiveVendorStudioPanelState extends State<LiveVendorStudioPanel> {
       unawaited(_prefetchChatUserNames(msgs));
       unawaited(_refreshTipContributors(msgs));
       _ingestSystemMessagesForActivity(msgs);
+      _trackSystemChatHighlights(msgs);
       _updatePublicChatUnread(msgs);
       final tipCount =
           msgs.where((m) => m.kind == LiveRoomMessageKind.tip).length;
@@ -421,6 +442,15 @@ class LiveVendorStudioPanelState extends State<LiveVendorStudioPanel> {
     });
     unawaited(_loadCatalogRows());
     unawaited(_loadReservationQueue());
+    unawaited(_refreshRaffleState());
+    _subscribeRaffleRealtime(id);
+    _rafflePollTimer?.cancel();
+    _rafflePollTimer = Timer.periodic(const Duration(seconds: 3), (_) {
+      if (!mounted) return;
+      if (_raffleState?.hasRaffle == true) {
+        unawaited(_refreshRaffleState());
+      }
+    });
     unawaited(SellerStaffContext.instance.refresh().then((_) {
       if (!mounted) return;
       final helpers = SellerStaffContext.instance.myTeamHelpers.where(
@@ -436,9 +466,15 @@ class LiveVendorStudioPanelState extends State<LiveVendorStudioPanel> {
       setState(() => _teamHelpersActive = helpers.length);
     }));
     _subscribeReservationRealtime();
+    _subscribeSellerReservationRealtime();
     _reservationPollTimer = Timer.periodic(const Duration(seconds: 4), (_) {
       if (!mounted) return;
       unawaited(_loadReservationQueue(refreshMetrics: false));
+    });
+    _catalogStockPollTimer?.cancel();
+    _catalogStockPollTimer = Timer.periodic(const Duration(seconds: 2), (_) {
+      if (!mounted) return;
+      unawaited(_refreshStockCache());
     });
     _subscribeCatalogRealtime();
     _subscribeOrdersRealtime();
@@ -618,7 +654,149 @@ class LiveVendorStudioPanelState extends State<LiveVendorStudioPanel> {
     if (ids.isEmpty) return;
     final snaps = await LiveCatalogStockService.fetchMany(ids);
     if (!mounted) return;
+    for (final entry in snaps.entries) {
+      _syncCatalogRowAfterStockChange(entry.key, entry.value);
+    }
     setState(() => _stockByItemId.addAll(snaps));
+  }
+
+  Future<void> _refreshCatalogStockFromRealtime() async {
+    await _refreshStockCache();
+  }
+
+  Future<void> _refreshRaffleState() async {
+    final liveId = widget.liveId.trim();
+    if (liveId.isEmpty) return;
+    try {
+      final raffle = _raffleState?.raffle;
+      if (raffle != null && raffle.isActive && raffle.hasTimer) {
+        await LiveRaffleService.tick(raffle.id);
+      }
+      final next = await LiveRaffleService.fetchState(liveId);
+      int? participants;
+      final rid = next.raffle?.id;
+      if (rid != null && rid.isNotEmpty) {
+        participants = await LiveRaffleService.fetchParticipantCount(rid);
+      }
+      if (mounted) {
+        setState(() {
+          _raffleState = next;
+          _raffleParticipantCount = participants;
+        });
+      }
+    } catch (_) {}
+  }
+
+  void _subscribeRaffleRealtime(String liveId) {
+    if (liveId.isEmpty) return;
+    try {
+      _raffleRealtimeSub?.cancel();
+      _raffleRealtimeSub = SupaFlow.client
+          .from('live_raffles')
+          .stream(primaryKey: ['id'])
+          .eq('live_id', liveId)
+          .listen((_) => unawaited(_refreshRaffleState()));
+
+      _raffleEntriesRealtimeSub?.cancel();
+      _raffleEntriesRealtimeSub = SupaFlow.client
+          .from('live_raffle_entries')
+          .stream(primaryKey: ['id'])
+          .eq('live_id', liveId)
+          .listen((_) => unawaited(_refreshRaffleState()));
+    } catch (_) {}
+  }
+
+  Future<void> _openRaffleSellerSheet() async {
+    if (_raffleState?.hasRaffle == true) return;
+    final active = _activeCatalogRow;
+    await LiveRaffleSellerSheet.show(
+      context,
+      liveId: widget.liveId.trim(),
+      activeItem: active,
+      liveCatalogRows: _catalogRows ?? const [],
+      marketplaceProducts: _productByNormRef.values.toList(),
+      onChanged: _refreshRaffleState,
+    );
+  }
+
+  Future<void> _closeRaffleEntries() async {
+    final id = _raffleState?.raffle?.id;
+    if (id == null) return;
+    setState(() => _raffleActionLoading = true);
+    try {
+      await LiveRaffleService.closeEntries(id);
+      await _refreshRaffleState();
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Não foi possível encerrar.')),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _raffleActionLoading = false);
+    }
+  }
+
+  Future<void> _drawRaffle() async {
+    final id = _raffleState?.raffle?.id;
+    if (id == null) return;
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: const Color(0xFF1A2228),
+        title: Text(
+          'Sortear vencedor?',
+          style: GoogleFonts.inter(color: Colors.white, fontWeight: FontWeight.w800),
+        ),
+        content: Text(
+          'Sorteio automático e auditável.',
+          style: GoogleFonts.inter(color: Colors.white70, fontSize: 13),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('Cancelar'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text('Sortear'),
+          ),
+        ],
+      ),
+    );
+    if (ok != true) return;
+    setState(() => _raffleActionLoading = true);
+    try {
+      await LiveRaffleService.draw(id);
+      await _refreshRaffleState();
+    } catch (e) {
+      if (mounted) {
+        final msg = e.toString().contains('no_participants')
+            ? 'Sem participantes para sortear.'
+            : 'Não foi possível sortear.';
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
+      }
+    } finally {
+      if (mounted) setState(() => _raffleActionLoading = false);
+    }
+  }
+
+  Future<void> _cancelRaffle() async {
+    final id = _raffleState?.raffle?.id;
+    if (id == null) return;
+    setState(() => _raffleActionLoading = true);
+    try {
+      await LiveRaffleService.cancel(id);
+      await _refreshRaffleState();
+    } catch (_) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Não foi possível cancelar.')),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _raffleActionLoading = false);
+    }
   }
 
   ProductsRow? _productForLiveItem(LiveItemsRow row) {
@@ -631,42 +809,35 @@ class LiveVendorStudioPanelState extends State<LiveVendorStudioPanel> {
     final itemId = row.id?.trim() ?? '';
     final snap = _stockByItemId[itemId];
 
+    if (snap != null) {
+      var soldCount = snap.soldConvertedQty < 0 ? 0 : snap.soldConvertedQty;
+      if (LiveVendorSellerCopy.isMarkedSold(row.status) &&
+          soldCount < 1 &&
+          snap.availableQty <= 0) {
+        soldCount = 1;
+      }
+      return LiveVendorCatalogItemMetrics(
+        quantity: snap.totalQty,
+        available: snap.availableQty,
+        sold: soldCount,
+        reservations: snap.displayReservedQty,
+      );
+    }
+
     var reservations = 0;
     var sold = 0;
     for (final r in _reservationQueue) {
       if ((r.liveItemId ?? '').trim() != itemId) continue;
       final q = r.requestedQty < 1 ? 1 : r.requestedQty;
       final st = r.status ?? '';
-      if (st == 'pending' &&
+      if ((st == 'pending' || st == 'accepted') &&
           LiveReservationQueueService.isOpenSellerTreatReservation(
             status: r.status,
             notes: r.notes,
           )) {
         reservations += q;
       }
-      if (st == 'accepted' || st == 'converted') sold += q;
-    }
-
-    if (snap != null) {
-      var soldCount = snap.soldConvertedQty > sold ? snap.soldConvertedQty : sold;
-      if (sold > soldCount) soldCount = sold;
-      if (LiveVendorSellerCopy.isMarkedSold(row.status) &&
-          soldCount < 1 &&
-          snap.availableQty <= 0) {
-        soldCount = 1;
-      }
-      // Reservas = fila deste directo + compromissos do mesmo produto noutros directos.
-      final localRes = _reservationQueue.isEmpty
-          ? snap.pendingBagQty
-          : reservations;
-      final externalHolds = snap.blockedQty < 0 ? 0 : snap.blockedQty;
-      final resCount = localRes + externalHolds;
-      return LiveVendorCatalogItemMetrics(
-        quantity: snap.totalQty,
-        available: snap.availableQty,
-        sold: soldCount,
-        reservations: resCount,
-      );
+      if (st == 'converted') sold += q;
     }
 
     int? qty;
@@ -1181,52 +1352,246 @@ class LiveVendorStudioPanelState extends State<LiveVendorStudioPanel> {
     }
   }
 
+  Future<void> _showQuickEditErrorDialog(String message) async {
+    if (!mounted) return;
+    await showDialog<void>(
+      context: context,
+      useRootNavigator: true,
+      barrierDismissible: true,
+      builder: (dialogCtx) {
+        return AlertDialog(
+          backgroundColor: const Color(0xFF101518),
+          shape: RoundedRectangleBorder(
+            borderRadius: FleaberRadius.circularLg,
+          ),
+          titlePadding: const EdgeInsets.fromLTRB(20, 16, 8, 0),
+          contentPadding: const EdgeInsets.fromLTRB(20, 12, 20, 8),
+          actionsPadding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
+          title: Row(
+            children: [
+              Expanded(
+                child: Text(
+                  'Não foi possível guardar',
+                  style: GoogleFonts.inter(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w800,
+                    fontSize: 16,
+                  ),
+                ),
+              ),
+              IconButton(
+                icon: const Icon(Icons.close, color: Colors.white54),
+                onPressed: () => Navigator.pop(dialogCtx),
+                tooltip: 'Fechar',
+              ),
+            ],
+          ),
+          content: Text(
+            message,
+            style: GoogleFonts.inter(
+              color: Colors.white70,
+              fontSize: 14,
+              height: 1.4,
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogCtx),
+              child: Text(
+                'Fechar',
+                style: GoogleFonts.inter(
+                  color: FleaberColors.teal,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<ProductsRow?> _shadowProductForLiveItem(LiveItemsRow row) async {
+    final pid = row.checkoutProductId?.trim();
+    if (pid == null || pid.isEmpty) return null;
+    try {
+      final rows = await ProductsTable().queryRows(
+        queryFn: (q) => q.eqOrNull('id', pid),
+        limit: 1,
+      );
+      return rows.isEmpty ? null : rows.first;
+    } catch (_) {
+      return null;
+    }
+  }
+
   Future<void> _showCatalogQuickEditSheet(LiveItemsRow row) async {
-    final product = _productForLiveItem(row);
-    final refKey = LivePrepRefDetails.normalizeRefKey(row.refCode ?? '');
-    final prep = _prepRefDetails[refKey];
     final itemId = row.id?.trim() ?? '';
+    var itemRow = row;
+    if (itemId.isNotEmpty) {
+      for (final r in _catalogRows ?? const <LiveItemsRow>[]) {
+        if ((r.id ?? '').trim() == itemId) {
+          itemRow = r;
+          break;
+        }
+      }
+      final fresh = await LiveCatalogStockService.fetchLiveItemById(itemId);
+      if (fresh != null) itemRow = fresh;
+    }
+
+    final product =
+        itemRow.isMarketplaceProduct ? _productForLiveItem(itemRow) : null;
+    final shadowProduct = await _shadowProductForLiveItem(itemRow);
+    final refKey = LivePrepRefDetails.normalizeRefKey(itemRow.refCode ?? '');
+    final prep = _prepRefDetails[refKey];
     final snap = itemId.isNotEmpty
         ? (_stockByItemId[itemId] ?? await LiveCatalogStockService.fetch(itemId))
         : null;
-    final lockRef = row.isMarketplaceProduct || product?.id != null;
+    final lockRef = itemRow.isMarketplaceProduct || product?.id != null;
 
     final qtyCtrl = TextEditingController(
-      text: '${snap?.totalQty ?? product?.quantity ?? prep?.quantity ?? row.quantity ?? 1}',
+      text:
+          '${snap?.totalQty ?? product?.quantity ?? shadowProduct?.quantity ?? prep?.quantity ?? itemRow.quantity ?? 1}',
     );
     final priceCtrl = TextEditingController(
-      text: row.price?.toStringAsFixed(2).replaceAll('.', ',') ?? '',
+      text: itemRow.price?.toStringAsFixed(2).replaceAll('.', ',') ?? '',
     );
-    final sizeCtrl = TextEditingController(
-      text: product?.clothingSize?.trim() ?? prep?.clothingSize?.trim() ?? '',
+    final initialSize = itemRow.clothingSize?.trim().isNotEmpty == true
+        ? itemRow.clothingSize!.trim()
+        : (shadowProduct?.clothingSize?.trim() ??
+            product?.clothingSize?.trim() ??
+            prep?.clothingSize?.trim() ??
+            '');
+    final initialColor = itemRow.gender?.trim().isNotEmpty == true
+        ? itemRow.gender!.trim()
+        : (shadowProduct?.gender?.trim() ??
+            prep?.clothingColor?.trim() ??
+            product?.gender?.trim() ??
+            '');
+    final titleCtrl = TextEditingController(text: _itemTitle(itemRow));
+    final descCtrl = TextEditingController(
+      text: shadowProduct?.description?.trim() ??
+          product?.description?.trim() ??
+          '',
     );
-    final colorCtrl = TextEditingController(
-      text: product?.gender?.trim() ?? '',
-    );
-    final titleCtrl = TextEditingController(text: _itemTitle(row));
     final refCtrl = TextEditingController(
-      text: LiveVendorRefDisplay.formatRef(row.refCode),
+      text: LiveVendorRefDisplay.formatRef(itemRow.refCode),
     );
 
     if (!mounted) return;
 
-    Future<void> save({required bool andShow}) async {
+    var initialPhotos = <String>[];
+    if (shadowProduct?.imageUrls.isNotEmpty == true) {
+      initialPhotos = List<String>.from(shadowProduct!.imageUrls);
+    } else if (product?.imageUrls.isNotEmpty == true) {
+      initialPhotos = List<String>.from(product!.imageUrls);
+    } else if (itemRow.photoUrl?.trim().isNotEmpty == true) {
+      initialPhotos = [itemRow.photoUrl!.trim()];
+    }
+
+    BuildContext? quickEditSheetContext;
+
+    List<String> effectiveMarketplacePhotos(List<String> editPhotos) {
+      if (editPhotos.isNotEmpty) return editPhotos;
+      return initialPhotos;
+    }
+
+    var marketplaceInlineError = '';
+    void Function(void Function())? rebuildQuickEditSheet;
+
+    Future<void> save({
+      required bool andShow,
+      required String? selectedSize,
+      required String? selectedColor,
+      required List<String> photos,
+      required bool photosChanged,
+      required bool listOnMarketplace,
+    }) async {
       final priceRaw = priceCtrl.text.trim().replaceAll(',', '.');
       final price = double.tryParse(priceRaw);
       final qty = int.tryParse(qtyCtrl.text.trim()) ?? 1;
-      final id = row.id?.trim();
+      final id = itemRow.id?.trim();
       if (id == null || id.isEmpty) return;
 
+      final titleOut = titleCtrl.text.trim();
+      final descOut = descCtrl.text.trim();
+      final isClothing = (selectedSize?.isNotEmpty ?? false) ||
+          (selectedColor?.isNotEmpty ?? false) ||
+          (prep?.isClothing ?? false);
+      if (listOnMarketplace) {
+        final missing = _quickEditMarketplaceMissing(
+          title: titleOut,
+          price: price,
+          photos: effectiveMarketplacePhotos(photos),
+          description: descOut,
+          isClothing: isClothing,
+          size: selectedSize,
+          color: selectedColor,
+        );
+        if (missing.isNotEmpty) {
+          marketplaceInlineError = missing.length == 1
+              ? 'Para o marketplace falta: ${missing.first}.'
+              : 'Para o marketplace falta: ${missing.join(', ')}.';
+          rebuildQuickEditSheet?.call(() {});
+          return;
+        }
+      }
+
       try {
+        final wasListed =
+            itemRow.isMarketplaceProduct && product?.listOnMarketplace == true;
+        final listParam = listOnMarketplace
+            ? true
+            : (wasListed && !listOnMarketplace ? false : null);
+
         final updated = await LiveCatalogStockService.updateItem(
           liveItemId: id,
           quantity: qty < 1 ? 1 : qty,
           price: price,
-          title: titleCtrl.text.trim().isEmpty ? null : titleCtrl.text.trim(),
-          clothingSize: sizeCtrl.text.trim().isEmpty ? null : sizeCtrl.text.trim(),
-          gender: colorCtrl.text.trim().isEmpty ? null : colorCtrl.text.trim(),
+          title: titleOut.isEmpty ? null : titleOut,
+          description: descOut.isEmpty ? '' : descOut,
+          clothingSize:
+              selectedSize == null || selectedSize.isEmpty ? null : selectedSize,
+          gender:
+              selectedColor == null || selectedColor.isEmpty ? null : selectedColor,
           refCode: lockRef ? null : refCtrl.text.trim(),
+          photoUrl: photosChanged
+              ? (photos.isEmpty ? '' : photos.first)
+              : null,
+          listOnMarketplace: listParam,
         );
+        var productIdForPhotos = itemRow.isMarketplaceProduct
+            ? (itemRow.productId ?? product?.id)?.trim()
+            : itemRow.checkoutProductId?.trim();
+        if (!itemRow.isMarketplaceProduct &&
+            (photosChanged ||
+                descOut.isNotEmpty ||
+                listOnMarketplace ||
+                (selectedSize?.isNotEmpty ?? false) ||
+                (selectedColor?.isNotEmpty ?? false))) {
+          final shadowId =
+              await LiveCatalogStockService.ensureCheckoutProduct(id);
+          if (shadowId != null && shadowId.trim().isNotEmpty) {
+            productIdForPhotos = shadowId.trim();
+          }
+        }
+        if (productIdForPhotos != null && productIdForPhotos.isNotEmpty) {
+          final patch = <String, dynamic>{};
+          if (photosChanged) patch['image_urls'] = photos;
+          if (descOut.isNotEmpty) patch['description'] = descOut;
+          if (selectedSize != null && selectedSize.isNotEmpty) {
+            patch['clothing_size'] = selectedSize;
+          }
+          if (selectedColor != null && selectedColor.isNotEmpty) {
+            patch['gender'] = selectedColor;
+          }
+          if (patch.isNotEmpty) {
+            await ProductsTable().update(
+              data: patch,
+              matchingRows: (rows) => rows.eqOrNull('id', productIdForPhotos),
+            );
+          }
+        }
         if (updated != null && mounted) {
           setState(() {
             _stockByItemId[id] = updated;
@@ -1251,10 +1616,32 @@ class LiveVendorStudioPanelState extends State<LiveVendorStudioPanel> {
             setState(() => _syncCatalogRowAfterStockChange(id, snap));
           }
         }
+        final refRaw = itemRow.refCode?.trim() ?? refCtrl.text.trim();
+        if (refRaw.isNotEmpty) {
+          await LivePrepRefDetails.save(
+            refRaw,
+            LiveRefChipDetail(
+              title: titleCtrl.text.trim().isEmpty
+                  ? null
+                  : titleCtrl.text.trim(),
+              price: price,
+              quantity: qty < 1 ? 1 : qty,
+              clothingSize: selectedSize,
+              clothingColor: selectedColor,
+              isClothing: (selectedSize?.isNotEmpty ?? false) ||
+                  (selectedColor?.isNotEmpty ?? false),
+              quantityExplicit: true,
+              titleExplicit: titleCtrl.text.trim().isNotEmpty,
+            ),
+          );
+        }
+
         if (!mounted) return;
-        Navigator.pop(context);
+        if (quickEditSheetContext?.mounted == true) {
+          Navigator.pop(quickEditSheetContext!);
+        }
         if (andShow) {
-          var rowToShow = row;
+          var rowToShow = itemRow;
           for (final r in _catalogRows ?? const <LiveItemsRow>[]) {
             if ((r.id ?? '').trim() == id) {
               rowToShow = r;
@@ -1263,9 +1650,7 @@ class LiveVendorStudioPanelState extends State<LiveVendorStudioPanel> {
           }
           await _setActiveCatalogRow(rowToShow);
         } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Alterações guardadas.')),
-          );
+          FleaberSnack.show(context, 'Alterações guardadas.');
         }
         _logStudio(
           'catalog.edit',
@@ -1284,14 +1669,33 @@ class LiveVendorStudioPanelState extends State<LiveVendorStudioPanel> {
           error: e,
         );
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Não foi possível guardar agora.'),
-            ),
-          );
+          final err = e.toString();
+          final msg = err.contains('price_locked_after_sale')
+              ? 'Preço bloqueado após venda neste artigo.'
+              : err.contains('marketplace_missing_photo')
+                  ? 'Para o marketplace é obrigatória pelo menos uma foto.'
+                  : err.contains('marketplace_missing_description')
+                      ? 'Para o marketplace é obrigatória a descrição.'
+                      : err.contains('marketplace_missing_title')
+                          ? 'Para o marketplace é obrigatório o título.'
+                          : err.contains('marketplace_missing_price')
+                              ? 'Para o marketplace o preço mínimo é 1,00 €.'
+                              : err.contains('marketplace_missing_size')
+                                  ? 'Para o marketplace falta o tamanho.'
+                                  : err.contains('marketplace_missing_color')
+                                      ? 'Para o marketplace falta a cor.'
+                                      : 'Não foi possível guardar agora.';
+          await _showQuickEditErrorDialog(msg);
         }
       }
     }
+
+    var selectedSize = initialSize.isEmpty ? null : initialSize;
+    var selectedColor = initialColor.isEmpty ? null : initialColor;
+    var editPhotos = List<String>.from(initialPhotos);
+    var photosDirty = false;
+    var listOnMarketplace =
+        itemRow.isMarketplaceProduct && product?.listOnMarketplace == true;
 
     await showModalBottomSheet<void>(
       context: context,
@@ -1299,6 +1703,7 @@ class LiveVendorStudioPanelState extends State<LiveVendorStudioPanel> {
       backgroundColor: const Color(0xFF101518),
       shape: RoundedRectangleBorder(borderRadius: FleaberRadius.circularLg),
       builder: (ctx) {
+        quickEditSheetContext = ctx;
         return Padding(
           padding: EdgeInsets.only(
             left: 16,
@@ -1306,53 +1711,247 @@ class LiveVendorStudioPanelState extends State<LiveVendorStudioPanel> {
             top: 12,
             bottom: MediaQuery.viewInsetsOf(ctx).bottom + 16,
           ),
-          child: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  'Editar rápido',
-                  style: GoogleFonts.inter(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w800,
-                    fontSize: 16,
-                  ),
-                ),
-                const SizedBox(height: 12),
-                _quickField('Quantidade', qtyCtrl, keyboard: TextInputType.number),
-                _quickField('Preço (€)', priceCtrl),
-                _quickField('Tamanho', sizeCtrl),
-                _quickField('Cor / género', colorCtrl),
-                _quickField('Título', titleCtrl),
-                _quickField(
-                  'Ref',
-                  refCtrl,
-                  readOnly: lockRef,
-                ),
-                const SizedBox(height: 12),
-                Row(
+          child: StatefulBuilder(
+            builder: (ctx, setSheetState) {
+              rebuildQuickEditSheet = setSheetState;
+              return SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    Expanded(
-                      child: OutlinedButton(
-                        onPressed: () => save(andShow: false),
-                        child: const Text('Guardar'),
+                    Text(
+                      'Editar rápido',
+                      style: GoogleFonts.inter(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w800,
+                        fontSize: 16,
                       ),
                     ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: FilledButton(
-                        onPressed: () => save(andShow: true),
-                        style: FilledButton.styleFrom(
-                          backgroundColor: FleaberColors.teal,
-                        ),
-                        child: const Text('Guardar e mostrar'),
+                    const SizedBox(height: 12),
+                    Text(
+                      'Fotos',
+                      style: GoogleFonts.inter(
+                        color: Colors.white70,
+                        fontWeight: FontWeight.w700,
+                        fontSize: 12,
                       ),
+                    ),
+                    const SizedBox(height: 8),
+                    SizedBox(
+                      height: 84,
+                      child: ReorderableListView.builder(
+                        scrollDirection: Axis.horizontal,
+                        buildDefaultDragHandles: false,
+                        itemCount: editPhotos.length,
+                        onReorder: (oldIndex, newIndex) {
+                          setSheetState(() {
+                            photosDirty = true;
+                            if (newIndex > oldIndex) newIndex -= 1;
+                            final moved = editPhotos.removeAt(oldIndex);
+                            editPhotos.insert(newIndex, moved);
+                          });
+                        },
+                        itemBuilder: (ctx, i) {
+                          final url = editPhotos[i];
+                          return Padding(
+                            key: ValueKey(url),
+                            padding: const EdgeInsets.only(right: 8),
+                            child: Stack(
+                              children: [
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(8),
+                                  child: Image.network(
+                                    url,
+                                    width: 72,
+                                    height: 72,
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
+                                Positioned(
+                                  top: 0,
+                                  left: 0,
+                                  child: ReorderableDragStartListener(
+                                    index: i,
+                                    child: const Icon(
+                                      Icons.drag_handle_rounded,
+                                      color: Colors.white,
+                                      size: 18,
+                                    ),
+                                  ),
+                                ),
+                                Positioned(
+                                  top: 0,
+                                  right: 0,
+                                  child: IconButton(
+                                    visualDensity: VisualDensity.compact,
+                                    padding: EdgeInsets.zero,
+                                    iconSize: 18,
+                                    onPressed: () => setSheetState(() {
+                                      photosDirty = true;
+                                      editPhotos.removeAt(i);
+                                    }),
+                                    icon: const Icon(
+                                      Icons.close_rounded,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    OutlinedButton.icon(
+                      onPressed: () async {
+                        final urls = await _uploadQuickEditPhotos(
+                          remaining: 12 - editPhotos.length,
+                        );
+                        if (urls.isEmpty) return;
+                        if (!ctx.mounted) return;
+                        setSheetState(() {
+                          photosDirty = true;
+                          editPhotos.addAll(urls);
+                        });
+                      },
+                      icon: const Icon(Icons.add_photo_alternate_outlined),
+                      label: const Text('Adicionar fotos'),
+                    ),
+                    const SizedBox(height: 12),
+                    _quickField('Quantidade', qtyCtrl, keyboard: TextInputType.number),
+                    _quickField(
+                      'Preço (€)',
+                      priceCtrl,
+                      keyboard: const TextInputType.numberWithOptions(decimal: true),
+                      inputFormatters: [
+                        FilteringTextInputFormatter.allow(RegExp(r'[\d.,]')),
+                      ],
+                    ),
+                    _quickDropdown(
+                      label: 'Tamanho',
+                      value: selectedSize,
+                      items: ClothingOptionLists.sizes,
+                      onChanged: (v) => setSheetState(() => selectedSize = v),
+                    ),
+                    _quickDropdown(
+                      label: 'Cor',
+                      value: selectedColor,
+                      items: ClothingOptionLists.colors,
+                      onChanged: (v) => setSheetState(() => selectedColor = v),
+                    ),
+                    _quickField('Título', titleCtrl),
+                    _quickField(
+                      'Descrição',
+                      descCtrl,
+                      maxLines: 3,
+                    ),
+                    _quickField(
+                      'Ref',
+                      refCtrl,
+                      readOnly: lockRef,
+                    ),
+                    const SizedBox(height: 8),
+                    if (marketplaceInlineError.isNotEmpty) ...[
+                      Text(
+                        marketplaceInlineError,
+                        style: GoogleFonts.inter(
+                          color: const Color(0xFFFF8A80),
+                          fontSize: 11,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                    ],
+                    CheckboxListTile(
+                      value: listOnMarketplace,
+                      onChanged: (v) {
+                        if (v == true) {
+                          final priceRaw =
+                              priceCtrl.text.trim().replaceAll(',', '.');
+                          final price = double.tryParse(priceRaw);
+                          final isClothing = (selectedSize?.isNotEmpty ?? false) ||
+                              (selectedColor?.isNotEmpty ?? false) ||
+                              (prep?.isClothing ?? false);
+                          final missing = _quickEditMarketplaceMissing(
+                            title: titleCtrl.text.trim(),
+                            price: price,
+                            photos: effectiveMarketplacePhotos(editPhotos),
+                            description: descCtrl.text.trim(),
+                            isClothing: isClothing,
+                            size: selectedSize,
+                            color: selectedColor,
+                          );
+                          if (missing.isNotEmpty) {
+                            marketplaceInlineError = missing.length == 1
+                                ? 'Para o marketplace falta: ${missing.first}.'
+                                : 'Para o marketplace falta: ${missing.join(', ')}.';
+                            setSheetState(() {});
+                            return;
+                          }
+                        }
+                        marketplaceInlineError = '';
+                        setSheetState(() => listOnMarketplace = v == true);
+                      },
+                      activeColor: FleaberColors.teal,
+                      checkColor: Colors.white,
+                      contentPadding: EdgeInsets.zero,
+                      controlAffinity: ListTileControlAffinity.leading,
+                      title: Text(
+                        'Adicionar ao marketplace',
+                        style: GoogleFonts.inter(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 13,
+                        ),
+                      ),
+                      subtitle: Text(
+                        'Só publica se tiveres título, preço, foto e descrição.',
+                        style: GoogleFonts.inter(
+                          color: Colors.white54,
+                          fontSize: 11,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: OutlinedButton(
+                            onPressed: () => save(
+                              andShow: false,
+                              selectedSize: selectedSize,
+                              selectedColor: selectedColor,
+                              photos: editPhotos,
+                              photosChanged: photosDirty,
+                              listOnMarketplace: listOnMarketplace,
+                            ),
+                            child: const Text('Guardar'),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: FilledButton(
+                            onPressed: () => save(
+                              andShow: true,
+                              selectedSize: selectedSize,
+                              selectedColor: selectedColor,
+                              photos: editPhotos,
+                              photosChanged: photosDirty,
+                              listOnMarketplace: listOnMarketplace,
+                            ),
+                            style: FilledButton.styleFrom(
+                              backgroundColor: FleaberColors.teal,
+                            ),
+                            child: const Text('Guardar e mostrar'),
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
-              ],
-            ),
+              );
+            },
           ),
         );
       },
@@ -1360,10 +1959,29 @@ class LiveVendorStudioPanelState extends State<LiveVendorStudioPanel> {
 
     qtyCtrl.dispose();
     priceCtrl.dispose();
-    sizeCtrl.dispose();
-    colorCtrl.dispose();
     titleCtrl.dispose();
     refCtrl.dispose();
+  }
+
+  List<String> _quickEditMarketplaceMissing({
+    required String title,
+    required double? price,
+    required List<String> photos,
+    required String description,
+    required bool isClothing,
+    String? size,
+    String? color,
+  }) {
+    final missing = <String>[];
+    if (price == null || price < 1) missing.add('Preço mínimo 1,00 €');
+    if (title.trim().isEmpty) missing.add('Título');
+    if (photos.isEmpty) missing.add('Pelo menos uma foto');
+    if (description.trim().isEmpty) missing.add('Descrição');
+    if (isClothing) {
+      if (size == null || size.isEmpty) missing.add('Tamanho');
+      if (color == null || color.isEmpty) missing.add('Cor');
+    }
+    return missing;
   }
 
   Widget _quickField(
@@ -1371,6 +1989,8 @@ class LiveVendorStudioPanelState extends State<LiveVendorStudioPanel> {
     TextEditingController ctrl, {
     TextInputType? keyboard,
     bool readOnly = false,
+    int maxLines = 1,
+    List<TextInputFormatter>? inputFormatters,
   }) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
@@ -1378,6 +1998,8 @@ class LiveVendorStudioPanelState extends State<LiveVendorStudioPanel> {
         controller: ctrl,
         readOnly: readOnly,
         keyboardType: keyboard,
+        maxLines: maxLines,
+        inputFormatters: inputFormatters,
         style: GoogleFonts.inter(color: Colors.white, fontSize: 13),
         decoration: InputDecoration(
           labelText: label,
@@ -1391,6 +2013,47 @@ class LiveVendorStudioPanelState extends State<LiveVendorStudioPanel> {
             borderSide: const BorderSide(color: FleaberColors.teal),
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _quickDropdown({
+    required String label,
+    required String? value,
+    required List<String> items,
+    required ValueChanged<String?> onChanged,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: DropdownButtonFormField<String>(
+        value: value != null && items.contains(value) ? value : null,
+        decoration: InputDecoration(
+          labelText: label,
+          labelStyle: GoogleFonts.inter(color: Colors.white54, fontSize: 11),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: FleaberRadius.circularSm,
+            borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.2)),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: FleaberRadius.circularSm,
+            borderSide: const BorderSide(color: FleaberColors.teal),
+          ),
+        ),
+        dropdownColor: const Color(0xFF1A2329),
+        style: GoogleFonts.inter(color: Colors.white, fontSize: 13),
+        items: [
+          DropdownMenuItem<String>(
+            value: null,
+            child: Text('—', style: GoogleFonts.inter(color: Colors.white54)),
+          ),
+          ...items.map(
+            (s) => DropdownMenuItem<String>(
+              value: s,
+              child: Text(s),
+            ),
+          ),
+        ],
+        onChanged: onChanged,
       ),
     );
   }
@@ -1620,6 +2283,35 @@ class LiveVendorStudioPanelState extends State<LiveVendorStudioPanel> {
   }
 
   bool get _chatProminent => _panel == SellerLiveActivePanel.chat;
+
+  String? _itemAttributes(LiveItemsRow row) {
+    return LiveCatalogItemAttributes.subtitle(
+      clothingSize: row.clothingSize,
+      color: row.gender,
+    );
+  }
+
+  Future<List<String>> _uploadQuickEditPhotos({required int remaining}) async {
+    if (remaining < 1) return const [];
+    final picked = await FleaberGalleryPicker.pickImages(limit: remaining);
+    if (picked.isEmpty) return const [];
+    final uid = currentUserUid;
+    if (uid.isEmpty) return const [];
+    final urls = <String>[];
+    for (final file in picked) {
+      final bytes = await file.readAsBytes();
+      final safeName = file.name.replaceAll(RegExp(r'[^\w.\-]'), '_');
+      final path =
+          'live_item_photos/$uid/${DateTime.now().millisecondsSinceEpoch}_$safeName';
+      await SupaFlow.client.storage.from('chat_media').uploadBinary(
+            path,
+            bytes,
+            fileOptions: const FileOptions(upsert: false),
+          );
+      urls.add(SupaFlow.client.storage.from('chat_media').getPublicUrl(path));
+    }
+    return urls;
+  }
 
   String _itemTitle(LiveItemsRow row) {
     final title = (row.title ?? '').trim();
@@ -1978,6 +2670,125 @@ class LiveVendorStudioPanelState extends State<LiveVendorStudioPanel> {
       }
     }
     return _refForLiveItem(liveItemId);
+  }
+
+  String? _normalizeSystemChatItemLabel(String raw) {
+    var segment = raw.trim();
+    if (segment.isEmpty) return null;
+    if (segment.toLowerCase().startsWith('ref ')) {
+      segment = segment.substring(4).trim();
+    }
+    for (final row in _catalogRows ?? const <LiveItemsRow>[]) {
+      final code = (row.refCode ?? '').trim();
+      if (code.isEmpty) continue;
+      final formatted = LiveVendorRefDisplay.formatRef(code);
+      final refLabel = LiveVendorRefDisplay.refLabel(code);
+      if (segment == formatted ||
+          segment == code ||
+          segment == refLabel ||
+          raw.trim() == refLabel ||
+          raw.trim() == 'Ref $formatted') {
+        return LiveVendorRefDisplay.itemDisplayName(
+          title: row.title,
+          refCode: row.refCode,
+        );
+      }
+    }
+    if (!raw.trim().toLowerCase().startsWith('ref ')) {
+      return raw.trim();
+    }
+    return raw.trim();
+  }
+
+  Set<String> _visibleSystemMessageIds(List<LiveRoomMessage> msgs) {
+    final seenSocialKeys = <String>{};
+    final out = <String>{};
+    for (final m in msgs) {
+      if (m.kind != LiveRoomMessageKind.system) continue;
+      final id = m.id.trim();
+      if (id.isEmpty) continue;
+      if (LivePublicChatSystemLine.shouldRenderSystemMessage(
+        m.body,
+        seenSocialKeys: seenSocialKeys,
+        normalizeItemLabel: _normalizeSystemChatItemLabel,
+        resolveBuyerName: (raw) =>
+            _resolveSystemChatBuyerName(raw, m.userId),
+      )) {
+        out.add(id);
+      }
+    }
+    return out;
+  }
+
+  String? _resolveSystemChatBuyerName(String raw, String? userId) {
+    final trimmed = raw.trim();
+    if (trimmed.isNotEmpty &&
+        trimmed.toLowerCase() != 'utilizador' &&
+        trimmed.length > 4) {
+      return trimmed;
+    }
+    final uid = userId?.trim() ?? '';
+    if (uid.isNotEmpty) {
+      final cached = _chatUserNameCache[uid];
+      if (cached != null && cached.trim().isNotEmpty) return cached.trim();
+    }
+    return null;
+  }
+
+  void _trackSystemChatHighlights(List<LiveRoomMessage> msgs) {
+    var changed = false;
+    for (final m in msgs) {
+      if (m.kind == LiveRoomMessageKind.tip) {
+        final tipId = m.tipId?.trim() ?? '';
+        if (tipId.isEmpty || !_chatSystemEffectsPrimed) continue;
+        final key = 'tip:$tipId';
+        if (_systemHighlightMsgIds.add(key)) {
+          changed = true;
+          Future<void>.delayed(const Duration(seconds: 4), () {
+            _systemHighlightMsgIds.remove(key);
+            if (mounted) setState(() {});
+          });
+        }
+        continue;
+      }
+      if (m.kind != LiveRoomMessageKind.system) continue;
+      if (m.id.isEmpty) continue;
+      final parsed = LiveSystemChatHumanizer.parse(
+        m.body,
+        normalizeItemLabel: _normalizeSystemChatItemLabel,
+        resolveBuyerName: (raw) =>
+            _resolveSystemChatBuyerName(raw, m.userId),
+      );
+      if (!_chatSystemEffectsPrimed ||
+          !parsed.showInPublicChat ||
+          parsed.highlightDuration == null) {
+        continue;
+      }
+      if (_systemHighlightMsgIds.add(m.id)) {
+        changed = true;
+        final msgId = m.id;
+        final dur = parsed.highlightDuration!;
+        Future<void>.delayed(dur, () {
+          _systemHighlightMsgIds.remove(msgId);
+          if (mounted) setState(() {});
+        });
+      }
+    }
+    if (!_chatSystemEffectsPrimed) {
+      _chatSystemEffectsPrimed = true;
+    } else if (changed && mounted) {
+      setState(() {});
+    }
+  }
+
+  bool _shouldAnimateSystemHighlight(String messageId) {
+    final id = messageId.trim();
+    return id.isNotEmpty && _systemHighlightMsgIds.contains(id);
+  }
+
+  bool _shouldAnimateTipHighlight(String? tipId) {
+    final id = tipId?.trim() ?? '';
+    return id.isNotEmpty && _systemHighlightMsgIds.contains('tip:$id');
   }
 
   String? _staffLogToActivity(StaffActionLogsRow log) {
@@ -2458,6 +3269,7 @@ class LiveVendorStudioPanelState extends State<LiveVendorStudioPanel> {
             unawaited(_refreshLiveOrderMetrics());
             unawaited(_syncLiveOpsMetrics());
             unawaited(_loadReservationQueue(refreshMetrics: true));
+            unawaited(_refreshCatalogStockFromRealtime());
           });
     } catch (_) {}
   }
@@ -2652,7 +3464,6 @@ class LiveVendorStudioPanelState extends State<LiveVendorStudioPanel> {
 
     var inBag = snap?.pendingBagQty ?? 0;
     var external = 0;
-    var acceptedAwaitingPay = 0;
     var interested = snap?.pendingBagQty ?? 0;
     if (snap == null) {
       final pending = _reservationQueue.where(
@@ -2690,36 +3501,22 @@ class LiveVendorStudioPanelState extends State<LiveVendorStudioPanel> {
         }
       }
     }
-    for (final r in _reservationQueue) {
-      if ((r.liveItemId ?? '').trim() != itemId) continue;
-      if (r.status == 'accepted') {
-        acceptedAwaitingPay += r.requestedQty < 1 ? 1 : r.requestedQty;
-      }
-    }
-    var sold = snap?.soldConvertedQty ??
-        _reservationQueue
-            .where((r) =>
-                (r.liveItemId ?? '').trim() == itemId &&
-                r.status == 'converted')
-            .fold<int>(
-                0, (a, b) => a + (b.requestedQty < 1 ? 1 : b.requestedQty));
-    if (acceptedAwaitingPay > sold) sold = acceptedAwaitingPay;
+    final metrics = _metricsForLiveItem(active);
+    final reservationsTotal = metrics.reservations;
     final activeRow = _activeCatalogRow;
-    final availQty = snap?.availableQty;
+    var sold = snap?.soldConvertedQty ?? metrics.sold;
+    final availQty = snap?.availableQty ?? metrics.available;
     if (LiveVendorSellerCopy.isMarkedSold(activeRow?.status) &&
         sold < 1 &&
         (availQty == null || availQty <= 0)) {
       sold = 1;
     }
 
-    final metrics = _metricsForLiveItem(active);
-    final reservationsTotal = metrics.reservations;
-
     if (!mounted) return;
     setState(() {
       _activeOpsSnapshot = LiveItemOpsSnapshot(
-        available: metrics.available ?? availQty,
-        sold: metrics.sold > sold ? metrics.sold : sold,
+        available: availQty,
+        sold: sold,
         inBag: inBag,
         interested: reservationsTotal,
         externalRequests: external,
@@ -2817,6 +3614,47 @@ class LiveVendorStudioPanelState extends State<LiveVendorStudioPanel> {
         section: section ?? SellerOperationSection.queue,
       );
 
+  /// Harness Maestro (debug): abre Operação e expande categoria de reservas.
+  void prepareMaestroHarnessUi({
+    SellerOperationSection section = SellerOperationSection.queue,
+    String? expandCategory,
+  }) {
+    openOperationalQueue(section: section);
+    final wanted = _categoryFromHarnessParam(expandCategory);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      unawaited(
+        _refreshActiveOpsSnapshot(forceFetch: true).then((_) {
+          if (!mounted) return;
+          if (section != SellerOperationSection.queue) return;
+          if (wanted != null) {
+            if (_reservationsForCategory(wanted).isNotEmpty) {
+              setState(() => _expandedReservationCategory = wanted);
+            }
+            return;
+          }
+          for (final cat in _ReservationListCategory.values) {
+            if (_reservationsForCategory(cat).isNotEmpty) {
+              setState(() => _expandedReservationCategory = cat);
+              break;
+            }
+          }
+        }),
+      );
+    });
+  }
+
+  _ReservationListCategory? _categoryFromHarnessParam(String? raw) {
+    return switch (raw?.trim().toLowerCase()) {
+      'inbag' || 'in_bag' || 'nosaco' => _ReservationListCategory.inBag,
+      'pending' || 'pendentes' => _ReservationListCategory.pending,
+      'accepted' || 'aceites' => _ReservationListCategory.accepted,
+      'external' || 'externos' => _ReservationListCategory.external,
+      'unpaid' || 'sempagamento' => _ReservationListCategory.unpaid,
+      _ => null,
+    };
+  }
+
   int get queuePendingBadge => _computeOpsTotals().actionPendingCount;
 
   Future<void> _handleQuickAction(String id) async {
@@ -2882,9 +3720,28 @@ class LiveVendorStudioPanelState extends State<LiveVendorStudioPanel> {
           .listen((_) {
             unawaited(_loadReservationQueue());
             unawaited(_loadCatalogRows(silent: true));
+            unawaited(_refreshCatalogStockFromRealtime());
             unawaited(_refreshActiveOpsSnapshot(forceFetch: true));
             unawaited(_syncLiveOpsMetrics());
             unawaited(_refreshActivityEvents());
+            if (mounted) setState(() {});
+          });
+    } catch (_) {}
+  }
+
+  /// Reservas noutros directos/gravados (mesma ref) → actualizar stock dos cards.
+  void _subscribeSellerReservationRealtime() {
+    final sellerId = widget.sellerId.trim();
+    if (sellerId.isEmpty) return;
+    try {
+      _sellerReservationRealtimeSub?.cancel();
+      _sellerReservationRealtimeSub = SupaFlow.client
+          .from('live_reservation_requests')
+          .stream(primaryKey: ['id'])
+          .eq('seller_id', sellerId)
+          .listen((_) {
+            unawaited(_refreshCatalogStockFromRealtime());
+            unawaited(_syncLiveOpsMetrics());
             if (mounted) setState(() {});
           });
     } catch (_) {}
@@ -2966,7 +3823,12 @@ class LiveVendorStudioPanelState extends State<LiveVendorStudioPanel> {
     _catalogReloadDebounce?.cancel();
     _catalogListScroll.dispose();
     _reservationRealtimeSub?.cancel();
+    _sellerReservationRealtimeSub?.cancel();
     _reservationPollTimer?.cancel();
+    _catalogStockPollTimer?.cancel();
+    _rafflePollTimer?.cancel();
+    _raffleRealtimeSub?.cancel();
+    _raffleEntriesRealtimeSub?.cancel();
     _catalogRealtimeSub?.cancel();
     _ordersRealtimeSub?.cancel();
     _tipsRealtimeSub?.cancel();
@@ -3147,6 +4009,14 @@ class LiveVendorStudioPanelState extends State<LiveVendorStudioPanel> {
                 '❌ Recusaste o pedido de $q un. · $label (acima do stock na live)',
             senderLabel: 'Sistema',
           );
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Pedido recusado — stock insuficiente'),
+                duration: Duration(seconds: 4),
+              ),
+            );
+          }
         }
       }
       await _loadReservationQueue(refreshMetrics: true);
@@ -4074,6 +4944,7 @@ class LiveVendorStudioPanelState extends State<LiveVendorStudioPanel> {
         initialData: List.unmodifiable(room.messages),
         builder: (context, snap) {
           final msgs = (snap.data ?? const []).where(_passesFilter).toList();
+          final visibleSystemIds = _visibleSystemMessageIds(msgs);
           if (msgs.isEmpty) {
             return Align(
               alignment: Alignment.centerLeft,
@@ -4094,27 +4965,24 @@ class LiveVendorStudioPanelState extends State<LiveVendorStudioPanel> {
             itemBuilder: (context, index) {
               final m = msgs[msgs.length - 1 - index];
               if (m.kind == LiveRoomMessageKind.tip) {
-                return Padding(
-                  padding: EdgeInsets.only(bottom: _chatProminent ? 6 : 4),
-                  child: LiveTipGiftBubble(
-                    amountEur: m.tipAmountEur ?? 0,
-                    showPrivacyNote: false,
-                    contributorLabel:
-                        m.tipId != null ? _tipContributors[m.tipId!] : null,
-                  ),
+                return LiveTipGiftBubble(
+                  amountEur: m.tipAmountEur ?? 0,
+                  showPrivacyNote: false,
+                  contributorLabel:
+                      m.tipId != null ? _tipContributors[m.tipId!] : null,
+                  animateHighlight: _shouldAnimateTipHighlight(m.tipId),
                 );
               }
               if (m.kind == LiveRoomMessageKind.system) {
-                return Padding(
-                  padding: EdgeInsets.only(bottom: _chatProminent ? 5 : 3),
-                  child: Text(
-                    m.body,
-                    style: GoogleFonts.inter(
-                      color: Colors.white.withValues(alpha: 0.72),
-                      fontSize: _chatProminent ? 10.5 : 9.5,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
+                if (!visibleSystemIds.contains(m.id)) {
+                  return const SizedBox.shrink();
+                }
+                return LivePublicChatSystemLine.fromBody(
+                  m.body,
+                  normalizeItemLabel: _normalizeSystemChatItemLabel,
+                  resolveBuyerName: (raw) =>
+                      _resolveSystemChatBuyerName(raw, m.userId),
+                  animateHighlight: _shouldAnimateSystemHighlight(m.id),
                 );
               }
               final label = _chatSenderLabel(m);
@@ -4423,7 +5291,7 @@ class LiveVendorStudioPanelState extends State<LiveVendorStudioPanel> {
       children: [
         if (walletTotal > 0.009) ...[
           Text(
-            'Carteira deste directo: '
+            'Ganhos desta live: '
             '${walletTotal.toStringAsFixed(2).replaceAll('.', ',')} €',
             style: GoogleFonts.inter(
               color: const Color(0xFF6ED8DE),
@@ -4704,6 +5572,15 @@ class LiveVendorStudioPanelState extends State<LiveVendorStudioPanel> {
             onTapHelpers: () => unawaited(_openTeamSheet()),
             onTapUrgent: () =>
                 setOperationSection(SellerOperationSection.queue),
+          ),
+          LiveRaffleSellerOpsBar(
+            state: _raffleState,
+            participantCount: _raffleParticipantCount,
+            loading: _raffleActionLoading,
+            onCreate: () => unawaited(_openRaffleSellerSheet()),
+            onCloseEntries: () => unawaited(_closeRaffleEntries()),
+            onDraw: () => unawaited(_drawRaffle()),
+            onCancel: () => unawaited(_cancelRaffle()),
           ),
           LiveVendorOperationSectionTabs(
             selected: _operationSection,
@@ -5200,6 +6077,31 @@ class LiveVendorStudioPanelState extends State<LiveVendorStudioPanel> {
                   ),
                 ],
               ),
+              if (itemRow != null &&
+                  !LiveItemPriceGate.hasPayableUnitPrice(liveItemPrice: price))
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 8),
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: TextButton.icon(
+                      onPressed: () =>
+                          unawaited(_showCatalogQuickEditSheet(itemRow!)),
+                      icon: const Icon(
+                        Icons.euro_rounded,
+                        color: Colors.white,
+                        size: 16,
+                      ),
+                      label: Text(
+                        'Definir preço',
+                        style: GoogleFonts.inter(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w800,
+                          fontSize: 11,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
               const SizedBox(height: 8),
               Row(
                 children: [
@@ -5274,6 +6176,7 @@ class LiveVendorStudioPanelState extends State<LiveVendorStudioPanel> {
         LiveVendorCompactProductCard(
           refLabel: _itemRefLabel(activeRow),
           title: _itemTitle(activeRow),
+          attributesLine: _itemAttributes(activeRow),
           priceLabel: _itemPriceLabel(activeRow),
           photoUrl: activeRow.photoUrl,
           stats: stats,
@@ -5375,6 +6278,7 @@ class LiveVendorStudioPanelState extends State<LiveVendorStudioPanel> {
         LiveVendorCurrentProductPill(
           refLabel: _itemRefLabel(activeRow),
           title: _itemTitle(activeRow),
+          attributesLine: _itemAttributes(activeRow),
           priceLabel: _itemPriceLabel(activeRow),
           onTap: panelOpen
               ? null
@@ -5798,6 +6702,7 @@ class LiveVendorStudioPanelState extends State<LiveVendorStudioPanel> {
         return LiveVendorCatalogQueueCard(
           title: title,
           refLabel: ref,
+          attributesLine: _itemAttributes(row),
           priceLabel: price,
           photoUrl: row.photoUrl,
           metrics: metrics,

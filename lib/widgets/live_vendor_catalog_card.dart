@@ -42,6 +42,7 @@ class LiveVendorCatalogQueueCard extends StatelessWidget {
     super.key,
     required this.title,
     required this.refLabel,
+    this.attributesLine,
     this.priceLabel,
     this.photoUrl,
     required this.metrics,
@@ -54,6 +55,7 @@ class LiveVendorCatalogQueueCard extends StatelessWidget {
 
   final String title;
   final String refLabel;
+  final String? attributesLine;
   final String? priceLabel;
   final String? photoUrl;
   final LiveVendorCatalogItemMetrics metrics;
@@ -127,6 +129,19 @@ class LiveVendorCatalogQueueCard extends StatelessWidget {
                       height: 1.15,
                     ),
                   ),
+                  if (attributesLine != null && attributesLine!.isNotEmpty) ...[
+                    const SizedBox(height: 2),
+                    Text(
+                      attributesLine!,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: GoogleFonts.inter(
+                        color: Colors.white.withValues(alpha: 0.62),
+                        fontSize: 9,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
                   if (priceLabel != null && priceLabel!.isNotEmpty) ...[
                     const SizedBox(height: 2),
                     Text(

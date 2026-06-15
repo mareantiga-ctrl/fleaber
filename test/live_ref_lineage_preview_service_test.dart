@@ -91,6 +91,8 @@ void main() {
           {
             'logical_item_id': 'uuid-puzzle',
             'display_title': 'Puzzle Star Wars',
+            'history_status': 'active',
+            'can_continue': true,
             'open_reservation_count': 2,
             'open_reserved_units': 3,
             'completed_purchase_count': 0,
@@ -100,6 +102,8 @@ void main() {
           {
             'logical_item_id': 'uuid-boneca',
             'display_title': 'Boneca Barbie',
+            'history_status': 'active',
+            'can_continue': true,
             'open_reservation_count': 0,
             'open_reserved_units': 0,
             'completed_purchase_count': 5,
@@ -116,9 +120,10 @@ void main() {
 
       expect(report.refCode, '#15');
       expect(report.lineages.length, 2);
+      expect(report.shouldPromptLineageDecision, isTrue);
       expect(report.needsSheetForDraft, isTrue);
       expect(report.lineages.first.badgeLabel(), contains('reservas abertas'));
-      expect(report.lineages[1].badgeLabel(), contains('vendas concluídas'));
+      expect(report.lineages[1].badgeLabel(), contains('vendas globais'));
     });
 
     test('draft com logical_item_id → sem sheet', () {
@@ -133,7 +138,57 @@ void main() {
           'needs_lineage_decision': false,
         },
       });
+      expect(report.shouldPromptLineageDecision, isFalse);
       expect(report.needsSheetForDraft, isFalse);
+    });
+
+    test('histórico relevante mas draft já com logical_item_id → L13', () {
+      final report = LiveRefLineagePreviewReport.fromRpc({
+        'ok': true,
+        'ref_code': '#15',
+        'should_show_sheet': true,
+        'summary': {'lineage_count': 2},
+        'lineages': [
+          {
+            'logical_item_id': 'uuid-a',
+            'display_title': 'Puzzle',
+            'open_reservation_count': 1,
+            'open_reserved_units': 1,
+            'completed_purchase_count': 0,
+            'completed_units': 0,
+            'last_origin': 'Gravado',
+          },
+        ],
+        'draft': {
+          'live_item_id': 'draft-item',
+          'logical_item_id': 'uuid-chosen',
+          'needs_lineage_decision': false,
+        },
+      });
+      expect(report.shouldPromptLineageDecision, isFalse);
+    });
+
+    test('parse lineages quando RPC devolve um único Map', () {
+      final rows = parseLineagesFromRpc({
+        'logical_item_id': 'uuid-only',
+        'display_title': 'Ref 1',
+        'open_reservation_count': 0,
+        'open_reserved_units': 0,
+        'completed_purchase_count': 0,
+        'completed_units': 0,
+        'last_origin': 'Gravado',
+      });
+      expect(rows.length, 1);
+      expect(rows.first.displayTitle, 'Ref 1');
+    });
+
+    test('RPC ok:false → sem sheet nem upsert implícito', () {
+      final report = LiveRefLineagePreviewReport.fromRpc({
+        'ok': false,
+        'error': 'not_allowed',
+      });
+      expect(report.isOk, isFalse);
+      expect(report.shouldPromptLineageDecision, isFalse);
     });
   });
 

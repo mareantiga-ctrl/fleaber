@@ -12,6 +12,7 @@ import '/utils/mux_urls.dart';
 import '/utils/fleaber_screen_wake.dart';
 import '/widgets/batata_cached_image.dart';
 import '/widgets/live_hls_viewer.dart';
+import '/utils/live_system_chat_humanizer.dart';
 import '/widgets/live_public_chat_line.dart';
 import '/widgets/live_tip_gift_bubble.dart';
 import '/widgets/profile_avatar.dart';
@@ -21,12 +22,16 @@ import '/live_tip/live_tip_flow.dart';
 import '/auth/supabase_auth/auth_util.dart';
 import '/utils/live_reservation_queue_service.dart';
 import '/utils/live_catalog_stock_service.dart';
+import '/utils/live_catalog_item_attributes.dart';
+import '/utils/live_item_price_gate.dart';
 import '/utils/fleaber_stripe_checkout_context.dart';
 import '/utils/fleaber_stripe_tip_context.dart';
 import '/utils/live_in_stream_checkout.dart';
 import '/widgets/live_bag_checkout_sheet.dart';
 import '/widgets/live_bag_sheet.dart';
 import '/widgets/live_vendor_ops_ui.dart';
+import '/utils/live_raffle_service.dart';
+import '/widgets/live_raffle_buyer_card.dart';
 import '/order_cancel_eligibility.dart';
 import '/index.dart';
 import 'package:flutter/foundation.dart';
@@ -60,6 +65,7 @@ class FleaberLivePlayerWidget extends StatefulWidget {
     this.playbackId,
     this.isLive,
     this.sellerId,
+    this.raffleRef,
   });
 
   final String? liveId;
@@ -68,6 +74,8 @@ class FleaberLivePlayerWidget extends StatefulWidget {
   final bool? isLive;
   /// Vendedor (Home passa logo — gorjeta não depende da query lives).
   final String? sellerId;
+  /// Código referral da Rifa da Live (`?ref=` no link partilhado).
+  final String? raffleRef;
 
   static String routeName = 'FleaberLivePlayer';
   static String routePath = '/fleaberLivePlayer';
@@ -120,6 +128,7 @@ class _FleaberLivePlayerWidgetState extends State<FleaberLivePlayerWidget>
   bool _chatLoadOlderBusy = false;
 
   List<LiveItemsRow>? _catalogRows;
+  Map<String, LiveCatalogStockSnapshot> _catalogStockByItemId = {};
   List<LiveItemShowEventsRow> _catalogShowEvents = [];
   String? _vodActiveItemId;
   bool _catalogLoading = true;
@@ -138,6 +147,7 @@ class _FleaberLivePlayerWidgetState extends State<FleaberLivePlayerWidget>
   LiveRoomService? _liveRoom;
   LivePrivateRoomService? _privateRoom;
   RealtimeChannel? _catalogChannel;
+  RealtimeChannel? _sellerCatalogStockChannel;
   RealtimeChannel? _buyerCheckoutChannel;
   RealtimeChannel? _liveBagChannel;
   int _liveViewerCount = 0;
@@ -151,6 +161,23 @@ class _FleaberLivePlayerWidgetState extends State<FleaberLivePlayerWidget>
   final Set<String> _seenTipIds = <String>{};
   final Set<String> _seenAcceptBroadcastMsgIds = <String>{};
   bool _chatAcceptBroadcastsPrimed = false;
+  final Set<String> _seenPriceDefinedMsgIds = <String>{};
+  bool _chatPriceBroadcastsPrimed = false;
+  final Set<String> _systemHighlightMsgIds = <String>{};
+  final Set<String> _seenBackofficeSnackMsgIds = <String>{};
+  bool _chatSystemEffectsPrimed = false;
+  _PriceDefinedBroadcastNotice? _priceDefinedNotice;
+  Timer? _priceDefinedNoticeTimer;
+  Timer? _catalogActivePollTimer;
+  Timer? _catalogStockPollTimer;
+  LiveRaffleState? _raffleState;
+  bool _raffleRefVisitRegistered = false;
+  int? _raffleParticipantCount;
+  bool _raffleJoinLoading = false;
+  bool? _isFollowingSeller;
+  Timer? _rafflePollTimer;
+  RealtimeChannel? _raffleChannel;
+  StreamSubscription<List<Map<String, dynamic>>>? _raffleStreamSub;
   bool _playbackIsLive = true;
   Duration _playbackPosition = Duration.zero;
   DateTime? _liveChatAnchor;
@@ -248,7 +275,7 @@ class _FleaberLivePlayerWidgetState extends State<FleaberLivePlayerWidget>
     }
   }
 
-  Future<void> _initCatalog() async {
+  Future<void> _initCatalog({bool skipCache = false}) async {
     final liveId = widget.liveId?.trim() ?? '';
     final hintSeen = await LiveCatalogCache.scrollHintDismissed();
 
@@ -262,7 +289,7 @@ class _FleaberLivePlayerWidgetState extends State<FleaberLivePlayerWidget>
       return;
     }
 
-    final cached = await LiveCatalogCache.read(liveId);
+    final cached = skipCache ? null : await LiveCatalogCache.read(liveId);
     if (cached != null && cached.isNotEmpty && mounted) {
       setState(() {
         _catalogRows = cached;
@@ -294,6 +321,8 @@ class _FleaberLivePlayerWidgetState extends State<FleaberLivePlayerWidget>
         _catalogLoading = false;
         _showCatalogScrollHint = !hintSeen && rows.length > 1;
       });
+      unawaited(_refreshCatalogStock(rows));
+      _startCatalogStockPoll();
       _notifyActiveCatalogItemIfChanged(rows);
       _syncVodCatalogHighlight(force: true);
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -361,10 +390,12 @@ class _FleaberLivePlayerWidgetState extends State<FleaberLivePlayerWidget>
         }
       }
       await _seedCurrentUserProfilePhoto();
+      await _refreshFollowState();
       if (mounted) {
         setState(() {});
         _ensureLiveClock();
         _subscribeBuyerCheckoutRealtime(liveId);
+        _subscribeSellerCatalogStockRealtime();
       }
       _ensurePrivateRoom();
       if (liveId.isNotEmpty) {
@@ -482,18 +513,8 @@ class _FleaberLivePlayerWidgetState extends State<FleaberLivePlayerWidget>
     context.safePop();
   }
 
-  void _notifyActiveCatalogItemIfChanged(List<LiveItemsRow> rows) {
-    if (_isVodReplay) return;
-    String? activeId;
-    for (final r in rows) {
-      if (r.isActive == true) {
-        activeId = r.id?.trim();
-        break;
-      }
-    }
-    if (activeId == null || activeId.isEmpty) return;
-    if (activeId == _lastTrackedActiveCatalogId) return;
-    _lastTrackedActiveCatalogId = activeId;
+  void _showCatalogSpotlight(String activeId, List<LiveItemsRow> rows) {
+    if (activeId.isEmpty || _isVodReplay) return;
     _spotlightTimer?.cancel();
     if (!_catalogMinimized) {
       setState(() => _spotlightItemId = null);
@@ -505,9 +526,7 @@ class _FleaberLivePlayerWidgetState extends State<FleaberLivePlayerWidget>
       }
       return;
     }
-    setState(() {
-      _spotlightItemId = activeId;
-    });
+    setState(() => _spotlightItemId = activeId);
     _spotlightTimer = Timer(const Duration(seconds: 10), () {
       if (mounted) setState(() => _spotlightItemId = null);
     });
@@ -517,6 +536,107 @@ class _FleaberLivePlayerWidgetState extends State<FleaberLivePlayerWidget>
         if (mounted) _scrollCatalogToIndex(idx);
       });
     }
+  }
+
+  void _notifyActiveCatalogItemIfChanged(List<LiveItemsRow> rows) {
+    if (_isVodReplay) return;
+    String? activeId;
+    for (final r in rows) {
+      if (r.isActive == true) {
+        activeId = r.id?.trim();
+        break;
+      }
+    }
+    if (activeId == null || activeId.isEmpty) return;
+    if (activeId == _lastTrackedActiveCatalogId && !_catalogMinimized) return;
+    _lastTrackedActiveCatalogId = activeId;
+    _showCatalogSpotlight(activeId, rows);
+  }
+
+  void _patchCatalogActiveItem(String activeItemId, {bool force = false}) {
+    final id = activeItemId.trim();
+    if (id.isEmpty) return;
+    final rows = _catalogRows;
+    if (rows == null || rows.isEmpty) return;
+    var changed = false;
+    for (final r in rows) {
+      final rid = r.id?.trim() ?? '';
+      final shouldBeActive = rid == id;
+      if (r.isActive != shouldBeActive) {
+        r.isActive = shouldBeActive;
+        changed = true;
+      }
+    }
+    if (!mounted) return;
+    if (changed || force) {
+      _lastTrackedActiveCatalogId = null;
+      setState(() {});
+      _showCatalogSpotlight(id, rows);
+    }
+  }
+
+  void _onCatalogShowEvent(Map<String, dynamic> record) {
+    if (_isVodReplay) return;
+    final itemId = record['live_item_id']?.toString().trim() ?? '';
+    if (itemId.isEmpty) return;
+    _patchCatalogActiveItem(itemId, force: true);
+    unawaited(_initCatalog(skipCache: true));
+  }
+
+  Future<void> _syncActiveCatalogItemFromServer(String liveId) async {
+    if (_isVodReplay || liveId.isEmpty || !mounted) return;
+    try {
+      final rows = await LiveItemsTable().queryRows(
+        queryFn: (q) => q.eqOrNull('live_id', liveId),
+      );
+      String? activeId;
+      for (final r in rows) {
+        if (r.isActive == true) {
+          activeId = r.id?.trim();
+          break;
+        }
+      }
+      if (activeId != null && activeId.isNotEmpty) {
+        _patchCatalogActiveItem(activeId, force: true);
+      } else {
+        final local = _catalogRows;
+        if (local != null) {
+          var cleared = false;
+          for (final r in local) {
+            if (r.isActive == true) {
+              r.isActive = false;
+              cleared = true;
+            }
+          }
+          if (cleared && mounted) setState(() {});
+        }
+      }
+    } catch (_) {}
+  }
+
+  void _startCatalogActivePoll(String liveId) {
+    if (liveId.isEmpty || _isVodReplay) return;
+    _catalogActivePollTimer?.cancel();
+    _catalogActivePollTimer = Timer.periodic(const Duration(seconds: 2), (_) {
+      unawaited(_syncActiveCatalogItemFromServer(liveId));
+    });
+  }
+
+  void _startCatalogStockPoll() {
+    _catalogStockPollTimer?.cancel();
+    _catalogStockPollTimer = Timer.periodic(const Duration(seconds: 2), (_) {
+      final rows = _catalogRows;
+      if (rows == null || rows.isEmpty) return;
+      unawaited(_refreshCatalogStock(rows));
+    });
+  }
+
+  void _onLiveItemRealtimeChange(PostgresChangePayload payload) {
+    if (_isVodReplay) return;
+    final liveId = widget.liveId?.trim() ?? '';
+    if (liveId.isEmpty) return;
+    unawaited(_syncActiveCatalogItemFromServer(liveId));
+    unawaited(_initCatalog(skipCache: true));
   }
 
   LiveItemsRow? _catalogRowById(String? id) {
@@ -542,6 +662,11 @@ class _FleaberLivePlayerWidgetState extends State<FleaberLivePlayerWidget>
   Widget _buildSpotlightCatalogCard(LiveItemsRow row) {
     final unavailable = _isCatalogRowUnavailable(row);
     final badge = _catalogUnavailableBadge(row);
+    final itemId = row.id?.trim() ?? '';
+    final stockSnap =
+        itemId.isNotEmpty ? _catalogStockByItemId[itemId] : null;
+    final reservationsQty = _reservationsCountFromStock(stockSnap);
+    final availableNow = stockSnap?.availableQty;
     return Material(
       color: Colors.transparent,
       child: Container(
@@ -605,6 +730,26 @@ class _FleaberLivePlayerWidgetState extends State<FleaberLivePlayerWidget>
                       fontSize: 14,
                     ),
                   ),
+                  if (LiveCatalogItemAttributes.subtitle(
+                        clothingSize: row.clothingSize,
+                        color: row.gender,
+                      ) !=
+                      null) ...[
+                    const SizedBox(height: 2),
+                    Text(
+                      LiveCatalogItemAttributes.subtitle(
+                        clothingSize: row.clothingSize,
+                        color: row.gender,
+                      )!,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: GoogleFonts.inter(
+                        color: Colors.white.withValues(alpha: 0.72),
+                        fontSize: 10,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
                   if (_formatPriceEur(row) != null) ...[
                     const SizedBox(height: 4),
                     Text(
@@ -614,6 +759,36 @@ class _FleaberLivePlayerWidgetState extends State<FleaberLivePlayerWidget>
                         fontWeight: FontWeight.w900,
                         fontSize: 16,
                       ),
+                    ),
+                  ],
+                  if (!unavailable &&
+                      (reservationsQty > 0 || availableNow != null)) ...[
+                    const SizedBox(height: 6),
+                    Row(
+                      children: [
+                        if (reservationsQty > 0)
+                          Expanded(
+                            child: Text(
+                              'Reservas: $reservationsQty',
+                              style: GoogleFonts.inter(
+                                color: Colors.white.withValues(alpha: 0.78),
+                                fontSize: 10,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ),
+                        if (availableNow != null)
+                          Expanded(
+                            child: Text(
+                              'Disp: $availableNow',
+                              style: GoogleFonts.inter(
+                                color: const Color(0xFF00A3AD),
+                                fontSize: 10,
+                                fontWeight: FontWeight.w800,
+                              ),
+                            ),
+                          ),
+                      ],
                     ),
                   ],
                 ],
@@ -1201,15 +1376,13 @@ class _FleaberLivePlayerWidgetState extends State<FleaberLivePlayerWidget>
 
   String _resolveChatBuyerName(String raw, String? userId) {
     final trimmed = raw.trim();
-    if (trimmed.isNotEmpty && trimmed.toLowerCase() != 'utilizador') {
-      return trimmed;
-    }
+    if (!_isPlaceholderChatName(trimmed)) return trimmed;
     final uid = userId?.trim() ?? '';
     if (uid.isEmpty) {
       return trimmed.isEmpty ? 'Utilizador' : trimmed;
     }
     final cached = _userNameCacheById[uid]?.trim() ?? '';
-    if (cached.isNotEmpty && cached.toLowerCase() != 'utilizador') {
+    if (cached.isNotEmpty && !_isPlaceholderChatName(cached)) {
       return cached;
     }
     if (uid == currentUserUid) {
@@ -1219,6 +1392,13 @@ class _FleaberLivePlayerWidgetState extends State<FleaberLivePlayerWidget>
     return trimmed.isEmpty ? 'Utilizador' : trimmed;
   }
 
+  static bool _isPlaceholderChatName(String? raw) {
+    final trimmed = raw?.trim() ?? '';
+    if (trimmed.isEmpty) return true;
+    final lower = trimmed.toLowerCase();
+    return lower == 'utilizador' || lower == 'user' || trimmed.length <= 3;
+  }
+
   String _resolveHumanChatLabel({
     required String? senderLabel,
     required String? userId,
@@ -1226,12 +1406,12 @@ class _FleaberLivePlayerWidgetState extends State<FleaberLivePlayerWidget>
   }) {
     final raw = senderLabel?.trim() ?? '';
     final uid = userId?.trim() ?? '';
-    if (raw.isNotEmpty && raw.toLowerCase() != 'utilizador') return raw;
+    if (!_isPlaceholderChatName(raw)) return raw;
 
     final cached = uid.isNotEmpty ? _userNameCacheById[uid]?.trim() : null;
     if (cached != null &&
         cached.isNotEmpty &&
-        cached.toLowerCase() != 'utilizador') {
+        !_isPlaceholderChatName(cached)) {
       return cached;
     }
 
@@ -1272,9 +1452,28 @@ class _FleaberLivePlayerWidgetState extends State<FleaberLivePlayerWidget>
     }
   }
 
+  void _seedChatIdentityFromMessages(List<LiveRoomMessage> msgs) {
+    var changed = false;
+    for (final m in msgs) {
+      final uid = m.userId?.trim();
+      if (uid == null || uid.isEmpty) continue;
+      final label = m.senderLabel?.trim() ?? '';
+      if (!_isPlaceholderChatName(label)) {
+        final cached = _userNameCacheById[uid];
+        if (_isPlaceholderChatName(cached)) {
+          _userNameCacheById[uid] = label;
+          changed = true;
+        }
+      }
+    }
+    if (changed && mounted) setState(() {});
+  }
+
   void _ensureUserNamesResolved(List<LiveRoomMessage> msgs) {
+    _seedChatIdentityFromMessages(msgs);
+
     final now = DateTime.now();
-    if (now.difference(_lastUserNameFetchAt) < const Duration(milliseconds: 350)) {
+    if (now.difference(_lastUserNameFetchAt) < const Duration(milliseconds: 200)) {
       return;
     }
 
@@ -1285,8 +1484,7 @@ class _FleaberLivePlayerWidgetState extends State<FleaberLivePlayerWidget>
         .where((id) => !_userNameFetchInFlight.contains(id))
         .where((id) {
           if (!_userNameCacheById.containsKey(id)) return true;
-          final cached = _userNameCacheById[id]?.trim().toLowerCase() ?? '';
-          if (cached.isEmpty || cached == 'utilizador') return true;
+          if (_isPlaceholderChatName(_userNameCacheById[id])) return true;
           final photo = _userPhotoCacheById[id];
           return photo == null || photo.trim().isEmpty;
         })
@@ -1311,12 +1509,21 @@ class _FleaberLivePlayerWidgetState extends State<FleaberLivePlayerWidget>
           final pid = p.id?.trim();
           if (pid == null || pid.isEmpty) continue;
           final full = p.fullName?.trim();
-          if (full != null && full.isNotEmpty) {
+          if (full != null && full.isNotEmpty && !_isPlaceholderChatName(full)) {
             names[pid] = full;
           }
           final photo = p.photoUrl?.trim() ?? '';
           if (photo.isNotEmpty) {
             photos[pid] = photo;
+          }
+        }
+        for (final m in msgs) {
+          final uid = m.userId?.trim();
+          if (uid == null || !ids.contains(uid)) continue;
+          if (names.containsKey(uid)) continue;
+          final label = m.senderLabel?.trim() ?? '';
+          if (!_isPlaceholderChatName(label)) {
+            names[uid] = label;
           }
         }
         if (!mounted) return;
@@ -1582,91 +1789,22 @@ class _FleaberLivePlayerWidgetState extends State<FleaberLivePlayerWidget>
     return _truncateUiText(name, max: 24);
   }
 
-  static String _formatSystemMessageUi(String body) {
-    final text = body.trim().replaceAll(RegExp(r'\s+'), ' ');
-    if (text.isEmpty) return text;
-
-    final reserve = RegExp(r'^(?:🛍️\s*)?(.*?)\s+reservou\s+(.*)$').firstMatch(text);
-    if (reserve != null) {
-      final name = _truncateUiText(reserve.group(1) ?? 'Utilizador', max: 20);
-      final label = _truncateUiText(
-        (reserve.group(2) ?? '').replaceAll('para o saco da live', '').trim(),
-        max: 24,
-      );
-      return label.isEmpty ? '🛍️ $name reservou no saco' : '🛍️ $name reservou $label';
-    }
-
-    final bought = RegExp(r'^(?:✅\s*)?(.*?)\s+comprou\s+(.*)$').firstMatch(text);
-    if (bought != null) {
-      final name = _truncateUiText(bought.group(1) ?? 'Utilizador', max: 20);
-      final label = _truncateUiText((bought.group(2) ?? '').trim(), max: 24);
-      return label.isEmpty ? '✅ $name comprou' : '✅ $name comprou $label';
-    }
-
-    final cleaned = text
-        .replaceAll(RegExp(r'[0-9a-fA-F]{8}-[0-9a-fA-F-]{20,}'), '')
-        .replaceAll(RegExp(r'\s+'), ' ')
-        .trim();
-    return _truncateUiText(cleaned, max: 72);
+  Future<ProductsRow?> _resolveProductForLiveItem(LiveItemsRow row) async {
+    return LiveItemPriceGate.resolveProductForCheckout(
+      itemRow: row,
+      sellerId: _sellerId,
+      liveId: widget.liveId,
+    );
   }
 
-  Future<ProductsRow?> _resolveProductForLiveItem(LiveItemsRow row) async {
-    final sellerId = _sellerId?.trim() ?? '';
-    if (sellerId.isEmpty) return null;
-
-    final linkedProductId = row.productId?.trim();
-    if (linkedProductId != null && linkedProductId.isNotEmpty) {
-      final byId = await ProductsTable().queryRows(
-        queryFn: (q) => q.eqOrNull('id', linkedProductId),
-        limit: 1,
-      );
-      if (byId.isNotEmpty) return byId.first;
-    }
-
-    final checkoutId = row.checkoutProductId?.trim();
-    if (checkoutId != null && checkoutId.isNotEmpty) {
-      final byCheckout = await ProductsTable().queryRows(
-        queryFn: (q) => q.eqOrNull('id', checkoutId),
-        limit: 1,
-      );
-      if (byCheckout.isNotEmpty) return byCheckout.first;
-    }
-
-    final ref = (row.refCode ?? '').trim();
-    if (ref.isNotEmpty) {
-      final byRef = await ProductsTable().queryRows(
-        queryFn: (q) => q
-            .eqOrNull('seller_id', sellerId)
-            .eqOrNull('ref_code', ref)
-            .order('created_at', ascending: false),
-        limit: 1,
-      );
-      if (byRef.isNotEmpty) return byRef.first;
-    }
-    final title = (row.title ?? '').trim();
-    if (title.isNotEmpty) {
-      final byTitle = await ProductsTable().queryRows(
-        queryFn: (q) => q
-            .eqOrNull('seller_id', sellerId)
-            .eqOrNull('title', title)
-            .order('created_at', ascending: false),
-        limit: 1,
-      );
-      if (byTitle.isNotEmpty) return byTitle.first;
-    }
-    final liveItemId = row.id?.trim() ?? '';
-    if (liveItemId.isNotEmpty && !row.isMarketplaceProduct) {
-      final shadowId =
-          await LiveCatalogStockService.ensureCheckoutProduct(liveItemId);
-      if (shadowId != null && shadowId.isNotEmpty) {
-        final shadow = await ProductsTable().queryRows(
-          queryFn: (q) => q.eqOrNull('id', shadowId),
-          limit: 1,
-        );
-        if (shadow.isNotEmpty) return shadow.first;
-      }
-    }
-    return null;
+  Future<void> _refreshCatalogStock(List<LiveItemsRow> rows) async {
+    final ids = rows
+        .map((r) => r.id?.trim() ?? '')
+        .where((id) => id.isNotEmpty);
+    if (ids.isEmpty) return;
+    final snaps = await LiveCatalogStockService.fetchMany(ids);
+    if (!mounted) return;
+    setState(() => _catalogStockByItemId = snaps);
   }
 
   Future<LiveCatalogStockSnapshot?> _fetchLiveItemStock(LiveItemsRow row) async {
@@ -1704,13 +1842,10 @@ class _FleaberLivePlayerWidgetState extends State<FleaberLivePlayerWidget>
     }
   }
 
-  /// Reservas no card expandido — mesma regra do catálogo vendedor:
-  /// pendentes neste directo + compromissos do mesmo produto noutros directos.
+  /// Reservas no card — local + outros directos/gravados (mesma ref).
   int _reservationsCountFromStock(LiveCatalogStockSnapshot? snap) {
     if (snap == null) return 0;
-    final localRes = snap.pendingBagQty < 0 ? 0 : snap.pendingBagQty;
-    final externalHolds = snap.blockedQty < 0 ? 0 : snap.blockedQty;
-    return localRes + externalHolds;
+    return snap.displayReservedQty;
   }
 
   Future<void> _openCheckoutForProduct(
@@ -1764,15 +1899,31 @@ class _FleaberLivePlayerWidgetState extends State<FleaberLivePlayerWidget>
         }
       } catch (_) {}
     }
-    final itemRow =
-        liveItemId != null && liveItemId.trim().isNotEmpty
-            ? _catalogRowById(liveItemId.trim())
-            : null;
+    final liid = liveItemId?.trim() ?? '';
+    var itemRow = liid.isNotEmpty ? _catalogRowById(liid) : null;
+    if (liid.isNotEmpty) {
+      itemRow = await LiveCatalogStockService.fetchLiveItemById(liid) ?? itemRow;
+    }
+    final unitOverride = await LiveItemPriceGate.resolveFreshUnitPrice(
+      liveItemId: liid,
+      fallbackLiveItemPrice: itemRow?.price,
+      productPrice: product.price,
+    );
+    if (unitOverride == null) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(LiveItemPriceGate.pendingPriceLabel),
+        ),
+      );
+      return;
+    }
     await LiveInStreamCheckout.show(
       context: context,
       product: product,
       liveId: liveId,
       liveItemId: liveItemId,
+      overrideItemPriceEur: unitOverride,
       playbackId: widget.playbackId?.trim(),
       isLive: _playbackIsLive,
       liveSellerId: _sellerId?.trim(),
@@ -1805,6 +1956,7 @@ class _FleaberLivePlayerWidgetState extends State<FleaberLivePlayerWidget>
             pending,
             liveId: liveId,
           );
+          await _refreshRaffleState(liveId, silent: true);
           await FleaberStripeCheckoutContext.loadAndClear();
           final liveItemId =
               pending['live_item_id']?.toString().trim() ?? '';
@@ -1918,6 +2070,7 @@ class _FleaberLivePlayerWidgetState extends State<FleaberLivePlayerWidget>
       if (mounted) setState(() {});
     }());
 
+    Timer? stockRefreshTimer;
     await showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
@@ -1929,6 +2082,18 @@ class _FleaberLivePlayerWidgetState extends State<FleaberLivePlayerWidget>
       builder: (ctx) {
         return StatefulBuilder(
           builder: (ctx, setModalState) {
+            stockRefreshTimer ??= Timer.periodic(const Duration(seconds: 2), (_) {
+              unawaited(() async {
+                final st = await _fetchLiveItemStock(row);
+                if (!ctx.mounted) return;
+                setModalState(() {
+                  stock = st;
+                  qtyAvailable = st?.availableQty;
+                  soldQty = st?.soldConvertedQty ?? soldQty;
+                  reservationsQty = _reservationsCountFromStock(st);
+                });
+              }());
+            });
             unawaited(() async {
               if (loading) {
                 final st = await _fetchLiveItemStock(row);
@@ -1978,8 +2143,15 @@ class _FleaberLivePlayerWidgetState extends State<FleaberLivePlayerWidget>
                 : (qtyAvailable ?? stock?.availableQty ?? 0);
             final totalInitial =
                 stock?.totalQty ?? product?.quantity ?? 1;
-            final size = product?.clothingSize?.trim() ?? '';
-            final gender = product?.gender?.trim() ?? '';
+            final size = row.clothingSize?.trim().isNotEmpty == true
+                ? row.clothingSize!.trim()
+                : (product?.clothingSize?.trim() ?? '');
+            final gender = row.gender?.trim().isNotEmpty == true
+                ? row.gender!.trim()
+                : (product?.gender?.trim() ?? '');
+            final description = product?.description?.trim().isNotEmpty == true
+                ? product!.description!.trim()
+                : '';
             final isAlreadyInBag = qtyInBag > 0;
 
             return SafeArea(
@@ -2025,6 +2197,28 @@ class _FleaberLivePlayerWidgetState extends State<FleaberLivePlayerWidget>
                         if (gender.isNotEmpty) _miniInfoChip('Género', gender),
                       ],
                     ),
+                    if (description.isNotEmpty) ...[
+                      const SizedBox(height: 10),
+                      Text(
+                        'Descrição',
+                        style: GoogleFonts.inter(
+                          color: Colors.white.withValues(alpha: 0.55),
+                          fontSize: 10,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: 0.2,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        description,
+                        style: GoogleFonts.inter(
+                          color: Colors.white.withValues(alpha: 0.88),
+                          fontSize: 12,
+                          height: 1.35,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
                     const SizedBox(height: 10),
                     if (isUnavailable) ...[
                       Container(
@@ -2152,6 +2346,7 @@ class _FleaberLivePlayerWidgetState extends State<FleaberLivePlayerWidget>
         );
       },
     );
+    stockRefreshTimer?.cancel();
   }
 
   Widget _miniInfoChip(String label, String value) {
@@ -2390,10 +2585,14 @@ class _FleaberLivePlayerWidgetState extends State<FleaberLivePlayerWidget>
       });
       _subscribeCatalogRealtime(liveId);
       _subscribeLiveBagRealtime(liveId);
+      _startCatalogActivePoll(liveId);
       if ((widget.sellerId?.trim().isNotEmpty ?? false)) {
         _subscribeBuyerCheckoutRealtime(liveId);
+        _subscribeSellerCatalogStockRealtime();
       }
       unawaited(_loadLiveBagCount(liveId));
+      _initRaffle(liveId);
+      unawaited(_maybeRegisterRaffleReferralVisit(liveId));
     }
 
     unawaited(
@@ -2439,6 +2638,295 @@ class _FleaberLivePlayerWidgetState extends State<FleaberLivePlayerWidget>
     });
   }
 
+  void _initRaffle(String liveId) {
+    unawaited(_refreshRaffleState(liveId));
+    _rafflePollTimer?.cancel();
+    _rafflePollTimer = Timer.periodic(const Duration(seconds: 2), (_) {
+      unawaited(_refreshRaffleState(liveId, silent: true));
+    });
+    _subscribeRaffleRealtime(liveId);
+    _subscribeRaffleStream(liveId);
+  }
+
+  void _subscribeRaffleStream(String liveId) {
+    if (liveId.trim().isEmpty) return;
+    try {
+      _raffleStreamSub?.cancel();
+      _raffleStreamSub = SupaFlow.client
+          .from('live_raffles')
+          .stream(primaryKey: ['id'])
+          .eq('live_id', liveId)
+          .listen((_) => unawaited(_refreshRaffleState(liveId, silent: true)));
+    } catch (_) {}
+  }
+
+  Future<void> _maybeRegisterRaffleReferralVisit(String liveId) async {
+    final code = widget.raffleRef?.trim() ?? '';
+    if (code.isEmpty || liveId.trim().isEmpty || _raffleRefVisitRegistered) {
+      return;
+    }
+    if (currentUserUid.isEmpty) return;
+    try {
+      await LiveRaffleService.registerReferralVisit(
+        liveId: liveId,
+        code: code,
+      );
+      _raffleRefVisitRegistered = true;
+    } catch (e) {
+      debugPrint('[LiveRaffle] registerReferral: $e');
+    }
+  }
+
+  @override
+  void didUpdateWidget(covariant FleaberLivePlayerWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    final liveId = widget.liveId?.trim() ?? '';
+    if (liveId.isEmpty) return;
+    final oldRef = oldWidget.raffleRef?.trim() ?? '';
+    final newRef = widget.raffleRef?.trim() ?? '';
+    if (newRef.isNotEmpty && newRef != oldRef) {
+      _raffleRefVisitRegistered = false;
+      unawaited(_maybeRegisterRaffleReferralVisit(liveId));
+    }
+  }
+
+  Future<void> _refreshRaffleState(String liveId, {bool silent = false}) async {
+    if (liveId.trim().isEmpty) return;
+    unawaited(_maybeRegisterRaffleReferralVisit(liveId));
+    try {
+      final raffle = _raffleState?.raffle;
+      if (raffle != null && raffle.isActive && raffle.hasTimer) {
+        await LiveRaffleService.tick(raffle.id);
+      }
+      if (currentUserUid.isNotEmpty) {
+        unawaited(LiveRaffleService.qualifyReferralVisits(liveId));
+      }
+      final next = await LiveRaffleService.fetchState(liveId);
+      int? participants;
+      final rid = next.raffle?.id;
+      if (rid != null && rid.isNotEmpty) {
+        participants = await LiveRaffleService.fetchParticipantCount(rid);
+      }
+      if (!mounted) return;
+      setState(() {
+        _raffleState = next;
+        _raffleParticipantCount = participants;
+      });
+    } catch (e) {
+      if (!silent) {
+        debugPrint('[LiveRaffle] refresh: $e');
+      }
+    }
+  }
+
+  void _subscribeRaffleRealtime(String liveId) {
+    if (liveId.trim().isEmpty || _raffleChannel != null) return;
+    final filter = PostgresChangeFilter(
+      type: PostgresChangeFilterType.eq,
+      column: 'live_id',
+      value: liveId,
+    );
+    _raffleChannel = SupaFlow.client
+        .channel('live_raffle:$liveId')
+        .onPostgresChanges(
+          event: PostgresChangeEvent.all,
+          schema: 'public',
+          table: 'live_raffles',
+          filter: filter,
+          callback: (_) => unawaited(_refreshRaffleState(liveId, silent: true)),
+        )
+        .onPostgresChanges(
+          event: PostgresChangeEvent.all,
+          schema: 'public',
+          table: 'live_raffle_entries',
+          filter: filter,
+          callback: (_) => unawaited(_refreshRaffleState(liveId, silent: true)),
+        )
+        .subscribe();
+  }
+
+  Future<void> _participateInRaffle(String liveId) async {
+    final raffleId = (_raffleState?.raffle?.id ?? '').trim();
+    if (liveId.trim().isEmpty || raffleId.isEmpty) return;
+    if (currentUserUid.isEmpty) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Inicia sessão para participar na Rifa.')),
+      );
+      return;
+    }
+    if (_raffleState?.viewer.joined == true) return;
+
+    setState(() => _raffleJoinLoading = true);
+    try {
+      await LiveRaffleService.join(raffleId);
+      await _refreshRaffleState(liveId);
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Estás na Rifa — +1 rifa!')),
+      );
+    } catch (_) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Não foi possível participar.')),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _raffleJoinLoading = false);
+    }
+  }
+
+  Future<void> _onRaffleTap() async {
+    final liveId = widget.liveId?.trim() ?? '';
+    if (liveId.isEmpty || _raffleState?.hasRaffle != true) return;
+    if (currentUserUid.isEmpty) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Inicia sessão para participar na Rifa.')),
+      );
+      return;
+    }
+
+    if (!mounted) return;
+    final state = _raffleState;
+    if (state == null || !state.hasRaffle) return;
+    final joined = state.viewer.joined;
+    final active = state.raffle?.isActive == true;
+    await LiveRaffleDetailsSheet.show(
+      context,
+      state: state,
+      participantCount: _raffleParticipantCount,
+      joinLoading: _raffleJoinLoading,
+      onParticipate: !joined && active
+          ? () => unawaited(_participateInRaffle(liveId))
+          : null,
+      onShareTap: () => unawaited(_onShareLiveTap(fromRaffleSheet: true)),
+    );
+  }
+
+  Future<void> _refreshFollowState() async {
+    final sellerId = _sellerId?.trim() ?? '';
+    final uid = currentUserUid.trim();
+    if (sellerId.isEmpty || uid.isEmpty || sellerId == uid) {
+      if (mounted) setState(() => _isFollowingSeller = false);
+      return;
+    }
+    try {
+      final rows = await FollowsTable().queryRows(
+        queryFn: (q) => q
+            .eqOrNull('follower_id', uid)
+            .eqOrNull('following_id', sellerId),
+        limit: 1,
+      );
+      if (mounted) {
+        setState(() => _isFollowingSeller = rows.isNotEmpty);
+      }
+    } catch (_) {
+      if (mounted) setState(() => _isFollowingSeller = false);
+    }
+  }
+
+  Future<void> _toggleFollowSeller() async {
+    final sellerId = _sellerId?.trim() ?? '';
+    final uid = currentUserUid.trim();
+    final liveId = widget.liveId?.trim() ?? '';
+    if (sellerId.isEmpty || uid.isEmpty) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Inicia sessão para seguir.')),
+      );
+      return;
+    }
+    if (sellerId == uid) return;
+
+    final wasFollowing = _isFollowingSeller == true;
+    final hadFollowBonus = _raffleState?.viewer.followBonusClaimed == true;
+    try {
+      if (wasFollowing) {
+        await FollowsTable().delete(
+          matchingRows: (rows) => rows
+              .eqOrNull('follower_id', uid)
+              .eqOrNull('following_id', sellerId),
+        );
+      } else {
+        await FollowsTable().insert({
+          'follower_id': uid,
+          'following_id': sellerId,
+        });
+      }
+      await _refreshFollowState();
+      if (!wasFollowing && liveId.isNotEmpty) {
+        await _refreshRaffleState(liveId, silent: true);
+      }
+      if (!mounted) return;
+      if (!wasFollowing &&
+          !hadFollowBonus &&
+          _raffleState?.viewer.followBonusClaimed == true) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('A seguir — +1 rifa!')),
+        );
+      }
+    } catch (_) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Não foi possível actualizar o seguir.')),
+      );
+    }
+  }
+
+  Future<void> _onShareLiveTap({bool fromRaffleSheet = false}) async {
+    final liveId = widget.liveId?.trim() ?? '';
+    if (liveId.isEmpty) return;
+
+    final raffleId = (_raffleState?.raffle?.id ?? '').trim();
+    var link = 'https://fleaber.app/live/$liveId';
+    if (raffleId.isNotEmpty &&
+        _raffleState?.viewer.joined == true &&
+        _raffleState?.raffle?.isActive == true) {
+      final refCode = await LiveRaffleService.ensureReferralLink(raffleId);
+      if (refCode != null && refCode.trim().isNotEmpty) {
+        link = '$link?ref=${Uri.encodeQueryComponent(refCode.trim())}';
+      }
+    }
+    await Clipboard.setData(ClipboardData(text: link));
+    final canClaimRaffle = currentUserUid.isNotEmpty &&
+        raffleId.isNotEmpty &&
+        _raffleState?.viewer.joined == true &&
+        _raffleState?.raffle?.isActive == true &&
+        _raffleState?.viewer.shareBonusClaimed != true;
+
+    if (canClaimRaffle) {
+      try {
+        final res = await LiveRaffleService.claimShareIntent(raffleId);
+        await _refreshRaffleState(liveId, silent: true);
+        if (!mounted) return;
+        final msg = res.ok && !res.duplicate
+            ? 'Link copiado — +1 rifa!'
+            : res.duplicate
+                ? 'Link copiado — já tinhas a rifa de partilha.'
+                : 'Link copiado.';
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(msg)),
+        );
+        if (fromRaffleSheet && mounted) {
+          Navigator.of(context).pop();
+        }
+        return;
+      } catch (_) {}
+    }
+
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          canClaimRaffle
+              ? 'Link copiado.'
+              : 'Link copiado. Participa na Rifa para ganhares +1 ao partilhar.',
+        ),
+      ),
+    );
+  }
+
   Future<void> _maybeStartTipStripePoll() async {
     final pending = await FleaberStripeTipContext.peek();
     if (!mounted || pending == null) {
@@ -2471,6 +2959,14 @@ class _FleaberLivePlayerWidgetState extends State<FleaberLivePlayerWidget>
     if (state == AppLifecycleState.resumed) {
       unawaited(_refreshBuyerStateAfterCheckout());
       unawaited(_maybeStartTipStripePoll());
+      final liveId = widget.liveId?.trim() ?? '';
+      if (liveId.isNotEmpty) {
+        unawaited(_maybeRegisterRaffleReferralVisit(liveId));
+        if (currentUserUid.isNotEmpty) {
+          unawaited(LiveRaffleService.qualifyReferralVisits(liveId));
+          unawaited(_refreshRaffleState(liveId, silent: true));
+        }
+      }
     }
   }
 
@@ -2496,12 +2992,27 @@ class _FleaberLivePlayerWidgetState extends State<FleaberLivePlayerWidget>
     if (cat != null) {
       unawaited(SupaFlow.client.removeChannel(cat));
     }
+    final sellerStockCh = _sellerCatalogStockChannel;
+    _sellerCatalogStockChannel = null;
+    if (sellerStockCh != null) {
+      unawaited(SupaFlow.client.removeChannel(sellerStockCh));
+    }
     final buyerCh = _buyerCheckoutChannel;
     _buyerCheckoutChannel = null;
     if (buyerCh != null) {
       unawaited(SupaFlow.client.removeChannel(buyerCh));
     }
     _spotlightTimer?.cancel();
+    _priceDefinedNoticeTimer?.cancel();
+    _catalogActivePollTimer?.cancel();
+    _catalogStockPollTimer?.cancel();
+    _rafflePollTimer?.cancel();
+    _raffleStreamSub?.cancel();
+    final raffleCh = _raffleChannel;
+    _raffleChannel = null;
+    if (raffleCh != null) {
+      unawaited(SupaFlow.client.removeChannel(raffleCh));
+    }
     _tipStripePollTimer?.cancel();
     _liveClockTimer?.cancel();
     _catalogScrollController.dispose();
@@ -2520,6 +3031,14 @@ class _FleaberLivePlayerWidgetState extends State<FleaberLivePlayerWidget>
       final id = m.tipId?.trim();
       if (id == null || id.isEmpty || _seenTipIds.contains(id)) continue;
       _seenTipIds.add(id);
+      if (_chatSystemEffectsPrimed) {
+        _systemHighlightMsgIds.add('tip:$id');
+        Future<void>.delayed(const Duration(seconds: 4), () {
+          _systemHighlightMsgIds.remove('tip:$id');
+          if (mounted) setState(() {});
+        });
+        if (mounted) setState(() {});
+      }
       unawaited(_playCashRegisterThinThin());
     }
   }
@@ -2534,9 +3053,6 @@ class _FleaberLivePlayerWidgetState extends State<FleaberLivePlayerWidget>
 
   void _subscribeCatalogRealtime(String liveId) {
     if (liveId.trim().isEmpty || _catalogChannel != null) return;
-    void onCatalogChange() {
-      unawaited(_initCatalog());
-    }
 
     final filter = PostgresChangeFilter(
       type: PostgresChangeFilterType.eq,
@@ -2550,14 +3066,80 @@ class _FleaberLivePlayerWidgetState extends State<FleaberLivePlayerWidget>
           schema: 'public',
           table: 'live_items',
           filter: filter,
-          callback: (_) => onCatalogChange(),
+          callback: _onLiveItemRealtimeChange,
         )
         .onPostgresChanges(
           event: PostgresChangeEvent.insert,
           schema: 'public',
           table: 'live_items',
           filter: filter,
-          callback: (_) => onCatalogChange(),
+          callback: (_) => unawaited(_initCatalog(skipCache: true)),
+        )
+        .onPostgresChanges(
+          event: PostgresChangeEvent.all,
+          schema: 'public',
+          table: 'live_item_show_events',
+          filter: filter,
+          callback: (payload) {
+            _onCatalogShowEvent(payload.newRecord);
+          },
+        )
+        .onPostgresChanges(
+          event: PostgresChangeEvent.all,
+          schema: 'public',
+          table: 'orders',
+          filter: filter,
+          callback: (_) => unawaited(_refreshCatalogStock(_catalogRows ?? const [])),
+        )
+        .onPostgresChanges(
+          event: PostgresChangeEvent.all,
+          schema: 'public',
+          table: 'live_reservation_requests',
+          filter: filter,
+          callback: (_) {
+            final rows = _catalogRows;
+            if (rows == null || rows.isEmpty) {
+              unawaited(_initCatalog(skipCache: true));
+              return;
+            }
+            unawaited(_refreshCatalogStock(rows));
+          },
+        )
+        .subscribe();
+  }
+
+  void _subscribeSellerCatalogStockRealtime() {
+    final sellerId = _sellerId?.trim() ?? '';
+    if (sellerId.isEmpty || _sellerCatalogStockChannel != null) return;
+    final sellerFilter = PostgresChangeFilter(
+      type: PostgresChangeFilterType.eq,
+      column: 'seller_id',
+      value: sellerId,
+    );
+    void onSellerStockChange() {
+      final rows = _catalogRows;
+      if (rows == null || rows.isEmpty) {
+        unawaited(_initCatalog(skipCache: true));
+        return;
+      }
+      unawaited(_refreshCatalogStock(rows));
+    }
+
+    _sellerCatalogStockChannel = SupaFlow.client
+        .channel('live_catalog_seller_stock:$sellerId')
+        .onPostgresChanges(
+          event: PostgresChangeEvent.all,
+          schema: 'public',
+          table: 'orders',
+          filter: sellerFilter,
+          callback: (_) => onSellerStockChange(),
+        )
+        .onPostgresChanges(
+          event: PostgresChangeEvent.all,
+          schema: 'public',
+          table: 'live_reservation_requests',
+          filter: sellerFilter,
+          callback: (_) => onSellerStockChange(),
         )
         .subscribe();
   }
@@ -2608,7 +3190,7 @@ class _FleaberLivePlayerWidgetState extends State<FleaberLivePlayerWidget>
     _playTipSoundOnNewMessages(msgs);
     _ensureUserNamesResolved(msgs);
 
-    if (liveId.trim().isEmpty || currentUserUid.isEmpty) return;
+    if (liveId.trim().isEmpty) return;
     var newAcceptForBuyer = false;
     for (final m in msgs) {
       if (m.kind != LiveRoomMessageKind.system) continue;
@@ -2619,7 +3201,9 @@ class _FleaberLivePlayerWidgetState extends State<FleaberLivePlayerWidget>
         continue;
       }
       final uid = m.userId?.trim() ?? '';
-      if (uid.isNotEmpty && uid != currentUserUid) continue;
+      if (currentUserUid.isNotEmpty && uid.isNotEmpty && uid != currentUserUid) {
+        continue;
+      }
       _seenAcceptBroadcastMsgIds.add(m.id);
       if (_chatAcceptBroadcastsPrimed) {
         newAcceptForBuyer = true;
@@ -2628,9 +3212,194 @@ class _FleaberLivePlayerWidgetState extends State<FleaberLivePlayerWidget>
     if (!_chatAcceptBroadcastsPrimed) {
       _chatAcceptBroadcastsPrimed = true;
     }
-    if (newAcceptForBuyer) {
+    if (newAcceptForBuyer && currentUserUid.isNotEmpty) {
       unawaited(_syncBuyerAcceptedNoticesOnConnect(liveId));
     }
+
+    for (final m in msgs) {
+      if (m.kind != LiveRoomMessageKind.system) continue;
+      if (m.id.isEmpty || _seenPriceDefinedMsgIds.contains(m.id)) continue;
+      if (!RegExp(r'preço\s+definido', caseSensitive: false).hasMatch(m.body)) {
+        continue;
+      }
+      _seenPriceDefinedMsgIds.add(m.id);
+      if (!_chatPriceBroadcastsPrimed) continue;
+      final parsed = _parsePriceDefinedBody(m.body);
+      if (parsed != null) _showPriceDefinedNotice(parsed);
+    }
+    if (!_chatPriceBroadcastsPrimed) {
+      _chatPriceBroadcastsPrimed = true;
+    }
+
+    for (final m in msgs) {
+      if (m.kind != LiveRoomMessageKind.system) continue;
+      if (m.id.isEmpty || _seenBackofficeSnackMsgIds.contains(m.id)) continue;
+      final parsed = LiveSystemChatHumanizer.parse(
+        m.body,
+        normalizeItemLabel: _normalizeSystemChatItemLabel,
+        resolveBuyerName: (raw) => _resolveChatBuyerName(raw, m.userId),
+      );
+      if (parsed.visibility != LiveSystemChatVisibility.backoffice) {
+        if (_chatSystemEffectsPrimed &&
+            parsed.highlightDuration != null &&
+            parsed.showInPublicChat) {
+          _systemHighlightMsgIds.add(m.id);
+          final msgId = m.id;
+          final dur = parsed.highlightDuration!;
+          Future<void>.delayed(dur, () {
+            _systemHighlightMsgIds.remove(msgId);
+            if (mounted) setState(() {});
+          });
+        }
+        continue;
+      }
+      _seenBackofficeSnackMsgIds.add(m.id);
+      if (!_chatSystemEffectsPrimed) continue;
+      final snack = parsed.snackbarLine?.trim() ?? '';
+      if (snack.isEmpty || !mounted) continue;
+      final uid = m.userId?.trim() ?? '';
+      final forMe = uid.isEmpty ||
+          uid == currentUserUid ||
+          parsed.kind == LiveSystemChatEventKind.backofficeOverStock;
+      if (!forMe) continue;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(snack), duration: const Duration(seconds: 4)),
+      );
+    }
+    if (!_chatSystemEffectsPrimed) {
+      _chatSystemEffectsPrimed = true;
+    } else if (mounted) {
+      setState(() {});
+    }
+  }
+
+  Set<String> _visibleSystemMessageIds(List<LiveRoomMessage> msgs) {
+    final seenSocialKeys = <String>{};
+    final out = <String>{};
+    for (final m in msgs) {
+      if (m.kind != LiveRoomMessageKind.system) continue;
+      final id = m.id.trim();
+      if (id.isEmpty) continue;
+      if (LivePublicChatSystemLine.shouldRenderSystemMessage(
+        m.body,
+        seenSocialKeys: seenSocialKeys,
+        normalizeItemLabel: _normalizeSystemChatItemLabel,
+        resolveBuyerName: (raw) => _resolveChatBuyerName(raw, m.userId),
+      )) {
+        out.add(id);
+      }
+    }
+    return out;
+  }
+
+  bool _shouldAnimateSystemHighlight(String messageId) {
+    final id = messageId.trim();
+    return id.isNotEmpty && _systemHighlightMsgIds.contains(id);
+  }
+
+  bool _shouldAnimateTipHighlight(String? tipId) {
+    final id = tipId?.trim() ?? '';
+    return id.isNotEmpty && _systemHighlightMsgIds.contains('tip:$id');
+  }
+
+  _PriceDefinedBroadcastNotice? _parsePriceDefinedBody(String body) {
+    final match = RegExp(
+      r'Preço definido\s*·\s*(.+?)\s*·\s*([\d.,]+)\s*€',
+      caseSensitive: false,
+    ).firstMatch(body.trim());
+    if (match == null) return null;
+    final rawLabel = match.group(1)!.trim();
+    final label = _normalizeSystemChatItemLabel(rawLabel) ?? rawLabel;
+    return _PriceDefinedBroadcastNotice(
+      itemLabel: label,
+      priceLabel: '${match.group(2)!.trim()} €',
+    );
+  }
+
+  void _dismissPriceDefinedNotice() {
+    _priceDefinedNoticeTimer?.cancel();
+    if (!mounted) return;
+    setState(() => _priceDefinedNotice = null);
+  }
+
+  void _showPriceDefinedNotice(_PriceDefinedBroadcastNotice notice) {
+    _priceDefinedNoticeTimer?.cancel();
+    if (!mounted) return;
+    setState(() => _priceDefinedNotice = notice);
+    _priceDefinedNoticeTimer = Timer(const Duration(seconds: 5), () {
+      if (mounted) setState(() => _priceDefinedNotice = null);
+    });
+  }
+
+  Widget _buildPriceDefinedBroadcastCard(
+    _PriceDefinedBroadcastNotice notice,
+  ) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
+      decoration: BoxDecoration(
+        color: const Color(0xFF1A2329).withValues(alpha: 0.98),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(
+          color: const Color(0xFF4CAF50),
+          width: 1.2,
+        ),
+        boxShadow: const [
+          BoxShadow(
+            color: Colors.black54,
+            blurRadius: 10,
+            offset: Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          const Icon(
+            Icons.euro_rounded,
+            color: Color(0xFF4CAF50),
+            size: 36,
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Já tem preço',
+                  style: GoogleFonts.inter(
+                    color: const Color(0xFF4CAF50),
+                    fontWeight: FontWeight.w800,
+                    fontSize: 13,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  '${notice.itemLabel} — ${notice.priceLabel}',
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: GoogleFonts.inter(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w700,
+                    fontSize: 12,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          IconButton(
+            onPressed: _dismissPriceDefinedNotice,
+            icon: Icon(
+              Icons.close_rounded,
+              color: Colors.white.withValues(alpha: 0.65),
+              size: 20,
+            ),
+            padding: EdgeInsets.zero,
+            constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+            tooltip: 'Fechar',
+          ),
+        ],
+      ),
+    );
   }
 
   void _subscribeLiveBagRealtime(String liveId) {
@@ -2889,17 +3658,8 @@ class _FleaberLivePlayerWidgetState extends State<FleaberLivePlayerWidget>
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Reserva aceite',
-                    style: GoogleFonts.inter(
-                      color: const Color(0xFF4CAF50),
-                      fontWeight: FontWeight.w800,
-                      fontSize: 13,
-                    ),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    '${notice.title} · ${notice.qty} un.',
-                    maxLines: 2,
+                    'Ficaste com ${notice.title} — 5 dias para pagar',
+                    maxLines: 3,
                     overflow: TextOverflow.ellipsis,
                     style: GoogleFonts.inter(
                       color: Colors.white,
@@ -2907,13 +3667,14 @@ class _FleaberLivePlayerWidgetState extends State<FleaberLivePlayerWidget>
                       fontSize: 12,
                     ),
                   ),
-                  Text(
-                    '5 dias para pagar',
-                    style: GoogleFonts.inter(
-                      color: Colors.white.withValues(alpha: 0.72),
-                      fontSize: 11,
+                  if (notice.qty > 1)
+                    Text(
+                      '${notice.qty} unidades',
+                      style: GoogleFonts.inter(
+                        color: Colors.white.withValues(alpha: 0.72),
+                        fontSize: 11,
+                      ),
                     ),
-                  ),
                 ],
               ),
             ),
@@ -2951,6 +3712,10 @@ class _FleaberLivePlayerWidgetState extends State<FleaberLivePlayerWidget>
     final price = _formatPriceEur(row);
     final photo = row.photoUrl;
     final itemId = row.id;
+    final stockSnap = itemId != null && itemId.isNotEmpty
+        ? _catalogStockByItemId[itemId]
+        : null;
+    final reservationsQty = _reservationsCountFromStock(stockSnap);
 
     return GestureDetector(
       onTap: () => _openItemActionsModal(row),
@@ -3024,6 +3789,26 @@ class _FleaberLivePlayerWidgetState extends State<FleaberLivePlayerWidget>
                             height: 1.15,
                           ),
                         ),
+                        if (LiveCatalogItemAttributes.subtitle(
+                              clothingSize: row.clothingSize,
+                              color: row.gender,
+                            ) !=
+                            null) ...[
+                          const SizedBox(height: 2),
+                          Text(
+                            LiveCatalogItemAttributes.subtitle(
+                              clothingSize: row.clothingSize,
+                              color: row.gender,
+                            )!,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: GoogleFonts.inter(
+                              fontSize: 8,
+                              color: Colors.white.withValues(alpha: 0.68),
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
                         const SizedBox(height: 4),
                         if (price != null)
                           Container(
@@ -3052,6 +3837,18 @@ class _FleaberLivePlayerWidgetState extends State<FleaberLivePlayerWidget>
                               ),
                             ),
                           ),
+                        if (reservationsQty > 0) ...[
+                          const SizedBox(height: 3),
+                          Text(
+                            'Reservas: $reservationsQty',
+                            style: GoogleFonts.inter(
+                              color: Colors.white.withValues(alpha: 0.72),
+                              fontSize: 8.5,
+                              fontWeight: FontWeight.w700,
+                              height: 1.1,
+                            ),
+                          ),
+                        ],
                         const Spacer(),
                         Align(
                           alignment: Alignment.center,
@@ -3219,7 +4016,6 @@ class _FleaberLivePlayerWidgetState extends State<FleaberLivePlayerWidget>
                 ? catalogStripBottom + 2
                 : chatInputBottom + 8;
             final spotlightBottom = catalogStripBottom;
-
             return Stack(
               fit: StackFit.expand,
               clipBehavior: Clip.none,
@@ -3372,14 +4168,18 @@ class _FleaberLivePlayerWidgetState extends State<FleaberLivePlayerWidget>
                                   borderRadius: BorderRadius.circular(999),
                                   child: InkWell(
                                     borderRadius: BorderRadius.circular(999),
-                                    onTap: () {},
+                                    onTap: _sellerId == currentUserUid
+                                        ? null
+                                        : () => unawaited(_toggleFollowSeller()),
                                     child: Padding(
                                       padding: const EdgeInsets.symmetric(
                                         horizontal: 12,
                                         vertical: 5,
                                       ),
                                       child: Text(
-                                        'Seguir',
+                                        _isFollowingSeller == true
+                                            ? 'A seguir'
+                                            : 'Seguir',
                                         style: GoogleFonts.inter(
                                           color: Colors.white,
                                           fontSize: 11,
@@ -3501,9 +4301,17 @@ class _FleaberLivePlayerWidgetState extends State<FleaberLivePlayerWidget>
                     children: [
                         _glassCircleIcon(
                           icon: Icons.share_outlined,
-                          onTap: () {},
+                          onTap: () => unawaited(_onShareLiveTap()),
                         style: _LiveActionStyle.secondary,
                         ),
+                        if (_raffleState?.hasRaffle == true) ...[
+                          const SizedBox(height: 12),
+                          LiveRaffleSidebarButton(
+                            state: _raffleState!,
+                            loading: _raffleJoinLoading,
+                            onTap: () => unawaited(_onRaffleTap()),
+                          ),
+                        ],
                         const SizedBox(height: 12),
                         _glassCircleIcon(
                           icon: Icons.euro_rounded,
@@ -3770,7 +4578,8 @@ class _FleaberLivePlayerWidgetState extends State<FleaberLivePlayerWidget>
                                     ),
                         ),
 
-                if (_buyerAcceptedNotices.isNotEmpty)
+                if (_priceDefinedNotice != null ||
+                    _buyerAcceptedNotices.isNotEmpty)
                         Positioned(
                     left: 12,
                     right: 12,
@@ -3779,6 +4588,10 @@ class _FleaberLivePlayerWidgetState extends State<FleaberLivePlayerWidget>
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       mainAxisSize: MainAxisSize.min,
                       children: [
+                        if (_priceDefinedNotice != null)
+                          _buildPriceDefinedBroadcastCard(
+                            _priceDefinedNotice!,
+                          ),
                         for (final notice
                             in _buyerAcceptedNotices.take(2))
                           _buildBuyerAcceptedReservationCard(notice),
@@ -4018,25 +4831,29 @@ class _FleaberLivePlayerWidgetState extends State<FleaberLivePlayerWidget>
               _isVodReplay ? 'Chat da gravação…' : 'Sem mensagens ainda',
           );
         }
+        _ensureUserNamesResolved(msgs);
+        final visibleSystemIds = _visibleSystemMessageIds(msgs);
         return _buildReversedChatList(
           itemCount: msgs.length,
           enableOlderLoad: !_isVodReplay,
           itemBuilder: (context, index) {
             final m = msgs[index];
             if (m.kind == LiveRoomMessageKind.tip) {
-              return Padding(
-                padding: const EdgeInsets.only(bottom: 6),
-                child: LiveTipGiftBubble(
-                  amountEur: m.tipAmountEur ?? 0,
-                ),
+              return LiveTipGiftBubble(
+                amountEur: m.tipAmountEur ?? 0,
+                animateHighlight: _shouldAnimateTipHighlight(m.tipId),
               );
             }
             if (m.kind == LiveRoomMessageKind.system) {
+              if (!visibleSystemIds.contains(m.id)) {
+                return const SizedBox.shrink();
+              }
               return LivePublicChatSystemLine.fromBody(
                 m.body,
                 normalizeItemLabel: _normalizeSystemChatItemLabel,
                 resolveBuyerName: (raw) =>
                     _resolveChatBuyerName(raw, m.userId),
+                animateHighlight: _shouldAnimateSystemHighlight(m.id),
               );
             }
             final userId = m.userId?.trim() ?? '';
@@ -4194,6 +5011,16 @@ class _FleaberLivePlayerWidgetState extends State<FleaberLivePlayerWidget>
       style: style,
     );
   }
+}
+
+class _PriceDefinedBroadcastNotice {
+  const _PriceDefinedBroadcastNotice({
+    required this.itemLabel,
+    required this.priceLabel,
+  });
+
+  final String itemLabel;
+  final String priceLabel;
 }
 
 class _BuyerAcceptedReservationNotice {

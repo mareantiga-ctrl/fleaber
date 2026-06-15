@@ -1,27 +1,28 @@
 appId: com.mycompany.fleaber
 ---
-- launchApp:
-    clearState: true
-- runFlow: dismiss_before_login.yaml
+- runFlow: launch_fleaber_login.yaml
 - extendedWaitUntil:
-    visible: "Bem-vindo de volta"
+    visible: "Bem-vindo de volta!"
     timeout: 30000
-    optional: true
-- extendedWaitUntil:
-    visible: "E-mail"
-    timeout: 90000
+- waitForAnimationToEnd:
+    timeout: 8000
 - tapOn:
     text: "E-mail"
     index: 0
-- eraseText
+- eraseText: 80
 - inputText: ${MAESTRO_BUYER_EMAIL}
 - extendedWaitUntil:
-    visible: "Senha"
+    visible: "${MAESTRO_BUYER_EMAIL}"
     timeout: 15000
+- hideKeyboard
+- extendedWaitUntil:
+    visible: "Senha"
+    timeout: 30000
 - tapOn:
     text: "Senha"
     index: 0
-- eraseText
+    waitUntilVisible: true
+- eraseText: 40
 - inputText: ${MAESTRO_BUYER_PASSWORD}
 - hideKeyboard
 - extendedWaitUntil:
@@ -30,6 +31,9 @@ appId: com.mycompany.fleaber
 - tapOn:
     text: "Entrar"
     retryTapIfNoChange: true
+- tapOn:
+    text: "Ok"
+    optional: true
 - extendedWaitUntil:
     notVisible: "Entrar"
     timeout: 20000

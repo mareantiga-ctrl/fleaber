@@ -119,6 +119,8 @@ class _OrdersListTabState extends State<_OrdersListTab>
 
   /// Força novo estado no [FutureBuilder] após recargas (evita snapshot antigo).
   int _payloadEpoch = 0;
+  final ScrollController _listScrollController = ScrollController();
+  double? _pendingScrollRestore;
 
   StreamSubscription<List<Map<String, dynamic>>>? _ordersRealtimeSub;
 
@@ -136,7 +138,7 @@ class _OrdersListTabState extends State<_OrdersListTab>
 
   void _onOrdersListRefreshTick() {
     if (!mounted) return;
-    _reloadPayload();
+    _reloadPayload(preserveScroll: true);
   }
 
   void _subscribeOrdersRealtime() {
@@ -153,7 +155,7 @@ class _OrdersListTabState extends State<_OrdersListTab>
           .eq(column, filterId)
           .listen(
             (_) {
-              if (mounted) _reloadPayload();
+              if (mounted) _reloadPayload(preserveScroll: true);
             },
             onError: (Object e, StackTrace st) {
               print('MINHAS_ENCOMENDAS_BATATA stream orders: $e');
@@ -178,6 +180,7 @@ class _OrdersListTabState extends State<_OrdersListTab>
   void dispose() {
     ordersListRefreshTick.removeListener(_onOrdersListRefreshTick);
     _ordersRealtimeSub?.cancel();
+    _listScrollController.dispose();
     WidgetsBinding.instance.removeObserver(this);
     routeObserver.unsubscribe(this);
     super.dispose();
@@ -200,13 +203,24 @@ class _OrdersListTabState extends State<_OrdersListTab>
     _reloadPayload();
   }
 
-  Future<void> _reloadPayload() async {
+  Future<void> _reloadPayload({bool preserveScroll = false}) async {
     if (!mounted) return;
+    if (preserveScroll && _listScrollController.hasClients) {
+      _pendingScrollRestore = _listScrollController.offset;
+    }
     setState(() {
       _payloadEpoch++;
       _payloadFuture = _loadPayload();
     });
     await _payloadFuture;
+    if (!mounted || _pendingScrollRestore == null) return;
+    final target = _pendingScrollRestore!;
+    _pendingScrollRestore = null;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted || !_listScrollController.hasClients) return;
+      final max = _listScrollController.position.maxScrollExtent;
+      _listScrollController.jumpTo(target.clamp(0.0, max));
+    });
   }
 
   static Future<Map<String, ProductsRow>> _productsForOrders(
@@ -269,7 +283,6 @@ class _OrdersListTabState extends State<_OrdersListTab>
     }
 
     return FutureBuilder<_TabOrdersPayload>(
-      key: ValueKey<int>(_payloadEpoch),
       future: _payloadFuture,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting &&
@@ -297,6 +310,7 @@ class _OrdersListTabState extends State<_OrdersListTab>
           color: const Color(0xFF007782),
           onRefresh: _reloadPayload,
           child: ListView.separated(
+            controller: _listScrollController,
             padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
             itemCount: orders.length,
             separatorBuilder: (_, __) => const Divider(
@@ -315,7 +329,7 @@ class _OrdersListTabState extends State<_OrdersListTab>
                 order: order,
                 product: product,
                 isVendasTab: widget.isVendasTab,
-                onOrdersChanged: _reloadPayload,
+                onOrdersChanged: () => _reloadPayload(preserveScroll: true),
                 onSnackBar: (message, {bool error = false}) {
                   if (!mounted) return;
                   ScaffoldMessenger.of(context).showSnackBar(
@@ -452,9 +466,12 @@ class _OrderRowTileState extends State<_OrderRowTile> {
     try {
       await run();
       requestMarketplaceFeedRefresh();
-      requestOrdersListRefresh();
       pingBatataReservationForNotificationBell();
-      onChanged?.call();
+      if (onChanged != null) {
+        onChanged();
+      } else {
+        requestOrdersListRefresh();
+      }
       snack?.call(okMessage);
     } catch (e, st) {
       print('BATATA_ORDER_ACTION ERRO: $e\n$st');

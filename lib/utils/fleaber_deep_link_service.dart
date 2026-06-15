@@ -69,7 +69,26 @@ class FleaberDeepLinkService {
   static String? stripeSuccessGoLocation(Uri uri) => _stripeSuccessGoLocation(uri);
 
   static String? _goRouterLocation(Uri uri) {
-    return _stripeSuccessGoLocation(uri) ?? _maestroTestGoLocation(uri);
+    return _stripeSuccessGoLocation(uri) ??
+        _liveShareGoLocation(uri) ??
+        _maestroTestGoLocation(uri);
+  }
+
+  /// `https://fleaber.app/live/{liveId}?ref=...` → player in-app.
+  static String? _liveShareGoLocation(Uri uri) {
+    final host = uri.host.toLowerCase();
+    if (host != 'fleaber.app' && host != 'fleaber.com') return null;
+    var path = uri.path;
+    if (path.isEmpty || path == '/') return null;
+    if (!path.startsWith('/')) path = '/$path';
+    final m = RegExp(r'^/live/([^/]+)/?$').firstMatch(path);
+    if (m == null) return null;
+    final liveId = m.group(1)?.trim() ?? '';
+    if (liveId.isEmpty) return null;
+    final qp = Map<String, String>.from(uri.queryParameters);
+    qp['liveId'] = liveId;
+    qp.putIfAbsent('isLive', () => 'true');
+    return '/fleaberLivePlayer?${Uri(queryParameters: qp).query}';
   }
 
   /// Rotas de teste / automação (`maestro openLink`, QA manual).
@@ -89,6 +108,26 @@ class FleaberDeepLinkService {
       qp.remove('live_id');
       qp.putIfAbsent('isLive', () => 'true');
       return '$path?${Uri(queryParameters: qp).query}';
+    }
+    if (path == '/conviteColaborador' ||
+        path.startsWith('/conviteColaborador/')) {
+      final linkId = qp['helperLinkId']?.trim().isNotEmpty == true
+          ? qp['helperLinkId']!.trim()
+          : (qp['helper_link_id']?.trim() ?? '');
+      if (linkId.isEmpty) return null;
+      qp['helperLinkId'] = linkId;
+      qp.remove('helper_link_id');
+      return '/conviteColaborador?${Uri(queryParameters: qp).query}';
+    }
+    if (path == '/maestroSellerStudio' ||
+        path.startsWith('/maestroSellerStudio/')) {
+      final live = qp['liveId']?.trim().isNotEmpty == true
+          ? qp['liveId']!.trim()
+          : (qp['live_id']?.trim() ?? '');
+      if (live.isEmpty) return null;
+      qp['liveId'] = live;
+      qp.remove('live_id');
+      return '/maestroSellerStudio?${Uri(queryParameters: qp).query}';
     }
     if (path == '/criarDirecto' || path == '/prepararDirecto') {
       return path;

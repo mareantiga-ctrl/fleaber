@@ -16,7 +16,9 @@ import '/utils/fleaber_logger.dart';
 import '/utils/fleaber_radius.dart';
 import '/utils/fleaber_stripe_checkout_context.dart';
 import '/utils/live_catalog_stock_service.dart';
+import '/utils/live_item_price_gate.dart';
 import '/utils/live_reservation_queue_service.dart';
+import '/utils/live_system_chat_humanizer.dart';
 import '/utils/profile_shipping_requirements.dart';
 import '/widgets/fleaber_primary_button.dart';
 import '/widgets/live_vendor_ops_ui.dart';
@@ -90,6 +92,7 @@ abstract final class LiveInStreamCheckout {
     if (liveStock == null) return false;
     if (reservationStatus == 'accepted') return false;
     final sel = selectedQuantity < 1 ? 1 : selectedQuantity;
+    if (liveStock.canDirectPayWithoutApproval(sel)) return false;
     return liveStock.requestExceedsSellableCapacity(
       sel,
       restorePendingQty: sel,
@@ -239,6 +242,7 @@ abstract final class LiveInStreamCheckout {
     required int requestedQty,
     required int availableQty,
     String? refLabel,
+    BuildContext? snackbarContext,
   }) async {
     final lid = liveId.trim();
     final iid = liveItemId.trim();
@@ -276,6 +280,16 @@ abstract final class LiveInStreamCheckout {
           '📋 Pedido de $req un.$labelBit — só $avail disponível${avail == 1 ? '' : 'eis'}; aguarda confirmação',
       senderLabel: 'Sistema',
     );
+    final parsed = LiveSystemChatHumanizer.parse(
+      '📋 Pedido de $req un.$labelBit — só $avail disponível; aguarda confirmação',
+    );
+    final snack = parsed.snackbarLine?.trim() ?? '';
+    final ctx = snackbarContext;
+    if (snack.isNotEmpty && ctx != null && ctx.mounted) {
+      ScaffoldMessenger.of(ctx).showSnackBar(
+        SnackBar(content: Text(snack), duration: const Duration(seconds: 4)),
+      );
+    }
   }
 
   /// Portes: 3,50 € transportadora ou 0 € entrega em mão. Seguro: 0,65 € + 5% sobre (artigo+portes).
@@ -363,6 +377,28 @@ abstract final class LiveInStreamCheckout {
     VoidCallback? onPaymentStarted,
   }) async {
     if (currentUserUid.isEmpty) return;
+
+    final itemIdForPrice = liveItemId?.trim() ?? '';
+    var unitOverride = overrideItemPriceEur;
+    if (unitOverride == null || unitOverride <= 0) {
+      unitOverride = await LiveItemPriceGate.resolveFreshUnitPrice(
+        liveItemId: itemIdForPrice,
+        productPrice: product.price,
+      );
+    }
+    if (unitOverride == null || unitOverride <= 0) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(LiveItemPriceGate.pendingPriceLabel),
+          ),
+        );
+      }
+      return;
+    }
+    if (itemIdForPrice.isNotEmpty) {
+      await LiveCatalogStockService.ensureCheckoutProduct(itemIdForPrice);
+    }
 
     var resStatus = reservationStatus?.trim();
     final reqId = reservationRequestId?.trim() ?? '';
@@ -645,6 +681,7 @@ abstract final class LiveInStreamCheckout {
                                       title: product.title,
                                       refCode: product.refCode,
                                     ),
+                                    snackbarContext: ctx,
                                   );
                                 }
                                 if (!ctx.mounted) return;
@@ -970,8 +1007,55 @@ abstract final class LiveInStreamCheckout {
     final lid = liveId.trim();
     if (lid.isEmpty) return false;
 
+    LiveItemPriceGate.logCheckoutGate(
+      'pay_bag_lines_start',
+      liveId: lid,
+      sellerId: liveSellerId,
+      reason: 'line_count_${lines.length}',
+    );
+
     for (final line in lines) {
       final liid = line.itemRow?.id?.trim() ?? '';
+      var itemRow = line.itemRow;
+      if (liid.isNotEmpty) {
+        itemRow =
+            await LiveCatalogStockService.fetchLiveItemById(liid) ?? itemRow;
+      }
+      final product = await LiveItemPriceGate.resolveProductForCheckout(
+            itemRow: itemRow,
+            sellerId: liveSellerId,
+            liveId: lid,
+          ) ??
+          line.product;
+      final unit = await LiveItemPriceGate.resolveFreshUnitPrice(
+        liveItemId: liid,
+        fallbackLiveItemPrice: itemRow?.price,
+        productPrice: product.price,
+        sellerId: liveSellerId,
+        liveId: lid,
+        itemRow: itemRow,
+      );
+      if (unit == null) {
+        LiveItemPriceGate.logCheckoutGate(
+          'pay_bag_lines_blocked',
+          liveId: lid,
+          sellerId: liveSellerId,
+          liveItemId: liid,
+          requestId: line.request.id,
+          productId: product.id,
+          liveItemPrice: itemRow?.price,
+          productPrice: product.price,
+          reason: 'unit_null',
+        );
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text(LiveItemPriceGate.pendingPriceLabel),
+            ),
+          );
+        }
+        return false;
+      }
       if (liid.isEmpty) continue;
       final snap = await LiveCatalogStockService.fetch(liid);
       final rid = line.request.id?.trim() ?? '';
@@ -997,6 +1081,7 @@ abstract final class LiveInStreamCheckout {
               title: line.itemRow?.title,
               refCode: line.itemRow?.refCode,
             ),
+            snackbarContext: context,
           );
         }
         if (context.mounted) {
@@ -1029,15 +1114,36 @@ abstract final class LiveInStreamCheckout {
       var totalEur = 0.0;
 
       for (final line in lines) {
-        final product = line.product;
+        final liid = line.itemRow?.id?.trim() ?? '';
+        var itemRow = line.itemRow;
+        if (liid.isNotEmpty) {
+          itemRow =
+              await LiveCatalogStockService.fetchLiveItemById(liid) ?? itemRow;
+        }
+        final product = await LiveItemPriceGate.resolveProductForCheckout(
+              itemRow: itemRow,
+              sellerId: liveSellerId,
+              liveId: lid,
+            ) ??
+            line.product;
         final productId = product.id;
         final sellerId = product.sellerId;
         if (productId == null || sellerId == null) {
           throw Exception('Artigo sem produto associado.');
         }
-        final liid = line.itemRow?.id?.trim() ?? '';
         final qty = line.payQty < 1 ? 1 : line.payQty;
-        final unit = product.price ?? line.itemRow?.price ?? 0.0;
+        final unit = await LiveItemPriceGate.resolveFreshUnitPrice(
+              liveItemId: liid,
+              fallbackLiveItemPrice: itemRow?.price,
+              productPrice: product.price,
+              sellerId: liveSellerId,
+              liveId: lid,
+              itemRow: itemRow,
+            ) ??
+            0.0;
+        if (unit <= 0) {
+          throw Exception('Artigo sem preço definido.');
+        }
         final lineItem = unit * qty;
         final lineTotal = calculateFleaberBuyerTotal(
           itemPriceEur: lineItem,

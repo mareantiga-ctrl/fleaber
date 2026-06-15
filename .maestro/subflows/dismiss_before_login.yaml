@@ -1,7 +1,22 @@
 # Fecha popups/dialogos do sistema antes do ecra de login Fleaber.
+# Nota: nao usar pressKey back no arranque — no login fecha a app.
 appId: com.mycompany.fleaber
 ---
-- pressKey: back
+- runFlow:
+    when:
+      visible: "isn't responding"
+    commands:
+      - tapOn: "Wait"
+- runFlow:
+    when:
+      visible: "não está a responder"
+    commands:
+      - tapOn: "Aguardar"
+- runFlow:
+    when:
+      visible: "not responding"
+    commands:
+      - tapOn: "Wait"
 - runFlow:
     when:
       visible: "Cancel"
@@ -22,11 +37,7 @@ appId: com.mycompany.fleaber
       visible: "OK"
     commands:
       - tapOn: "OK"
-- runFlow:
-    when:
-      visible: "Não"
-    commands:
-      - tapOn: "Não"
+# Nao usar "Nao" — faz match em "Nao tem uma conta?" no login.
 - runFlow:
     when:
       visible: "Agora não"

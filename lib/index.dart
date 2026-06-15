@@ -9,6 +9,8 @@ export '/live_stream_vendor/live_stream_vendor_widget.dart'
 export '/vendedor/preparar_directo_page_widget.dart'
     show PrepararDirectoPageWidget;
 export '/vendedor/criar_directo_page_widget.dart' show CriarDirectoPageWidget;
+export '/vendedor/maestro_seller_studio_page_widget.dart'
+    show MaestroSellerStudioPageWidget;
 export '/fleaber_live_player/fleaber_live_player_widget.dart'
     show FleaberLivePlayerWidget;
 export '/chat_page/chat_page_widget.dart' show ChatPageWidget;
@@ -20,6 +22,8 @@ export '/pages/bundle/descontos_conjuntos_widget.dart'
 export '/pages/bundle/criar_conjunto_page_widget.dart' show CriarConjuntoPageWidget;
 export '/pages/bundle/ver_conjunto_page_widget.dart' show VerConjuntoPageWidget;
 export '/pages/vendedor/modo_ferias_page_widget.dart' show ModoFeriasPageWidget;
+export '/pages/vendedor/gestao_referencias_page_widget.dart'
+    show GestaoReferenciasPageWidget;
 export '/pages/staff/seller_helpers_page_widget.dart'
     show SellerHelpersPageWidget;
 export '/pages/staff/helper_access_page_widget.dart' show HelperAccessPageWidget;

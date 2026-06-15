@@ -141,6 +141,130 @@ class LiveOpsStagingClient {
     }
   }
 
+  Future<List<Map<String, dynamic>>> selectAsUser(
+    String table, {
+    required String accessToken,
+    String? filter,
+    int limit = 100,
+  }) async {
+    var path = '$url/rest/v1/$table?select=*';
+    if (filter != null && filter.isNotEmpty) {
+      path += '&$filter';
+    }
+    path += '&limit=$limit';
+    final res = await http.get(Uri.parse(path), headers: _userHeaders(accessToken));
+    if (res.statusCode >= 400) {
+      throw HttpException('selectAsUser $table ${res.statusCode}: ${res.body}');
+    }
+    final list = jsonDecode(res.body);
+    if (list is! List) return [];
+    return list.map((e) => Map<String, dynamic>.from(e as Map)).toList();
+  }
+
+  Future<Map<String, dynamic>> insertAsUser(
+    String table,
+    Map<String, dynamic> row, {
+    required String accessToken,
+  }) async {
+    final res = await http.post(
+      Uri.parse('$url/rest/v1/$table'),
+      headers: _userHeaders(accessToken),
+      body: jsonEncode(row),
+    );
+    if (res.statusCode >= 400) {
+      throw HttpException('insertAsUser $table ${res.statusCode}: ${res.body}');
+    }
+    final body = jsonDecode(res.body);
+    if (body is List && body.isNotEmpty) {
+      return Map<String, dynamic>.from(body.first as Map);
+    }
+    if (body is Map) {
+      return Map<String, dynamic>.from(body);
+    }
+    throw HttpException('insertAsUser $table: resposta inesperada');
+  }
+
+  Future<void> patchAsUser(
+    String table,
+    String filter,
+    Map<String, dynamic> row, {
+    required String accessToken,
+  }) async {
+    final res = await http.patch(
+      Uri.parse('$url/rest/v1/$table?$filter'),
+      headers: _userHeaders(accessToken),
+      body: jsonEncode(row),
+    );
+    if (res.statusCode >= 400) {
+      throw HttpException('patchAsUser $table ${res.statusCode}: ${res.body}');
+    }
+  }
+
+  Future<void> deleteAsUser(
+    String table,
+    String filter, {
+    required String accessToken,
+  }) async {
+    final res = await http.delete(
+      Uri.parse('$url/rest/v1/$table?$filter'),
+      headers: _userHeaders(accessToken),
+    );
+    if (res.statusCode >= 400) {
+      throw HttpException('deleteAsUser $table ${res.statusCode}: ${res.body}');
+    }
+  }
+
+  Future<int> countRows(
+    String table, {
+    String? filter,
+    bool serviceRole = true,
+    String? accessToken,
+  }) async {
+    var path = '$url/rest/v1/$table?select=id';
+    if (filter != null && filter.isNotEmpty) {
+      path += '&$filter';
+    }
+    final headers = serviceRole
+        ? Map<String, String>.from(_serviceHeaders)
+        : _userHeaders(accessToken!);
+    headers['Prefer'] = 'count=exact';
+    headers['Range'] = '0-0';
+    final res = await http.head(Uri.parse(path), headers: headers);
+    if (res.statusCode >= 400) {
+      throw HttpException('count $table ${res.statusCode}: ${res.body}');
+    }
+    final range = res.headers['content-range'] ?? '';
+    final slash = range.lastIndexOf('/');
+    if (slash < 0) return 0;
+    return int.tryParse(range.substring(slash + 1)) ?? 0;
+  }
+
+  Future<String> createAdminUser({
+    required String email,
+    required String password,
+    Map<String, dynamic>? userMetadata,
+  }) async {
+    final res = await http.post(
+      Uri.parse('$url/auth/v1/admin/users'),
+      headers: _serviceHeaders,
+      body: jsonEncode({
+        'email': email,
+        'password': password,
+        'email_confirm': true,
+        if (userMetadata != null) 'user_metadata': userMetadata,
+      }),
+    );
+    if (res.statusCode >= 400) {
+      throw HttpException('createAdminUser ${res.statusCode}: ${res.body}');
+    }
+    final map = jsonDecode(res.body) as Map<String, dynamic>;
+    final id = map['id']?.toString() ?? '';
+    if (id.isEmpty) {
+      throw const HttpException('createAdminUser: id em falta');
+    }
+    return id;
+  }
+
   Future<dynamic> rpc(
     String fn,
     Map<String, dynamic> params, {
@@ -223,4 +347,14 @@ String envRequire(Map<String, String> env, String key) {
     throw StateError('Variável $key em falta em tool/live_ops_staging.env');
   }
   return v;
+}
+
+/// `https://abcdefgh.supabase.co` → `abcdefgh`
+String supabaseProjectRefFromUrl(String projectUrl) {
+  final u = normalizeSupabaseProjectUrl(projectUrl);
+  final host = Uri.tryParse(u)?.host ?? '';
+  if (host.endsWith('.supabase.co')) {
+    return host.split('.').first;
+  }
+  return host;
 }

@@ -208,6 +208,10 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) => GoRouter(
               'sellerId',
               ParamType.String,
             ),
+            raffleRef: params.getParam(
+              'ref',
+              ParamType.String,
+            ),
           ),
         ),
         FFRoute(
@@ -220,6 +224,10 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) => GoRouter(
             ),
             chatId: params.getParam(
               'chatId',
+              ParamType.String,
+            ),
+            orderId: params.getParam(
+              'orderId',
               ParamType.String,
             ),
             requestCancelOnOpen:
@@ -327,6 +335,12 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) => GoRouter(
           builder: (context, params) => const ModoFeriasPageWidget(),
         ),
         FFRoute(
+          name: GestaoReferenciasPageWidget.routeName,
+          path: GestaoReferenciasPageWidget.routePath,
+          requireAuth: true,
+          builder: (context, params) => const GestaoReferenciasPageWidget(),
+        ),
+        FFRoute(
           name: SellerHelpersPageWidget.routeName,
           path: SellerHelpersPageWidget.routePath,
           requireAuth: true,
@@ -345,6 +359,25 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) => GoRouter(
           builder: (context, params) => HelperInvitationPageWidget(
             helperLinkId: params.getParam(
               'helperLinkId',
+              ParamType.String,
+            ),
+          ),
+        ),
+        FFRoute(
+          name: MaestroSellerStudioPageWidget.routeName,
+          path: MaestroSellerStudioPageWidget.routePath,
+          requireAuth: true,
+          builder: (context, params) => MaestroSellerStudioPageWidget(
+            liveId: params.getParam(
+              'liveId',
+              ParamType.String,
+            ),
+            opsSection: params.getParam(
+              'opsSection',
+              ParamType.String,
+            ),
+            expandCategory: params.getParam(
+              'expandCategory',
               ParamType.String,
             ),
           ),

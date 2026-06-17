@@ -1,0 +1,40 @@
+---
+description: Maestro UX tests must navigate like a real user; no deep links except rare emergencies
+globs: .maestro/**/*.yaml,tool/run_*maestro*.ps1,tool/run_cross_surface*.ps1,tool/open_seller_test_studio.ps1
+alwaysApply: false
+---
+
+# Maestro — navegação real (sem deep links)
+
+## Regra principal
+
+Nos testes Maestro e baterias UX, **navegar como um utilizador real**: toques em botões, tabs, sheets e fluxos visíveis.
+
+**Proibido usar `openLink`, `adb shell am start` com URI, ou scripts `open_seller_test_studio` / deep links** para contornar bugs de navegação ou “chegar mais rápido” a um ecrã.
+
+## Exceção (rara)
+
+Deep link só quando **não há caminho UX viável** no produto (ex.: feature ainda sem UI) e o utilizador aprovar explicitamente. Documentar no flow YAML o motivo.
+
+## O que fazer em vez de deep link
+
+| Destino | Navegação UX esperada |
+|---------|----------------------|
+| Seller studio / Operação | Home → Criar → Novo Direto → iniciar/preparar → painel |
+| Player comprador | Home → entrar na live / card da live |
+| Saco / rifa | Dentro do player, botões visíveis |
+| Catálogo +Stock | Tab Catálogo no studio (após chegar por UX) |
+
+## PASS não conta só com ecrã aberto
+
+Um teste **não passa** só porque um ecrã abriu ou um botão existe. Exige:
+
+1. Maestro executou o fluxo UX completo (sem atalhos)
+2. Screenshots + logs recolhidos
+3. Auditoria Cursor (quando existir) com PASS ou PASS COM AVISO
+
+## Scripts a evitar para navegação normal
+
+- `tool/open_seller_test_studio.ps1` — só harness legado; substituir por flows UX
+- `run_maestro_adb_sequence.ps1` com `-DeepLink` — usar apenas se exceção aprovada
+- `openLink:` em flows de bateria UX (Fase 1/2)

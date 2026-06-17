@@ -7,6 +7,8 @@ import '/index.dart';
 import '/utils/fleaber_colors.dart';
 import '/utils/fleaber_radius.dart';
 
+enum _CreateAction { novoAnuncio, novoDirecto }
+
 /// Bottom sheet glass «Criar» (Novo Anúncio / Novo Direto) — Home, Mensagens, Perfil.
 class FleaberCreateSheet extends StatelessWidget {
   const FleaberCreateSheet._({
@@ -18,23 +20,29 @@ class FleaberCreateSheet extends StatelessWidget {
   final VoidCallback onNovoDirecto;
 
   static Future<void> show(BuildContext context) {
-    return showModalBottomSheet<void>(
+    return showModalBottomSheet<_CreateAction>(
       context: context,
       backgroundColor: Colors.transparent,
       isScrollControlled: true,
       builder: (sheetContext) {
         return FleaberCreateSheet._(
           onNovoAnuncio: () {
-            Navigator.of(sheetContext).pop();
-            context.pushNamed(SellerProductFormWidget.routeName);
+            Navigator.of(sheetContext).pop(_CreateAction.novoAnuncio);
           },
           onNovoDirecto: () {
-            Navigator.of(sheetContext).pop();
-            context.pushNamed(PrepararDirectoPageWidget.routeName);
+            Navigator.of(sheetContext).pop(_CreateAction.novoDirecto);
           },
         );
       },
-    );
+    ).then((action) {
+      if (!context.mounted || action == null) return;
+      switch (action) {
+        case _CreateAction.novoAnuncio:
+          context.pushNamed(SellerProductFormWidget.routeName);
+        case _CreateAction.novoDirecto:
+          context.pushNamed(PrepararDirectoPageWidget.routeName);
+      }
+    });
   }
 
   static const _sheetPadding = EdgeInsets.fromLTRB(12.0, 0.0, 12.0, 12.0);
@@ -74,7 +82,12 @@ class FleaberCreateSheet extends StatelessWidget {
                     borderRadius: FleaberRadius.circularPill,
                   ),
                 ),
-                ListTile(
+                Semantics(
+                  identifier: 'prep_sheet_novo_anuncio',
+                  button: true,
+                  onTap: onNovoAnuncio,
+                  child: ExcludeSemantics(
+                    child: ListTile(
                   leading: const Icon(
                     Icons.inventory_2_outlined,
                     color: _accent,
@@ -83,7 +96,14 @@ class FleaberCreateSheet extends StatelessWidget {
                   textColor: Colors.white,
                   onTap: onNovoAnuncio,
                 ),
-                ListTile(
+                  ),
+                ),
+                Semantics(
+                  identifier: 'prep_sheet_novo_direto',
+                  button: true,
+                  onTap: onNovoDirecto,
+                  child: ExcludeSemantics(
+                    child: ListTile(
                   leading: const Icon(
                     Icons.videocam_outlined,
                     color: _accent,
@@ -91,6 +111,8 @@ class FleaberCreateSheet extends StatelessWidget {
                   title: const Text('Novo Direto'),
                   textColor: Colors.white,
                   onTap: onNovoDirecto,
+                ),
+                  ),
                 ),
               ],
             ),

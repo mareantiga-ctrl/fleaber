@@ -1,0 +1,35 @@
+# Arranque quente — mantém sessão (sem clearState).
+
+appId: com.mycompany.fleaber
+---
+- launchApp:
+    clearState: false
+- runFlow:
+    when:
+      visible: "isn't responding"
+    commands:
+      - tapOn: "Wait"
+- runFlow:
+    when:
+      visible: "not responding"
+    commands:
+      - tapOn: "Wait"
+- runFlow:
+    when:
+      visible: "Process system isn't responding"
+    commands:
+      - tapOn: "Wait"
+- runFlow:
+    when:
+      visible: "Close app"
+    commands:
+      - tapOn: "Wait"
+- runFlow: dismiss_permissions.yaml
+- extendedWaitUntil:
+    visible: "Início"
+    timeout: 15000
+    optional: true
+- extendedWaitUntil:
+    visible: "E-mail"
+    timeout: 15000
+    optional: true

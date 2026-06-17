@@ -1,0 +1,12 @@
+# Login seller sem apagar sessão — salta credenciais se já estiver em Início.
+appId: com.mycompany.fleaber
+---
+- runFlow: launch_fleaber_warm.yaml
+- runFlow:
+    when:
+      visible:
+        id: login_email
+    file: login_seller_credentials.yaml
+- extendedWaitUntil:
+    visible: "Início"
+    timeout: 180000

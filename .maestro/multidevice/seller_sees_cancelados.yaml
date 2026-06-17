@@ -1,16 +1,15 @@
-# Seller: Pagamentos mostra cancelados pelo comprador.
+# Seller: Pagamentos mostra cancelados pelo comprador (apos buyer cancelar).
 appId: com.mycompany.fleaber
 ---
-- openLink: ${MAESTRO_DEEP_LINK_BASE}/criarDirecto
+- runFlow: ../subflows/login_seller.yaml
+- runFlow: ../subflows/nav_seller_to_studio.yaml
 - extendedWaitUntil:
     visible: "Operação"
     timeout: 120000
-    optional: true
-- tapOn:
-    text: "Operação"
-    optional: true
-- tapOn: "Pagamentos"
+- tapOn: "Operação"
+- tapOn: "A receber"
 - extendedWaitUntil:
     visible: "Cancelados pelo comprador"
     timeout: 60000
+- takeScreenshot: cs05_seller_cancelados
 - assertVisible: "Cancelados pelo comprador"

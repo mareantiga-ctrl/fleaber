@@ -1,0 +1,15 @@
+# A022 — Back do prep e reentrada sem crash.
+appId: com.mycompany.fleaber
+---
+- runFlow: ../../subflows/login_seller.yaml
+- runFlow: ../../subflows/nav_seller_to_prep.yaml
+- runFlow: ../../subflows/prep_add_ref_99.yaml
+- back
+- extendedWaitUntil:
+    visible: "Início"
+    timeout: 30000
+- runFlow: ../../subflows/nav_seller_to_prep.yaml
+- extendedWaitUntil:
+    visible: "Artigos do directo"
+    timeout: 60000
+- takeScreenshot: a022_prep_reentry

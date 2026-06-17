@@ -1,0 +1,31 @@
+# CS04/R32 — Vendido + repor +10 stock (prints qty).
+appId: com.mycompany.fleaber
+---
+- extendedWaitUntil:
+    visible: "Catálogo"
+    timeout: 120000
+- tapOn: "Catálogo"
+- extendedWaitUntil:
+    visible: "Maestro smoke item"
+    timeout: 30000
+- takeScreenshot: cs04_seller_catalog_before
+- tapOn: "Maestro smoke item"
+- tapOn: "Vendido"
+- extendedWaitUntil:
+    notVisible: "Failed assertion"
+    timeout: 20000
+- takeScreenshot: cs04_seller_after_sold
+- tapOn: "+Stock"
+- extendedWaitUntil:
+    visible: "Adicionar"
+    timeout: 30000
+- takeScreenshot: cs04_seller_stock_sheet
+- tapOn: "+10"
+- tapOn: "Adicionar"
+- extendedWaitUntil:
+    notVisible: "Failed assertion"
+    timeout: 20000
+- takeScreenshot: cs04_seller_after_restock
+- extendedWaitUntil:
+    visible: "Catálogo"
+    timeout: 30000

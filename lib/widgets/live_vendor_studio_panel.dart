@@ -28,6 +28,7 @@ import '/utils/live_raffle_service.dart';
 import '/widgets/live_raffle_seller_sheet.dart';
 import '/widgets/live_raffle_seller_ops_bar.dart';
 import '/utils/live_item_price_gate.dart';
+import '/utils/maestro_studio_debug_log.dart';
 import '/widgets/live_ref_chip_editor_sheet.dart';
 import '/utils/live_fomo_broadcaster.dart';
 import '/utils/fleaber_logger.dart';
@@ -293,6 +294,8 @@ class LiveVendorStudioPanel extends StatefulWidget {
     this.sellerOverlayLayout = false,
     this.showTopNav = false,
     this.onMoreTap,
+    this.modalHostContext,
+    this.onModalVisibilityChanged,
   });
 
   final String liveId;
@@ -313,6 +316,9 @@ class LiveVendorStudioPanel extends StatefulWidget {
   final bool sellerOverlayLayout;
   final bool showTopNav;
   final VoidCallback? onMoreTap;
+  /// Contexto estável para modais (ex.: harness Maestro).
+  final BuildContext? modalHostContext;
+  final ValueChanged<bool>? onModalVisibilityChanged;
 
   @override
   State<LiveVendorStudioPanel> createState() => LiveVendorStudioPanelState();
@@ -395,6 +401,78 @@ class LiveVendorStudioPanelState extends State<LiveVendorStudioPanel> {
   final Set<String> _activitySystemMsgIds = {};
   bool _activitySystemReady = false;
   final Map<String, int> _lastLowStockActivityQty = {};
+  int _panelRebuildLockCount = 0;
+  bool _stockSheetOpen = false;
+  bool _deferredCatalogReload = false;
+  bool _deferredCatalogReloadSilent = true;
+  bool _deferPanelVisualRefresh = false;
+
+  bool get _panelRebuildsLocked => _panelRebuildLockCount > 0;
+
+  bool get _deferCatalogSync => _stockSheetOpen || _panelRebuildsLocked;
+
+  void _acquirePanelRebuildLock() {
+    _panelRebuildLockCount++;
+  }
+
+  void _releasePanelRebuildLock({bool flushDeferredCatalog = false}) {
+    if (_panelRebuildLockCount <= 0) return;
+    _panelRebuildLockCount--;
+    if (_panelRebuildLockCount > 0 || !mounted) return;
+
+    final needsRefresh = _deferPanelVisualRefresh;
+    _deferPanelVisualRefresh = false;
+    _maestroLog(
+      'panel.rebuild_lock.release',
+      data: {
+        'needs_refresh': needsRefresh,
+        'flush_deferred_catalog': flushDeferredCatalog,
+        'deferred_catalog': _deferredCatalogReload,
+      },
+    );
+    if (needsRefresh) {
+      super.setState(() {});
+    }
+
+    if (flushDeferredCatalog && _deferredCatalogReload) {
+      unawaited(_runDeferredPanelRebuilds());
+    }
+  }
+
+  Future<void> _runDeferredPanelRebuilds() async {
+    if (!mounted || _panelRebuildsLocked || !_deferredCatalogReload) return;
+    _deferredCatalogReload = false;
+    final silent = _deferredCatalogReloadSilent;
+    await _loadCatalogRows(silent: silent, bypassRebuildLock: true);
+    if (!mounted) return;
+    await _refreshStockCache(bypassRebuildLock: true);
+    if (!mounted) return;
+    await _refreshActiveOpsSnapshot(forceFetch: true, bypassRebuildLock: true);
+  }
+
+  @override
+  void setState(VoidCallback fn) {
+    if (_panelRebuildsLocked) {
+      fn();
+      _deferPanelVisualRefresh = true;
+      if (MaestroStudioDebugLog.enabled) {
+        unawaited(MaestroStudioDebugLog.log('panel.setState.deferred'));
+      }
+      return;
+    }
+    super.setState(fn);
+  }
+
+  void _maestroLog(String event, {Map<String, Object?> data = const {}}) {
+    if (!MaestroStudioDebugLog.enabled) return;
+    unawaited(MaestroStudioDebugLog.log(event, data: data));
+  }
+
+  void _setModalVisible(bool open) {
+    _stockSheetOpen = open;
+    widget.onModalVisibilityChanged?.call(open);
+    _maestroLog('panel.modal_visibility', data: {'open': open});
+  }
 
   @override
   void initState() {
@@ -509,7 +587,15 @@ class LiveVendorStudioPanelState extends State<LiveVendorStudioPanel> {
     );
   }
 
-  Future<void> _loadCatalogRows({bool silent = false}) async {
+  Future<void> _loadCatalogRows({
+    bool silent = false,
+    bool bypassRebuildLock = false,
+  }) async {
+    if (!bypassRebuildLock && _deferCatalogSync) {
+      _deferredCatalogReload = true;
+      _deferredCatalogReloadSilent = silent;
+      return;
+    }
     final liveId = widget.liveId.trim();
     if (liveId.isEmpty) return;
     try {
@@ -555,6 +641,11 @@ class LiveVendorStudioPanelState extends State<LiveVendorStudioPanel> {
   }
 
   void _scheduleCatalogReload({bool silent = true}) {
+    if (_deferCatalogSync) {
+      _deferredCatalogReload = true;
+      _deferredCatalogReloadSilent = silent;
+      return;
+    }
     _catalogReloadDebounce?.cancel();
     _catalogReloadDebounce = Timer(const Duration(milliseconds: 450), () {
       unawaited(_loadCatalogRows(silent: silent));
@@ -647,7 +738,10 @@ class LiveVendorStudioPanelState extends State<LiveVendorStudioPanel> {
     }
   }
 
-  Future<void> _refreshStockCache([Iterable<String>? itemIds]) async {
+  Future<void> _refreshStockCache({
+    Iterable<String>? itemIds,
+    bool bypassRebuildLock = false,
+  }) async {
     final rows = _catalogRows ?? const <LiveItemsRow>[];
     final ids = itemIds ??
         rows.map((r) => r.id?.trim() ?? '').where((s) => s.isNotEmpty);
@@ -657,7 +751,10 @@ class LiveVendorStudioPanelState extends State<LiveVendorStudioPanel> {
     for (final entry in snaps.entries) {
       _syncCatalogRowAfterStockChange(entry.key, entry.value);
     }
-    setState(() => _stockByItemId.addAll(snaps));
+    _stockByItemId.addAll(snaps);
+    if (!bypassRebuildLock && _panelRebuildsLocked) return;
+    if (!mounted) return;
+    setState(() {});
   }
 
   Future<void> _refreshCatalogStockFromRealtime() async {
@@ -879,7 +976,7 @@ class LiveVendorStudioPanelState extends State<LiveVendorStudioPanel> {
         });
       }
       await _loadCatalogRows(silent: true);
-      await _refreshStockCache([id]);
+      await _refreshStockCache(itemIds: [id]);
       await _syncLiveOpsMetrics();
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -931,8 +1028,14 @@ class LiveVendorStudioPanelState extends State<LiveVendorStudioPanel> {
 
     if (!mounted) return;
     _logStudio('stock.sheet.open', liveItemId: id, data: {'current_qty': current});
-    await showModalBottomSheet<void>(
-      context: context,
+    _maestroLog('stock.sheet.open', data: {'live_item_id': id, 'current': current});
+    _StockAdjustSheetOutcome? outcome;
+    _setModalVisible(true);
+    final sheetHost = widget.modalHostContext ?? context;
+    try {
+      outcome = await showModalBottomSheet<_StockAdjustSheetOutcome>(
+      context: sheetHost,
+      useRootNavigator: true,
       isScrollControlled: true,
       backgroundColor: const Color(0xFF101518),
       shape: RoundedRectangleBorder(borderRadius: FleaberRadius.circularLg),
@@ -940,6 +1043,8 @@ class LiveVendorStudioPanelState extends State<LiveVendorStudioPanel> {
         return StatefulBuilder(
           builder: (context, setSheetState) {
             Future<void> applyAdjust({required bool remove}) async {
+              FocusScope.of(context).unfocus();
+              _maestroLog('stock.apply.start', data: {'remove': remove});
               final parsed = int.tryParse(manualCtrl.text.trim());
               final amount = (parsed != null && parsed > 0)
                   ? parsed
@@ -947,79 +1052,56 @@ class LiveVendorStudioPanelState extends State<LiveVendorStudioPanel> {
               final change = remove ? -amount : amount;
               final next = current + change;
               if (next < 1) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Stock mínimo: 1 unidade.'),
-                  ),
+                FleaberSnack.showAboveSheet(
+                  ctx,
+                  'Stock mínimo: 1 unidade.',
                 );
                 return;
               }
+              _acquirePanelRebuildLock();
               try {
                 final updated = await LiveCatalogStockService.updateItem(
                   liveItemId: id,
                   quantity: next,
                 );
-                if (updated != null && mounted) {
-                  setState(() {
-                    _stockByItemId[id] = updated;
-                    _syncCatalogRowAfterStockChange(id, updated);
-                  });
+                if (updated == null) {
+                  _releasePanelRebuildLock(flushDeferredCatalog: true);
+                  if (ctx.mounted) {
+                    FleaberSnack.showAboveSheet(
+                      ctx,
+                      'Não foi possível actualizar stock.',
+                    );
+                  }
+                  return;
                 }
-                await _loadCatalogRows(silent: true);
-                await _loadCatalogSupportData();
-                await _refreshStockCache([id]);
-                await _refreshActiveOpsSnapshot(forceFetch: true);
-                if (ctx.mounted) Navigator.pop(ctx);
-                if (mounted) {
-                  final disp = updated?.availableQty ?? next;
-                  ScaffoldMessenger.of(this.context).showSnackBar(
-                    SnackBar(
-                      content: Text(
-                        disp != next
-                            ? 'Stock na live: $next un. · Disponível: $disp un.'
-                            : 'Stock actualizado: $next un.',
-                      ),
-                    ),
-                  );
+                if (!ctx.mounted) {
+                  _releasePanelRebuildLock(flushDeferredCatalog: true);
+                  return;
                 }
-                _logStudio(
-                  remove ? 'stock.remove' : 'stock.add',
-                  liveItemId: id,
-                  data: {
-                    'from_qty': current,
-                    'to_qty': next,
-                    'delta': change,
-                    'amount': amount,
-                    if (updated != null) ...{
-                      'available_qty': updated.availableQty,
-                      'blocked_qty': updated.blockedQty,
-                    },
-                  },
+                _maestroLog(
+                  'stock.apply.api_ok',
+                  data: {'next': next, 'available': updated.availableQty},
                 );
-                final ref = _itemRefLabel(row);
-                if (!remove) {
-                  _appendActivity(
-                    'stock-adj-$id-${DateTime.now().millisecondsSinceEpoch}',
-                    '➕ ${_actorSellerLabel} adicionou +$amount un. $ref',
-                    DateTime.now(),
-                    LiveOpsActivityKind.stockAdjust,
-                    id,
-                    null,
-                    'Ver artigo',
-                  );
-                }
-                if (updated != null) {
-                  _maybeRecordLowStockActivity(
-                    liveItemId: id,
-                    refLabel: LiveVendorRefDisplay.itemDisplayName(
-                      title: row.title,
-                      refCode: row.refCode,
-                    ),
-                    availableQty: updated.availableQty,
-                  );
-                }
-                if (mounted) setState(() {});
-              } catch (e) {
+                Navigator.pop(
+                  ctx,
+                  _StockAdjustSheetOutcome(
+                    updated: updated,
+                    current: current,
+                    amount: amount,
+                    remove: remove,
+                    change: change,
+                    next: next,
+                  ),
+                );
+              } catch (e, st) {
+                _releasePanelRebuildLock(flushDeferredCatalog: true);
+                unawaited(
+                  MaestroStudioDebugLog.log(
+                    'stock.apply.error',
+                    error: e,
+                    stack: st,
+                  ),
+                );
                 _logStudio(
                   remove ? 'stock.remove' : 'stock.add',
                   liveItemId: id,
@@ -1027,11 +1109,10 @@ class LiveVendorStudioPanelState extends State<LiveVendorStudioPanel> {
                   data: {'from_qty': current, 'attempt_qty': next},
                   error: e,
                 );
-                if (mounted) {
-                  ScaffoldMessenger.of(this.context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Não foi possível actualizar stock.'),
-                    ),
+                if (ctx.mounted) {
+                  FleaberSnack.showAboveSheet(
+                    ctx,
+                    'Não foi possível actualizar stock.',
                   );
                 }
               }
@@ -1144,7 +1225,81 @@ class LiveVendorStudioPanelState extends State<LiveVendorStudioPanel> {
         );
       },
     );
-    manualCtrl.dispose();
+    } finally {
+      _setModalVisible(false);
+    }
+
+    if (!mounted) {
+      WidgetsBinding.instance.addPostFrameCallback((_) => manualCtrl.dispose());
+      if (_deferredCatalogReload) unawaited(_runDeferredPanelRebuilds());
+      return;
+    }
+    if (outcome == null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) => manualCtrl.dispose());
+      if (_deferredCatalogReload) await _runDeferredPanelRebuilds();
+      return;
+    }
+
+    try {
+      _deferredCatalogReload = false;
+      _maestroLog('stock.sheet.apply_outcome', data: {'next': outcome.next});
+      final updated = outcome.updated;
+      setState(() {
+        _stockByItemId[id] = updated;
+        _syncCatalogRowAfterStockChange(id, updated);
+      });
+      await _loadCatalogRows(silent: true, bypassRebuildLock: true);
+      await _loadCatalogSupportData();
+      await _refreshStockCache(itemIds: [id], bypassRebuildLock: true);
+      await _refreshActiveOpsSnapshot(
+        forceFetch: true,
+        bypassRebuildLock: true,
+      );
+      if (!mounted) return;
+      final disp = updated.availableQty;
+      FleaberSnack.show(
+        context,
+        disp != outcome.next
+            ? 'Stock na live: ${outcome.next} un. · Disponível: $disp un.'
+            : 'Stock actualizado: ${outcome.next} un.',
+      );
+      _logStudio(
+        outcome.remove ? 'stock.remove' : 'stock.add',
+        liveItemId: id,
+        data: {
+          'from_qty': outcome.current,
+          'to_qty': outcome.next,
+          'delta': outcome.change,
+          'amount': outcome.amount,
+          'available_qty': updated.availableQty,
+          'blocked_qty': updated.blockedQty,
+        },
+      );
+      final ref = _itemRefLabel(row);
+      if (!outcome.remove) {
+        _appendActivity(
+          'stock-adj-$id-${DateTime.now().millisecondsSinceEpoch}',
+          '➕ ${_actorSellerLabel} adicionou +${outcome.amount} un. $ref',
+          DateTime.now(),
+          LiveOpsActivityKind.stockAdjust,
+          id,
+          null,
+          'Ver artigo',
+        );
+      }
+      _maybeRecordLowStockActivity(
+        liveItemId: id,
+        refLabel: LiveVendorRefDisplay.itemDisplayName(
+          title: row.title,
+          refCode: row.refCode,
+        ),
+        availableQty: updated.availableQty,
+      );
+      _maestroLog('stock.sheet.done', data: {'next': outcome.next});
+    } finally {
+      _releasePanelRebuildLock(flushDeferredCatalog: false);
+      WidgetsBinding.instance.addPostFrameCallback((_) => manualCtrl.dispose());
+    }
   }
 
   Future<void> _addStockForCatalogItem(LiveItemsRow row, {int delta = 1}) async {
@@ -1538,6 +1693,8 @@ class LiveVendorStudioPanelState extends State<LiveVendorStudioPanel> {
       }
 
       try {
+        _maestroLog('quick_edit.apply.start');
+        _acquirePanelRebuildLock();
         final wasListed =
             itemRow.isMarketplaceProduct && product?.listOnMarketplace == true;
         final listParam = listOnMarketplace
@@ -1592,30 +1749,10 @@ class LiveVendorStudioPanelState extends State<LiveVendorStudioPanel> {
             );
           }
         }
-        if (updated != null && mounted) {
-          setState(() {
-            _stockByItemId[id] = updated;
-            _syncCatalogRowAfterStockChange(id, updated);
-          });
-        } else {
-          await _refreshStockCache([id]);
+        if (updated == null) {
+          await _refreshStockCache(itemIds: [id]);
         }
 
-        try {
-          await SupaFlow.client.rpc(
-            'batata_recompute_live_item_status',
-            params: {'p_live_item_id': id},
-          );
-        } catch (_) {}
-
-        await _loadCatalogRows(silent: true);
-        if (mounted) {
-          await _refreshStockCache([id]);
-          final snap = _stockByItemId[id];
-          if (snap != null) {
-            setState(() => _syncCatalogRowAfterStockChange(id, snap));
-          }
-        }
         final refRaw = itemRow.refCode?.trim() ?? refCtrl.text.trim();
         if (refRaw.isNotEmpty) {
           await LivePrepRefDetails.save(
@@ -1636,34 +1773,25 @@ class LiveVendorStudioPanelState extends State<LiveVendorStudioPanel> {
           );
         }
 
-        if (!mounted) return;
-        if (quickEditSheetContext?.mounted == true) {
-          Navigator.pop(quickEditSheetContext!);
+        final sheetCtx = quickEditSheetContext;
+        if (sheetCtx == null || !sheetCtx.mounted) {
+          _releasePanelRebuildLock(flushDeferredCatalog: true);
+          return;
         }
-        if (andShow) {
-          var rowToShow = itemRow;
-          for (final r in _catalogRows ?? const <LiveItemsRow>[]) {
-            if ((r.id ?? '').trim() == id) {
-              rowToShow = r;
-              break;
-            }
-          }
-          await _setActiveCatalogRow(rowToShow);
-        } else {
-          FleaberSnack.show(context, 'Alterações guardadas.');
-        }
-        _logStudio(
-          'catalog.edit',
-          liveItemId: id,
-          data: {
-            'qty': qty,
-            if (price != null) 'price': price,
-            'and_show': andShow,
-          },
+        _maestroLog('quick_edit.apply.api_ok', data: {'qty': qty});
+        Navigator.pop(
+          sheetCtx,
+          _QuickEditSheetOutcome(
+            updated: updated,
+            qty: qty < 1 ? 1 : qty,
+            andShow: andShow,
+            liveItemId: id,
+          ),
         );
       } catch (e) {
+        _releasePanelRebuildLock(flushDeferredCatalog: true);
         _logStudio(
-          'catalog.edit',
+          'quick.edit',
           liveItemId: id,
           status: 'error',
           error: e,
@@ -1697,8 +1825,14 @@ class LiveVendorStudioPanelState extends State<LiveVendorStudioPanel> {
     var listOnMarketplace =
         itemRow.isMarketplaceProduct && product?.listOnMarketplace == true;
 
-    await showModalBottomSheet<void>(
-      context: context,
+    _QuickEditSheetOutcome? outcome;
+    _maestroLog('quick_edit.sheet.open', data: {'live_item_id': itemId});
+    _setModalVisible(true);
+    final sheetHost = widget.modalHostContext ?? context;
+    try {
+      outcome = await showModalBottomSheet<_QuickEditSheetOutcome>(
+      context: sheetHost,
+      useRootNavigator: true,
       isScrollControlled: true,
       backgroundColor: const Color(0xFF101518),
       shape: RoundedRectangleBorder(borderRadius: FleaberRadius.circularLg),
@@ -1956,11 +2090,76 @@ class LiveVendorStudioPanelState extends State<LiveVendorStudioPanel> {
         );
       },
     );
+    } finally {
+      _setModalVisible(false);
+    }
 
-    qtyCtrl.dispose();
-    priceCtrl.dispose();
-    titleCtrl.dispose();
-    refCtrl.dispose();
+    void disposeQuickEditCtrls() {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        qtyCtrl.dispose();
+        priceCtrl.dispose();
+        titleCtrl.dispose();
+        descCtrl.dispose();
+        refCtrl.dispose();
+      });
+    }
+
+    if (!mounted) {
+      disposeQuickEditCtrls();
+      if (_deferredCatalogReload) unawaited(_runDeferredPanelRebuilds());
+      return;
+    }
+    if (outcome == null) {
+      disposeQuickEditCtrls();
+      if (_deferredCatalogReload) await _runDeferredPanelRebuilds();
+      return;
+    }
+
+    final appliedId = outcome.liveItemId;
+    try {
+      _deferredCatalogReload = false;
+      _maestroLog('quick_edit.sheet.apply_outcome', data: {'qty': outcome.qty});
+      final updated = outcome.updated;
+      if (updated != null && appliedId.isNotEmpty) {
+        setState(() {
+          _stockByItemId[appliedId] = updated;
+          _syncCatalogRowAfterStockChange(appliedId, updated);
+        });
+      }
+      try {
+        await SupaFlow.client.rpc(
+          'batata_recompute_live_item_status',
+          params: {'p_live_item_id': appliedId},
+        );
+      } catch (_) {}
+      await _loadCatalogRows(silent: true, bypassRebuildLock: true);
+      await _refreshStockCache(itemIds: [appliedId], bypassRebuildLock: true);
+      if (!mounted) return;
+      if (outcome.andShow) {
+        var rowToShow = itemRow;
+        for (final r in _catalogRows ?? const <LiveItemsRow>[]) {
+          if ((r.id ?? '').trim() == appliedId) {
+            rowToShow = r;
+            break;
+          }
+        }
+        await _setActiveCatalogRow(rowToShow);
+      } else {
+        FleaberSnack.show(context, 'Alterações guardadas.');
+      }
+      _logStudio(
+        'quick.edit',
+        liveItemId: appliedId,
+        data: {
+          'qty': outcome.qty,
+          'and_show': outcome.andShow,
+        },
+      );
+      _maestroLog('quick_edit.sheet.done', data: {'qty': outcome.qty});
+    } finally {
+      _releasePanelRebuildLock(flushDeferredCatalog: false);
+      disposeQuickEditCtrls();
+    }
   }
 
   List<String> _quickEditMarketplaceMissing({
@@ -2090,7 +2289,7 @@ class LiveVendorStudioPanelState extends State<LiveVendorStudioPanel> {
         // Tabela ainda não migrada no Supabase — o live continua via is_active.
       }
       if (!mounted) return;
-      await _refreshStockCache([id]);
+      await _refreshStockCache(itemIds: [id]);
       await _refreshActiveOpsSnapshot(forceFetch: true);
       _logStudio('catalog.show', liveItemId: id);
       _scheduleCatalogReload(silent: true);
@@ -2172,7 +2371,7 @@ class LiveVendorStudioPanelState extends State<LiveVendorStudioPanel> {
             .where((id) => id.isNotEmpty)
             .toSet();
         if (itemIds.isNotEmpty) {
-          unawaited(_refreshStockCache(itemIds));
+          unawaited(_refreshStockCache(itemIds: itemIds));
           unawaited(_loadCatalogRows(silent: true));
         }
       }
@@ -3444,10 +3643,18 @@ class LiveVendorStudioPanelState extends State<LiveVendorStudioPanel> {
     }
   }
 
-  Future<void> _refreshActiveOpsSnapshot({bool forceFetch = false}) async {
+  Future<void> _refreshActiveOpsSnapshot({
+    bool forceFetch = false,
+    bool bypassRebuildLock = false,
+  }) async {
     final active = _activeCatalogRow;
     if (active == null) {
-      if (mounted) setState(() => _activeOpsSnapshot = null);
+      if (!mounted) return;
+      if (!bypassRebuildLock && _deferCatalogSync) {
+        _activeOpsSnapshot = null;
+        return;
+      }
+      setState(() => _activeOpsSnapshot = null);
       return;
     }
     final itemId = active.id?.trim() ?? '';
@@ -3513,15 +3720,21 @@ class LiveVendorStudioPanelState extends State<LiveVendorStudioPanel> {
     }
 
     if (!mounted) return;
+    final snapshot = LiveItemOpsSnapshot(
+      available: availQty,
+      sold: sold,
+      inBag: inBag,
+      interested: reservationsTotal,
+      externalRequests: external,
+      pendingPayments: reservationsTotal,
+    );
+    if (!bypassRebuildLock && _deferCatalogSync) {
+      _activeOpsSnapshot = snapshot;
+      _notifyOpsTotals();
+      return;
+    }
     setState(() {
-      _activeOpsSnapshot = LiveItemOpsSnapshot(
-        available: availQty,
-        sold: sold,
-        inBag: inBag,
-        interested: reservationsTotal,
-        externalRequests: external,
-        pendingPayments: reservationsTotal,
-      );
+      _activeOpsSnapshot = snapshot;
     });
     _notifyOpsTotals();
   }
@@ -3718,6 +3931,11 @@ class LiveVendorStudioPanelState extends State<LiveVendorStudioPanel> {
           .stream(primaryKey: ['id'])
           .eq('live_id', liveId)
           .listen((_) {
+            if (_deferCatalogSync) {
+              _deferredCatalogReload = true;
+              _deferredCatalogReloadSilent = true;
+              return;
+            }
             unawaited(_loadReservationQueue());
             unawaited(_loadCatalogRows(silent: true));
             unawaited(_refreshCatalogStockFromRealtime());
@@ -3740,6 +3958,11 @@ class LiveVendorStudioPanelState extends State<LiveVendorStudioPanel> {
           .stream(primaryKey: ['id'])
           .eq('seller_id', sellerId)
           .listen((_) {
+            if (_deferCatalogSync) {
+              _deferredCatalogReload = true;
+              _deferredCatalogReloadSilent = true;
+              return;
+            }
             unawaited(_refreshCatalogStockFromRealtime());
             unawaited(_syncLiveOpsMetrics());
             if (mounted) setState(() {});
@@ -4022,7 +4245,7 @@ class LiveVendorStudioPanelState extends State<LiveVendorStudioPanel> {
       await _loadReservationQueue(refreshMetrics: true);
       final itemId = row.liveItemId?.trim() ?? '';
       if (itemId.isNotEmpty) {
-        await _refreshStockCache([itemId]);
+        await _refreshStockCache(itemIds: [itemId]);
       }
       await _syncLiveOpsMetrics();
       if (mounted) setState(() {});
@@ -6914,4 +7137,36 @@ class LiveVendorStudioPanelState extends State<LiveVendorStudioPanel> {
       ),
     );
   }
+}
+
+class _QuickEditSheetOutcome {
+  const _QuickEditSheetOutcome({
+    required this.updated,
+    required this.qty,
+    required this.andShow,
+    required this.liveItemId,
+  });
+
+  final LiveCatalogStockSnapshot? updated;
+  final int qty;
+  final bool andShow;
+  final String liveItemId;
+}
+
+class _StockAdjustSheetOutcome {
+  const _StockAdjustSheetOutcome({
+    required this.updated,
+    required this.current,
+    required this.amount,
+    required this.remove,
+    required this.change,
+    required this.next,
+  });
+
+  final LiveCatalogStockSnapshot updated;
+  final int current;
+  final int amount;
+  final bool remove;
+  final int change;
+  final int next;
 }

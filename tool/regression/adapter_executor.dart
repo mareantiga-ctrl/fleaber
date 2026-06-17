@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'hybrid_runner.dart';
 import 'maestro_device.dart';
+import 'maestro_live_log.dart';
 import 'models.dart';
 import 'run_session.dart';
 
@@ -365,24 +366,7 @@ class AdapterExecutor {
       }
     }
 
-    if (adapter.type == 'maestro' || adapter.requiresMaestro) {
-      final flow = (adapter.entry ?? adapter.path).toLowerCase();
-      if (flow.contains('harness_assert') ||
-          flow.contains('seller_harness') ||
-          flow.contains('harness_accept')) {
-        final mode = switch (test.id) {
-          'A090' => 'accepted',
-          'A094' => 'cancelled',
-          _ => 'pending',
-        };
-        await Process.run(
-          'dart',
-          ['run', 'tool/maestro_seed_harness.dart', '--mode', mode],
-          workingDirectory: repoRoot,
-          runInShell: Platform.isWindows,
-        );
-      }
-    }
+    await _runMaestroPreHooks(test);
 
     final flowPath = adapter.path.startsWith('../')
         ? '$repoRoot/.maestro/${adapter.path.replaceFirst('../', '')}'
@@ -471,6 +455,60 @@ class AdapterExecutor {
       result: result,
     );
   }
+
+  /// Hooks Dart antes de um passo Maestro (BD, seed harness, etc.).
+  Future<void> runMaestroPreHooks(ManifestTest test) async {
+    await _runMaestroPreHooks(test);
+  }
+
+  Future<void> _runMaestroPreHooks(ManifestTest test) async {
+    final adapter = test.adapter;
+    if (adapter == null) return;
+    if (adapter.type != 'maestro' && !adapter.requiresMaestro) return;
+
+    final flow = (adapter.entry ?? adapter.path).toLowerCase();
+    if (flow.contains('harness_assert') ||
+        flow.contains('seller_harness') ||
+        flow.contains('harness_accept')) {
+      final mode = switch (test.id) {
+        'A090' => 'accepted',
+        'A094' => 'cancelled',
+        _ => 'pending',
+      };
+      await Process.run(
+        'dart',
+        ['run', 'tool/maestro_seed_harness.dart', '--mode', mode],
+        workingDirectory: repoRoot,
+        runInShell: Platform.isWindows,
+      );
+    }
+    if (test.id == 'A002') {
+      await Process.run(
+        'dart',
+        ['run', 'tool/maestro_prep_empty_catalog.dart'],
+        workingDirectory: repoRoot,
+        runInShell: Platform.isWindows,
+      );
+    }
+  }
+
+  /// Invoca `run_maestro_flow.ps1` (usado pelas cadeias).
+  Future<ProcessResult> invokeMaestroFlow({
+    required String flowPath,
+    String? device,
+    required int driverPort,
+    bool skipInstall = false,
+    bool streamOutput = false,
+  }) =>
+      _invokeMaestroFlow(
+        flowPath: flowPath,
+        device: device,
+        driverPort: driverPort,
+        skipInstall: skipInstall,
+        streamOutput: streamOutput,
+      );
+
+  String tailMaestroOutput(ProcessResult result) => _tailOutput(result);
 
   /// Seller harness: login → adb deep link → assert (A089/A090/A094).
   Future<ProcessResult> _runSellerHarnessMaestro({
@@ -573,30 +611,40 @@ class AdapterExecutor {
     String? device,
     required int driverPort,
     bool skipInstall = false,
+    bool streamOutput = false,
   }) async {
     final path = flowPath ??
         (loginSubflow != null
             ? '$repoRoot/.maestro/$loginSubflow'
             : '$repoRoot/.maestro/$opsFlow');
+    final args = [
+      '-ExecutionPolicy',
+      'Bypass',
+      '-File',
+      'tool/run_maestro_flow.ps1',
+      '-FlowPath',
+      path.replaceAll('\\', '/'),
+      if (device != null && device.isNotEmpty) ...[
+        '-Device',
+        device,
+      ],
+      if (driverPort > 0) ...[
+        '-DriverHostPort',
+        '$driverPort',
+      ],
+      if (skipInstall) '-SkipInstall',
+    ];
+    if (streamOutput) {
+      return MaestroLiveLog.runStreaming(
+        executable: 'powershell',
+        arguments: args,
+        workingDirectory: repoRoot,
+        runInShell: true,
+      );
+    }
     return Process.run(
       'powershell',
-      [
-        '-ExecutionPolicy',
-        'Bypass',
-        '-File',
-        'tool/run_maestro_flow.ps1',
-        '-FlowPath',
-        path.replaceAll('\\', '/'),
-        if (device != null && device.isNotEmpty) ...[
-          '-Device',
-          device,
-        ],
-        if (driverPort > 0) ...[
-          '-DriverHostPort',
-          '$driverPort',
-        ],
-        if (skipInstall) '-SkipInstall',
-      ],
+      args,
       workingDirectory: repoRoot,
       runInShell: true,
     );
@@ -699,8 +747,7 @@ class AdapterExecutor {
   String _tailOutput(ProcessResult result) {
     final stderr = result.stderr.toString().trim();
     final stdout = result.stdout.toString().trim();
-    final tail = stderr.isNotEmpty ? stderr : stdout;
-    return tail.length > 400 ? tail.substring(tail.length - 400) : tail;
+    return MaestroLiveLog.parseFailure(stdout, stderr);
   }
 }
 

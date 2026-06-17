@@ -8,6 +8,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '/auth/supabase_auth/auth_util.dart';
 import '/backend/supabase/supabase.dart';
 import '/utils/fleaber_screen_wake.dart';
+import '/utils/maestro_studio_debug_log.dart';
 import '/widgets/live_vendor_ops_ui.dart';
 import '/widgets/live_vendor_studio_panel.dart';
 
@@ -48,6 +49,7 @@ class _MaestroSellerStudioPageWidgetState extends State<MaestroSellerStudioPageW
   bool _privateChatMode = false;
   int _privateUnread = 0;
   SellerLiveActivePanel _activePanel = SellerLiveActivePanel.none;
+  bool _studioModalOpen = false;
 
   @override
   void initState() {
@@ -55,6 +57,8 @@ class _MaestroSellerStudioPageWidgetState extends State<MaestroSellerStudioPageW
     unawaited(
       SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]),
     );
+    unawaited(MaestroStudioDebugLog.enable(session: 'maestro_seller_studio'));
+    MaestroStudioDebugLog.installFlutterErrorHandler();
     unawaited(_bootstrap());
   }
 
@@ -147,7 +151,65 @@ class _MaestroSellerStudioPageWidgetState extends State<MaestroSellerStudioPageW
     }
   }
 
+  void _onStudioModalVisibilityChanged(bool open) {
+    if (_studioModalOpen == open) return;
+    _studioModalOpen = open;
+    unawaited(
+      MaestroStudioDebugLog.log(
+        'parent.modal_visibility',
+        data: {'open': open},
+      ),
+    );
+  }
+
+  void _parentSetState(VoidCallback fn) {
+    if (_studioModalOpen) {
+      unawaited(
+        MaestroStudioDebugLog.log('parent.setState.blocked_while_modal'),
+      );
+      return;
+    }
+    setState(fn);
+  }
+
   DateTime? get _startedAt => _live?.createdAt;
+
+  Widget _studioPanel({
+    required BuildContext modalHostContext,
+    required LivesRow live,
+  }) {
+    final liveId = live.id!.trim();
+    final sellerId = live.sellerId?.trim() ?? currentUserUid;
+
+    return LiveVendorStudioPanel(
+      key: _studioPanelKey,
+      liveId: liveId,
+      sellerId: sellerId,
+      startedAt: _startedAt,
+      catalogItemCount: _catalogItemCount,
+      hideTopChrome: true,
+      viewerStyleLayout: true,
+      sellerOverlayLayout: true,
+      showTopNav: true,
+      modalHostContext: modalHostContext,
+      onModalVisibilityChanged: _onStudioModalVisibilityChanged,
+      privateChatMode: _privateChatMode,
+      onPrivateChatModeChanged: (v) {
+        if (_privateChatMode == v) return;
+        _parentSetState(() => _privateChatMode = v);
+      },
+      onPrivateUnreadChanged: (n) {
+        if (_privateUnread == n) return;
+        _parentSetState(() => _privateUnread = n);
+      },
+      activePanel: _activePanel,
+      onActivePanelChanged: (panel) {
+        if (_activePanel == panel) return;
+        _parentSetState(() => _activePanel = panel);
+      },
+      onMoreTap: () => _studioPanelKey.currentState?.showMoreMenu(),
+    );
+  }
 
   SellerOperationSection _opsSectionFromParam(String? raw) {
     return switch (raw?.trim().toLowerCase()) {
@@ -295,32 +357,12 @@ class _MaestroSellerStudioPageWidgetState extends State<MaestroSellerStudioPageW
                 Expanded(
                   child: Padding(
                     padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
-                    child: LiveVendorStudioPanel(
-                      key: _studioPanelKey,
-                      liveId: liveId,
-                      sellerId: sellerId,
-                      startedAt: _startedAt,
-                      catalogItemCount: _catalogItemCount,
-                      hideTopChrome: true,
-                      viewerStyleLayout: true,
-                      sellerOverlayLayout: true,
-                      showTopNav: true,
-                      privateChatMode: _privateChatMode,
-                      onPrivateChatModeChanged: (v) {
-                        if (_privateChatMode == v) return;
-                        setState(() => _privateChatMode = v);
-                      },
-                      onPrivateUnreadChanged: (n) {
-                        if (_privateUnread == n) return;
-                        setState(() => _privateUnread = n);
-                      },
-                      activePanel: _activePanel,
-                      onActivePanelChanged: (panel) {
-                        if (_activePanel == panel) return;
-                        setState(() => _activePanel = panel);
-                      },
-                      onMoreTap: () =>
-                          _studioPanelKey.currentState?.showMoreMenu(),
+                    child: Builder(
+                      builder: (modalHostContext) =>
+                          _studioPanel(
+                            modalHostContext: modalHostContext,
+                            live: live,
+                          ),
                     ),
                   ),
                 ),

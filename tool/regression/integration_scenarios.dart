@@ -1,4 +1,6 @@
 // ignore_for_file: avoid_print
+import 'dart:io';
+
 import '../live_ops_staging_client.dart';
 
 const _liveTitle = 'REGRESSION_INT_TEST';
@@ -61,6 +63,8 @@ class IntegrationScenarios {
         return _scenarioCrossPoolProductSold(sellerId, buyerId);
       case 'logical_item_lineage':
         return _scenarioLogicalItemLineage(sellerId);
+      case 'a3_r32_qty_alignment':
+        return _scenarioA3R32QtyAlignment(sellerId, sellerToken);
       case 'helper_seller_exists':
         return _scenarioHelperSellerExists(sellerId);
       case 'chat_messages_db':
@@ -518,6 +522,107 @@ class IntegrationScenarios {
     }
   }
 
+  /// A3/R32 — quick edit qty, venda, live ended, novo directo: pool stock coerente.
+  Future<bool> _scenarioA3R32QtyAlignment(
+    String sellerId,
+    String sellerToken,
+  ) async {
+    try {
+      await _cleanup(sellerId);
+      final buyerId = await _buyerId();
+      final fxA = await _createLiveFixture(
+        sellerId: sellerId,
+        buyerId: buyerId,
+        itemQty: 10,
+      );
+      final itemA = fxA['live_item_id']!;
+      final productId = fxA['product_id']!;
+
+      final upd = await client.rpc(
+        'batata_update_live_item',
+        {'p_live_item_id': itemA, 'p_quantity': 12},
+        accessToken: sellerToken,
+      );
+      if (upd is! Map) {
+        print('  update qty: $upd');
+        return false;
+      }
+
+      final order = await client.insert('orders', {
+        'product_id': productId,
+        'buyer_id': buyerId,
+        'seller_id': sellerId,
+        'price_total': 5,
+        'status': 'pago',
+        'quantity': 1,
+        'live_id': fxA['live_id'],
+        'live_item_id': itemA,
+        'payment_method': 'Pagamento na App',
+      });
+      await client.insert('live_reservation_requests', {
+        'live_id': fxA['live_id'],
+        'live_item_id': itemA,
+        'seller_id': sellerId,
+        'buyer_id': buyerId,
+        'requested_qty': 1,
+        'status': 'converted',
+        'source': 'fleaber_live',
+        'notes': 'order:${order['id']}',
+      });
+
+      await client.patch(
+        'lives',
+        'id=eq.${fxA['live_id']}',
+        {'status': 'ended', 'is_active': false},
+      );
+
+      final liveB = await client.insert('lives', {
+        'title': _liveTitle,
+        'status': 'live',
+        'seller_id': sellerId,
+        'vendedor_id': sellerId,
+        'is_active': true,
+      });
+      final ref = fxA['ref']!;
+      final itemB = await client.insert('live_items', {
+        'live_id': liveB['id'],
+        'ref_code': ref,
+        'title': 'Regression item B',
+        'price': 5,
+        'is_active': true,
+        'status': 'available',
+        'item_kind': 'marketplace_product',
+        'product_id': productId,
+        'checkout_product_id': productId,
+        'logical_item_id': productId,
+      });
+      final itemBId = itemB['id']!.toString();
+
+      final stockB = await _stockRpc(itemBId);
+      if (stockB == null) {
+        print('  stock rpc null on new live');
+        return false;
+      }
+      final total = (stockB['total_qty'] as num?)?.toInt();
+      final avail = (stockB['available_qty'] as num?)?.toInt();
+      final sold = (stockB['sold_converted_qty'] as num?)?.toInt() ??
+          (stockB['sold'] as num?)?.toInt();
+      print('  a3_r32: liveB total=$total available=$avail sold=$sold');
+      if (total != 12) {
+        print('  expected total_qty=12 after quick edit inherit');
+        return false;
+      }
+      if (avail == null || avail < 10 || avail > 11) {
+        print('  expected available ~11 after 1 sold (got $avail)');
+        return false;
+      }
+      return true;
+    } catch (e) {
+      print('  a3_r32_qty_alignment: $e');
+      return false;
+    }
+  }
+
   Future<bool> _scenarioLogicalItemInherit(String sellerId) async {
     try {
       await _cleanup(sellerId);
@@ -636,9 +741,35 @@ class IntegrationScenarios {
 
   Future<bool> _scenarioVerifyRaffleJoin(String sellerId) async {
     try {
+      final buyerId = await _buyerId();
+      var raffleId = env['MAESTRO_RAFFLE_ID']?.trim() ?? '';
+      if (!isUuid(raffleId)) {
+        final maestroEnv = File('.maestro/.env');
+        if (maestroEnv.existsSync()) {
+          for (final line in maestroEnv.readAsLinesSync()) {
+            final t = line.trim();
+            if (t.startsWith('MAESTRO_RAFFLE_ID=')) {
+              raffleId = t.substring('MAESTRO_RAFFLE_ID='.length).trim();
+              break;
+            }
+          }
+        }
+      }
+      if (!isUuid(raffleId)) {
+        final raffles = await client.select(
+          'live_raffles',
+          filter: 'seller_id=eq.$sellerId',
+          limit: 20,
+        );
+        if (raffles.isEmpty) return false;
+        raffles.sort((a, b) =>
+            (b['created_at']?.toString() ?? '').compareTo(a['created_at']?.toString() ?? ''));
+        raffleId = raffles.first['id']?.toString() ?? '';
+      }
+      if (!isUuid(raffleId)) return false;
       final rows = await client.select(
         'live_raffle_entries',
-        filter: 'seller_id=eq.$sellerId',
+        filter: 'raffle_id=eq.$raffleId&user_id=eq.$buyerId',
         limit: 5,
       );
       return rows.isNotEmpty;

@@ -1,0 +1,27 @@
+# Doc #3 — seller adiciona stock (harness Maestro).
+appId: com.mycompany.fleaber
+---
+- extendedWaitUntil:
+    visible: ".*Ref MAESTRO.*"
+    timeout: 120000
+- takeScreenshot: cs02_seller_catalog_before
+- scrollUntilVisible:
+    element:
+      text: ".*Ref MAESTRO.*"
+    direction: DOWN
+    timeout: 60000
+- tapOn: "Menu artigo catálogo"
+- tapOn: "Adicionar stock"
+- takeScreenshot: cs02_seller_stock_sheet
+- tapOn: "Adicionar"
+- extendedWaitUntil:
+    notVisible: "Failed assertion"
+    timeout: 20000
+- takeScreenshot: cs02_seller_catalog_after
+- extendedWaitUntil:
+    visible: "Stock actualizado"
+    optional: true
+    timeout: 8000
+- extendedWaitUntil:
+    visible: ".*Ref MAESTRO.*"
+    timeout: 30000

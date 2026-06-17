@@ -1,0 +1,19 @@
+# CS01 — buyer player apos reserva pending (prints).
+appId: com.mycompany.fleaber
+---
+- runFlow: ../subflows/login_buyer.yaml
+- runFlow: ../subflows/nav_buyer_to_live_player.yaml
+- extendedWaitUntil:
+    visible: "Saco da live"
+    timeout: 90000
+- takeScreenshot: cs01_buyer_player
+- extendedWaitUntil:
+    visible: "Maestro smoke item"
+    timeout: 60000
+    optional: true
+- takeScreenshot: cs01_buyer_item_card
+- tapOn: "Saco da live"
+- extendedWaitUntil:
+    visible: "Saco da live"
+    timeout: 20000
+- takeScreenshot: cs01_buyer_bag

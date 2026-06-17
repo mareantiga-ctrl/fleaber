@@ -1,0 +1,38 @@
+# CS03 — A3: quick edit qty no catalogo (5+1 reserva -> total 10, disp 9).
+appId: com.mycompany.fleaber
+---
+- extendedWaitUntil:
+    visible: "Catálogo"
+    timeout: 120000
+- takeScreenshot: cs03_seller_catalog_before
+- tapOn: "Catálogo"
+- extendedWaitUntil:
+    visible: "Maestro smoke item"
+    timeout: 30000
+- takeScreenshot: cs03_seller_catalog_card_before
+- tapOn:
+    point: "92%,28%"
+- tapOn: "Editar rápido"
+- extendedWaitUntil:
+    visible: "Quantidade"
+    timeout: 30000
+- takeScreenshot: cs03_seller_quick_edit_open
+- tapOn:
+    text: "Quantidade"
+    index: 0
+- eraseText: 10
+- inputText: "10"
+- hideKeyboard
+- tapOn: "Guardar"
+- extendedWaitUntil:
+    notVisible: "Failed assertion"
+    timeout: 20000
+- extendedWaitUntil:
+    visible: "9 disponíveis"
+    timeout: 45000
+- extendedWaitUntil:
+    visible: "Disp: 9"
+    timeout: 30000
+- takeScreenshot: cs03_seller_catalog_after_edit
+- assertVisible: "9 disponíveis"
+- assertVisible: "Disp: 9"

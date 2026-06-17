@@ -27,6 +27,8 @@ RunnerOptions _parseArgs(List<String> args) {
   var regenerateManifest = false;
   var selfTest = false;
   var guided = false;
+  var skipAudit = false;
+  var maestroChains = true;
   String? range;
   String? priority;
   String? area;
@@ -54,6 +56,15 @@ RunnerOptions _parseArgs(List<String> args) {
         break;
       case '--guided':
         guided = true;
+        break;
+      case '--skip-audit':
+        skipAudit = true;
+        break;
+      case '--no-maestro-chains':
+        maestroChains = false;
+        break;
+      case '--maestro-chains':
+        maestroChains = true;
         break;
       case '--range':
         range = _nextArg(args, ++i, a);
@@ -121,6 +132,8 @@ RunnerOptions _parseArgs(List<String> args) {
     regenerateManifest: regenerateManifest,
     selfTest: selfTest,
     guided: guided,
+    skipAudit: skipAudit,
+    maestroChains: maestroChains,
   );
 }
 
@@ -149,7 +162,11 @@ Comandos:
   --suggest-retest --changed lib/widgets/live_vendor_studio_panel.dart
   --regenerate-manifest     Re-parse docs → manifest + risk_graph
   --self-test               Smoke da infraestrutura
+  --skip-audit              Não corre auditoria Cursor pós-teste
+  --no-maestro-chains       Maestro: 1 flow por ID (legado, mais lento)
+  --maestro-chains          Maestro: sessões em cadeia (defeito ON)
 
+Auditoria (por defeito ON): tool/logs/regression_<stamp>/ + tool/logs/audit_<stamp>/
 Relatórios: tool/reports/regression_<timestamp>/
 Estado: test/regression/state.json
 ''');

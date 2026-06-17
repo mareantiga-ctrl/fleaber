@@ -1,0 +1,25 @@
+# A022 — passos (sem login): sair do prep e reentrar.
+appId: com.mycompany.fleaber
+---
+- runFlow: nav_seller_to_prep.yaml
+- runFlow: prep_add_ref_99.yaml
+- pressKey: back
+- pressKey: back
+- pressKey: back
+- extendedWaitUntil:
+    visible: "Início"
+    timeout: 20000
+    optional: true
+- runFlow:
+    when:
+      notVisible: "Início"
+    commands:
+      - runFlow: nav_seller_home.yaml
+- extendedWaitUntil:
+    visible: "Início"
+    timeout: 60000
+- runFlow: nav_seller_to_prep.yaml
+- extendedWaitUntil:
+    visible: "Artigos do directo"
+    timeout: 60000
+- takeScreenshot: a022_prep_reentry

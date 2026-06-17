@@ -10,11 +10,13 @@ import 'models.dart';
 import '../maestro_seed_harness.dart';
 import 'guided_session.dart';
 import 'maestro_device.dart';
+import 'maestro_chain_runner.dart';
 import 'report_writer.dart';
 import 'run_session.dart';
 import 'staging_guard.dart';
 import 'store.dart';
 import 'failure_classifier.dart';
+import 'audit_hook.dart';
 
 class RegressionRunner {
   RegressionRunner(this.options)
@@ -120,16 +122,50 @@ class RegressionRunner {
 
     final coverage = computeCoverage(manifest);
 
+    final auditStamp = _auditStamp();
+    final auditHook = RegressionAuditHook(
+      repoRoot: paths.repoRoot,
+      stamp: auditStamp,
+    );
+
     print('Fleaber Regression Runner');
     print('Comando: $command${options.guided ? " (guided)" : ""}');
+    if (!options.skipAudit) {
+      print(
+        'Auditoria: stamp=$auditStamp '
+        'logs=${auditHook.evidenceRoot}/ + ${auditHook.auditRoot}/',
+      );
+    }
     print('Adapters registados: ${coverage.total} / ${manifest.length}');
     print('  automated=${coverage.automated} manual=${coverage.manual} guided=${coverage.guided}');
     print('  overrides explícitos=${countExplicitOverrides()}');
     print('Testes seleccionados: ${ids.length} / ${manifest.length}');
+    if (options.maestroChains && !options.guided) {
+      print('Maestro: modo cadeia ON (usa --no-maestro-chains para legado)');
+    }
     print('---');
 
     final sw = Stopwatch()..start();
     final results = <TestRunResult>[];
+
+    final maestroIds = ids
+        .where((id) => manifest[id]?.adapter?.type == 'maestro')
+        .toSet();
+    var chainResults = <String, TestRunResult>{};
+    if (options.maestroChains &&
+        !options.guided &&
+        maestroIds.isNotEmpty &&
+        session.maestroReady) {
+      if (!options.skipAudit) {
+        auditHook.markMaestroWindow();
+      }
+      chainResults = await MaestroChainRunner(
+        repoRoot: paths.repoRoot,
+        session: session,
+        executor: executor,
+        manifest: manifest,
+      ).run(maestroIds);
+    }
 
     for (final id in ids) {
       final test = manifest[id]!;
@@ -137,7 +173,21 @@ class RegressionRunner {
       final dedupeKey = adapter?.dedupeKey ?? adapter?.path;
 
       TestRunResult result;
-      if (dedupeKey != null) {
+      if (chainResults.containsKey(id)) {
+        result = chainResults[id]!;
+        if (dedupeKey != null) {
+          session.putCache(
+            dedupeKey,
+            TestRunCache(
+              status: result.status,
+              layersRun: result.layersRun,
+              message: result.message,
+              durationMs: result.durationMs,
+              realExecution: result.durationMs > 0,
+            ),
+          );
+        }
+      } else if (dedupeKey != null) {
         final cached = session.cached(dedupeKey);
         if (cached != null && cached.realExecution) {
           result = TestRunResult(
@@ -149,6 +199,9 @@ class RegressionRunner {
             message: 'Dedupe $dedupeKey (já executado)',
           );
         } else {
+          if (!options.skipAudit && _needsMaestroWindow(test)) {
+            auditHook.markMaestroWindow();
+          }
           result = await executor.run(test);
           session.putCache(
             dedupeKey,
@@ -162,7 +215,21 @@ class RegressionRunner {
           );
         }
       } else {
+        if (!options.skipAudit && _needsMaestroWindow(test)) {
+          auditHook.markMaestroWindow();
+        }
         result = await executor.run(test);
+      }
+
+      if (!options.skipAudit) {
+        final audited = await auditHook.maybeAudit(test: test, result: result);
+        if (audited != null) {
+          result = mergeAuditResult(result, audited);
+          print(
+            '  AUDIT ${result.id} => ${audited.conclusion}'
+            '${audited.probableCause.isNotEmpty ? " | ${audited.probableCause}" : ""}',
+          );
+        }
       }
 
       results.add(result);
@@ -194,11 +261,28 @@ class RegressionRunner {
 
     print('---');
     print('Relatório: $reportDir');
+    if (!options.skipAudit) {
+      print('Auditoria agregada: ${auditHook.auditRoot}/audit_summary.md');
+    }
     _printSummary(results);
 
     final appFails =
         results.where((r) => classifyResult(r) == FailureClass.appFail).length;
     return appFails > 0 ? 1 : 0;
+  }
+
+  bool _needsMaestroWindow(ManifestTest test) {
+    final a = test.adapter;
+    if (a == null) return false;
+    return a.type == 'maestro' ||
+        a.type == 'hybrid' ||
+        a.requiresMaestro;
+  }
+
+  String _auditStamp() {
+    final n = DateTime.now();
+    String two(int v) => v.toString().padLeft(2, '0');
+    return '${n.year}${two(n.month)}${two(n.day)}_${two(n.hour)}${two(n.minute)}${two(n.second)}';
   }
 
   bool _needsLiveId(ManifestTest test) {
@@ -230,6 +314,24 @@ class RegressionRunner {
 
     env.addAll(parseEnvFile(maestroEnvPath));
 
+    final liveIdMissing =
+        (env['MAESTRO_LIVE_ID']?.trim().isEmpty ?? true) ||
+            !isUuid(env['MAESTRO_LIVE_ID']?.trim() ?? '');
+    if (liveIdMissing) {
+      print('MAESTRO_LIVE_ID em falta — a preparar live staging…');
+      final r = await Process.run(
+        'dart',
+        ['run', 'tool/maestro_prepare_live.dart'],
+        workingDirectory: paths.repoRoot,
+        runInShell: Platform.isWindows,
+      );
+      if (r.exitCode != 0) {
+        print('AVISO maestro_prepare_live: ${_tail(r)}');
+      } else {
+        env.addAll(parseEnvFile(maestroEnvPath));
+      }
+    }
+
     final probe = await MaestroDeviceProbe.detect(paths.repoRoot);
     _assignMaestroDevices(env, probe.devices);
 
@@ -260,19 +362,26 @@ class RegressionRunner {
 
   void _assignMaestroDevices(Map<String, String> env, List<String> devices) {
     if (devices.isEmpty) return;
-    const sellerPref = 'emulator-5554';
-    const buyerPref = 'emulator-5558';
-    final seller = devices.contains(sellerPref)
-        ? sellerPref
-        : devices.first;
-    final buyer = devices.contains(buyerPref)
-        ? buyerPref
-        : devices.length > 1
-            ? devices.firstWhere((d) => d != seller, orElse: () => seller)
-            : seller;
+    final stagingSeller = env['MAESTRO_DEVICE_SELLER']?.trim() ?? '';
+    final stagingBuyer = env['MAESTRO_DEVICE_BUYER']?.trim() ?? '';
+
+    final seller = stagingSeller.isNotEmpty && devices.contains(stagingSeller)
+        ? stagingSeller
+        : devices.firstWhere(
+            (d) => !d.startsWith('emulator-'),
+            orElse: () => devices.first,
+          );
+
+    final buyer = stagingBuyer.isNotEmpty && devices.contains(stagingBuyer)
+        ? stagingBuyer
+        : devices.firstWhere(
+            (d) => d != seller,
+            orElse: () => seller,
+          );
+
     env.putIfAbsent('MAESTRO_DEVICE_SELLER', () => seller);
     env.putIfAbsent('MAESTRO_DEVICE_BUYER', () => buyer);
-    env.putIfAbsent('MAESTRO_DEVICE_DEFAULT', () => buyer);
+    env.putIfAbsent('MAESTRO_DEVICE_DEFAULT', () => seller);
   }
 
   String _tail(ProcessResult r) {

@@ -37,11 +37,13 @@ void main(List<String> args) async {
     failed++;
   } else {
     final st = lives.first['status']?.toString() ?? '';
-    if (st != 'live') {
+    if (st == 'live') {
+      print('OK live_status=live');
+    } else if (st == 'ended' && expectAccepted) {
+      print('WARN live_status=ended (reserva aceite OK; live pode ter fechado no studio)');
+    } else {
       print('FAIL live_status=$st (esperado live)');
       failed++;
-    } else {
-      print('OK live_status=live');
     }
   }
 

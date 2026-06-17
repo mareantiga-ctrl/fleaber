@@ -2,17 +2,18 @@
 appId: com.mycompany.fleaber
 ---
 - runFlow: ../subflows/login_buyer.yaml
-- openLink: ${MAESTRO_DEEP_LINK_BASE}/fleaberLivePlayer?liveId=${MAESTRO_LIVE_ID}&isLive=true
+- runFlow: ../subflows/nav_buyer_to_live_player.yaml
 - extendedWaitUntil:
     visible: "Saco da live"
     timeout: 90000
+- takeScreenshot: cs10_buyer_player
 - tapOn:
     text: "Rifa da Live"
     optional: true
 - extendedWaitUntil:
-    visible: "Participar na Rifa"
+    visible: "Participar na Rifa (+1)"
     timeout: 45000
-    optional: true
+- takeScreenshot: cs10_buyer_raffle_sheet
 - tapOn:
     text: "Participar na Rifa (+1)"
     optional: true
@@ -20,7 +21,20 @@ appId: com.mycompany.fleaber
     visible: "Ganha mais rifas"
     timeout: 30000
     optional: true
-- tapOn: "Saco da live"
+- runFlow:
+    when:
+      visible: "Ganha mais rifas"
+    commands:
+      - tapOn:
+          text: "Fechar"
+          optional: true
+      - tapOn:
+          text: "OK"
+          optional: true
+      - pressKey: back
+- tapOn:
+    text: "Saco.*"
 - extendedWaitUntil:
     visible: "Saco da live"
     timeout: 20000
+- takeScreenshot: cs10_buyer_bag

@@ -7,7 +7,17 @@ appId: com.mycompany.fleaber
 - extendedWaitUntil:
     visible: "Aceitar"
     timeout: 120000
+- takeScreenshot: cs01_seller_pending_aceitar
 - assertNotVisible:
     text: "A tratar"
     optional: true
 - tapOn: "Aceitar"
+- runFlow:
+    when:
+      visible: "Aceitar sem stock?"
+    commands:
+      - tapOn: "Sim, aceitar"
+- extendedWaitUntil:
+    notVisible: "Aceitar"
+    timeout: 60000
+- takeScreenshot: cs01_seller_after_aceitar

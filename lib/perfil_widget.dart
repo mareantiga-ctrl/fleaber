@@ -186,10 +186,6 @@ class _PerfilWidgetState extends State<PerfilWidget> {
                             staff.effectiveSellerId,
                             ParamType.String,
                           ),
-                          'initialTab': serializeParam(
-                            'marketplace',
-                            ParamType.String,
-                          ),
                         }.withoutNulls,
                       );
                     },

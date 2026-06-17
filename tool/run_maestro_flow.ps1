@@ -45,6 +45,9 @@ Get-Content $envFile | ForEach-Object {
 
 if ($Device -eq "") {
   $deviceFromEnv = (Get-Content $envFile | Where-Object { $_ -match '^MAESTRO_DEVICE_DEFAULT=' } | Select-Object -First 1)
+  if (-not $deviceFromEnv) {
+    $deviceFromEnv = (Get-Content $envFile | Where-Object { $_ -match '^MAESTRO_DEVICE_SELLER=' } | Select-Object -First 1)
+  }
   if ($deviceFromEnv) {
     $Device = ($deviceFromEnv -split '=', 2)[1].Trim()
   }
@@ -100,4 +103,6 @@ $maestroArgs += $flowFull
 
 Write-Host "Maestro -> $flowFull (device=$Device port=$DriverHostPort)"
 & $maestroBat @maestroArgs
-exit $LASTEXITCODE
+$code = $LASTEXITCODE
+if ($code -ne 0) { exit $code }
+exit 0

@@ -92,7 +92,10 @@ class LiveVendorCatalogQueueCard extends StatelessWidget {
       ),
       child: Padding(
         padding: const EdgeInsets.fromLTRB(8, 8, 6, 8),
-        child: Row(
+        child: Semantics(
+          container: true,
+          explicitChildNodes: true,
+          child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             ClipRRect(
@@ -180,7 +183,10 @@ class LiveVendorCatalogQueueCard extends StatelessWidget {
             const SizedBox(width: 4),
             _compactActionButton(),
             if (onMenuSelected != null)
-              PopupMenuButton<String>(
+              Semantics(
+                label: 'Menu artigo catálogo',
+                button: true,
+                child: PopupMenuButton<String>(
                 padding: EdgeInsets.zero,
                 icon: Icon(
                   Icons.more_vert_rounded,
@@ -212,7 +218,9 @@ class LiveVendorCatalogQueueCard extends StatelessWidget {
                   ),
                 ],
               ),
+              ),
           ],
+        ),
         ),
       ),
     );

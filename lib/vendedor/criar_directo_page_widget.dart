@@ -1947,7 +1947,11 @@ class _CriarDirectoPageWidgetState extends State<CriarDirectoPageWidget>
                         ),
                       ),
                       Expanded(
-                        child: TextField(
+                        child: Semantics(
+                          identifier: 'criar_directo_title',
+                          textField: true,
+                          label: 'Título do Direto',
+                          child: TextField(
                           controller: _titleController,
                           enabled: !_starting,
                           style: GoogleFonts.inter(
@@ -1968,6 +1972,7 @@ class _CriarDirectoPageWidgetState extends State<CriarDirectoPageWidget>
                               vertical: 14,
                             ),
                           ),
+                        ),
                         ),
                       ),
                     ],

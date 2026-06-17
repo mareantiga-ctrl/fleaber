@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'adapter_registry.dart';
 import 'area_mapper.dart';
+import 'automation_policy.dart';
 import 'models.dart';
 
 /// Gera manifest.json + risk_graph.json a partir dos docs expandidos.
@@ -57,11 +58,18 @@ class ManifestBuilder {
       tests.entries.toList()..sort((a, b) => a.key.compareTo(b.key)),
     );
 
+    final resolved = applyRegistryToManifest(sorted);
+
     return {
       'version': 1,
       'generated_at': DateTime.now().toUtc().toIso8601String(),
       'source': 'docs/live-ecosystem-test-matrix-A*.md',
-      'tests': sorted.map((k, v) => MapEntry(k, v.toJson())),
+      'automation_policy': {
+        'manual_checkpoint_ids': kManualCheckpointIds.toList()..sort(),
+        'guided_checkpoint_ids': kGuidedCheckpointIds.toList()..sort(),
+        'expected_automated': kExpectedAutomated,
+      },
+      'tests': resolved.map((k, v) => MapEntry(k, v.toJson())),
     };
   }
 

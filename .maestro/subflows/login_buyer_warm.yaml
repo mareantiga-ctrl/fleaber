@@ -1,0 +1,12 @@
+# Login comprador sem apagar sessão.
+appId: com.mycompany.fleaber
+---
+- runFlow: launch_fleaber_warm.yaml
+- runFlow:
+    when:
+      visible:
+        id: login_email
+    file: login_buyer_credentials.yaml
+- extendedWaitUntil:
+    visible: "Início"
+    timeout: 180000

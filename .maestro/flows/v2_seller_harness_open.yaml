@@ -1,11 +1,10 @@
-# A089 — parte 1: login + abrir harness (painel Operação ainda FECHADO).
+# A089 — parte 1: login + abrir harness por UX (painel Operação ainda FECHADO).
 appId: com.mycompany.fleaber
 ---
 - runFlow: ../subflows/login_seller.yaml
+- runFlow: ../subflows/nav_seller_to_studio.yaml
 - pressKey: Home
-- openLink: ${MAESTRO_DEEP_LINK_BASE}/maestroSellerStudio?liveId=${MAESTRO_LIVE_ID}
-- pressKey: Home
-- openLink: ${MAESTRO_DEEP_LINK_BASE}/maestroSellerStudio?liveId=${MAESTRO_LIVE_ID}
+- runFlow: ../subflows/nav_seller_to_studio.yaml
 - extendedWaitUntil:
     visible: "Operação"
     timeout: 120000

@@ -1,11 +1,15 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
+import '/auth/supabase_auth/auth_util.dart';
 import '/backend/supabase/supabase.dart';
+import '/index.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/fleaber_live_player/fleaber_live_player_widget.dart';
 import '/utils/fleaber_colors.dart';
+import '/utils/seller_staff_service.dart';
 import '/utils/seller_vacation_mode.dart';
 import '/utils/fleaber_grid_spacing.dart';
 import '/utils/mux_urls.dart';
@@ -127,6 +131,8 @@ class _ProfileLivesTabState extends State<ProfileLivesTab> {
     final title = live.title?.trim().isNotEmpty == true
         ? live.title!.trim()
         : 'Direto Fleaber';
+    final aspectRatio =
+        (!kReleaseMode && showLiveBadge) ? 16 / 9 : 9 / 16;
 
     return Material(
       color: Colors.white,
@@ -142,7 +148,7 @@ class _ProfileLivesTabState extends State<ProfileLivesTab> {
           child: ClipRRect(
             borderRadius: BorderRadius.circular(14),
             child: AspectRatio(
-              aspectRatio: 9 / 16,
+              aspectRatio: aspectRatio,
               child: Stack(
                 fit: StackFit.expand,
                 children: [
@@ -307,6 +313,27 @@ class _ProfileLivesTabState extends State<ProfileLivesTab> {
             ),
             const SizedBox(height: 10),
             _thumbCard(active, showLiveBadge: true),
+            if (!kReleaseMode && _canOpenMaestroPanel(active)) ...[
+              const SizedBox(height: 10),
+              Semantics(
+                label: 'Painel operacional',
+                button: true,
+                child: SizedBox(
+                  width: double.infinity,
+                  child: FilledButton(
+                    style: FilledButton.styleFrom(
+                      backgroundColor: _kTeal,
+                      foregroundColor: Colors.white,
+                    ),
+                    onPressed: () => _openMaestroPanel(active),
+                    child: Text(
+                      'Painel operacional',
+                      style: GoogleFonts.inter(fontWeight: FontWeight.w700),
+                    ),
+                  ),
+                ),
+              ),
+            ],
             const SizedBox(height: 20),
           ],
           if (past.isNotEmpty) ...[
@@ -334,6 +361,27 @@ class _ProfileLivesTabState extends State<ProfileLivesTab> {
           ],
         ],
       ),
+    );
+  }
+
+  bool _canOpenMaestroPanel(LivesRow live) {
+    final uid = currentUserUid.trim();
+    if (uid.isEmpty) return false;
+    final liveSeller =
+        (live.sellerId ?? live.vendedorId ?? '').trim();
+    if (liveSeller.isNotEmpty && liveSeller != uid) return false;
+    if (!SellerStaffContext.instance.isOwnerContext) return false;
+    return true;
+  }
+
+  void _openMaestroPanel(LivesRow live) {
+    final liveId = live.id?.trim() ?? '';
+    if (liveId.isEmpty) return;
+    context.pushNamed(
+      MaestroSellerStudioPageWidget.routeName,
+      queryParameters: {
+        'liveId': serializeParam(liveId, ParamType.String),
+      }.withoutNulls,
     );
   }
 }

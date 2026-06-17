@@ -2,14 +2,69 @@
 /// Prepara live + .maestro/.env para flows Maestro (a partir de live_ops_staging.env).
 /// Uso: dart run tool/maestro_prepare_live.dart
 ///      dart run tool/maestro_prepare_live.dart --multi   (V1.5: só env + cleanup, sem live pré-criada)
+///      dart run tool/maestro_prepare_live.dart --real-mux  (create-mux-live real; default com TCL)
+///      dart run tool/maestro_prepare_live.dart --fake-mux  (playback fake; só emulador)
 library;
 
+import 'dart:convert';
 import 'dart:io';
 
 import 'live_ops_staging_client.dart';
 
 const _liveTitle = 'MAESTRO_SMOKE_LIVE';
 const _refPrefix = 'MAESTRO';
+const _fakePlaybackId = 'maestro-smoke-staging-playback';
+
+String _urlEnc(String value) => Uri.encodeComponent(value);
+
+bool _isTruthy(String? value) {
+  final v = value?.trim().toLowerCase() ?? '';
+  return v == '1' || v == 'true' || v == 'yes' || v == 'on';
+}
+
+bool _isPhysicalAdbDevice(String deviceId) {
+  final id = deviceId.trim();
+  if (id.isEmpty) return false;
+  return !id.startsWith('emulator-');
+}
+
+bool _useRealMux({
+  required List<String> args,
+  required Map<String, String> staging,
+}) {
+  if (args.contains('--fake-mux')) return false;
+  if (args.contains('--real-mux')) return true;
+  if (_isTruthy(staging['MAESTRO_USE_REAL_MUX'])) return true;
+  final seller = staging['MAESTRO_DEVICE_SELLER']?.trim() ?? '';
+  return _isPhysicalAdbDevice(seller);
+}
+
+Future<Map<String, dynamic>> _createLiveViaMux({
+  required LiveOpsStagingClient client,
+  required String sellerToken,
+  required String title,
+}) async {
+  final res = await client.invokeEdge(
+    'create-mux-live',
+    {'title': title},
+    accessToken: sellerToken,
+  );
+  if (res.statusCode < 200 || res.statusCode >= 300) {
+    throw HttpException(
+      'create-mux-live ${res.statusCode}: ${res.body}',
+    );
+  }
+  final body = jsonDecode(res.body);
+  if (body is! Map) {
+    throw const HttpException('create-mux-live: resposta inválida');
+  }
+  final map = Map<String, dynamic>.from(body);
+  final live = map['live'];
+  if (live is Map) {
+    return Map<String, dynamic>.from(live);
+  }
+  throw const HttpException('create-mux-live: live em falta na resposta');
+}
 
 void main(List<String> args) async {
   final multi = args.contains('--multi');
@@ -35,6 +90,7 @@ void main(List<String> args) async {
   }
 
   await _cleanupOld(client, sellerId);
+  await _cleanupSellerDraft(client, sellerId);
 
   final deviceSeller = staging['MAESTRO_DEVICE_SELLER']?.trim() ?? '';
   final deviceBuyer = staging['MAESTRO_DEVICE_BUYER']?.trim() ?? '';
@@ -47,10 +103,13 @@ void main(List<String> args) async {
       'MAESTRO_BUYER_PASSWORD=$buyerPassword',
       'MAESTRO_SELLER_EMAIL=$sellerEmail',
       'MAESTRO_SELLER_PASSWORD=$sellerPassword',
+      'MAESTRO_SELLER_EMAIL_URL=${_urlEnc(sellerEmail)}',
+      'MAESTRO_BUYER_EMAIL_URL=${_urlEnc(buyerEmail)}',
       'MAESTRO_DEEP_LINK_BASE=fleaber://fleaber.com',
       'MAESTRO_ITEM_TITLE=Maestro smoke item',
       if (deviceSeller.isNotEmpty) 'MAESTRO_DEVICE_SELLER=$deviceSeller',
       if (deviceBuyer.isNotEmpty) 'MAESTRO_DEVICE_BUYER=$deviceBuyer',
+      if (deviceSeller.isNotEmpty) 'MAESTRO_DEVICE_DEFAULT=$deviceSeller',
       if (deviceSeller.isNotEmpty) 'MAESTRO_DRIVER_PORT_SELLER=7001',
       if (deviceBuyer.isNotEmpty) 'MAESTRO_DRIVER_PORT_BUYER=7002',
     ];
@@ -67,14 +126,31 @@ void main(List<String> args) async {
     return;
   }
 
-  final live = await client.insert('lives', {
-    'title': _liveTitle,
-    'status': 'live',
-    'seller_id': sellerId,
-    'vendedor_id': sellerId,
-    'is_active': true,
-  });
-  final liveId = live['id']!.toString();
+  final useRealMux = _useRealMux(args: args, staging: staging);
+  late final String liveId;
+  String? muxPlaybackId;
+  if (useRealMux) {
+    print('Mux real: create-mux-live (LiveKit→Mux no TCL)…');
+    final live = await _createLiveViaMux(
+      client: client,
+      sellerToken: sellerToken,
+      title: _liveTitle,
+    );
+    liveId = live['id']!.toString();
+    muxPlaybackId = live['mux_playback_id']?.toString();
+    print('  mux_playback_id=$muxPlaybackId');
+  } else {
+    print('Mux fake: playback_id=$_fakePlaybackId (emulador / --fake-mux)');
+    final live = await client.insert('lives', {
+      'title': _liveTitle,
+      'status': 'live',
+      'seller_id': sellerId,
+      'vendedor_id': sellerId,
+      'is_active': true,
+      'mux_playback_id': _fakePlaybackId,
+    });
+    liveId = live['id']!.toString();
+  }
   final ref = '$_refPrefix-${DateTime.now().millisecondsSinceEpoch % 100000}';
 
   final product = await client.insert('products', {
@@ -149,8 +225,15 @@ void main(List<String> args) async {
     'MAESTRO_BUYER_PASSWORD=$buyerPassword',
     'MAESTRO_SELLER_EMAIL=$sellerEmail',
     'MAESTRO_SELLER_PASSWORD=$sellerPassword',
+    'MAESTRO_SELLER_EMAIL_URL=${_urlEnc(sellerEmail)}',
+    'MAESTRO_BUYER_EMAIL_URL=${_urlEnc(buyerEmail)}',
     'MAESTRO_DEEP_LINK_BASE=fleaber://fleaber.com',
     if (raffleId != null && raffleId.isNotEmpty) 'MAESTRO_RAFFLE_ID=$raffleId',
+    if (deviceSeller.isNotEmpty) 'MAESTRO_DEVICE_SELLER=$deviceSeller',
+    if (deviceBuyer.isNotEmpty) 'MAESTRO_DEVICE_BUYER=$deviceBuyer',
+    if (deviceSeller.isNotEmpty) 'MAESTRO_DEVICE_DEFAULT=$deviceSeller',
+    if (deviceSeller.isNotEmpty) 'MAESTRO_DRIVER_PORT_SELLER=7001',
+    if (deviceBuyer.isNotEmpty) 'MAESTRO_DRIVER_PORT_BUYER=7002',
   ];
 
   final outFile = File('.maestro/.env');
@@ -159,6 +242,7 @@ void main(List<String> args) async {
 
   print('Maestro prepare OK');
   print('  live_id=$liveId');
+  print('  mux=${useRealMux ? "real" : "fake"}');
   print('  seller_id=$sellerId');
   print('  ref=$ref');
   if (raffleId != null && raffleId.isNotEmpty) {
@@ -184,5 +268,19 @@ Future<void> _cleanupOld(LiveOpsStagingClient client, String sellerId) async {
     await client.deleteWhere('orders', 'live_id=eq.$liveId');
     await client.deleteWhere('live_items', 'live_id=eq.$liveId');
     await client.deleteWhere('lives', 'id=eq.$liveId');
+  }
+}
+
+/// Limpa items do draft para Maestro re-pedir linhagem (A008) e sync fresco (A019).
+Future<void> _cleanupSellerDraft(LiveOpsStagingClient client, String sellerId) async {
+  final drafts = await client.select(
+    'lives',
+    filter: 'seller_id=eq.$sellerId&status=eq.draft',
+    limit: 5,
+  );
+  for (final live in drafts) {
+    final liveId = live['id']?.toString() ?? '';
+    if (liveId.isEmpty) continue;
+    await client.deleteWhere('live_items', 'live_id=eq.$liveId');
   }
 }

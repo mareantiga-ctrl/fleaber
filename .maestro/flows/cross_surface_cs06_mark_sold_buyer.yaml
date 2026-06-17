@@ -1,0 +1,14 @@
+# CS06 — buyer ve player apos seller marcar vendido.
+appId: com.mycompany.fleaber
+---
+- runFlow: ../subflows/login_buyer.yaml
+- runFlow: ../subflows/nav_buyer_to_live_player.yaml
+- extendedWaitUntil:
+    visible: "Saco da live"
+    timeout: 90000
+- takeScreenshot: cs06_buyer_player
+- extendedWaitUntil:
+    visible: "Maestro smoke item"
+    timeout: 60000
+    optional: true
+- takeScreenshot: cs06_buyer_card_after_sold

@@ -3,15 +3,22 @@
 appId: com.mycompany.fleaber
 ---
 - runFlow: ../subflows/login_buyer.yaml
-- openLink: ${MAESTRO_DEEP_LINK_BASE}/fleaberLivePlayer?liveId=${MAESTRO_LIVE_ID}
+- runFlow: ../subflows/nav_buyer_to_live_player.yaml
 - extendedWaitUntil:
     visible: "Saco da live"
     timeout: 90000
+- takeScreenshot: cs05_buyer_player_before_bag
 - tapOn: "Saco da live"
+- extendedWaitUntil:
+    visible: "Gerir reservas"
+    timeout: 90000
+- takeScreenshot: cs05_buyer_bag_before_cancel
+- tapOn: "Gerir reservas"
 - extendedWaitUntil:
     visible: "Cancelar"
     timeout: 45000
 - tapOn: "Cancelar"
+- takeScreenshot: cs05_buyer_bag_after_cancel
 - extendedWaitUntil:
     notVisible: "Cancelar"
     timeout: 30000

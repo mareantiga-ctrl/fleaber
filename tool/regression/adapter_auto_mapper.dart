@@ -1,14 +1,15 @@
 // ignore_for_file: avoid_print
 import 'models.dart';
+import 'automation_policy.dart';
 
 /// Mapeamento automático A### → adapter quando não há override explícito.
 class AdapterAutoMapper {
   static RegressionAdapter map(ManifestTest test) {
-    if (test.status == 'manual' || test.layer == 'manual') {
-      return _manual(test);
-    }
-    if (_needsGuided(test)) {
+    if (isGuidedCheckpoint(test.id)) {
       return _guided(test);
+    }
+    if (isManualCheckpoint(test.id)) {
+      return _manual(test);
     }
 
     switch (test.layer) {
@@ -22,26 +23,25 @@ class AdapterAutoMapper {
         return _maestroFor(test);
       case 'hybrid':
         return _hybridFor(test);
+      case 'manual':
+        return _automateFormerManual(test);
       default:
         return _fallbackFor(test);
     }
+  }
+
+  /// Docs marcados «Manual» passam a ter robô (Maestro/bot/dados) salvo allowlist.
+  static RegressionAdapter _automateFormerManual(ManifestTest test) {
+    if (test.area == 'prep') return _maestroFor(test);
+    if (test.area == 'publish') return _maestroFor(test);
+    return _fallbackFor(test);
   }
 
   static bool isAutomatedType(String type) {
     return const {'unit', 'integration', 'bot', 'maestro', 'hybrid'}.contains(type);
   }
 
-  static bool _needsGuided(ManifestTest test) {
-    final n = int.tryParse(test.id.replaceFirst('A', '')) ?? 0;
-    if (n >= 50 && n <= 79) return true;
-    if (n == 205 || n == 207) return true;
-    if (const {64, 72, 73, 76, 169, 399, 400, 410}.contains(n)) return true;
-    final t = test.title.toLowerCase();
-    return t.contains('stripe') ||
-        t.contains('mux') ||
-        t.contains('câmara') ||
-        t.contains('camera');
-  }
+  static bool _needsGuided(ManifestTest test) => isGuidedCheckpoint(test.id);
 
   static RegressionAdapter _manual(ManifestTest test) => RegressionAdapter(
         type: 'manual_checkpoint',
@@ -208,19 +208,33 @@ class AdapterAutoMapper {
 
   static RegressionAdapter _maestroFor(ManifestTest test) {
     final flow = _maestroFlow(test);
-    final guided = const {'publish', 'buyer_player', 'checkout', 'raffle'}.contains(test.area);
     return RegressionAdapter(
       type: 'maestro',
       path: flow.startsWith('../') ? flow : '.maestro/flows/$flow',
       entry: flow,
       requiresMaestro: true,
       requiresStaging: true,
-      requiresGuided: guided,
-      dedupeKey: 'auto:maestro:$flow',
+      requiresGuided: _needsGuided(test),
+      dedupeKey: 'auto:maestro:${test.id}',
     );
   }
 
+  static const _prepMaestroFlows = {
+    'A001': 'prep/a001_sheet_novo_direto.yaml',
+    'A002': 'prep/a002_empty_catalog.yaml',
+    'A004': 'prep/a004_ref_l1.yaml',
+    'A008': 'prep/a008_lineage_cancel.yaml',
+    'A019': 'prep/a019_to_criar.yaml',
+    'A022': 'prep/a022_back_nav.yaml',
+    'A031': 'prep/a031_tabs.yaml',
+    'A032': 'prep/a032_title_criar.yaml',
+    'A035': 'prep/a035_remove_ref.yaml',
+  };
+
   static String _maestroFlow(ManifestTest test) {
+    final prepFlow = _prepMaestroFlows[test.id];
+    if (prepFlow != null) return prepFlow;
+
     final n = int.tryParse(test.id.replaceFirst('A', '')) ?? 0;
     final t = test.title.toLowerCase();
 
@@ -230,14 +244,31 @@ class AdapterAutoMapper {
     if (test.area == 'publish' || (n >= 50 && n <= 79)) {
       return 'v1_05_seller_live_studio_smoke.yaml';
     }
-    if (t.contains('cancel') && t.contains('saco')) return 'doc_04_buyer_cancel_bag.yaml';
-    if (test.area == 'raffle' || t.contains('rifa')) return 'v2_buyer_raffle_bag.yaml';
-    if (t.contains('aceitar') || test.area == 'seller_ops') {
-      return 'v2_seller_harness_accept.yaml';
+    if (t.contains('cancel') && t.contains('saco')) {
+      return 'doc_04_buyer_cancel_bag.yaml';
     }
-    if (test.area == 'checkout' || t.contains('saco')) return 'v1_03_buyer_bag_sheet.yaml';
-    if (test.area == 'buyer_player') return 'v1_02_buyer_live_player.yaml';
-    if (test.area == 'helpers') return '../multidevice/seller_studio_live.yaml';
+    if (test.area == 'raffle' || t.contains('rifa')) {
+      return 'v2_buyer_raffle_bag.yaml';
+    }
+    if (test.area == 'catalog' ||
+        t.contains('stock') ||
+        t.contains('catálogo') ||
+        t.contains('catalogo')) {
+      return 'v2_seller_automation_chain.yaml';
+    }
+    if (t.contains('aceitar') ||
+        test.area == 'seller_ops' ||
+        t.contains('operação') ||
+        t.contains('operacao')) {
+      return 'v2_seller_automation_chain.yaml';
+    }
+    if (test.area == 'checkout' || t.contains('saco') || t.contains('pagar')) {
+      return 'v1_03_buyer_bag_sheet.yaml';
+    }
+    if (test.area == 'buyer_player') {
+      return 'cross_surface_cs01_buyer_player.yaml';
+    }
+    if (test.area == 'helpers') return 'open_seller_studio_nav.yaml';
     return 'v1_01_login_buyer_home.yaml';
   }
 
@@ -250,7 +281,7 @@ class AdapterAutoMapper {
       requiresLiveId: true,
       requiresStaging: true,
       requiresMaestro: steps.any((s) => s.type == 'maestro'),
-      requiresGuided: true,
+      requiresGuided: false,
       dedupeKey: 'auto:hybrid:${test.area}',
       steps: steps,
     );
@@ -259,7 +290,7 @@ class AdapterAutoMapper {
   static List<HybridStep> _hybridSteps(ManifestTest test) => switch (test.area) {
         'checkout' || 'seller_ops' => [
             const HybridStep(type: 'bot', scenario: 'reservations'),
-            const HybridStep(type: 'maestro', flow: 'v2_seller_harness_accept.yaml'),
+            const HybridStep(type: 'maestro', flow: 'v2_seller_automation_chain.yaml'),
             const HybridStep(type: 'integration', scenario: 'verify_accepted'),
             const HybridStep(type: 'maestro', flow: 'v1_03_buyer_bag_sheet.yaml'),
           ],
@@ -284,6 +315,13 @@ class AdapterAutoMapper {
       };
 
   static RegressionAdapter _fallbackFor(ManifestTest test) {
+    final n = int.tryParse(test.id.replaceFirst('A', '')) ?? 0;
+    if (test.area == 'prep' || (n >= 1 && n <= 49)) {
+      return _maestroFor(test);
+    }
+    if (test.area == 'publish' || (n >= 50 && n <= 79)) {
+      return _maestroFor(test);
+    }
     if (test.priority == 'P0' || test.priority == 'P1') {
       if (const {'checkout', 'payments', 'cross_pool', 'seller_ops', 'catalog'}
           .contains(test.area)) {
@@ -294,8 +332,6 @@ class AdapterAutoMapper {
       }
     }
     if (test.priority == 'P2') return _unitFor(test);
-    final t = test.title.toLowerCase();
-    if (t.contains('ui') || t.contains('visual')) return _manual(test);
     return _unitFor(test);
   }
 }

@@ -143,12 +143,16 @@ class _LiveRefLineageSheetState extends State<LiveRefLineageSheet> {
                     ),
                   ),
                   const SizedBox(height: 14),
-                  Text(
-                    'A referência $ref já foi usada antes',
-                    style: GoogleFonts.inter(
-                      color: Colors.white,
-                      fontSize: 18,
-                      fontWeight: FontWeight.w800,
+                  Semantics(
+                    identifier: 'prep_lineage_sheet',
+                    label: 'A referência $ref já foi usada antes',
+                    child: Text(
+                      'A referência $ref já foi usada antes',
+                      style: GoogleFonts.inter(
+                        color: Colors.white,
+                        fontSize: 18,
+                        fontWeight: FontWeight.w800,
+                      ),
                     ),
                   ),
                   const SizedBox(height: 8),
@@ -195,21 +199,31 @@ class _LiveRefLineageSheetState extends State<LiveRefLineageSheet> {
                     ),
                   ],
                   const SizedBox(height: 14),
-                  OutlinedButton(
-                    onPressed: () {
+                  Semantics(
+                    identifier: 'prep_lineage_new_history',
+                    button: true,
+                    label: 'Começar novo histórico',
+                    onTap: () {
                       Navigator.pop(context, LiveRefLineageNewArticle());
                     },
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: const Color(0xFF80DEEA),
-                      side: const BorderSide(color: Color(0xFF80DEEA)),
-                      minimumSize: const Size.fromHeight(48),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
+                    child: ExcludeSemantics(
+                      child: OutlinedButton(
+                        onPressed: () {
+                          Navigator.pop(context, LiveRefLineageNewArticle());
+                        },
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: const Color(0xFF80DEEA),
+                          side: const BorderSide(color: Color(0xFF80DEEA)),
+                          minimumSize: const Size.fromHeight(48),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                        ),
+                        child: Text(
+                          'Começar novo histórico',
+                          style: GoogleFonts.inter(fontWeight: FontWeight.w700),
+                        ),
                       ),
-                    ),
-                    child: Text(
-                      'Começar novo histórico',
-                      style: GoogleFonts.inter(fontWeight: FontWeight.w700),
                     ),
                   ),
                   const SizedBox(height: 4),
@@ -223,11 +237,19 @@ class _LiveRefLineageSheetState extends State<LiveRefLineageSheet> {
                     ),
                   ),
                   const SizedBox(height: 8),
-                  TextButton(
-                    onPressed: () => Navigator.pop(context),
-                    child: Text(
-                      'Cancelar',
-                      style: GoogleFonts.inter(color: Colors.white60),
+                  Semantics(
+                    identifier: 'prep_lineage_cancel',
+                    button: true,
+                    label: 'Cancelar',
+                    onTap: () => Navigator.pop(context),
+                    child: ExcludeSemantics(
+                      child: TextButton(
+                        onPressed: () => Navigator.pop(context),
+                        child: Text(
+                          'Cancelar',
+                          style: GoogleFonts.inter(color: Colors.white60),
+                        ),
+                      ),
                     ),
                   ),
                 ],

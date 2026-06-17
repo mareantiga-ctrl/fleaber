@@ -165,6 +165,10 @@ abstract final class LivePublishCleanup {
       final id = row.id?.trim();
       if (id == null || id.isEmpty) continue;
       if (id == _inProgressLiveId) continue;
+      if (!kReleaseMode) {
+        final title = (row.title ?? '').trim();
+        if (title == 'MAESTRO_SMOKE_LIVE') continue;
+      }
       if (await finalizeEnded(id)) n++;
     }
     return n;

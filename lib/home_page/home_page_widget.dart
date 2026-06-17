@@ -1215,9 +1215,14 @@ class _HomePageWidgetState extends State<HomePageWidget>
                                 ),
                               ),
                               Semantics(
+                                identifier: 'home_fleaber_criar',
                                 label: 'Fleaber criar',
                                 button: true,
-                                child: InkWell(
+                                onTap: () async {
+                                  await _showCreateBottomSheet();
+                                },
+                                child: ExcludeSemantics(
+                                  child: InkWell(
                                   splashColor: Colors.transparent,
                                   focusColor: Colors.transparent,
                                   hoverColor: Colors.transparent,
@@ -1249,6 +1254,7 @@ class _HomePageWidgetState extends State<HomePageWidget>
                                       ),
                                     ],
                                   ),
+                                ),
                                 ),
                               ),
                               InkWell(

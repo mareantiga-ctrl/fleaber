@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -57,9 +58,11 @@ class _PrepararDirectoPageWidgetState extends State<PrepararDirectoPageWidget>
   bool _refDraftRowVisible = true;
   Map<String, LiveRefChipDetail> _refChipDetails = const {};
 
-  static const double _colPrefix = 52;
-  static const double _colNum = 58;
-  static const double _colExcludeBtn = 40;
+  static const double _colPrefix = 46;
+  static const double _colNum = 52;
+  static const double _colExcludeBtn = 36;
+  static const double _colActions = 88;
+  static const double _colGap = 4;
 
   @override
   void initState() {
@@ -160,11 +163,21 @@ class _PrepararDirectoPageWidgetState extends State<PrepararDirectoPageWidget>
 
   Future<void> _openRefChipEditor(int n) async {
     final label = _refLabelForNumber(n);
+    await _openRefChipEditorForLabel(label);
+  }
+
+  Future<void> _openRefChipEditorForScheme(LiveRefScheme scheme, int n) async {
+    await _openRefChipEditorForLabel(scheme.formatRef(n));
+  }
+
+  Future<void> _openRefChipEditorForLabel(String label) async {
     final key = LivePrepRefDetails.normalizeRefKey(label);
+    final creating = !_refChipDetails.containsKey(key);
     final saved = await showLiveRefChipEditorSheet(
       context: context,
       refLabel: label,
       initial: _refChipDetails[key] ?? const LiveRefChipDetail(),
+      creatingNew: creating,
     );
     if (saved == null || !mounted) return;
     await LivePrepRefDetails.save(key, saved.detail);
@@ -338,8 +351,15 @@ class _PrepararDirectoPageWidgetState extends State<PrepararDirectoPageWidget>
       _clearRefDraftForm();
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(
-            'Gravado: ${scheme.displayLabel()} (${scheme.spanCount} refs).',
+          duration: kDebugMode
+              ? const Duration(seconds: 10)
+              : const Duration(seconds: 4),
+          content: Semantics(
+            identifier: 'prep_snack_ref_saved',
+            label: 'Gravado: ${scheme.displayLabel()}',
+            child: Text(
+              'Gravado: ${scheme.displayLabel()} (${scheme.spanCount} refs).',
+            ),
           ),
         ),
       );
@@ -408,9 +428,14 @@ class _PrepararDirectoPageWidgetState extends State<PrepararDirectoPageWidget>
     if (selected == 0 && schemes.isEmpty) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text(
-            'Tens de ter pelo menos um artigo no catálogo ou uma referência criada.',
+        SnackBar(
+          content: Semantics(
+            identifier: 'prep_snack_need_item',
+            label:
+                'Tens de ter pelo menos um artigo no catálogo ou uma referência criada.',
+            child: const Text(
+              'Tens de ter pelo menos um artigo no catálogo ou uma referência criada.',
+            ),
           ),
         ),
       );
@@ -610,7 +635,7 @@ class _PrepararDirectoPageWidgetState extends State<PrepararDirectoPageWidget>
               _compactRefField('99999', _colNum),
               const SizedBox(width: 6),
               Expanded(child: _compactRefField('3, 5…', double.infinity)),
-              const SizedBox(width: 72),
+              const SizedBox(width: _colActions),
             ],
           ),
         ),
@@ -627,7 +652,13 @@ class _PrepararDirectoPageWidgetState extends State<PrepararDirectoPageWidget>
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
-      child: Row(
+      child: Semantics(
+        identifier: 'prep_ref_row_$index',
+        label: '${scheme.from}-${scheme.to}',
+        onLongPress: scheme.from == scheme.to
+            ? () => unawaited(_openRefChipEditorForScheme(scheme, scheme.from))
+            : null,
+        child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           _compactRefField(prefix.isEmpty ? '—' : prefix, _colPrefix),
@@ -638,20 +669,50 @@ class _PrepararDirectoPageWidgetState extends State<PrepararDirectoPageWidget>
           const SizedBox(width: 6),
           Expanded(child: _compactRefField(exLabel, double.infinity)),
           SizedBox(
-            width: 72,
+            width: _colActions,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                IconButton(
+                Semantics(
+                  identifier: 'prep_ref_edit_$index',
+                  button: true,
+                  label: 'Editar linha ${scheme.from}-${scheme.to}',
+                  onTap: () {
+                    if (scheme.from == scheme.to) {
+                      unawaited(
+                        _openRefChipEditorForScheme(scheme, scheme.from),
+                      );
+                    } else {
+                      _startEditScheme(index);
+                    }
+                  },
+                  child: ExcludeSemantics(
+                    child: IconButton(
                   tooltip: 'Editar linha',
                   visualDensity: VisualDensity.compact,
                   padding: EdgeInsets.zero,
                   constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
-                  onPressed: () => _startEditScheme(index),
+                  onPressed: () {
+                    if (scheme.from == scheme.to) {
+                      unawaited(
+                        _openRefChipEditorForScheme(scheme, scheme.from),
+                      );
+                    } else {
+                      _startEditScheme(index);
+                    }
+                  },
                   icon: const Icon(Icons.edit_outlined, size: 18),
                   color: _kTeal,
                 ),
-                IconButton(
+                  ),
+                ),
+                Semantics(
+                  identifier: 'prep_ref_delete_$index',
+                  button: true,
+                  label: 'Remover linha',
+                  onTap: () => unawaited(_removeScheme(index)),
+                  child: ExcludeSemantics(
+                    child: IconButton(
                   tooltip: 'Remover linha',
                   visualDensity: VisualDensity.compact,
                   padding: EdgeInsets.zero,
@@ -660,10 +721,13 @@ class _PrepararDirectoPageWidgetState extends State<PrepararDirectoPageWidget>
                   icon: const Icon(Icons.delete_outline_rounded, size: 18),
                   color: const Color(0xFF98A1AA),
                 ),
+                  ),
+                ),
               ],
             ),
           ),
         ],
+      ),
       ),
     );
   }
@@ -750,15 +814,24 @@ class _PrepararDirectoPageWidgetState extends State<PrepararDirectoPageWidget>
 
   Widget _refDraftActionsRow({required LiveRefScheme? draft}) {
     return SizedBox(
-      width: 72,
+      width: _colActions,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
-          IconButton(
+          Semantics(
+            identifier: 'prep_ref_save',
+            button: true,
+            label: 'Gravar intervalo',
+            enabled: draft != null,
+            onTap: draft == null
+                ? null
+                : () => unawaited(_commitCurrentRefLine(addAnother: false)),
+            child: ExcludeSemantics(
+              child: IconButton(
             tooltip: 'Gravar intervalo',
             visualDensity: VisualDensity.compact,
             padding: EdgeInsets.zero,
-            constraints: const BoxConstraints(minWidth: 34, minHeight: 34),
+            constraints: const BoxConstraints(minWidth: 30, minHeight: 30),
             onPressed: draft == null
                 ? null
                 : () => _commitCurrentRefLine(addAnother: false),
@@ -766,19 +839,29 @@ class _PrepararDirectoPageWidgetState extends State<PrepararDirectoPageWidget>
               backgroundColor: const Color(0xFFEAF5F6),
               foregroundColor: _kTeal,
             ),
-            icon: const Icon(Icons.save_outlined, size: 20),
+            icon: const Icon(Icons.save_outlined, size: 18),
           ),
-          IconButton(
+            ),
+          ),
+          Semantics(
+            identifier: 'prep_ref_add_line',
+            button: true,
+            label: 'Adicionar outra linha',
+            onTap: () => unawaited(_openNewRefDraftLine()),
+            child: ExcludeSemantics(
+              child: IconButton(
             tooltip: 'Adicionar outra linha',
             visualDensity: VisualDensity.compact,
             padding: EdgeInsets.zero,
-            constraints: const BoxConstraints(minWidth: 34, minHeight: 34),
+            constraints: const BoxConstraints(minWidth: 30, minHeight: 30),
             onPressed: () => _openNewRefDraftLine(),
             style: IconButton.styleFrom(
               backgroundColor: const Color(0xFFF3F6F7),
               foregroundColor: const Color(0xFF57636C),
             ),
-            icon: const Icon(Icons.add_rounded, size: 20),
+            icon: const Icon(Icons.add_rounded, size: 18),
+          ),
+            ),
           ),
         ],
       ),
@@ -792,12 +875,17 @@ class _PrepararDirectoPageWidgetState extends State<PrepararDirectoPageWidget>
     return ListView(
       padding: const EdgeInsets.fromLTRB(0, 12, 0, 24),
       children: [
-        Text(
-          'Cria referências numéricas para vender no directo sem artigos no catálogo.',
-          style: GoogleFonts.inter(
-            color: const Color(0xFF57636C),
-            fontSize: 13,
-            height: 1.35,
+        Semantics(
+          identifier: 'prep_sem_catalogo_hint',
+          label:
+              'Cria referências numéricas para vender no directo sem artigos no catálogo.',
+          child: Text(
+            'Cria referências numéricas para vender no directo sem artigos no catálogo.',
+            style: GoogleFonts.inter(
+              color: const Color(0xFF57636C),
+              fontSize: 13,
+              height: 1.35,
+            ),
           ),
         ),
         const SizedBox(height: 12),
@@ -839,10 +927,21 @@ class _PrepararDirectoPageWidgetState extends State<PrepararDirectoPageWidget>
                           decoration: _compactRefInputDecoration(),
                         ),
                       ),
-                      const SizedBox(width: 6),
-                      SizedBox(
-                        width: _colNum,
-                        child: TextField(
+                      const SizedBox(width: _colGap),
+                      Expanded(
+                        child: Semantics(
+                          identifier: 'prep_ref_from',
+                          label: 'prep_ref_from',
+                          textField: true,
+                          value: _fromController.text,
+                          onSetText: (text) {
+                            _fromController.text = text;
+                            _normalizeNumericField(_fromController);
+                            _pruneDraftExclude();
+                            setState(() {});
+                          },
+                          child: ExcludeSemantics(
+                            child: TextField(
                           controller: _fromController,
                           textAlign: TextAlign.center,
                           style: GoogleFonts.inter(fontSize: 12),
@@ -858,11 +957,24 @@ class _PrepararDirectoPageWidgetState extends State<PrepararDirectoPageWidget>
                           },
                           decoration: _compactRefInputDecoration(),
                         ),
+                          ),
+                        ),
                       ),
-                      const SizedBox(width: 6),
-                      SizedBox(
-                        width: _colNum,
-                        child: TextField(
+                      const SizedBox(width: _colGap),
+                      Expanded(
+                        child: Semantics(
+                          identifier: 'prep_ref_to',
+                          label: 'prep_ref_to',
+                          textField: true,
+                          value: _toController.text,
+                          onSetText: (text) {
+                            _toController.text = text;
+                            _normalizeNumericField(_toController);
+                            _pruneDraftExclude();
+                            setState(() {});
+                          },
+                          child: ExcludeSemantics(
+                            child: TextField(
                           controller: _toController,
                           textAlign: TextAlign.center,
                           style: GoogleFonts.inter(fontSize: 12),
@@ -878,8 +990,10 @@ class _PrepararDirectoPageWidgetState extends State<PrepararDirectoPageWidget>
                           },
                           decoration: _compactRefInputDecoration(),
                         ),
+                          ),
+                        ),
                       ),
-                      const SizedBox(width: 6),
+                      const SizedBox(width: _colGap),
                       _refExcludePickerCell(),
                       _refDraftActionsRow(draft: draft),
                     ],
@@ -911,7 +1025,13 @@ class _PrepararDirectoPageWidgetState extends State<PrepararDirectoPageWidget>
                 ] else
                   Align(
                     alignment: Alignment.centerRight,
-                    child: IconButton(
+                    child: Semantics(
+                      identifier: 'prep_ref_add_line',
+                      button: true,
+                      label: 'Adicionar outra linha',
+                      onTap: () => unawaited(_openNewRefDraftLine()),
+                      child: ExcludeSemantics(
+                        child: IconButton(
                       tooltip: 'Adicionar outra linha',
                       visualDensity: VisualDensity.compact,
                       onPressed: _openNewRefDraftLine,
@@ -920,6 +1040,8 @@ class _PrepararDirectoPageWidgetState extends State<PrepararDirectoPageWidget>
                         foregroundColor: const Color(0xFF57636C),
                       ),
                       icon: const Icon(Icons.add_rounded, size: 22),
+                    ),
+                      ),
                     ),
                   ),
               ],
@@ -1042,43 +1164,72 @@ class _PrepararDirectoPageWidgetState extends State<PrepararDirectoPageWidget>
                 ),
                 tabs: [
                   Tab(
-                    child: ListenableBuilder(
-                      listenable: _tabController,
-                      builder: (context, _) {
-                        final selected = _tabController.index == 0;
-                        final labelColor = selected
-                            ? _kTeal
-                            : const Color(0xFF57636C);
-                        return Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(
-                              'Meu Catálogo',
-                              style: GoogleFonts.inter(
-                                color: labelColor,
-                                fontWeight: selected
-                                    ? FontWeight.w700
-                                    : FontWeight.w500,
-                                fontSize: 13,
+                    child: Semantics(
+                      identifier: 'prep_tab_meu_catalogo',
+                      button: true,
+                      label: 'Meu Catálogo',
+                      child: ListenableBuilder(
+                        listenable: _tabController,
+                        builder: (context, _) {
+                          final selected = _tabController.index == 0;
+                          final labelColor = selected
+                              ? _kTeal
+                              : const Color(0xFF57636C);
+                          return Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                'Meu Catálogo',
+                                style: GoogleFonts.inter(
+                                  color: labelColor,
+                                  fontWeight: selected
+                                      ? FontWeight.w700
+                                      : FontWeight.w500,
+                                  fontSize: 13,
+                                ),
                               ),
-                            ),
-                            const SizedBox(height: 2),
-                            Text(
-                              'Recomendado',
-                              style: GoogleFonts.inter(
-                                color: const Color(0xFFB8860B),
-                                fontSize: 9,
-                                fontWeight: FontWeight.w800,
-                                letterSpacing: 0.2,
+                              const SizedBox(height: 2),
+                              Text(
+                                'Recomendado',
+                                style: GoogleFonts.inter(
+                                  color: const Color(0xFFB8860B),
+                                  fontSize: 9,
+                                  fontWeight: FontWeight.w800,
+                                  letterSpacing: 0.2,
+                                ),
                               ),
-                            ),
-                          ],
-                        );
-                      },
+                            ],
+                          );
+                        },
+                      ),
                     ),
                   ),
-                  const Tab(text: 'Sem catálogo'),
+                  Tab(
+                    child: Semantics(
+                      identifier: 'prep_tab_sem_catalogo',
+                      button: true,
+                      label: 'Sem catálogo',
+                      child: ListenableBuilder(
+                        listenable: _tabController,
+                        builder: (context, _) {
+                          final selected = _tabController.index == 1;
+                          return Text(
+                            'Sem catálogo',
+                            style: GoogleFonts.inter(
+                              color: selected
+                                  ? _kTeal
+                                  : const Color(0xFF57636C),
+                              fontWeight: selected
+                                  ? FontWeight.w700
+                                  : FontWeight.w500,
+                              fontSize: 13,
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ),
                 ],
               ),
       ),
@@ -1090,17 +1241,25 @@ class _PrepararDirectoPageWidgetState extends State<PrepararDirectoPageWidget>
           child: SizedBox(
             width: double.infinity,
             height: 52,
-            child: FilledButton(
-              onPressed: _continueToLive,
-              style: FilledButton.styleFrom(
-                backgroundColor: _kTeal,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(14),
+            child: Semantics(
+              identifier: 'prep_continuar',
+              button: true,
+              label: 'Continuar para o directo',
+              onTap: () => unawaited(_continueToLive()),
+              child: ExcludeSemantics(
+                child: FilledButton(
+                  onPressed: _continueToLive,
+                  style: FilledButton.styleFrom(
+                    backgroundColor: _kTeal,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                  ),
+                  child: Text(
+                    'Continuar para o directo',
+                    style: GoogleFonts.inter(fontWeight: FontWeight.w700),
+                  ),
                 ),
-              ),
-              child: Text(
-                'Continuar para o directo',
-                style: GoogleFonts.inter(fontWeight: FontWeight.w700),
               ),
             ),
           ),

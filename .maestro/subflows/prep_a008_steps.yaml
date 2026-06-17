@@ -1,0 +1,46 @@
+# A008 — passos (sem login): linhagem ref #15 → Cancelar.
+appId: com.mycompany.fleaber
+---
+- runFlow: nav_seller_to_prep.yaml
+- tapOn:
+    id: prep_tab_sem_catalogo
+- waitForAnimationToEnd:
+    timeout: 5000
+- runFlow: prep_strip_refs.yaml
+- extendedWaitUntil:
+    visible:
+      id: prep_sem_catalogo_hint
+    timeout: 20000
+- tapOn:
+    id: prep_ref_from
+- eraseText: 10
+- inputText: "15"
+- tapOn:
+    id: prep_ref_to
+- eraseText: 10
+- inputText: "15"
+- tapOn:
+    id: prep_ref_save
+- extendedWaitUntil:
+    visible:
+      id: prep_ref_row_0
+    timeout: 20000
+- tapOn:
+    id: prep_continuar
+- extendedWaitUntil:
+    visible:
+      id: prep_lineage_sheet
+    timeout: 90000
+- scrollUntilVisible:
+    element:
+      id: prep_lineage_cancel
+    direction: DOWN
+    timeout: 30000
+- tapOn:
+    id: prep_lineage_cancel
+- extendedWaitUntil:
+    visible: "Artigos do directo"
+    timeout: 15000
+- assertNotVisible:
+    id: prep_lineage_sheet
+- takeScreenshot: a008_lineage_cancelled

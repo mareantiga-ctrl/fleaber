@@ -1,0 +1,32 @@
+# A035 — remover ref (sem login).
+appId: com.mycompany.fleaber
+---
+- runFlow: nav_seller_to_prep.yaml
+- runFlow: prep_add_ref_99.yaml
+- tapOn:
+    id: prep_ref_add_line
+- extendedWaitUntil:
+    visible:
+      id: prep_ref_from
+    timeout: 15000
+- tapOn:
+    id: prep_ref_from
+- eraseText: 10
+- inputText: "77"
+- tapOn:
+    id: prep_ref_to
+- eraseText: 10
+- inputText: "77"
+- tapOn:
+    id: prep_ref_save
+- extendedWaitUntil:
+    visible:
+      id: prep_ref_row_1
+    timeout: 15000
+- tapOn:
+    id: prep_ref_delete_1
+- extendedWaitUntil:
+    notVisible:
+      id: prep_ref_row_1
+    timeout: 15000
+- takeScreenshot: a035_ref_removed

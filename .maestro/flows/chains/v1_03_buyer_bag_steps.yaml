@@ -1,0 +1,14 @@
+# Checkout saco (sem login).
+appId: com.mycompany.fleaber
+---
+- runFlow: ../../subflows/nav_buyer_to_live_player.yaml
+- extendedWaitUntil:
+    visible: "Reservar"
+    timeout: 90000
+    optional: true
+- tapOn: "Saco da live"
+- extendedWaitUntil:
+    visible: "Pagar"
+    timeout: 30000
+- takeScreenshot: cs09_buyer_bag_pagar
+- assertVisible: "Pagar"

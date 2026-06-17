@@ -11,6 +11,10 @@ export '/vendedor/preparar_directo_page_widget.dart'
 export '/vendedor/criar_directo_page_widget.dart' show CriarDirectoPageWidget;
 export '/vendedor/maestro_seller_studio_page_widget.dart'
     show MaestroSellerStudioPageWidget;
+export '/utils/maestro_autologin_page_widget.dart'
+    show MaestroAutologinPageWidget;
+export '/utils/maestro_show_create_sheet_page_widget.dart'
+    show MaestroShowCreateSheetPageWidget;
 export '/fleaber_live_player/fleaber_live_player_widget.dart'
     show FleaberLivePlayerWidget;
 export '/chat_page/chat_page_widget.dart' show ChatPageWidget;

@@ -121,6 +121,47 @@ class GuidedSession {
     final line = stdin.readLineSync()?.trim().toLowerCase() ?? '';
     return line == 'pass' || line == 'p' || line.isEmpty;
   }
+
+  /// Doc #3 APK — barra Stock no rodapé do studio vendedor.
+  Future<bool> confirmDoc3StockBar() async {
+    return pauseForOperator(
+      'Doc #3 — barra Stock (vendedor)',
+      [
+        'No emulador SELLER: abre o studio da live de teste.',
+        'Toca na barra «Stock» no rodapé do catálogo.',
+        'Aumenta qty de um artigo vendido (ex. +10).',
+        'Confirma: card catálogo e barra mostram Total/Disp coerentes.',
+        'ENTER=pass | fail | skip',
+      ],
+    );
+  }
+
+  /// A3 / R32 — alinhamento qty após quick edit, venda, gravado, novo directo.
+  Future<bool> confirmA3QuantityAlignment() async {
+    return pauseForOperator(
+      'A3/R32 — quantidades catálogo · barra · carrossel',
+      [
+        '1. Seller: quick edit qty no catálogo da live.',
+        '2. Vende 1 un. na live (ou simula conversão).',
+        '3. Termina → gravado; verifica badge/qty no replay se aplicável.',
+        '4. Novo directo: confirma Total · Disp iguais no card, barra e carrossel comprador.',
+        'ENTER=pass | fail | skip',
+      ],
+    );
+  }
+
+  /// Rifa buyer — botão após rifa activa na live.
+  Future<bool> confirmBuyerRaffleVisible() async {
+    return pauseForOperator(
+      'Rifa comprador — Participar na Rifa',
+      [
+        'No emulador BUYER: player da live com rifa activa.',
+        'Confirma que vês «Rifa da Live» / «Participar na Rifa».',
+        'Se não aparecer, espera 5s e pull-to-refresh; depois ENTER.',
+        'ENTER=pass | fail | skip',
+      ],
+    );
+  }
 }
 
 /// Lê chaves de ficheiro KEY=VALUE.

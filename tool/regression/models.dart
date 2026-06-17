@@ -191,6 +191,8 @@ class TestRunResult {
     this.layersRun = const [],
     this.durationMs = 0,
     this.message,
+    this.auditConclusion,
+    this.auditPath,
   });
 
   final String id;
@@ -199,6 +201,8 @@ class TestRunResult {
   final List<String> layersRun;
   final int durationMs;
   final String? message;
+  final String? auditConclusion;
+  final String? auditPath;
 
   Map<String, dynamic> toJson() => {
         'id': id,
@@ -207,6 +211,8 @@ class TestRunResult {
         'layers_run': layersRun,
         'duration_ms': durationMs,
         'message': message,
+        if (auditConclusion != null) 'audit_conclusion': auditConclusion,
+        if (auditPath != null) 'audit_path': auditPath,
       };
 }
 
@@ -224,12 +230,16 @@ class RunnerOptions {
     this.regenerateManifest = false,
     this.selfTest = false,
     this.guided = false,
+    this.skipAudit = false,
+    this.maestroChains = true,
     this.repoRoot,
   });
 
   final bool full;
   final bool failedOnly;
   final bool retestRequired;
+  final bool skipAudit;
+  final bool maestroChains;
   final String? range;
   final String? priority;
   final String? area;

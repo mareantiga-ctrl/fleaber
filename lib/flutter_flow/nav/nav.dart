@@ -364,6 +364,27 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) => GoRouter(
           ),
         ),
         FFRoute(
+          name: MaestroShowCreateSheetPageWidget.routeName,
+          path: MaestroShowCreateSheetPageWidget.routePath,
+          requireAuth: true,
+          builder: (context, params) =>
+              const MaestroShowCreateSheetPageWidget(),
+        ),
+        FFRoute(
+          name: MaestroAutologinPageWidget.routeName,
+          path: MaestroAutologinPageWidget.routePath,
+          builder: (context, params) => MaestroAutologinPageWidget(
+            email: params.getParam(
+              'email',
+              ParamType.String,
+            ),
+            password: params.getParam(
+              'password',
+              ParamType.String,
+            ),
+          ),
+        ),
+        FFRoute(
           name: MaestroSellerStudioPageWidget.routeName,
           path: MaestroSellerStudioPageWidget.routePath,
           requireAuth: true,

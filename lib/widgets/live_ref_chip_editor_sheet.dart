@@ -344,7 +344,13 @@ class _LiveRefChipEditorSheetState extends State<_LiveRefChipEditorSheet> {
           const SizedBox(height: 16),
           SizedBox(
             height: 48,
-            child: FilledButton(
+            child: Semantics(
+              identifier: 'prep_chip_save_ref',
+              button: true,
+              label: widget.creatingNew ? 'Criar referência' : 'Guardar referência',
+              onTap: _save,
+              child: ExcludeSemantics(
+                child: FilledButton(
               onPressed: _save,
               style: FilledButton.styleFrom(
                 backgroundColor: _kTeal,
@@ -355,6 +361,8 @@ class _LiveRefChipEditorSheetState extends State<_LiveRefChipEditorSheet> {
               child: Text(
                 widget.creatingNew ? 'Criar referência' : 'Guardar referência',
                 style: GoogleFonts.inter(fontWeight: FontWeight.w700),
+              ),
+            ),
               ),
             ),
           ),

@@ -1,0 +1,36 @@
+# CS06 — seller marca Vendido no artigo activo.
+
+appId: com.mycompany.fleaber
+
+---
+
+- runFlow: open_seller_studio_catalog.yaml
+
+- extendedWaitUntil:
+
+    visible: "Maestro smoke item"
+
+    timeout: 30000
+
+- takeScreenshot: cs06_seller_before_sold
+
+- tapOn: "Maestro smoke item"
+
+- tapOn: "Vendido"
+
+- extendedWaitUntil:
+
+    notVisible: "Failed assertion"
+
+    timeout: 20000
+
+- extendedWaitUntil:
+
+    visible: ".*VENDIDO|ESGOTADO|vendidos.*"
+
+    timeout: 45000
+
+    optional: true
+
+- takeScreenshot: cs06_seller_after_sold
+

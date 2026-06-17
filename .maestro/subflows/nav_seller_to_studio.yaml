@@ -1,0 +1,25 @@
+# Navegação UX: Perfil → loja → Directos → Painel operacional (live activa).
+# Substitui openLink/adb maestroSellerStudio nos testes harness.
+appId: com.mycompany.fleaber
+---
+- extendedWaitUntil:
+    visible: "Início"
+    timeout: 30000
+- tapOn: "Perfil"
+- extendedWaitUntil:
+    visible: ".*anúncios e diretos.*"
+    timeout: 60000
+- tapOn:
+    text: ".*anúncios e diretos.*"
+- extendedWaitUntil:
+    visible: ".*MAESTRO_SMOKE.*"
+    timeout: 90000
+- scrollUntilVisible:
+    element:
+      text: "Painel operacional"
+    direction: DOWN
+    timeout: 60000
+- tapOn: "Painel operacional"
+- extendedWaitUntil:
+    visible: "Operação"
+    timeout: 120000

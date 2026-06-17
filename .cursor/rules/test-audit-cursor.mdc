@@ -1,0 +1,57 @@
+---
+description: Cursor audit layer on top of Maestro — UI vs BD, visual/logic checks, PASS/PASS COM AVISO/FAIL
+globs: tool/**,test/regression/**,.maestro/**
+alwaysApply: true
+---
+
+# Auditoria Cursor pós-teste (camada sobre Maestro)
+
+## Pipeline
+
+1. **Maestro** corre o teste, tira screenshots, grava logs.
+2. **No final de cada teste**, o agente Cursor audita evidências antes de marcar resultado final.
+
+## Evidências obrigatórias por teste
+
+- Screenshots Maestro (`tool/logs/screenshots_*`, `~/.maestro/tests/`)
+- Logs do passo (`*_run.log`, `maestro.log`)
+- Snapshot BD quando aplicável (`dart run tool/...`, `regression_integration`, RPC checks)
+- Resultado dos asserts Maestro (commands JSON)
+
+## Testes com comparação UI ↔ BD
+
+Para stock, quantidades, reservas, vendidos, disponíveis, cross-pool, gravado, marketplace:
+
+- Extrair valores visíveis na UI (screenshot/OCR/hierarchy)
+- Consultar valores reais na BD staging
+- **PASS** só se coincidirem (tolerância documentada se houver delay de sync)
+
+## Auditoria visual e lógica (além do assert)
+
+Procurar activamente:
+
+- Números inconsistentes entre seller e buyer
+- Textos técnicos, labels antigas, ERP cru
+- Cards desalinhados, overlays bloqueados, red screens
+- Dados diferentes entre superfícies
+- Erros de arquitectura visíveis
+
+## Classificação final
+
+| Resultado | Critério |
+|-----------|----------|
+| **PASS** | Maestro OK + auditoria sem discrepâncias |
+| **PASS COM AVISO** | Fluxo OK mas avisos UX/dados menores documentados |
+| **FAIL** | Maestro falhou, UI≠BD, ou problema grave na auditoria |
+
+## Relatório por teste (formato)
+
+Para cada ID (A###, T##, CS##):
+
+- Resultado (PASS / PASS COM AVISO / FAIL)
+- Evidência usada (BD, screenshot, logs)
+- Valores esperados vs encontrados
+- Avisos
+- Causa provável se FAIL
+
+Actualizar `tool/test_battery_registry.json` e `tool/TEST_BATTERY_LIVE.md` com o resultado **auditado**, não só o exit code do Maestro.

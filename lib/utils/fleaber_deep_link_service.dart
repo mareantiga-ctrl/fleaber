@@ -119,6 +119,13 @@ class FleaberDeepLinkService {
       qp.remove('helper_link_id');
       return '/conviteColaborador?${Uri(queryParameters: qp).query}';
     }
+    if (path == '/maestroShowCreateSheet' ||
+        path.startsWith('/maestroShowCreateSheet/')) {
+      return '/maestroShowCreateSheet';
+    }
+    if (path == '/maestroAutologin' || path.startsWith('/maestroAutologin/')) {
+      return '/maestroAutologin?${Uri(queryParameters: qp).query}';
+    }
     if (path == '/maestroSellerStudio' ||
         path.startsWith('/maestroSellerStudio/')) {
       final live = qp['liveId']?.trim().isNotEmpty == true

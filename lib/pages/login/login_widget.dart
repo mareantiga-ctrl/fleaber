@@ -8,6 +8,9 @@ import '/flutter_flow/custom_functions.dart' as functions;
 import '/index.dart';
 import '/utils/login_remember_storage.dart';
 import '/widgets/fleaber_primary_button.dart';
+import 'dart:async';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/semantics.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'login_model.dart';
@@ -61,6 +64,83 @@ class _LoginWidgetState extends State<LoginWidget> {
     _model.dispose();
 
     super.dispose();
+  }
+
+  Future<void> _submitLogin() async {
+    if (kDebugMode) {
+      debugPrint(
+        'MAESTRO_LOGIN len email=${_model.emailLoginTextController.text.length} '
+        'pass=${_model.senhaLoginTextController.text.length}',
+      );
+    }
+    if (!functions.checkLoginFields(
+      _model.emailLoginTextController.text,
+      _model.senhaLoginTextController.text,
+    )) {
+      await showDialog(
+        context: context,
+        builder: (alertDialogContext) {
+          return AlertDialog(
+            title: Text('Erro'),
+            content: Text('E-mail inválido ou campo vazio'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(alertDialogContext),
+                child: Text('Ok'),
+              ),
+            ],
+          );
+        },
+      );
+      return;
+    }
+
+    GoRouter.of(context).prepareAuthEvent();
+
+    final user = await authManager.signInWithEmail(
+      context,
+      _model.emailLoginTextController.text,
+      _model.senhaLoginTextController.text,
+    );
+    if (user == null) {
+      return;
+    }
+
+    final email = _model.emailLoginTextController.text.trim();
+    final password = _model.senhaLoginTextController.text;
+    if (_model.rememberOnDevice) {
+      await LoginRememberStorage.saveCredentials(
+        email: email,
+        password: password,
+      );
+    } else {
+      await LoginRememberStorage.clearCredentials();
+    }
+
+    await Future.delayed(const Duration(milliseconds: 800));
+    if (!mounted) return;
+    if (currentUserUid != '') {
+      context.pushNamedAuth(HomePageWidget.routeName, context.mounted);
+      return;
+    }
+
+    await showDialog(
+      context: context,
+      builder: (alertDialogContext) {
+        return AlertDialog(
+          title: Text('Erro no Login'),
+          content: Text(
+            'Utilizador não encontrado ou senha errada. Verifica os teus dados ou regista-te!',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(alertDialogContext),
+              child: Text('Ok'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -179,12 +259,22 @@ class _LoginWidgetState extends State<LoginWidget> {
                         child: Column(
                           mainAxisSize: MainAxisSize.max,
                           children: [
-                            TextFormField(
+                            Semantics(
+                              identifier: 'login_email',
+                              textField: true,
+                              label: 'E-mail',
+                              value: _model.emailLoginTextController.text,
+                              onSetText: (text) {
+                                _model.emailLoginTextController.text = text;
+                                safeSetState(() {});
+                              },
+                              child: ExcludeSemantics(
+                                child: TextFormField(
                               controller: _model.emailLoginTextController,
                               focusNode: _model.emailLoginFocusNode,
                               autofocus: false,
                               autofillHints: [AutofillHints.email],
-                              textInputAction: TextInputAction.done,
+                              textInputAction: TextInputAction.next,
                               obscureText: false,
                               decoration: InputDecoration(
                                 hintText: 'E-mail',
@@ -271,11 +361,24 @@ class _LoginWidgetState extends State<LoginWidget> {
                                     lineHeight: 1.4,
                                   ),
                               cursorColor: Color(0xFF007782),
+                              onChanged: (_) => safeSetState(() {}),
                               validator: _model
                                   .emailLoginTextControllerValidator
                                   .asValidator(context),
                             ),
-                            TextFormField(
+                              ),
+                            ),
+                            Semantics(
+                              identifier: 'login_password',
+                              textField: true,
+                              label: 'Senha',
+                              value: _model.senhaLoginTextController.text,
+                              onSetText: (text) {
+                                _model.senhaLoginTextController.text = text;
+                                safeSetState(() {});
+                              },
+                              child: ExcludeSemantics(
+                                child: TextFormField(
                               controller: _model.senhaLoginTextController,
                               focusNode: _model.senhaLoginFocusNode,
                               autofocus: false,
@@ -381,9 +484,12 @@ class _LoginWidgetState extends State<LoginWidget> {
                                     lineHeight: 1.4,
                                   ),
                               cursorColor: Color(0xFF007782),
+                              onChanged: (_) => safeSetState(() {}),
                               validator: _model
                                   .senhaLoginTextControllerValidator
                                   .asValidator(context),
+                            ),
+                              ),
                             ),
                             Row(
                               children: [
@@ -449,88 +555,18 @@ class _LoginWidgetState extends State<LoginWidget> {
                                 ),
                               ],
                             ),
-                            FleaberPrimaryButton(
+                            Semantics(
+                              identifier: 'login_entrar',
+                              button: true,
+                              label: 'Entrar',
+                              onTap: () => unawaited(_submitLogin()),
+                              child: ExcludeSemantics(
+                                child: FleaberPrimaryButton(
                               width: double.infinity,
                               label: 'Entrar',
-                              onPressed: () async {
-                                if (functions.checkLoginFields(
-                                    _model.emailLoginTextController.text,
-                                    _model.senhaLoginTextController.text)) {
-                                  GoRouter.of(context).prepareAuthEvent();
-
-                                  final user =
-                                      await authManager.signInWithEmail(
-                                    context,
-                                    _model.emailLoginTextController.text,
-                                    _model.senhaLoginTextController.text,
-                                  );
-                                  if (user == null) {
-                                    return;
-                                  }
-
-                                  final email =
-                                      _model.emailLoginTextController.text
-                                          .trim();
-                                  final password =
-                                      _model.senhaLoginTextController.text;
-                                  if (_model.rememberOnDevice) {
-                                    await LoginRememberStorage.saveCredentials(
-                                      email: email,
-                                      password: password,
-                                    );
-                                  } else {
-                                    await LoginRememberStorage
-                                        .clearCredentials();
-                                  }
-
-                                  await Future.delayed(
-                                    Duration(
-                                      milliseconds: 800,
-                                    ),
-                                  );
-                                  if (currentUserUid != '') {
-                                    context.pushNamedAuth(
-                                        HomePageWidget.routeName,
-                                        context.mounted);
-                                  } else {
-                                    await showDialog(
-                                      context: context,
-                                      builder: (alertDialogContext) {
-                                        return AlertDialog(
-                                          title: Text('Erro no Login'),
-                                          content: Text(
-                                              'Utilizador não encontrado ou senha errada. Verifica os teus dados ou regista-te!'),
-                                          actions: [
-                                            TextButton(
-                                              onPressed: () => Navigator.pop(
-                                                  alertDialogContext),
-                                              child: Text('Ok'),
-                                            ),
-                                          ],
-                                        );
-                                      },
-                                    );
-                                  }
-                                } else {
-                                  await showDialog(
-                                    context: context,
-                                    builder: (alertDialogContext) {
-                                      return AlertDialog(
-                                        title: Text('Erro'),
-                                        content: Text(
-                                            'E-mail inválido ou campo vazio'),
-                                        actions: [
-                                          TextButton(
-                                            onPressed: () => Navigator.pop(
-                                                alertDialogContext),
-                                            child: Text('Ok'),
-                                          ),
-                                        ],
-                                      );
-                                    },
-                                  );
-                                }
-                              },
+                              onPressed: () => unawaited(_submitLogin()),
+                            ),
+                              ),
                             ),
                             Container(
                               width: double.infinity,

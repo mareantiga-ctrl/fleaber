@@ -118,6 +118,7 @@ drop policy if exists "Lives ativas são visíveis por todos" on public.lives;
 drop policy if exists "lives_select_public_live" on public.lives;
 
 -- Feed Home / player / Hub: ver lives públicas sem ser dono
+drop policy if exists "lives_select_feed_or_owner" on public.lives;
 create policy "lives_select_feed_or_owner"
   on public.lives
   for select

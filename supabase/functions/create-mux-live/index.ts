@@ -1,14 +1,11 @@
+﻿import { buildCorsHeaders } from "../_shared/cors.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.4";
-
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type",
-};
 
 type CreateMuxLiveRequest = {
   title?: string;
 };
+
+let corsHeaders: Record<string, string> = { "Access-Control-Allow-Origin": "*" };
 
 function jsonResponse(body: Record<string, unknown>, status = 200) {
   return new Response(JSON.stringify(body), {
@@ -22,6 +19,7 @@ function jsonResponse(body: Record<string, unknown>, status = 200) {
 }
 
 Deno.serve(async (req) => {
+  corsHeaders = buildCorsHeaders(req);
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
   }
@@ -75,6 +73,30 @@ Deno.serve(async (req) => {
       );
     }
 
+    // SEC-017: quota diária de creates Mux (custo) — BATATA: não bloqueia 1.º directo.
+    const uid = userData.user.id;
+    const sinceIso = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+    const maxMuxCreatesPerDay = 10;
+    const { count: muxCreatesToday, error: quotaError } = await supabase
+      .from("lives")
+      .select("id", { count: "exact", head: true })
+      .or(`seller_id.eq.${uid},vendedor_id.eq.${uid}`)
+      .not("mux_live_id", "is", null)
+      .gte("created_at", sinceIso);
+    if (quotaError) {
+      console.warn("create-mux-live quota check failed (continue)", quotaError.message);
+    } else if ((muxCreatesToday ?? 0) >= maxMuxCreatesPerDay) {
+      return jsonResponse(
+        {
+          error:
+            "Limite diário de diretos Mux atingido. Tenta amanhã ou contacta suporte.",
+          step: "quota",
+          max_per_day: maxMuxCreatesPerDay,
+        },
+        429,
+      );
+    }
+
     const muxResponse = await fetch("https://api.mux.com/video/v1/live-streams", {
       method: "POST",
       headers: {
@@ -121,10 +143,12 @@ Deno.serve(async (req) => {
       );
     }
 
+    // Só «AO VIVO» / is_active no go-live (egress/RTMP). Create = preparar Mux.
+    // Antes: is_active=true aqui → Hub/Admin Lab mostravam directo sem sinal Mux.
     const insertPayload: Record<string, unknown> = {
       title,
-      status: "live",
-      is_active: true,
+      status: "scheduled",
+      is_active: false,
       vendedor_id: userData.user.id,
       mux_live_id: muxLiveId,
       mux_stream_key: streamKey,

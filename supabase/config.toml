@@ -1,7 +1,18 @@
+# JWT: false só onde o browser Stripe return URL faz GET sem sessão app.
+# POST de checkout/tip valida sempre auth.getUser() no código (SEC-018 aceite residual).
 [functions.create-payment-intent]
 verify_jwt = false
 
+[functions.stripe-webhook]
+verify_jwt = false
+
+[functions.refund-order]
+verify_jwt = true
+
 [functions.create-live-tip-checkout]
+verify_jwt = false
+
+[functions.meta-data-deletion]
 verify_jwt = false
 
 [functions.livekit-mux-publish]
@@ -14,4 +25,16 @@ verify_jwt = true
 verify_jwt = true
 
 [functions.livekit-egress-cleanup]
+verify_jwt = false
+
+[functions.delete-test-account]
+verify_jwt = true
+
+[functions.ingest-ocr-reservation]
+verify_jwt = false
+
+[functions.ps-pairing-claim]
+verify_jwt = false
+
+[functions.ps-heartbeat]
 verify_jwt = false

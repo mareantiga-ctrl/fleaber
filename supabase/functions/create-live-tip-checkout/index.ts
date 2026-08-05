@@ -1,11 +1,9 @@
+﻿import { buildCorsHeaders } from "../_shared/cors.ts";
+import { checkAnonRate } from "../_shared/anon_rate.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.4";
 import Stripe from "https://esm.sh/stripe@16.12.0?target=deno";
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type",
-};
+let corsHeaders: Record<string, string> = { "Access-Control-Allow-Origin": "*" };
 
 type LiveTipCheckoutRequest = {
   tip_id?: string;
@@ -84,10 +82,11 @@ function androidIntentUrl(
   const deepLinkPath =
     `fleaber.com/stripe-success?${stripeReturnQuery(sessionId, options).toString()}`;
   const fallback = encodeURIComponent("https://fleaber.app");
-  return `intent://${deepLinkPath}#Intent;scheme=fleaber;package=com.mycompany.fleaber;S.browser_fallback_url=${fallback};end`;
+  return `intent://${deepLinkPath}#Intent;scheme=fleaber;package=pt.fleaber.app;S.browser_fallback_url=${fallback};end`;
 }
 
 Deno.serve(async (req) => {
+  corsHeaders = buildCorsHeaders(req);
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
   }
@@ -115,6 +114,20 @@ Deno.serve(async (req) => {
       const sessionId = url.searchParams.get("session_id");
       if (!sessionId) {
         return textResponse("Sessão Stripe em falta.", 400);
+      }
+
+      // SEC-034: rate-limit settle via return URL (sem JWT) — BATATA gorjetas.
+      const tipRate = await checkAnonRate(
+        supabase,
+        `tip_settle:${sessionId.slice(0, 64)}`,
+        "create-live-tip-checkout-get",
+        20,
+      );
+      if (tipRate.rateLimited) {
+        return textResponse(
+          "Demasiados pedidos. Volta à app Fleaber e espera um momento.",
+          429,
+        );
       }
 
       const session = await stripe.checkout.sessions.retrieve(sessionId);
@@ -203,6 +216,23 @@ Deno.serve(async (req) => {
     } = await supabaseForAuth.auth.getUser();
     if (userError || !user) {
       throw new Error("Invalid checkout user.");
+    }
+
+    // SEC-034b: anti-spam só — fail-open. 30/h >> gorjetas reais.
+    const tipCreateRate = await checkAnonRate(
+      supabase,
+      `tip_create:${user.id}`,
+      "create-live-tip-checkout-post",
+      30,
+    );
+    if (tipCreateRate.rateLimited) {
+      return new Response(
+        JSON.stringify({ error: "Demasiadas gorjetas. Tenta daqui a pouco." }),
+        {
+          status: 429,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        },
+      );
     }
 
     const amountCents = Math.round(amountEur * 100);

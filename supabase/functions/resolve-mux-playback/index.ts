@@ -1,10 +1,8 @@
+﻿import { buildCorsHeaders } from "../_shared/cors.ts";
+import { checkAnonRate } from "../_shared/anon_rate.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.4";
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type",
-};
+let corsHeaders: Record<string, string> = { "Access-Control-Allow-Origin": "*" };
 
 type ResolveMuxPlaybackRequest = {
   live_id?: string;
@@ -38,6 +36,7 @@ function playbackIdFromAsset(asset: Record<string, unknown>): string {
 }
 
 Deno.serve(async (req) => {
+  corsHeaders = buildCorsHeaders(req);
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
   }
@@ -56,9 +55,6 @@ Deno.serve(async (req) => {
     if (!muxTokenId || !muxTokenSecret || !supabaseUrl || !serviceRoleKey) {
       return jsonResponse({ error: "Config em falta no servidor." }, 500);
     }
-    if (!authHeader.toLowerCase().startsWith("bearer ")) {
-      return jsonResponse({ error: "Auth obrigatória." }, 401);
-    }
 
     const body = (await req.json().catch(() => ({}))) as ResolveMuxPlaybackRequest;
     const liveId = (body.live_id ?? "").trim();
@@ -70,11 +66,8 @@ Deno.serve(async (req) => {
       auth: { persistSession: false },
     });
 
-    const jwt = authHeader.replace(/^Bearer\s+/i, "");
-    const { data: userData, error: userError } = await supabase.auth.getUser(jwt);
-    if (userError || !userData.user?.id) {
-      return jsonResponse({ error: "Utilizador inválido." }, 401);
-    }
+    // Hub anon OK: só devolve playback IDs públicos (nunca stream keys).
+    void authHeader;
 
     const { data: live, error: liveError } = await supabase
       .from("lives")
@@ -91,7 +84,8 @@ Deno.serve(async (req) => {
     const vodCached = (live.mux_vod_playback_id ?? "").trim();
     const ended = live.status === "ended" || live.is_active === false;
 
-    if (vodCached) {
+    // VOD só quando o directo já terminou — senão preferir stream live.
+    if (vodCached && ended) {
       return jsonResponse({
         playback_id: vodCached,
         playback_url: `https://stream.mux.com/${vodCached}.m3u8`,
@@ -102,6 +96,41 @@ Deno.serve(async (req) => {
 
     const muxLiveId = (live.mux_live_id ?? "").trim();
     const livePlayback = (live.mux_playback_id ?? "").trim();
+
+    // Directo activo: devolver HLS live de imediato (não esperar asset VOD).
+    if (!ended && livePlayback) {
+      return jsonResponse({
+        playback_id: livePlayback,
+        playback_url:
+          `https://stream.mux.com/${livePlayback}.m3u8?reduced_latency=true`,
+        source: "live_active",
+        is_live: true,
+      });
+    }
+
+    // SEC-016: rate-limit chamadas Mux API por live (custo / spam).
+    const rate = await checkAnonRate(
+      supabase,
+      `mux_resolve:${liveId}`,
+      "resolve-mux-playback",
+      30,
+    );
+    if (rate.rateLimited) {
+      if (livePlayback) {
+        return jsonResponse({
+          playback_id: livePlayback,
+          playback_url: `https://stream.mux.com/${livePlayback}.m3u8`,
+          source: "rate_limited_fallback",
+          is_live: !ended,
+          note: "rate_limited",
+        });
+      }
+      return jsonResponse(
+        { error: "Demasiados pedidos. Tenta daqui a pouco.", source: "rate_limited" },
+        429,
+      );
+    }
+
     if (!muxLiveId) {
       if (livePlayback) {
         return jsonResponse({
@@ -217,13 +246,17 @@ Deno.serve(async (req) => {
       );
     }
 
-    await supabase
-      .from("lives")
-      .update({
-        mux_asset_id: assetId,
-        mux_vod_playback_id: assetPlayback,
-      })
-      .eq("id", liveId);
+    // SEC-016: nunca sobrescrever VOD já gravado (só preencher se null).
+    if (!vodCached) {
+      await supabase
+        .from("lives")
+        .update({
+          mux_asset_id: assetId,
+          mux_vod_playback_id: assetPlayback,
+        })
+        .eq("id", liveId)
+        .is("mux_vod_playback_id", null);
+    }
 
     return jsonResponse({
       playback_id: assetPlayback,

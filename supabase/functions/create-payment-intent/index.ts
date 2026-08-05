@@ -1,11 +1,9 @@
+﻿import { buildCorsHeaders } from "../_shared/cors.ts";
+import { checkAnonRate } from "../_shared/anon_rate.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.4";
 import Stripe from "https://esm.sh/stripe@16.12.0?target=deno";
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type",
-};
+let corsHeaders: Record<string, string> = { "Access-Control-Allow-Origin": "*" };
 
 type BagCheckoutLine = {
   order_id?: string;
@@ -35,6 +33,7 @@ type PaymentIntentRequest = {
   live_seller_id?: string;
   live_item_id?: string;
   reservation_request_id?: string;
+  prize_shipping?: boolean;
   bag_checkout?: boolean;
   bag_lines?: BagCheckoutLine[];
 };
@@ -76,6 +75,19 @@ async function assertCheckoutPricesPositive(
   isBagCheckout: boolean,
   bagLines: BagCheckoutLine[],
 ): Promise<void> {
+  // Prémio da Rifa: só portes (+ seguro). item_price pode ser 0.
+  if (body.prize_shipping === true) {
+    const shipping = Number(body.shipping ?? 0);
+    const amount = Number(body.amount ?? 0);
+    if (!Number.isInteger(shipping) || shipping < 50) {
+      throw new Error("Invalid prize shipping amount.");
+    }
+    if (!Number.isInteger(amount) || amount < 50) {
+      throw new Error("Invalid payment amount.");
+    }
+    return;
+  }
+
   if (isBagCheckout) {
     for (const line of bagLines) {
       const unit = await unitPriceEurForCheckout(
@@ -101,6 +113,77 @@ async function assertCheckoutPricesPositive(
   );
   if (!Number.isFinite(unit) || unit <= 0) {
     throw new Error("Checkout blocked: item without price.");
+  }
+}
+
+/**
+ * SEC-006 parcial (BATATA): compara amount do cliente com price_total na BD.
+ * Só regista aviso — NUNCA rejeita o checkout (portes/taxas/descontos podem divergir).
+ */
+async function observeCheckoutAmountVsDb(
+  admin: ReturnType<typeof createClient>,
+  opts: {
+    orderId?: string;
+    bagLines: BagCheckoutLine[];
+    isBagCheckout: boolean;
+    amountCents: number;
+    buyerId?: string;
+  },
+): Promise<void> {
+  try {
+    const orderIds: string[] = [];
+    if (opts.isBagCheckout) {
+      for (const line of opts.bagLines) {
+        const id = line.order_id?.trim() ?? "";
+        if (id) orderIds.push(id);
+      }
+    } else {
+      const id = opts.orderId?.trim() ?? "";
+      if (id) orderIds.push(id);
+    }
+    if (orderIds.length === 0) return;
+
+    const { data: rows, error } = await admin
+      .from("orders")
+      .select("id, price_total")
+      .in("id", orderIds);
+    if (error || !rows?.length) return;
+
+    let dbCents = 0;
+    for (const row of rows) {
+      const eur = Number(row.price_total ?? 0);
+      if (Number.isFinite(eur) && eur > 0) {
+        dbCents += Math.round(eur * 100);
+      }
+    }
+    if (dbCents <= 0) return;
+
+    const delta = opts.amountCents - dbCents;
+    // Só log se divergência > 2 € (evita ruído de arredondamento)
+    if (Math.abs(delta) <= 200) return;
+
+    console.warn("SEC-006 amount observe", {
+      order_ids: orderIds,
+      amount_cents: opts.amountCents,
+      db_cents: dbCents,
+      delta_cents: delta,
+      buyer_id: opts.buyerId ?? null,
+    });
+
+    await admin.from("stripe_checkout_events").insert({
+      session_id: null,
+      order_id: orderIds[0] ?? null,
+      event: "sec006_amount_observe",
+      detail: JSON.stringify({
+        order_ids: orderIds,
+        amount_cents: opts.amountCents,
+        db_price_total_cents: dbCents,
+        delta_cents: delta,
+        bag: opts.isBagCheckout,
+      }),
+    });
+  } catch (e) {
+    console.warn("SEC-006 observe failed (ignored)", e);
   }
 }
 
@@ -166,12 +249,155 @@ function compactBagStripeMetadata(
   };
 }
 
+async function resolveBagLineLabels(
+  supabase: ReturnType<typeof createClient>,
+  lines: BagCheckoutLine[],
+): Promise<string[]> {
+  const labels: string[] = [];
+  for (const line of lines) {
+    const fromMeta = (line.item_label ?? "").trim();
+    if (
+      fromMeta.length > 0 &&
+      fromMeta !== "Artigo" &&
+      fromMeta !== "Artigo Fleaber"
+    ) {
+      labels.push(fromMeta);
+      continue;
+    }
+    const pid = line.product_id?.trim() ?? "";
+    if (!pid) {
+      labels.push("Artigo");
+      continue;
+    }
+    const { data } = await supabase
+      .from("products")
+      .select("title")
+      .eq("id", pid)
+      .maybeSingle();
+    const title = (data?.title as string | undefined)?.trim() ?? "";
+    labels.push(title.length > 0 ? title : "Artigo");
+  }
+  return labels;
+}
+
+async function sendMarketplaceBagPaidChatMessage(
+  supabase: ReturnType<typeof createClient>,
+  buyerId: string,
+  sellerId: string,
+  lines: BagCheckoutLine[],
+  totalCents: number,
+) {
+  if (lines.length === 0) return;
+  const firstProductId = lines[0]?.product_id?.trim() ?? "";
+  if (!firstProductId) return;
+
+  const labels = await resolveBagLineLabels(supabase, lines);
+  const count = lines.length;
+  const totalText =
+    Number.isFinite(totalCents) && totalCents > 0
+      ? ` (${(totalCents / 100).toFixed(2).replace(".", ",")} €)`
+      : "";
+
+  let text: string;
+  if (count > 1) {
+    // Card «Comprado!» injectado no cliente — payload oculto na timeline.
+    text = `FLEABER_JSON_V1:${JSON.stringify({
+      kind: "marketplace_bag_paid",
+      v: 1,
+      line_count: count,
+      total_cents: totalCents,
+      lines: lines.map((l, i) => ({
+        product_id: l.product_id,
+        item_label: labels[i] ?? "Artigo",
+      })),
+    })}`;
+  } else {
+    const label = labels[0] ?? "Artigo";
+    text = `Compra paga através do Seguro Fleaber: ${label}${totalText}.`;
+  }
+
+  try {
+    const { data: existingChat } = await supabase
+      .from("chats")
+      .select("id")
+      .eq("product_id", firstProductId)
+      .or(
+        `and(user_a.eq.${buyerId},user_b.eq.${sellerId}),and(user_a.eq.${sellerId},user_b.eq.${buyerId})`,
+      )
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    let chatId = existingChat?.id as string | undefined;
+    if (!chatId) {
+      const { data: newChat } = await supabase
+        .from("chats")
+        .insert({ user_a: buyerId, user_b: sellerId, product_id: firstProductId })
+        .select("id")
+        .single();
+      chatId = newChat?.id;
+    }
+
+    if (!chatId) return;
+
+    const { data: existingPlain } = await supabase
+      .from("chat_messages")
+      .select("id")
+      .eq("chat_id", chatId)
+      .like("text", "Compra%conjunto paga através do Seguro Fleaber%")
+      .limit(1)
+      .maybeSingle();
+    const { data: existingJson } = await supabase
+      .from("chat_messages")
+      .select("id")
+      .eq("chat_id", chatId)
+      .like("text", "FLEABER_JSON_V1:%marketplace_bag_paid%")
+      .limit(1)
+      .maybeSingle();
+    const existingMessage = existingPlain ?? existingJson;
+
+    if (!existingMessage) {
+      await supabase.from("chat_messages").insert({
+        sender_id: buyerId,
+        receiver_id: sellerId,
+        chat_id: chatId,
+        text,
+        is_read: false,
+        is_reservation: false,
+      });
+    }
+
+    await supabase
+      .from("chats")
+      .update({
+        last_message: "Compra paga pelo Seguro Fleaber",
+        last_message_time: new Date().toISOString(),
+      })
+      .eq("id", chatId);
+  } catch (chatError) {
+    console.error("Fleaber bag chat update failed", chatError);
+  }
+}
+
+function stripeIdsFromSession(session: {
+  id?: string;
+  payment_intent?: string | { id?: string } | null;
+}): { sessionId: string; paymentIntentId: string } {
+  const sessionId = (session.id ?? "").trim();
+  const pi = session.payment_intent;
+  const paymentIntentId = typeof pi === "string"
+    ? pi.trim()
+    : (pi?.id ?? "").trim();
+  return { sessionId, paymentIntentId };
+}
+
 async function settlePaidBagOrders(
   supabase: ReturnType<typeof createClient>,
   lines: BagCheckoutLine[],
   buyerId: string,
   sellerId: string,
   liveIdMeta: string,
+  stripeIds?: { sessionId: string; paymentIntentId: string },
 ) {
   for (const line of lines) {
     const orderId = line.order_id?.trim() ?? "";
@@ -195,6 +421,19 @@ async function settlePaidBagOrders(
     if (liveIdMeta.length > 0) orderPatch.live_id = liveIdMeta;
     const liveItemId = line.live_item_id?.trim() ?? "";
     if (liveItemId.length > 0) orderPatch.live_item_id = liveItemId;
+    if (stripeIds?.sessionId) {
+      orderPatch.stripe_checkout_session_id = stripeIds.sessionId;
+    }
+    if (stripeIds?.paymentIntentId) {
+      orderPatch.stripe_payment_intent_id = stripeIds.paymentIntentId;
+    }
+
+    // BUG-QA-021: rasto do stock (o decremento é feito pelo trigger ao ficar «pago»).
+    const { data: beforeRow } = await supabase
+      .from("products")
+      .select("quantity, is_sold, list_on_marketplace")
+      .eq("id", productId)
+      .maybeSingle();
 
     const { error: orderUpdateError } = await supabase
       .from("orders")
@@ -202,10 +441,19 @@ async function settlePaidBagOrders(
       .eq("id", orderId);
     if (orderUpdateError) throw orderUpdateError;
 
-    await supabase
+    // BUG-QA-016: o stock (quantity/is_sold) é tratado pelo trigger
+    // batata_mark_product_sold_on_paid_order ao ficar «pago». Não atualizamos
+    // products aqui para não decrementar duas vezes.
+    const { data: afterRow } = await supabase
       .from("products")
-      .update({ is_sold: true, list_on_marketplace: false })
-      .eq("id", productId);
+      .select("quantity, is_sold, list_on_marketplace")
+      .eq("id", productId)
+      .maybeSingle();
+    console.log(
+      `BATATA_STOCK bag order=${orderId} product=${productId} ` +
+        `qty_before=${beforeRow?.quantity ?? "?"} qty_after=${afterRow?.quantity ?? "?"} ` +
+        `is_sold=${afterRow?.is_sold ?? "?"} list=${afterRow?.list_on_marketplace ?? "?"}`,
+    );
 
     const requestId = line.reservation_request_id?.trim() ?? "";
     if (requestId.length > 0) {
@@ -439,10 +687,11 @@ function androidIntentUrl(
 ) {
   const deepLinkPath = `fleaber.com/stripe-success?${stripeReturnQuery(sessionId, options).toString()}`;
   const fallback = encodeURIComponent("https://fleaber.app");
-  return `intent://${deepLinkPath}#Intent;scheme=fleaber;package=com.mycompany.fleaber;S.browser_fallback_url=${fallback};end`;
+  return `intent://${deepLinkPath}#Intent;scheme=fleaber;package=pt.fleaber.app;S.browser_fallback_url=${fallback};end`;
 }
 
 Deno.serve(async (req) => {
+  corsHeaders = buildCorsHeaders(req);
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
   }
@@ -473,6 +722,24 @@ Deno.serve(async (req) => {
       const appUrl = sessionId != null ? androidIntentUrl(sessionId) : deepLinkUrl;
       if (!sessionId) {
         return textResponse("Sessão Stripe em falta.", 400);
+      }
+
+      // SEC-018b / SEC-005 residual: anti-spam settle via return URL — fail-open.
+      // Não muda a lógica de marcar pago; só limita martelar session_id.
+      if (serviceRoleKey) {
+        const supabaseRate = createClient(supabaseUrl, serviceRoleKey);
+        const settleRate = await checkAnonRate(
+          supabaseRate,
+          `checkout_settle:${sessionId.slice(0, 64)}`,
+          "create-payment-intent-get",
+          30,
+        );
+        if (settleRate.rateLimited) {
+          return textResponse(
+            "Demasiados pedidos. Volta à app Fleaber e espera um momento.",
+            429,
+          );
+        }
       }
 
       const session = await stripe.checkout.sessions.retrieve(sessionId);
@@ -509,6 +776,7 @@ Deno.serve(async (req) => {
           const bagLines = parseBagCheckoutLines(session.metadata);
           const isBagPaid =
             session.metadata?.bag_checkout === "true" && bagLines.length > 0;
+          const stripeIds = stripeIdsFromSession(session);
 
           if (isBagPaid && buyerId && sellerId) {
             await settlePaidBagOrders(
@@ -517,7 +785,17 @@ Deno.serve(async (req) => {
               buyerId,
               sellerId,
               liveIdMeta,
+              stripeIds,
             );
+            if (liveIdMeta.length === 0) {
+              await sendMarketplaceBagPaidChatMessage(
+                supabase,
+                buyerId,
+                sellerId,
+                bagLines,
+                Number(session.metadata?.total ?? 0),
+              );
+            }
           } else if (orderId && productId && buyerId && sellerId) {
             const orderPatch: Record<string, unknown> = {
               status: "pago",
@@ -528,6 +806,12 @@ Deno.serve(async (req) => {
             if (liveItemIdMeta.length > 0) {
               orderPatch.live_item_id = liveItemIdMeta;
             }
+            if (stripeIds.sessionId) {
+              orderPatch.stripe_checkout_session_id = stripeIds.sessionId;
+            }
+            if (stripeIds.paymentIntentId) {
+              orderPatch.stripe_payment_intent_id = stripeIds.paymentIntentId;
+            }
 
             const { error: orderUpdateError } = await supabase
               .from("orders")
@@ -537,13 +821,9 @@ Deno.serve(async (req) => {
               throw orderUpdateError;
             }
 
-            const { error: productUpdateError } = await supabase
-              .from("products")
-              .update({ is_sold: true, list_on_marketplace: false })
-              .eq("id", productId);
-            if (productUpdateError) {
-              throw productUpdateError;
-            }
+            // BUG-QA-016: stock (quantity/is_sold) tratado pelo trigger
+            // batata_mark_product_sold_on_paid_order ao ficar «pago».
+            // Evita duplo decremento — não atualizar products aqui.
 
             try {
               const { data: existingChat } = await supabase
@@ -857,12 +1137,38 @@ Deno.serve(async (req) => {
     }
 
     const supabaseAdmin = createClient(supabaseUrl, serviceRoleKey);
+
+    // SEC-006c: anti-spam só — fail-open. 60/h >> uso real (não bloqueia checkout normal).
+    const checkoutBurst = await checkAnonRate(
+      supabaseAdmin,
+      `create_payment_intent:${user.id}`,
+      "create-payment-intent-post",
+      60,
+    );
+    if (checkoutBurst.rateLimited) {
+      return new Response(
+        JSON.stringify({ error: "Demasiados checkouts. Tenta daqui a pouco." }),
+        {
+          status: 429,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        },
+      );
+    }
+
     await assertCheckoutPricesPositive(
       supabaseAdmin,
       body,
       isBagCheckout,
       bagLines,
     );
+
+    await observeCheckoutAmountVsDb(supabaseAdmin, {
+      orderId: body.order_id,
+      bagLines,
+      isBagCheckout,
+      amountCents: amount,
+      buyerId: body.buyer_id,
+    });
 
     const functionUrl = `${supabaseUrl}/functions/v1/create-payment-intent`;
 
@@ -893,7 +1199,11 @@ Deno.serve(async (req) => {
           {
             price_data: {
               currency,
-              product_data: { name: "Compra Fleaber" },
+              product_data: {
+                name: body.prize_shipping === true
+                  ? "Envio — Prémio da Rifa"
+                  : "Compra Fleaber",
+              },
               unit_amount: amount,
             },
             quantity: 1,
@@ -916,6 +1226,7 @@ Deno.serve(async (req) => {
       live_seller_id: body.live_seller_id ?? "",
       live_item_id: body.live_item_id ?? "",
       reservation_request_id: body.reservation_request_id ?? "",
+      prize_shipping: body.prize_shipping === true ? "1" : "",
     };
     if (isBagCheckout) {
       Object.assign(metadata, compactBagStripeMetadata(bagLines));

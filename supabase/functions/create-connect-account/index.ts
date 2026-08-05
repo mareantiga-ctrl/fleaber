@@ -1,18 +1,17 @@
+﻿import { buildCorsHeaders } from "../_shared/cors.ts";
+import { checkAnonRate } from "../_shared/anon_rate.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.4";
 import Stripe from "https://esm.sh/stripe@16.12.0?target=deno";
-
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type",
-};
 
 type ConnectAccountRequest = {
   user_id?: string;
   amount?: number;
 };
 
+let corsHeaders: Record<string, string> = { "Access-Control-Allow-Origin": "*" };
+
 Deno.serve(async (req) => {
+  corsHeaders = buildCorsHeaders(req);
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
   }
@@ -46,6 +45,24 @@ Deno.serve(async (req) => {
     }
     if (body.user_id && body.user_id !== user.id) {
       throw new Error("Cannot create another user Stripe account.");
+    }
+
+    // SEC-037: anti-spam onboarding/levantamento — fail-open. 20/h >> uso real wallet.
+    const supabaseAdmin = createClient(supabaseUrl, serviceRoleKey);
+    const connectRate = await checkAnonRate(
+      supabaseAdmin,
+      `connect_account:${user.id}`,
+      "create-connect-account",
+      20,
+    );
+    if (connectRate.rateLimited) {
+      return new Response(
+        JSON.stringify({ error: "Demasiados pedidos. Tenta daqui a pouco." }),
+        {
+          status: 429,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        },
+      );
     }
 
     const stripe = new Stripe(stripeSecretKey, {
@@ -155,11 +172,11 @@ Deno.serve(async (req) => {
       );
     }
 
-    const origin = req.headers.get("origin") ?? "https://fleaber.app";
+    const origin = req.headers.get("origin") ?? "https://fleaber.pt";
     const accountLink = await stripe.accountLinks.create({
       account: accountId,
-      refresh_url: origin,
-      return_url: origin,
+      refresh_url: `${origin.replace(/\/$/, "")}/wallet`,
+      return_url: `${origin.replace(/\/$/, "")}/wallet`,
       type: "account_onboarding",
     });
 

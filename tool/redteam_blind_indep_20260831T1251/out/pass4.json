@@ -1,0 +1,201 @@
+{
+  "auditor": "REDTEAM_BLIND_INDEP_v4",
+  "stamp": "20260831T1251",
+  "project": "fxdknzrqjenzqcvnwqqq",
+  "production_touched": false,
+  "fase4": false,
+  "corrections_applied": false,
+  "fresh_id": "5026498d-dfa6-49aa-a5c2-41e770a13598",
+  "findings": [],
+  "holds": [
+    {
+      "id": "p1.race2",
+      "title": "≤1 hold qty=1",
+      "well": "1",
+      "evidence": {
+        "held": 1
+      }
+    },
+    {
+      "id": "p1.backroom.order",
+      "title": "hold unlist+live activo bloqueado",
+      "well": "1",
+      "evidence": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"order_hold_product_not_listed\"}"
+    },
+    {
+      "id": "p4.tip.patch",
+      "title": "tip não completed via JWT",
+      "well": "4",
+      "evidence": {
+        "id": "21dd37be-e0e9-4f52-a011-e0c9b9533475",
+        "status": "pending",
+        "stripe_session_id": null,
+        "amount": 5.0
+      }
+    },
+    {
+      "id": "p2.refund.after.ship",
+      "title": "refund pós-envio bloqueado",
+      "well": "2",
+      "evidence": {
+        "rf": "403 {\"ok\":false,\"error\":\"Não é possível anular esta venda neste estado (já enviada ou concluída).\",\"code\":\"order_refund_blocked_status\",\"status\":\"enviado\"}",
+        "order": {
+          "id": "bedc6a59-bd37-45e5-8704-72a6f57d8f34",
+          "status": "enviado",
+          "stripe_refund_id": null,
+          "amount_paid_cents": 590
+        }
+      }
+    }
+  ],
+  "notes": [
+    {
+      "id": "p1.race2",
+      "title": "parallel insert",
+      "well": "1",
+      "detail": "201 [{\"id\":\"c46c5c2c-dd4b-44e3-8c00-b38a3143188f\",\"created_at\":\"2026-08-31T12:07:31.349465+00:00\",\"product_id\":\"47927716-b85e-4e2a-afb8-530f9ab12545\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"price_total\":4.50,\"shipping_meth…"
+    },
+    {
+      "id": "p1.race2",
+      "title": "parallel insert",
+      "well": "1",
+      "detail": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"order_hold_exceeds_stock\"}"
+    },
+    {
+      "id": "p1.race2",
+      "title": "parallel insert",
+      "well": "1",
+      "detail": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"order_hold_exceeds_stock\"}"
+    },
+    {
+      "id": "p1.race2",
+      "title": "parallel insert",
+      "well": "1",
+      "detail": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"order_hold_exceeds_stock\"}"
+    },
+    {
+      "id": "p1.race2.result",
+      "title": "holds",
+      "well": "1",
+      "detail": {
+        "n": 1,
+        "product": {
+          "id": "47927716-b85e-4e2a-afb8-530f9ab12545",
+          "quantity": 1,
+          "is_sold": false
+        }
+      }
+    },
+    {
+      "id": "p1.mux.create",
+      "title": "create-mux-live seller",
+      "well": "1",
+      "detail": "{\"live\":{\"id\":\"2cef75be-5733-4f16-9f45-9b8936748f7b\",\"created_at\":\"2026-08-31T12:07:32.801575+00:00\",\"vendedor_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"mux_live_id\":\"Jf9yAQOtiQYzMe3BcuICRpI587cssxFveXRX5eqLsAY\",\"stream_key\":\"6a061e74-8a75-56cc-5b77-b3619d5b7fd5\",\"playback_id\":\"XFLAwoggE5u01iFRVVridPyKSc5URZDyGwACR70101oGCQ\",\"is_active\":false,\"title\":\"RTI4-20260831T1251- live unlist bypass\",\"sta…"
+    },
+    {
+      "id": "p1.live.now",
+      "title": "live used",
+      "well": "1",
+      "detail": {
+        "id": "2cef75be-5733-4f16-9f45-9b8936748f7b",
+        "status": "scheduled",
+        "is_active": false,
+        "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588"
+      }
+    },
+    {
+      "id": "p1.backroom.order",
+      "title": "unlist + live_id activo, SEM live_item",
+      "well": "1",
+      "detail": {
+        "hub": 0,
+        "order": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"order_hold_product_not_listed\"}",
+        "live": {
+          "id": "2cef75be-5733-4f16-9f45-9b8936748f7b",
+          "status": "scheduled",
+          "is_active": false,
+          "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588"
+        }
+      }
+    },
+    {
+      "id": "p1.live.end",
+      "title": "end live",
+      "well": "1",
+      "detail": "200 {\"ok\":true,\"mux_live_id\":\"Jf9yAQOtiQYzMe3BcuICRpI587cssxFveXRX5eqLsAY\",\"step\":\"complete\",\"vod_playback_id\":null,\"mux_asset_id\":null,\"livekit_egress_stopped\":[],\"livekit_active_egress_before\":0}"
+    },
+    {
+      "id": "p4.tip.ended",
+      "title": "tip pending gravado",
+      "well": "4",
+      "detail": "200 \"21dd37be-e0e9-4f52-a011-e0c9b9533475\""
+    },
+    {
+      "id": "p4.tip.patch",
+      "title": "PATCH tip",
+      "well": "4",
+      "detail": {
+        "http": 200,
+        "after": {
+          "id": "21dd37be-e0e9-4f52-a011-e0c9b9533475",
+          "status": "pending",
+          "stripe_session_id": null,
+          "amount": 5.0
+        }
+      }
+    },
+    {
+      "id": "p4.tip.edge",
+      "title": "tip checkout",
+      "well": "4",
+      "detail": "{\"error\":\"Client tip_id is not allowed.\"}"
+    },
+    {
+      "id": "p4.tip.wallet",
+      "title": "wallet tip ended",
+      "well": "4",
+      "detail": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"not_allowed\"}"
+    },
+    {
+      "id": "p3.hub.reviews2",
+      "title": "hub_reviews_public",
+      "well": "3",
+      "detail": {
+        "http": 200,
+        "n": 8
+      }
+    },
+    {
+      "id": "p3.hub.profiles2",
+      "title": "hub_profiles",
+      "well": "3",
+      "detail": {
+        "http": 200,
+        "n": 2
+      }
+    },
+    {
+      "id": "p2.refund.after.ship",
+      "title": "seller refund after enviado",
+      "well": "2",
+      "detail": "403 {\"ok\":false,\"error\":\"Não é possível anular esta venda neste estado (já enviada ou concluída).\",\"code\":\"order_refund_blocked_status\",\"status\":\"enviado\"}"
+    },
+    {
+      "id": "p2.release.rpc",
+      "title": "release wallet JWT",
+      "well": "2",
+      "detail": "200 false"
+    }
+  ],
+  "created_products": [
+    "47927716-b85e-4e2a-afb8-530f9ab12545",
+    "335579db-1a1b-4541-8264-f74491b82e92"
+  ],
+  "created_orders": [
+    "c46c5c2c-dd4b-44e3-8c00-b38a3143188f"
+  ],
+  "created_lives": [
+    "2cef75be-5733-4f16-9f45-9b8936748f7b",
+    "327c44c1-67ba-4f34-bc5e-920eb16a7eae"
+  ]
+}

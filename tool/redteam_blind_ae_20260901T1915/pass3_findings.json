@@ -1,0 +1,130 @@
+{
+  "stamp": "20260901T1915",
+  "prefix": "RTAE-20260901T1915",
+  "lenses": [
+    "AE1",
+    "AE3"
+  ],
+  "findings": [
+    {
+      "id": "AE1-PICK-CHEAPEST-ENDED-LIVE-ITEM",
+      "lens": "AE1",
+      "severity": "P0",
+      "title": "Buyer escolhe o live_item ended mais barato de entre vários",
+      "actor": "buyer JWT",
+      "pre": "dois lives ended 25€ e 6€ no mesmo SKU 40€",
+      "repro": "POST orders live_item_id=o mais barato; create-payment-intent",
+      "expected": "catálogo 40€ após lives ended",
+      "obtained": 695,
+      "proven": true,
+      "evidence": {}
+    }
+  ],
+  "blocked": [
+    {
+      "id": "AE1-CROSS",
+      "lens": "AE1",
+      "title": "cross-seller live_item recusado",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"order_live_item_product_mismatch\"}"
+    },
+    {
+      "id": "AE1-PATCH-LI",
+      "lens": "AE1",
+      "title": "selo 40€ mantém-se após PATCH",
+      "ev": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1c8Ab2AjjHlnYtB6QAOyAKxqh56KvR052ZXIoa0KYXe8LHq4WboiDpbzH#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21…"
+    }
+  ],
+  "skipped": [],
+  "notes": [
+    {
+      "id": "p3.cross",
+      "lens": "AE1",
+      "title": "live_item S2 em produto S1",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"order_live_item_product_mismatch\"}"
+    },
+    {
+      "id": "p3.patch.li",
+      "lens": "AE1",
+      "title": "PATCH live_item após selo 40€",
+      "ev": {
+        "c0": 4000,
+        "c1": 4000,
+        "li1": "",
+        "patch": "200 [{\"id\":\"59af88fb-1930-412c-8ac4-6811797395a3\",\"created_at\":\"2026-09-01T18:29:55.463212+00:00\",\"product_id\":\"8e39a32f-95ac-4491-a954-5c9f78e15aba\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c…",
+        "amt": 4265,
+        "want40": 4265
+      }
+    },
+    {
+      "id": "p3.hist",
+      "lens": "AE1",
+      "title": "escolhe live_item histórico mais barato",
+      "ev": {
+        "amt": 695,
+        "want6": 695,
+        "want25": 2690,
+        "want40": 4265,
+        "liLow": "5e3b2695-9bea-43a1-a288-91829dfcac22",
+        "liHigh": "dc5a0fac-6862-48d5-8acd-f9db1ad29fea"
+      }
+    },
+    {
+      "id": "p3.qty2.ctx",
+      "lens": "AE3",
+      "title": "bundle+stock da order qty=2",
+      "ev": {
+        "bundle": {
+          "id": "05a60f77-4f39-4aaf-90cd-1ad6ed4e7e2e",
+          "status": "pending",
+          "total_eur": 38.0,
+          "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+          "product_ids": [
+            "0a456cf0-af2a-4e1b-bc89-85ed6e893485",
+            "9fa7adec-b9cf-4bc9-8fc9-c028e312fa94"
+          ]
+        },
+        "order_qty": 2,
+        "stock": {
+          "id": "0a456cf0-af2a-4e1b-bc89-85ed6e893485",
+          "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+          "title": "RTAE-20260901T1915-ae3-c",
+          "price": 8.0,
+          "quantity": 5,
+          "is_sold": false,
+          "list_on_marketplace": true
+        }
+      }
+    }
+  ],
+  "actors": {
+    "buyer": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+    "seller": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+    "buyer2": null,
+    "seller2": "9e03267b-bfc0-46a9-9bae-c4d2a0e96430"
+  },
+  "created": {
+    "lives": [
+      "57d812c3-5a02-4b63-bb98-c9653cdf234f",
+      "382affa1-0413-4b50-a2ec-d5c7475aafa0",
+      "c32e5367-58b7-4d5c-8ad1-9fedc48e71c6",
+      "89a707a5-6c16-4edd-b403-8548dfc0b036"
+    ],
+    "items": [
+      "42f1b194-a0e6-4bf5-882f-5a508efb4c3b",
+      "5671b12a-8d41-499c-9bc0-532a1db3ed8a",
+      "dc5a0fac-6862-48d5-8acd-f9db1ad29fea",
+      "5e3b2695-9bea-43a1-a288-91829dfcac22"
+    ],
+    "orders": [
+      "59af88fb-1930-412c-8ac4-6811797395a3",
+      "731e93bd-4583-4862-8c75-c5085264082f"
+    ],
+    "products": [
+      "16c7e6c5-462e-4f8d-9069-c8a02f63123a",
+      "8dfe3ee8-9b0f-4613-9919-f41964d5ad6e",
+      "8e39a32f-95ac-4491-a954-5c9f78e15aba",
+      "ad61cfb9-4b49-4bc7-acc9-3ce165f3bbaf"
+    ],
+    "bundles": []
+  }
+}

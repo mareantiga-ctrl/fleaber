@@ -1,0 +1,279 @@
+{
+  "findings": [
+    {
+      "id": "AJ4-02b",
+      "lens": "AJ4",
+      "severity": "P1",
+      "title": "Unlist cruzado: Hub some; live_item pode ficar available",
+      "actor": "seller",
+      "pre": "SKU seller2 listado no Hub; live_only checkout_product_id",
+      "repro": "mark_sold no live_only do seller A",
+      "expected": "produto seller2 intacto",
+      "obtained": {
+        "ms": "200 {\"ok\": true, \"price\": 9.0, \"live_id\": \"2adf274c-abb7-4ac5-8cf5-53bce6d90ead\", \"ref_code\": \"VIC1\", \"item_kind\": \"live_only\", \"total_qty\": 1, \"product_id\": null, \"blocked_qty\": 0, \"live_status\": \"live\", \"live_item_id\": \"b559f603-0509-4db1-9a6…",
+        "prodBefore": {
+          "id": "f0d4f335-8ab9-495e-bdb7-ae7cc689275e",
+          "seller_id": "698a9b96-ec6f-433c-808d-d3fde92f6bbb",
+          "title": "RTAJ-20260902T0728-victim-hub",
+          "price": 21.0,
+          "quantity": 1,
+          "is_sold": false,
+          "list_on_marketplace": true,
+          "available_for_live": true
+        },
+        "prodAfter": {
+          "id": "f0d4f335-8ab9-495e-bdb7-ae7cc689275e",
+          "seller_id": "698a9b96-ec6f-433c-808d-d3fde92f6bbb",
+          "title": "RTAJ-20260902T0728-victim-hub",
+          "price": 21.0,
+          "quantity": 1,
+          "is_sold": true,
+          "list_on_marketplace": false,
+          "available_for_live": true
+        },
+        "hubBeforeEmpty": true,
+        "hubAfterGone": true,
+        "itemStatusAfter": "available",
+        "buyAttempt": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"order_hold_exceeds_stock\"}",
+        "victimPublicId": "f0d4f335-8ab9-495e-bdb7-ae7cc689275e"
+      },
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "AJ4-06",
+      "lens": "AJ4",
+      "severity": "P1",
+      "title": "PATCH checkout_product_id depois do INSERT + mark_sold unlist alheio",
+      "actor": "seller",
+      "pre": "live_only sem checkout; PATCH para SKU seller2",
+      "repro": "PATCH checkout_product_id + mark_sold",
+      "expected": "PATCH recusado ou unlist só próprio",
+      "obtained": {
+        "patch": "200 [{\"id\":\"0ad0ac94-1cc0-4356-957e-60a5f8ada931\",\"live_id\":\"2adf274c-abb7-4ac5-8cf5-53bce6d90ead\",\"seller_id\":null,\"ref_code\":\"PATCHCK\",\"title\":\"RTAJ-20260902T0728 live_only\",\"description\":null,\"price\":9.0,\"image_url\":null,\"size\":null,\"color\":…",
+        "row": {
+          "id": "0ad0ac94-1cc0-4356-957e-60a5f8ada931",
+          "live_id": "2adf274c-abb7-4ac5-8cf5-53bce6d90ead",
+          "product_id": null,
+          "checkout_product_id": "2851dfc7-8ea9-4824-ba02-4e31d28bf15d",
+          "item_kind": "live_only",
+          "quantity": 1,
+          "status": "available",
+          "price": 9.0,
+          "ref_code": "PATCHCK",
+          "is_active": true
+        },
+        "before": {
+          "id": "2851dfc7-8ea9-4824-ba02-4e31d28bf15d",
+          "seller_id": "698a9b96-ec6f-433c-808d-d3fde92f6bbb",
+          "title": "RTAJ-20260902T0728-victim-patch",
+          "price": 22.0,
+          "quantity": 1,
+          "is_sold": false,
+          "list_on_marketplace": true,
+          "available_for_live": true
+        },
+        "ms": "200 {\"ok\": true, \"price\": 9.0, \"live_id\": \"2adf274c-abb7-4ac5-8cf5-53bce6d90ead\", \"ref_code\": \"PATCHCK\", \"item_kind\": \"live_only\", \"total_qty\": 1, \"product_id\": null, \"blocked_qty\": 0, \"live_status\": \"live\", \"live_item_id\": \"0ad0ac94-1cc0-4356-…",
+        "after": {
+          "id": "2851dfc7-8ea9-4824-ba02-4e31d28bf15d",
+          "seller_id": "698a9b96-ec6f-433c-808d-d3fde92f6bbb",
+          "title": "RTAJ-20260902T0728-victim-patch",
+          "price": 22.0,
+          "quantity": 1,
+          "is_sold": true,
+          "list_on_marketplace": false,
+          "available_for_live": true
+        }
+      },
+      "proven": true,
+      "evidence": {}
+    }
+  ],
+  "blocked": [
+    {
+      "id": "AJ4-07",
+      "lens": "AJ4",
+      "title": "buyer PATCH checkout_product_id",
+      "ev": "200 []"
+    },
+    {
+      "id": "AJ4-08",
+      "lens": "AJ4",
+      "title": "mkt mark_sold no unlist without PI",
+      "ev": {
+        "ms": "200 {\"ok\": true, \"price\": 12.0, \"live_id\": \"2adf274c-abb7-4ac5-8cf5-53bce6d90ead\", \"ref_code\": \"MKT1\", \"item_kind\": \"marketplace_product\", \"total_qty\": 1, \"product_id\": \"f1904317-6aee-45cc-96c3-45b55026d08c\", \"blocked_qty\": 0, \"live_status\": \"l…",
+        "after": {
+          "id": "f1904317-6aee-45cc-96c3-45b55026d08c",
+          "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+          "title": "RTAJ-20260902T0728-own-mkt",
+          "price": 14.0,
+          "quantity": 1,
+          "is_sold": false,
+          "list_on_marketplace": true,
+          "available_for_live": true
+        },
+        "itemStatus": "available"
+      }
+    },
+    {
+      "id": "AJ3-03",
+      "lens": "AJ3",
+      "title": "INSERT sold hidden",
+      "ev": {
+        "disc": "401 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_live_item_stock\"}",
+        "hub": "401 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_live_item_stock\"}",
+        "buyer": "200 []"
+      }
+    },
+    {
+      "id": "AJ1-06b",
+      "lens": "AJ1",
+      "title": "reconcile unpaid market",
+      "ev": {
+        "rec": "200 {\"ok\": false, \"error\": \"order_not_paid\", \"status\": \"reserva_pendente\"}",
+        "sync": "200 {\"ok\": true, \"total_qty\": 1, \"blocked_qty\": 0, \"item_status\": \"available\", \"live_item_id\": \"85da73c1-c9f9-44e5-ade7-2cee1adce0f7\", \"available_qty\": 1, \"reserved_accepted_qty\": 0}",
+        "st": "pending",
+        "ost": "reserva_pendente"
+      }
+    },
+    {
+      "id": "AJ5-01b",
+      "lens": "AJ5",
+      "title": "dup sku holds",
+      "ev": {
+        "st1": "pending",
+        "st2": "pending",
+        "o1": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"order_live_item_exhausted\"}",
+        "o2": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"order_live_item_exhausted\"}"
+      }
+    },
+    {
+      "id": "AJ8-03",
+      "lens": "AJ8",
+      "title": "tip spoof",
+      "ev": "400 {\"error\":\"[object Object]\"}"
+    }
+  ],
+  "notes": [
+    {
+      "id": "p2.mkt",
+      "lens": "AJ3",
+      "title": "market item qty-null",
+      "ev": "85da73c1-c9f9-44e5-ade7-2cee1adce0f7"
+    },
+    {
+      "id": "p2.aj4.hub",
+      "lens": "AJ4",
+      "title": "cross unlist surfaces",
+      "ev": {
+        "hubBefore": "200 []",
+        "hubAfter": "200 []",
+        "buyerProd": "200 [{\"id\":\"f0d4f335-8ab9-495e-bdb7-ae7cc689275e\",\"is_sold\":true,\"list_on_marketplace\":false,\"seller_id\":\"698a9b96-ec6f-433c-808d-d3fde92f6bbb\"}]",
+        "s2prod": "200 [{\"id\":\"f0d4f335-8ab9-495e-bdb7-ae7cc689275e\",\"is_sold\":true,\"list_on_marketplace\":false}]",
+        "buyAttempt": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"order_hold_exceeds_stock\"}",
+        "itemBefore": {
+          "id": "b559f603-0509-4db1-9a6a-77cbbdf69d59",
+          "live_id": "2adf274c-abb7-4ac5-8cf5-53bce6d90ead",
+          "product_id": null,
+          "checkout_product_id": "f0d4f335-8ab9-495e-bdb7-ae7cc689275e",
+          "item_kind": "live_only",
+          "quantity": 1,
+          "status": "available",
+          "price": 9.0,
+          "ref_code": "VIC1",
+          "is_active": true
+        },
+        "itemAfter": {
+          "id": "b559f603-0509-4db1-9a6a-77cbbdf69d59",
+          "live_id": "2adf274c-abb7-4ac5-8cf5-53bce6d90ead",
+          "product_id": null,
+          "checkout_product_id": "f0d4f335-8ab9-495e-bdb7-ae7cc689275e",
+          "item_kind": "live_only",
+          "quantity": 1,
+          "status": "available",
+          "price": 9.0,
+          "ref_code": "VIC1",
+          "is_active": true
+        },
+        "walletS2": 0
+      }
+    },
+    {
+      "id": "p2.aj4.relist",
+      "lens": "AJ4",
+      "title": "seller2 relist",
+      "ev": {
+        "patch": "200 [{\"id\":\"f0d4f335-8ab9-495e-bdb7-ae7cc689275e\",\"created_at\":\"2026-09-02T06:41:38.978814+00:00\",\"seller_id\":\"698a9b96-ec6f-433c-808d-d3fde92f6bbb\",\"title\":\"RTAJ-20260902T0728-victim-hub\",\"price\":21.0,\"ref_code\":null,\"category\":null,\"clothing_…",
+        "row": {
+          "id": "f0d4f335-8ab9-495e-bdb7-ae7cc689275e",
+          "seller_id": "698a9b96-ec6f-433c-808d-d3fde92f6bbb",
+          "title": "RTAJ-20260902T0728-victim-hub",
+          "price": 21.0,
+          "quantity": 1,
+          "is_sold": false,
+          "list_on_marketplace": true,
+          "available_for_live": true
+        }
+      }
+    },
+    {
+      "id": "p2.aj1.ord",
+      "lens": "AJ1",
+      "title": "buyer order+res",
+      "ev": {
+        "res": "201 [{\"id\":\"3d28d467-887a-4b46-b83a-62592c71ff0d\",\"live_id\":\"2adf274c-abb7-4ac5-8cf5-53bce6d90ead\",\"live_item_id\":\"85da73c1-c9f9-44e5-ade7-2cee1adce0f7\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0…",
+        "ord": "201 [{\"id\":\"a9ca976a-7346-41d2-901a-54aa1dc1637f\",\"created_at\":\"2026-09-02T06:41:43.000789+00:00\",\"product_id\":\"f1904317-6aee-45cc-96c3-45b55026d08c\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c…"
+      }
+    },
+    {
+      "id": "p2.dup",
+      "lens": "AJ5",
+      "title": "dup items",
+      "ev": {
+        "d1": "dc2be54e-5869-45cd-90fb-111d29de3091",
+        "d2": "3937fa6d-da50-4ca3-b26f-f9175b86f7bc"
+      }
+    },
+    {
+      "id": "p2.aj3.mkt",
+      "lens": "AJ3",
+      "title": "hub after mkt path",
+      "ev": {
+        "stock": "200 {\"ok\": true, \"price\": 12.0, \"live_id\": \"2adf274c-abb7-4ac5-8cf5-53bce6d90ead\", \"ref_code\": \"MKT1\", \"item_kind\": \"marketplace_product\", \"total_qty\": 1, \"product_id\": \"f1904317-6aee-45cc-96c3-45b55026d08c\", \"blocked_qty\": 0, \"live_status\": \"l…",
+        "disc": "401 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_live_item_stock\"}",
+        "hub": "401 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_live_item_stock\"}",
+        "fomo": "200 {\"ok\": true, \"items\": [{\"status\": \"available\", \"is_last_unit\": false, \"live_item_id\": \"b559f603-0509-4db1-9a6a-77cbbdf69d59\", \"available_qty\": 1, \"pending_queue_count\": 0, \"display_reserved_qty\": …",
+        "prodHub": "200 [{\"id\":\"f1904317-6aee-45cc-96c3-45b55026d08c\",\"is_sold\":false}]"
+      }
+    },
+    {
+      "id": "p2.aj8.tip",
+      "lens": "AJ8",
+      "title": "tip spoof seller_id",
+      "ev": "400 {\"error\":\"[object Object]\"}"
+    },
+    {
+      "id": "p2.aj6.convert",
+      "lens": "AJ6",
+      "title": "double convert",
+      "ev": [
+        "200 {\"ok\": false, \"error\": \"convert_requires_paid_order\"}",
+        "200 {\"ok\": false, \"error\": \"convert_requires_paid_order\"}"
+      ]
+    },
+    {
+      "id": "p2.gql",
+      "lens": "AJ3",
+      "title": "graphql",
+      "ev": "200 {\"errors\": [{\"message\": \"pg_graphql extension is not enabled.\"}]}"
+    }
+  ],
+  "lenses": [
+    "AJ1",
+    "AJ3",
+    "AJ4",
+    "AJ5",
+    "AJ6",
+    "AJ8"
+  ]
+}

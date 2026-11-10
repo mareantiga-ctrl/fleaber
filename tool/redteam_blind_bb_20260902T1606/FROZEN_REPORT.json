@@ -1,0 +1,46 @@
+{
+  "auditor": "REDTEAM_BLIND_BB_LIVE_POS_ANAS_v1",
+  "frozen_at": "2026-09-02T16:25:00+01:00",
+  "production_touched": false,
+  "fase4": false,
+  "corrections_applied": false,
+  "lentes_cobertas": ["BB1", "BB2", "BB3", "BB4", "BB5", "BB6", "BB7", "BB8"],
+  "prefix": "RTBB2-20260902T1606",
+  "contagem": {
+    "P0": 0,
+    "P1": 0,
+    "P2": 0,
+    "P3": 2,
+    "P4": 0,
+    "total_p0_p3": 2
+  },
+  "veredicto": "FAIL_P3",
+  "findings": [
+    {
+      "id": "BB-P3-01",
+      "severity": "P3",
+      "lenses": ["BB1", "BB2"],
+      "title": "Helper can_manage_chat injeta kind=system «comprou» sem PI (visível Hub anon)",
+      "rpc": "batata_live_system_message",
+      "proofs": ["pass2.json BB1-04", "pass3.json BB1-04.hub"]
+    },
+    {
+      "id": "BB-P3-02",
+      "severity": "P3",
+      "lenses": ["BB1", "BB8"],
+      "title": "reconcile aguarda_confirmacao devolve ok/direct_insert e cria pending (não converted)",
+      "rpc": "batata_live_reconcile_stripe_order",
+      "proofs": ["pass3.json BB1-14 (falso P1)", "pass3b.json BB1-14"]
+    }
+  ],
+  "discarded": [
+    {
+      "id": "BB8-03",
+      "reason": "PATCH wallets 200 [] não persiste; Δ balance = 0"
+    },
+    {
+      "id": "BB1-14-pass3-P1",
+      "reason": "converted=[] e item available; pass3b confirma só pending + RPC mentiroso"
+    }
+  ]
+}

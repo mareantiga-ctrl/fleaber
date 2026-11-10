@@ -1,0 +1,468 @@
+import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+
+import '/backend/supabase/supabase.dart';
+import '/batata_bundle_actions.dart';
+import '/hub/hub_account_routes.dart';
+import '/utils/dpd_pudo_service.dart';
+import '/utils/dpd_shipping_rates.dart';
+import '/utils/fee_calculator.dart';
+import '/utils/order_shipment_weight.dart';
+import '/utils/profile_shipping_requirements.dart';
+import '/utils/seller_professional.dart';
+import '/widgets/dpd_pickup_picker_sheet.dart';
+import '/widgets/fleaber_checkout_ui.dart';
+import '/widgets/seller_consumer_rights_notice.dart';
+
+const String kBundleShippingCarrier = kFleaberShippingCarrierMethod;
+const String kBundleShippingHand = kFleaberShippingHandMethod;
+const String kBundlePaymentInApp = 'Pagamento na app';
+const String kBundlePaymentDirect =
+    'Pagamento Direto ao Vendedor (MB WAY/Transf)';
+
+/// Sheet único para concluir compra de conjunto aceite (chat sticky + card).
+Future<void> showBundleAcceptedCheckoutSheet({
+  required BuildContext context,
+  required String bundleId,
+  Map<String, dynamic>? bundleMeta,
+  VoidCallback? onUpdated,
+}) async {
+  if (bundleId.isEmpty) return;
+
+  final bundle = bundleMeta ?? await fetchProductBundle(bundleId);
+  final itemsTotal = (bundle?['total_eur'] as num?)?.toDouble() ?? 0.0;
+  final subtotalEur = (bundle?['subtotal_eur'] as num?)?.toDouble() ?? itemsTotal;
+  final discountPct = (bundle?['discount_pct'] as num?)?.toDouble() ?? 0.0;
+  final discountEur = (bundle?['discount_eur'] as num?)?.toDouble() ?? 0.0;
+  final sellerId = bundle?['seller_id']?.toString() ?? '';
+
+  var sellerAllowsDirectPayment = false;
+  String? sellerDisplayName;
+  if (sellerId.isNotEmpty) {
+    final sellerRows = await ProfilesDirectoryTable().queryRows(
+      queryFn: (q) => q.eqOrNull('id', sellerId),
+      limit: 1,
+    );
+    if (sellerRows.isNotEmpty) {
+      sellerAllowsDirectPayment = sellerRows.first.externalPaymentsEnabled;
+      final n = (sellerRows.first.fullName ?? '').trim();
+      if (n.isNotEmpty) sellerDisplayName = n;
+    }
+  }
+
+  ProfilesRow? buyerProfile;
+  try {
+    buyerProfile = await ProfileShippingRequirements.fetchCurrentProfile();
+  } catch (_) {}
+  final addressComplete =
+      ProfileShippingRequirements.isComplete(buyerProfile);
+  final addressLines = buyerProfile == null
+      ? <String>[]
+      : ProfileShippingRequirements.formatAddress(buyerProfile).split('\n');
+
+  var selectedShipping = kBundleShippingCarrier;
+  var selectedPayment = kBundlePaymentInApp;
+  var deliveryMode = 'home'; // home | pickup
+  DpdPudoPoint? pickupPoint;
+
+  // Peso só do vendedor (artigos do conjunto) — comprador não escolhe escalão.
+  FleaberDpdWeightBand? checkoutWeightBand;
+  double? checkoutWeightKg;
+  try {
+    final rawIds = parseBundleProductIds(bundle?['product_ids']);
+    final qtyMap = <String, int>{};
+    for (final id in rawIds) {
+      qtyMap[id] = (qtyMap[id] ?? 0) + 1;
+    }
+    final uniqueIds = qtyMap.keys.toList();
+    if (uniqueIds.isNotEmpty) {
+      final products = await ProductsTable().queryRows(
+        queryFn: (q) => q.inFilter('id', uniqueIds),
+        limit: 80,
+      );
+      final agg = fleaberAggregateShipmentWeight([
+        for (final p in products)
+          FleaberShipmentWeightInput.fromProduct(
+            p,
+            quantity: qtyMap[p.id] ?? 1,
+          ),
+      ]);
+      if (agg.ok) {
+        checkoutWeightBand = agg.band;
+        checkoutWeightKg = agg.totalKg;
+      }
+    }
+  } catch (_) {}
+
+  if (!context.mounted) return;
+  await FleaberCheckoutUi.showHost<void>(
+    context: context,
+    builder: (ctx) {
+      var processing = false;
+      return Scaffold(
+        backgroundColor: Colors.white,
+        body: SafeArea(
+          top: false,
+          child: StatefulBuilder(
+            builder: (context, setModalState) {
+              final shippingCost = selectedShipping == kBundleShippingCarrier
+                  ? (checkoutWeightBand == null
+                      ? 0.0
+                      : fleaberCheckoutDpdShippingEur(
+                          pickup: deliveryMode == 'pickup',
+                          weightKg: checkoutWeightKg,
+                          band: checkoutWeightBand,
+                        ))
+                  : 0.0;
+              final isDirect = selectedPayment == kBundlePaymentDirect;
+              final protectionFee = calculateFleaberProtectionFee(
+                itemsTotal,
+                shippingEur: shippingCost,
+              );
+              final effectiveProtection = isDirect ? 0.0 : protectionFee;
+              final total = calculateFleaberBuyerTotal(
+                itemPriceEur: itemsTotal,
+                shippingEur: shippingCost,
+                includeProtectionFee: !isDirect,
+              );
+              return Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(20, 14, 12, 0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        const FleaberCheckoutHandle(),
+                        FleaberCheckoutTitleBar(
+                          title: 'Concluir compra do conjunto',
+                          subtitle: sellerDisplayName == null
+                              ? 'Confirma envio e pagamento do conjunto aceite.'
+                              : 'Vendedor: $sellerDisplayName',
+                          onClose: () => Navigator.of(ctx).pop(),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Expanded(
+                    child: FleaberCheckoutBody(
+                      primaryLabel: processing
+                          ? 'A processar…'
+                          : (isDirect
+                              ? 'Confirmar pagamento directo'
+                              : 'Pagar com Seguro Fleaber'),
+                      primaryLoading: processing,
+                      primaryEnabled: !processing,
+                      footerNote: isDirect
+                          ? 'Pagamento directo não inclui a Protecção Fleaber. '
+                              'Recomendamos o Seguro Fleaber para maior segurança.'
+                          : 'Seguro Fleaber: 0,65 € + 5% sobre artigos e portes.',
+                      onPrimary: () async {
+                        if (selectedShipping == kBundleShippingCarrier &&
+                            deliveryMode == 'pickup' &&
+                            pickupPoint == null) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text(
+                                'Escolhe um ponto Pickup DPD antes de pagar.',
+                              ),
+                            ),
+                          );
+                          return;
+                        }
+                        if (selectedShipping == kBundleShippingCarrier &&
+                            checkoutWeightBand == null) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text(
+                                kFleaberBuyerWeightMissingMessage,
+                              ),
+                            ),
+                          );
+                          return;
+                        }
+                        setModalState(() => processing = true);
+                        try {
+                          // Persistir Pickup/Home + selo peso nas linhas do conjunto.
+                          final bundleOrders = await OrdersTable().queryRows(
+                            queryFn: (q) => q.eqOrNull('bundle_id', bundleId),
+                            limit: 40,
+                          );
+                          final seal = fleaberOrderShippingSealFields(
+                            handDelivery:
+                                selectedShipping == kBundleShippingHand,
+                            weightKg: checkoutWeightKg,
+                            band: checkoutWeightBand,
+                            pickup: deliveryMode == 'pickup',
+                            shippingEurCharged: shippingCost,
+                          );
+                          for (final o in bundleOrders) {
+                            final oid = o.id?.trim() ?? '';
+                            if (oid.isEmpty) continue;
+                            await OrdersTable().update(
+                              data: {
+                                'shipping_method': selectedShipping,
+                                ...seal,
+                              },
+                              matchingRows: (rows) => rows.eqOrNull('id', oid),
+                            );
+                            if (selectedShipping == kBundleShippingCarrier &&
+                                deliveryMode == 'pickup' &&
+                                pickupPoint != null) {
+                              await DpdPudoService.attachPickupToOrder(
+                                orderId: oid,
+                                point: pickupPoint!,
+                              );
+                            } else if (selectedShipping ==
+                                kBundleShippingCarrier) {
+                              await DpdPudoService.attachHomeToOrder(oid);
+                            }
+                          }
+                          if (isDirect) {
+                            await payAcceptedBundleProposalDirect(
+                              bundleId: bundleId,
+                              paymentMethod: kBundlePaymentDirect,
+                              shippingMethod: selectedShipping,
+                            );
+                          } else {
+                            await payAcceptedBundleProposalCheckout(
+                              bundleId: bundleId,
+                              shippingWeightBand: checkoutWeightBand,
+                              shippingEur: shippingCost,
+                              pickup: deliveryMode == 'pickup',
+                            );
+                          }
+                          if (!context.mounted) return;
+                          Navigator.of(ctx).pop();
+                          onUpdated?.call();
+                        } catch (e) {
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('$e')),
+                            );
+                          }
+                        } finally {
+                          if (context.mounted) {
+                            setModalState(() => processing = false);
+                          }
+                        }
+                      },
+                      children: [
+                        const FleaberCheckoutSectionLabel('Morada de entrega'),
+                        const SizedBox(height: 8),
+                        FleaberCheckoutAddressCard(
+                          lines: addressLines,
+                          complete: addressComplete,
+                          onEdit: () =>
+                              HubAccountRoutes.openContaDefinicoes(ctx),
+                        ),
+                        const SizedBox(height: 16),
+                        const FleaberCheckoutSectionLabel('Envio'),
+                        const SizedBox(height: 8),
+                        if (selectedShipping == kBundleShippingCarrier) ...[
+                          Text(
+                            kFleaberCheckoutShippingDeltaNotice,
+                            style: GoogleFonts.inter(
+                              fontSize: 11,
+                              height: 1.35,
+                              color: Colors.black54,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          if (checkoutWeightBand == null)
+                            Text(
+                              kFleaberBuyerWeightMissingMessage,
+                              style: GoogleFonts.inter(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                                color: const Color(0xFFB45309),
+                                height: 1.35,
+                              ),
+                            )
+                          else
+                            Text(
+                              'Portes calculados automaticamente'
+                              '${checkoutWeightKg != null ? ' · ~${checkoutWeightKg.toStringAsFixed(1)} kg' : ''}',
+                              style: GoogleFonts.inter(
+                                fontSize: 12,
+                                color: Colors.black54,
+                              ),
+                            ),
+                          const SizedBox(height: 10),
+                        ],
+                        Builder(builder: (_) {
+                          String homePrice = '—';
+                          String pickupPrice = '—';
+                          try {
+                            if (checkoutWeightBand != null) {
+                              homePrice =
+                                  '${fleaberCheckoutDpdShippingEur(pickup: false, weightKg: checkoutWeightKg, band: checkoutWeightBand).toStringAsFixed(2)} €';
+                              pickupPrice =
+                                  '${fleaberCheckoutDpdShippingEur(pickup: true, weightKg: checkoutWeightKg, band: checkoutWeightBand).toStringAsFixed(2)} €';
+                            }
+                          } catch (_) {}
+                          final modeKey =
+                              selectedShipping == kBundleShippingHand
+                                  ? 'hand'
+                                  : deliveryMode;
+                          return Column(
+                            children: [
+                              FleaberCheckoutChoiceCard<String>(
+                                value: 'home',
+                                groupValue: modeKey,
+                                title: 'Entrega em casa',
+                                subtitle: 'DPD para a tua morada · $homePrice',
+                                onChanged: processing
+                                    ? null
+                                    : (_) => setModalState(() {
+                                          selectedShipping =
+                                              kBundleShippingCarrier;
+                                          deliveryMode = 'home';
+                                          pickupPoint = null;
+                                        }),
+                              ),
+                              const SizedBox(height: 8),
+                              FleaberCheckoutChoiceCard<String>(
+                                value: 'pickup',
+                                groupValue: modeKey,
+                                title: 'Levantar numa loja Pickup',
+                                subtitle: pickupPoint == null
+                                    ? 'Ponto DPD · $pickupPrice'
+                                    : '${pickupPoint!.name} · $pickupPrice',
+                                onChanged: processing
+                                    ? null
+                                    : (_) async {
+                                        final zip =
+                                            (buyerProfile?.shippingPostalCode ??
+                                                    '')
+                                                .trim();
+                                        final city =
+                                            (buyerProfile?.shippingCity ?? '')
+                                                .trim();
+                                        final picked =
+                                            await showDpdPickupPickerSheet(
+                                          context,
+                                          initialZip: zip,
+                                          initialCity: city,
+                                        );
+                                        if (picked == null) return;
+                                        setModalState(() {
+                                          selectedShipping =
+                                              kBundleShippingCarrier;
+                                          deliveryMode = 'pickup';
+                                          pickupPoint = picked;
+                                        });
+                                      },
+                              ),
+                              const SizedBox(height: 8),
+                              FleaberCheckoutChoiceCard<String>(
+                                value: 'hand',
+                                groupValue: modeKey,
+                                title: kFleaberShippingHandLabel,
+                                subtitle:
+                                    'Combinas o encontro com o vendedor',
+                                onChanged: processing
+                                    ? null
+                                    : (_) => setModalState(() {
+                                          selectedShipping =
+                                              kBundleShippingHand;
+                                          deliveryMode = 'home';
+                                          pickupPoint = null;
+                                        }),
+                              ),
+                            ],
+                          );
+                        }),
+                        const SizedBox(height: 16),
+                        const FleaberCheckoutSectionLabel('Pagamento'),
+                        const SizedBox(height: 8),
+                        FleaberCheckoutChoiceCard<String>(
+                          value: kBundlePaymentInApp,
+                          groupValue: selectedPayment,
+                          title: kBundlePaymentInApp,
+                          subtitle: 'Cartão com Protecção Fleaber',
+                          onChanged: processing
+                              ? null
+                              : (v) => setModalState(
+                                    () => selectedPayment = v,
+                                  ),
+                        ),
+                        if (sellerAllowsDirectPayment) ...[
+                          const SizedBox(height: 8),
+                          FleaberCheckoutChoiceCard<String>(
+                            value: kBundlePaymentDirect,
+                            groupValue: selectedPayment,
+                            title: kBundlePaymentDirect,
+                            subtitle:
+                                'MB WAY / transferência · sem Protecção Fleaber',
+                            onChanged: processing
+                                ? null
+                                : (v) => setModalState(
+                                      () => selectedPayment = v,
+                                    ),
+                          ),
+                        ],
+                        const SizedBox(height: 16),
+                        const FleaberCheckoutSectionLabel('Resumo'),
+                        const SizedBox(height: 8),
+                        FleaberCheckoutTotalsCard(
+                          lines: [
+                            FleaberCheckoutPriceLine(
+                              label: 'Subtotal artigos',
+                              value: formatEuros(subtotalEur),
+                            ),
+                            if (discountEur > 0.009)
+                              FleaberCheckoutPriceLine(
+                                label:
+                                    'Desconto de conjunto (${discountPct.toStringAsFixed(0)}%)',
+                                value: '- ${formatEuros(discountEur)}',
+                                emphasis: true,
+                              ),
+                            FleaberCheckoutPriceLine(
+                              label: discountEur > 0.009
+                                  ? 'Artigos (após desconto)'
+                                  : 'Artigos',
+                              value: formatEuros(itemsTotal),
+                            ),
+                            FleaberCheckoutPriceLine(
+                              label: 'Envio',
+                              value: formatEuros(shippingCost),
+                            ),
+                            FleaberCheckoutPriceLine(
+                              label: 'Protecção Fleaber',
+                              value: formatEuros(effectiveProtection),
+                            ),
+                            FleaberCheckoutPriceLine(
+                              label: 'Total a pagar',
+                              value: formatEuros(total),
+                              isTotal: true,
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 14),
+                        FutureBuilder<Map<String, SellerTradePublicInfo>>(
+                          future: SellerProfessionalCache.warm(
+                            [if (sellerId.isNotEmpty) sellerId],
+                          ),
+                          builder: (context, snap) {
+                            final info = snap.data?[sellerId] ??
+                                SellerProfessionalCache.peek(sellerId) ??
+                                SellerTradePublicInfo.particular(sellerId);
+                            return SellerConsumerRightsNotice(
+                              info: info,
+                              sellerDisplayName: sellerDisplayName,
+                            );
+                          },
+                        ),
+                        const SizedBox(height: 8),
+                      ],
+                    ),
+                  ),
+                ],
+              );
+            },
+          ),
+        ),
+      );
+    },
+  );
+}

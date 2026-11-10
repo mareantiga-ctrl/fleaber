@@ -1,0 +1,97 @@
+{
+  "auditor": "REDTEAM_BLIND_CF_LIVE_POS_BXCC_v1",
+  "prefix": "RTCF-20260906T1228",
+  "findings": [
+    {
+      "id": "p3b.sched.playback_id",
+      "lens": "CF7",
+      "severity": "P2",
+      "title": "buyer lê playback_id (sched.playback_id)",
+      "actor": "buyer JWT",
+      "pre": "seller2 unpublished",
+      "repro": "GET lives select=playback_id",
+      "expected": "vazio/403",
+      "obtained": "200 [{\"id\":\"4fb2d871-c14d-48d7-bca5-280c5434f0f1\",\"status\":\"scheduled\",\"is_active\":false,\"playback_id\":\"CF3BPLAY1228fake0001\"}]",
+      "proven": true,
+      "evidence": {
+        "col": "playback_id",
+        "val": "CF3BPLAY1228fake0001",
+        "live": "4fb2d871-c14d-48d7-bca5-280c5434f0f1"
+      }
+    },
+    {
+      "id": "p3b.sched.room",
+      "lens": "CF7",
+      "severity": "P2",
+      "title": "buyer lê livekit_room_name (sched.room)",
+      "actor": "buyer JWT",
+      "pre": "seller2 unpublished",
+      "repro": "GET lives select=livekit_room_name",
+      "expected": "vazio/403",
+      "obtained": "200 [{\"id\":\"4fb2d871-c14d-48d7-bca5-280c5434f0f1\",\"status\":\"scheduled\",\"is_active\":false,\"livekit_room_name\":\"CF3BROOM1228\"}]",
+      "proven": true,
+      "evidence": {
+        "col": "livekit_room_name",
+        "val": "CF3BROOM1228",
+        "live": "4fb2d871-c14d-48d7-bca5-280c5434f0f1"
+      }
+    },
+    {
+      "id": "p3b.live.playback_id",
+      "lens": "CF7",
+      "severity": "P2",
+      "title": "buyer lê playback_id (live.playback_id)",
+      "actor": "buyer JWT",
+      "pre": "seller2 unpublished",
+      "repro": "GET lives select=playback_id",
+      "expected": "vazio/403",
+      "obtained": "200 [{\"id\":\"cba7406d-4290-42e2-86e6-b7771f56b684\",\"status\":\"live\",\"is_active\":true,\"playback_id\":\"CF3BLIVE1228fake0001\"}]",
+      "proven": true,
+      "evidence": {
+        "col": "playback_id",
+        "val": "CF3BLIVE1228fake0001",
+        "live": "cba7406d-4290-42e2-86e6-b7771f56b684"
+      }
+    }
+  ],
+  "blocked": [
+    {
+      "id": "p3b.ended.playback_id",
+      "lens": "CF7",
+      "title": "não lê playback_id ended.playback_id",
+      "ev": "200 []"
+    },
+    {
+      "id": "p3b.buyer.patch.pi",
+      "lens": "CF1",
+      "title": "buyer não marca pago/PI",
+      "ev": {
+        "patch": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"order_money_fields_immutable\"}",
+        "row": {
+          "id": "9de6554b-e721-43d4-83d1-af52a20a7339",
+          "status": "pendente",
+          "stripe_payment_intent_id": null,
+          "amount_paid_cents": null
+        }
+      }
+    }
+  ],
+  "notes": [
+    {
+      "id": "p3b.hub.unpub",
+      "lens": "CF7",
+      "title": "Hub unpublished",
+      "ev": "200 []"
+    },
+    {
+      "id": "p3b.order.insert",
+      "lens": "CF1",
+      "title": "marketplace pendente",
+      "ev": "201 [{\"id\":\"9de6554b-e721-43d4-83d1-af52a20a7339\",\"created_at\":\"2026-09-06T11:38:54.516221+00:00\",\"product_id\":\"196662f6-4657-476e-bc09-5db26f4b21b6\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-00…"
+    }
+  ],
+  "lenses": [
+    "CF1",
+    "CF7"
+  ]
+}

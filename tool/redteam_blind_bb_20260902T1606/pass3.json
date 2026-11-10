@@ -1,0 +1,141 @@
+{
+  "stamp": "20260902T1606",
+  "prefix": "RTBB2-20260902T1606",
+  "lenses": [
+    "BB1",
+    "BB2",
+    "BB8"
+  ],
+  "findings": [
+    {
+      "id": "BB1-14",
+      "lens": "BB1",
+      "severity": "P1",
+      "title": "reconcile aguarda_confirmacao em marketplace_product converte sem captura",
+      "actor": "buyer+seller JWT",
+      "pre": "order status=aguarda_confirmacao + live_item com product_id",
+      "repro": "rpc batata_live_reconcile_stripe_order",
+      "expected": "negado",
+      "obtained": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"convert_requires_paid_order\"}",
+      "proven": true,
+      "evidence": {
+        "buyer": "200 {\"ok\": true, \"live_item_id\": \"c7b79d5b-5130-47a2-9fc9-f60c0e64a778\", \"direct_insert\": true}",
+        "seller": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"convert_requires_paid_order\"}",
+        "converted": [],
+        "item": {
+          "id": "c7b79d5b-5130-47a2-9fc9-f60c0e64a778",
+          "live_id": "a739ab0b-381b-4248-b8a9-8362e9d1f84a",
+          "status": "available",
+          "quantity": "",
+          "is_active": true,
+          "item_kind": "marketplace_product",
+          "product_id": "7df19f89-5b84-42e7-8757-fb5afada4aa1",
+          "checkout_product_id": "",
+          "price": 12.0,
+          "title": "RTBB2-20260902T1606 p3 mp"
+        },
+        "order": {
+          "id": "667fd177-7eb9-4d9e-ac5a-79c325512f0e",
+          "status": "aguarda_confirmacao",
+          "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+          "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+          "product_id": "7df19f89-5b84-42e7-8757-fb5afada4aa1",
+          "quantity": 1,
+          "price_total": 12,
+          "amount_paid_cents": "",
+          "stripe_payment_intent_id": "",
+          "live_item_id": "c7b79d5b-5130-47a2-9fc9-f60c0e64a778",
+          "live_id": "a739ab0b-381b-4248-b8a9-8362e9d1f84a",
+          "stock_units_applied": ""
+        }
+      }
+    }
+  ],
+  "blocked": [
+    {
+      "id": "BB1-09b",
+      "lens": "BB8",
+      "title": "Buyer INSERT order premio_rifa persiste esse status",
+      "ev": "201 [{\"id\":\"6ae73fa5-0edc-43f3-8ce4-65d67384010b\",\"created_at\":\"2026-09-02T15:19:06.88512+00:00\",\"product_id\":\"7df19f89-5b84-42e7-8757-fb5afada4aa1\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c2…"
+    }
+  ],
+  "skipped": [],
+  "notes": [
+    {
+      "id": "BB1-14.order",
+      "lens": "BB1",
+      "title": "aguarda_confirmacao fixture",
+      "ev": {
+        "ins": "201 [{\"id\":\"667fd177-7eb9-4d9e-ac5a-79c325512f0e\",\"created_at\":\"2026-09-02T15:19:05.993094+00:00\",\"product_id\":\"7df19f89-5b84-42e7-8757-fb5afada4aa1\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c…",
+        "row": {
+          "id": "667fd177-7eb9-4d9e-ac5a-79c325512f0e",
+          "status": "aguarda_confirmacao",
+          "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+          "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+          "product_id": "7df19f89-5b84-42e7-8757-fb5afada4aa1",
+          "quantity": 1,
+          "price_total": 12,
+          "amount_paid_cents": "",
+          "stripe_payment_intent_id": "",
+          "live_item_id": "c7b79d5b-5130-47a2-9fc9-f60c0e64a778",
+          "live_id": "a739ab0b-381b-4248-b8a9-8362e9d1f84a",
+          "stock_units_applied": ""
+        }
+      }
+    },
+    {
+      "id": "BB1-04.hub",
+      "lens": "BB2",
+      "title": "mentira system no Hub",
+      "ev": {
+        "auth": "200 [{\"id\":\"03c09a2f-15e8-4e8e-8605-3f61df819386\",\"kind\":\"system\",\"body\":\"✅ HubLie comprou RTBB2-P3-HUB-BB480482\",\"live_id\":\"a739ab0b-381b-4248-b8a9-8362e9d1f84a\"}]",
+        "anon": "200 [{\"id\":\"03c09a2f-15e8-4e8e-8605-3f61df819386\",\"kind\":\"system\",\"body\":\"✅ HubLie comprou RTBB2-P3-HUB-BB480482\",\"live_id\":\"a739ab0b-381b-4248-b8a9-8362e9d1f84a\"}]"
+      }
+    },
+    {
+      "id": "wallets.p3",
+      "lens": "BB8",
+      "title": "caixa",
+      "ev": {
+        "t0": {
+          "buyer": 61.1,
+          "seller": 15.0,
+          "buyer2": 0,
+          "seller2": 0
+        },
+        "t1": {
+          "buyer": 61.1,
+          "seller": 15.0,
+          "buyer2": 0,
+          "seller2": 0
+        }
+      }
+    }
+  ],
+  "actors": {
+    "buyer": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+    "seller": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+    "buyer2": "10177905-724e-41c4-b98a-4e6c58a6cc19",
+    "seller2": "9efcde56-1e1c-4395-ab3b-581f0d35a93e",
+    "helper": "a988bd86-6ec9-4343-a284-18ed80aa682e"
+  },
+  "created": {
+    "lives": [
+      "a739ab0b-381b-4248-b8a9-8362e9d1f84a"
+    ],
+    "items": [
+      "c7b79d5b-5130-47a2-9fc9-f60c0e64a778"
+    ],
+    "orders": [
+      "667fd177-7eb9-4d9e-ac5a-79c325512f0e",
+      "6ae73fa5-0edc-43f3-8ce4-65d67384010b"
+    ],
+    "products": [
+      "7df19f89-5b84-42e7-8757-fb5afada4aa1"
+    ],
+    "reservations": [],
+    "helpers": [
+      "150fa98d-76f1-4bef-bcc8-202e7537557c"
+    ]
+  }
+}

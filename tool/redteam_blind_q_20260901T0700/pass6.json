@@ -1,0 +1,120 @@
+{
+  "notes": [
+    {
+      "id": "p6.fix",
+      "lens": "Q8",
+      "title": "lives",
+      "ev": {
+        "liveA": "82346bfb-f632-4d1e-b8ad-9260bbffeb1d",
+        "liveB": "548e39e9-e6e4-4327-9ef4-387087125fa2",
+        "itemA": "e07f495b-1e88-4e57-85ac-7097970d81a7",
+        "item": {
+          "id": "e07f495b-1e88-4e57-85ac-7097970d81a7",
+          "live_id": "82346bfb-f632-4d1e-b8ad-9260bbffeb1d",
+          "title": "RTQ-20260901T0700 p6 itemA",
+          "quantity": 5,
+          "status": "available",
+          "product_id": null
+        }
+      }
+    },
+    {
+      "id": "p6.pend",
+      "lens": "Q1",
+      "title": "pending",
+      "ev": "201 [{\"id\":\"8cccbb62-ff19-4c7f-b580-4b14c9c720fe\",\"live_id\":\"548e39e9-e6e4-4327-9ef4-387087125fa2\",\"live_item_id\":\"e07f495b-1e88-4e57-85ac-7097970d81a7\",\"seller_id\":\"acf14a9b-833e-4dfc-a80e-ea5b8362f928\",\"buyer_id\":\"bfcbeeee…"
+    },
+    {
+      "id": "p6.accept",
+      "lens": "Q1",
+      "title": "S2 accept",
+      "ev": "200 {\"ok\": true, \"item_qty\": 5, \"request_id\": \"8cccbb62-ff19-4c7f-b580-4b14c9c720fe\", \"item_status\": \"available\", \"reserved_qty\": 1}"
+    },
+    {
+      "id": "p6.row.after.accept",
+      "lens": "Q1",
+      "title": "reserva",
+      "ev": {
+        "id": "8cccbb62-ff19-4c7f-b580-4b14c9c720fe",
+        "live_id": "548e39e9-e6e4-4327-9ef4-387087125fa2",
+        "live_item_id": "e07f495b-1e88-4e57-85ac-7097970d81a7",
+        "seller_id": "acf14a9b-833e-4dfc-a80e-ea5b8362f928",
+        "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+        "status": "accepted",
+        "requested_qty": 1,
+        "source": "fleaber_live"
+      }
+    },
+    {
+      "id": "p6.item.after.accept",
+      "lens": "Q1",
+      "title": "item A",
+      "ev": {
+        "id": "e07f495b-1e88-4e57-85ac-7097970d81a7",
+        "live_id": "82346bfb-f632-4d1e-b8ad-9260bbffeb1d",
+        "title": "RTQ-20260901T0700 p6 itemA",
+        "quantity": 5,
+        "status": "available",
+        "product_id": null
+      }
+    },
+    {
+      "id": "p6.convert",
+      "lens": "Q8",
+      "title": "S2 convert",
+      "ev": "200 {\"ok\": true, \"item_qty\": 5, \"request_id\": \"8cccbb62-ff19-4c7f-b580-4b14c9c720fe\", \"item_status\": \"available\", \"reserved_qty\": 1}"
+    },
+    {
+      "id": "p6.checkout.cross",
+      "lens": "Q8",
+      "title": "PI no item A via live B / seller S2",
+      "ev": "400 {\"error\":\"Missing payment metadata.\"}"
+    }
+  ],
+  "findings": [
+    {
+      "id": "RTQ-Q8-convert-foreign-item",
+      "lens": "Q8",
+      "severity": "P0",
+      "title": "S2 converte stock do artigo de S1 sem pagar",
+      "actor": "seller2 JWT",
+      "pre": "accept cruzado live_id B / item A",
+      "repro": "rpc process convert",
+      "expected": "convert recusado — item não é da live B",
+      "obtained": {
+        "row": {
+          "id": "8cccbb62-ff19-4c7f-b580-4b14c9c720fe",
+          "live_id": "548e39e9-e6e4-4327-9ef4-387087125fa2",
+          "live_item_id": "e07f495b-1e88-4e57-85ac-7097970d81a7",
+          "seller_id": "acf14a9b-833e-4dfc-a80e-ea5b8362f928",
+          "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+          "status": "converted",
+          "requested_qty": 1,
+          "source": "fleaber_live"
+        },
+        "item": {
+          "id": "e07f495b-1e88-4e57-85ac-7097970d81a7",
+          "live_id": "82346bfb-f632-4d1e-b8ad-9260bbffeb1d",
+          "title": "RTQ-20260901T0700 p6 itemA",
+          "quantity": 5,
+          "status": "available",
+          "product_id": null
+        }
+      },
+      "proven": true,
+      "evidence": {}
+    }
+  ],
+  "w0": {
+    "buyer": 51.66,
+    "seller": 11.05,
+    "buyer2": 0,
+    "seller2": 0
+  },
+  "wEnd": {
+    "buyer": 51.66,
+    "seller": 11.05,
+    "buyer2": 0,
+    "seller2": 0
+  }
+}

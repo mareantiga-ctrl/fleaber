@@ -1,0 +1,137 @@
+{
+  "stamp": "20260906T1316",
+  "prefix": "RTCJ-20260906T1316",
+  "lenses": [
+    "CJ2",
+    "CJ5",
+    "CJ6",
+    "CJ7"
+  ],
+  "wells": [
+    "CJ-A",
+    "CJ-B",
+    "CJ-C"
+  ],
+  "findings": [],
+  "blocked": [
+    {
+      "id": "C1-LAST",
+      "lens": "CJ5",
+      "title": "última unidade ≤1 Session",
+      "ev": {
+        "ok": 0
+      }
+    },
+    {
+      "id": "B1c-CROSS",
+      "lens": "CJ7",
+      "title": "offer outro seller não underpay",
+      "ev": {
+        "amt": 1955,
+        "status": 200
+      }
+    }
+  ],
+  "skipped": [],
+  "probes": [
+    {
+      "probe_id": "C1",
+      "poco": "CJ-C",
+      "payload": "Future.wait 2 buyers CPI após 2 holds + PATCH qty=1",
+      "http_rpc": [
+        "400 {\"error\":\"Checkout blocked: quantity 1 exceeds available stock 0.\"}",
+        "400 {\"error\":\"Checkout blocked: quantity 1 exceeds available stock 0.\"}"
+      ],
+      "bd_stripe": {
+        "ok": 0
+      },
+      "verdict": "FAIL",
+      "lens": "CJ5"
+    },
+    {
+      "probe_id": "B1c",
+      "poco": "CJ-B",
+      "payload": "offer seller2 aceite colada em SKU seller1",
+      "http_rpc": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1yNzkh8RS1t8uCsEPiUncjkf1zlvFtqlVeyOOQg0rIIM13VlnMATLfQCn#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21oYWlsUnxrVkRhQUQyNlJjSWBCN3BXNXVvVT1haml…",
+      "bd_stripe": 1955,
+      "verdict": "FAIL",
+      "lens": "CJ7"
+    },
+    {
+      "probe_id": "A5b",
+      "poco": "CJ-A",
+      "payload": "settle GET + HTTP GET páginas das 2 cs_ overlap 4∥2",
+      "http_rpc": {
+        "settle4": "402 Pagamento ainda não confirmado. Se já pagaste, aguarda alguns segundos e volta à app Fleaber.",
+        "settle2": "402 Pagamento ainda não confirmado. Se já pagaste, aguarda alguns segundos e volta à app Fleaber.",
+        "page4": 403,
+        "page2": 403
+      },
+      "bd_stripe": {
+        "sid4": "cs_test_a1FttdGw2k2ue2V2ifYVAvMQ5WrDATWkmDrN6QEm1cskODQxjeyEY0PWdo",
+        "sid2": "cs_test_a1ZlGY9Zhtg1KTDzfbV1HIhU95aySHH2rJ8N8dhGjRKYMpbBmb0lkKpAJe"
+      },
+      "verdict": "FAIL",
+      "lens": "CJ2"
+    }
+  ],
+  "notes": [
+    {
+      "id": "C1.pass2",
+      "lens": "CJ6",
+      "well": "CJ-C",
+      "title": "2 holds + qty=1 + Future.wait CPI",
+      "ev": {
+        "patch": "200 [{\"id\":\"400a6de7-ad1d-4ecf-85ab-70d0a8b67401\",\"created_at\":\"2026-09-06T12:28:35.014825+00:00\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"title\":\"RTCJ-20260906T1316-c1b-last\",\"price\":11.0,\"ref_code\":null,\"category\":null,\"clothing_size\":null,\"gender\":null,\"description\":\"RT…",
+        "ok": 0,
+        "a": "400 {\"error\":\"Checkout blocked: quantity 1 exceeds available stock 0.\"}",
+        "b": "400 {\"error\":\"Checkout blocked: quantity 1 exceeds available stock 0.\"}"
+      }
+    },
+    {
+      "id": "B1c.pass2",
+      "lens": "CJ7",
+      "well": "CJ-B",
+      "title": "offer S2 em SKU S1",
+      "ev": {
+        "ck": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1yNzkh8RS1t8uCsEPiUncjkf1zlvFtqlVeyOOQg0rIIM13VlnMATLfQCn#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21oYWlsUnxrVkRhQUQyNlJjSWBCN3BXNXVvVT1haml…",
+        "amt": 1955
+      }
+    },
+    {
+      "id": "A5.live",
+      "lens": "CJ2",
+      "well": "CJ-A",
+      "title": "settle + GET páginas overlap 4∥2",
+      "ev": {
+        "settle4": "402 Pagamento ainda não confirmado. Se já pagaste, aguarda alguns segundos e volta à app Fleaber.",
+        "settle2": "402 Pagamento ainda não confirmado. Se já pagaste, aguarda alguns segundos e volta à app Fleaber.",
+        "page4": "403 <?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Error><Code>AccessDenied</Code><Message>AWS authentication requires a valid Date or x-amz-date header</Message><RequestI…",
+        "page2": "403 <?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Error><Code>AccessDenied</Code><Message>AWS authentication requires a valid Date or x-amz-date header</Message><RequestI…"
+      }
+    }
+  ],
+  "actors": {
+    "buyer": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+    "seller": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+    "buyer2": "34484420-577e-468a-aa60-919cb762eae7",
+    "seller2": "90324b9b-8324-436a-a95a-347cccb68b0f"
+  },
+  "created": {
+    "orders": [
+      "9ea9652a-22cb-4e7e-8517-38f1bda3af88",
+      "6b76b51d-e099-4f10-bcf3-7b312f3697dd",
+      "5adb244e-2930-4b78-beb2-906091c934d0"
+    ],
+    "products": [
+      "400a6de7-ad1d-4ecf-85ab-70d0a8b67401",
+      "e9a1d933-f462-4de8-aef9-1e418b886de9",
+      "d979c75d-5fd5-4074-8554-e89691e8ec6a"
+    ],
+    "bundles": [],
+    "offers": [],
+    "sessions": [
+      "cs_test_a1yNzkh8RS1t8uCsEPiUncjkf1zlvFtqlVeyOOQg0rIIM13VlnMATLfQCn"
+    ]
+  }
+}

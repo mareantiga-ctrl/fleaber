@@ -1,0 +1,53 @@
+{
+  "auditor": "REDTEAM_BLIND_EL_BAG_RETEST_POS_OPEN_v1",
+  "frozen_at": "2026-09-06T20:02:00+01:00",
+  "production_touched": false,
+  "fase4": false,
+  "corrections_applied": false,
+  "prefix": "RTEL-20260906T1950",
+  "staging": "fxdknzrqjenzqcvnwqqq",
+  "probes_na_tabela": 18,
+  "classes_novas": 8,
+  "races": 12,
+  "overlap_races": 7,
+  "stripe_test_pago": true,
+  "veredicto": "FAIL_P1",
+  "contagem": {
+    "P0": 0,
+    "P1": 1,
+    "P2": 0,
+    "P3": 0,
+    "P4": 0,
+    "TOTAL_P0_P3": 1
+  },
+  "resumo_numerico": "P0=0 P1=1 P2=0 P3=0 TOTAL=1",
+  "findings": [
+    {
+      "id": "P1-1",
+      "severity": "P1",
+      "title": "Bag paralelo com artigo avulso: duas Sessions (ABCDE∥C, bag∥single∥bag)",
+      "probes": ["B5", "B6"],
+      "gate": "dual cs_ HTTP 200 reused=false; ledger aponta ao saco; órfã settle 402 sem prova expire nativo"
+    }
+  ],
+  "closed_since_ef": {
+    "B1_6x4": "400 overlapping + 200; 1 cs_",
+    "B2_6x4_50ms": "400 overlapping + 200; 1 cs_",
+    "B3_expand": "200 + 400 overlapping; nunca 2.ª cs_",
+    "B4_shrink": "reuse do maior; 1 cs_",
+    "B7_triangulo": "≤1 cs_ + 400 overlapping",
+    "D2_bizum": "400 off-platform; sem cs_ (P2 EF fechado)"
+  },
+  "closed_identical_bag": {
+    "A1": "1 cs_ reused",
+    "A2": "1 cs_ 3x paralelo",
+    "A3": "1 cs_ reused UUID invertido"
+  },
+  "pago": {
+    "order_id": "834a0a4b-7321-48b5-b30d-a9eb1936eb05",
+    "pi": "pi_3UClEOH7FWYUN3jh0aL4vBmH",
+    "cents": 590,
+    "stock_applied": 1
+  },
+  "hold_ratio": "2/18=11%"
+}

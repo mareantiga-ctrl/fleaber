@@ -1,0 +1,272 @@
+{
+  "stamp": "20260906T1410",
+  "prefix": "RTCP-20260906T1410",
+  "lenses": [
+    "CP1",
+    "CP3",
+    "CP4",
+    "CP5"
+  ],
+  "wells": [
+    "CP-A",
+    "CP-B",
+    "CP-C"
+  ],
+  "findings": [
+    {
+      "id": "P1-ALW1",
+      "lens": "CP5",
+      "severity": "P1",
+      "title": "allowlist off-platform bypass encodings fw,cyr",
+      "actor": "buyer JWT",
+      "pre": "payment_method lookalike",
+      "repro": "INSERT order + CPI",
+      "expected": "400 off-platform",
+      "obtained": {
+        "nbsp": {
+          "http": "400 {\"error\":\"Checkout blocked: order is off-platform payment (no Stripe Session).\"}",
+          "pm": "mbway ",
+          "sid": ""
+        },
+        "cr": {
+          "http": "400 {\"error\":\"Checkout blocked: order is off-platform payment (no Stripe Session).\"}",
+          "pm": "mbway\r",
+          "sid": ""
+        },
+        "fw": {
+          "http": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1byiCY1D458sXV6CCZqW0ULm6OhntzUbxUq6GHJWx0aOCir0wttdWjwhB#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21oYWlsUnxrVkRhQUQyNlJjSWBCN3BXNXVvVT1haml…",
+          "pm": "ｍｂｗａｙ",
+          "sid": "cs_test_a1byiCY1D458sXV6CCZqW0ULm6OhntzUbxUq6GHJWx0aOCir0wttdWjwhB"
+        },
+        "cyr": {
+          "http": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1qXVOXf4jlRRzr8deFK1beZ1vhorOVswBNbSb4bj72uusY99dUYzlEMfD#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21oYWlsUnxrVkRhQUQyNlJjSWBCN3BXNXVvVT1haml…",
+          "pm": "мbway",
+          "sid": "cs_test_a1qXVOXf4jlRRzr8deFK1beZ1vhorOVswBNbSb4bj72uusY99dUYzlEMfD"
+        }
+      },
+      "proven": true,
+      "evidence": {}
+    }
+  ],
+  "blocked": [
+    {
+      "id": "B2-LAST",
+      "lens": "CP4",
+      "title": "última unidade ≤1 Session",
+      "ev": {
+        "ok": 0,
+        "h1": 400,
+        "h2": 400,
+        "o2": "8a279b79-3342-4b25-af69-f993636b52bc"
+      }
+    }
+  ],
+  "skipped": [],
+  "probes": [
+    {
+      "probe_id": "B2",
+      "poco": "CP-B",
+      "payload": "Future.wait 2 buyers CPI última unidade (qty 2→1)",
+      "http_rpc": {
+        "h1": "400 {\"error\":\"Checkout blocked: quantity 1 exceeds available stock 0.\"}",
+        "h2": "400 {\"error\":\"Checkout blocked: quantity 1 exceeds available stock 0.\"}",
+        "insert2": "8a279b79-3342-4b25-af69-f993636b52bc"
+      },
+      "bd_stripe": {
+        "ok": 0
+      },
+      "verdict": "FAIL",
+      "lens": "CP4"
+    },
+    {
+      "probe_id": "ALW1",
+      "poco": "CP-C",
+      "payload": "payment_method mbway NBSP/CR/fullwidth/cyrillic",
+      "http_rpc": {
+        "nbsp": {
+          "http": "400 {\"error\":\"Checkout blocked: order is off-platform payment (no Stripe Session).\"}",
+          "pm": "mbway ",
+          "sid": ""
+        },
+        "cr": {
+          "http": "400 {\"error\":\"Checkout blocked: order is off-platform payment (no Stripe Session).\"}",
+          "pm": "mbway\r",
+          "sid": ""
+        },
+        "fw": {
+          "http": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1byiCY1D458sXV6CCZqW0ULm6OhntzUbxUq6GHJWx0aOCir0wttdWjwhB#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21oYWlsUnxrVkRhQUQyNlJjSWBCN3BXNXVvVT1haml…",
+          "pm": "ｍｂｗａｙ",
+          "sid": "cs_test_a1byiCY1D458sXV6CCZqW0ULm6OhntzUbxUq6GHJWx0aOCir0wttdWjwhB"
+        },
+        "cyr": {
+          "http": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1qXVOXf4jlRRzr8deFK1beZ1vhorOVswBNbSb4bj72uusY99dUYzlEMfD#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21oYWlsUnxrVkRhQUQyNlJjSWBCN3BXNXVvVT1haml…",
+          "pm": "мbway",
+          "sid": "cs_test_a1qXVOXf4jlRRzr8deFK1beZ1vhorOVswBNbSb4bj72uusY99dUYzlEMfD"
+        }
+      },
+      "bd_stripe": {
+        "opened": [
+          "fw",
+          "cyr"
+        ]
+      },
+      "verdict": "HOLD",
+      "lens": "CP5"
+    }
+  ],
+  "notes": [
+    {
+      "id": "A4.pages",
+      "lens": "CP1",
+      "well": "CP-A",
+      "title": "Stripe pages A4",
+      "ev": [
+        {
+          "sid": "cs_test_a1T6KKwOE1IgOanFQ3NK",
+          "settle": "402 Pagamento ainda não confirmado. Se já pagaste, aguarda alguns segundos e volta à app Fleaber.",
+          "page_http": 200,
+          "page_snip": "<!doctype html><html lang=\"en\" translate=\"no\" class=\"App--classic\" data-checkout-variant=\"classic\"><head><link rel=\"dns-prefetch\" href=\"https://api.stripe.com\"/><link rel=\"dns-pref…",
+          "expired_hint": true,
+          "pay_hint": false
+        },
+        {
+          "sid": "cs_test_a1l1trZ1vdeeoinThnxV",
+          "settle": "402 Pagamento ainda não confirmado. Se já pagaste, aguarda alguns segundos e volta à app Fleaber.",
+          "page_http": 400,
+          "page_snip": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Error><Code>InvalidArgument</Code><Message>Unsupported Authorization Type</Message><ArgumentName>Authorization</ArgumentName><ArgumentValue>…",
+          "expired_hint": false,
+          "pay_hint": false
+        },
+        {
+          "sid": "cs_test_a1sMZErbNuYPFM07vcEo",
+          "settle": "402 Pagamento ainda não confirmado. Se já pagaste, aguarda alguns segundos e volta à app Fleaber.",
+          "page_http": 400,
+          "page_snip": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Error><Code>InvalidArgument</Code><Message>Unsupported Authorization Type</Message><ArgumentName>Authorization</ArgumentName><ArgumentValue>…",
+          "expired_hint": false,
+          "pay_hint": false
+        }
+      ]
+    },
+    {
+      "id": "B1.pages",
+      "lens": "CP3",
+      "well": "CP-B",
+      "title": "Stripe pages B1",
+      "ev": [
+        {
+          "sid": "cs_test_a1HoXqnSZLkmdbye9jlx",
+          "settle": "402 Pagamento ainda não confirmado. Se já pagaste, aguarda alguns segundos e volta à app Fleaber.",
+          "page_http": 200,
+          "page_snip": "<!doctype html><html lang=\"en\" translate=\"no\" class=\"App--classic\" data-checkout-variant=\"classic\"><head><link rel=\"dns-prefetch\" href=\"https://api.stripe.com\"/><link rel=\"dns-pref…",
+          "expired_hint": true,
+          "pay_hint": false
+        },
+        {
+          "sid": "cs_test_a1ZTLk9Y92y8jtizgwgt",
+          "settle": "402 Pagamento ainda não confirmado. Se já pagaste, aguarda alguns segundos e volta à app Fleaber.",
+          "page_http": 200,
+          "page_snip": "<!doctype html><html lang=\"en\" translate=\"no\" class=\"App--classic\" data-checkout-variant=\"classic\"><head><link rel=\"dns-prefetch\" href=\"https://api.stripe.com\"/><link rel=\"dns-pref…",
+          "expired_hint": true,
+          "pay_hint": false
+        }
+      ]
+    },
+    {
+      "id": "C1.zwsp.row",
+      "lens": "CP5",
+      "well": "CP-C",
+      "title": "order com cs_ ZWSP",
+      "ev": "200 [{\"id\":\"b29e6317-a75b-4a8f-926d-f1a53657c3ea\",\"payment_method\":\"mbway​\",\"status\":\"reserva_pendente\",\"stripe_checkout_session_id\":\"cs_test_a1kugyn3SFz0p9wjclBRfaDVt8Z764ARtdbJBp3UGXZCVGISxTy3UkQTpT\",\"price_total\":19.55}]"
+    },
+    {
+      "id": "C1.zwsp.pm",
+      "lens": "CP5",
+      "well": "CP-C",
+      "title": "payment_method codes",
+      "ev": {
+        "pm": "mbway​",
+        "len": 6,
+        "has_zwsp": true,
+        "codes": [
+          "6d",
+          "62",
+          "77",
+          "61",
+          "79",
+          "200b"
+        ]
+      }
+    },
+    {
+      "id": "B2.last",
+      "lens": "CP4",
+      "well": "CP-B",
+      "title": "2 buyers last unit",
+      "ev": {
+        "o1": "9523818b-07f3-4b3d-ba76-5e063be4d5a3",
+        "o2": "8a279b79-3342-4b25-af69-f993636b52bc",
+        "patch": "200 [{\"id\":\"6341c05f-c6d6-4f9a-b3c8-452ed5cc4923\",\"created_at\":\"2026-09-06T13:19:10.93766+00:00\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"title\":\"RTCP-20260906T1410-b2b-last\",\"price\":11.0,\"ref_code\":null,\"category\":null,\"clothing_size\":null,\"gender\":null,\"description\":\"RTC…",
+        "h1": "400 {\"error\":\"Checkout blocked: quantity 1 exceeds available stock 0.\"}",
+        "h2": "400 {\"error\":\"Checkout blocked: quantity 1 exceeds available stock 0.\"}",
+        "ok": 0
+      }
+    },
+    {
+      "id": "ALW.pay",
+      "lens": "CP5",
+      "well": "CP-C",
+      "title": "off-platform encoding extras",
+      "ev": {
+        "nbsp": {
+          "http": "400 {\"error\":\"Checkout blocked: order is off-platform payment (no Stripe Session).\"}",
+          "pm": "mbway ",
+          "sid": ""
+        },
+        "cr": {
+          "http": "400 {\"error\":\"Checkout blocked: order is off-platform payment (no Stripe Session).\"}",
+          "pm": "mbway\r",
+          "sid": ""
+        },
+        "fw": {
+          "http": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1byiCY1D458sXV6CCZqW0ULm6OhntzUbxUq6GHJWx0aOCir0wttdWjwhB#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21oYWlsUnxrVkRhQUQyNlJjSWBCN3BXNXVvVT1haml…",
+          "pm": "ｍｂｗａｙ",
+          "sid": "cs_test_a1byiCY1D458sXV6CCZqW0ULm6OhntzUbxUq6GHJWx0aOCir0wttdWjwhB"
+        },
+        "cyr": {
+          "http": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1qXVOXf4jlRRzr8deFK1beZ1vhorOVswBNbSb4bj72uusY99dUYzlEMfD#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21oYWlsUnxrVkRhQUQyNlJjSWBCN3BXNXVvVT1haml…",
+          "pm": "мbway",
+          "sid": "cs_test_a1qXVOXf4jlRRzr8deFK1beZ1vhorOVswBNbSb4bj72uusY99dUYzlEMfD"
+        }
+      }
+    }
+  ],
+  "actors": {
+    "buyer": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+    "seller": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+    "buyer2": "7d57f0d3-f403-4e93-bc00-edbd1c20a348",
+    "seller2": null
+  },
+  "created": {
+    "orders": [
+      "9523818b-07f3-4b3d-ba76-5e063be4d5a3",
+      "8a279b79-3342-4b25-af69-f993636b52bc",
+      "b026b851-8a38-4564-aafb-6c647012f4b7",
+      "b8c74bfb-0a3b-4e8d-9704-95d7e8e67efa",
+      "92f236fa-fa0d-4556-bc2d-00872e003541",
+      "6b3020b4-0645-404f-9c9e-20b0f5ee9965"
+    ],
+    "products": [
+      "6341c05f-c6d6-4f9a-b3c8-452ed5cc4923",
+      "d80276d6-28e9-47a3-a583-d1a39ed62f18",
+      "70a44995-ca03-443d-9387-456dcc7a38ee",
+      "210d849c-ab47-468a-a953-3f908e7603fd",
+      "a9b41566-93af-4b9a-a448-e19cf5fca5a9"
+    ],
+    "bundles": [],
+    "offers": [],
+    "sessions": [
+      "cs_test_a1byiCY1D458sXV6CCZqW0ULm6OhntzUbxUq6GHJWx0aOCir0wttdWjwhB",
+      "cs_test_a1qXVOXf4jlRRzr8deFK1beZ1vhorOVswBNbSb4bj72uusY99dUYzlEMfD"
+    ]
+  }
+}

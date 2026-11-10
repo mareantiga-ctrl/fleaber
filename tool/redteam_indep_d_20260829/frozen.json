@@ -1,0 +1,185 @@
+{
+  "schema": "fleaber.redteam.blind.v1",
+  "FROZEN_AT": "2026-08-29T14:02:00Z",
+  "project": "fxdknzrqjenzqcvnwqqq",
+  "stripe": "TEST",
+  "production_touched": false,
+  "fase4_started": false,
+  "fixes_implemented": false,
+  "verdict": "A_FAIL_P0",
+  "saturation": false,
+  "saturation_reason": "Last complete pass discovered a new P0 class (wallet mint via batata_wallet_apply_tip_once + Connect TEST transfer).",
+  "identities": {
+    "buyer": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+    "seller": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+    "buyer2": "e621595b-80f2-49e7-a7c8-01c8d5268c78"
+  },
+  "probes": [
+    "tool/redteam_indep_d_20260829/probe.py",
+    "tool/redteam_indep_d_20260829/probe_cont.py",
+    "tool/redteam_indep_d_20260829/probe_pass3.py",
+    "tool/redteam_indep_d_20260829/probe_rpc.py",
+    "tool/redteam_indep_d_20260829/probe_rpc2.py",
+    "tool/redteam_indep_d_20260829/probe_p0_tip_mint.py"
+  ],
+  "findings": [
+    {
+      "id": "RT-D-P0-001",
+      "severity": "P0",
+      "title": "JWT mints wallet via batata_wallet_apply_tip_once on unpaid pending tip; seller Connect payout of minted funds",
+      "actor": "authenticated buyer or seller JWT",
+      "preconditions": "create-live-tip-checkout pending row; p_wallet_id equals attacker; seller Connect ready for payout variant",
+      "reproduction": "POST create-live-tip-checkout then POST /rest/v1/rpc/batata_wallet_apply_tip_once with arbitrary p_amount/p_type/p_description; seller create-connect-account amount=1000",
+      "impact": "Arbitrary Fleaber balance without tip Stripe capture; extra credit if p_type changes; TEST Transfer tr_1U9mjiH7FWYUN3jhNElEk8wE of 10 EUR minted",
+      "state": "OPEN",
+      "evidence_files": [
+        "probe_p0_tip_mint.json",
+        "probe_p0_payout.json"
+      ]
+    },
+    {
+      "id": "RT-D-P2-001",
+      "severity": "P2",
+      "title": "Anon INSERT favorites and follows with third-party UUIDs",
+      "actor": "anon",
+      "preconditions": "valid product/user UUIDs",
+      "reproduction": "POST /rest/v1/favorites and /follows with chosen ids",
+      "impact": "social graph write as another user",
+      "state": "OPEN",
+      "evidence_files": ["probe_cont_raw.json"]
+    },
+    {
+      "id": "RT-D-P2-002",
+      "severity": "P2",
+      "title": "Eight concurrent holds accepted on stock=1",
+      "actor": "buyer",
+      "preconditions": "product quantity=1",
+      "reproduction": "8 parallel order inserts",
+      "impact": "hold window; not two valid sales",
+      "state": "OPEN",
+      "evidence_files": ["probe_cont_raw.json"]
+    },
+    {
+      "id": "RT-D-P2-003",
+      "severity": "P2",
+      "title": "Multiple Checkout Sessions for one order / two orders on stock=1",
+      "actor": "buyer",
+      "preconditions": "open hold",
+      "reproduction": "parallel create-payment-intent",
+      "impact": "payment window; sessions are not captures",
+      "state": "OPEN",
+      "evidence_files": ["probe_cont_raw.json", "probe_pass3.json"]
+    },
+    {
+      "id": "RT-D-P2-004",
+      "severity": "P2",
+      "title": "Buyer INSERT premio_rifa rewritten to reserva_pendente; prize checkout blocked",
+      "actor": "buyer",
+      "preconditions": "own order insert",
+      "reproduction": "INSERT orders payment_method premio_rifa; POST checkout",
+      "impact": "FSM noise; no economic prize checkout",
+      "state": "OPEN",
+      "evidence_files": ["probe_cont_raw.json"]
+    },
+    {
+      "id": "RT-D-P2-005",
+      "severity": "P2",
+      "title": "Second stock=1 Stripe TEST pay: return path payment received, Fleaber settle refused",
+      "actor": "buyer",
+      "preconditions": "order A already pago stock consumed",
+      "reproduction": "Pay cs_test_a1ASrkCj… then GET create-payment-intent?checkout_return=success",
+      "impact": "one valid Fleaber sale; second Stripe capture net state NOT_PROVEN",
+      "state": "OPEN",
+      "evidence_files": ["stock1_capture_observe.json"]
+    }
+  ],
+  "invariants": {
+    "A_stripe_charges_server_contract": true,
+    "B_buyer_cannot_set_price_qty_authority": true,
+    "C_payout_refund_release_cannot_exceed_legit_funds": false,
+    "C_refuted_by": "RT-D-P0-001",
+    "D_one_unit_two_valid_sales": false,
+    "E_jwt_cannot_mint_wallet_ledger_payout": false,
+    "F_offplatform_cannot_mint_fleaber": true,
+    "G_refund_exceeds_capture": false,
+    "H_parties_coherent": true,
+    "I_one_payout_intent_one_transfer": true,
+    "J_two_intents_two_transfers": true,
+    "K_catalog_change_does_not_rewrite_contract": true,
+    "L_offer_bundle_discount_authority": true
+  },
+  "races": [
+    { "name": "8 holds stock=1", "n": 8, "final": "product.quantity=1" },
+    { "name": "6 checkout sessions same order", "n": 6, "final": "6 sessions created" },
+    { "name": "4 refunds on hold", "n": 4, "final": "all HTTP 422" },
+    { "name": "4 payouts same idempotency key", "n": 4, "final": "1 transfer" },
+    { "name": "4 payouts distinct keys concurrent", "n": 4, "final": "1 transfer observed" },
+    { "name": "6 review inserts", "n": 6, "final": "all 400" },
+    { "name": "stock=1 two sessions pay A then B", "n": 2, "final": "A pago; B reserva_pendente" }
+  ],
+  "stripe_test": {
+    "hostile_amount_session": { "client": 50, "server": 590, "kind": "SESSION_CREATED" },
+    "stock1_order_a": { "kind": "CAPTURA_REAL_TEST", "pi": "pi_3U9mk1H7FWYUN3jh0tXzj8SN", "paid_cents": 590 },
+    "stock1_order_b": { "kind": "SESSION_PLUS_RETURN_RECEIVED_SETTLE_REFUSED", "net_capture": "NOT_PROVEN" },
+    "minted_payout": { "kind": "CAPTURA_MOVIMENTO_REAL_TEST", "transferId": "tr_1U9mjiH7FWYUN3jhNElEk8wE", "amount_cents": 1000 }
+  },
+  "matrix": [
+    { "surface": "RPC/WALLET", "attack": "apply_tip_once arbitrary amount on pending tip", "identity": "buyer JWT", "result": "true; 39.81->89.81", "impact": "mint", "severity": "P0", "evidence": "probe_p0_tip_mint.json" },
+    { "surface": "RPC/WALLET", "attack": "same tip different p_type", "identity": "buyer JWT", "result": "+3.00 extra", "impact": "repeat mint", "severity": "P0", "evidence": "probe_p0_tip_mint.json" },
+    { "surface": "PAYOUT", "attack": "Connect payout of minted 10 EUR", "identity": "seller JWT", "result": "tr_1U9mjiH7FWYUN3jhNElEk8wE", "impact": "extract minted", "severity": "P0", "evidence": "probe_p0_payout.json" },
+    { "surface": "RPC", "attack": "credit_wallet_once", "identity": "buyer", "result": "42501", "impact": "none", "severity": "INFO", "evidence": "probe_cont_raw.json" },
+    { "surface": "CHECKOUT", "attack": "client amount=50", "identity": "buyer", "result": "server 590", "impact": "none", "severity": "INFO", "evidence": "probe_pass3.json" },
+    { "surface": "CHECKOUT", "attack": "bag line_total_cents=1", "identity": "buyer", "result": "1199", "impact": "none", "severity": "INFO", "evidence": "probe_cont_raw.json" },
+    { "surface": "ORDERS", "attack": "INSERT pago+PI+amount_paid", "identity": "buyer", "result": "reserva_pendente stripped", "impact": "none", "severity": "INFO", "evidence": "probe_cont_raw.json" },
+    { "surface": "STOCK", "attack": "8 concurrent holds qty=1", "identity": "buyer", "result": "accepted=8 qty=1", "impact": "hold window", "severity": "P2", "evidence": "probe_cont_raw.json" },
+    { "surface": "STOCK x STRIPE", "attack": "two sessions pay both", "identity": "buyer", "result": "A pago B refused settle", "impact": "one sale", "severity": "P2", "evidence": "stock1_capture_observe.json" },
+    { "surface": "RLS", "attack": "anon INSERT favorites/follows", "identity": "anon", "result": "201 persisted", "impact": "social write", "severity": "P2", "evidence": "probe_cont_raw.json" },
+    { "surface": "RAFFLES", "attack": "INSERT premio_rifa + checkout", "identity": "buyer", "result": "201 rewritten; checkout 400", "impact": "noise", "severity": "P2", "evidence": "probe_cont_raw.json" },
+    { "surface": "REVIEWS", "attack": "insert/forge/race", "identity": "buyer", "result": "400", "impact": "none", "severity": "INFO", "evidence": "probe_cont_raw.json" },
+    { "surface": "WEBHOOK", "attack": "unsigned", "identity": "anon", "result": "400 missing_signature", "impact": "none", "severity": "INFO", "evidence": "probe_cont_raw.json" },
+    { "surface": "PAYOUT", "attack": "same idempotency key x4", "identity": "seller", "result": "1 transfer", "impact": "none", "severity": "INFO", "evidence": "probe_cont_raw.json" },
+    { "surface": "CHAT", "attack": "SELECT messages", "identity": "buyer", "result": "own chats only", "impact": "none", "severity": "INFO", "evidence": "probe_cont_raw.json" },
+    { "surface": "AUTH", "attack": "PATCH user_type=admin", "identity": "buyer", "result": "still comprador", "impact": "none", "severity": "INFO", "evidence": "probe_raw.json" },
+    { "surface": "LIVEKIT", "attack": "cleanup as buyer", "identity": "buyer", "result": "401", "impact": "none", "severity": "INFO", "evidence": "probe_cont_raw.json" },
+    { "surface": "MB WAY", "attack": "seller mark pago", "identity": "seller", "result": "stock consumed wallet unchanged", "impact": "off-platform model", "severity": "INFO", "evidence": "probe_cont_raw.json" }
+  ],
+  "checklist": {
+    "1_p0_open": true,
+    "2_p0_count": 1,
+    "3_p1_open": false,
+    "4_p1_count": 0,
+    "5_buyer_price_authority": false,
+    "6_buyer_qty_authority": false,
+    "7_seller_fake_platform_payment": false,
+    "8_jwt_mints_balance": true,
+    "9_refund_exceeds_capture": false,
+    "10_release_plus_refund_net_money": false,
+    "11_payout_duplicate_same_intent": false,
+    "12_stock1_two_valid_sales": false,
+    "13_stock1_two_net_captures": "NOT_PROVEN",
+    "14_capacity_bypass": "HOLD_YES_SETTLE_NO",
+    "15_cross_user_financial": false,
+    "16_cross_user_sensitive_data": false,
+    "17_buyer_as_seller_admin": false,
+    "18_seller_as_buyer_admin": false,
+    "19_reviews_forged_dup": false,
+    "20_dangerous_security_definer": true,
+    "21_critical_rls_broken": false,
+    "22_edge_trusts_client_price_qty": false,
+    "23_critical_unproven": true,
+    "24_functional_regression": false,
+    "25_last_pass_new_p0_p1_class": true,
+    "26_saturation": false,
+    "27_production_touched": false,
+    "28_fase4_started": false
+  },
+  "gaps": [
+    "No STRIPE_SECRET in ops env; second stock=1 session Stripe object not retrieved",
+    "Partial+full refund and release+refund composition on a paid Stripe order not completed",
+    "No extra full pass after P0 discovery"
+  ],
+  "cleanup": {
+    "buyer_wallet": "93.81 -> 39.81 service_role",
+    "file": "cleanup_wallet_observe.json"
+  }
+}

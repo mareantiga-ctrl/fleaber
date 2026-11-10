@@ -1,0 +1,277 @@
+{
+  "findings": [
+    {
+      "id": "T3-ROLLBACK-PAGO-WALLET-MINT",
+      "lens": "T8",
+      "severity": "P0",
+      "title": "Seller reabre status pago após entregue e o parcial minta carteira sem Stripe",
+      "actor": "seller JWT + buyer JWT (conluio)",
+      "pre": "entregue + disputa + oferta 40% + PI capturado",
+      "repro": "PATCH orders status=pago; rpc batata_process_partial_refund_dispute",
+      "expected": "não voltar a pago; ou parcial continua a exigir Stripe",
+      "obtained": {
+        "rollback": "200 [{\"id\":\"a8e51373-dc2f-4d0b-9057-3f4add003bff\",\"created_at\":\"2026-09-01T08:06:11.379968+00:00\",\"product_id\":\"7d60ebdc-f9bd-4378-9638-a733224ffc0b\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-00…",
+        "rpc": true,
+        "delta_buyer": 2.3599999999999994,
+        "order": {
+          "id": "a8e51373-dc2f-4d0b-9057-3f4add003bff",
+          "status": "pago",
+          "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+          "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+          "product_id": "7d60ebdc-f9bd-4378-9638-a733224ffc0b",
+          "quantity": 1,
+          "price_total": 5.9,
+          "amount_paid_cents": 590,
+          "payment_method": "Pagamento na app",
+          "shipping_method": null,
+          "stripe_payment_intent_id": "pi_3UAmhrH7FWYUN3jh0tc1WYIM",
+          "stripe_checkout_session_id": null,
+          "stripe_refund_id": null,
+          "wallet_release_processed_at": "2026-09-01T08:06:15.093585+00:00",
+          "wallet_refund_processed_at": "2026-09-01T08:06:15.093585+00:00",
+          "stock_units_applied": 1,
+          "completed_at": null,
+          "live_id": null,
+          "live_item_id": null,
+          "proof_url": null
+        }
+      },
+      "proven": true,
+      "evidence": {
+        "wallets_before": {
+          "buyer": 56.38,
+          "seller": 16.33,
+          "buyer2": 0,
+          "seller2": 0
+        },
+        "wallets_after": {
+          "buyer": 58.74,
+          "seller": 18.97,
+          "buyer2": 0,
+          "seller2": 0
+        }
+      }
+    },
+    {
+      "id": "T3-PARTIAL-ON-PAGO-WALLET",
+      "lens": "T3",
+      "severity": "P1",
+      "title": "RPC parcial em pago credita carteira sem refund Stripe (disputa não abrível por JWT neste estado)",
+      "actor": "buyer JWT (disputa pré-existente)",
+      "pre": "order pago capturado; oferta 40%",
+      "repro": "rpc batata_process_partial_refund_dispute enquanto status=pago",
+      "expected": "exige Stripe ou recusa até envio/refund-order",
+      "obtained": {
+        "rpc": true,
+        "delta_buyer": 2.3599999999999994,
+        "order": {
+          "id": "f7914a3f-d7a7-450c-a8f7-1ae1baed2c8a",
+          "status": "pago",
+          "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+          "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+          "product_id": "1f0e0f96-7456-4a59-9a21-6e51cd0e59e8",
+          "quantity": 1,
+          "price_total": 5.9,
+          "amount_paid_cents": 590,
+          "payment_method": "Pagamento na app",
+          "shipping_method": null,
+          "stripe_payment_intent_id": "pi_3UAmhwH7FWYUN3jh0vmw4rjC",
+          "stripe_checkout_session_id": null,
+          "stripe_refund_id": null,
+          "wallet_release_processed_at": "2026-09-01T08:06:18.505303+00:00",
+          "wallet_refund_processed_at": "2026-09-01T08:06:18.505303+00:00",
+          "stock_units_applied": 1,
+          "completed_at": null,
+          "live_id": null,
+          "live_item_id": null,
+          "proof_url": null
+        }
+      },
+      "proven": true,
+      "evidence": {
+        "pi": "pi_3UAmhwH7FWYUN3jh0vmw4rjC",
+        "w0": {
+          "buyer": 58.74,
+          "seller": 18.97,
+          "buyer2": 0,
+          "seller2": 0
+        },
+        "w1": {
+          "buyer": 61.1,
+          "seller": 21.61,
+          "buyer2": 0,
+          "seller2": 0
+        }
+      }
+    },
+    {
+      "id": "T5-BUYER-RESOLVIDA-NO-DECISION",
+      "lens": "T5",
+      "severity": "P2",
+      "title": "Comprador fecha disputa resolvida sem buyer_decision",
+      "actor": "buyer JWT",
+      "pre": "disputa aberta/respondida",
+      "repro": "PATCH status=resolvida",
+      "expected": "exigir decisão ou fluxo de oferta",
+      "obtained": {
+        "id": "ee9effe9-2158-4c4c-ae41-fc43a62c489f",
+        "order_id": "a8e51373-dc2f-4d0b-9057-3f4add003bff",
+        "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+        "status": "resolvida",
+        "current_turn": "administracao",
+        "seller_offer_type": "partial_refund",
+        "seller_refund_percent": 40.0,
+        "seller_offer_set_by": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+        "buyer_decision": null,
+        "admin_resolution": null,
+        "return_label_url": null
+      },
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "T4-Q6-DECREASE-BELOW-HELD",
+      "lens": "T4",
+      "severity": "P2",
+      "title": "Q6 só bloqueia aumento — seller põe quantity=0 com encomenda a segurar stock",
+      "actor": "seller JWT",
+      "pre": "order pago stock_units_applied=1",
+      "repro": "PATCH products quantity=0",
+      "expected": "chão ≥ unidades em encomendas activas",
+      "obtained": {
+        "id": "1f0e0f96-7456-4a59-9a21-6e51cd0e59e8",
+        "title": "Refund crash E2E 1788249975753",
+        "price": 5.9,
+        "quantity": 0,
+        "is_sold": false,
+        "list_on_marketplace": true,
+        "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588"
+      },
+      "proven": true,
+      "evidence": {}
+    }
+  ],
+  "blocked": [],
+  "notes": [
+    {
+      "id": "fixture.paid",
+      "lens": "T3",
+      "title": "setup_paid_order Stripe TEST",
+      "ev": "200 {\n  \"ok\": true,\n  \"order_id\": \"a8e51373-dc2f-4d0b-9057-3f4add003bff\",\n  \"product_id\": \"7d60ebdc-f9bd-4378-9638-a733224ffc0b\",\n  \"payment_intent_id\": \"pi_3UAmhrH7FWYUN3jh0tc1WYIM\",\n  \"pi_status\": \"succeeded\",\n  \"pi_amount…"
+    },
+    {
+      "id": "T3.rollback.pago",
+      "lens": "T3",
+      "title": "seller entregue→pago",
+      "ev": {
+        "patch": "200 [{\"id\":\"a8e51373-dc2f-4d0b-9057-3f4add003bff\",\"created_at\":\"2026-09-01T08:06:11.379968+00:00\",\"product_id\":\"7d60ebdc-f9bd-4378-9638-a733224ffc0b\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-00…",
+        "before": "entregue",
+        "after": "pago"
+      }
+    },
+    {
+      "id": "T3.partial.after.rollback",
+      "lens": "T8",
+      "title": "parcial após rollback pago",
+      "ev": {
+        "rpc": "200 true",
+        "wallets": {
+          "before": {
+            "buyer": 56.38,
+            "seller": 16.33,
+            "buyer2": 0,
+            "seller2": 0
+          },
+          "after": {
+            "buyer": 58.74,
+            "seller": 18.97,
+            "buyer2": 0,
+            "seller2": 0
+          }
+        },
+        "stripe_refund_id": null
+      }
+    },
+    {
+      "id": "fixture.paid",
+      "lens": "T3",
+      "title": "setup_paid_order Stripe TEST",
+      "ev": "200 {\n  \"ok\": true,\n  \"order_id\": \"f7914a3f-d7a7-450c-a8f7-1ae1baed2c8a\",\n  \"product_id\": \"1f0e0f96-7456-4a59-9a21-6e51cd0e59e8\",\n  \"payment_intent_id\": \"pi_3UAmhwH7FWYUN3jh0vmw4rjC\",\n  \"pi_status\": \"succeeded\",\n  \"pi_amount…"
+    },
+    {
+      "id": "T3.disp.pago.fixture",
+      "lens": "T3",
+      "title": "disputa em pago (fixture RLS)",
+      "ev": "201 [{\"id\":\"d96c637d-f816-423d-b4da-c5297a1e977d\",\"order_id\":\"f7914a3f-d7a7-450c-a8f7-1ae1baed2c8a\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"reason\":\"nao_corresponde\",\"description\":\"RTT-20260901T0850 disputa-on-pag…"
+    },
+    {
+      "id": "T3.partial.pago",
+      "lens": "T3",
+      "title": "parcial status=pago PI capturado",
+      "ev": {
+        "rpc": "200 true",
+        "status": "pago",
+        "wallets": {
+          "before": {
+            "buyer": 58.74,
+            "seller": 18.97,
+            "buyer2": 0,
+            "seller2": 0
+          },
+          "after": {
+            "buyer": 61.1,
+            "seller": 21.61,
+            "buyer2": 0,
+            "seller2": 0
+          }
+        },
+        "stripe_refund_id": null,
+        "pi": "pi_3UAmhwH7FWYUN3jh0vmw4rjC"
+      }
+    },
+    {
+      "id": "T5.buyer.resolvida",
+      "lens": "T5",
+      "title": "buyer PATCH resolvida",
+      "ev": {
+        "patch": "200 [{\"id\":\"ee9effe9-2158-4c4c-ae41-fc43a62c489f\",\"order_id\":\"a8e51373-dc2f-4d0b-9057-3f4add003bff\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"reason\":\"nao_corresponde\",\"description\":\"RTT-T disputa\",\"proof_photos\":[]…",
+        "row": {
+          "id": "ee9effe9-2158-4c4c-ae41-fc43a62c489f",
+          "order_id": "a8e51373-dc2f-4d0b-9057-3f4add003bff",
+          "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+          "status": "resolvida",
+          "current_turn": "administracao",
+          "seller_offer_type": "partial_refund",
+          "seller_refund_percent": 40.0,
+          "seller_offer_set_by": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+          "buyer_decision": null,
+          "admin_resolution": null,
+          "return_label_url": null
+        }
+      }
+    },
+    {
+      "id": "T7.b2.patch.dispute",
+      "lens": "T7",
+      "title": "B2 PATCH disputa B1",
+      "ev": "200 []"
+    },
+    {
+      "id": "T4.decrease.held",
+      "lens": "T4",
+      "title": "PATCH quantity=0 com stock_units_applied>0",
+      "ev": {
+        "patch": "200 [{\"id\":\"1f0e0f96-7456-4a59-9a21-6e51cd0e59e8\",\"created_at\":\"2026-09-01T08:06:15.946861+00:00\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"title\":\"Refund crash E2E 1788249975753\",\"price\":5.9,\"ref_code\":\"RC-E2E-178…",
+        "before": 1,
+        "after": 0,
+        "held": 1
+      }
+    }
+  ],
+  "wallets": {
+    "buyer": 61.1,
+    "seller": 21.61,
+    "buyer2": 0,
+    "seller2": 0
+  }
+}

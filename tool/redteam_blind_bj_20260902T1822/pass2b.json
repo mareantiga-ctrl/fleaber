@@ -1,0 +1,123 @@
+{
+  "stamp": "20260902T1822",
+  "prefix": "RTBJ-20260902T1822",
+  "auditor": "REDTEAM_BLIND_BJ_PAYOUT_POS_ATBE_v1",
+  "lenses": [
+    "BJ3",
+    "BJ5"
+  ],
+  "findings": [
+    {
+      "id": "BJ5-06-mbway-morada-concluido",
+      "lens": "BJ5",
+      "severity": "P1",
+      "title": "MB WAY + \"entrega em morada\": buyer concluiu sem envio",
+      "actor": "buyer JWT",
+      "pre": "is_hand true; shipped_at null",
+      "repro": "PATCH status=concluido após pago MB WAY",
+      "expected": "order_concluido_requires_shipped",
+      "obtained": {
+        "concluido": "200 [{\"id\":\"1de53c7f-904a-4406-b6d2-aa80cdd81073\",\"created_at\":\"2026-09-02T17:33:47.108468+00:00\",\"product_id\":\"123967c4-e4ff-47cb-9470-85fa92e74661\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c…",
+        "status": "concluido",
+        "shipped_at": "",
+        "release": "200 true",
+        "delta": 0.0
+      },
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "BJ5-07-hand-ctt-concluido",
+      "lens": "BJ5",
+      "severity": "P1",
+      "title": "MB WAY + \"hand-ctt\": buyer concluiu sem envio",
+      "actor": "buyer JWT",
+      "pre": "is_hand LIKE hand%",
+      "repro": "INSERT shipping=hand-ctt payment=MB WAY → pago → concluido",
+      "expected": "denied",
+      "obtained": "200 [{\"id\":\"2a86639b-2e2d-46ad-9dd3-6b5e777729af\",\"created_at\":\"2026-09-02T17:33:48.034531+00:00\",\"product_id\":\"123967c4-e4ff-47cb-9470-85fa92e74661\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c…",
+      "proven": true,
+      "evidence": {}
+    }
+  ],
+  "blocked": [],
+  "skipped": [],
+  "notes": [
+    {
+      "id": "p2b.pago",
+      "lens": "BJ5",
+      "title": "seller marca pago MB WAY",
+      "ev": "200 [{\"id\":\"1de53c7f-904a-4406-b6d2-aa80cdd81073\",\"created_at\":\"2026-09-02T17:33:47.108468+00:00\",\"product_id\":\"123967c4-e4ff-47cb-9470-85fa92e74661\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c…"
+    },
+    {
+      "id": "p2b.row.pago",
+      "lens": "BJ5",
+      "title": "row",
+      "ev": {
+        "id": "1de53c7f-904a-4406-b6d2-aa80cdd81073",
+        "status": "pago",
+        "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+        "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+        "product_id": "123967c4-e4ff-47cb-9470-85fa92e74661",
+        "quantity": 1,
+        "price_total": 7.2,
+        "amount_paid_cents": "",
+        "payment_method": "MB WAY",
+        "shipping_method": "entrega em morada",
+        "shipped_at": "",
+        "stripe_payment_intent_id": "",
+        "stripe_checkout_session_id": "",
+        "stripe_refund_id": "",
+        "wallet_release_processed_at": "",
+        "wallet_refund_processed_at": "",
+        "stock_units_applied": 1
+      }
+    },
+    {
+      "id": "p2b.concluido",
+      "lens": "BJ5",
+      "title": "buyer concluido sem enviado",
+      "ev": "200 [{\"id\":\"1de53c7f-904a-4406-b6d2-aa80cdd81073\",\"created_at\":\"2026-09-02T17:33:47.108468+00:00\",\"product_id\":\"123967c4-e4ff-47cb-9470-85fa92e74661\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c…"
+    },
+    {
+      "id": "p2b.release",
+      "lens": "BJ3",
+      "title": "release após concluido sem shipped",
+      "ev": "200 true"
+    },
+    {
+      "id": "p2b.handctt",
+      "lens": "BJ5",
+      "title": "hand-ctt MB WAY",
+      "ev": {
+        "pago": "200 [{\"id\":\"2a86639b-2e2d-46ad-9dd3-6b5e777729af\",\"created_at\":\"2026-09-02T17:33:48.034531+00:00\",\"product_id\":\"123967c4-e4ff-47cb-9470-85fa92e74661\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c…",
+        "concl": "200 [{\"id\":\"2a86639b-2e2d-46ad-9dd3-6b5e777729af\",\"created_at\":\"2026-09-02T17:33:48.034531+00:00\",\"product_id\":\"123967c4-e4ff-47cb-9470-85fa92e74661\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c…"
+      }
+    },
+    {
+      "id": "p2b.unship.check",
+      "lens": "BJ5",
+      "title": "order unship alleged",
+      "ev": {
+        "status": "cancelado",
+        "shipped_at": "",
+        "stripe_refund_id": "re_3UBI1EH7FWYUN3jh0igQZX1W"
+      }
+    }
+  ],
+  "actors": {
+    "buyer": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+    "seller": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+    "buyer2": null,
+    "seller2": null
+  },
+  "created": {
+    "orders": [
+      "1de53c7f-904a-4406-b6d2-aa80cdd81073",
+      "2a86639b-2e2d-46ad-9dd3-6b5e777729af"
+    ],
+    "products": [
+      "123967c4-e4ff-47cb-9470-85fa92e74661"
+    ]
+  }
+}

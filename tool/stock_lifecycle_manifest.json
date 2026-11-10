@@ -1,0 +1,166 @@
+{
+  "version": 3,
+  "description": "Stock lifecycle: 7 fases, 11 Maestro (mínimo), BD/mensagens em batch, audit por checkpoint + holístico. Stripe excluído.",
+  "screenshotRoot": "tool/logs/stock_lifecycle_{stamp}",
+  "coverageMatrix": "tool/stock_lifecycle_coverage.json",
+  "devices": {
+    "seller": "emulator-5554",
+    "buyer": "emulator-5556"
+  },
+  "scenarios": [
+    {
+      "id": "SL-A",
+      "name": "UX mínimo — 1 seed, 5 Maestro, todos movimentos live",
+      "matrixIds": [
+        "A003", "A089", "A090", "A131", "A132", "A144", "A148", "A160", "A230",
+        "Doc#3", "Doc#4", "A3", "R32", "A429", "A348"
+      ],
+      "action": "pending→accept→+stock→qty→reserve→cancel→reserve→accept→vendido→restock",
+      "surfaces": [
+        "seller_catalog", "seller_operacao", "seller_footer_bar",
+        "buyer_player", "buyer_carousel", "buyer_bag"
+      ],
+      "preStep": "prepare_live",
+      "registryId": "T22",
+      "uxSteps": [
+        {
+          "id": "A1",
+          "buyerFlow": ".maestro/flows/stock_lc_buyer_session.yaml",
+          "buyerHint": "Buyer: login + player + carrossel baseline."
+        },
+        {
+          "id": "A2",
+          "sellerFlow": ".maestro/flows/stock_lc_seller_session.yaml",
+          "sellerHint": "Seller: login + studio catálogo."
+        },
+        {
+          "id": "A3",
+          "sellerFlow": ".maestro/flows/stock_lc_seller_cycle1.yaml",
+          "sellerHint": "Seller: Aceitar → +stock → edit qty.",
+          "bdScenario": "verify_maestro_accepted"
+        },
+        {
+          "id": "A4",
+          "buyerFlow": ".maestro/flows/stock_lc_buyer_res_cancel_res.yaml",
+          "buyerHint": "Buyer: Reservar → Cancelar → Reservar.",
+          "bdScenario": "verify_maestro_rejected"
+        },
+        {
+          "id": "A5",
+          "sellerFlow": ".maestro/flows/stock_lc_seller_cycle2.yaml",
+          "sellerHint": "Seller: Aceitar → Vendido → +10 stock.",
+          "bdScenario": "verify_maestro_accepted"
+        },
+        {
+          "id": "A6",
+          "buyerFlow": ".maestro/flows/stock_lc_buyer_verify.yaml",
+          "buyerHint": "Buyer: carrossel final — Disp/Total vs seller."
+        }
+      ],
+      "postBd": "maestro_live_stock",
+      "checkpointAudit": true
+    },
+    {
+      "id": "SL-B",
+      "name": "BD batch — cross-pool, gravado, marketplace, A3/R32 fixture",
+      "matrixIds": ["A340", "A341", "A342", "A343", "A344", "A349", "T04", "T05"],
+      "action": "7 cenários integration num único processo Dart",
+      "surfaces": ["gravado_replay", "marketplace_pdp", "seller_catalog"],
+      "automation": "bd_batch",
+      "bdBatch": "tool/stock_lifecycle_bd_batch.dart",
+      "registryId": "T32"
+    },
+    {
+      "id": "SL-C",
+      "name": "Mensagens — humanizer + emissores + live session",
+      "matrixIds": ["M01-M23", "A294"],
+      "action": "flutter test humanizer + message_battery emitters + audit live_messages",
+      "surfaces": ["public_chat", "buyer_bag", "seller_operacao"],
+      "automation": "messages_batch",
+      "messageSteps": [
+        { "cmd": "flutter", "args": ["test", "test/message_battery_humanizer_test.dart"] },
+        { "cmd": "dart", "args": ["run", "tool/message_battery.dart", "--area", "emitters", "--keep"] },
+        { "cmd": "dart", "args": ["run", "tool/message_battery.dart", "--area", "reservation_state", "--keep"] },
+        { "cmd": "dart", "args": ["run", "tool/message_battery.dart", "--area", "order_state", "--keep"] },
+        { "cmd": "dart", "args": ["run", "tool/message_battery.dart", "--area", "dm", "--keep"] },
+        { "cmd": "dart", "args": ["run", "tool/stock_lifecycle_live_messages.dart"] }
+      ],
+      "registryId": "T40"
+    },
+    {
+      "id": "SL-D",
+      "name": "Auditoria holística — todos prints/logs vs BD + heurísticas",
+      "matrixIds": ["audit_all"],
+      "action": "Varre pasta evidência: técnico, redundância, humanização, qty UI↔BD",
+      "surfaces": ["all"],
+      "automation": "deep_audit",
+      "deepAudit": "tool/stock_lifecycle_deep_audit.dart",
+      "registryId": "T41"
+    },
+    {
+      "id": "SL-E",
+      "name": "Edge cases — waitlist, reject, partial, overstock (BD + UX)",
+      "matrixIds": ["A150", "A142", "A082", "A127", "A125", "M15-M18"],
+      "action": "BD batch edge + seed live + seller Recusar + buyer fila saco",
+      "surfaces": ["buyer_bag", "seller_operacao"],
+      "automation": "edge_suite",
+      "preStep": "edge_seed",
+      "postStep": "restore_env",
+      "edgeBatch": "tool/stock_lifecycle_edge_batch.dart",
+      "registryId": "T42",
+      "uxSteps": [
+        {
+          "id": "E1",
+          "sellerFlow": ".maestro/flows/stock_lc_edge_seller_reject.yaml",
+          "sellerHint": "Seller: Operação → Recusar pedido overstock/reject."
+        },
+        {
+          "id": "E2",
+          "buyerFlow": ".maestro/flows/stock_lc_edge_buyer_waitlist.yaml",
+          "buyerHint": "Buyer: saco — verifica posição na fila / waitlist."
+        }
+      ],
+      "checkpointAudit": true
+    },
+    {
+      "id": "SL-F",
+      "name": "Hub publish — handle + vitrine pública",
+      "matrixIds": ["H12", "batata_publish_hub"],
+      "action": "dart run tool/hub_publish_staging_functional.dart",
+      "surfaces": ["hub_vitrine", "seller_profile"],
+      "automation": "hub_functional",
+      "hubScript": "tool/hub_publish_staging_functional.dart",
+      "registryId": "T43"
+    },
+    {
+      "id": "SL-G",
+      "name": "Cross-pool UI — live carrossel + gravado + marketplace",
+      "matrixIds": ["A340", "A343", "A349", "A350", "A351", "A352", "A146"],
+      "action": "Seed cross pool + Maestro buyer em 3 superfícies",
+      "surfaces": ["buyer_carousel", "gravado_replay", "marketplace_pdp"],
+      "automation": "cross_pool_ui",
+      "preStep": "cross_pool_ui_seed",
+      "postStep": "restore_env",
+      "registryId": "T44",
+      "uxSteps": [
+        {
+          "id": "G1",
+          "buyerFlow": ".maestro/flows/stock_lc_cross_buyer_carousel.yaml",
+          "buyerHint": "Buyer: player live cross — Disp no carrossel.",
+          "bdScenario": "maestro_live_stock"
+        },
+        {
+          "id": "G2",
+          "buyerFlow": ".maestro/flows/stock_lc_cross_buyer_gravado.yaml",
+          "buyerHint": "Buyer: perfil → gravados → player GRAVADO."
+        },
+        {
+          "id": "G3",
+          "buyerFlow": ".maestro/flows/stock_lc_cross_buyer_marketplace.yaml",
+          "buyerHint": "Buyer: Marketplace → card produto → PDP qty."
+        }
+      ],
+      "checkpointAudit": true
+    }
+  ]
+}

@@ -1,0 +1,323 @@
+{
+  "stamp": "20260906T1050",
+  "prefix": "RTBW-20260906T1050",
+  "lenses": [
+    "BW1",
+    "BW2",
+    "BW5",
+    "BW7"
+  ],
+  "findings": [],
+  "blocked": [
+    {
+      "id": "BW7.b2_insert_on_b1_pago",
+      "lens": "BW7",
+      "title": "B2 INSERT disputa em encomenda B1 (pago)",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"new row violates row-level security policy for table \\\"order_disputes\\\"\"}"
+    },
+    {
+      "id": "BW7.b2_insert_spoof_buyer_id",
+      "lens": "BW7",
+      "title": "B2 INSERT disputa buyer_id=B1 JWT=B2",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"new row violates row-level security policy for table \\\"order_disputes\\\"\"}"
+    },
+    {
+      "id": "BW7.seller2_insert",
+      "lens": "BW7",
+      "title": "S2 INSERT disputa em encomenda S1",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"new row violates row-level security policy for table \\\"order_disputes\\\"\"}"
+    },
+    {
+      "id": "BW7.anon_insert",
+      "lens": "BW7",
+      "title": "anon INSERT disputa",
+      "ev": "401 {\"code\":\"PGRST301\",\"details\":null,\"hint\":null,\"message\":\"Empty JWT is sent in Authorization header\"}"
+    },
+    {
+      "id": "BW1.buyer_pedido_from_pago_no_dispute",
+      "lens": "BW1",
+      "title": "Buyer pedido_devolucao a partir de pago sem disputa",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"order_pedido_devolucao_denied\"}"
+    },
+    {
+      "id": "BW1.dispute_on_pago",
+      "lens": "BW1",
+      "title": "Buyer abre disputa em pago",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"new row violates row-level security policy for table \\\"order_disputes\\\"\"}"
+    },
+    {
+      "id": "BW2.seller_pago_entregue",
+      "lens": "BW2",
+      "title": "Seller marca entregue a partir de pago",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"order_seller_cannot_mark_entregue\"}"
+    },
+    {
+      "id": "BW2.seller_pago_concluido",
+      "lens": "BW2",
+      "title": "Seller marca concluido a partir de pago",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"order_seller_cannot_mark_concluido\"}"
+    },
+    {
+      "id": "BW2.seller_devolvida_from_pago",
+      "lens": "BW2",
+      "title": "Seller marca devolvida a partir de pago",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"order_devolvida_denied\"}"
+    },
+    {
+      "id": "BW2.buyer_concluido_from_pago_carrier",
+      "lens": "BW2",
+      "title": "Buyer concluido a partir de pago (carrier, sem mão)",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"order_concluido_requires_shipped\"}"
+    },
+    {
+      "id": "BW1.dispute_on_enviado",
+      "lens": "BW1",
+      "title": "Buyer abre disputa em enviado",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"new row violates row-level security policy for table \\\"order_disputes\\\"\"}"
+    },
+    {
+      "id": "BW7.b2_insert_on_concluido",
+      "lens": "BW7",
+      "title": "B2 INSERT disputa em encomenda B1 (concluido)",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"new row violates row-level security policy for table \\\"order_disputes\\\"\"}"
+    },
+    {
+      "id": "BW1.second_dispute",
+      "lens": "BW1",
+      "title": "2.ª disputa recusada",
+      "ev": "409 {\"code\":\"23505\",\"details\":null,\"hint\":null,\"message\":\"dispute_already_exists_for_order\"}"
+    },
+    {
+      "id": "BW1.second_dispute_race",
+      "lens": "BW1",
+      "title": "race 2.ª disputa",
+      "ev": [
+        "409 {\"code\":\"23505\",\"details\":null,\"hint\":null,\"message\":\"dispute_already_exists_for_order\"}",
+        "409 {\"code\":\"23505\",\"details\":null,\"hint\":null,\"message\":\"dispute_already_exists_for_order\"}"
+      ]
+    },
+    {
+      "id": "BW1.reopen_after_resolvida",
+      "lens": "BW1",
+      "title": "reopen após resolvida",
+      "ev": "409 {\"code\":\"23505\",\"details\":null,\"hint\":null,\"message\":\"dispute_already_exists_for_order\"}"
+    },
+    {
+      "id": "BW2.buyer_concluido_mid_return",
+      "lens": "BW2",
+      "title": "Buyer concluido a meio da devolução (pedido_devolucao)",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"order_concluido_denied_during_return\"}"
+    },
+    {
+      "id": "BW2.seller_enviado_mid_return",
+      "lens": "BW2",
+      "title": "Seller aborta devolução com PATCH enviado",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"order_shipped_at_immutable\"}"
+    },
+    {
+      "id": "BW2.seller_devolvida_early_from_pedido",
+      "lens": "BW2",
+      "title": "Seller marca devolvida cedo (ainda pedido_devolucao)",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"order_devolvida_denied\"}"
+    },
+    {
+      "id": "BW2.seller_pago_mid_return",
+      "lens": "BW2",
+      "title": "Seller PATCH pago a meio da devolução",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"order_cannot_reopen_pago\"}"
+    },
+    {
+      "id": "BW2.buyer_concluido_em_devolucao",
+      "lens": "BW2",
+      "title": "Buyer concluido em em_devolucao",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"order_concluido_denied_during_return\"}"
+    },
+    {
+      "id": "BW2.seller_devolvida_from_em_devolucao",
+      "lens": "BW2",
+      "title": "Seller devolvida a partir de em_devolucao (salta devolucao_entregue)",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"order_devolvida_denied\"}"
+    },
+    {
+      "id": "BW2.buyer_devolvida",
+      "lens": "BW2",
+      "title": "Buyer marca devolvida",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"order_buyer_cannot_mark_devolvida\"}"
+    },
+    {
+      "id": "BW5.devolvida_stock_without_refund",
+      "lens": "BW5",
+      "title": "stock não restaurou em devolvida sem refund",
+      "ev": {
+        "qty_before": 1,
+        "qty_after": 1,
+        "refund": ""
+      }
+    },
+    {
+      "id": "BW2.buyer_concluido_after_devolvida",
+      "lens": "BW2",
+      "title": "Buyer concluido depois de devolvida",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"order_status_denied_after_refund\"}"
+    }
+  ],
+  "skipped": [],
+  "notes": [
+    {
+      "id": "actors",
+      "title": "JWT B1/S1/B2/S2",
+      "ev": {
+        "b1": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+        "s1": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+        "b2": "72fb28c3-63a5-43d5-9632-d2733aea4437",
+        "s2": "7d9a8d72-9485-4be7-9248-2a33ae177c64"
+      }
+    },
+    {
+      "id": "fixture.paid",
+      "lens": "BW1",
+      "title": "setup_paid_order Stripe TEST",
+      "ev": "200 {\n  \"ok\": true,\n  \"order_id\": \"d01677bd-e632-4699-9f6e-73b2f0d28105\",\n  \"product_id\": \"9e647f58-292f-44ec-9bb8-dbd0178658f0\",\n  \"payment_intent_id\": \"pi_3UCcoSH7FWYUN3jh0yTN0iaN\",\n  \"pi_status\": \"succeeded\",\n  \"pi_amount_received\": 590,\n  \"…"
+    },
+    {
+      "id": "BW1.fixture",
+      "lens": "BW1",
+      "title": "pago Stripe TEST",
+      "ev": {
+        "oid": "d01677bd-e632-4699-9f6e-73b2f0d28105",
+        "pid": "9e647f58-292f-44ec-9bb8-dbd0178658f0",
+        "status": "pago",
+        "paid": 590,
+        "pi": "pi_3UCcoSH7FWYUN3jh0yTN0iaN",
+        "stock": 1
+      }
+    },
+    {
+      "id": "exacto.BK.seller_pedido",
+      "lens": "BW1",
+      "title": "BK/BQ exacto seller pago→pedido_devolucao (NÃO contar)",
+      "ev": {
+        "hit": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"order_seller_cannot_mark_pedido_devolucao\"}",
+        "status": "pago"
+      }
+    },
+    {
+      "id": "fsm.enviado",
+      "lens": "BW2",
+      "title": "seller → enviado",
+      "ev": {
+        "hit": "200 [{\"id\":\"d01677bd-e632-4699-9f6e-73b2f0d28105\",\"created_at\":\"2026-09-06T09:56:36.160136+00:00\",\"product_id\":\"9e647f58-292f-44ec-9bb8-dbd0178658f0\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c…",
+        "status": "enviado",
+        "shipped_at": "2026-09-06T09:56:41.555731+00:00"
+      }
+    },
+    {
+      "id": "fsm.concluido",
+      "lens": "BW2",
+      "title": "buyer → concluido",
+      "ev": {
+        "hit": "200 [{\"id\":\"d01677bd-e632-4699-9f6e-73b2f0d28105\",\"created_at\":\"2026-09-06T09:56:36.160136+00:00\",\"product_id\":\"9e647f58-292f-44ec-9bb8-dbd0178658f0\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c…",
+        "status": "concluido"
+      }
+    },
+    {
+      "id": "BW1.dispute_open",
+      "lens": "BW1",
+      "title": "1.ª disputa em concluido",
+      "ev": {
+        "hit": "201 [{\"id\":\"30dbf3c2-b949-4023-a447-cd45c33169be\",\"order_id\":\"d01677bd-e632-4699-9f6e-73b2f0d28105\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"reason\":\"danificado\",\"description\":\"RTBW prova disputa artigo danificado no envio.\",\"proof_ph…",
+        "did": "30dbf3c2-b949-4023-a447-cd45c33169be",
+        "status": "aberta",
+        "order": "concluido"
+      }
+    },
+    {
+      "id": "BW1.close",
+      "lens": "BW1",
+      "title": "buyer fecha disputa resolvida",
+      "ev": {
+        "hit": "200 []",
+        "status": "aberta"
+      }
+    },
+    {
+      "id": "BW1.pedido",
+      "lens": "BW1",
+      "title": "buyer pedido_devolucao a partir de concluido+disputa",
+      "ev": {
+        "hit": "200 [{\"id\":\"d01677bd-e632-4699-9f6e-73b2f0d28105\",\"created_at\":\"2026-09-06T09:56:36.160136+00:00\",\"product_id\":\"9e647f58-292f-44ec-9bb8-dbd0178658f0\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c…",
+        "status": "pedido_devolucao"
+      }
+    },
+    {
+      "id": "BW2.em_devolucao",
+      "lens": "BW2",
+      "title": "buyer em_devolucao",
+      "ev": {
+        "hit": "200 [{\"id\":\"d01677bd-e632-4699-9f6e-73b2f0d28105\",\"created_at\":\"2026-09-06T09:56:36.160136+00:00\",\"product_id\":\"9e647f58-292f-44ec-9bb8-dbd0178658f0\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c…",
+        "status": "em_devolucao"
+      }
+    },
+    {
+      "id": "BW2.devolucao_entregue",
+      "lens": "BW2",
+      "title": "seller devolucao_entregue",
+      "ev": {
+        "hit": "200 [{\"id\":\"d01677bd-e632-4699-9f6e-73b2f0d28105\",\"created_at\":\"2026-09-06T09:56:36.160136+00:00\",\"product_id\":\"9e647f58-292f-44ec-9bb8-dbd0178658f0\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c…",
+        "status": "devolucao_entregue"
+      }
+    },
+    {
+      "id": "BW5.devolvida",
+      "lens": "BW5",
+      "title": "seller devolvida (captura Stripe viva)",
+      "ev": {
+        "hit": "200 [{\"id\":\"d01677bd-e632-4699-9f6e-73b2f0d28105\",\"created_at\":\"2026-09-06T09:56:36.160136+00:00\",\"product_id\":\"9e647f58-292f-44ec-9bb8-dbd0178658f0\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c…",
+        "status": "devolvida",
+        "qty_before": 1,
+        "qty_after": 1,
+        "refund_id": "",
+        "stock_units": 1,
+        "wallets_before": {
+          "buyer": 61.1,
+          "seller": 80.33,
+          "buyer2": 0,
+          "seller2": 0
+        },
+        "wallets_after": {
+          "buyer": 61.1,
+          "seller": 80.33,
+          "buyer2": 0,
+          "seller2": 0
+        }
+      }
+    },
+    {
+      "id": "pass1.ids",
+      "title": "IDs para pass 2/3",
+      "ev": {
+        "oid": "d01677bd-e632-4699-9f6e-73b2f0d28105",
+        "pid": "9e647f58-292f-44ec-9bb8-dbd0178658f0",
+        "did": "30dbf3c2-b949-4023-a447-cd45c33169be",
+        "pi": "pi_3UCcoSH7FWYUN3jh0yTN0iaN"
+      }
+    }
+  ],
+  "actors": {
+    "buyer": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+    "seller": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+    "buyer2": "72fb28c3-63a5-43d5-9632-d2733aea4437",
+    "seller2": "7d9a8d72-9485-4be7-9248-2a33ae177c64"
+  },
+  "created": {
+    "orders": [
+      "d01677bd-e632-4699-9f6e-73b2f0d28105"
+    ],
+    "products": [
+      "9e647f58-292f-44ec-9bb8-dbd0178658f0"
+    ],
+    "disputes": [
+      "30dbf3c2-b949-4023-a447-cd45c33169be"
+    ]
+  }
+}

@@ -1,0 +1,1069 @@
+{
+  "stamp": "20260906T1048",
+  "prefix": "RTBV-20260906T1048",
+  "auditor": "REDTEAM_BLIND_BV_PAYOUT_POS_BLBQ_v1",
+  "lenses": [
+    "BV1",
+    "BV2",
+    "BV4",
+    "BV6",
+    "BV7"
+  ],
+  "findings": [
+    {
+      "id": "BV-P1-DEST",
+      "lens": "BV6",
+      "severity": "P1",
+      "title": "destination spoof no body foi aceite (Transfer criada)",
+      "actor": "seller JWT",
+      "pre": "Edge deve ignorar destination do cliente e usar Connect do JWT",
+      "repro": "POST connect {amount:100, destination:acct_fake}",
+      "expected": "ignorar destination ou 4xx",
+      "obtained": "200 {\"success\":true,\"transferId\":\"tr_1UCcmkH7FWYUN3jh9xOKUBbg\",\"balance\":92.33} loc=\"\"",
+      "proven": true,
+      "count": true,
+      "evidence": {
+        "ledger_head": [
+          {
+            "idempotency_key": "p_0bfa4c7b938f7f8651a0ea7cf22c5e753bce6e5714dff147687a1b7f0161c5",
+            "user_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+            "amount_cents": 100,
+            "amount_eur": 1.0,
+            "status": "transferred",
+            "stripe_transfer_id": "tr_1UCcmkH7FWYUN3jh9xOKUBbg",
+            "balance_after": 92.33,
+            "created_at": "2026-09-06T09:54:50.144993+00:00",
+            "updated_at": "2026-09-06T09:54:51.086117+00:00"
+          },
+          {
+            "idempotency_key": "p_e8c4e551faf8f5fadd77de7994b4e3074f38adde81333848fb22a74f8912a2",
+            "user_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+            "amount_cents": 100,
+            "amount_eur": 1.0,
+            "status": "transferred",
+            "stripe_transfer_id": "tr_1UBM5CH7FWYUN3jhDkw2xCWH",
+            "balance_after": 15.05,
+            "created_at": "2026-09-02T21:52:38.092256+00:00",
+            "updated_at": "2026-09-02T21:52:39.126415+00:00"
+          },
+          {
+            "idempotency_key": "p_2e1f5567a24fecc840aa0e8dd97701c04247aca190f0f1fcb989ae731fe8be",
+            "user_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+            "amount_cents": 100,
+            "amount_eur": 1.0,
+            "status": "transferred",
+            "stripe_transfer_id": "tr_1UBM54H7FWYUN3jhwGYOVgl4",
+            "balance_after": 16.05,
+            "created_at": "2026-09-02T21:52:30.162086+00:00",
+            "updated_at": "2026-09-02T21:52:31.068993+00:00"
+          }
+        ]
+      }
+    },
+    {
+      "id": "BV-DESIGN-CASEFOLD",
+      "lens": "BV4",
+      "severity": "P3",
+      "title": "casefold Payout vs payout cria 2 Transfers (desenho case-sensitive)",
+      "actor": "seller JWT",
+      "pre": "payoutIdempotencyKey sem toLowerCase; Flutter wd_uuid_amount_ms",
+      "repro": "POST amount=100 key=PayoutRtbv1 depois payoutRtbv1",
+      "expected": "documentar: 2 intenções se casing diferente",
+      "obtained": {
+        "keyA": [
+          80,
+          97,
+          121,
+          111,
+          117,
+          116,
+          82,
+          116,
+          98,
+          118,
+          49
+        ],
+        "keyB": [
+          112,
+          97,
+          121,
+          111,
+          117,
+          116,
+          82,
+          116,
+          98,
+          118,
+          49
+        ],
+        "hitA": "200 {\"success\":true,\"transferId\":\"tr_1UCcnAH7FWYUN3jhT85uElOp\",\"balance\":87.33} loc=\"\"",
+        "hitB": "200 {\"success\":true,\"transferId\":\"tr_1UCcnDH7FWYUN3jhcqchi3vD\",\"balance\":86.33} loc=\"\"",
+        "tidA": "tr_1UCcnAH7FWYUN3jhT85uElOp",
+        "tidB": "tr_1UCcnDH7FWYUN3jhcqchi3vD",
+        "new_transfer_ids": [
+          "tr_1UCcnDH7FWYUN3jhcqchi3vD",
+          "tr_1UCcnAH7FWYUN3jhT85uElOp"
+        ],
+        "new_transfer_count": 2,
+        "wallet_before": 88.33,
+        "wallet_after": 86.33,
+        "delta_eur": -2.0,
+        "payoutOkA": true,
+        "payoutOkB": true,
+        "idempotentB": false
+      },
+      "proven": true,
+      "count": false,
+      "evidence": {}
+    },
+    {
+      "id": "BV-P2-HOMO",
+      "lens": "BV4",
+      "severity": "P2",
+      "title": "homóglifo cirílico na key cria 2ª Transfer",
+      "actor": "seller JWT",
+      "pre": "NFKC não colapsa Cyrillic а → Latin a; ZWJ/BOM já stripped",
+      "repro": "key rtbvlatinx vs rtbvаtinxx (U+0430)",
+      "expected": "1 Transfer se a intenção visual é a mesma, OU desenho Unicode",
+      "obtained": {
+        "keyA": [
+          114,
+          116,
+          98,
+          118,
+          108,
+          97,
+          116,
+          105,
+          110,
+          120
+        ],
+        "keyB": [
+          114,
+          116,
+          98,
+          118,
+          1072,
+          116,
+          105,
+          110,
+          120,
+          120
+        ],
+        "hitA": "200 {\"success\":true,\"transferId\":\"tr_1UCcnGH7FWYUN3jhGZflgUfV\",\"balance\":85.33} loc=\"\"",
+        "hitB": "200 {\"success\":true,\"transferId\":\"tr_1UCcnJH7FWYUN3jhFhLFQuav\",\"balance\":84.33} loc=\"\"",
+        "tidA": "tr_1UCcnGH7FWYUN3jhGZflgUfV",
+        "tidB": "tr_1UCcnJH7FWYUN3jhFhLFQuav",
+        "new_transfer_ids": [
+          "tr_1UCcnJH7FWYUN3jhFhLFQuav",
+          "tr_1UCcnGH7FWYUN3jhGZflgUfV"
+        ],
+        "new_transfer_count": 2,
+        "wallet_before": 86.33,
+        "wallet_after": 84.33,
+        "delta_eur": -2.0,
+        "payoutOkA": true,
+        "payoutOkB": true,
+        "idempotentB": false
+      },
+      "proven": true,
+      "count": true,
+      "evidence": {}
+    },
+    {
+      "id": "BV-P2-NBSP",
+      "lens": "BV4",
+      "severity": "P2",
+      "title": "NBSP no meio da key vs sem espaço cria 2ª Transfer",
+      "actor": "seller JWT",
+      "pre": "NFKC U+00A0→espaço; strip só ZWJ/BOM nas extremidades via trim, não compacta o meio",
+      "repro": "key rtbvkey88 vs rtbv\\u00A0key88",
+      "expected": "colapsar whitespace interior OU 1 Transfer",
+      "obtained": {
+        "keyA": [
+          114,
+          116,
+          98,
+          118,
+          107,
+          101,
+          121,
+          56,
+          56
+        ],
+        "keyB": [
+          114,
+          116,
+          98,
+          118,
+          160,
+          107,
+          101,
+          121,
+          56,
+          56
+        ],
+        "hitA": "200 {\"success\":true,\"transferId\":\"tr_1UCcnMH7FWYUN3jhz7FqHU1y\",\"balance\":83.33} loc=\"\"",
+        "hitB": "200 {\"success\":true,\"transferId\":\"tr_1UCcnOH7FWYUN3jhUCTbbDKe\",\"balance\":82.33} loc=\"\"",
+        "tidA": "tr_1UCcnMH7FWYUN3jhz7FqHU1y",
+        "tidB": "tr_1UCcnOH7FWYUN3jhUCTbbDKe",
+        "new_transfer_ids": [
+          "tr_1UCcnOH7FWYUN3jhUCTbbDKe",
+          "tr_1UCcnMH7FWYUN3jhz7FqHU1y"
+        ],
+        "new_transfer_count": 2,
+        "wallet_before": 84.33,
+        "wallet_after": 82.33,
+        "delta_eur": -2.0,
+        "payoutOkA": true,
+        "payoutOkB": true,
+        "idempotentB": false
+      },
+      "proven": true,
+      "count": true,
+      "evidence": {}
+    }
+  ],
+  "blocked": [
+    {
+      "id": "bv1.put",
+      "lens": "BV1",
+      "title": "PUT create-connect-account cria Transfer",
+      "ev": "405 {\"error\":\"Method not allowed.\"} loc=\"\""
+    },
+    {
+      "id": "bv1.patch",
+      "lens": "BV1",
+      "title": "PATCH create-connect-account cria Transfer",
+      "ev": "405 {\"error\":\"Method not allowed.\"} loc=\"\""
+    },
+    {
+      "id": "bv6.uid",
+      "lens": "BV6",
+      "title": "seller JWT + user_id=buyer cria levantamento na conta alheia",
+      "ev": "400 {\"error\":\"Cannot create another user Stripe account.\",\"code\":\"payout_failed\"} loc=\"\""
+    },
+    {
+      "id": "buyer.payout",
+      "lens": "BV6",
+      "title": "buyer payout recusado/sem Connect",
+      "ev": "400 {\"error\":\"Falta associar a conta bancária no Stripe. Abre outra vez Configurar conta bancária e adiciona o IBAN de teste.\",\"code\":\"payout_failed\"} loc=\"\""
+    },
+    {
+      "id": "bv6.debit.jwt",
+      "lens": "BV6",
+      "title": "JWT autenticado executou batata_wallet_payout_debit",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_wallet_payout_debit\"} loc=\"\""
+    },
+    {
+      "id": "bv6.finish.jwt",
+      "lens": "BV6",
+      "title": "JWT autenticado executou batata_wallet_payout_finish",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_wallet_payout_finish\"} loc=\"\""
+    },
+    {
+      "id": "bv6.debit.anon",
+      "lens": "BV6",
+      "title": "anon executou batata_wallet_payout_debit",
+      "ev": "401 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_wallet_payout_debit\"} loc=\"\""
+    },
+    {
+      "id": "bv4.amt.arr",
+      "lens": "BV4",
+      "title": "amount=[100] criou Transfer",
+      "ev": "400 {\"error\":\"Valor de levantamento inválido.\",\"code\":\"payout_failed\"} loc=\"\""
+    },
+    {
+      "id": "bv4.amt.obj",
+      "lens": "BV4",
+      "title": "amount={cents: 100} criou Transfer",
+      "ev": "400 {\"error\":\"Valor de levantamento inválido.\",\"code\":\"payout_failed\"} loc=\"\""
+    },
+    {
+      "id": "amt.str100",
+      "lens": "BV4",
+      "title": "amount 100 aceite como 100 cents (desenho JS integer)",
+      "ev": "200 {\"success\":true,\"transferId\":\"tr_1UCcmqH7FWYUN3jhrMRnX6KS\",\"balance\":91.33} loc=\"\""
+    },
+    {
+      "id": "amt.float100",
+      "lens": "BV4",
+      "title": "amount 100.0 aceite como 100 cents (desenho JS integer)",
+      "ev": "200 {\"success\":true,\"transferId\":\"tr_1UCcmsH7FWYUN3jhLEbIbMWo\",\"balance\":90.33} loc=\"\""
+    },
+    {
+      "id": "bv4.amt.frac",
+      "lens": "BV4",
+      "title": "amount=100.5 criou Transfer",
+      "ev": "400 {\"error\":\"O valor do levantamento tem de ser em cêntimos.\",\"code\":\"payout_failed\"} loc=\"\""
+    },
+    {
+      "id": "bv4.amt.bool",
+      "lens": "BV4",
+      "title": "amount=true criou Transfer",
+      "ev": "400 {\"error\":\"Valor de levantamento inválido.\",\"code\":\"payout_failed\"} loc=\"\""
+    },
+    {
+      "id": "bv4.amt.neg",
+      "lens": "BV4",
+      "title": "amount=-100 criou Transfer",
+      "ev": "400 {\"error\":\"Valor de levantamento inválido.\",\"code\":\"payout_failed\"} loc=\"\""
+    },
+    {
+      "id": "bv4.amt.hex",
+      "lens": "BV4",
+      "title": "amount=0x64 criou Transfer",
+      "ev": "400 {\"error\":\"Valor de levantamento inválido.\",\"code\":\"payout_failed\"} loc=\"\""
+    },
+    {
+      "id": "bv4.amt.sci",
+      "lens": "BV4",
+      "title": "amount=1e2 criou Transfer",
+      "ev": "400 {\"error\":\"Valor de levantamento inválido.\",\"code\":\"payout_failed\"} loc=\"\""
+    },
+    {
+      "id": "crash.nosec",
+      "lens": "BV4",
+      "title": "crash_inject ignorado sem secret",
+      "ev": "200 {\"success\":true,\"transferId\":\"tr_1UCcmyH7FWYUN3jhsiKLySUB\",\"balance\":89.33} loc=\"\""
+    },
+    {
+      "id": "crash.retry",
+      "lens": "BV4",
+      "title": "retry após crash não duplicou Transfer",
+      "ev": {
+        "crash": "500 {\"success\":false,\"error\":\"crash_inject:after_debit_before_stripe\",\"code\":\"payout_pending_reconcile\",\"needs_reconcile\":true,\"idempotency_key\":\"p_84e3af049fd68f301f907a8cf4a20239d7db8882ebd550feb1bfdbd3ae45be\",\"crash_injec… loc=\"\"",
+        "retry": "200 {\"success\":true,\"transferId\":\"tr_1UCcn2H7FWYUN3jhAeFBmyKj\",\"balance\":88.33} loc=\"\""
+      }
+    },
+    {
+      "id": "wh.nosig",
+      "lens": "BV4",
+      "title": "webhook recusou replay sem assinatura",
+      "ev": "400 {\"ok\":false,\"error\":\"missing_signature\"} loc=\"\""
+    },
+    {
+      "id": "wh.badsig",
+      "lens": "BV4",
+      "title": "assinatura inválida recusada",
+      "ev": "400 {\"ok\":false,\"error\":\"invalid_signature\"} loc=\"\""
+    },
+    {
+      "id": "wr.get.evil",
+      "lens": "BV2",
+      "title": "web_return https://evil.com sem Location hostil",
+      "ev": "200 <!DOCTYPE html><html lang=\"pt\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Fleaber</title><script>window.setTimeout(function(){ window.location.href = \"fleaber:/… loc=\"\""
+    },
+    {
+      "id": "wr.get.at",
+      "lens": "BV2",
+      "title": "web_return https://evil.com@fleaber.pt sem Location hostil",
+      "ev": "200 <!DOCTYPE html><html lang=\"pt\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Fleaber</title><script>window.setTimeout(function(){ window.location.href = \"fleaber:/… loc=\"\""
+    },
+    {
+      "id": "wr.get.sub",
+      "lens": "BV2",
+      "title": "web_return https://attacker.fleaber.pt sem Location hostil",
+      "ev": "200 <!DOCTYPE html><html lang=\"pt\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Fleaber</title><script>window.setTimeout(function(){ window.location.href = \"fleaber:/… loc=\"\""
+    },
+    {
+      "id": "wr.get.idn",
+      "lens": "BV2",
+      "title": "web_return https://xn--fleaber-xpa.pt sem Location hostil",
+      "ev": "200 <!DOCTYPE html><html lang=\"pt\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Fleaber</title><script>window.setTimeout(function(){ window.location.href = \"fleaber:/… loc=\"\""
+    },
+    {
+      "id": "wr.get.cyr",
+      "lens": "BV2",
+      "title": "web_return https://fleаber.pt sem Location hostil",
+      "ev": "200 <!DOCTYPE html><html lang=\"pt\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Fleaber</title><script>window.setTimeout(function(){ window.location.href = \"fleaber:/… loc=\"\""
+    },
+    {
+      "id": "wr.get.file",
+      "lens": "BV2",
+      "title": "web_return file:///etc/passwd sem Location hostil",
+      "ev": "200 <!DOCTYPE html><html lang=\"pt\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Fleaber</title><script>window.setTimeout(function(){ window.location.href = \"fleaber:/… loc=\"\""
+    },
+    {
+      "id": "wr.get.js",
+      "lens": "BV2",
+      "title": "web_return javascript:alert(1) sem Location hostil",
+      "ev": "403 <!DOCTYPE html>\n<!--[if lt IE 7]> <html class=\"no-js ie6 oldie\" lang=\"en-US\"> <![endif]-->\n<!--[if IE 7]>    <html class=\"no-js ie7 oldie\" lang=\"en-US\"> <![endif]-->\n<!--[if IE 8]>    <html class=\"no-js ie8 oldie\" lang=\"… loc=\"\""
+    },
+    {
+      "id": "wr.get.nip",
+      "lens": "BV2",
+      "title": "web_return https://127.0.0.1.nip.io sem Location hostil",
+      "ev": "200 <!DOCTYPE html><html lang=\"pt\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Fleaber</title><script>window.setTimeout(function(){ window.location.href = \"fleaber:/… loc=\"\""
+    },
+    {
+      "id": "wr.get.localtest",
+      "lens": "BV2",
+      "title": "web_return https://localtest.me sem Location hostil",
+      "ev": "200 <!DOCTYPE html><html lang=\"pt\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Fleaber</title><script>window.setTimeout(function(){ window.location.href = \"fleaber:/… loc=\"\""
+    },
+    {
+      "id": "wr.get.v6mapped",
+      "lens": "BV2",
+      "title": "web_return https://[::ffff:127.0.0.1] sem Location hostil",
+      "ev": "200 <!DOCTYPE html><html lang=\"pt\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Fleaber</title><script>window.setTimeout(function(){ window.location.href = \"fleaber:/… loc=\"\""
+    },
+    {
+      "id": "wr.get.octalshort",
+      "lens": "BV2",
+      "title": "web_return https://0177.0.0.1 sem Location hostil",
+      "ev": "200 <!DOCTYPE html><html lang=\"pt\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Fleaber</title><script>window.setTimeout(function(){ window.location.href = \"fleaber:/… loc=\"\""
+    },
+    {
+      "id": "wr.get.hexip",
+      "lens": "BV2",
+      "title": "web_return https://0x7f000001 sem Location hostil",
+      "ev": "200 <!DOCTYPE html><html lang=\"pt\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Fleaber</title><script>window.setTimeout(function(){ window.location.href = \"fleaber:/… loc=\"\""
+    },
+    {
+      "id": "wr.get.dotless",
+      "lens": "BV2",
+      "title": "web_return https://2130706433.fleaber.pt sem Location hostil",
+      "ev": "200 <!DOCTYPE html><html lang=\"pt\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Fleaber</title><script>window.setTimeout(function(){ window.location.href = \"fleaber:/… loc=\"\""
+    },
+    {
+      "id": "nbsp-space",
+      "lens": "BV4",
+      "title": "NBSP vs espaço = 1 intenção (NFKC HOLD)",
+      "ev": {
+        "keyA": [
+          114,
+          116,
+          98,
+          118,
+          32,
+          107,
+          56,
+          56,
+          120
+        ],
+        "keyB": [
+          114,
+          116,
+          98,
+          118,
+          160,
+          107,
+          56,
+          56,
+          120
+        ],
+        "hitA": "200 {\"success\":true,\"transferId\":\"tr_1UCcnSH7FWYUN3jheUKSzQ5B\",\"balance\":81.33} loc=\"\"",
+        "hitB": "200 {\"success\":true,\"transferId\":\"tr_1UCcnSH7FWYUN3jheUKSzQ5B\",\"balance\":81.33,\"idempotent\":true} loc=\"\"",
+        "tidA": "tr_1UCcnSH7FWYUN3jheUKSzQ5B",
+        "tidB": "tr_1UCcnSH7FWYUN3jheUKSzQ5B",
+        "new_transfer_ids": [
+          "tr_1UCcnSH7FWYUN3jheUKSzQ5B"
+        ],
+        "new_transfer_count": 1,
+        "wallet_before": 82.33,
+        "wallet_after": 81.33,
+        "delta_eur": -1.0,
+        "payoutOkA": true,
+        "payoutOkB": true,
+        "idempotentB": true
+      }
+    },
+    {
+      "id": "race.same",
+      "lens": "BV4",
+      "title": "race mesma key ≤1 Transfer",
+      "ev": {
+        "tids": [
+          "tr_1UCcnWH7FWYUN3jhyLReJu7P"
+        ],
+        "hits": [
+          "200 {\"success\":true,\"transferId\":\"tr_1UCcnWH7FWYUN3jhyLReJu7P\",\"balance\":80.33} loc=\"\"",
+          "200 {\"success\":true,\"transferId\":\"tr_1UCcnWH7FWYUN3jhyLReJu7P\",\"balance\":80.33} loc=\"\"",
+          "200 {\"success\":true,\"transferId\":\"tr_1UCcnWH7FWYUN3jhyLReJu7P\",\"balance\":80.33} loc=\"\""
+        ]
+      }
+    }
+  ],
+  "skipped": [],
+  "notes": [
+    {
+      "id": "wallet0",
+      "lens": "BV7",
+      "title": "seller wallet before",
+      "ev": {
+        "id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+        "balance": 93.33,
+        "stripe_account_id": "acct_1U5mYbQeUNx8ar08",
+        "updated_at": "2026-09-04T18:14:00.037157+00:00"
+      }
+    },
+    {
+      "id": "wallet.funded",
+      "lens": "BV7",
+      "title": "seller wallet after fixture credit",
+      "ev": {
+        "id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+        "balance": 93.33,
+        "stripe_account_id": "acct_1U5mYbQeUNx8ar08",
+        "updated_at": "2026-09-04T18:14:00.037157+00:00"
+      }
+    },
+    {
+      "id": "dest.spoof",
+      "lens": "BV6",
+      "title": "body destination spoof",
+      "ev": "200 {\"success\":true,\"transferId\":\"tr_1UCcmkH7FWYUN3jh9xOKUBbg\",\"balance\":92.33} loc=\"\""
+    },
+    {
+      "id": "buyer.payout",
+      "lens": "BV6",
+      "title": "buyer JWT payout 100c",
+      "ev": "400 {\"error\":\"Falta associar a conta bancária no Stripe. Abre outra vez Configurar conta bancária e adiciona o IBAN de teste.\",\"code\":\"payout_failed\"} loc=\"\""
+    },
+    {
+      "id": "amt.arr",
+      "lens": "BV4",
+      "title": "amount=[100]",
+      "ev": "400 {\"error\":\"Valor de levantamento inválido.\",\"code\":\"payout_failed\"} loc=\"\""
+    },
+    {
+      "id": "amt.obj",
+      "lens": "BV4",
+      "title": "amount={cents: 100}",
+      "ev": "400 {\"error\":\"Valor de levantamento inválido.\",\"code\":\"payout_failed\"} loc=\"\""
+    },
+    {
+      "id": "amt.str100",
+      "lens": "BV4",
+      "title": "amount=100",
+      "ev": "200 {\"success\":true,\"transferId\":\"tr_1UCcmqH7FWYUN3jhrMRnX6KS\",\"balance\":91.33} loc=\"\""
+    },
+    {
+      "id": "amt.str100.design",
+      "lens": "BV4",
+      "title": "aceite como 100 cêntimos (Number.isInteger)",
+      "ev": "200 {\"success\":true,\"transferId\":\"tr_1UCcmqH7FWYUN3jhrMRnX6KS\",\"balance\":91.33} loc=\"\""
+    },
+    {
+      "id": "amt.float100",
+      "lens": "BV4",
+      "title": "amount=100.0",
+      "ev": "200 {\"success\":true,\"transferId\":\"tr_1UCcmsH7FWYUN3jhLEbIbMWo\",\"balance\":90.33} loc=\"\""
+    },
+    {
+      "id": "amt.float100.design",
+      "lens": "BV4",
+      "title": "aceite como 100 cêntimos (Number.isInteger)",
+      "ev": "200 {\"success\":true,\"transferId\":\"tr_1UCcmsH7FWYUN3jhLEbIbMWo\",\"balance\":90.33} loc=\"\""
+    },
+    {
+      "id": "amt.frac",
+      "lens": "BV4",
+      "title": "amount=100.5",
+      "ev": "400 {\"error\":\"O valor do levantamento tem de ser em cêntimos.\",\"code\":\"payout_failed\"} loc=\"\""
+    },
+    {
+      "id": "amt.bool",
+      "lens": "BV4",
+      "title": "amount=true",
+      "ev": "400 {\"error\":\"Valor de levantamento inválido.\",\"code\":\"payout_failed\"} loc=\"\""
+    },
+    {
+      "id": "amt.neg",
+      "lens": "BV4",
+      "title": "amount=-100",
+      "ev": "400 {\"error\":\"Valor de levantamento inválido.\",\"code\":\"payout_failed\"} loc=\"\""
+    },
+    {
+      "id": "amt.hex",
+      "lens": "BV4",
+      "title": "amount=0x64",
+      "ev": "400 {\"error\":\"Valor de levantamento inválido.\",\"code\":\"payout_failed\"} loc=\"\""
+    },
+    {
+      "id": "amt.sci",
+      "lens": "BV4",
+      "title": "amount=1e2",
+      "ev": "400 {\"error\":\"Valor de levantamento inválido.\",\"code\":\"payout_failed\"} loc=\"\""
+    },
+    {
+      "id": "crash.nosec",
+      "lens": "BV4",
+      "title": "crash_inject sem header secret",
+      "ev": "200 {\"success\":true,\"transferId\":\"tr_1UCcmyH7FWYUN3jhsiKLySUB\",\"balance\":89.33} loc=\"\""
+    },
+    {
+      "id": "crash.secret",
+      "lens": "BV4",
+      "title": "crash_inject COM secret",
+      "ev": "500 {\"success\":false,\"error\":\"crash_inject:after_debit_before_stripe\",\"code\":\"payout_pending_reconcile\",\"needs_reconcile\":true,\"idempotency_key\":\"p_84e3af049fd68f301f907a8cf4a20239d7db8882ebd550feb1bfdbd3ae45be\",\"crash_injec… loc=\"\""
+    },
+    {
+      "id": "crash.retry",
+      "lens": "BV4",
+      "title": "retry mesma key após crash debit",
+      "ev": "200 {\"success\":true,\"transferId\":\"tr_1UCcn2H7FWYUN3jhAeFBmyKj\",\"balance\":88.33} loc=\"\""
+    },
+    {
+      "id": "crash.ledger",
+      "lens": "BV4",
+      "title": "ledger after crash retry",
+      "ev": {
+        "retry": "200 {\"success\":true,\"transferId\":\"tr_1UCcn2H7FWYUN3jhAeFBmyKj\",\"balance\":88.33} loc=\"\"",
+        "head": [
+          {
+            "idempotency_key": "p_84e3af049fd68f301f907a8cf4a20239d7db8882ebd550feb1bfdbd3ae45be",
+            "user_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+            "amount_cents": 100,
+            "amount_eur": 1.0,
+            "status": "transferred",
+            "stripe_transfer_id": "tr_1UCcn2H7FWYUN3jhAeFBmyKj",
+            "balance_after": 88.33,
+            "created_at": "2026-09-06T09:55:06.725076+00:00",
+            "updated_at": "2026-09-06T09:55:09.098916+00:00"
+          },
+          {
+            "idempotency_key": "p_c57d842d1975aa0eb3e69de73bb3e00da19074d75c1aae1fc1384f8048cb89",
+            "user_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+            "amount_cents": 100,
+            "amount_eur": 1.0,
+            "status": "transferred",
+            "stripe_transfer_id": "tr_1UCcmyH7FWYUN3jhsiKLySUB",
+            "balance_after": 89.33,
+            "created_at": "2026-09-06T09:55:04.109666+00:00",
+            "updated_at": "2026-09-06T09:55:05.005465+00:00"
+          },
+          {
+            "idempotency_key": "p_7f80b30571c359e780d8f91b55c6d8539f7710107da3c2a8d9593429519ba0",
+            "user_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+            "amount_cents": 100,
+            "amount_eur": 1.0,
+            "status": "transferred",
+            "stripe_transfer_id": "tr_1UCcmsH7FWYUN3jhLEbIbMWo",
+            "balance_after": 90.33,
+            "created_at": "2026-09-06T09:54:58.756008+00:00",
+            "updated_at": "2026-09-06T09:54:59.5591+00:00"
+          },
+          {
+            "idempotency_key": "p_42beef2c652391ff878335bd1d8816479621435d859b5d18e4111052669548",
+            "user_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+            "amount_cents": 100,
+            "amount_eur": 1.0,
+            "status": "transferred",
+            "stripe_transfer_id": "tr_1UCcmqH7FWYUN3jhrMRnX6KS",
+            "balance_after": 91.33,
+            "created_at": "2026-09-06T09:54:56.3194+00:00",
+            "updated_at": "2026-09-06T09:54:57.137586+00:00"
+          },
+          {
+            "idempotency_key": "p_0bfa4c7b938f7f8651a0ea7cf22c5e753bce6e5714dff147687a1b7f0161c5",
+            "user_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+            "amount_cents": 100,
+            "amount_eur": 1.0,
+            "status": "transferred",
+            "stripe_transfer_id": "tr_1UCcmkH7FWYUN3jh9xOKUBbg",
+            "balance_after": 92.33,
+            "created_at": "2026-09-06T09:54:50.144993+00:00",
+            "updated_at": "2026-09-06T09:54:51.086117+00:00"
+          },
+          {
+            "idempotency_key": "p_e8c4e551faf8f5fadd77de7994b4e3074f38adde81333848fb22a74f8912a2",
+            "user_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+            "amount_cents": 100,
+            "amount_eur": 1.0,
+            "status": "transferred",
+            "stripe_transfer_id": "tr_1UBM5CH7FWYUN3jhDkw2xCWH",
+            "balance_after": 15.05,
+            "created_at": "2026-09-02T21:52:38.092256+00:00",
+            "updated_at": "2026-09-02T21:52:39.126415+00:00"
+          },
+          {
+            "idempotency_key": "p_2e1f5567a24fecc840aa0e8dd97701c04247aca190f0f1fcb989ae731fe8be",
+            "user_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+            "amount_cents": 100,
+            "amount_eur": 1.0,
+            "status": "transferred",
+            "stripe_transfer_id": "tr_1UBM54H7FWYUN3jhwGYOVgl4",
+            "balance_after": 16.05,
+            "created_at": "2026-09-02T21:52:30.162086+00:00",
+            "updated_at": "2026-09-02T21:52:31.068993+00:00"
+          },
+          {
+            "idempotency_key": "p_68196f1572f00bf94f0f602a58dd1e2de80a62f47cc59ec63c08b729bb18c1",
+            "user_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+            "amount_cents": 100,
+            "amount_eur": 1.0,
+            "status": "transferred",
+            "stripe_transfer_id": "tr_1UBM3QH7FWYUN3jhxgkbUFVq",
+            "balance_after": 17.05,
+            "created_at": "2026-09-02T21:50:48.209006+00:00",
+            "updated_at": "2026-09-02T21:50:49.282723+00:00"
+          }
+        ]
+      }
+    },
+    {
+      "id": "wh.nosig",
+      "lens": "BV4",
+      "title": "transfer.created sem stripe-signature",
+      "ev": "400 {\"ok\":false,\"error\":\"missing_signature\"} loc=\"\""
+    },
+    {
+      "id": "wh.badsig",
+      "lens": "BV4",
+      "title": "transfer.created assinatura lixo",
+      "ev": "400 {\"ok\":false,\"error\":\"invalid_signature\"} loc=\"\""
+    },
+    {
+      "id": "wr.exact.decimal",
+      "lens": "BV2",
+      "title": "exact BP/BJ https://2130706433 (não contar)",
+      "ev": "200 <!DOCTYPE html><html lang=\"pt\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Fleaber</title><script>window.setTimeout(function(){ window.location.href = \"fleaber:/… loc=\"\""
+    },
+    {
+      "id": "wr.get.evil",
+      "lens": "BV2",
+      "title": "GET https://evil.com",
+      "ev": "200 <!DOCTYPE html><html lang=\"pt\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Fleaber</title><script>window.setTimeout(function(){ window.location.href = \"fleaber:/… loc=\"\""
+    },
+    {
+      "id": "wr.get.at",
+      "lens": "BV2",
+      "title": "GET https://evil.com@fleaber.pt",
+      "ev": "200 <!DOCTYPE html><html lang=\"pt\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Fleaber</title><script>window.setTimeout(function(){ window.location.href = \"fleaber:/… loc=\"\""
+    },
+    {
+      "id": "wr.get.sub",
+      "lens": "BV2",
+      "title": "GET https://attacker.fleaber.pt",
+      "ev": "200 <!DOCTYPE html><html lang=\"pt\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Fleaber</title><script>window.setTimeout(function(){ window.location.href = \"fleaber:/… loc=\"\""
+    },
+    {
+      "id": "wr.get.idn",
+      "lens": "BV2",
+      "title": "GET https://xn--fleaber-xpa.pt",
+      "ev": "200 <!DOCTYPE html><html lang=\"pt\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Fleaber</title><script>window.setTimeout(function(){ window.location.href = \"fleaber:/… loc=\"\""
+    },
+    {
+      "id": "wr.get.cyr",
+      "lens": "BV2",
+      "title": "GET https://fleаber.pt",
+      "ev": "200 <!DOCTYPE html><html lang=\"pt\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Fleaber</title><script>window.setTimeout(function(){ window.location.href = \"fleaber:/… loc=\"\""
+    },
+    {
+      "id": "wr.get.file",
+      "lens": "BV2",
+      "title": "GET file:///etc/passwd",
+      "ev": "200 <!DOCTYPE html><html lang=\"pt\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Fleaber</title><script>window.setTimeout(function(){ window.location.href = \"fleaber:/… loc=\"\""
+    },
+    {
+      "id": "wr.get.js",
+      "lens": "BV2",
+      "title": "GET javascript:alert(1)",
+      "ev": "403 <!DOCTYPE html>\n<!--[if lt IE 7]> <html class=\"no-js ie6 oldie\" lang=\"en-US\"> <![endif]-->\n<!--[if IE 7]>    <html class=\"no-js ie7 oldie\" lang=\"en-US\"> <![endif]-->\n<!--[if IE 8]>    <html class=\"no-js ie8 oldie\" lang=\"… loc=\"\""
+    },
+    {
+      "id": "wr.get.nip",
+      "lens": "BV2",
+      "title": "GET https://127.0.0.1.nip.io",
+      "ev": "200 <!DOCTYPE html><html lang=\"pt\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Fleaber</title><script>window.setTimeout(function(){ window.location.href = \"fleaber:/… loc=\"\""
+    },
+    {
+      "id": "wr.get.localtest",
+      "lens": "BV2",
+      "title": "GET https://localtest.me",
+      "ev": "200 <!DOCTYPE html><html lang=\"pt\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Fleaber</title><script>window.setTimeout(function(){ window.location.href = \"fleaber:/… loc=\"\""
+    },
+    {
+      "id": "wr.get.v6mapped",
+      "lens": "BV2",
+      "title": "GET https://[::ffff:127.0.0.1]",
+      "ev": "200 <!DOCTYPE html><html lang=\"pt\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Fleaber</title><script>window.setTimeout(function(){ window.location.href = \"fleaber:/… loc=\"\""
+    },
+    {
+      "id": "wr.get.octalshort",
+      "lens": "BV2",
+      "title": "GET https://0177.0.0.1",
+      "ev": "200 <!DOCTYPE html><html lang=\"pt\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Fleaber</title><script>window.setTimeout(function(){ window.location.href = \"fleaber:/… loc=\"\""
+    },
+    {
+      "id": "wr.get.hexip",
+      "lens": "BV2",
+      "title": "GET https://0x7f000001",
+      "ev": "200 <!DOCTYPE html><html lang=\"pt\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Fleaber</title><script>window.setTimeout(function(){ window.location.href = \"fleaber:/… loc=\"\""
+    },
+    {
+      "id": "wr.get.dotless",
+      "lens": "BV2",
+      "title": "GET https://2130706433.fleaber.pt",
+      "ev": "200 <!DOCTYPE html><html lang=\"pt\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Fleaber</title><script>window.setTimeout(function(){ window.location.href = \"fleaber:/… loc=\"\""
+    },
+    {
+      "id": "pair.casefold",
+      "lens": "BV4",
+      "title": "pair casefold",
+      "ev": {
+        "keyA": [
+          80,
+          97,
+          121,
+          111,
+          117,
+          116,
+          82,
+          116,
+          98,
+          118,
+          49
+        ],
+        "keyB": [
+          112,
+          97,
+          121,
+          111,
+          117,
+          116,
+          82,
+          116,
+          98,
+          118,
+          49
+        ],
+        "hitA": "200 {\"success\":true,\"transferId\":\"tr_1UCcnAH7FWYUN3jhT85uElOp\",\"balance\":87.33} loc=\"\"",
+        "hitB": "200 {\"success\":true,\"transferId\":\"tr_1UCcnDH7FWYUN3jhcqchi3vD\",\"balance\":86.33} loc=\"\"",
+        "tidA": "tr_1UCcnAH7FWYUN3jhT85uElOp",
+        "tidB": "tr_1UCcnDH7FWYUN3jhcqchi3vD",
+        "new_transfer_ids": [
+          "tr_1UCcnDH7FWYUN3jhcqchi3vD",
+          "tr_1UCcnAH7FWYUN3jhT85uElOp"
+        ],
+        "new_transfer_count": 2,
+        "wallet_before": 88.33,
+        "wallet_after": 86.33,
+        "delta_eur": -2.0,
+        "payoutOkA": true,
+        "payoutOkB": true,
+        "idempotentB": false
+      }
+    },
+    {
+      "id": "casefold.design",
+      "lens": "BV4",
+      "title": "Payout vs payout → 2 Transfers (app não lowercasa; keys Flutter wd_uuid_…)",
+      "ev": {
+        "keyA": [
+          80,
+          97,
+          121,
+          111,
+          117,
+          116,
+          82,
+          116,
+          98,
+          118,
+          49
+        ],
+        "keyB": [
+          112,
+          97,
+          121,
+          111,
+          117,
+          116,
+          82,
+          116,
+          98,
+          118,
+          49
+        ],
+        "hitA": "200 {\"success\":true,\"transferId\":\"tr_1UCcnAH7FWYUN3jhT85uElOp\",\"balance\":87.33} loc=\"\"",
+        "hitB": "200 {\"success\":true,\"transferId\":\"tr_1UCcnDH7FWYUN3jhcqchi3vD\",\"balance\":86.33} loc=\"\"",
+        "tidA": "tr_1UCcnAH7FWYUN3jhT85uElOp",
+        "tidB": "tr_1UCcnDH7FWYUN3jhcqchi3vD",
+        "new_transfer_ids": [
+          "tr_1UCcnDH7FWYUN3jhcqchi3vD",
+          "tr_1UCcnAH7FWYUN3jhT85uElOp"
+        ],
+        "new_transfer_count": 2,
+        "wallet_before": 88.33,
+        "wallet_after": 86.33,
+        "delta_eur": -2.0,
+        "payoutOkA": true,
+        "payoutOkB": true,
+        "idempotentB": false
+      }
+    },
+    {
+      "id": "pair.homo",
+      "lens": "BV4",
+      "title": "pair homo",
+      "ev": {
+        "keyA": [
+          114,
+          116,
+          98,
+          118,
+          108,
+          97,
+          116,
+          105,
+          110,
+          120
+        ],
+        "keyB": [
+          114,
+          116,
+          98,
+          118,
+          1072,
+          116,
+          105,
+          110,
+          120,
+          120
+        ],
+        "hitA": "200 {\"success\":true,\"transferId\":\"tr_1UCcnGH7FWYUN3jhGZflgUfV\",\"balance\":85.33} loc=\"\"",
+        "hitB": "200 {\"success\":true,\"transferId\":\"tr_1UCcnJH7FWYUN3jhFhLFQuav\",\"balance\":84.33} loc=\"\"",
+        "tidA": "tr_1UCcnGH7FWYUN3jhGZflgUfV",
+        "tidB": "tr_1UCcnJH7FWYUN3jhFhLFQuav",
+        "new_transfer_ids": [
+          "tr_1UCcnJH7FWYUN3jhFhLFQuav",
+          "tr_1UCcnGH7FWYUN3jhGZflgUfV"
+        ],
+        "new_transfer_count": 2,
+        "wallet_before": 86.33,
+        "wallet_after": 84.33,
+        "delta_eur": -2.0,
+        "payoutOkA": true,
+        "payoutOkB": true,
+        "idempotentB": false
+      }
+    },
+    {
+      "id": "pair.nbsp-none",
+      "lens": "BV4",
+      "title": "pair nbsp-none",
+      "ev": {
+        "keyA": [
+          114,
+          116,
+          98,
+          118,
+          107,
+          101,
+          121,
+          56,
+          56
+        ],
+        "keyB": [
+          114,
+          116,
+          98,
+          118,
+          160,
+          107,
+          101,
+          121,
+          56,
+          56
+        ],
+        "hitA": "200 {\"success\":true,\"transferId\":\"tr_1UCcnMH7FWYUN3jhz7FqHU1y\",\"balance\":83.33} loc=\"\"",
+        "hitB": "200 {\"success\":true,\"transferId\":\"tr_1UCcnOH7FWYUN3jhUCTbbDKe\",\"balance\":82.33} loc=\"\"",
+        "tidA": "tr_1UCcnMH7FWYUN3jhz7FqHU1y",
+        "tidB": "tr_1UCcnOH7FWYUN3jhUCTbbDKe",
+        "new_transfer_ids": [
+          "tr_1UCcnOH7FWYUN3jhUCTbbDKe",
+          "tr_1UCcnMH7FWYUN3jhz7FqHU1y"
+        ],
+        "new_transfer_count": 2,
+        "wallet_before": 84.33,
+        "wallet_after": 82.33,
+        "delta_eur": -2.0,
+        "payoutOkA": true,
+        "payoutOkB": true,
+        "idempotentB": false
+      }
+    },
+    {
+      "id": "pair.nbsp-space",
+      "lens": "BV4",
+      "title": "pair nbsp-space",
+      "ev": {
+        "keyA": [
+          114,
+          116,
+          98,
+          118,
+          32,
+          107,
+          56,
+          56,
+          120
+        ],
+        "keyB": [
+          114,
+          116,
+          98,
+          118,
+          160,
+          107,
+          56,
+          56,
+          120
+        ],
+        "hitA": "200 {\"success\":true,\"transferId\":\"tr_1UCcnSH7FWYUN3jheUKSzQ5B\",\"balance\":81.33} loc=\"\"",
+        "hitB": "200 {\"success\":true,\"transferId\":\"tr_1UCcnSH7FWYUN3jheUKSzQ5B\",\"balance\":81.33,\"idempotent\":true} loc=\"\"",
+        "tidA": "tr_1UCcnSH7FWYUN3jheUKSzQ5B",
+        "tidB": "tr_1UCcnSH7FWYUN3jheUKSzQ5B",
+        "new_transfer_ids": [
+          "tr_1UCcnSH7FWYUN3jheUKSzQ5B"
+        ],
+        "new_transfer_count": 1,
+        "wallet_before": 82.33,
+        "wallet_after": 81.33,
+        "delta_eur": -1.0,
+        "payoutOkA": true,
+        "payoutOkB": true,
+        "idempotentB": true
+      }
+    },
+    {
+      "id": "race.same",
+      "lens": "BV4",
+      "title": "3x mesma key",
+      "ev": {
+        "hits": [
+          "200 {\"success\":true,\"transferId\":\"tr_1UCcnWH7FWYUN3jhyLReJu7P\",\"balance\":80.33} loc=\"\"",
+          "200 {\"success\":true,\"transferId\":\"tr_1UCcnWH7FWYUN3jhyLReJu7P\",\"balance\":80.33} loc=\"\"",
+          "200 {\"success\":true,\"transferId\":\"tr_1UCcnWH7FWYUN3jhyLReJu7P\",\"balance\":80.33} loc=\"\""
+        ],
+        "tids": [
+          "tr_1UCcnWH7FWYUN3jhyLReJu7P"
+        ]
+      }
+    },
+    {
+      "id": "wallet.end.p1",
+      "lens": "BV7",
+      "title": "seller wallet end pass1",
+      "ev": {
+        "id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+        "balance": 80.33,
+        "stripe_account_id": "acct_1U5mYbQeUNx8ar08",
+        "updated_at": "2026-09-06T09:55:38.808116+00:00"
+      }
+    }
+  ],
+  "actors": {
+    "buyer": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+    "seller": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+    "buyer2": "f707d0a4-742d-427d-be80-6609d8571508",
+    "seller2": "5a85a86b-52c5-43c2-a8c9-6b9a70477a72"
+  },
+  "created": {
+    "orders": [],
+    "products": []
+  }
+}

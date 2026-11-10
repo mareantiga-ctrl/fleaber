@@ -1,0 +1,98 @@
+{
+  "findings": [
+    {
+      "id": "RTG-G5-002",
+      "lens": "G5",
+      "severity": "P1",
+      "title": "Reserva live aceite/convertida com expires_at no passado",
+      "actor": "seller + buyer JWT",
+      "pre": "expires_at -12m",
+      "repro": "process accept; stripe_convert",
+      "expected": "expired",
+      "obtained": {
+        "id": "ad0a6268-b57a-4b81-a27f-99407cc95c2d",
+        "status": "accepted",
+        "expires_at": "2026-09-05T12:10:49.342977+00:00",
+        "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96"
+      },
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "RTG-G8-004",
+      "lens": "G8",
+      "severity": "P1",
+      "title": "Review humana 5★ bloqueada — só o cron (service_role) liberta a carteira",
+      "actor": "buyer JWT",
+      "pre": "order concluido pago TEST; sem esperar 48h",
+      "repro": "POST reviews stars=5 author_role=comprador",
+      "expected": "201 review + wallet_release_processed_at",
+      "obtained": {
+        "rev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"order_wallet_release_flag_immutable\"}",
+        "order": {
+          "id": "208a072a-35ed-46d3-b3f9-4ff3835bbb28",
+          "status": "concluido",
+          "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+          "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+          "product_id": "c05e94fd-9641-4420-b552-8c19afc84f5f",
+          "quantity": 1,
+          "price_total": 5.9,
+          "amount_paid_cents": 590,
+          "payment_method": "Pagamento na app",
+          "shipping_method": null,
+          "stripe_payment_intent_id": "pi_3UAU34H7FWYUN3jh1MUViesL",
+          "stripe_checkout_session_id": null,
+          "stripe_refund_id": null,
+          "wallet_release_processed_at": null,
+          "wallet_refund_processed_at": null,
+          "stock_units_applied": 1,
+          "completed_at": "2026-08-31T12:10:53.457456+00:00",
+          "auto_feedback_processed_at": null,
+          "bundle_id": null
+        }
+      },
+      "proven": true,
+      "evidence": {}
+    }
+  ],
+  "notes": [
+    {
+      "id": "p5.upsert",
+      "lens": "G5",
+      "title": "upsert live item",
+      "ev": "200 \"16a877ba-ec4c-42a1-b1fe-2481158b6337\""
+    },
+    {
+      "id": "p5.resv",
+      "lens": "G5",
+      "title": "INSERT resv",
+      "ev": "201 [{\"id\":\"ad0a6268-b57a-4b81-a27f-99407cc95c2d\",\"live_id\":\"e9218ec6-af0f-4640-818d-46fbe205050c\",\"live_item_id\":\"16a877ba-ec4c-42a1-b1fe-2481158b6337\",\"seller_id\":\"980f4fa1-0004-42f9…"
+    },
+    {
+      "id": "p5.ttl",
+      "lens": "G5",
+      "title": "accept/convert expired",
+      "ev": {
+        "accept": "200 {\"ok\": true, \"item_qty\": 2, \"request_id\": \"ad0a6268-b57a-4b81-a27f-99407cc95c2d\", \"item_status\": \"reserved_partial\", \"reserved_qty\": 1}",
+        "convert": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_live_reservation_stripe_convert\"}",
+        "convert_b2": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_live_reservation_stripe_convert\"}",
+        "row": {
+          "id": "ad0a6268-b57a-4b81-a27f-99407cc95c2d",
+          "status": "accepted",
+          "expires_at": "2026-09-05T12:10:49.342977+00:00",
+          "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96"
+        }
+      }
+    },
+    {
+      "id": "p5.human_review",
+      "lens": "G8",
+      "title": "review sem cron",
+      "ev": {
+        "rev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"order_wallet_release_flag_immutable\"}",
+        "release": null,
+        "status": "concluido"
+      }
+    }
+  ]
+}

@@ -1,0 +1,167 @@
+{
+  "stamp": "20260902T1821",
+  "prefix": "RTBH-20260902T1821",
+  "auditor": "REDTEAM_BLIND_BH_LIVE_POS_ATBE_v1",
+  "lenses": [
+    "BH3",
+    "BH8"
+  ],
+  "findings": [
+    {
+      "id": "BH3-08",
+      "lens": "BH3",
+      "severity": "P3",
+      "title": "Stock gate trata marketplace_product (quantity NULL) como oculto a buyer/anon em live no ar",
+      "actor": "buyer JWT / anon",
+      "pre": "item_kind=marketplace_product quantity is null; live broadcasting",
+      "repro": "rpc batata_live_item_stock; INSERT orders live_item_id → order_live_item_exhausted",
+      "expected": "available_qty do produto, não live_item_not_found",
+      "obtained": {
+        "buyer": "200 {\"ok\": false, \"error\": \"live_item_not_found\"}",
+        "anon": "200 {\"ok\": false, \"error\": \"live_item_not_found\"}",
+        "seller": "200 {\"ok\": true, \"price\": 12.5, \"live_id\": \"494a874f-83b2-4bcf-8d4c-0b049c7a4874\", \"ref_code\": \"BH14020\", \"item_kind\": \"marketplace_product\", \"total_qty\": 2, \"product_id\": \"9a11f602-ded2-493d-8e16-47a47addae85\", \"blocked_qty\": 0, \"live_status\":…"
+      },
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "BH8-02",
+      "lens": "BH8",
+      "severity": "P2",
+      "title": "Reconcile MB WAY pending cria fila fantasma",
+      "actor": "JWT",
+      "pre": "order não capturada",
+      "repro": "rpc reconcile",
+      "expected": "sem reservation stripe_paid*",
+      "obtained": {
+        "recB": "200 {\"ok\": true, \"live_item_id\": \"3621f22e-a3e4-4cc0-826e-ffdc3ed46f35\", \"direct_insert\": true}",
+        "recS": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"convert_requires_paid_order\"}",
+        "ghosts": [
+          {
+            "id": "f914cb30-e1a8-44e9-a76a-6bb9c639151e",
+            "status": "pending",
+            "notes": "stripe_paid_direct:b37ea5d9-2031-447a-b485-771d4af525d3",
+            "requested_qty": 1,
+            "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+            "source": "fleaber_live",
+            "live_item_id": "3621f22e-a3e4-4cc0-826e-ffdc3ed46f35"
+          }
+        ]
+      },
+      "proven": true,
+      "evidence": {}
+    }
+  ],
+  "blocked": [
+    {
+      "id": "BH8-03",
+      "lens": "BH8",
+      "title": "sem Δ wallet",
+      "ev": {
+        "dSeller": 0.0,
+        "dBuyer": 0.0
+      }
+    },
+    {
+      "id": "BH8-04",
+      "lens": "BH8",
+      "title": "Anon reconcile",
+      "ev": "401 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_live_reconcile_stripe_order\"}"
+    },
+    {
+      "id": "BH8-05",
+      "lens": "BH8",
+      "title": "Seller2 reconcile order alheia",
+      "ev": "200 {\"ok\": false, \"error\": \"not_allowed\"}"
+    }
+  ],
+  "skipped": [],
+  "notes": [
+    {
+      "id": "BH3-mkt-stock",
+      "lens": "BH3",
+      "title": "stock marketplace_product qty null",
+      "ev": {
+        "buyer": "200 {\"ok\": false, \"error\": \"live_item_not_found\"}",
+        "seller": "200 {\"ok\": true, \"price\": 12.5, \"live_id\": \"494a874f-83b2-4bcf-8d4c-0b049c7a4874\", \"ref_code\": \"BH14020\", \"item_kind\": \"marketplace_product\", \"total_qty\": 2, \"product_id\": \"9a11f602-ded2-493d-8e16-47a47addae85\", \"blocked_qty\": 0, \"live_status\":…",
+        "anon": "200 {\"ok\": false, \"error\": \"live_item_not_found\"}"
+      }
+    },
+    {
+      "id": "BH8-svc-order",
+      "lens": "BH8",
+      "title": "service order aguarda_confirmacao",
+      "ev": "201 [{\"id\":\"b37ea5d9-2031-447a-b485-771d4af525d3\",\"created_at\":\"2026-09-02T17:36:00.739783+00:00\",\"product_id\":\"9a11f602-ded2-493d-8e16-47a47addae85\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c…"
+    },
+    {
+      "id": "BH8-rec",
+      "lens": "BH8",
+      "title": "reconcile MB WAY",
+      "ev": {
+        "recB": "200 {\"ok\": true, \"live_item_id\": \"3621f22e-a3e4-4cc0-826e-ffdc3ed46f35\", \"direct_insert\": true}",
+        "recS": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"convert_requires_paid_order\"}",
+        "recAnon": "401 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_live_reconcile_stripe_order\"}",
+        "recS2": "200 {\"ok\": false, \"error\": \"not_allowed\"}",
+        "recOnly": "",
+        "order": {
+          "id": "b37ea5d9-2031-447a-b485-771d4af525d3",
+          "status": "aguarda_confirmacao",
+          "amount_paid_cents": 0,
+          "stripe_payment_intent_id": "",
+          "live_id": "494a874f-83b2-4bcf-8d4c-0b049c7a4874",
+          "live_item_id": "3621f22e-a3e4-4cc0-826e-ffdc3ed46f35"
+        },
+        "res": [
+          {
+            "id": "f914cb30-e1a8-44e9-a76a-6bb9c639151e",
+            "status": "pending",
+            "notes": "stripe_paid_direct:b37ea5d9-2031-447a-b485-771d4af525d3",
+            "requested_qty": 1,
+            "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+            "source": "fleaber_live",
+            "live_item_id": "3621f22e-a3e4-4cc0-826e-ffdc3ed46f35"
+          }
+        ],
+        "w0": {
+          "buyer": 61.1,
+          "seller": 19.0,
+          "buyer2": "",
+          "seller2": ""
+        },
+        "w1": {
+          "buyer": 61.1,
+          "seller": 19.0,
+          "buyer2": "",
+          "seller2": ""
+        }
+      }
+    }
+  ],
+  "actors": {
+    "buyer": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+    "seller": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+    "buyer2": null,
+    "seller2": "e725febc-f8bb-40a8-812d-bcbf50808ca8",
+    "helperChat": null,
+    "helperMark": null,
+    "helperView": null,
+    "helperRes": null
+  },
+  "created": {
+    "orders": [
+      "b37ea5d9-2031-447a-b485-771d4af525d3"
+    ],
+    "products": [
+      "9a11f602-ded2-493d-8e16-47a47addae85"
+    ],
+    "lives": [
+      "494a874f-83b2-4bcf-8d4c-0b049c7a4874"
+    ],
+    "items": [
+      "3621f22e-a3e4-4cc0-826e-ffdc3ed46f35",
+      "1fc7ec48-8da0-42fd-a619-3e5c391db010"
+    ],
+    "reservations": [],
+    "helpers": []
+  }
+}

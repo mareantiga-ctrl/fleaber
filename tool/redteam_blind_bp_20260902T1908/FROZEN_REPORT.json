@@ -1,0 +1,60 @@
+{
+  "AUDITOR": "REDTEAM_BLIND_BP_PAYOUT_POS_BFBK_v1",
+  "FROZEN_AT": "2026-09-02T19:15:00+01:00",
+  "prefix": "RTBP-20260902T1908",
+  "production_touched": false,
+  "fase4": false,
+  "corrections_applied": false,
+  "lentes_cobertas": ["BP1", "BP2", "BP3", "BP4", "BP5", "BP6", "BP7"],
+  "VEREDICTO": "FAIL_P2",
+  "CONTAGEM": {
+    "P0_aberto": false,
+    "P0_quantos": 0,
+    "P1_aberto": false,
+    "P1_quantos": 0,
+    "P2_aberto": true,
+    "P2_quantos": 1,
+    "P3_aberto": false,
+    "P3_quantos": 0,
+    "P4_aberto": false,
+    "P4_quantos": 0,
+    "TOTAL_P0_P3_abertos": 1
+  },
+  "findings": [
+    {
+      "id": "P2-BP4-nfc-only-hash",
+      "severity": "P2",
+      "lenses": ["BP4", "BP7", "BP1"],
+      "title": "payoutIdempotencyKey só NFC; NFKC/ZWJ/casefold/fullwidth = 2 Transfers",
+      "encodings": [
+        {
+          "kind": "NFKC ligature fi",
+          "t1": "tr_1UBIdZH7FWYUN3jhcYUleECR",
+          "t2": "tr_1UBIdcH7FWYUN3jhp2DDkdsz"
+        },
+        {
+          "kind": "ZWJ",
+          "t1": "tr_1UBIdkH7FWYUN3jhTigmFodG",
+          "t2": "tr_1UBIdmH7FWYUN3jhp8MeDMPj"
+        },
+        {
+          "kind": "casefold",
+          "t1": "tr_1UBIdpH7FWYUN3jhEBABGfih",
+          "t2": "tr_1UBIdsH7FWYUN3jhOYGV9fX4"
+        },
+        {
+          "kind": "fullwidth",
+          "t1": "tr_1UBIdvH7FWYUN3jhqAYYz0WB",
+          "t2": "tr_1UBIdxH7FWYUN3jhylCi0x9v"
+        }
+      ]
+    }
+  ],
+  "not_counted_exact": [
+    "NFC=NFD same transfer tr_1UBIdVH7FWYUN3jhOcljLZJX",
+    "entrega em morada LIKE 403 order_concluido_requires_shipped",
+    "PUT Transfer 405",
+    "amount:true 400",
+    "web_return IP decimal 303 127.0.0.1 (baseline; staging Edge stale vs repo)"
+  ]
+}

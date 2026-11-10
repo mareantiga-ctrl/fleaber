@@ -1,0 +1,228 @@
+{
+  "stamp": "20260902T1608",
+  "prefix": "RTBA-20260902T1608",
+  "auditor": "REDTEAM_BLIND_BA_CHAT_POS_ANAS_v1",
+  "lenses": [
+    "BA1",
+    "BA4",
+    "BA5",
+    "BA6"
+  ],
+  "findings": [
+    {
+      "id": "BA4.p2.seller_reads_b2_proof",
+      "lens": "BA4",
+      "severity": "P1",
+      "title": "S1 (chat B1) lê bytes order_proofs B2 via proof_url no card",
+      "actor": "seller JWT",
+      "pre": "card 1281 proof_url = sign B2; S1 não é parte da order B2",
+      "repro": "GET signed URL persistida no chat B1-S1",
+      "expected": "403 / sem bytes",
+      "obtained": "200 <<PNG 70 bytes>>",
+      "proven": true,
+      "evidence": {
+        "seller": "200 <<PNG 70 bytes>>",
+        "anon": "200 <<PNG 70 bytes>>",
+        "b1": "200 <<PNG 70 bytes>>",
+        "png": true,
+        "anon_ok": true,
+        "b1_ok": true
+      }
+    },
+    {
+      "id": "BA4.p2.unsigned_object_alheio",
+      "lens": "BA4",
+      "severity": "P2",
+      "title": "proof_url object/fleaber_private path B2 (sem sign, B1 sozinho)",
+      "actor": "buyer JWT",
+      "pre": "assert permite object/fleaber_private/%",
+      "repro": "POST reservation_payment_submitted proof_url=object/fleaber_private/order_proofs/{B2}/…",
+      "expected": "url_denied (path tem de ser da order)",
+      "obtained": "201 [{\"id\":1316,\"created_at\":\"2026-09-02T15:15:33.773477+00:00\",\"chat_id\":\"ac2902d3-a3ca-4f82-b7de-2532db9cafba\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"reservation_payment_submitted\\\",\\\"order_id\\\"…",
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "BA1.p2.notes.afterpay",
+      "lens": "BA1",
+      "severity": "P2",
+      "title": "notes Afterpay 12,00 € confirmado",
+      "actor": "buyer JWT",
+      "pre": "mesma classe denylist gap",
+      "repro": "POST notes=Afterpay 12,00 € confirmado",
+      "expected": "notes_forbidden",
+      "obtained": "201 [{\"id\":1317,\"created_at\":\"2026-09-02T15:15:34.049187+00:00\",\"chat_id\":\"ac2902d3-a3ca-4f82-b7de-2532db9cafba\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"reservation_payment_submitted\\\",\\\"order_id\\\"…",
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "BA1.p2.notes.gpay",
+      "lens": "BA1",
+      "severity": "P2",
+      "title": "notes Google Pay 9 EUR aprovado",
+      "actor": "buyer JWT",
+      "pre": "mesma classe denylist gap",
+      "repro": "POST notes=Google Pay 9 EUR aprovado",
+      "expected": "notes_forbidden",
+      "obtained": "201 [{\"id\":1318,\"created_at\":\"2026-09-02T15:15:34.147993+00:00\",\"chat_id\":\"ac2902d3-a3ca-4f82-b7de-2532db9cafba\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"reservation_payment_submitted\\\",\\\"order_id\\\"…",
+      "proven": true,
+      "evidence": {}
+    }
+  ],
+  "blocked": [
+    {
+      "id": "BA1.order.still_unpaid",
+      "lens": "BA1",
+      "title": "order não virou pago",
+      "ev": "200 [{\"id\":\"a6b7d377-fcb9-4704-a132-8f1e73b12500\",\"status\":\"reserva_pendente\",\"amount_paid_cents\":null,\"stripe_payment_intent_id\":null,\"proof_url\":null}]"
+    },
+    {
+      "id": "BA6.p2.seller_get_unsigned_b2",
+      "lens": "BA6",
+      "title": "S1 GET object unsigned path B2",
+      "ev": "400 {\"statusCode\":\"404\",\"error\":\"not_found\",\"message\":\"Object not found\",\"code\":\"NoSuchKey\"}"
+    },
+    {
+      "id": "BA1.p2.notes.multibanco",
+      "lens": "BA1",
+      "title": "notes Multibanco 12€ pago",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_notes_forbidden\"}"
+    }
+  ],
+  "skipped": [],
+  "notes": [
+    {
+      "id": "p2.msg.1259",
+      "lens": "BA1",
+      "title": "persistiu",
+      "ev": {
+        "ok": true,
+        "head": "FLEABER_JSON_V1:{\"kind\":\"reservation_payment_submitted\",\"order_id\":\"a6b7d377-fcb9-4704-a132-8f1e73b12500\",\"notes\":\"Klarna 12,00 € confirmado\"}"
+      }
+    },
+    {
+      "id": "p2.msg.1260",
+      "lens": "BA1",
+      "title": "persistiu",
+      "ev": {
+        "ok": true,
+        "head": "FLEABER_JSON_V1:{\"kind\":\"reservation_payment_submitted\",\"order_id\":\"a6b7d377-fcb9-4704-a132-8f1e73b12500\",\"notes\":\"iDEAL 15 EUR aprovado\"}"
+      }
+    },
+    {
+      "id": "p2.msg.1262",
+      "lens": "BA1",
+      "title": "persistiu",
+      "ev": {
+        "ok": true,
+        "head": "FLEABER_JSON_V1:{\"kind\":\"reservation_payment_submitted\",\"order_id\":\"a6b7d377-fcb9-4704-a132-8f1e73b12500\",\"notes\":\"Twint pago 12 EUR\"}"
+      }
+    },
+    {
+      "id": "p2.msg.1264",
+      "lens": "BA1",
+      "title": "persistiu",
+      "ev": {
+        "ok": true,
+        "head": "FLEABER_JSON_V1:{\"kind\":\"seguro_fleaber_paid\",\"order_id\":\"c99bf6b7-f2d3-4f28-ae20-a1ab077ddf6a\",\"total\":\"12.00\",\"label\":\"Klarna\"}"
+      }
+    },
+    {
+      "id": "p2.msg.1265",
+      "lens": "BA1",
+      "title": "persistiu",
+      "ev": {
+        "ok": true,
+        "head": "FLEABER_JSON_V1:{\"kind\":\"cancel_request_outcome\",\"order_id\":\"c99bf6b7-f2d3-4f28-ae20-a1ab077ddf6a\",\"outcome\":\"rejected\",\"display\":\"iDEAL 12 EUR aprovado — pedid…"
+      }
+    },
+    {
+      "id": "p2.msg.1272",
+      "lens": "BA1",
+      "title": "persistiu",
+      "ev": {
+        "ok": true,
+        "head": "FLEABER_JSON_V1:{\"kind\":\"reservation_payment_submitted\",\"order_id\":\"a6b7d377-fcb9-4704-a132-8f1e73b12500\",\"notes\":\"Klarna confirmado 12 💶\"}"
+      }
+    },
+    {
+      "id": "p2.msg.1281",
+      "lens": "BA1",
+      "title": "persistiu",
+      "ev": {
+        "ok": true,
+        "head": "FLEABER_JSON_V1:{\"kind\":\"reservation_payment_submitted\",\"order_id\":\"a6b7d377-fcb9-4704-a132-8f1e73b12500\",\"notes\":\"comprovativo iDEAL\",\"proof_url\":\"https://fxdk…"
+      }
+    },
+    {
+      "id": "p2.del.1283",
+      "lens": "BA5",
+      "title": "hangul card after DELETE",
+      "ev": ""
+    },
+    {
+      "id": "p2.inbox",
+      "lens": "BA5",
+      "title": "last_message actual",
+      "ev": "Recebi 💳"
+    },
+    {
+      "id": "p2.order",
+      "lens": "BA1",
+      "title": "unpaid após cards",
+      "ev": {
+        "id": "a6b7d377-fcb9-4704-a132-8f1e73b12500",
+        "status": "reserva_pendente",
+        "amount_paid_cents": "",
+        "stripe_payment_intent_id": "",
+        "proof_url": ""
+      }
+    },
+    {
+      "id": "p2.proof_url.extracted",
+      "lens": "BA4",
+      "title": "url no card 1281",
+      "ev": "https://fxdknzrqjenzqcvnwqqq.supabase.co/storage/v1/object/sign/fleaber_private/order_proofs/7e196774-df33-457a-a667-e1d44c6a989a/acc22923-1760-4d68-b8d3-44c382c4b4e9/rtba-b2-secre…"
+    },
+    {
+      "id": "p2.fetch.seller",
+      "lens": "BA4",
+      "title": "S1 GET sign B2",
+      "ev": "200 <<PNG 70 bytes>>"
+    },
+    {
+      "id": "p2.fetch.b2",
+      "lens": "BA4",
+      "title": "B2 GET próprio sign",
+      "ev": "200 <<PNG 70 bytes>>"
+    },
+    {
+      "id": "p2.fetch.anon",
+      "lens": "BA4",
+      "title": "anon GET sign B2",
+      "ev": "200 <<PNG 70 bytes>>"
+    },
+    {
+      "id": "p2.fetch.b1",
+      "lens": "BA4",
+      "title": "B1 GET sign B2",
+      "ev": "200 <<PNG 70 bytes>>"
+    }
+  ],
+  "actors": {
+    "buyer": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+    "seller": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+    "buyer2": "7e196774-df33-457a-a667-e1d44c6a989a",
+    "seller2": "c2c36b07-4b73-4d0d-a29d-72e30dd7732a"
+  },
+  "created": {
+    "chats": [],
+    "orders": [],
+    "products": [],
+    "messages": [
+      "1316",
+      "1317",
+      "1318"
+    ]
+  }
+}

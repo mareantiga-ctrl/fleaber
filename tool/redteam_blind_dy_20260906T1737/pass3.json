@@ -1,0 +1,66 @@
+{
+  "auditor": "REDTEAM_BLIND_DY_COMPOSICAO_POS_DNDS_v1",
+  "pass": 3,
+  "prefix": "RTDY-20260906T1737",
+  "probes": [
+    {
+      "probe_id": "C1b",
+      "surfaces": "offer + CPI + Hub + orders",
+      "action": "B2 oferta 8€ aceite + CPI amount=1 (selo)",
+      "http": "{\"off\":\"201 [{\\\"id\\\":\\\"4cd2e4ca-363f-4bf7-bed1-936ca17ed26f\\\",\\\"product_id\\\":\\\"cb84c078-00e8-42e6-a895-fd4b423698ab\\\",\\\"chat_id\\\":null,\\\"buyer_id\\\":\\\"91d15a92-257d-4cde-95c7-4593ef5a61bc\\\",\\\"seller_id\\\":\\\"980f4fa1-0004-42f9-abca-69f1a9c29588\\\",\\\"amoun…\",\"cpi\":\"200 {\\\"checkoutUrl\\\":\\\"https://checkout.stripe.com/c/pay/cs…",
+      "oracles": "{\"offer_amt\":8.0,\"offer_st\":\"accepted\",\"sealed_cents\":905,\"hub_n\":1,\"cs\":\"cs_test_a1huIvtsTtGAbty0GNpcdMULXScANcKejaYUuYHGhSpdNNe55xjyDViRrm\"}",
+      "result": "FAIL",
+      "lens": "DY6",
+      "residual": false,
+      "count_finding": false,
+      "classe_nova": true
+    },
+    {
+      "probe_id": "B1b",
+      "surfaces": "rifa + live accept + bag outra linha + Hub",
+      "action": "B1 hitch A + B2 bag CPI SKU-B (evitar rate-limit B1)",
+      "http": "{\"acc\":\"200 [{\\\"id\\\":\\\"25bcd463-7c6e-4189-ad95-b656785f8e71\\\",\\\"live_id\\\":\\\"c56dbcc0-a055-4e7b-9e1c-73e83ff504ee\\\",\\\"live_item_id\\\":\\\"d4b7e5c2-2bbf-4449-8814-47fd61c7fcd2\\\",\\\"seller_id\\\":\\\"980f4fa1-0004-42f9-abca-69f1a9c29588\\\",\\\"buyer_id\\\":\\\"bfcbeeee…\",\"bag\":\"200 {\\\"checkoutUrl\\\":\\\"https://checkout.stripe.com/c/pay/cs…",
+      "oracles": "{\"res\":\"accepted\",\"bag_cs\":\"cs_test_a1FGbSPwkiHOKWusZBftfLlVuulaj37qQgOhFijqeMmkbLzewZTimRP9NS\",\"hubA_n\":0,\"hubB_n\":0}",
+      "result": "FAIL",
+      "lens": "DY2",
+      "residual": false,
+      "count_finding": false,
+      "classe_nova": true
+    }
+  ],
+  "findings": [],
+  "blocked": [
+    {
+      "id": "C1b",
+      "lens": "DY6",
+      "title": "oferta aceite: selo servidor vs amount=1 (B2)",
+      "ev": {
+        "offer": 8.0,
+        "status": "accepted",
+        "sealed": 905,
+        "hub_n": 1,
+        "cpi": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1huIvtsTtGAbty0GNpcdMULXScANcKejaYUuYHGhSpdNNe55xjyDViRrm#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDR…",
+        "cs": "cs_test_a1huIvtsTtGAbty0GNpcdMULXScANcKejaYUuYHGhSpdNNe55xjyDViRrm"
+      }
+    },
+    {
+      "id": "B1b",
+      "lens": "DY2",
+      "title": "rifa+accept A não cega bag B; Hub A/B",
+      "ev": {
+        "accepted": true,
+        "bag_cs": "cs_test_a1FGbSPwkiHOKWusZBftfLlVuulaj37qQgOhFijqeMmkbLzewZTimRP9NS",
+        "bag": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1FGbSPwkiHOKWusZBftfLlVuulaj37qQgOhFijqeMmkbLzewZTimRP9NS#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDR…",
+        "hubA": 0,
+        "hubB": 0,
+        "raf": "9e173677-1cef-4d32-ad44-871ae500737d"
+      }
+    }
+  ],
+  "notes": [],
+  "skipped": [],
+  "classe_nova": [
+    "B1b",
+    "C1b"
+  ]
+}

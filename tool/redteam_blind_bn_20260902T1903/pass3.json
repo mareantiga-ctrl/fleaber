@@ -1,0 +1,152 @@
+{
+  "auditor": "REDTEAM_BLIND_BN_LIVE_POS_BFBK_v1",
+  "stamp": "20260902T1903",
+  "findings": [
+    {
+      "id": "P1-BN5-logical-hitch-double-accept",
+      "lens": "BN5",
+      "severity": "P1",
+      "title": "Seller JWT PATCH logical_item_id (refs distintas) + 2 accepted em pool base=1",
+      "actor": "seller JWT",
+      "pre": "dois live_only qty=1 refs BNLOGA/BNLOGB; PATCH B.logical=A.id",
+      "repro": "PATCH live_items.logical_item_id; PATCH reservations accepted ×2",
+      "expected": "2.º accept qty_exceeds_stock (pool remaining)",
+      "obtained": {
+        "nAcc": 2,
+        "base": 1,
+        "remaining": 0,
+        "availA": 0,
+        "availB": 0,
+        "resA": 1,
+        "resB": 1,
+        "s1": "accepted",
+        "s2": "accepted"
+      },
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "P2-BN6-mux-end-accept",
+      "lens": "BN6",
+      "severity": "P2",
+      "title": "Race complete-mux-live ∥ accept deixa reserva accepted em live ended",
+      "actor": "seller JWT ×2",
+      "pre": "live com mux_live_id dummy; pending qty=1",
+      "repro": "Future.wait complete-mux-live + PATCH accepted",
+      "expected": "accept falha live_ended se live já ended",
+      "obtained": {
+        "ended": true,
+        "accepted": true,
+        "mux": "502 {\"error\":\"Mux API: Failed to parse ID \\\"bnMux20260902T1903\\\"\",\"step\":\"mux\",\"mux_status\":400,\"ended_marked\":true}"
+      },
+      "proven": true,
+      "evidence": {}
+    }
+  ],
+  "blocked": [],
+  "notes": [
+    {
+      "id": "p3.logical",
+      "lens": "BN5",
+      "title": "PATCH logical JWT",
+      "ev": {
+        "patch": "200 [{\"id\":\"89ad8e53-05a8-4802-aae1-fae358ddb6c8\",\"live_id\":\"af1e7fb5-9b6f-49da-9360-028e74a87759\",\"seller_id\":null,\"ref_code\":\"BNLOGB\",\"title\":\"RTBN-20260902T1903 live_only\",\"description\":null,\"price\":9.0,\"image_url\":null,\"size\":null,\"color\":n…",
+        "rowA": {
+          "id": "a3b96a11-88fe-4514-bb6e-aa21465969d5",
+          "live_id": "af1e7fb5-9b6f-49da-9360-028e74a87759",
+          "product_id": null,
+          "checkout_product_id": null,
+          "item_kind": "live_only",
+          "quantity": 1,
+          "status": "available",
+          "price": 9.0,
+          "ref_code": "BNLOGA",
+          "is_active": true,
+          "logical_item_id": null
+        },
+        "rowB": {
+          "id": "89ad8e53-05a8-4802-aae1-fae358ddb6c8",
+          "live_id": "af1e7fb5-9b6f-49da-9360-028e74a87759",
+          "product_id": null,
+          "checkout_product_id": null,
+          "item_kind": "live_only",
+          "quantity": 1,
+          "status": "available",
+          "price": 9.0,
+          "ref_code": "BNLOGB",
+          "is_active": true,
+          "logical_item_id": "a3b96a11-88fe-4514-bb6e-aa21465969d5"
+        }
+      }
+    },
+    {
+      "id": "p3.pool.result",
+      "lens": "BN5",
+      "title": "double accept after logical hitch",
+      "ev": {
+        "nAcc": 2,
+        "linked": true,
+        "s1": "accepted",
+        "s2": "accepted",
+        "acc1": "200 [{\"id\":\"e9649ffe-80c1-4e5a-b17b-35faf4aa2f21\",\"live_id\":\"af1e7fb5-9b6f-49da-9360-028e74a87759\",\"live_item_id\":\"a3b96a11-88fe-4514-bb6e-aa21465969d5\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0…",
+        "acc2": "200 [{\"id\":\"c17376c7-25cc-497d-b23b-e25c10f75379\",\"live_id\":\"af1e7fb5-9b6f-49da-9360-028e74a87759\",\"live_item_id\":\"89ad8e53-05a8-4802-aae1-fae358ddb6c8\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"buyer_id\":\"22d46fc2-f264-4b57-bdf5-59e0…",
+        "base": 1,
+        "remaining": 0,
+        "stA": {
+          "ok": true,
+          "price": 9.0,
+          "live_id": "af1e7fb5-9b6f-49da-9360-028e74a87759",
+          "ref_code": "BNLOGA",
+          "item_kind": "live_only",
+          "total_qty": 1,
+          "product_id": null,
+          "blocked_qty": 0,
+          "live_status": "live",
+          "live_item_id": "a3b96a11-88fe-4514-bb6e-aa21465969d5",
+          "available_qty": 0,
+          "pending_bag_qty": 0,
+          "sold_converted_qty": 0,
+          "checkout_product_id": null,
+          "reserved_accepted_qty": 1
+        },
+        "stB": {
+          "ok": true,
+          "price": 9.0,
+          "live_id": "af1e7fb5-9b6f-49da-9360-028e74a87759",
+          "ref_code": "BNLOGB",
+          "item_kind": "live_only",
+          "total_qty": 1,
+          "product_id": null,
+          "blocked_qty": 0,
+          "live_status": "live",
+          "live_item_id": "89ad8e53-05a8-4802-aae1-fae358ddb6c8",
+          "available_qty": 0,
+          "pending_bag_qty": 0,
+          "sold_converted_qty": 0,
+          "checkout_product_id": null,
+          "reserved_accepted_qty": 1
+        }
+      }
+    },
+    {
+      "id": "p3.mux.race",
+      "lens": "BN6",
+      "title": "complete-mux || accept",
+      "ev": {
+        "mux": "502 {\"error\":\"Mux API: Failed to parse ID \\\"bnMux20260902T1903\\\"\",\"step\":\"mux\",\"mux_status\":400,\"ended_marked\":true}",
+        "accept": "200 [{\"id\":\"7e8fa25e-4b82-4c44-a81e-fe859c0e35c5\",\"live_id\":\"af1e7fb5-9b6f-49da-9360-028e74a87759\",\"live_item_id\":\"48f63fa9-ff3e-45fc-a741-555e1c4b7c66\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0…",
+        "live": {
+          "id": "af1e7fb5-9b6f-49da-9360-028e74a87759",
+          "status": "ended",
+          "is_active": false,
+          "mux_live_id": "bnMux20260902T1903"
+        },
+        "req": "accepted"
+      }
+    }
+  ],
+  "lenses": [
+    "BN5",
+    "BN6"
+  ]
+}

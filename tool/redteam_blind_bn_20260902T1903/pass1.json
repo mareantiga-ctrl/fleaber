@@ -1,0 +1,500 @@
+{
+  "auditor": "REDTEAM_BLIND_BN_LIVE_POS_BFBK_v1",
+  "stamp": "20260902T1903",
+  "prefix": "RTBN-20260902T1903",
+  "lenses": [
+    "BN1",
+    "BN2",
+    "BN3",
+    "BN4",
+    "BN5",
+    "BN6",
+    "BN7",
+    "BN8"
+  ],
+  "findings": [
+    {
+      "id": "P2-BN1-accept-broadcast-buyer",
+      "lens": "BN1",
+      "severity": "P2",
+      "title": "Buyer JWT accept_broadcast publica «Reserva aceite» sem accept real",
+      "actor": "buyer JWT",
+      "pre": "sem reserva accepted",
+      "repro": "rpc batata_live_reservation_accept_broadcast",
+      "expected": "false / not_allowed, sem system message",
+      "obtained": {
+        "rpc": "200 true",
+        "posted": true
+      },
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "P2-BN2-fomo-synonyms-persist",
+      "lens": "BN2",
+      "severity": "P2",
+      "title": "system_message persiste anúncio de compra com sinónimos novos (snap/claimed/Braille/fullwidth/cirílico)",
+      "actor": "seller JWT",
+      "pre": "filtro BFBK cobre levou/sold/ZWJ/c0mprou; variantes snap/claimed/Braille/homoglyph não listadas",
+      "repro": "rpc batata_live_system_message bodies: snap-up,claimed,grabbed,took,gone,mine,reserved-for,braille-claimed,fullwidth-comprou,cyrillic-o,cyrillic-s,braille-word",
+      "expected": "purchase_announce_via_broadcast_only",
+      "obtained": {
+        "snap-up": "Ana just snapped up the jacket",
+        "claimed": "Item claimed by Ana",
+        "grabbed": "Ana grabbed the last one",
+        "took": "Ana took it",
+        "gone": "it's gone",
+        "mine": "this one is mine now",
+        "reserved-for": "reserved for Ana",
+        "braille-claimed": "⠀ claimed by Ana",
+        "fullwidth-comprou": "Ana ｃｏｍｐｒｏｕ o casaco",
+        "cyrillic-o": "Ana cоmprou o casaco",
+        "cyrillic-s": "Ana сomprou o casaco",
+        "braille-word": "Ana ⠉⠕⠍⠏⠗⠕⠥ o casaco"
+      },
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "P2-BN2-helper-chat-claimed",
+      "lens": "BN2",
+      "severity": "P2",
+      "title": "Helper can_manage_chat only anuncia FOMO «claimed»",
+      "actor": "helper chat JWT",
+      "pre": "helper active accepted, só can_manage_chat",
+      "repro": "rpc batata_live_system_message claimed",
+      "expected": "bloqueado purchase_announce ou not_allowed",
+      "obtained": "200 {\"ok\": true}",
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "P1-BN5-qty-pool-double-accept",
+      "lens": "BN5",
+      "severity": "P1",
+      "title": "Dois live_only no mesmo logical_item_id aceites (pool qty=1 → 2 holds)",
+      "actor": "seller JWT",
+      "pre": "pool_base_qty = max(quantity)=1; dois items qty=1 same logical",
+      "repro": "PATCH accepted em ambos os pedidos",
+      "expected": "2.º accept qty_exceeds_stock",
+      "obtained": {
+        "a1": "200 [{\"id\":\"954cc131-3a14-4bf1-b2c2-a33b234826f0\",\"live_id\":\"7f8c0a1b-5a41-4399-9ffe-aee37847b318\",\"live_item_id\":\"46c5aa18-8f48-44ea-a991-978a7fe594c1\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0…",
+        "a2": "200 [{\"id\":\"7b54ee0f-3985-4a8a-bbad-b5d4e9bfea53\",\"live_id\":\"7f8c0a1b-5a41-4399-9ffe-aee37847b318\",\"live_item_id\":\"6de541a1-2736-47df-acbb-33ca00276182\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"buyer_id\":\"22d46fc2-f264-4b57-bdf5-59e0…",
+        "s1": "accepted",
+        "s2": "accepted"
+      },
+      "proven": true,
+      "evidence": {}
+    }
+  ],
+  "blocked": [
+    {
+      "id": "BN1-01",
+      "lens": "BN1",
+      "title": "REST INSERT converted",
+      "ev": "201 [{\"id\":\"5cf3a117-9e20-49d5-a154-530dc172e9ee\",\"live_id\":\"7f8c0a1b-5a41-4399-9ffe-aee37847b318\",\"live_item_id\":\"138ce4e1-78b7-4be4-8340-87ff36a2e86f\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0…"
+    },
+    {
+      "id": "BN1-02",
+      "lens": "BN1",
+      "title": "stripe_convert buyer sem PI",
+      "ev": {
+        "rpc": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_live_reservation_stripe_convert\"}",
+        "status": "pending"
+      }
+    },
+    {
+      "id": "BN1-03",
+      "lens": "BN1",
+      "title": "stripe_convert seller sem PI",
+      "ev": {
+        "rpc": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_live_reservation_stripe_convert\"}",
+        "status": "pending"
+      }
+    },
+    {
+      "id": "BN1-04",
+      "lens": "BN1",
+      "title": "purchase_broadcast sem pago",
+      "ev": "200 false"
+    },
+    {
+      "id": "BN1-05",
+      "lens": "BN1",
+      "title": "buyer purchase_broadcast sem pago",
+      "ev": "200 false"
+    },
+    {
+      "id": "BN1-06",
+      "lens": "BN1",
+      "title": "REST system message",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"new row violates row-level security policy for table \\\"live_messages\\\"\"}"
+    },
+    {
+      "id": "BN2-02",
+      "lens": "BN2",
+      "title": "helper chat mark_sold",
+      "ev": "200 {\"ok\": false, \"error\": \"not_allowed\"}"
+    },
+    {
+      "id": "BN2-03",
+      "lens": "BN2",
+      "title": "helper view mark_sold",
+      "ev": "200 {\"ok\": false, \"error\": \"not_allowed\"}"
+    },
+    {
+      "id": "BN2-04",
+      "lens": "BN2",
+      "title": "helper mark sysmsg",
+      "ev": "200 {\"ok\": false, \"error\": \"not_allowed\"}"
+    },
+    {
+      "id": "BN4-01",
+      "lens": "BN4",
+      "title": "hitch own mark_sold unlist",
+      "ev": {
+        "rpc": "200 {\"ok\": true, \"price\": 9.0, \"live_id\": \"7f8c0a1b-5a41-4399-9ffe-aee37847b318\", \"ref_code\": \"BNHITCH\", \"item_kind\": \"live_only\", \"total_qty\": 1, \"product_id\": null, \"blocked_qty\": 0, \"live_status\": \"live\", \"live_item_id\": \"eb5ee2ac-6c2c-4fd7-…",
+        "item": "available",
+        "sku": {
+          "id": "05ba755e-b70d-4a55-9c43-571e4c080893",
+          "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+          "title": "RTBN-20260902T1903-extra",
+          "price": 12.0,
+          "quantity": 1,
+          "is_sold": false,
+          "list_on_marketplace": true,
+          "available_for_live": true
+        }
+      }
+    },
+    {
+      "id": "BN4-02",
+      "lens": "BN4",
+      "title": "hitch alien sku",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"live_item_checkout_product_seller_mismatch\"}"
+    },
+    {
+      "id": "BN4-03",
+      "lens": "BN4",
+      "title": "buyer mark_sold",
+      "ev": "200 {\"ok\": false, \"error\": \"not_allowed\"}"
+    },
+    {
+      "id": "BN4-04",
+      "lens": "BN4",
+      "title": "seller2 mark_sold live A",
+      "ev": "200 {\"ok\": false, \"error\": \"not_allowed\"}"
+    },
+    {
+      "id": "BN4-05",
+      "lens": "BN4",
+      "title": "PATCH status=sold",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"live_item_status_sold_rpc_only\"}"
+    },
+    {
+      "id": "BN5-01",
+      "lens": "BN5",
+      "title": "move live_id cross-seller",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"live_item_not_authorized\"}"
+    },
+    {
+      "id": "BN5-02",
+      "lens": "BN5",
+      "title": "inflate live_only qty",
+      "ev": {
+        "patch": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"live_item_qty_increase_not_allowed\"}",
+        "qty": 1
+      }
+    },
+    {
+      "id": "BN6-01",
+      "lens": "BN6",
+      "title": "race end||accept",
+      "ev": {
+        "ended": false,
+        "accepted": true
+      }
+    },
+    {
+      "id": "BN6-02",
+      "lens": "BN6",
+      "title": "double accept qty1",
+      "ev": {
+        "nAcc": 1,
+        "sa": "accepted",
+        "sb": "pending"
+      }
+    },
+    {
+      "id": "BN7-01",
+      "lens": "BN7",
+      "title": "buyer complete-mux",
+      "ev": "403 {\"error\":\"Sem permissão para esta live.\",\"step\":\"auth\"}"
+    },
+    {
+      "id": "BN7-02",
+      "lens": "BN7",
+      "title": "s2 complete-mux",
+      "ev": "403 {\"error\":\"Sem permissão para esta live.\",\"step\":\"auth\"}"
+    },
+    {
+      "id": "BN7-03",
+      "lens": "BN7",
+      "title": "s2 livekit token",
+      "ev": "403 {\"error\":\"Sem permissão para esta live.\",\"step\":\"auth\"}"
+    },
+    {
+      "id": "BN7-04",
+      "lens": "BN7",
+      "title": "buyer PATCH mux key",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table lives\"}"
+    },
+    {
+      "id": "BN7-05",
+      "lens": "BN7",
+      "title": "resolve scheduled",
+      "ev": "404 {\"error\":\"live_not_public\"}"
+    },
+    {
+      "id": "BN8-01",
+      "lens": "BN8",
+      "title": "ghost notes convert",
+      "ev": {
+        "rec": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"convert_requires_paid_order\"}",
+        "ghost": "pending"
+      }
+    }
+  ],
+  "notes": [
+    {
+      "id": "helper.fail",
+      "title": "fixtureHelper",
+      "ev": "409 {\"code\":\"23505\",\"details\":\"Key (seller_id, helper_user_id)=(980f4fa1-0004-42f9-abca-69f1a9c29588, b811dac8-2216-498d-8a35-3b8155004a2c) already exists.\",\"hint\":null,\"message\":\"duplicate key value violates unique constraint \\\"seller_helpers_…"
+    },
+    {
+      "id": "helper.fail",
+      "title": "fixtureHelper",
+      "ev": "409 {\"code\":\"23505\",\"details\":\"Key (seller_id, helper_user_id)=(980f4fa1-0004-42f9-abca-69f1a9c29588, 52701a0e-6d2a-4bc9-8a6e-4ec9ff8d26f5) already exists.\",\"hint\":null,\"message\":\"duplicate key value violates unique constraint \\\"seller_helpers_…"
+    },
+    {
+      "id": "helper.fail",
+      "title": "fixtureHelper",
+      "ev": "409 {\"code\":\"23505\",\"details\":\"Key (seller_id, helper_user_id)=(980f4fa1-0004-42f9-abca-69f1a9c29588, afdaac54-b109-4192-9790-88588f3040de) already exists.\",\"hint\":null,\"message\":\"duplicate key value violates unique constraint \\\"seller_helpers_…"
+    },
+    {
+      "id": "w0",
+      "lens": "BN8",
+      "title": "wallets start",
+      "ev": {
+        "buyer": 61.1,
+        "seller": 16.0,
+        "buyer2": 0,
+        "seller2": 0
+      }
+    },
+    {
+      "id": "BN2.fomo.snap-up",
+      "lens": "BN2",
+      "title": "persisted",
+      "ev": "200 {\"ok\": true}"
+    },
+    {
+      "id": "BN2.fomo.claimed",
+      "lens": "BN2",
+      "title": "persisted",
+      "ev": "200 {\"ok\": true}"
+    },
+    {
+      "id": "BN2.fomo.grabbed",
+      "lens": "BN2",
+      "title": "persisted",
+      "ev": "200 {\"ok\": true}"
+    },
+    {
+      "id": "BN2.fomo.took",
+      "lens": "BN2",
+      "title": "persisted",
+      "ev": "200 {\"ok\": true}"
+    },
+    {
+      "id": "BN2.fomo.gone",
+      "lens": "BN2",
+      "title": "persisted",
+      "ev": "200 {\"ok\": true}"
+    },
+    {
+      "id": "BN2.fomo.mine",
+      "lens": "BN2",
+      "title": "persisted",
+      "ev": "200 {\"ok\": true}"
+    },
+    {
+      "id": "BN2.fomo.reserved-for",
+      "lens": "BN2",
+      "title": "persisted",
+      "ev": "200 {\"ok\": true}"
+    },
+    {
+      "id": "BN2.fomo.braille-claimed",
+      "lens": "BN2",
+      "title": "persisted",
+      "ev": "200 {\"ok\": true}"
+    },
+    {
+      "id": "BN2.fomo.fullwidth-comprou",
+      "lens": "BN2",
+      "title": "persisted",
+      "ev": "200 {\"ok\": true}"
+    },
+    {
+      "id": "BN2.fomo.cyrillic-o",
+      "lens": "BN2",
+      "title": "persisted",
+      "ev": "200 {\"ok\": true}"
+    },
+    {
+      "id": "BN2.fomo.cyrillic-s",
+      "lens": "BN2",
+      "title": "persisted",
+      "ev": "200 {\"ok\": true}"
+    },
+    {
+      "id": "BN2.fomo.braille-word",
+      "lens": "BN2",
+      "title": "persisted",
+      "ev": "200 {\"ok\": true}"
+    },
+    {
+      "id": "BN2.exact.levou",
+      "lens": "BN2",
+      "title": "exact BH residual",
+      "ev": "200 {\"ok\": false, \"error\": \"purchase_announce_via_broadcast_only\"}"
+    },
+    {
+      "id": "BN3.stock.anon-or-default",
+      "lens": "BN3",
+      "title": "stock itemLo",
+      "ev": "200 {\"ok\": true, \"price\": 9.0, \"live_id\": \"7f8c0a1b-5a41-4399-9ffe-aee37847b318\", \"ref_code\": \"BNLO1\", \"item_kind\": \"live_only\", \"total_qty\": 1, \"product_id\": null, \"blocked_qty\": 1, \"live_status\": \"live\", \"live_item_id\": \"138ce4e1-78b7-4be4-83…"
+    },
+    {
+      "id": "BN3.stock.buyer",
+      "lens": "BN3",
+      "title": "stock buyer",
+      "ev": "200 {\"ok\": true, \"price\": 9.0, \"live_id\": \"7f8c0a1b-5a41-4399-9ffe-aee37847b318\", \"ref_code\": \"BNLO1\", \"item_kind\": \"live_only\", \"total_qty\": 1, \"product_id\": null, \"blocked_qty\": 1, \"live_status\": \"live\", \"live_item_id\": \"138ce4e1-78b7-4be4-83…"
+    },
+    {
+      "id": "BN3.hub.item",
+      "lens": "BN3",
+      "title": "discovery item",
+      "ev": "401 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_live_is_broadcasting\"}"
+    },
+    {
+      "id": "BN3.fomo.sched",
+      "lens": "BN3",
+      "title": "FOMO scheduled",
+      "ev": "200 {\"ok\": true, \"items\": [], \"live_id\": \"1c2b5641-bf44-4dda-894b-51e39c4f6108\", \"is_active\": false, \"live_status\": \"scheduled\", \"viewer_count\": 0}"
+    },
+    {
+      "id": "BN6.race.raw",
+      "lens": "BN6",
+      "title": "end||accept",
+      "ev": {
+        "end": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table lives\"}",
+        "accept": "200 [{\"id\":\"c72e8944-0fea-42ff-8bc2-a453a8eb651d\",\"live_id\":\"e8694ff0-25b0-47e8-9097-3d982191121f\",\"live_item_id\":\"88880ea1-8593-4026-a5b0-2ed8fa84a7cf\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0…",
+        "live": {
+          "id": "e8694ff0-25b0-47e8-9097-3d982191121f",
+          "status": "live",
+          "is_active": true
+        },
+        "req": "accepted"
+      }
+    },
+    {
+      "id": "BN8.fake-pago.jwt",
+      "lens": "BN8",
+      "title": "INSERT pago+PI JWT",
+      "ev": "201 [{\"id\":\"3bdaf76b-276e-4131-af00-6d66d4b07812\",\"created_at\":\"2026-09-02T18:08:34.18881+00:00\",\"product_id\":\"74c6fdb1-b3a3-4467-8597-d28ecb62c07b\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c2…"
+    },
+    {
+      "id": "BN8.fake-pago.svc",
+      "lens": "BN8",
+      "title": "INSERT pago+PI service fixture",
+      "ev": "201 [{\"id\":\"c7f0cdb5-a002-44b3-b28d-0a9ba4c46fd0\",\"created_at\":\"2026-09-02T18:08:34.324209+00:00\",\"product_id\":\"74c6fdb1-b3a3-4467-8597-d28ecb62c07b\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c…"
+    },
+    {
+      "id": "BN8.order.captured",
+      "lens": "BN8",
+      "title": "fixture captured?",
+      "ev": {
+        "id": "c7f0cdb5-a002-44b3-b28d-0a9ba4c46fd0",
+        "status": "pago",
+        "captured": true,
+        "cents": 1200,
+        "pi": "pi_rtbn_svc_20260902T1903"
+      }
+    },
+    {
+      "id": "BN8.ghost.insert",
+      "lens": "BN8",
+      "title": "B2 pending notes other order",
+      "ev": "201 [{\"id\":\"1a8663ae-4fda-477e-9257-0be06f3c933b\",\"live_id\":\"7f8c0a1b-5a41-4399-9ffe-aee37847b318\",\"live_item_id\":\"7eaeec58-1f86-4f1f-9226-6e1d5bd187af\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"buyer_id\":\"22d46fc2-f264-4b57-bdf5-59e0…"
+    },
+    {
+      "id": "w1",
+      "lens": "BN8",
+      "title": "wallets end",
+      "ev": {
+        "before": {
+          "buyer": 61.1,
+          "seller": 16.0,
+          "buyer2": 0,
+          "seller2": 0
+        },
+        "after": {
+          "buyer": 61.1,
+          "seller": 16.0,
+          "buyer2": 0,
+          "seller2": 0
+        }
+      }
+    }
+  ],
+  "skipped": [],
+  "created": {
+    "lives": [
+      "7f8c0a1b-5a41-4399-9ffe-aee37847b318",
+      "72e45ddd-e169-4533-9138-77f401e72660",
+      "1c2b5641-bf44-4dda-894b-51e39c4f6108",
+      "e8694ff0-25b0-47e8-9097-3d982191121f",
+      "c2b3a0b6-2088-4ef2-8213-83963ba116cc"
+    ],
+    "items": [
+      "138ce4e1-78b7-4be4-8340-87ff36a2e86f",
+      "7eaeec58-1f86-4f1f-9226-6e1d5bd187af",
+      "eb5ee2ac-6c2c-4fd7-b7b5-67bed4c22b55",
+      "46c5aa18-8f48-44ea-a991-978a7fe594c1",
+      "6de541a1-2736-47df-acbb-33ca00276182",
+      "88880ea1-8593-4026-a5b0-2ed8fa84a7cf",
+      "02e324dc-195d-4acb-b4a6-b9950cbaa5f2"
+    ],
+    "products": [
+      "74c6fdb1-b3a3-4467-8597-d28ecb62c07b",
+      "05ba755e-b70d-4a55-9c43-571e4c080893",
+      "5e5dcdcd-760d-4b5b-852d-316c5c0968f7"
+    ],
+    "orders": [
+      "3bdaf76b-276e-4131-af00-6d66d4b07812",
+      "c7f0cdb5-a002-44b3-b28d-0a9ba4c46fd0"
+    ],
+    "reqs": [
+      "5cf3a117-9e20-49d5-a154-530dc172e9ee",
+      "6e35c806-c1d4-4b7e-9285-655e337685a5",
+      "954cc131-3a14-4bf1-b2c2-a33b234826f0",
+      "7b54ee0f-3985-4a8a-bbad-b5d4e9bfea53",
+      "c72e8944-0fea-42ff-8bc2-a453a8eb651d",
+      "aa074bb5-b35d-44d1-bc3f-8837f8a5cf6a",
+      "e460cc04-3eb0-4d7e-9515-f8297cb5d42a",
+      "1a8663ae-4fda-477e-9257-0be06f3c933b"
+    ]
+  }
+}

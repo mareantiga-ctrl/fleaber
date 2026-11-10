@@ -1,0 +1,81 @@
+{
+  "probes": [
+    {
+      "probe_id": "C1",
+      "poco": "CY-C",
+      "payload": "create-mux-live B1+B2(comprador); S2 body seller_id=S1 (pass3 200 owner=S2)",
+      "http": "{\"buyer\":\"403 acao=* 572ms {\\\"error\\\":\\\"Apenas contas de vendedor podem criar directos.\\\",\\\"step\\\":\\\"authz\\\"}\",\"b2\":\"403 acao=* 689ms {\\\"error\\\":\\\"Apenas contas de vendedor podem criar directos.\\\",\\\"step\\\":\\\"authz\\\"}\",\"b2_type\":\"comprador\",\"s2_live\":\"200 213ms [{\\\"id\\\":\\\"39a8c246…",
+      "bd": "{\"live\":\"39a8c246-4dc8-499d-870a-840c714d759f\",\"owner\":\"6efb23e4-c04b-49ae-b7c9-346c5817ccf0\",\"status\":\"ended\"}",
+      "result": "HOLD",
+      "lens": "CY4",
+      "residual": false,
+      "count_finding": false
+    },
+    {
+      "probe_id": "C2",
+      "poco": "CY-C",
+      "payload": "OPTIONS/POST Origin null / evil / chrome-ext / *.fleaber / file",
+      "http": "{\"opt.null\":\"200 acao=https://fleaber.pt 315ms ok\",\"post.null\":\"200 acao=https://fleaber.pt 734ms {\\\"playback_id\\\":\\\"rtcyPbLive1450aaaa\\\",\\\"playback_url\\\":\\\"https://stream.mux.com/rtcyPbLive1450aaaa.m3u8\\\",\\\"source\\\":\\\"live_playback_only\\\",\\\"is_live\\\":false}\",\"opt.evil\":\"200 acao…",
+      "bd": "",
+      "result": "FAIL",
+      "lens": "CY5",
+      "residual": false,
+      "count_finding": true
+    },
+    {
+      "probe_id": "C3",
+      "poco": "CY-C",
+      "payload": "resolve-mux-playback unpublished anon/B1/dono S2",
+      "http": "{\"anon\":\"404 acao=* 658ms {\\\"error\\\":\\\"live_not_public\\\"}\",\"b1\":\"404 acao=* 623ms {\\\"error\\\":\\\"live_not_public\\\"}\",\"owner\":\"404 acao=* 755ms {\\\"error\\\":\\\"live_not_public\\\"}\"}",
+      "bd": "",
+      "result": "HOLD",
+      "lens": "CY4",
+      "residual": false,
+      "count_finding": false
+    }
+  ],
+  "findings": [
+    {
+      "id": "CY-C2-CORS-REFLECT",
+      "lens": "CY5",
+      "severity": "P2",
+      "title": "CORS reflecte Origin hostil [ext, sub]",
+      "actor": "browser",
+      "pre": "Origin null/evil/ext",
+      "repro": "OPTIONS create-mux-live + POST resolve-mux-playback",
+      "expected": "ACAO=https://fleaber.pt",
+      "obtained": {
+        "opt.null": "200 acao=https://fleaber.pt 315ms ok",
+        "post.null": "200 acao=https://fleaber.pt 734ms {\"playback_id\":\"rtcyPbLive1450aaaa\",\"playback_url\":\"https://stream.mux.com/rtcyPbLive1450aaaa.m3u8\",\"source\":\"live_playback_only\",\"is_live\":false}",
+        "opt.evil": "200 acao=https://fleaber.pt 301ms ok",
+        "post.evil": "200 acao=https://fleaber.pt 907ms {\"playback_id\":\"rtcyPbLive1450aaaa\",\"playback_url\":\"https://stream.mux.com/rtcyPbLive1450aaaa.m3u8\",\"source\":\"live_playback_only\",\"is_live\":false}",
+        "opt.ext": "200 acao=chrome-extension://abcdefghijklmnopqrstuvwxyz1234 237ms ok",
+        "post.ext": "200 acao=https://fleaber.pt 1083ms {\"playback_id\":\"rtcyPbLive1450aaaa\",\"playback_url\":\"https://stream.mux.com/rtcyPbLive1450aaaa.m3u8\",\"source\":\"live_playback_only\",\"is_live\":false}",
+        "opt.sub": "200 acao=https://evil.fleaber.pt 270ms ok",
+        "post.sub": "200 acao=https://fleaber.pt 835ms {\"playback_id\":\"rtcyPbLive1450aaaa\",\"playback_url\":\"https://stream.mux.com/rtcyPbLive1450aaaa.m3u8\",\"source\":\"live_playback_only\",\"is_live\":false}",
+        "opt.file": "200 acao=https://fleaber.pt 288ms ok",
+        "post.file": "200 acao=https://fleaber.pt 713ms {\"playback_id\":\"rtcyPbLive1450aaaa\",\"playback_url\":\"https://stream.mux.com/rtcyPbLive1450aaaa.m3u8\",\"source\":\"live_playback_only\",\"is_live\":false}"
+      },
+      "proven": true,
+      "count_exact_closed": false,
+      "evidence": {}
+    }
+  ],
+  "notes": [
+    {
+      "id": "mux.end",
+      "lens": "CY4",
+      "title": "mux live ended",
+      "ev": "200 213ms [{\"id\":\"39a8c246-4dc8-499d-870a-840c714d759f\",\"seller_id\":\"6efb23e4-c04b-49ae-b7c9-346c5817ccf0\",\"vendedor_id\":\"6efb23e4-c04b-49ae-b7c9-346c5817ccf0\",\"status\":\"ended\",\"is_active\":false,\"title\":\"RTCY-20260906T1450 s2-for-…"
+    }
+  ],
+  "s1_hub_final": true,
+  "mux_row": {
+    "id": "39a8c246-4dc8-499d-870a-840c714d759f",
+    "seller_id": "6efb23e4-c04b-49ae-b7c9-346c5817ccf0",
+    "vendedor_id": "6efb23e4-c04b-49ae-b7c9-346c5817ccf0",
+    "status": "ended",
+    "is_active": false,
+    "title": "RTCY-20260906T1450 s2-for-s1"
+  }
+}

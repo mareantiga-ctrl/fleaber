@@ -1,0 +1,481 @@
+{
+  "auditor": "REDTEAM_BLIND_BM_CHAT_POS_BFBK_v1",
+  "stamp": "20260902T1905",
+  "production_touched": false,
+  "fase4": false,
+  "corrections_applied": false,
+  "lenses": [
+    "BM1",
+    "BM2",
+    "BM3",
+    "BM4",
+    "BM5",
+    "BM6",
+    "BM7",
+    "BM8"
+  ],
+  "fixtures": {
+    "sku": "6ecb1df1-06eb-4d38-9bd4-75dfcb491307",
+    "chat": "dd403563-7dc5-436b-a465-d684986024bd",
+    "mbway_order": "7fe460e8-d13b-42d3-bea2-a690cb8c0373",
+    "paid_order": "54f71515-a916-4413-8959-4a30ceafe0d9",
+    "paid_cents": 590,
+    "paid_chat": "679247b2-d7fb-46bd-a9e4-f1592f11a460",
+    "live": "897f51cc-4da7-4455-81cd-ee6b69258850"
+  },
+  "findings": [
+    {
+      "id": "BM1.zelle-notes",
+      "lens": "BM1",
+      "severity": "P1",
+      "title": "notes Zelle no card reservation_payment_submitted",
+      "actor": "buyer JWT",
+      "pre": "order 7fe460e8-d13b-42d3-bea2-a690cb8c0373 chat dd403563-7dc5-436b-a465-d684986024bd",
+      "repro": "POST FLEABER_JSON_V1 {\"kind\":\"reservation_payment_submitted\",\"order_id\":\"7fe460e8-d13b-42d3-bea2-a690cb8c0373\",\"notes\":\"Zelle 12,00 € received\"}",
+      "expected": "recusa notes/label/url",
+      "obtained": "201 [{\"id\":1365,\"created_at\":\"2026-09-02T18:04:04.209331+00:00\",\"chat_id\":\"dd403563-7dc5-436b-a465-d684986024bd\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"reservation_payment_subm…",
+      "proven": true,
+      "evidence": {
+        "msg_id": "1365",
+        "payload": {
+          "kind": "reservation_payment_submitted",
+          "order_id": "7fe460e8-d13b-42d3-bea2-a690cb8c0373",
+          "notes": "Zelle 12,00 € received"
+        },
+        "stored": "FLEABER_JSON_V1:{\"kind\":\"reservation_payment_submitted\",\"order_id\":\"7fe460e8-d13b-42d3-bea2-a690cb8c0373\",\"notes\":\"Zelle 12,00 € received\"}"
+      }
+    },
+    {
+      "id": "BM1.clearpay-seguro-label",
+      "lens": "BM1",
+      "severity": "P2",
+      "title": "label Clearpay + montante 999 no card seguro (order Stripe)",
+      "actor": "buyer JWT",
+      "pre": "order 7fe460e8-d13b-42d3-bea2-a690cb8c0373 chat dd403563-7dc5-436b-a465-d684986024bd",
+      "repro": "POST FLEABER_JSON_V1 {\"kind\":\"seguro_fleaber_paid\",\"order_id\":\"54f71515-a916-4413-8959-4a30ceafe0d9\",\"total\":\"5.90\",\"label\":\"Clearpay 999,00 €\"}",
+      "expected": "recusa notes/label/url",
+      "obtained": "201 [{\"id\":1368,\"created_at\":\"2026-09-02T18:04:04.874466+00:00\",\"chat_id\":\"679247b2-d7fb-46bd-a9e4-f1592f11a460\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"seguro_fleaber_paid\\\",\\\"…",
+      "proven": true,
+      "evidence": {
+        "msg_id": "1368",
+        "payload": {
+          "kind": "seguro_fleaber_paid",
+          "order_id": "54f71515-a916-4413-8959-4a30ceafe0d9",
+          "total": "5.90",
+          "label": "Clearpay 999,00 €"
+        },
+        "stored": "FLEABER_JSON_V1:{\"kind\":\"seguro_fleaber_paid\",\"order_id\":\"54f71515-a916-4413-8959-4a30ceafe0d9\",\"total\":\"5.90\",\"label\":\"Clearpay 999,00 €\"}"
+      }
+    },
+    {
+      "id": "BM1.shoppay-seguro-label",
+      "lens": "BM1",
+      "severity": "P2",
+      "title": "label Shop Pay no card seguro",
+      "actor": "buyer JWT",
+      "pre": "order 7fe460e8-d13b-42d3-bea2-a690cb8c0373 chat dd403563-7dc5-436b-a465-d684986024bd",
+      "repro": "POST FLEABER_JSON_V1 {\"kind\":\"seguro_fleaber_paid\",\"order_id\":\"54f71515-a916-4413-8959-4a30ceafe0d9\",\"total\":\"5.90\",\"label\":\"Shop Pay\"}",
+      "expected": "recusa notes/label/url",
+      "obtained": "201 [{\"id\":1369,\"created_at\":\"2026-09-02T18:04:05.194845+00:00\",\"chat_id\":\"679247b2-d7fb-46bd-a9e4-f1592f11a460\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"seguro_fleaber_paid\\\",\\\"…",
+      "proven": true,
+      "evidence": {
+        "msg_id": "1369",
+        "payload": {
+          "kind": "seguro_fleaber_paid",
+          "order_id": "54f71515-a916-4413-8959-4a30ceafe0d9",
+          "total": "5.90",
+          "label": "Shop Pay"
+        },
+        "stored": "FLEABER_JSON_V1:{\"kind\":\"seguro_fleaber_paid\",\"order_id\":\"54f71515-a916-4413-8959-4a30ceafe0d9\",\"total\":\"5.90\",\"label\":\"Shop Pay\"}"
+      }
+    },
+    {
+      "id": "BM2.shoppay-cyr-s",
+      "lens": "BM2",
+      "severity": "P1",
+      "title": "notes Ѕhop Pay (cyrillic Dze)",
+      "actor": "buyer JWT",
+      "pre": "order 7fe460e8-d13b-42d3-bea2-a690cb8c0373 chat dd403563-7dc5-436b-a465-d684986024bd",
+      "repro": "POST FLEABER_JSON_V1 {\"kind\":\"reservation_payment_submitted\",\"order_id\":\"7fe460e8-d13b-42d3-bea2-a690cb8c0373\",\"notes\":\"Ѕhop Pay 12,00 €\"}",
+      "expected": "recusa notes/label/url",
+      "obtained": "201 [{\"id\":1371,\"created_at\":\"2026-09-02T18:04:05.625697+00:00\",\"chat_id\":\"dd403563-7dc5-436b-a465-d684986024bd\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"reservation_payment_subm…",
+      "proven": true,
+      "evidence": {
+        "msg_id": "1371",
+        "payload": {
+          "kind": "reservation_payment_submitted",
+          "order_id": "7fe460e8-d13b-42d3-bea2-a690cb8c0373",
+          "notes": "Ѕhop Pay 12,00 €"
+        },
+        "stored": "FLEABER_JSON_V1:{\"kind\":\"reservation_payment_submitted\",\"order_id\":\"7fe460e8-d13b-42d3-bea2-a690cb8c0373\",\"notes\":\"Ѕhop Pay 12,00 €\"}"
+      }
+    },
+    {
+      "id": "BM2.clearpay-fullwidth",
+      "lens": "BM2",
+      "severity": "P1",
+      "title": "notes Clearpay fullwidth",
+      "actor": "buyer JWT",
+      "pre": "order 7fe460e8-d13b-42d3-bea2-a690cb8c0373 chat dd403563-7dc5-436b-a465-d684986024bd",
+      "repro": "POST FLEABER_JSON_V1 {\"kind\":\"reservation_payment_submitted\",\"order_id\":\"7fe460e8-d13b-42d3-bea2-a690cb8c0373\",\"notes\":\"Ｃｌｅａｒｐａｙ 12,00 €\"}",
+      "expected": "recusa notes/label/url",
+      "obtained": "201 [{\"id\":1373,\"created_at\":\"2026-09-02T18:04:06.031717+00:00\",\"chat_id\":\"dd403563-7dc5-436b-a465-d684986024bd\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"reservation_payment_subm…",
+      "proven": true,
+      "evidence": {
+        "msg_id": "1373",
+        "payload": {
+          "kind": "reservation_payment_submitted",
+          "order_id": "7fe460e8-d13b-42d3-bea2-a690cb8c0373",
+          "notes": "Ｃｌｅａｒｐａｙ 12,00 €"
+        },
+        "stored": "FLEABER_JSON_V1:{\"kind\":\"reservation_payment_submitted\",\"order_id\":\"7fe460e8-d13b-42d3-bea2-a690cb8c0373\",\"notes\":\"Ｃｌｅａｒｐａｙ 12,00 €\"}"
+      }
+    },
+    {
+      "id": "BM2.plain-clearpay",
+      "lens": "BM2",
+      "severity": "P2",
+      "title": "Texto de pagamento persistiu: Clearpay confirmado 12,00 €",
+      "actor": "buyer JWT",
+      "pre": "denylist BFBK sem este rail/encoding",
+      "repro": "POST chat_messages text=Clearpay confirmado 12,00 €",
+      "expected": "recusa payment_lie / inbox",
+      "obtained": "201 [{\"id\":1374,\"created_at\":\"2026-09-02T18:04:06.410934+00:00\",\"chat_id\":\"dd403563-7dc5-436b-a465-d684986024bd\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"Clearpay confirmado 12,00 €\",\"is_reservation\":false,…",
+      "proven": true,
+      "evidence": {
+        "text": "Clearpay confirmado 12,00 €",
+        "id": "1374"
+      }
+    },
+    {
+      "id": "BM2.plain-shoppay",
+      "lens": "BM2",
+      "severity": "P2",
+      "title": "Texto de pagamento persistiu: Shop Pay 12,00 € aprovado",
+      "actor": "buyer JWT",
+      "pre": "denylist BFBK sem este rail/encoding",
+      "repro": "POST chat_messages text=Shop Pay 12,00 € aprovado",
+      "expected": "recusa payment_lie / inbox",
+      "obtained": "201 [{\"id\":1375,\"created_at\":\"2026-09-02T18:04:06.512195+00:00\",\"chat_id\":\"dd403563-7dc5-436b-a465-d684986024bd\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"Shop Pay 12,00 € aprovado\",\"is_reservation\":false,\"i…",
+      "proven": true,
+      "evidence": {
+        "text": "Shop Pay 12,00 € aprovado",
+        "id": "1375"
+      }
+    },
+    {
+      "id": "BM2.plain-strike-rho",
+      "lens": "BM2",
+      "severity": "P2",
+      "title": "Texto de pagamento persistiu: StΡike 12,00 €",
+      "actor": "buyer JWT",
+      "pre": "denylist BFBK sem este rail/encoding",
+      "repro": "POST chat_messages text=StΡike 12,00 €",
+      "expected": "recusa payment_lie / inbox",
+      "obtained": "201 [{\"id\":1376,\"created_at\":\"2026-09-02T18:04:06.623031+00:00\",\"chat_id\":\"dd403563-7dc5-436b-a465-d684986024bd\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"StΡike 12,00 €\",\"is_reservation\":false,\"is_read\":fal…",
+      "proven": true,
+      "evidence": {
+        "text": "StΡike 12,00 €",
+        "id": "1376"
+      }
+    },
+    {
+      "id": "BM4.dotdot-traversal",
+      "lens": "BM4",
+      "severity": "P1",
+      "title": "proof_url com ../ foge do prefixo order_proofs",
+      "actor": "buyer JWT",
+      "pre": "order 7fe460e8-d13b-42d3-bea2-a690cb8c0373 chat dd403563-7dc5-436b-a465-d684986024bd",
+      "repro": "POST FLEABER_JSON_V1 {\"kind\":\"reservation_payment_submitted\",\"order_id\":\"7fe460e8-d13b-42d3-bea2-a690cb8c0373\",\"notes\":\"ok\",\"proof_url\":\"https://fxdknzrqjenzqcvnwqqq.supabase.co/storage/v1/object/fleaber_private/order_proofs/bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96/7fe460e8-d13b-42d3-bea2-a690cb8c0373/../../../public/rtbm-stolen.jpg\"}",
+      "expected": "recusa notes/label/url",
+      "obtained": "201 [{\"id\":1381,\"created_at\":\"2026-09-02T18:04:07.812987+00:00\",\"chat_id\":\"dd403563-7dc5-436b-a465-d684986024bd\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"reservation_payment_subm…",
+      "proven": true,
+      "evidence": {
+        "msg_id": "1381",
+        "payload": {
+          "kind": "reservation_payment_submitted",
+          "order_id": "7fe460e8-d13b-42d3-bea2-a690cb8c0373",
+          "notes": "ok",
+          "proof_url": "https://fxdknzrqjenzqcvnwqqq.supabase.co/storage/v1/object/fleaber_private/order_proofs/bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96/7fe460e8-d13b-42d3-bea2-a690cb8c0373/../../../public/rtbm-stolen.jpg"
+        },
+        "stored": "FLEABER_JSON_V1:{\"kind\":\"reservation_payment_submitted\",\"order_id\":\"7fe460e8-d13b-42d3-bea2-a690cb8c0373\",\"notes\":\"ok\",\"proof_url\":\"https://fxdknzrqjenzqcvnwqqq.supabase.co/storage/v1/object/fleaber_private/order_proofs/bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96/7fe460e8-d13b-42d3-bea2-a690cb8c0373/../../../public/rtbm-stolen.jpg\"}"
+      }
+    },
+    {
+      "id": "BM4.dotdot-encoded",
+      "lens": "BM4",
+      "severity": "P1",
+      "title": "proof_url %2e%2e path traversal",
+      "actor": "buyer JWT",
+      "pre": "order 7fe460e8-d13b-42d3-bea2-a690cb8c0373 chat dd403563-7dc5-436b-a465-d684986024bd",
+      "repro": "POST FLEABER_JSON_V1 {\"kind\":\"reservation_payment_submitted\",\"order_id\":\"7fe460e8-d13b-42d3-bea2-a690cb8c0373\",\"notes\":\"ok\",\"proof_url\":\"https://fxdknzrqjenzqcvnwqqq.supabase.co/storage/v1/object/fleaber_private/order_proofs/bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96/7fe460e8-d13b-42d3-bea2-a690cb8c0373/%2e%2e/%2e%2e/%2e%2e/public/x.jpg\"}",
+      "expected": "recusa notes/label/url",
+      "obtained": "201 [{\"id\":1382,\"created_at\":\"2026-09-02T18:04:08.123218+00:00\",\"chat_id\":\"dd403563-7dc5-436b-a465-d684986024bd\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"reservation_payment_subm…",
+      "proven": true,
+      "evidence": {
+        "msg_id": "1382",
+        "payload": {
+          "kind": "reservation_payment_submitted",
+          "order_id": "7fe460e8-d13b-42d3-bea2-a690cb8c0373",
+          "notes": "ok",
+          "proof_url": "https://fxdknzrqjenzqcvnwqqq.supabase.co/storage/v1/object/fleaber_private/order_proofs/bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96/7fe460e8-d13b-42d3-bea2-a690cb8c0373/%2e%2e/%2e%2e/%2e%2e/public/x.jpg"
+        },
+        "stored": "FLEABER_JSON_V1:{\"kind\":\"reservation_payment_submitted\",\"order_id\":\"7fe460e8-d13b-42d3-bea2-a690cb8c0373\",\"notes\":\"ok\",\"proof_url\":\"https://fxdknzrqjenzqcvnwqqq.supabase.co/storage/v1/object/fleaber_private/order_proofs/bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96/7fe460e8-d13b-42d3-bea2-a690cb8c0373/%2e%2e/%2e%2e/%2e%2e/public/x.jpg\"}"
+      }
+    },
+    {
+      "id": "BM4.prefix-before-needle",
+      "lens": "BM4",
+      "severity": "P1",
+      "title": "path com prefixo extra antes de order_proofs",
+      "actor": "buyer JWT",
+      "pre": "order 7fe460e8-d13b-42d3-bea2-a690cb8c0373 chat dd403563-7dc5-436b-a465-d684986024bd",
+      "repro": "POST FLEABER_JSON_V1 {\"kind\":\"reservation_payment_submitted\",\"order_id\":\"7fe460e8-d13b-42d3-bea2-a690cb8c0373\",\"notes\":\"ok\",\"proof_url\":\"https://fxdknzrqjenzqcvnwqqq.supabase.co/storage/v1/object/fleaber_private/other/bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96/order_proofs/bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96/7fe460e8-d13b-42d3-bea2-a690cb8c0373/x.jpg\"}",
+      "expected": "recusa notes/label/url",
+      "obtained": "201 [{\"id\":1387,\"created_at\":\"2026-09-02T18:04:08.824465+00:00\",\"chat_id\":\"dd403563-7dc5-436b-a465-d684986024bd\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"reservation_payment_subm…",
+      "proven": true,
+      "evidence": {
+        "msg_id": "1387",
+        "payload": {
+          "kind": "reservation_payment_submitted",
+          "order_id": "7fe460e8-d13b-42d3-bea2-a690cb8c0373",
+          "notes": "ok",
+          "proof_url": "https://fxdknzrqjenzqcvnwqqq.supabase.co/storage/v1/object/fleaber_private/other/bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96/order_proofs/bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96/7fe460e8-d13b-42d3-bea2-a690cb8c0373/x.jpg"
+        },
+        "stored": "FLEABER_JSON_V1:{\"kind\":\"reservation_payment_submitted\",\"order_id\":\"7fe460e8-d13b-42d3-bea2-a690cb8c0373\",\"notes\":\"ok\",\"proof_url\":\"https://fxdknzrqjenzqcvnwqqq.supabase.co/storage/v1/object/fleaber_private/other/bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96/order_proofs/bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96/7fe460e8-d13b-42d3-bea2-a690cb8c0373/x.jpg\"}"
+      }
+    },
+    {
+      "id": "BM5.inbox-strike",
+      "lens": "BM5",
+      "severity": "P1",
+      "title": "inbox last_message forjado: Strike 12,00 €",
+      "actor": "buyer JWT",
+      "pre": "chats_update_participants",
+      "repro": "PATCH chats.last_message=Strike 12,00 €",
+      "expected": "chat_inbox_preview_forbidden",
+      "obtained": "Strike 12,00 €",
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "BM7.meta-extra-clearpay",
+      "lens": "BM7",
+      "severity": "P3",
+      "title": "chave meta extra com mentira Clearpay persistiu no card",
+      "actor": "buyer JWT",
+      "pre": "order 7fe460e8-d13b-42d3-bea2-a690cb8c0373 chat dd403563-7dc5-436b-a465-d684986024bd",
+      "repro": "POST FLEABER_JSON_V1 {\"kind\":\"reservation_payment_submitted\",\"order_id\":\"7fe460e8-d13b-42d3-bea2-a690cb8c0373\",\"notes\":\"ok\",\"meta\":{\"rail\":\"Clearpay\",\"amount\":\"12.00\",\"status\":\"paid\"}}",
+      "expected": "recusa notes/label/url",
+      "obtained": "201 [{\"id\":1390,\"created_at\":\"2026-09-02T18:04:14.589162+00:00\",\"chat_id\":\"dd403563-7dc5-436b-a465-d684986024bd\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"reservation_payment_subm…",
+      "proven": true,
+      "evidence": {
+        "msg_id": "1390",
+        "payload": {
+          "kind": "reservation_payment_submitted",
+          "order_id": "7fe460e8-d13b-42d3-bea2-a690cb8c0373",
+          "notes": "ok",
+          "meta": {
+            "rail": "Clearpay",
+            "amount": "12.00",
+            "status": "paid"
+          }
+        },
+        "stored": "FLEABER_JSON_V1:{\"kind\":\"reservation_payment_submitted\",\"order_id\":\"7fe460e8-d13b-42d3-bea2-a690cb8c0373\",\"notes\":\"ok\",\"meta\":{\"rail\":\"Clearpay\",\"amount\":\"12.00\",\"status\":\"paid\"}}"
+      }
+    }
+  ],
+  "blocked": [
+    {
+      "id": "BM1.clearpay-notes",
+      "lens": "BM1",
+      "title": "notes Clearpay no card reservation_payment_submitted",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_notes_forbidden\"}"
+    },
+    {
+      "id": "BM1.shoppay-notes",
+      "lens": "BM1",
+      "title": "notes Shop Pay no card reservation_payment_submitted",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_notes_forbidden\"}"
+    },
+    {
+      "id": "BM1.strike-notes",
+      "lens": "BM1",
+      "title": "notes Strike no card reservation_payment_submitted",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_notes_forbidden\"}"
+    },
+    {
+      "id": "BM1.affirm-label-control",
+      "lens": "BM1",
+      "title": "card recusado",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_label_mismatch\"}"
+    },
+    {
+      "id": "BM1.cashapp-notes-control",
+      "lens": "BM1",
+      "title": "card recusado",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_notes_forbidden\"}"
+    },
+    {
+      "id": "BM2.clearpay-lunate",
+      "lens": "BM2",
+      "title": "notes Ϲlearpay (lunate sigma) no card prova",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_notes_forbidden\"}"
+    },
+    {
+      "id": "BM2.strike-zwsp",
+      "lens": "BM2",
+      "title": "notes St\\u200brike (ZWSP)",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_notes_forbidden\"}"
+    },
+    {
+      "id": "BM3.insert-created-at-past",
+      "lens": "BM3",
+      "title": "created_at forçado a now",
+      "ev": "2026-09-02T18:04:06.830787+00:00"
+    },
+    {
+      "id": "BM3.patch-created-at",
+      "lens": "BM3",
+      "title": "created_at imutável",
+      "ev": {
+        "patch": "200 [{\"id\":1378,\"created_at\":\"2026-09-02T18:04:06.830787+00:00\",\"chat_id\":\"dd403563-7dc5-436b-a465-d684986024bd\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"BM3 backdate ping\",\"is_reservation\":false,\"is_read\":…",
+        "stored": "2026-09-02T18:04:06.830787+00:00"
+      }
+    },
+    {
+      "id": "BM3.delete-json-card",
+      "lens": "BM3",
+      "title": "DELETE card recusado",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_immutable\"}"
+    },
+    {
+      "id": "BM4.fragment-needle",
+      "lens": "BM4",
+      "title": "needle só no fragmento # (controlo BFBK path-only)",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_url_denied\"}"
+    },
+    {
+      "id": "BM4.query-needle-control",
+      "lens": "BM4",
+      "title": "needle só na query (exacto BFBK, não contar)",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_url_denied\"}"
+    },
+    {
+      "id": "BM4.signed-other-bucket",
+      "lens": "BM4",
+      "title": "signed URL noutro bucket com needle no path",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_url_denied\"}"
+    },
+    {
+      "id": "BM4.compact-uuid-path",
+      "lens": "BM4",
+      "title": "proof_url buyer/order compactos (sem hífen)",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_url_denied\"}"
+    },
+    {
+      "id": "BM5.inbox-clearpay",
+      "lens": "BM5",
+      "title": "inbox recusado",
+      "ev": {
+        "http": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"chat_inbox_preview_forbidden\"}",
+        "stored": "null"
+      }
+    },
+    {
+      "id": "BM5.inbox-shoppay",
+      "lens": "BM5",
+      "title": "inbox recusado",
+      "ev": {
+        "http": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"chat_inbox_preview_forbidden\"}",
+        "stored": "null"
+      }
+    },
+    {
+      "id": "BM5.inbox-affirm-control",
+      "lens": "BM5",
+      "title": "inbox recusado",
+      "ev": {
+        "http": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"chat_inbox_preview_forbidden\"}",
+        "stored": "Strike 12,00 €"
+      }
+    },
+    {
+      "id": "BM6.list-cross-user",
+      "lens": "BM6",
+      "title": "list cross-user recusado",
+      "ev": {
+        "root": "200 []",
+        "b1": "200 []"
+      }
+    },
+    {
+      "id": "BM6.get-cross-user",
+      "lens": "BM6",
+      "title": "GET cross-user recusado",
+      "ev": "400 {\"statusCode\":\"404\",\"error\":\"not_found\",\"message\":\"Object not found\",\"code\":\"NoSuchKey\"}"
+    },
+    {
+      "id": "BM6.upload-cross-user",
+      "lens": "BM6",
+      "title": "upload B2 recusado",
+      "ev": "400 {\"statusCode\":\"415\",\"error\":\"invalid_mime_type\",\"message\":\"mime type application/octet-stream is not supported\",\"code\":\"InvalidMimeType\"}"
+    },
+    {
+      "id": "BM7.b2-insert-b1-chat",
+      "lens": "BM7",
+      "title": "B2 fora do chat",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"new row violates row-level security policy for table \\\"chat_messages\\\"\"}"
+    },
+    {
+      "id": "BM8.ocr-fake-token",
+      "lens": "BM8",
+      "title": "token falso recusado",
+      "ev": "401 {\"ok\":false,\"error\":\"invalid_token\"}"
+    },
+    {
+      "id": "BM8.ocr-rpc-jwt",
+      "lens": "BM8",
+      "title": "RPC OCR JWT recusado",
+      "ev": "200 {\"ok\": false, \"error\": \"invalid_token\"}"
+    }
+  ],
+  "notes": [
+    {
+      "id": "fixture.paid",
+      "lens": "BM1",
+      "title": "setup_paid_order Stripe TEST",
+      "ev": "200 {\n  \"ok\": true,\n  \"order_id\": \"54f71515-a916-4413-8959-4a30ceafe0d9\",\n  \"product_id\": \"87bb6613-f9ea-4021-a55d-fb5c37565c4e\",\n  \"payment_intent_id\": \"pi_3UBIVxH7FWYUN3jh1gBwnzKH\",\n  \"pi_status\": \"succeeded\",\n  \"pi_amount…"
+    },
+    {
+      "id": "BM2.affirm-greek-control",
+      "lens": "BM2",
+      "title": "persistiu (exacto BFBK, não contar)",
+      "ev": "201 [{\"id\":1377,\"created_at\":\"2026-09-02T18:04:06.732824+00:00\",\"chat_id\":\"dd403563-7dc5-436b-a465-d684986024bd\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"Αffirm 12,00 €\",\"is_reservation\":false,\"is_read\":fal…"
+    },
+    {
+      "id": "BM3.delete-plain",
+      "lens": "BM3",
+      "title": "plain delete ok",
+      "ev": "200 [{\"id\":1380,\"created_at\":\"2026-09-02T18:04:07.610285+00:00\",\"chat_id\":\"dd403563-7dc5-436b-a465-d684986024bd\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"apaga-me BM3\",\"is_reservation\":false,\"is_read\":false…"
+    },
+    {
+      "id": "BM4.honest-path",
+      "lens": "BM4",
+      "title": "persistiu (não contar)",
+      "ev": "201 [{\"id\":1388,\"created_at\":\"2026-09-02T18:04:09.119306+00:00\",\"chat_id\":\"dd403563-7dc5-436b-a465-d684986024bd\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"reservation_payment_subm…"
+    },
+    {
+      "id": "BM6.upload-own",
+      "lens": "BM6",
+      "title": "upload próprio",
+      "ev": "400 {\"statusCode\":\"415\",\"error\":\"invalid_mime_type\",\"message\":\"mime type application/octet-stream is not supported\",\"code\":\"InvalidMimeType\"}"
+    },
+    {
+      "id": "BM8.live",
+      "lens": "BM8",
+      "title": "live fixture",
+      "ev": "201 [{\"id\":\"897f51cc-4da7-4455-81cd-ee6b69258850\",\"created_at\":\"2026-09-02T18:04:14.874702+00:00\",\"vendedor_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"mux_live_id\":null,\"stream_key\":null,\"playback_id\":null,\"is_active\":true,…"
+    }
+  ]
+}

@@ -1,0 +1,648 @@
+{
+  "pass": 3,
+  "project": "fxdknzrqjenzqcvnwqqq",
+  "at": "2026-08-29T15:43:32.160543Z",
+  "findings": [
+    {
+      "id": "F-PII-EMAIL-LOOKUP",
+      "severity": "P2",
+      "title": "RPC resolve email→uuid",
+      "actor": "buyer",
+      "preconditions": "know email",
+      "reproduction": "batata_find_user_id_by_email",
+      "impact": "enumeração de contas",
+      "estado": "COMPROVADO",
+      "evidence": "null"
+    },
+    {
+      "id": "F-PII-EMAIL-LOOKUP",
+      "severity": "P2",
+      "title": "RPC resolve email→uuid",
+      "actor": "seller",
+      "preconditions": "know email",
+      "reproduction": "batata_find_user_id_by_email",
+      "impact": "enumeração de contas",
+      "estado": "COMPROVADO",
+      "evidence": "\"980f4fa1-0004-42f9-abca-69f1a9c29588\""
+    },
+    {
+      "id": "F-REV-OFFPLATFORM-COLLUSION",
+      "severity": "P2",
+      "title": "Review após MB WAY pago atestado pelo seller (sem Stripe)",
+      "actor": "buyer+seller collusion",
+      "preconditions": "seller PATCH pago + buyer PATCH concluido",
+      "reproduction": "POST reviews on that order",
+      "impact": "reputação sem fundos plataforma (off-platform by design; collusion)",
+      "estado": "COMPROVADO",
+      "evidence": "[{\"id\":\"3b572536-2d48-4246-a4fb-f4ae32c69348\",\"created_at\":\"2026-08-29T15:43:24.68018+00:00\",\"target_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"stars\":5,\"comment\":\"rtf3 mbway collusion\",\"is_automatic\":false,\"target_type\":\"seller\",\"author_role\":\"comprador\",\"order_id\":\"bb56dbbf-589f-4a5b-ba2d-81526e87cc33\",\"purchase_verified\":false}]"
+    }
+  ],
+  "notes": [],
+  "cleanup": {
+    "order_ids": [
+      "b241022c-2883-42ed-828f-6e68415b72e5",
+      "10c41bc5-fb04-43c0-9810-ef992077bef8"
+    ],
+    "product_ids": [
+      "7c7de7b2-e6d0-4875-8477-471a109b169d"
+    ],
+    "checkout_urls": []
+  },
+  "pay_urls_file": "tool/redteam_blind_f_20260829/pass3_pay_urls.json",
+  "matrix": [
+    {
+      "surface": "WALLET",
+      "attack": "balances at pass3 start",
+      "identity": "service_observe",
+      "result": "[{\"id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"balance\":39.81}, \n {\"id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"balance\":6.41}]",
+      "impact": "baseline",
+      "severity": "info",
+      "evidence": "[{\"id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"balance\":39.81}, \n {\"id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"balance\":6.41}]"
+    },
+    {
+      "surface": "RPC",
+      "attack": "batata_credit_wallet_once as buyer",
+      "identity": "buyer",
+      "result": "404 {\"code\":\"PGRST202\",\"details\":\"Searched for the function public.batata_credit_wallet_once with parameters p_amount, p_reason, p_user_id or with a single unnamed json/jsonb parameter, but no matches wer…",
+      "impact": "denied_or_false",
+      "severity": "info",
+      "evidence": "{\"code\":\"PGRST202\",\"details\":\"Searched for the function public.batata_credit_wallet_once with parameters p_amount, p_reason, p_user_id or with a single unnamed json/jsonb parameter, but no matches were found in the schema cache.\",\"hint\":\"Perhaps you meant to call the function public.batata_credit_wallet_once(p_amount, p_description, p_order_id, p_type, p_wallet_id)\",\"message\":\"Could not find the function public.batata_credit_wallet_once(p_amount, p_reason, p_user_id) in the schema cache\"}"
+    },
+    {
+      "surface": "RPC",
+      "attack": "batata_debit_wallet_once as buyer",
+      "identity": "buyer",
+      "result": "404 {\"code\":\"PGRST202\",\"details\":\"Searched for the function public.batata_debit_wallet_once with parameters p_amount, p_reason, p_user_id or with a single unnamed json/jsonb parameter, but no matches were…",
+      "impact": "denied_or_false",
+      "severity": "info",
+      "evidence": "{\"code\":\"PGRST202\",\"details\":\"Searched for the function public.batata_debit_wallet_once with parameters p_amount, p_reason, p_user_id or with a single unnamed json/jsonb parameter, but no matches were found in the schema cache.\",\"hint\":\"Perhaps you meant to call the function public.batata_debit_wallet_once(p_amount, p_description, p_order_id, p_wallet_id)\",\"message\":\"Could not find the function public.batata_debit_wallet_once(p_amount, p_reason, p_user_id) in the schema cache\"}"
+    },
+    {
+      "surface": "RPC",
+      "attack": "batata_wallet_apply_tip_once as buyer",
+      "identity": "buyer",
+      "result": "404 {\"code\":\"PGRST202\",\"details\":\"Searched for the function public.batata_wallet_apply_tip_once with parameter p_tip_id or with a single unnamed json/jsonb parameter, but no matches were found in the sche…",
+      "impact": "denied_or_false",
+      "severity": "info",
+      "evidence": "{\"code\":\"PGRST202\",\"details\":\"Searched for the function public.batata_wallet_apply_tip_once with parameter p_tip_id or with a single unnamed json/jsonb parameter, but no matches were found in the schema cache.\",\"hint\":null,\"message\":\"Could not find the function public.batata_wallet_apply_tip_once(p_tip_id) in the schema cache\"}"
+    },
+    {
+      "surface": "RPC",
+      "attack": "batata_clawback_seller_wallet_for_order as buyer",
+      "identity": "buyer",
+      "result": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_clawback_seller_wallet_for_order\"}",
+      "impact": "denied_or_false",
+      "severity": "info",
+      "evidence": "{\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_clawback_seller_wallet_for_order\"}"
+    },
+    {
+      "surface": "RPC",
+      "attack": "batata_create_raffle_prize_order as buyer",
+      "identity": "buyer",
+      "result": "404 {\"code\":\"PGRST202\",\"details\":\"Searched for the function public.batata_create_raffle_prize_order with parameters p_raffle_id, p_winner_id or with a single unnamed json/jsonb parameter, but no matches w…",
+      "impact": "denied_or_false",
+      "severity": "info",
+      "evidence": "{\"code\":\"PGRST202\",\"details\":\"Searched for the function public.batata_create_raffle_prize_order with parameters p_raffle_id, p_winner_id or with a single unnamed json/jsonb parameter, but no matches were found in the schema cache.\",\"hint\":\"Perhaps you meant to call the function public.batata_create_raffle_prize_order(p_raffle_id, p_rank, p_winner_uid)\",\"message\":\"Could not find the function public.batata_create_raffle_prize_order(p_raffle_id, p_winner_id) in the schema cache\"}"
+    },
+    {
+      "surface": "RPC",
+      "attack": "batata_admin_resolve_dispute as buyer",
+      "identity": "buyer",
+      "result": "404 {\"code\":\"PGRST202\",\"details\":\"Searched for the function public.batata_admin_resolve_dispute with parameters p_action, p_dispute_id or with a single unnamed json/jsonb parameter, but no matches were fo…",
+      "impact": "denied_or_false",
+      "severity": "info",
+      "evidence": "{\"code\":\"PGRST202\",\"details\":\"Searched for the function public.batata_admin_resolve_dispute with parameters p_action, p_dispute_id or with a single unnamed json/jsonb parameter, but no matches were found in the schema cache.\",\"hint\":\"Perhaps you meant to call the function public.batata_admin_resolve_dispute(p_dispute_id, p_note, p_resolution)\",\"message\":\"Could not find the function public.batata_admin_resolve_dispute(p_action, p_dispute_id) in the schema cache\"}"
+    },
+    {
+      "surface": "RPC",
+      "attack": "batata_find_user_id_by_email as buyer",
+      "identity": "buyer",
+      "result": "200 null",
+      "impact": "denied_or_false",
+      "severity": "info",
+      "evidence": "null"
+    },
+    {
+      "surface": "RPC",
+      "attack": "batata_is_admin as buyer",
+      "identity": "buyer",
+      "result": "200 false",
+      "impact": "denied_or_false",
+      "severity": "info",
+      "evidence": "false"
+    },
+    {
+      "surface": "RPC",
+      "attack": "batata_generate_auto_feedback as buyer",
+      "identity": "buyer",
+      "result": "404 {\"code\":\"PGRST202\",\"details\":\"Searched for the function public.batata_generate_auto_feedback with parameter p_order_id or with a single unnamed json/jsonb parameter, but no matches were found in the s…",
+      "impact": "denied_or_false",
+      "severity": "info",
+      "evidence": "{\"code\":\"PGRST202\",\"details\":\"Searched for the function public.batata_generate_auto_feedback with parameter p_order_id or with a single unnamed json/jsonb parameter, but no matches were found in the schema cache.\",\"hint\":\"Perhaps you meant to call the function public.batata_generate_auto_feedback(p_now)\",\"message\":\"Could not find the function public.batata_generate_auto_feedback(p_order_id) in the schema cache\"}"
+    },
+    {
+      "surface": "RPC",
+      "attack": "batata_seller_direct_payment_details as buyer",
+      "identity": "buyer",
+      "result": "200 []",
+      "impact": "denied_or_false",
+      "severity": "info",
+      "evidence": "[]"
+    },
+    {
+      "surface": "RPC",
+      "attack": "batata_get_my_payout_details as buyer",
+      "identity": "buyer",
+      "result": "200 [{\"mb_way\":null,\"iban\":null,\"external_payments_enabled\":false}]",
+      "impact": "NONEMPTY EXECUTE",
+      "severity": "info",
+      "evidence": "[{\"mb_way\":null,\"iban\":null,\"external_payments_enabled\":false}]"
+    },
+    {
+      "surface": "RPC",
+      "attack": "batata_lab_clear_all_fm_pending as buyer",
+      "identity": "buyer",
+      "result": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_lab_clear_all_fm_pending\"}",
+      "impact": "denied_or_false",
+      "severity": "info",
+      "evidence": "{\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_lab_clear_all_fm_pending\"}"
+    },
+    {
+      "surface": "RPC",
+      "attack": "batata_lab_clear_fm_pending as buyer",
+      "identity": "buyer",
+      "result": "404 {\"code\":\"PGRST202\",\"details\":\"Searched for the function public.batata_lab_clear_fm_pending without parameters or with a single unnamed json/jsonb parameter, but no matches were found in the schema cac…",
+      "impact": "denied_or_false",
+      "severity": "info",
+      "evidence": "{\"code\":\"PGRST202\",\"details\":\"Searched for the function public.batata_lab_clear_fm_pending without parameters or with a single unnamed json/jsonb parameter, but no matches were found in the schema cache.\",\"hint\":null,\"message\":\"Could not find the function public.batata_lab_clear_fm_pending without parameters in the schema cache\"}"
+    },
+    {
+      "surface": "RPC",
+      "attack": "batata_record_buyer_purchase_ledger as buyer",
+      "identity": "buyer",
+      "result": "400 {\"code\":\"42P10\",\"details\":null,\"hint\":null,\"message\":\"there is no unique or exclusion constraint matching the ON CONFLICT specification\"}",
+      "impact": "denied_or_false",
+      "severity": "info",
+      "evidence": "{\"code\":\"42P10\",\"details\":null,\"hint\":null,\"message\":\"there is no unique or exclusion constraint matching the ON CONFLICT specification\"}"
+    },
+    {
+      "surface": "RPC",
+      "attack": "batata_record_fleaber_commission_once as buyer",
+      "identity": "buyer",
+      "result": "404 {\"code\":\"PGRST202\",\"details\":\"Searched for the function public.batata_record_fleaber_commission_once with parameter p_order_id or with a single unnamed json/jsonb parameter, but no matches were found …",
+      "impact": "denied_or_false",
+      "severity": "info",
+      "evidence": "{\"code\":\"PGRST202\",\"details\":\"Searched for the function public.batata_record_fleaber_commission_once with parameter p_order_id or with a single unnamed json/jsonb parameter, but no matches were found in the schema cache.\",\"hint\":null,\"message\":\"Could not find the function public.batata_record_fleaber_commission_once(p_order_id) in the schema cache\"}"
+    },
+    {
+      "surface": "RPC",
+      "attack": "batata_award_live_raffle_tickets as buyer",
+      "identity": "buyer",
+      "result": "404 {\"code\":\"PGRST202\",\"details\":\"Searched for the function public.batata_award_live_raffle_tickets with parameters p_live_id, p_qty, p_user_id or with a single unnamed json/jsonb parameter, but no matche…",
+      "impact": "denied_or_false",
+      "severity": "info",
+      "evidence": "{\"code\":\"PGRST202\",\"details\":\"Searched for the function public.batata_award_live_raffle_tickets with parameters p_live_id, p_qty, p_user_id or with a single unnamed json/jsonb parameter, but no matches were found in the schema cache.\",\"hint\":null,\"message\":\"Could not find the function public.batata_award_live_raffle_tickets(p_live_id, p_qty, p_user_id) in the schema cache\"}"
+    },
+    {
+      "surface": "RPC",
+      "attack": "batata_draw_live_raffle_winners as buyer",
+      "identity": "buyer",
+      "result": "400 {\"code\":\"P0001\",\"details\":null,\"hint\":null,\"message\":\"raffle_not_found\"}",
+      "impact": "denied_or_false",
+      "severity": "info",
+      "evidence": "{\"code\":\"P0001\",\"details\":null,\"hint\":null,\"message\":\"raffle_not_found\"}"
+    },
+    {
+      "surface": "RPC",
+      "attack": "batata_join_live_raffle as buyer",
+      "identity": "buyer",
+      "result": "200 {\"ok\": false, \"error\": \"raffle_not_found\"}",
+      "impact": "NONEMPTY EXECUTE",
+      "severity": "info",
+      "evidence": "{\"ok\": false, \"error\": \"raffle_not_found\"}"
+    },
+    {
+      "surface": "RPC",
+      "attack": "batata_mark_live_item_sold as buyer",
+      "identity": "buyer",
+      "result": "200 {\"ok\": false, \"error\": \"live_item_not_found\"}",
+      "impact": "NONEMPTY EXECUTE",
+      "severity": "info",
+      "evidence": "{\"ok\": false, \"error\": \"live_item_not_found\"}"
+    },
+    {
+      "surface": "RPC",
+      "attack": "batata_create_live_raffle as buyer",
+      "identity": "buyer",
+      "result": "404 {\"code\":\"PGRST202\",\"details\":\"Searched for the function public.batata_create_live_raffle with parameters p_live_id, p_live_item_id or with a single unnamed json/jsonb parameter, but no matches were fo…",
+      "impact": "denied_or_false",
+      "severity": "info",
+      "evidence": "{\"code\":\"PGRST202\",\"details\":\"Searched for the function public.batata_create_live_raffle with parameters p_live_id, p_live_item_id or with a single unnamed json/jsonb parameter, but no matches were found in the schema cache.\",\"hint\":null,\"message\":\"Could not find the function public.batata_create_live_raffle(p_live_id, p_live_item_id) in the schema cache\"}"
+    },
+    {
+      "surface": "RPC",
+      "attack": "batata_staging_h_v1_ux_demo_seed as buyer",
+      "identity": "buyer",
+      "result": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_staging_h_v1_ux_demo_seed\"}",
+      "impact": "denied_or_false",
+      "severity": "info",
+      "evidence": "{\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_staging_h_v1_ux_demo_seed\"}"
+    },
+    {
+      "surface": "RPC",
+      "attack": "batata_send_live_tip_from_wallet as buyer",
+      "identity": "buyer",
+      "result": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"not_allowed\"}",
+      "impact": "denied_or_false",
+      "severity": "info",
+      "evidence": "{\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"not_allowed\"}"
+    },
+    {
+      "surface": "RPC",
+      "attack": "batata_credit_wallet_once as seller",
+      "identity": "seller",
+      "result": "404 {\"code\":\"PGRST202\",\"details\":\"Searched for the function public.batata_credit_wallet_once with parameters p_amount, p_reason, p_user_id or with a single unnamed json/jsonb parameter, but no matches wer…",
+      "impact": "denied_or_false",
+      "severity": "info",
+      "evidence": "{\"code\":\"PGRST202\",\"details\":\"Searched for the function public.batata_credit_wallet_once with parameters p_amount, p_reason, p_user_id or with a single unnamed json/jsonb parameter, but no matches were found in the schema cache.\",\"hint\":\"Perhaps you meant to call the function public.batata_credit_wallet_once(p_amount, p_description, p_order_id, p_type, p_wallet_id)\",\"message\":\"Could not find the function public.batata_credit_wallet_once(p_amount, p_reason, p_user_id) in the schema cache\"}"
+    },
+    {
+      "surface": "RPC",
+      "attack": "batata_debit_wallet_once as seller",
+      "identity": "seller",
+      "result": "404 {\"code\":\"PGRST202\",\"details\":\"Searched for the function public.batata_debit_wallet_once with parameters p_amount, p_reason, p_user_id or with a single unnamed json/jsonb parameter, but no matches were…",
+      "impact": "denied_or_false",
+      "severity": "info",
+      "evidence": "{\"code\":\"PGRST202\",\"details\":\"Searched for the function public.batata_debit_wallet_once with parameters p_amount, p_reason, p_user_id or with a single unnamed json/jsonb parameter, but no matches were found in the schema cache.\",\"hint\":\"Perhaps you meant to call the function public.batata_debit_wallet_once(p_amount, p_description, p_order_id, p_wallet_id)\",\"message\":\"Could not find the function public.batata_debit_wallet_once(p_amount, p_reason, p_user_id) in the schema cache\"}"
+    },
+    {
+      "surface": "RPC",
+      "attack": "batata_wallet_apply_tip_once as seller",
+      "identity": "seller",
+      "result": "404 {\"code\":\"PGRST202\",\"details\":\"Searched for the function public.batata_wallet_apply_tip_once with parameter p_tip_id or with a single unnamed json/jsonb parameter, but no matches were found in the sche…",
+      "impact": "denied_or_false",
+      "severity": "info",
+      "evidence": "{\"code\":\"PGRST202\",\"details\":\"Searched for the function public.batata_wallet_apply_tip_once with parameter p_tip_id or with a single unnamed json/jsonb parameter, but no matches were found in the schema cache.\",\"hint\":null,\"message\":\"Could not find the function public.batata_wallet_apply_tip_once(p_tip_id) in the schema cache\"}"
+    },
+    {
+      "surface": "RPC",
+      "attack": "batata_clawback_seller_wallet_for_order as seller",
+      "identity": "seller",
+      "result": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_clawback_seller_wallet_for_order\"}",
+      "impact": "denied_or_false",
+      "severity": "info",
+      "evidence": "{\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_clawback_seller_wallet_for_order\"}"
+    },
+    {
+      "surface": "RPC",
+      "attack": "batata_create_raffle_prize_order as seller",
+      "identity": "seller",
+      "result": "404 {\"code\":\"PGRST202\",\"details\":\"Searched for the function public.batata_create_raffle_prize_order with parameters p_raffle_id, p_winner_id or with a single unnamed json/jsonb parameter, but no matches w…",
+      "impact": "denied_or_false",
+      "severity": "info",
+      "evidence": "{\"code\":\"PGRST202\",\"details\":\"Searched for the function public.batata_create_raffle_prize_order with parameters p_raffle_id, p_winner_id or with a single unnamed json/jsonb parameter, but no matches were found in the schema cache.\",\"hint\":\"Perhaps you meant to call the function public.batata_create_raffle_prize_order(p_raffle_id, p_rank, p_winner_uid)\",\"message\":\"Could not find the function public.batata_create_raffle_prize_order(p_raffle_id, p_winner_id) in the schema cache\"}"
+    },
+    {
+      "surface": "RPC",
+      "attack": "batata_admin_resolve_dispute as seller",
+      "identity": "seller",
+      "result": "404 {\"code\":\"PGRST202\",\"details\":\"Searched for the function public.batata_admin_resolve_dispute with parameters p_action, p_dispute_id or with a single unnamed json/jsonb parameter, but no matches were fo…",
+      "impact": "denied_or_false",
+      "severity": "info",
+      "evidence": "{\"code\":\"PGRST202\",\"details\":\"Searched for the function public.batata_admin_resolve_dispute with parameters p_action, p_dispute_id or with a single unnamed json/jsonb parameter, but no matches were found in the schema cache.\",\"hint\":\"Perhaps you meant to call the function public.batata_admin_resolve_dispute(p_dispute_id, p_note, p_resolution)\",\"message\":\"Could not find the function public.batata_admin_resolve_dispute(p_action, p_dispute_id) in the schema cache\"}"
+    },
+    {
+      "surface": "RPC",
+      "attack": "batata_find_user_id_by_email as seller",
+      "identity": "seller",
+      "result": "200 \"980f4fa1-0004-42f9-abca-69f1a9c29588\"",
+      "impact": "NONEMPTY EXECUTE",
+      "severity": "info",
+      "evidence": "\"980f4fa1-0004-42f9-abca-69f1a9c29588\""
+    },
+    {
+      "surface": "RPC",
+      "attack": "batata_is_admin as seller",
+      "identity": "seller",
+      "result": "200 false",
+      "impact": "denied_or_false",
+      "severity": "info",
+      "evidence": "false"
+    },
+    {
+      "surface": "RPC",
+      "attack": "batata_generate_auto_feedback as seller",
+      "identity": "seller",
+      "result": "404 {\"code\":\"PGRST202\",\"details\":\"Searched for the function public.batata_generate_auto_feedback with parameter p_order_id or with a single unnamed json/jsonb parameter, but no matches were found in the s…",
+      "impact": "denied_or_false",
+      "severity": "info",
+      "evidence": "{\"code\":\"PGRST202\",\"details\":\"Searched for the function public.batata_generate_auto_feedback with parameter p_order_id or with a single unnamed json/jsonb parameter, but no matches were found in the schema cache.\",\"hint\":\"Perhaps you meant to call the function public.batata_generate_auto_feedback(p_now)\",\"message\":\"Could not find the function public.batata_generate_auto_feedback(p_order_id) in the schema cache\"}"
+    },
+    {
+      "surface": "RPC",
+      "attack": "batata_seller_direct_payment_details as seller",
+      "identity": "seller",
+      "result": "200 [{\"mb_way\":\"910000000\",\"iban\":\"PT50000201231234567890154\"}]",
+      "impact": "NONEMPTY EXECUTE",
+      "severity": "info",
+      "evidence": "[{\"mb_way\":\"910000000\",\"iban\":\"PT50000201231234567890154\"}]"
+    },
+    {
+      "surface": "RPC",
+      "attack": "batata_get_my_payout_details as seller",
+      "identity": "seller",
+      "result": "200 [{\"mb_way\":\"910000000\",\"iban\":\"PT50000201231234567890154\",\"external_payments_enabled\":true}]",
+      "impact": "NONEMPTY EXECUTE",
+      "severity": "info",
+      "evidence": "[{\"mb_way\":\"910000000\",\"iban\":\"PT50000201231234567890154\",\"external_payments_enabled\":true}]"
+    },
+    {
+      "surface": "RPC",
+      "attack": "batata_lab_clear_all_fm_pending as seller",
+      "identity": "seller",
+      "result": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_lab_clear_all_fm_pending\"}",
+      "impact": "denied_or_false",
+      "severity": "info",
+      "evidence": "{\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_lab_clear_all_fm_pending\"}"
+    },
+    {
+      "surface": "RPC",
+      "attack": "batata_lab_clear_fm_pending as seller",
+      "identity": "seller",
+      "result": "404 {\"code\":\"PGRST202\",\"details\":\"Searched for the function public.batata_lab_clear_fm_pending without parameters or with a single unnamed json/jsonb parameter, but no matches were found in the schema cac…",
+      "impact": "denied_or_false",
+      "severity": "info",
+      "evidence": "{\"code\":\"PGRST202\",\"details\":\"Searched for the function public.batata_lab_clear_fm_pending without parameters or with a single unnamed json/jsonb parameter, but no matches were found in the schema cache.\",\"hint\":null,\"message\":\"Could not find the function public.batata_lab_clear_fm_pending without parameters in the schema cache\"}"
+    },
+    {
+      "surface": "RPC",
+      "attack": "batata_record_buyer_purchase_ledger as seller",
+      "identity": "seller",
+      "result": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"not_allowed\"}",
+      "impact": "denied_or_false",
+      "severity": "info",
+      "evidence": "{\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"not_allowed\"}"
+    },
+    {
+      "surface": "RPC",
+      "attack": "batata_record_fleaber_commission_once as seller",
+      "identity": "seller",
+      "result": "404 {\"code\":\"PGRST202\",\"details\":\"Searched for the function public.batata_record_fleaber_commission_once with parameter p_order_id or with a single unnamed json/jsonb parameter, but no matches were found …",
+      "impact": "denied_or_false",
+      "severity": "info",
+      "evidence": "{\"code\":\"PGRST202\",\"details\":\"Searched for the function public.batata_record_fleaber_commission_once with parameter p_order_id or with a single unnamed json/jsonb parameter, but no matches were found in the schema cache.\",\"hint\":null,\"message\":\"Could not find the function public.batata_record_fleaber_commission_once(p_order_id) in the schema cache\"}"
+    },
+    {
+      "surface": "RPC",
+      "attack": "batata_award_live_raffle_tickets as seller",
+      "identity": "seller",
+      "result": "404 {\"code\":\"PGRST202\",\"details\":\"Searched for the function public.batata_award_live_raffle_tickets with parameters p_live_id, p_qty, p_user_id or with a single unnamed json/jsonb parameter, but no matche…",
+      "impact": "denied_or_false",
+      "severity": "info",
+      "evidence": "{\"code\":\"PGRST202\",\"details\":\"Searched for the function public.batata_award_live_raffle_tickets with parameters p_live_id, p_qty, p_user_id or with a single unnamed json/jsonb parameter, but no matches were found in the schema cache.\",\"hint\":null,\"message\":\"Could not find the function public.batata_award_live_raffle_tickets(p_live_id, p_qty, p_user_id) in the schema cache\"}"
+    },
+    {
+      "surface": "RPC",
+      "attack": "batata_draw_live_raffle_winners as seller",
+      "identity": "seller",
+      "result": "400 {\"code\":\"P0001\",\"details\":null,\"hint\":null,\"message\":\"raffle_not_found\"}",
+      "impact": "denied_or_false",
+      "severity": "info",
+      "evidence": "{\"code\":\"P0001\",\"details\":null,\"hint\":null,\"message\":\"raffle_not_found\"}"
+    },
+    {
+      "surface": "RPC",
+      "attack": "batata_join_live_raffle as seller",
+      "identity": "seller",
+      "result": "200 {\"ok\": false, \"error\": \"raffle_not_found\"}",
+      "impact": "NONEMPTY EXECUTE",
+      "severity": "info",
+      "evidence": "{\"ok\": false, \"error\": \"raffle_not_found\"}"
+    },
+    {
+      "surface": "RPC",
+      "attack": "batata_mark_live_item_sold as seller",
+      "identity": "seller",
+      "result": "200 {\"ok\": false, \"error\": \"live_item_not_found\"}",
+      "impact": "NONEMPTY EXECUTE",
+      "severity": "info",
+      "evidence": "{\"ok\": false, \"error\": \"live_item_not_found\"}"
+    },
+    {
+      "surface": "RPC",
+      "attack": "batata_create_live_raffle as seller",
+      "identity": "seller",
+      "result": "404 {\"code\":\"PGRST202\",\"details\":\"Searched for the function public.batata_create_live_raffle with parameters p_live_id, p_live_item_id or with a single unnamed json/jsonb parameter, but no matches were fo…",
+      "impact": "denied_or_false",
+      "severity": "info",
+      "evidence": "{\"code\":\"PGRST202\",\"details\":\"Searched for the function public.batata_create_live_raffle with parameters p_live_id, p_live_item_id or with a single unnamed json/jsonb parameter, but no matches were found in the schema cache.\",\"hint\":null,\"message\":\"Could not find the function public.batata_create_live_raffle(p_live_id, p_live_item_id) in the schema cache\"}"
+    },
+    {
+      "surface": "RPC",
+      "attack": "batata_staging_h_v1_ux_demo_seed as seller",
+      "identity": "seller",
+      "result": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_staging_h_v1_ux_demo_seed\"}",
+      "impact": "denied_or_false",
+      "severity": "info",
+      "evidence": "{\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_staging_h_v1_ux_demo_seed\"}"
+    },
+    {
+      "surface": "RPC",
+      "attack": "batata_send_live_tip_from_wallet as seller",
+      "identity": "seller",
+      "result": "400 {\"code\":\"P0001\",\"details\":null,\"hint\":null,\"message\":\"Vendedor inválido para gorjeta.\"}",
+      "impact": "denied_or_false",
+      "severity": "info",
+      "evidence": "{\"code\":\"P0001\",\"details\":null,\"hint\":null,\"message\":\"Vendedor inválido para gorjeta.\"}"
+    },
+    {
+      "surface": "WALLET",
+      "attack": "balances after privileged RPC storm",
+      "identity": "service_observe",
+      "result": "[{\"id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"balance\":39.81}, \n {\"id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"balance\":6.41}]",
+      "impact": "detect mint vs start",
+      "severity": "info",
+      "evidence": "start=[{\"id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"balance\":39.81}, \n {\"id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"balance\":6.41}] after=[{\"id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"balance\":39.81}, \n {\"id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"balance\":6.41}]"
+    },
+    {
+      "surface": "REVIEWS",
+      "attack": "review after seller-attested MB WAY concluido",
+      "identity": "buyer",
+      "result": "201 [{\"id\":\"3b572536-2d48-4246-a4fb-f4ae32c69348\",\"created_at\":\"2026-08-29T15:43:24.68018+00:00\",\"target_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"stars\":5,\"comment\":\"rtf3 mbway collusion\",\"is_automatic…",
+      "impact": "review from off-platform attest",
+      "severity": "info",
+      "evidence": "[{\"id\":\"3b572536-2d48-4246-a4fb-f4ae32c69348\",\"created_at\":\"2026-08-29T15:43:24.68018+00:00\",\"target_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"stars\":5,\"comment\":\"rtf3 mbway collusion\",\"is_automatic\":false,\"target_type\":\"seller\",\"author_role\":\"comprador\",\"order_id\":\"bb56dbbf-589f-4a5b-ba2d-81526e87cc33\",\"purchase_verified\":false}]"
+    },
+    {
+      "surface": "REVIEWS",
+      "attack": "duplicate review same order",
+      "identity": "buyer",
+      "result": "201 [{\"id\":\"dfb1f6bc-fabf-4e4a-ba5e-c9d3392dbaa4\",\"created_at\":\"2026-08-29T15:43:24.899684+00:00\",\"target_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"star…",
+      "impact": "dup review",
+      "severity": "info",
+      "evidence": "[{\"id\":\"dfb1f6bc-fabf-4e4a-ba5e-c9d3392dbaa4\",\"created_at\":\"2026-08-29T15:43:24.899684+00:00\",\"target_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"stars\":1,\"comment\":\"rtf3 dup\",\"is_automatic\":false,\"target_type\":\"seller\",\"author_role\":\"comprador\",\"order_id\":\"bb56dbbf-589f-4a5b-ba2d-81526e87cc33\",\"purchase_verified\":false}]"
+    },
+    {
+      "surface": "LIVE",
+      "attack": "SELECT hub_lives_public *",
+      "identity": "buyer",
+      "result": "200 [{\"id\":\"5dd5cfd2-63b1-4cd8-82b1-c888e9dc5234\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"seller_handle\":\"fleahub-demo-ux\",\"title\":\"O meu direto\",\"status\":\"ended\",\"is_active\":false,\"mux_playback_id\":\"00ErJWBwqaXL00hlMxr015H4o00prdwhoNeSwu1959nO59c\",\"mux_vod_playback_id\":n…",
+      "impact": "no stream key in public view",
+      "severity": "info",
+      "evidence": "[{\"id\":\"5dd5cfd2-63b1-4cd8-82b1-c888e9dc5234\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"seller_handle\":\"fleahub-demo-ux\",\"title\":\"O meu direto\",\"status\":\"ended\",\"is_active\":false,\"mux_playback_id\":\"00ErJWBwqaXL00hlMxr015H4o00prdwhoNeSwu1959nO59c\",\"mux_vod_playback_id\":null,\"viewer_count\":0,\"went_live_at\":null,\"created_at\":\"2026-06-18T04:30:09.170457+00:00\",\"publish_backend\":\"mux_rtmp\"}, \n {\"id\":\"301713b2-49b0-409c-b758-4c2153b2ddd1\",\"seller_id\":\"69104e91-6a00-40d9-a7c9-b1571422ae43\",\"seller_handle\":\"joao84\",\"title\":\"O meu direto\",\"status\":\"ended\",\"is_active\":false,\"mux_playback_id\":\"nawV6qIHrJ00FqiFVAte00AMis4yxxXWee9LWoTrOLDc00\",\"mux_vod_playback_id\":null,\"viewer_count\":0,\"went_live_at\":null,\"created_at\":\"2026-06-10T06:06:10.904959+00:00\",\"publish_backend\":\"mux_rtmp\"}, \n {\"id\":\"ed8624e6-6920-4d12-8578-aa8599ebc6d0\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"seller_handle\":\"fleahub-demo-ux\",\"title\":\"O meu direto\",\"status\":\"ended\",\"is_active\":false,\"mux_playback_id\":\"…"
+    },
+    {
+      "surface": "LIVE",
+      "attack": "SELECT hub_lives_public anon",
+      "identity": "anon",
+      "result": "200 [{\"id\":\"5dd5cfd2-63b1-4cd8-82b1-c888e9dc5234\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"seller_handle\":\"fleahub-demo-ux\",\"title\":\"O meu direto\",\"status\":\"ended\",\"is_active\":false,\"mux_playback_id\":\"00ErJWBwqaXL…",
+      "impact": "public live",
+      "severity": "info",
+      "evidence": "[{\"id\":\"5dd5cfd2-63b1-4cd8-82b1-c888e9dc5234\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"seller_handle\":\"fleahub-demo-ux\",\"title\":\"O meu direto\",\"status\":\"ended\",\"is_active\":false,\"mux_playback_id\":\"00ErJWBwqaXL00hlMxr015H4o00prdwhoNeSwu1959nO59c\",\"mux_vod_playback_id\":null,\"viewer_count\":0,\"went_live_at\":null,\"created_at\":\"2026-06-18T04:30:09.170457+00:00\",\"publish_backend\":\"mux_rtmp\"}, \n {\"id\":\"301713b2-49b0-409c-b758-4c2153b2ddd1\",\"seller_id\":\"69104e91-6a00-40d9-a7c9-b1571422ae43\",\"seller_handle\":\"joao84\",\"title\":\"O meu direto\",\"status\":\"ended\",\"is_active\":false,\"mux_playback_id\":\"nawV6qIHrJ00FqiFVAte00AMis4yxxXWee9LWoTrOLDc00\",\"mux_vod_playback_id\":null,\"viewer_count\":0,\"went_live_at\":null,\"created_at\":\"2026-06-10T06:06:10.904959+00:00\",\"publish_backend\":\"mux_rtmp\"}, \n {\"id\":\"ed8624e6-6920-4d12-8578-aa8599ebc6d0\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"seller_handle\":\"fleahub-demo-ux\",\"title\":\"O meu direto\",\"status\":\"ended\",\"is_active\":false,\"mux_playback_id\":\"…"
+    },
+    {
+      "surface": "LIVE ITEMS",
+      "attack": "SELECT live_items",
+      "identity": "buyer",
+      "result": "200 n=5 [{\"id\":\"ffb7b7e5-3007-44c7-b59d-44f99f36cb7f\",\"live_id\":\"d43f048f-fd95-4fec-ac7a-4bea85cadeec\",\"price\":10.0,\"status\":\"available\",\"seller_id\":null}, \n {\"id\":\"bd1fe033-927d-449b-b9fc…",
+      "impact": "scope",
+      "severity": "info",
+      "evidence": "[{\"id\":\"ffb7b7e5-3007-44c7-b59d-44f99f36cb7f\",\"live_id\":\"d43f048f-fd95-4fec-ac7a-4bea85cadeec\",\"price\":10.0,\"status\":\"available\",\"seller_id\":null}, \n {\"id\":\"bd1fe033-927d-449b-b9fc-b231f73114f9\",\"live_id\":\"f1d48e20-c59e-4519-8c43-36f6f2df698d\",\"price\":5.0,\"status\":\"available\",\"seller_id\":null}, \n {\"id\":\"fb6be9e8-c9b4-40ad-a73a-889e482ef519\",\"live_id\":\"89ab21cd-e57d-48db-8cc2-4de99aff3867\",\"price\":3.0,\"status\":\"available\",\"seller_id\":null}, \n {\"id\":\"9415e809-b137-43d8-a20f-a0769d67bc25\",\"live_id\":\"560414a6-33a4-4fa9-89bf-a340019ef8f6\",\"price\":5.0,\"status\":\"available\",\"seller_id\":null}, \n {\"id\":\"befa0f00-543a-4973-b6a2-2419dda0ff01\",\"live_id\":\"612c7766-0150-4696-ac80-214fba48fe36\",\"price\":3.0,\"status\":\"available\",\"seller_id\":null}]"
+    },
+    {
+      "surface": "TIPS",
+      "attack": "SELECT live_tips",
+      "identity": "buyer",
+      "result": "200 n=10",
+      "impact": "own or empty",
+      "severity": "info",
+      "evidence": "[{\"id\":\"6f279c54-3327-4eec-a7c8-18e605e15a44\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"amount\":50.00,\"status\":\"pending\"}, \n {\"id\":\"0ad632e2-f26a-4de8-a6ef-235d95a25410\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa…"
+    },
+    {
+      "surface": "STORAGE",
+      "attack": "GET seller product photo as anon",
+      "identity": "anon",
+      "result": "200 bytes=2373923 ct=image/jpeg",
+      "impact": "public catalog image readable (expected if public bucket)",
+      "severity": "info",
+      "evidence": "status=200"
+    },
+    {
+      "surface": "OFFERS",
+      "attack": "INSERT amount=0.01 status=accepted",
+      "identity": "buyer",
+      "result": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"new row violates row-level security policy for table \\\"product_offers\\\"\"}",
+      "impact": "blocked",
+      "severity": "info",
+      "evidence": "{\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"new row violates row-level security policy for table \\\"product_offers\\\"\"}"
+    },
+    {
+      "surface": "LIVE RESERVATIONS",
+      "attack": "batata_process_live_reservation_request qty=99",
+      "identity": "buyer",
+      "result": "404 {\"code\":\"PGRST202\",\"details\":\"Searched for the function public.batata_process_live_reservation_request with parameters p_live_id, p_qty, p_request_id or with a single unnamed json/…",
+      "impact": "reservation abuse",
+      "severity": "info",
+      "evidence": "{\"code\":\"PGRST202\",\"details\":\"Searched for the function public.batata_process_live_reservation_request with parameters p_live_id, p_qty, p_request_id or with a single unnamed json/jsonb parameter, but no matches were found in the schema cache.\",\"hint\":\"Perhaps you meant to call the function public.batata_process_live_reservation_request(p_action, p_notes, p_processed_by, p_request_id)\",\"message\":\"Could not find the function public.batata_process_live_reservation_request(p_live_id, p_qty, p_request_id) in the schema cache\"}"
+    },
+    {
+      "surface": "LIVE RESERVATIONS",
+      "attack": "batata_live_reservation_accept_available qty=99",
+      "identity": "buyer",
+      "result": "404 {\"code\":\"PGRST202\",\"details\":\"Searched for the function public.batata_live_reservation_accept_available with parameters p_live_id, p_qty, p_request_id or with a single unnamed json…",
+      "impact": "reservation abuse",
+      "severity": "info",
+      "evidence": "{\"code\":\"PGRST202\",\"details\":\"Searched for the function public.batata_live_reservation_accept_available with parameters p_live_id, p_qty, p_request_id or with a single unnamed json/jsonb parameter, but no matches were found in the schema cache.\",\"hint\":\"Perhaps you meant to call the function public.batata_live_reservation_accept_available(p_exclude_request_id, p_live_item_id)\",\"message\":\"Could not find the function public.batata_live_reservation_accept_available(p_live_id, p_qty, p_request_id) in the schema cache\"}"
+    },
+    {
+      "surface": "LIVE RESERVATIONS",
+      "attack": "batata_claim_external_reservations qty=99",
+      "identity": "buyer",
+      "result": "404 {\"code\":\"PGRST202\",\"details\":\"Searched for the function public.batata_claim_external_reservations with parameters p_live_id, p_qty, p_request_id or with a single unnamed json/jsonb…",
+      "impact": "reservation abuse",
+      "severity": "info",
+      "evidence": "{\"code\":\"PGRST202\",\"details\":\"Searched for the function public.batata_claim_external_reservations with parameters p_live_id, p_qty, p_request_id or with a single unnamed json/jsonb parameter, but no matches were found in the schema cache.\",\"hint\":\"Perhaps you meant to call the function public.batata_claim_external_reservations(p_live_id)\",\"message\":\"Could not find the function public.batata_claim_external_reservations(p_live_id, p_qty, p_request_id) in the schema cache\"}"
+    },
+    {
+      "surface": "LIVE RESERVATIONS",
+      "attack": "batata_confirm_ps_reservation qty=99",
+      "identity": "buyer",
+      "result": "404 {\"code\":\"PGRST202\",\"details\":\"Searched for the function public.batata_confirm_ps_reservation with parameters p_live_id, p_qty, p_request_id or with a single unnamed json/jsonb para…",
+      "impact": "reservation abuse",
+      "severity": "info",
+      "evidence": "{\"code\":\"PGRST202\",\"details\":\"Searched for the function public.batata_confirm_ps_reservation with parameters p_live_id, p_qty, p_request_id or with a single unnamed json/jsonb parameter, but no matches were found in the schema cache.\",\"hint\":\"Perhaps you meant to call the function public.batata_confirm_ps_reservation(p_action, p_ref_number, p_request_id)\",\"message\":\"Could not find the function public.batata_confirm_ps_reservation(p_live_id, p_qty, p_request_id) in the schema cache\"}"
+    },
+    {
+      "surface": "LIVE RESERVATIONS",
+      "attack": "batata_live_bag_update_qty qty=99",
+      "identity": "buyer",
+      "result": "404 {\"code\":\"PGRST202\",\"details\":\"Searched for the function public.batata_live_bag_update_qty with parameters p_live_id, p_qty, p_request_id or with a single unnamed json/jsonb paramet…",
+      "impact": "reservation abuse",
+      "severity": "info",
+      "evidence": "{\"code\":\"PGRST202\",\"details\":\"Searched for the function public.batata_live_bag_update_qty with parameters p_live_id, p_qty, p_request_id or with a single unnamed json/jsonb parameter, but no matches were found in the schema cache.\",\"hint\":\"Perhaps you meant to call the function public.batata_live_bag_update_qty(p_qty, p_request_id)\",\"message\":\"Could not find the function public.batata_live_bag_update_qty(p_live_id, p_qty, p_request_id) in the schema cache\"}"
+    },
+    {
+      "surface": "STRIPE TEST",
+      "attack": "create session order=b241022c-2883-42ed-828f-6e68415b72e5",
+      "identity": "buyer",
+      "result": "200 amt=905 sid=cs_test_a1uvaijQah20VxtK1edSVq7BwzZrJ6c3GSdxd8oxw1obUszAgYfxw8yWR8",
+      "impact": "SESSION CRIADA",
+      "severity": "info",
+      "evidence": "{\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1uvaijQah20VxtK1edSVq7BwzZrJ6c3GSdxd8oxw1obUszAgYfxw8yWR8#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21oYWlsUnxrVkRhQUQyNlJjSWBCN3BXNXVvVT1hamlcf3Fjd1dRMGJmREk9Yz09PH1CMzVTY0pBXD1kMU5HZl1da05gf0s1XGQ1NWA3bVFBNzNMJyknY3dqaFZgd3Ngdyc%2FcXdwYCknZ2RmbmJ3anBrYUZqaWp3Jz8nJmNjY2NjYycpJ2lkfGpwcVF8dWAnPyd2bGtiaWBabHFgaCcpJ2BrZGdpYFVpZGZgbWppYWB3dic%2FcXdwYHgl\",\"checkoutSessionId\":\"cs_test_a1uvaijQah20VxtK1edSVq7BwzZrJ6c3GSdxd8oxw1obUszAgYfxw8yWR8\",\"paidChatId\":\"68a70ea0-07a8-493b-b2eb-2c4665628723\",\"server_amount_cents\":905,\"amount_total\":905}"
+    },
+    {
+      "surface": "STRIPE TEST",
+      "attack": "create session order=10c41bc5-fb04-43c0-9810-ef992077bef8",
+      "identity": "fresh",
+      "result": "200 amt=905 sid=cs_test_a1XKZ38IARekmVOMlG01klhh5s3dBM4HcXRu62Obcs58MOiTSVTr2nKclT",
+      "impact": "SESSION CRIADA",
+      "severity": "info",
+      "evidence": "{\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1XKZ38IARekmVOMlG01klhh5s3dBM4HcXRu62Obcs58MOiTSVTr2nKclT#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21oYWlsUnxrVkRhQUQyNlJjSWBCN3BXNXVvVT1hamlcf3Fjd1dRMGJmREk9Yz09PH1CMzVTY0pBXD1kMU5HZl1da05gf0s1XGQ1NWA3bVFBNzNMJyknY3dqaFZgd3Ngdyc%2FcXdwYCknZ2RmbmJ3anBrYUZqaWp3Jz8nJmNjY2NjYycpJ2lkfGpwcVF8dWAnPyd2bGtiaWBabHFgaCcpJ2BrZGdpYFVpZGZgbWppYWB3dic%2FcXdwYHgl\",\"checkoutSessionId\":\"cs_test_a1XKZ38IARekmVOMlG01klhh5s3dBM4HcXRu62Obcs58MOiTSVTr2nKclT\",\"paidChatId\":\"74338880-e429-44b0-90bb-abae14364007\",\"server_amount_cents\":905,\"amount_total\":905}"
+    },
+    {
+      "surface": "REFUNDS",
+      "attack": "partial refund 50% on MB WAY concluido",
+      "identity": "buyer",
+      "result": "400 {\"code\":\"P0001\",\"details\":null,\"hint\":null,\"message\":\"no_platform_funds_for_wallet_refund\"}",
+      "impact": "mint from off-platform?",
+      "severity": "info",
+      "evidence": "{\"code\":\"P0001\",\"details\":null,\"hint\":null,\"message\":\"no_platform_funds_for_wallet_refund\"}"
+    },
+    {
+      "surface": "WALLET",
+      "attack": "balances after partial refund RPC",
+      "identity": "service_observe",
+      "result": "[{\"id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"balance\":39.81}, \n {\"id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"balance\":6.41}]",
+      "impact": "detect mint",
+      "severity": "info",
+      "evidence": "[{\"id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"balance\":39.81}, \n {\"id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"balance\":6.41}]"
+    },
+    {
+      "surface": "DISPUTES",
+      "attack": "INSERT dispute on MB WAY concluido",
+      "identity": "buyer",
+      "result": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"new row violates row-level security policy for table \\\"order_disputes\\\"\"}",
+      "impact": "dispute without stripe",
+      "severity": "info",
+      "evidence": "{\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"new row violates row-level security policy for table \\\"order_disputes\\\"\"}"
+    },
+    {
+      "surface": "CHAT",
+      "attack": "INSERT message into foreign chat fa1a3f99-03b8-40fc-a923-7964a6dad586",
+      "identity": "buyer",
+      "result": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"new row violates row-level security policy for table \\\"chat_messages\\\"\"}",
+      "impact": "blocked",
+      "severity": "info",
+      "evidence": "{\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"new row violates row-level security policy for table \\\"chat_messages\\\"\"}"
+    },
+    {
+      "surface": "LEDGER",
+      "attack": "INSERT wallet_transactions credit 50",
+      "identity": "buyer",
+      "result": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"new row violates row-level security policy for table \\\"wallet_transactions\\\"\"}",
+      "impact": "blocked",
+      "severity": "info",
+      "evidence": "{\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"new row violates row-level security policy for table \\\"wallet_transactions\\\"\"}"
+    }
+  ]
+}

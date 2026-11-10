@@ -1,0 +1,810 @@
+{
+  "stamp": "20260906T1452",
+  "prefix": "RTDA-20260906T1452",
+  "lenses": [
+    "DA1",
+    "DA2",
+    "DA3",
+    "DA4",
+    "DA5",
+    "DA6",
+    "DA7"
+  ],
+  "wells": [
+    "DA-A",
+    "DA-B",
+    "DA-C"
+  ],
+  "findings": [
+    {
+      "id": "DA-A1.proof_ok_clean",
+      "lens": "DA1",
+      "severity": "P2",
+      "title": "Helper path exacto aceita URL limpa",
+      "actor": "buyer JWT",
+      "pre": "RPC batata_dispute_proof_url_ok URL signed própria",
+      "repro": "DA-A1.proof_ok_clean",
+      "expected": "200/201 sem 54000",
+      "obtained": "200 false",
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "DA-A2.open_with_canonical_proof",
+      "lens": "DA3",
+      "severity": "P2",
+      "title": "Abrir disputa + prova canónica própria",
+      "actor": "buyer JWT",
+      "pre": "POST order_disputes proof_photos=[signed PNG próprio]",
+      "repro": "DA-A2.open_with_canonical_proof",
+      "expected": "200/201 sem 54000",
+      "obtained": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"dispute_proof_url_denied\"}",
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "DA-A3.label_canonical",
+      "lens": "DA1",
+      "severity": "P2",
+      "title": "Label URL canónica limpa OK",
+      "actor": "buyer JWT",
+      "pre": "PATCH return_label_url=signed PNG próprio https",
+      "repro": "DA-A3.label_canonical",
+      "expected": "200/201 sem 54000",
+      "obtained": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"order_dispute_label_url_denied\"}",
+      "proven": true,
+      "evidence": {}
+    }
+  ],
+  "blocked": [
+    {
+      "id": "DA-A1.canon_simple",
+      "lens": "DA2",
+      "title": "RPC URL limpa sem 54000",
+      "ev": "200 \"https://example.com/a\""
+    },
+    {
+      "id": "DA-A1.canon_signed",
+      "lens": "DA2",
+      "title": "RPC signed URL limpa sem 54000",
+      "ev": "200 \"https://fxdknzrqjenzqcvnwqqq.supabase.co/storage/v1/object/sign/fleaber_private/order_disputes/bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96/27de0758-9e80-41d8-b016-391420a2bf02/ok.png\""
+    },
+    {
+      "id": "DA-B1.control_252f_255c",
+      "lens": "DA4",
+      "title": "controlo %252f%255c concat (não contar)",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"dispute_proof_url_denied\"}"
+    },
+    {
+      "id": "DA-B2.unicode_revsolidus_29f5",
+      "lens": "DA4",
+      "title": "proof unicode slash U+29F5 (novo)",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"dispute_proof_url_denied\"}"
+    },
+    {
+      "id": "DA-B2b.unicode_small_revsolidus_fe68",
+      "lens": "DA4",
+      "title": "proof unicode slash U+FE68 (novo)",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"dispute_proof_url_denied\"}"
+    },
+    {
+      "id": "DA-B2c.overlong_c1af",
+      "lens": "DA4",
+      "title": "proof overlong UTF-8 %c1%af (novo)",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"dispute_proof_url_denied\"}"
+    },
+    {
+      "id": "DA-B2d.box_slash_2571",
+      "lens": "DA4",
+      "title": "proof unicode slash U+2571 (novo)",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"dispute_proof_url_denied\"}"
+    },
+    {
+      "id": "DA-B2e.math_rising_27cb",
+      "lens": "DA4",
+      "title": "proof unicode slash U+27CB (novo)",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"dispute_proof_url_denied\"}"
+    },
+    {
+      "id": "DA-B2f.scheme_single_slash",
+      "lens": "DA4",
+      "title": "proof scheme https:/ sem // (novo)",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"dispute_proof_url_denied\"}"
+    },
+    {
+      "id": "DA-B2g.backslash_raw",
+      "lens": "DA4",
+      "title": "proof backslash raw (novo)",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"dispute_proof_url_denied\"}"
+    },
+    {
+      "id": "DA-B3.dotdot_backslash",
+      "lens": "DA4",
+      "title": "proof ..\\ encoded → deny",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"dispute_proof_url_denied\"}"
+    },
+    {
+      "id": "DA-B4.bucket_public",
+      "lens": "DA4",
+      "title": "bucket swap public → deny",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"dispute_proof_url_denied\"}"
+    },
+    {
+      "id": "DA-B4b.proof_b2_on_a",
+      "lens": "DA4",
+      "title": "prova B2 em disputa A → deny",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"dispute_proof_url_denied\"}"
+    },
+    {
+      "id": "DA-B5.label_evil_host",
+      "lens": "DA4",
+      "title": "label host evil + needle",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"order_dispute_label_url_denied\"}"
+    },
+    {
+      "id": "DA-B5b.label_relative_needle",
+      "lens": "DA4",
+      "title": "label relativo com needle (novo vs host check)",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"order_dispute_label_url_denied\"}"
+    },
+    {
+      "id": "DA-B5c.label_https_single_slash",
+      "lens": "DA4",
+      "title": "label https:/ + needle (novo)",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"order_dispute_label_url_denied\"}"
+    },
+    {
+      "id": "DA-B5d.label_schemeless_needle",
+      "lens": "DA4",
+      "title": "label scheme-less + needle (novo)",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"order_dispute_label_url_denied\"}"
+    },
+    {
+      "id": "DA-B5e.label_auth_concat_no_slashmix",
+      "lens": "DA4",
+      "title": "label concat /../ (não %252f%255c)",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"order_dispute_label_url_denied\"}"
+    },
+    {
+      "id": "DA-C2.pedido_devolucao",
+      "lens": "DA5",
+      "title": "FSM buyer pedido_devolucao",
+      "ev": "200 [{\"id\":\"27de0758-9e80-41d8-b016-391420a2bf02\",\"created_at\":\"2026-09-06T13:54:16.433124+00:00\",\"product_id\":\"286e3efa-e33d-4924-8ba6-a3daec650a10\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c…"
+    },
+    {
+      "id": "DA-C2b.buyer_seller_fsm",
+      "lens": "DA5",
+      "title": "FSM buyer+seller até em_devolucao",
+      "ev": "200 [{\"id\":\"27de0758-9e80-41d8-b016-391420a2bf02\",\"created_at\":\"2026-09-06T13:54:16.433124+00:00\",\"product_id\":\"286e3efa-e33d-4924-8ba6-a3daec650a10\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c…"
+    },
+    {
+      "id": "DA-C1.second_dispute",
+      "lens": "DA5",
+      "title": "2.ª disputa recusada",
+      "ev": "409 {\"code\":\"23505\",\"details\":null,\"hint\":null,\"message\":\"dispute_already_exists_for_order\"}"
+    },
+    {
+      "id": "DA-C3.stock_refund",
+      "lens": "DA6",
+      "title": "stock restore ≤1 + refund ≤ captura",
+      "ev": {
+        "qty": "0→1",
+        "stripe": "0/0"
+      }
+    },
+    {
+      "id": "DA-C4.buyer_refund",
+      "lens": "DA7",
+      "title": "buyer refund 403",
+      "ev": "403 {\"ok\":false,\"error\":\"Sem permissão.\"}"
+    },
+    {
+      "id": "DA-C4b.release_with_open_dispute",
+      "lens": "DA7",
+      "title": "release bloqueado com disputa",
+      "ev": {
+        "hit": "200 false",
+        "dSeller": 0.0
+      }
+    }
+  ],
+  "skipped": [],
+  "probes": [
+    {
+      "id": "DA-A1.canon_simple",
+      "matrix": "DA-A",
+      "payload": "RPC batata_storage_url_path_canonical https://example.com/a",
+      "http": "200 \"https://example.com/a\"",
+      "bd": "\"https://example.com/a\"",
+      "result": "FAIL"
+    },
+    {
+      "id": "DA-A1.canon_signed",
+      "matrix": "DA-A",
+      "payload": "RPC canonical signed PNG próprio (https path normal)",
+      "http": "200 \"https://fxdknzrqjenzqcvnwqqq.supabase.co/storage/v1/object/sign/fleaber_private/order_disputes/bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96/27de0758-9e80-41d8-b016-391420a2bf02/ok.png\"",
+      "bd": "\"https://fxdknzrqjenzqcvnwqqq.supabase.co/storage/v1/object/sign/fleaber_private/order_disputes/bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96/27de0758-9e80-41d8-b016-391420a2bf02/ok.png\"",
+      "result": "FAIL"
+    },
+    {
+      "id": "DA-A1.proof_ok_clean",
+      "matrix": "DA-A",
+      "payload": "RPC batata_dispute_proof_url_ok URL signed própria",
+      "http": "200 false",
+      "bd": "ok=false",
+      "result": "HOLD"
+    },
+    {
+      "id": "DA-A2.open_with_canonical_proof",
+      "matrix": "DA-A",
+      "payload": "POST order_disputes proof_photos=[signed PNG próprio]",
+      "http": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"dispute_proof_url_denied\"}",
+      "bd": "did=null status=null photos=null",
+      "result": "HOLD"
+    },
+    {
+      "id": "DA-A3.label_canonical",
+      "matrix": "DA-A",
+      "payload": "PATCH return_label_url=signed PNG próprio https",
+      "http": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"order_dispute_label_url_denied\"}",
+      "bd": "url=null",
+      "result": "HOLD"
+    },
+    {
+      "id": "DA-B1.control_252f_255c",
+      "matrix": "DA-B",
+      "payload": "controlo exacto CU %252f%255c + path B2",
+      "http": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"dispute_proof_url_denied\"}",
+      "bd": "rpc=false photos=[]",
+      "result": "FAIL"
+    },
+    {
+      "id": "DA-B2.unicode_revsolidus_29f5",
+      "matrix": "DA-B",
+      "payload": "joiner U+29F5 REVERSE SOLIDUS OPERATOR + path B2",
+      "http": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"dispute_proof_url_denied\"}",
+      "bd": "rpc=false photos=[]",
+      "result": "FAIL"
+    },
+    {
+      "id": "DA-B2b.unicode_small_revsolidus_fe68",
+      "matrix": "DA-B",
+      "payload": "joiner U+FE68 SMALL REVERSE SOLIDUS + path B2",
+      "http": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"dispute_proof_url_denied\"}",
+      "bd": "rpc=false photos=[]",
+      "result": "FAIL"
+    },
+    {
+      "id": "DA-B2c.overlong_c1af",
+      "matrix": "DA-B",
+      "payload": "joiner overlong %c1%af (não está na lista %c0%af) + path B2",
+      "http": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"dispute_proof_url_denied\"}",
+      "bd": "rpc=false photos=[]",
+      "result": "FAIL"
+    },
+    {
+      "id": "DA-B2d.box_slash_2571",
+      "matrix": "DA-B",
+      "payload": "joiner U+2571 box-drawing slash + path B2",
+      "http": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"dispute_proof_url_denied\"}",
+      "bd": "rpc=false photos=[]",
+      "result": "FAIL"
+    },
+    {
+      "id": "DA-B2e.math_rising_27cb",
+      "matrix": "DA-B",
+      "payload": "joiner U+27CB math rising diagonal + path B2",
+      "http": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"dispute_proof_url_denied\"}",
+      "bd": "rpc=false photos=[]",
+      "result": "FAIL"
+    },
+    {
+      "id": "DA-B2f.scheme_single_slash",
+      "matrix": "DA-B",
+      "payload": "https:/ (um slash) host supabase + path próprio",
+      "http": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"dispute_proof_url_denied\"}",
+      "bd": "rpc=false photos=[]",
+      "result": "FAIL"
+    },
+    {
+      "id": "DA-B2g.backslash_raw",
+      "matrix": "DA-B",
+      "payload": "joiner backslash raw \\ + path B2",
+      "http": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"dispute_proof_url_denied\"}",
+      "bd": "rpc=false photos=[]",
+      "result": "FAIL"
+    },
+    {
+      "id": "DA-B3.dotdot_backslash",
+      "matrix": "DA-B",
+      "payload": "%2e%2e%5c traversal",
+      "http": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"dispute_proof_url_denied\"}",
+      "bd": "rpc=false photos=[]",
+      "result": "FAIL"
+    },
+    {
+      "id": "DA-B3b.residual_25252e",
+      "matrix": "DA-B",
+      "payload": "residual CDCI %25252e%25252e%25252f (não contar)",
+      "http": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"dispute_proof_url_denied\"}",
+      "bd": "rpc=false photos=[]",
+      "result": "FAIL"
+    },
+    {
+      "id": "DA-B4.bucket_public",
+      "matrix": "DA-B",
+      "payload": "/object/public/fleaber_private/ + needle próprio",
+      "http": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"dispute_proof_url_denied\"}",
+      "bd": "rpc=false photos=[]",
+      "result": "FAIL"
+    },
+    {
+      "id": "DA-B4b.proof_b2_on_a",
+      "matrix": "DA-B",
+      "payload": "signed URL objecto B2 em disputa A",
+      "http": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"dispute_proof_url_denied\"}",
+      "bd": "rpc=false photos=[]",
+      "result": "FAIL"
+    },
+    {
+      "id": "DA-B5.label_evil_host",
+      "matrix": "DA-B",
+      "payload": "https://evil.example/…/order_disputes/{buyer}/{oid}/label.png",
+      "http": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"order_dispute_label_url_denied\"}",
+      "bd": "stored=",
+      "result": "FAIL"
+    },
+    {
+      "id": "DA-B5b.label_relative_needle",
+      "matrix": "DA-B",
+      "payload": "relativo COM needle order_disputes/{b}/{oid}/ (sem https://)",
+      "http": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"order_dispute_label_url_denied\"}",
+      "bd": "stored=",
+      "result": "FAIL"
+    },
+    {
+      "id": "DA-B5c.label_https_single_slash",
+      "matrix": "DA-B",
+      "payload": "https:/evil.example/…/order_disputes/{b}/{oid}/ (sem //)",
+      "http": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"order_dispute_label_url_denied\"}",
+      "bd": "stored=",
+      "result": "FAIL"
+    },
+    {
+      "id": "DA-B5d.label_schemeless_needle",
+      "matrix": "DA-B",
+      "payload": "path scheme-less order_disputes/{b}/{oid}/ok.png",
+      "http": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"order_dispute_label_url_denied\"}",
+      "bd": "stored=",
+      "result": "FAIL"
+    },
+    {
+      "id": "DA-B5e.label_auth_concat_no_slashmix",
+      "matrix": "DA-B",
+      "payload": "label authenticated próprio + /../ + B2 (traversal real /)",
+      "http": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"order_dispute_label_url_denied\"}",
+      "bd": "stored=",
+      "result": "FAIL"
+    },
+    {
+      "id": "DA-C2.pedido_devolucao",
+      "matrix": "DA-C",
+      "payload": "buyer PATCH status=pedido_devolucao",
+      "http": "200 [{\"id\":\"27de0758-9e80-41d8-b016-391420a2bf02\",\"created_at\":\"2026-09-06T13:54:16.433124+00:00\",\"product_id\":\"286e3efa-e33d-4924-8ba6-a3daec650a10\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c…",
+      "bd": "status=pedido_devolucao",
+      "result": "FAIL"
+    },
+    {
+      "id": "DA-C2b.buyer_seller_fsm",
+      "matrix": "DA-C",
+      "payload": "buyer em_devolucao + seller reply disputa",
+      "http": "200 [{\"id\":\"27de0758-9e80-41d8-b016-391420a2bf02\",\"created_at\":\"2026-09-06T13:54:16.433124+00:00\",\"product_id\":\"286e3efa-e33d-4924-8ba6-a3daec650a10\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c…",
+      "bd": "status=em_devolucao reply=201",
+      "result": "FAIL"
+    },
+    {
+      "id": "DA-C1.second_dispute",
+      "matrix": "DA-C",
+      "payload": "2.ª POST order_disputes mesma encomenda",
+      "http": "409 {\"code\":\"23505\",\"details\":null,\"hint\":null,\"message\":\"dispute_already_exists_for_order\"}",
+      "bd": "",
+      "result": "FAIL"
+    },
+    {
+      "id": "DA-C3.stock_refund",
+      "matrix": "DA-C",
+      "payload": "devolvida → refund-order Stripe TEST",
+      "http": "200 {\"ok\":true,\"already_refunded\":true,\"idempotent\":true,\"refund_id\":\"re_3UCgWSH7FWYUN3jh072SoyEg\",\"status\":\"devolvida\",\"stock_units_applied\":null,\"amount_cents\":590,\"payment_intent\":\"pi_3UCgWSH7FWYUN3jh0IJzCrj0\",\"status_stripe\":\"succeeded\"}",
+      "bd": "qty 0→1 stripe_n=0 stripe_sum=0 paid=590 Δb=0.0 Δs=0.0",
+      "result": "FAIL"
+    },
+    {
+      "id": "DA-C4.buyer_refund",
+      "matrix": "DA-C",
+      "payload": "buyer JWT POST refund-order (seller-only)",
+      "http": "403 {\"ok\":false,\"error\":\"Sem permissão.\"}",
+      "bd": "",
+      "result": "FAIL"
+    },
+    {
+      "id": "DA-C4b.release_with_open_dispute",
+      "matrix": "DA-C",
+      "payload": "release RPC com disputa aberta",
+      "http": "200 false",
+      "bd": "Δseller=0.0",
+      "result": "FAIL"
+    }
+  ],
+  "notes": [
+    {
+      "id": "fixture.paid",
+      "lens": "DA3",
+      "title": "setup_paid_order Stripe TEST",
+      "ev": "200 {\n  \"ok\": true,\n  \"order_id\": \"27de0758-9e80-41d8-b016-391420a2bf02\",\n  \"product_id\": \"286e3efa-e33d-4924-8ba6-a3daec650a10\",\n  \"payment_intent_id\": \"pi_3UCgWSH7FWYUN3jh0IJzCrj0\",\n  \"pi_status\": \"succeeded\",\n  \"pi_amount_received\": 590,\n  \"…"
+    },
+    {
+      "id": "fsm.enviado",
+      "lens": "DA5",
+      "title": "seller → enviado",
+      "ev": {
+        "hit": "200 [{\"id\":\"27de0758-9e80-41d8-b016-391420a2bf02\",\"created_at\":\"2026-09-06T13:54:16.433124+00:00\",\"product_id\":\"286e3efa-e33d-4924-8ba6-a3daec650a10\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c…",
+        "status": "enviado",
+        "shipped_at": "2026-09-06T13:54:18.869483+00:00"
+      }
+    },
+    {
+      "id": "fsm.concluido",
+      "lens": "DA5",
+      "title": "buyer → concluido",
+      "ev": {
+        "hit": "200 [{\"id\":\"27de0758-9e80-41d8-b016-391420a2bf02\",\"created_at\":\"2026-09-06T13:54:16.433124+00:00\",\"product_id\":\"286e3efa-e33d-4924-8ba6-a3daec650a10\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c…",
+        "status": "concluido"
+      }
+    },
+    {
+      "id": "DA1.upload",
+      "lens": "DA1",
+      "title": "PNG próprio assinado",
+      "ev": {
+        "up": "200 {\"Key\":\"fleaber_private/order_disputes/bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96/27de0758-9e80-41d8-b016-391420a2bf02/ok.png\",\"Id\":\"31741ed0-85a6-48ab-9a03-d3c13a5d1d53\"}",
+        "signed": "https://fxdknzrqjenzqcvnwqqq.supabase.co/storage/v1/object/sign/fleaber_private/order_disputes/bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96/27de0758-9e80-41d8-b016-391420a2bf02/ok.png?token=eyJraWQiOiI3YmY5ZTQ0Ni1mOTg4LTRlNWEtYjM0Mi0zYTQ1ZTE5NTgzYzkiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJmbGVhYmVyX3ByaXZhdGUvb3JkZXJfZGlzcHV0ZXMvYmZjYmVlZWUtN2RjMS00Y2QxLWIyYTctZDNhMGE2Y2Y3Yzk2LzI3ZGUwNzU4LTllODAtNDFkOC1iMDE2LTM5MTQyMGEyYmYwMi9vay5wbmciLCJzY29wZSI6ImRvd25sb2FkIiwiaWF0IjoxNzg4NzAyODYwLCJleHAiOjE3ODg3MDY0NjB9.CtR1kRFWOksw84QPmNMacgs1tlz5zI4LhM9peRdZK2o",
+        "path": "order_disputes/bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96/27de0758-9e80-41d8-b016-391420a2bf02/ok.png"
+      }
+    },
+    {
+      "id": "DA4.alien",
+      "lens": "DA4",
+      "title": "objecto B2",
+      "ev": "200 {\"Key\":\"fleaber_private/order_disputes/b23a83be-6498-4a88-9182-320581e8b4d3/00000000-0000-0000-0000-00000000da02/rtda-secret.png\",\"Id\":\"c7fbd341-a7ec-418e-8a39-37ac049aab65\"}"
+    },
+    {
+      "id": "A1.canon_simple",
+      "lens": "DA1",
+      "title": "RPC https://example.com/a",
+      "ev": "200 \"https://example.com/a\""
+    },
+    {
+      "id": "A1.canon_signed",
+      "lens": "DA1",
+      "title": "RPC signed PNG próprio",
+      "ev": "200 \"https://fxdknzrqjenzqcvnwqqq.supabase.co/storage/v1/object/sign/fleaber_private/order_disputes/bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96/27de0758-9e80-41d8-b016-391420a2bf02/ok.png\""
+    },
+    {
+      "id": "A1.proof_ok_clean",
+      "lens": "DA1",
+      "title": "RPC batata_dispute_proof_url_ok signed próprio",
+      "ev": {
+        "hit": "200 false",
+        "body": "false"
+      }
+    },
+    {
+      "id": "A2.insert_photo",
+      "lens": "DA3",
+      "title": "INSERT disputa proof canónica",
+      "ev": {
+        "hit": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"dispute_proof_url_denied\"}",
+        "photos": "",
+        "status": ""
+      }
+    },
+    {
+      "id": "A2.fallback_empty",
+      "lens": "DA3",
+      "title": "INSERT vazio após falha com foto",
+      "ev": "201 [{\"id\":\"1b290954-baaf-4ba4-9166-6785e93aa6cb\",\"order_id\":\"27de0758-9e80-41d8-b016-391420a2bf02\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"reason\":\"danificado\",\"description\":\"RTDA prova disputa artigo danificado no envio.\",\"proof_ph…"
+    },
+    {
+      "id": "A3.label_clean",
+      "lens": "DA1",
+      "title": "PATCH return_label_url canónica",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"order_dispute_label_url_denied\"}"
+    },
+    {
+      "id": "DA-B1.control_252f_255c",
+      "lens": "DA4",
+      "title": "controlo %252f%255c concat (não contar)",
+      "ev": {
+        "rpc_ok": "200 false",
+        "hit": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"dispute_proof_url_denied\"}",
+        "photos": ""
+      }
+    },
+    {
+      "id": "DA-B2.unicode_revsolidus_29f5",
+      "lens": "DA4",
+      "title": "proof unicode slash U+29F5 (novo)",
+      "ev": {
+        "rpc_ok": "200 false",
+        "hit": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"dispute_proof_url_denied\"}",
+        "photos": ""
+      }
+    },
+    {
+      "id": "DA-B2b.unicode_small_revsolidus_fe68",
+      "lens": "DA4",
+      "title": "proof unicode slash U+FE68 (novo)",
+      "ev": {
+        "rpc_ok": "200 false",
+        "hit": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"dispute_proof_url_denied\"}",
+        "photos": ""
+      }
+    },
+    {
+      "id": "DA-B2c.overlong_c1af",
+      "lens": "DA4",
+      "title": "proof overlong UTF-8 %c1%af (novo)",
+      "ev": {
+        "rpc_ok": "200 false",
+        "hit": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"dispute_proof_url_denied\"}",
+        "photos": ""
+      }
+    },
+    {
+      "id": "DA-B2d.box_slash_2571",
+      "lens": "DA4",
+      "title": "proof unicode slash U+2571 (novo)",
+      "ev": {
+        "rpc_ok": "200 false",
+        "hit": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"dispute_proof_url_denied\"}",
+        "photos": ""
+      }
+    },
+    {
+      "id": "DA-B2e.math_rising_27cb",
+      "lens": "DA4",
+      "title": "proof unicode slash U+27CB (novo)",
+      "ev": {
+        "rpc_ok": "200 false",
+        "hit": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"dispute_proof_url_denied\"}",
+        "photos": ""
+      }
+    },
+    {
+      "id": "DA-B2f.scheme_single_slash",
+      "lens": "DA4",
+      "title": "proof scheme https:/ sem // (novo)",
+      "ev": {
+        "rpc_ok": "200 false",
+        "hit": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"dispute_proof_url_denied\"}",
+        "photos": ""
+      }
+    },
+    {
+      "id": "DA-B2g.backslash_raw",
+      "lens": "DA4",
+      "title": "proof backslash raw (novo)",
+      "ev": {
+        "rpc_ok": "200 false",
+        "hit": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"dispute_proof_url_denied\"}",
+        "photos": ""
+      }
+    },
+    {
+      "id": "DA-B3.dotdot_backslash",
+      "lens": "DA4",
+      "title": "proof ..\\ encoded → deny",
+      "ev": {
+        "rpc_ok": "200 false",
+        "hit": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"dispute_proof_url_denied\"}",
+        "photos": ""
+      }
+    },
+    {
+      "id": "DA-B3b.residual_25252e",
+      "lens": "DA4",
+      "title": "residual CDCI triple-dot (não contar)",
+      "ev": {
+        "rpc_ok": "200 false",
+        "hit": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"dispute_proof_url_denied\"}",
+        "photos": ""
+      }
+    },
+    {
+      "id": "DA-B4.bucket_public",
+      "lens": "DA4",
+      "title": "bucket swap public → deny",
+      "ev": {
+        "rpc_ok": "200 false",
+        "hit": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"dispute_proof_url_denied\"}",
+        "photos": ""
+      }
+    },
+    {
+      "id": "DA-B4b.proof_b2_on_a",
+      "lens": "DA4",
+      "title": "prova B2 em disputa A → deny",
+      "ev": {
+        "rpc_ok": "200 false",
+        "hit": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"dispute_proof_url_denied\"}",
+        "photos": ""
+      }
+    },
+    {
+      "id": "DA-B5.label_evil_host",
+      "lens": "DA4",
+      "title": "label host evil + needle",
+      "ev": {
+        "hit": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"order_dispute_label_url_denied\"}",
+        "stored": ""
+      }
+    },
+    {
+      "id": "DA-B5b.label_relative_needle",
+      "lens": "DA4",
+      "title": "label relativo com needle (novo vs host check)",
+      "ev": {
+        "hit": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"order_dispute_label_url_denied\"}",
+        "stored": ""
+      }
+    },
+    {
+      "id": "DA-B5c.label_https_single_slash",
+      "lens": "DA4",
+      "title": "label https:/ + needle (novo)",
+      "ev": {
+        "hit": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"order_dispute_label_url_denied\"}",
+        "stored": ""
+      }
+    },
+    {
+      "id": "DA-B5d.label_schemeless_needle",
+      "lens": "DA4",
+      "title": "label scheme-less + needle (novo)",
+      "ev": {
+        "hit": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"order_dispute_label_url_denied\"}",
+        "stored": ""
+      }
+    },
+    {
+      "id": "DA-B5e.label_auth_concat_no_slashmix",
+      "lens": "DA4",
+      "title": "label concat /../ (não %252f%255c)",
+      "ev": {
+        "hit": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"order_dispute_label_url_denied\"}",
+        "stored": ""
+      }
+    },
+    {
+      "id": "C2.pedido",
+      "lens": "DA5",
+      "title": "buyer pedido_devolucao",
+      "ev": {
+        "hit": "200 [{\"id\":\"27de0758-9e80-41d8-b016-391420a2bf02\",\"created_at\":\"2026-09-06T13:54:16.433124+00:00\",\"product_id\":\"286e3efa-e33d-4924-8ba6-a3daec650a10\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c…",
+        "status": "pedido_devolucao"
+      }
+    },
+    {
+      "id": "C2.steps",
+      "lens": "DA5",
+      "title": "buyer em_devolucao + seller reply",
+      "ev": {
+        "em_dev": "200 [{\"id\":\"27de0758-9e80-41d8-b016-391420a2bf02\",\"created_at\":\"2026-09-06T13:54:16.433124+00:00\",\"product_id\":\"286e3efa-e33d-4924-8ba6-a3daec650a10\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c…",
+        "status": "em_devolucao",
+        "seller_reply": "201 [{\"id\":\"0fbd9b3e-8911-40df-9af0-4a30e1f845e2\",\"dispute_id\":\"1b290954-baaf-4ba4-9166-6785e93aa6cb\",\"sender_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"message\":\"RTDA seller recebeu pedido de devolução.\",\"proof_photos\":[],\"created_at\":\"2026-0…"
+      }
+    },
+    {
+      "id": "C1.second",
+      "lens": "DA5",
+      "title": "2.ª disputa mesma order",
+      "ev": "409 {\"code\":\"23505\",\"details\":null,\"hint\":null,\"message\":\"dispute_already_exists_for_order\"}"
+    },
+    {
+      "id": "C3.stock_refund",
+      "lens": "DA6",
+      "title": "stock restore no refund",
+      "ev": {
+        "dev": "200 [{\"id\":\"27de0758-9e80-41d8-b016-391420a2bf02\",\"created_at\":\"2026-09-06T13:54:16.433124+00:00\",\"product_id\":\"286e3efa-e33d-4924-8ba6-a3daec650a10\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c…",
+        "refund": "200 {\"ok\":true,\"already_refunded\":true,\"idempotent\":true,\"refund_id\":\"re_3UCgWSH7FWYUN3jh072SoyEg\",\"status\":\"devolvida\",\"stock_units_applied\":null,\"amount_cents\":590,\"payment_intent\":\"pi_3UCgWSH7FWYUN3jh0IJzCrj0\",\"status_stripe\":\"succeeded\"}",
+        "status": "devolvida",
+        "qty": "0→0→1",
+        "paid": 590,
+        "stripe_n": 0,
+        "stripe_sum": 0,
+        "dBuyer": 0.0,
+        "dSeller": 0.0
+      }
+    },
+    {
+      "id": "fixture.paid",
+      "lens": "DA7",
+      "title": "setup_paid_order Stripe TEST",
+      "ev": "200 {\n  \"ok\": true,\n  \"order_id\": \"7c2886e7-a389-4c11-aa63-016a1a21ce0f\",\n  \"product_id\": \"5c3dc0c5-ec77-4962-9888-aa12dade689a\",\n  \"payment_intent_id\": \"pi_3UCgWlH7FWYUN3jh1ELLPnbu\",\n  \"pi_status\": \"succeeded\",\n  \"pi_amount_received\": 590,\n  \"…"
+    },
+    {
+      "id": "C4.buyer_refund",
+      "lens": "DA7",
+      "title": "buyer refund-order",
+      "ev": "403 {\"ok\":false,\"error\":\"Sem permissão.\"}"
+    },
+    {
+      "id": "fixture.paid",
+      "lens": "DA7",
+      "title": "setup_paid_order Stripe TEST",
+      "ev": "200 {\n  \"ok\": true,\n  \"order_id\": \"9fd2297a-06a3-47bc-80e3-715d7ffdcf1e\",\n  \"product_id\": \"64729503-4578-4c75-9d08-0a0c93058af9\",\n  \"payment_intent_id\": \"pi_3UCgWpH7FWYUN3jh09UiAgEj\",\n  \"pi_status\": \"succeeded\",\n  \"pi_amount_received\": 590,\n  \"…"
+    },
+    {
+      "id": "fsm.enviado",
+      "lens": "DA5",
+      "title": "seller → enviado",
+      "ev": {
+        "hit": "200 [{\"id\":\"9fd2297a-06a3-47bc-80e3-715d7ffdcf1e\",\"created_at\":\"2026-09-06T13:54:38.799484+00:00\",\"product_id\":\"64729503-4578-4c75-9d08-0a0c93058af9\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c…",
+        "status": "enviado",
+        "shipped_at": "2026-09-06T13:54:41.306078+00:00"
+      }
+    },
+    {
+      "id": "fsm.concluido",
+      "lens": "DA5",
+      "title": "buyer → concluido",
+      "ev": {
+        "hit": "200 [{\"id\":\"9fd2297a-06a3-47bc-80e3-715d7ffdcf1e\",\"created_at\":\"2026-09-06T13:54:38.799484+00:00\",\"product_id\":\"64729503-4578-4c75-9d08-0a0c93058af9\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c…",
+        "status": "concluido"
+      }
+    },
+    {
+      "id": "C4.release_open",
+      "lens": "DA7",
+      "title": "release com disputa aberta",
+      "ev": {
+        "dispute": "201 [{\"id\":\"1a3e8823-9e01-4752-a9a4-0df34c456bc1\",\"order_id\":\"9fd2297a-06a3-47bc-80e3-715d7ffdcf1e\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"reason\":\"danificado\",\"description\":\"RTDA prova disputa artigo danificado no envio.\",\"proof_ph…",
+        "release": "200 false",
+        "dSeller": 0.0
+      }
+    },
+    {
+      "id": "DA.end",
+      "lens": "DA7",
+      "title": "wallets fim pass1",
+      "ev": {
+        "buyer": 61.1,
+        "seller": 50.0,
+        "buyer2": 0,
+        "seller2": 0
+      }
+    }
+  ],
+  "actors": {
+    "buyer": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+    "seller": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+    "buyer2": "b23a83be-6498-4a88-9182-320581e8b4d3",
+    "seller2": null
+  },
+  "created": {
+    "orders": [
+      "27de0758-9e80-41d8-b016-391420a2bf02",
+      "7c2886e7-a389-4c11-aa63-016a1a21ce0f",
+      "9fd2297a-06a3-47bc-80e3-715d7ffdcf1e"
+    ],
+    "products": [
+      "286e3efa-e33d-4924-8ba6-a3daec650a10",
+      "5c3dc0c5-ec77-4962-9888-aa12dade689a",
+      "64729503-4578-4c75-9d08-0a0c93058af9"
+    ],
+    "disputes": [
+      "1b290954-baaf-4ba4-9166-6785e93aa6cb",
+      "1a3e8823-9e01-4752-a9a4-0df34c456bc1"
+    ]
+  }
+}

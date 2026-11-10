@@ -1,0 +1,173 @@
+{
+  "auditor": "REDTEAM_BLIND_AW_HUB_EDGE_POS_ANAS_v1",
+  "pass": 2,
+  "stamp": "20260902T1608",
+  "lives_svc": [
+    {
+      "id": "06021c4d-270b-47cf-9dd9-ceffed8d6ab5",
+      "status": "ended",
+      "is_active": false,
+      "title": "RTAW-20260902T1608 error-active"
+    },
+    {
+      "id": "181fc282-68ad-469f-8e10-e4e592d3d859",
+      "status": "ended",
+      "is_active": false,
+      "title": "RTAW-20260902T1608 live-pub"
+    },
+    {
+      "id": "cd6d425c-8891-445f-b2be-7f901bdaac13",
+      "status": "ended",
+      "is_active": false,
+      "title": "RTAW-20260902T1608 draft-active"
+    }
+  ],
+  "hub_lives": [
+    {
+      "id": "06021c4d-270b-47cf-9dd9-ceffed8d6ab5",
+      "status": "ended",
+      "is_active": false,
+      "mux_playback_id": "rtaw_error_pb_20260902T1608",
+      "mux_vod_playback_id": "rtaw_error_vod_20260902T1608",
+      "title": "RTAW-20260902T1608 error-active"
+    },
+    {
+      "id": "181fc282-68ad-469f-8e10-e4e592d3d859",
+      "status": "ended",
+      "is_active": false,
+      "mux_playback_id": "rtaw_live_pb_20260902T1608",
+      "mux_vod_playback_id": null,
+      "title": "RTAW-20260902T1608 live-pub"
+    },
+    {
+      "id": "cd6d425c-8891-445f-b2be-7f901bdaac13",
+      "status": "ended",
+      "is_active": false,
+      "mux_playback_id": "rtaw_draft_pb_20260902T1608",
+      "mux_vod_playback_id": "rtaw_draft_vod_20260902T1608",
+      "title": "RTAW-20260902T1608 draft-active"
+    }
+  ],
+  "draft_row": [
+    {
+      "id": "cd6d425c-8891-445f-b2be-7f901bdaac13",
+      "status": "ended",
+      "is_active": false,
+      "mux_playback_id": "rtaw_draft_pb_20260902T1608",
+      "mux_vod_playback_id": "rtaw_draft_vod_20260902T1608",
+      "title": "RTAW-20260902T1608 draft-active"
+    }
+  ],
+  "error_row": [
+    {
+      "id": "06021c4d-270b-47cf-9dd9-ceffed8d6ab5",
+      "status": "ended",
+      "is_active": false,
+      "mux_playback_id": "rtaw_error_pb_20260902T1608",
+      "mux_vod_playback_id": "rtaw_error_vod_20260902T1608",
+      "title": "RTAW-20260902T1608 error-active"
+    }
+  ],
+  "fomo_draft": {
+    "ok": true,
+    "items": [],
+    "live_id": "cd6d425c-8891-445f-b2be-7f901bdaac13",
+    "is_active": false,
+    "live_status": "ended",
+    "viewer_count": 0
+  },
+  "qty_vs_stock": {
+    "ended_avail": {
+      "stock": "200 loc=null acao=null {\"ok\": false, \"error\": \"live_item_not_found\"}",
+      "qty": "200 loc=null acao=null 2",
+      "qty_json": 2
+    },
+    "ended_rf": {
+      "stock": "200 loc=null acao=null {\"ok\": false, \"error\": \"live_item_not_found\"}",
+      "qty": "200 loc=null acao=null 1",
+      "qty_json": 1
+    },
+    "hitch0": {
+      "stock": "200 loc=null acao=null {\"ok\": false, \"error\": \"live_item_not_found\"}",
+      "qty": "200 loc=null acao=null 2",
+      "qty_json": 2
+    },
+    "paused": {
+      "stock": "200 loc=null acao=null {\"ok\": false, \"error\": \"live_item_not_found\"}",
+      "qty": "200 loc=null acao=null 2",
+      "qty_json": 2
+    },
+    "showing": {
+      "stock": "200 loc=null acao=null {\"ok\": false, \"error\": \"live_item_not_found\"}",
+      "qty": "200 loc=null acao=null 1",
+      "qty_json": 1
+    }
+  },
+  "mux_draft": "200 loc=null acao=* {\"playback_id\":\"rtaw_draft_vod_20260902T1608\",\"playback_url\":\"https://stream.mux.com/rtaw_draft_vod_20260902T1608.m3u8\",\"source\":\"cache\",\"is_live\":false}",
+  "mux_error": "200 loc=null acao=* {\"playback_id\":\"rtaw_error_vod_20260902T1608\",\"playback_url\":\"https://stream.mux.com/rtaw_error_vod_20260902T1608.m3u8\",\"source\":\"cache\",\"is_live\":false}",
+  "connect_decimal": "303 loc=https://127.0.0.1/wallet acao=* ",
+  "connect_127_1": "303 loc=https://127.0.0.1/wallet acao=* ",
+  "findings": [
+    {
+      "id": "RTAW-AW1-DRAFT-ACTIVE-HUB-LIVES",
+      "lens": "AW1",
+      "severity": "P3",
+      "title": "hub_lives_public ainda lista draft (mesmo após endLives se status não mudou para ended)",
+      "actor": "anon",
+      "pre": "pass1 draft+is_active; pass2 re-read",
+      "repro": "GET hub_lives_public?id=eq.draft",
+      "expected": "[] após cleanup ended, ou ausente se ainda draft",
+      "obtained": [
+        {
+          "id": "cd6d425c-8891-445f-b2be-7f901bdaac13",
+          "status": "ended",
+          "is_active": false,
+          "mux_playback_id": "rtaw_draft_pb_20260902T1608",
+          "mux_vod_playback_id": "rtaw_draft_vod_20260902T1608",
+          "title": "RTAW-20260902T1608 draft-active"
+        }
+      ],
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "RTAW-AW1-ERROR-ACTIVE-HUB-LIVES",
+      "lens": "AW1",
+      "severity": "P3",
+      "title": "hub_lives_public lista status=error via OR is_active",
+      "actor": "anon",
+      "pre": "status=error is_active (cleanup may have ended it)",
+      "repro": "GET hub_lives_public",
+      "expected": "error fora da vitrine",
+      "obtained": [
+        {
+          "id": "06021c4d-270b-47cf-9dd9-ceffed8d6ab5",
+          "status": "ended",
+          "is_active": false,
+          "mux_playback_id": "rtaw_error_pb_20260902T1608",
+          "mux_vod_playback_id": "rtaw_error_vod_20260902T1608",
+          "title": "RTAW-20260902T1608 error-active"
+        }
+      ],
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "RTAW-AW2-CONNECT-DECIMAL-LOCALHOST",
+      "lens": "AW2",
+      "severity": "P3",
+      "title": "Connect GET aceita 2130706433 / 127.1 e 303 para https://127.0.0.1/wallet",
+      "actor": "anon",
+      "pre": "sanitize hostAllowed(127.0.0.1) após URL parse",
+      "repro": "GET create-connect-account?web_return_origin=https://2130706433",
+      "expected": "rejeitar IPs decimais / shorthand (não na allowlist literal)",
+      "obtained": {
+        "decimal": "303 loc=https://127.0.0.1/wallet acao=* ",
+        "shorthand": "303 loc=https://127.0.0.1/wallet acao=* "
+      },
+      "proven": true,
+      "evidence": {}
+    }
+  ],
+  "holds": []
+}

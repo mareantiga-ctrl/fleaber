@@ -1,0 +1,155 @@
+{
+  "FROZEN_AT": "2026-08-30T15:25:00Z",
+  "audit_id": "RT1605",
+  "stamp": "20260830T1605",
+  "project": "fxdknzrqjenzqcvnwqqq",
+  "environment": "staging",
+  "stripe": "TEST",
+  "production_touched": false,
+  "fase4_started": false,
+  "fixes_implemented": false,
+  "verdict": "D_PASS_CEGO_SATURADO",
+  "saturation": true,
+  "last_pass_new_p0_p1_class": false,
+  "checklist": {
+    "p0_open": false,
+    "p0_count": 0,
+    "p1_open": false,
+    "p1_count": 0,
+    "buyer_manipulates_authoritative_price": false,
+    "buyer_manipulates_authoritative_qty": false,
+    "seller_forges_platform_payment": false,
+    "jwt_creates_balance": false,
+    "refund_exceeds_capture": false,
+    "release_plus_refund_mints": false,
+    "payout_duplicate_transfer": false,
+    "stock1_two_valid_sales": false,
+    "stock1_two_permanent_captures": "NOT_PROVEN",
+    "capacity_bypass": false,
+    "cross_user_financial": false,
+    "cross_user_sensitive": false,
+    "buyer_assumes_seller_admin": false,
+    "seller_assumes_buyer_admin": false,
+    "reviews_forged_or_duplicated": false,
+    "dangerous_security_definer": false,
+    "critical_rls_broken": false,
+    "edge_trusts_client_authority": false,
+    "critical_conclusion_unproven": true,
+    "functional_regression": false,
+    "last_pass_new_p0_p1_class": false,
+    "saturation": true,
+    "production_touched": false,
+    "fase4_started": false
+  },
+  "findings": [
+    {
+      "id": "RT1605-P2-01",
+      "severity": "P2",
+      "title": "JWT da parte da encomenda consegue INSERT em stripe_checkout_events (incl. refund_created)",
+      "actor": "buyer",
+      "preconditions": "order própria",
+      "reproduction": "POST /rest/v1/stripe_checkout_events {order_id, buyer_id: self, event: refund_created} → 201. B2 na order alheia → 403.",
+      "impact": "Poluição de diário; release de wallet pode recusar crédito se o evento for tratado como refund Stripe. Não encadeado com captura real nesta ronda.",
+      "state": "ABERTO"
+    },
+    {
+      "id": "RT1605-P3-01",
+      "severity": "P3",
+      "title": "batata_find_user_id_by_email enumeração lenta (só vendedor)",
+      "actor": "seller",
+      "preconditions": "JWT vendedor",
+      "reproduction": "POST /rpc/batata_find_user_id_by_email; buyer→null; seller→uuid próprio",
+      "impact": "Enum 5/h para convites staff",
+      "state": "ABERTO"
+    },
+    {
+      "id": "RT1605-P3-02",
+      "severity": "P3",
+      "title": "ps-pairing-claim devolve device_token a código 6 dígitos válido",
+      "actor": "anon",
+      "preconditions": "código gerado por seller/helper",
+      "reproduction": "POST /functions/v1/ps-pairing-claim {code}",
+      "impact": "Fluxo PS intencional; rate-limit; B2 sem helper not_allowed",
+      "state": "ACEITE_RESIDUAL"
+    }
+  ],
+  "rejected_false_positives": [
+    "SELECT wallet_transactions/order_disputes/chat_messages do próprio lab",
+    "RPC HTTP 200 com body false/not_allowed/order_not_paid",
+    "Gorjeta wallet 1€ (débito 1,00 / crédito 0,57 / taxa 0,43) sobre saldo pré-existente",
+    "PS pairing pelo helper com can_manage_reservations (convite lab, cleanup 204)"
+  ],
+  "invariants": {
+    "A_stripe_charges_server_contract": "HELD",
+    "B_buyer_no_price_qty_authority": "HELD",
+    "C_no_over_distribution": "HELD_ON_EXERCISED_PATHS",
+    "D_no_double_sale_unit": "HELD",
+    "E_jwt_no_privileged_money_fields": "HELD",
+    "F_offplatform_no_wallet_mint": "HELD_ON_MBWAY_PATH",
+    "G_refund_le_capture": "NOT_EXERCISED_WITH_PRODUCT_CAPTURE",
+    "H_parties_coherent": "HELD",
+    "I_one_payout_intent_one_transfer": "HELD",
+    "J_two_intents_two_transfers": "HELD",
+    "K_catalog_no_retro_contract": "HELD",
+    "L_offer_bundle_reservation_authority": "HELD"
+  },
+  "races": [
+    {
+      "name": "stock=1 two buyers INSERT",
+      "final": "1 order 201 + 1 order_hold_exceeds_stock; product quantity still 1"
+    },
+    {
+      "name": "stock=1 10x same buyer INSERT",
+      "final": "1 order created, rest 400"
+    },
+    {
+      "name": "8x checkout same order",
+      "final": "8x 200, 1 checkoutSessionId, reused_session true"
+    },
+    {
+      "name": "payout two distinct keys 1 cent",
+      "final": "two distinct TEST transferIds from existing balance"
+    },
+    {
+      "name": "payout same idempotency_key",
+      "final": "same transferId, idempotent true"
+    },
+    {
+      "name": "two refunds no PI",
+      "final": "both 422"
+    }
+  ],
+  "stripe_test": {
+    "session_created": true,
+    "examples": [
+      {"client_amount_cents": 50, "server_amount_cents": 3215, "item_eur": 30, "shipping": "hand"},
+      {"client_amount_cents": 50, "server_amount_cents": 2144, "bag": "2x11eur"}
+    ],
+    "product_checkout_capture_completed": false,
+    "payout_test_transfers_1_cent": true,
+    "wallet_tip_conservation": {"debit_eur": 1.0, "seller_credit_eur": 0.57, "fee_eur": 0.43}
+  },
+  "openapi": {"tables": 68, "rpcs": 176},
+  "probes": [
+    "tool/redteam_cega_indep_20260830T1605/pass1.dart",
+    "tool/redteam_cega_indep_20260830T1605/pass23.dart",
+    "tool/redteam_cega_indep_20260830T1605/pass4.dart",
+    "tool/redteam_cega_indep_20260830T1605/pass5.dart",
+    "tool/redteam_cega_indep_20260830T1605/pass6.dart"
+  ],
+  "evidence_files": [
+    "tool/redteam_cega_indep_20260830T1605/out/pass1.json",
+    "tool/redteam_cega_indep_20260830T1605/out/pass23.json",
+    "tool/redteam_cega_indep_20260830T1605/out/pass4.json",
+    "tool/redteam_cega_indep_20260830T1605/out/pass5.json",
+    "tool/redteam_cega_indep_20260830T1605/out/pass6.json",
+    "tool/redteam_cega_indep_20260830T1605/out/openapi_svc2.json",
+    "tool/redteam_cega_indep_20260830T1605/out/rpc_sweep.json"
+  ],
+  "gaps": [
+    "Product Checkout Sessions not paid through to capture/webhook",
+    "P2-01 not chained to captured order + release",
+    "Partial refund / raffle prize / OCR ingest with stolen token not fully chained",
+    "Not every OpenAPI RPC invoked with exact signature"
+  ]
+}

@@ -1,0 +1,700 @@
+{
+  "auditor": "REDTEAM_BLIND_INDEP_v4",
+  "stamp": "20260831T0816",
+  "project": "fxdknzrqjenzqcvnwqqq",
+  "production_touched": false,
+  "fase4": false,
+  "corrections_applied": false,
+  "fresh_id": "39008314-d9f8-405c-98d4-be1ebd332dff",
+  "findings": [
+    {
+      "id": "RTI4-P3-REVIEWS-GERAIS-UID",
+      "title": "JWT lê reviews_gerais.buyer_id de terceiros",
+      "actor": "buyer",
+      "sev": "P2",
+      "well": "3",
+      "pre": "GET reviews_gerais",
+      "request": "buyer JWT",
+      "before": null,
+      "after": [
+        "4b343994-0b66-488e-a470-b7594f51cffb",
+        "4b343994-0b66-488e-a470-b7594f51cffb",
+        "980f4fa1-0004-42f9-abca-69f1a9c29588"
+      ],
+      "impact": "UID de autores de reviews Hub (view pública omite).",
+      "repro": "GET /rest/v1/reviews_gerais?select=id,buyer_id"
+    },
+    {
+      "id": "RTI4-P1-HOLD-UNLIST-OWN-LIVE",
+      "title": "unlist + live_id activo do próprio seller",
+      "actor": "buyer JWT",
+      "sev": "P1",
+      "well": "1",
+      "pre": "produto morto/montra",
+      "request": "POST orders status=reserva_pendente live=4d2efb5a-d520-4478-8d8d-1a2a0a92cc5c raffle=null",
+      "before": {
+        "product": "bf6c5e1d-f59f-471c-be48-f12d5f36d044"
+      },
+      "after": {
+        "id": "73be7fe0-4f15-409b-9eb4-93fec9f5fb5b",
+        "status": "reserva_pendente",
+        "product_id": "bf6c5e1d-f59f-471c-be48-f12d5f36d044",
+        "live_id": "4d2efb5a-d520-4478-8d8d-1a2a0a92cc5c",
+        "live_item_id": null,
+        "live_raffle_id": null,
+        "quantity": 1
+      },
+      "impact": "Hold / venda sobre SKU morto ou unlist.",
+      "repro": "POST /rest/v1/orders JWT"
+    }
+  ],
+  "holds": [
+    {
+      "id": "p1.hub.unlisted",
+      "title": "Hub vazio para unlist",
+      "well": "1",
+      "evidence": "200 []"
+    },
+    {
+      "id": "p1.hub.sold",
+      "title": "Hub omite is_sold",
+      "well": "1",
+      "evidence": "200 []"
+    },
+    {
+      "id": "p1.rest.unlisted.anon",
+      "title": "anon não lê unlist",
+      "well": "1",
+      "evidence": "401 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table products\"}"
+    },
+    {
+      "id": "p1.rest.unlisted.buyer",
+      "title": "buyer sem order não lê unlist",
+      "well": "1",
+      "evidence": "200 []"
+    },
+    {
+      "id": "p1.draft.insert",
+      "title": "INSERT rascunho recusado",
+      "well": "1",
+      "evidence": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"new row for relation \\\"orders\\\" violates check constraint \\\"orders_status_batata_check\\\"\"}"
+    },
+    {
+      "id": "p1.edge.after.unlist",
+      "title": "Edge recusa unlist pós-hold",
+      "well": "1",
+      "evidence": "400 {\"error\":\"Missing payment metadata.\"}"
+    },
+    {
+      "id": "p1.race.hold",
+      "title": "≤1 hold persistido",
+      "well": "1",
+      "evidence": "ok=1"
+    },
+    {
+      "id": "p1.bundle.dead",
+      "title": "bundle morto recusado",
+      "well": "1",
+      "evidence": "400 {\"code\":\"PGRST204\",\"details\":null,\"hint\":null,\"message\":\"Could not find the 'discount_percent' column of 'product_bundles' in the schema cache\"}"
+    },
+    {
+      "id": "p3.silent.pago",
+      "title": "HTTP OK mas status não persistiu pago (silent revert)",
+      "well": "3",
+      "evidence": {
+        "id": "1ca2548c-252b-4220-b7f0-05ccb47a8661",
+        "status": "reserva_pendente"
+      }
+    },
+    {
+      "id": "p3.reviews_gerais",
+      "title": "INSERT reviews_gerais recusado",
+      "well": "3",
+      "evidence": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"review_order_required\"}"
+    },
+    {
+      "id": "p3.reviews",
+      "title": "review recusada",
+      "well": "3",
+      "evidence": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"review_order_invalid_status\"}"
+    },
+    {
+      "id": "p4.notif",
+      "title": "INSERT notif recusado",
+      "well": "4",
+      "evidence": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"new row violates row-level security policy for table \\\"user_notifications\\\"\"}"
+    }
+  ],
+  "notes": [
+    {
+      "id": "disc.openapi",
+      "title": "openapi paths",
+      "well": "3",
+      "detail": 0
+    },
+    {
+      "id": "disc.rpc.interesting",
+      "title": "rpc names",
+      "well": "3",
+      "detail": []
+    },
+    {
+      "id": "p3.set_config.anon",
+      "title": "rpc set_config",
+      "well": "3",
+      "detail": "404 {\"code\":\"PGRST202\",\"details\":\"Searched for the function public.set_config with parameters is_local, setting, value or with a single unnamed json/jsonb parameter, but no matches were found in the schema cache.\",\"hint\":null,\"message\":\"Could not find the function public.set_config(i…"
+    },
+    {
+      "id": "p3.set_config.buyer",
+      "title": "rpc set_config",
+      "well": "3",
+      "detail": "404 {\"code\":\"PGRST202\",\"details\":\"Searched for the function public.set_config with parameters is_local, setting, value or with a single unnamed json/jsonb parameter, but no matches were found in the schema cache.\",\"hint\":null,\"message\":\"Could not find the function public.set_config(i…"
+    },
+    {
+      "id": "p4.cron.batata_generate_auto_feedback.anon",
+      "title": "batata_generate_auto_feedback",
+      "well": "4",
+      "detail": "401 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_generate_auto_feedback\"}"
+    },
+    {
+      "id": "p4.cron.batata_generate_auto_feedback.buyer",
+      "title": "batata_generate_auto_feedback",
+      "well": "4",
+      "detail": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_generate_auto_feedback\"}"
+    },
+    {
+      "id": "p4.cron.batata_release_expired_reservations.anon",
+      "title": "batata_release_expired_reservations",
+      "well": "4",
+      "detail": "404 {\"code\":\"PGRST202\",\"details\":\"Searched for the function public.batata_release_expired_reservations without parameters or with a single unnamed json/jsonb parameter, but no matches were found in the schema cache.\",\"hint\":\"Perhaps you meant to call the function public.batata_claim_…"
+    },
+    {
+      "id": "p4.cron.batata_release_expired_reservations.buyer",
+      "title": "batata_release_expired_reservations",
+      "well": "4",
+      "detail": "404 {\"code\":\"PGRST202\",\"details\":\"Searched for the function public.batata_release_expired_reservations without parameters or with a single unnamed json/jsonb parameter, but no matches were found in the schema cache.\",\"hint\":\"Perhaps you meant to call the function public.batata_claim_…"
+    },
+    {
+      "id": "p4.cron.batata_expire_pending_orders.anon",
+      "title": "batata_expire_pending_orders",
+      "well": "4",
+      "detail": "404 {\"code\":\"PGRST202\",\"details\":\"Searched for the function public.batata_expire_pending_orders without parameters or with a single unnamed json/jsonb parameter, but no matches were found in the schema cache.\",\"hint\":\"Perhaps you meant to call the function public.batata_expire_produc…"
+    },
+    {
+      "id": "p4.cron.batata_expire_pending_orders.buyer",
+      "title": "batata_expire_pending_orders",
+      "well": "4",
+      "detail": "404 {\"code\":\"PGRST202\",\"details\":\"Searched for the function public.batata_expire_pending_orders without parameters or with a single unnamed json/jsonb parameter, but no matches were found in the schema cache.\",\"hint\":\"Perhaps you meant to call the function public.batata_expire_produc…"
+    },
+    {
+      "id": "p4.cron.batata_process_auto_complete_orders.anon",
+      "title": "batata_process_auto_complete_orders",
+      "well": "4",
+      "detail": "404 {\"code\":\"PGRST202\",\"details\":\"Searched for the function public.batata_process_auto_complete_orders without parameters or with a single unnamed json/jsonb parameter, but no matches were found in the schema cache.\",\"hint\":\"Perhaps you meant to call the function public.batata_proces…"
+    },
+    {
+      "id": "p4.cron.batata_process_auto_complete_orders.buyer",
+      "title": "batata_process_auto_complete_orders",
+      "well": "4",
+      "detail": "404 {\"code\":\"PGRST202\",\"details\":\"Searched for the function public.batata_process_auto_complete_orders without parameters or with a single unnamed json/jsonb parameter, but no matches were found in the schema cache.\",\"hint\":\"Perhaps you meant to call the function public.batata_proces…"
+    },
+    {
+      "id": "p4.cron.batata_wallet_payout_tick.anon",
+      "title": "batata_wallet_payout_tick",
+      "well": "4",
+      "detail": "404 {\"code\":\"PGRST202\",\"details\":\"Searched for the function public.batata_wallet_payout_tick without parameters or with a single unnamed json/jsonb parameter, but no matches were found in the schema cache.\",\"hint\":\"Perhaps you meant to call the function public.batata_wallet_payout_fi…"
+    },
+    {
+      "id": "p4.cron.batata_wallet_payout_tick.buyer",
+      "title": "batata_wallet_payout_tick",
+      "well": "4",
+      "detail": "404 {\"code\":\"PGRST202\",\"details\":\"Searched for the function public.batata_wallet_payout_tick without parameters or with a single unnamed json/jsonb parameter, but no matches were found in the schema cache.\",\"hint\":\"Perhaps you meant to call the function public.batata_wallet_payout_fi…"
+    },
+    {
+      "id": "p4.cron.batata_livekit_egress_cleanup.anon",
+      "title": "batata_livekit_egress_cleanup",
+      "well": "4",
+      "detail": "404 {\"code\":\"PGRST202\",\"details\":\"Searched for the function public.batata_livekit_egress_cleanup without parameters or with a single unnamed json/jsonb parameter, but no matches were found in the schema cache.\",\"hint\":\"Perhaps you meant to call the function public.batata_invoke_livek…"
+    },
+    {
+      "id": "p4.cron.batata_livekit_egress_cleanup.buyer",
+      "title": "batata_livekit_egress_cleanup",
+      "well": "4",
+      "detail": "404 {\"code\":\"PGRST202\",\"details\":\"Searched for the function public.batata_livekit_egress_cleanup without parameters or with a single unnamed json/jsonb parameter, but no matches were found in the schema cache.\",\"hint\":\"Perhaps you meant to call the function public.batata_invoke_livek…"
+    },
+    {
+      "id": "p4.auto_feedback.future",
+      "title": "auto_feedback p_now",
+      "well": "4",
+      "detail": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_generate_auto_feedback\"}"
+    },
+    {
+      "id": "p3.view.anon.hub_products_public",
+      "title": "hub_products_public",
+      "well": "3",
+      "detail": "200 n=3"
+    },
+    {
+      "id": "p3.view.anon.hub_profiles_public",
+      "title": "hub_profiles_public",
+      "well": "3",
+      "detail": "200 n=2"
+    },
+    {
+      "id": "p3.view.anon.hub_lives_public",
+      "title": "hub_lives_public",
+      "well": "3",
+      "detail": "200 n=3"
+    },
+    {
+      "id": "p3.view.anon.hub_live_items_public",
+      "title": "hub_live_items_public",
+      "well": "3",
+      "detail": "200 n=3"
+    },
+    {
+      "id": "p3.view.anon.hub_live_messages_public",
+      "title": "hub_live_messages_public",
+      "well": "3",
+      "detail": "200 n=3"
+    },
+    {
+      "id": "p3.view.anon.hub_reviews_public",
+      "title": "hub_reviews_public",
+      "well": "3",
+      "detail": "200 n=3"
+    },
+    {
+      "id": "p3.view.anon.hub_profiles_discovery_public",
+      "title": "hub_profiles_discovery_public",
+      "well": "3",
+      "detail": "200 n=2"
+    },
+    {
+      "id": "p3.view.anon.profiles_directory_public",
+      "title": "profiles_directory_public",
+      "well": "3",
+      "detail": "401 n=0"
+    },
+    {
+      "id": "p3.view.anon.reviews_public_ratings",
+      "title": "reviews_public_ratings",
+      "well": "3",
+      "detail": "200 n=3"
+    },
+    {
+      "id": "p3.anon.lives",
+      "title": "lives",
+      "well": "3",
+      "detail": "401 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table lives\"}"
+    },
+    {
+      "id": "p3.buyer.lives",
+      "title": "lives",
+      "well": "3",
+      "detail": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table lives\"}"
+    },
+    {
+      "id": "p3.anon.lives",
+      "title": "lives",
+      "well": "3",
+      "detail": "400 {\"code\":\"42703\",\"details\":null,\"hint\":null,\"message\":\"column lives.livekit_url does not exist\"}"
+    },
+    {
+      "id": "p3.buyer.lives",
+      "title": "lives",
+      "well": "3",
+      "detail": "400 {\"code\":\"42703\",\"details\":null,\"hint\":null,\"message\":\"column lives.livekit_url does not exist\"}"
+    },
+    {
+      "id": "p3.anon.profiles",
+      "title": "profiles",
+      "well": "3",
+      "detail": "400 {\"code\":\"42703\",\"details\":null,\"hint\":null,\"message\":\"column profiles.email does not exist\"}"
+    },
+    {
+      "id": "p3.buyer.profiles",
+      "title": "profiles",
+      "well": "3",
+      "detail": "400 {\"code\":\"42703\",\"details\":null,\"hint\":null,\"message\":\"column profiles.email does not exist\"}"
+    },
+    {
+      "id": "p3.anon.wallets",
+      "title": "wallets",
+      "well": "3",
+      "detail": "400 {\"code\":\"42703\",\"details\":null,\"hint\":null,\"message\":\"column wallets.available_balance does not exist\"}"
+    },
+    {
+      "id": "p3.buyer.wallets",
+      "title": "wallets",
+      "well": "3",
+      "detail": "400 {\"code\":\"42703\",\"details\":null,\"hint\":null,\"message\":\"column wallets.available_balance does not exist\"}"
+    },
+    {
+      "id": "p3.anon.wallet_transactions",
+      "title": "wallet_transactions",
+      "well": "3",
+      "detail": "400 {\"code\":\"42703\",\"details\":null,\"hint\":\"Perhaps you meant to reference the column \\\"wallet_transactions.order_id\\\".\",\"message\":\"column wallet_transactions.user_id does not exist\"}"
+    },
+    {
+      "id": "p3.buyer.wallet_transactions",
+      "title": "wallet_transactions",
+      "well": "3",
+      "detail": "400 {\"code\":\"42703\",\"details\":null,\"hint\":\"Perhaps you meant to reference the column \\\"wallet_transactions.order_id\\\".\",\"message\":\"column wallet_transactions.user_id does not exist\"}"
+    },
+    {
+      "id": "p3.anon.orders",
+      "title": "orders",
+      "well": "3",
+      "detail": "200 []"
+    },
+    {
+      "id": "p3.buyer.orders",
+      "title": "orders",
+      "well": "3",
+      "detail": "200 [{\"id\":\"5dcbbb4a-bec2-48c6-8466-54016e08fbfc\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"status\":\"cancelado\",\"stripe_payment_intent_id\":\"pi_fase1_test_lock\"}, {\"id\":\"df2d1466-1bc1-4965-91a6-de5f83903146\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"status\":\"reserva_…"
+    },
+    {
+      "id": "p3.anon.reviews_gerais",
+      "title": "reviews_gerais",
+      "well": "3",
+      "detail": "401 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for view reviews_gerais\"}"
+    },
+    {
+      "id": "p3.buyer.reviews_gerais",
+      "title": "reviews_gerais",
+      "well": "3",
+      "detail": "200 [{\"id\":\"aa90960c-d519-455d-8d48-d3dd675ab67e\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"target_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"stars\":5,\"comment\":\"rtb collusion\"}, {\"id\":\"437d1ed9-6666-413b-ba67-02f866564f15\",\"buyer_id\":\"4b343994-0b66-488e-a470-b7594f51cffb\",…"
+    },
+    {
+      "id": "p3.anon.reviews",
+      "title": "reviews",
+      "well": "3",
+      "detail": "200 []"
+    },
+    {
+      "id": "p3.buyer.reviews",
+      "title": "reviews",
+      "well": "3",
+      "detail": "200 [{\"id\":\"aa90960c-d519-455d-8d48-d3dd675ab67e\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"target_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"order_id\":\"0a4f5b08-b699-41e3-9071-95d9c97f4d86\",\"stars\":5}, {\"id\":\"21ea0f91-a1cb-49a1-baf2-a1a577d72bc3\",\"buyer_id\":\"980f4fa1-0004-…"
+    },
+    {
+      "id": "p3.anon.user_notifications",
+      "title": "user_notifications",
+      "well": "3",
+      "detail": "200 []"
+    },
+    {
+      "id": "p3.buyer.user_notifications",
+      "title": "user_notifications",
+      "well": "3",
+      "detail": "200 [{\"id\":\"cbd8721f-5d65-4184-9a5b-37d222b3f002\",\"user_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"title\":\"Nova contra-proposta\",\"body\":\"4.00 € · RTD-20260830T1931-p2 1788115296824819\"}, {\"id\":\"4e462de3-aa49-4238-b4ab-b85216d70705\",\"user_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"t…"
+    },
+    {
+      "id": "p3.anon.products",
+      "title": "products",
+      "well": "3",
+      "detail": "400 {\"code\":\"42703\",\"details\":null,\"hint\":null,\"message\":\"column products.cost_price does not exist\"}"
+    },
+    {
+      "id": "p3.buyer.products",
+      "title": "products",
+      "well": "3",
+      "detail": "400 {\"code\":\"42703\",\"details\":null,\"hint\":null,\"message\":\"column products.cost_price does not exist\"}"
+    },
+    {
+      "id": "p3.hub.lives.streamcol",
+      "title": "hub_lives mux_stream_key",
+      "well": "3",
+      "detail": "400 {\"code\":\"42703\",\"details\":null,\"hint\":null,\"message\":\"column hub_lives_public.mux_stream_key does not exist\"}"
+    },
+    {
+      "id": "p1.hub.unlisted",
+      "title": "hub unlisted",
+      "well": "1",
+      "detail": "200 []"
+    },
+    {
+      "id": "p1.hub.sold",
+      "title": "hub sold",
+      "well": "1",
+      "detail": "200 []"
+    },
+    {
+      "id": "p1.rest.unlisted.anon",
+      "title": "products unlisted anon",
+      "well": "1",
+      "detail": "401 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table products\"}"
+    },
+    {
+      "id": "p1.rest.unlisted.buyer",
+      "title": "products unlisted buyer",
+      "well": "1",
+      "detail": "200 []"
+    },
+    {
+      "id": "p1.rest.sold.anon",
+      "title": "products sold anon",
+      "well": "1",
+      "detail": "401 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table products\"}"
+    },
+    {
+      "id": "RTI4-P1-HOLD-UNLIST",
+      "title": "hold unlistado",
+      "well": "1",
+      "detail": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"order_hold_product_not_listed\"}"
+    },
+    {
+      "id": "RTI4-P1-HOLD-SOLD",
+      "title": "hold is_sold",
+      "well": "1",
+      "detail": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"order_hold_product_sold\"}"
+    },
+    {
+      "id": "RTI4-P1-HOLD-QTY0",
+      "title": "hold qty=0",
+      "well": "1",
+      "detail": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"order_hold_exceeds_stock\"}"
+    },
+    {
+      "id": "RTI4-P1-HOLD-UNLIST-FAKELIVE",
+      "title": "unlist + live_id UUID inventado",
+      "well": "1",
+      "detail": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"order_live_not_found\"}"
+    },
+    {
+      "id": "RTI4-P1-HOLD-UNLIST-RAFFLE",
+      "title": "unlist + live_raffle_id JWT",
+      "well": "1",
+      "detail": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"order_hold_product_not_listed\"}"
+    },
+    {
+      "id": "p1.ghost.draft",
+      "title": "insert status rascunho unlist",
+      "well": "1",
+      "detail": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"new row for relation \\\"orders\\\" violates check constraint \\\"orders_status_batata_check\\\"\"}"
+    },
+    {
+      "id": "p1.ended.lives",
+      "title": "hub ended lives",
+      "well": "1",
+      "detail": "5"
+    },
+    {
+      "id": "RTI4-P1-HOLD-UNLIST-ENDED-LIVE",
+      "title": "unlist + live_id ended Hub",
+      "well": "1",
+      "detail": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"order_hold_product_not_listed\"}"
+    },
+    {
+      "id": "p1.active.lives",
+      "title": "active lives svc",
+      "well": "1",
+      "detail": "10"
+    },
+    {
+      "id": "RTI4-P1-HOLD-UNLIST-OWN-LIVE",
+      "title": "unlist + live_id activo do próprio seller",
+      "well": "1",
+      "detail": "201 [{\"id\":\"73be7fe0-4f15-409b-9eb4-93fec9f5fb5b\",\"created_at\":\"2026-08-31T07:28:38.605194+00:00\",\"product_id\":\"bf6c5e1d-f59f-471c-be48-f12d5f36d044\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"price_total\":4.50,\"shipping_meth…"
+    },
+    {
+      "id": "p1.listed.hold",
+      "title": "control listed hold",
+      "well": "1",
+      "detail": "201 [{\"id\":\"1ca2548c-252b-4220-b7f0-05ccb47a8661\",\"created_at\":\"2026-08-31T07:28:38.781313+00:00\",\"product_id\":\"2d841305-9ad4-47f8-9daf-b2d7676a7964\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"price_total\":4.50,\"shipping_meth…"
+    },
+    {
+      "id": "p1.edge.listed",
+      "title": "checkout listed control",
+      "well": "1",
+      "detail": "400 {\"error\":\"Missing payment metadata.\"}"
+    },
+    {
+      "id": "p1.unlist.after.hold",
+      "title": "seller unlist after hold",
+      "well": "1",
+      "detail": "200 [{\"id\":\"2d841305-9ad4-47f8-9daf-b2d7676a7964\",\"created_at\":\"2026-08-31T07:28:36.700691+00:00\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"title\":\"RTI4-20260831T0816-LA\",\"price\":4.5,\"ref_code\":\"RTI4-1788161316657-1\",\"category\":null,\"clothing_size\":null,\"gender\":null,\"descr…"
+    },
+    {
+      "id": "p1.edge.after.unlist",
+      "title": "checkout after unlist",
+      "well": "1",
+      "detail": "400 {\"error\":\"Missing payment metadata.\"}"
+    },
+    {
+      "id": "p1.edge.unlisted.noid",
+      "title": "edge unlist sem order",
+      "well": "1",
+      "detail": "400 {\"error\":\"Missing payment metadata.\"}"
+    },
+    {
+      "id": "p1.race.holds",
+      "title": "N=5 holds qty=1",
+      "well": "1",
+      "detail": "ok=1 codes=[201, 400, 400, 400, 400]"
+    },
+    {
+      "id": "p1.bundle.dead.accept",
+      "title": "buyer self-accept dead bundle",
+      "well": "1",
+      "detail": "400 {\"code\":\"PGRST204\",\"details\":null,\"hint\":null,\"message\":\"Could not find the 'discount_percent' column of 'product_bundles' in the schema cache\"}"
+    },
+    {
+      "id": "p1.offer.unlist",
+      "title": "offer unlist",
+      "well": "1",
+      "detail": "201 [{\"id\":\"38d0d5a4-907a-4d70-ace1-79434f3b6fd8\",\"product_id\":\"bf6c5e1d-f59f-471c-be48-f12d5f36d044\",\"chat_id\":null,\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"amount\":1.00,\"list_price\":null,\"offered_by\":\"buyer\",\"status\":\"pen…"
+    },
+    {
+      "id": "p3.silent.pago",
+      "title": "buyer PATCH pago",
+      "well": "3",
+      "detail": "200 [{\"id\":\"1ca2548c-252b-4220-b7f0-05ccb47a8661\",\"created_at\":\"2026-08-31T07:28:38.781313+00:00\",\"product_id\":\"2d841305-9ad4-47f8-9daf-b2d7676a7964\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"price_total\":4.50,\"shipping_meth… after=reserva_pendente"
+    },
+    {
+      "id": "p3.reviews_gerais.insert",
+      "title": "INSERT reviews_gerais",
+      "well": "3",
+      "detail": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"review_order_required\"}"
+    },
+    {
+      "id": "p3.reviews.insert",
+      "title": "INSERT reviews sem concluido",
+      "well": "3",
+      "detail": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"review_order_invalid_status\"}"
+    },
+    {
+      "id": "p3.admin.buyer",
+      "title": "admin resolve buyer",
+      "well": "3",
+      "detail": "400 {\"code\":\"P0001\",\"details\":null,\"hint\":null,\"message\":\"Apenas administradores podem resolver disputas.\"}"
+    },
+    {
+      "id": "p3.admin.anon",
+      "title": "admin resolve anon",
+      "well": "3",
+      "detail": "401 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_admin_resolve_dispute\"}"
+    },
+    {
+      "id": "p4.notif.insert",
+      "title": "notif to seller",
+      "well": "4",
+      "detail": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"new row violates row-level security policy for table \\\"user_notifications\\\"\"}"
+    },
+    {
+      "id": "p4.fav.spoof",
+      "title": "favorite as seller uid",
+      "well": "4",
+      "detail": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"new row violates row-level security policy for table \\\"favorites\\\"\"}"
+    },
+    {
+      "id": "p4.follow.spoof",
+      "title": "follow as seller",
+      "well": "4",
+      "detail": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"new row violates row-level security policy for table \\\"follows\\\"\"}"
+    },
+    {
+      "id": "p4.connect.origin",
+      "title": "https://evil.com",
+      "well": "4",
+      "detail": "200 {\"stripeAccountId\":\"acct_1U5mYbQeUNx8ar08\",\"url\":\"https://connect.stripe.com/setup/e/acct_1U5mYbQeUNx8ar08/RYuPXNmH0mHM\"}"
+    },
+    {
+      "id": "p4.connect.origin",
+      "title": "https://fleaber.pt.evil.com",
+      "well": "4",
+      "detail": "200 {\"stripeAccountId\":\"acct_1U5mYbQeUNx8ar08\",\"url\":\"https://connect.stripe.com/setup/e/acct_1U5mYbQeUNx8ar08/gl1OZmAlk9zp\"}"
+    },
+    {
+      "id": "p4.connect.origin",
+      "title": "https://attacker.fleaber.pt",
+      "well": "4",
+      "detail": "200 {\"stripeAccountId\":\"acct_1U5mYbQeUNx8ar08\",\"url\":\"https://connect.stripe.com/setup/e/acct_1U5mYbQeUNx8ar08/jhPQIFfrTF9P\"}"
+    },
+    {
+      "id": "p4.connect.origin",
+      "title": "javascript:alert(1)",
+      "well": "4",
+      "detail": "200 {\"stripeAccountId\":\"acct_1U5mYbQeUNx8ar08\",\"url\":\"https://connect.stripe.com/setup/e/acct_1U5mYbQeUNx8ar08/lrUuBlk12vfI\"}"
+    },
+    {
+      "id": "p4.connect.origin",
+      "title": "https://fleaber.pt/../../../evil",
+      "well": "4",
+      "detail": "200 {\"stripeAccountId\":\"acct_1U5mYbQeUNx8ar08\",\"url\":\"https://connect.stripe.com/setup/e/acct_1U5mYbQeUNx8ar08/DLJznCj5HwBd\"}"
+    },
+    {
+      "id": "p4.connect.origin",
+      "title": "http://fleaber.pt",
+      "well": "4",
+      "detail": "200 {\"stripeAccountId\":\"acct_1U5mYbQeUNx8ar08\",\"url\":\"https://connect.stripe.com/setup/e/acct_1U5mYbQeUNx8ar08/jTKwFmEF97G2\"}"
+    },
+    {
+      "id": "p4.connect.origin",
+      "title": "https://fleaber.pt",
+      "well": "4",
+      "detail": "200 {\"stripeAccountId\":\"acct_1U5mYbQeUNx8ar08\",\"url\":\"https://connect.stripe.com/setup/e/acct_1U5mYbQeUNx8ar08/9LNjuyVvPPGJ\"}"
+    },
+    {
+      "id": "p4.tip.ended",
+      "title": "tip pending ended live",
+      "well": "4",
+      "detail": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"live_not_active_for_tip\"}"
+    },
+    {
+      "id": "p4.tip.edge.fake",
+      "title": "tip edge fake live + tip_id",
+      "well": "4",
+      "detail": "400 {\"error\":\"Client tip_id is not allowed.\"}"
+    },
+    {
+      "id": "p4.tip.wallet.fake",
+      "title": "wallet tip fake live",
+      "well": "4",
+      "detail": "400 {\"code\":\"P0001\",\"details\":null,\"hint\":null,\"message\":\"Direto não encontrado.\"}"
+    },
+    {
+      "id": "p4.release.fake",
+      "title": "release uuid fake",
+      "well": "4",
+      "detail": "200 false"
+    },
+    {
+      "id": "p3.fresh.orders",
+      "title": "fresh GET seller orders",
+      "well": "3",
+      "detail": "200 []"
+    },
+    {
+      "id": "p3.anon.rpc.batata_release_seller_wallet_for_order",
+      "title": "batata_release_seller_wallet_for_order",
+      "well": "3",
+      "detail": "404 {\"code\":\"PGRST202\",\"details\":\"Searched for the function public.batata_release_seller_wallet_for_order with parameters p_email, p_order_id or with a single unnamed json/jsonb parameter, but no matches were found in the schema cache.\",\"hint\":\"Perhaps you meant to call the function …"
+    },
+    {
+      "id": "p3.anon.rpc.batata_settle_order_from_stripe",
+      "title": "batata_settle_order_from_stripe",
+      "well": "3",
+      "detail": "404 {\"code\":\"PGRST202\",\"details\":\"Searched for the function public.batata_settle_order_from_stripe with parameters p_email, p_order_id or with a single unnamed json/jsonb parameter, but no matches were found in the schema cache.\",\"hint\":\"Perhaps you meant to call the function public.…"
+    },
+    {
+      "id": "p3.anon.rpc.batata_settle_live_tip_from_stripe",
+      "title": "batata_settle_live_tip_from_stripe",
+      "well": "3",
+      "detail": "404 {\"code\":\"PGRST202\",\"details\":\"Searched for the function public.batata_settle_live_tip_from_stripe with parameters p_email, p_order_id or with a single unnamed json/jsonb parameter, but no matches were found in the schema cache.\",\"hint\":null,\"message\":\"Could not find the function …"
+    },
+    {
+      "id": "p3.anon.rpc.batata_credit_wallet_once",
+      "title": "batata_credit_wallet_once",
+      "well": "3",
+      "detail": "404 {\"code\":\"PGRST202\",\"details\":\"Searched for the function public.batata_credit_wallet_once with parameters p_email, p_order_id or with a single unnamed json/jsonb parameter, but no matches were found in the schema cache.\",\"hint\":null,\"message\":\"Could not find the function public.ba…"
+    },
+    {
+      "id": "p3.anon.rpc.batata_find_user_id_by_email",
+      "title": "batata_find_user_id_by_email",
+      "well": "3",
+      "detail": "404 {\"code\":\"PGRST202\",\"details\":\"Searched for the function public.batata_find_user_id_by_email with parameters p_email, p_order_id or with a single unnamed json/jsonb parameter, but no matches were found in the schema cache.\",\"hint\":\"Perhaps you meant to call the function public.bat…"
+    }
+  ]
+}

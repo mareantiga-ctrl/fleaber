@@ -1,0 +1,215 @@
+{
+  "pass": 1,
+  "prefix": "RTG-20260831T1253",
+  "actors": {
+    "buyer": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+    "seller": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+    "buyer2": "af9c7e0f-9767-4107-b5fc-2d85806325d9",
+    "seller2": "6400f0c7-65f5-4090-8193-f0eb829000eb"
+  },
+  "rpc_time_related": [
+    "batata_assert_wallet_rpc_grants",
+    "batata_claim_checkout_session_slot",
+    "batata_claim_external_reservations",
+    "batata_claim_handle",
+    "batata_claim_live_raffle_share_intent",
+    "batata_clawback_seller_wallet_for_order",
+    "batata_confirm_ps_reservation",
+    "batata_confirm_ps_reservation_v2",
+    "batata_credit_wallet_once",
+    "batata_debit_wallet_once",
+    "batata_ensure_wallet",
+    "batata_expire_product_offers",
+    "batata_finalize_stripe_order_refund",
+    "batata_generate_auto_feedback",
+    "batata_get_my_payout_details",
+    "batata_ingest_ocr_reservation",
+    "batata_ingest_ocr_reservation_v2",
+    "batata_live_raffle_prize_hold_qty",
+    "batata_live_ref_open_reservations_preview",
+    "batata_live_reservation_accept_available",
+    "batata_live_reservation_accept_broadcast",
+    "batata_live_reservation_queue_for_live",
+    "batata_live_reservation_status_canonical",
+    "batata_live_reservation_status_consumes_capacity",
+    "batata_live_reservation_stripe_convert",
+    "batata_live_start_open_reservations_check",
+    "batata_order_allows_seller_stripe_refund",
+    "batata_order_status_holds_product_qty",
+    "batata_order_wallet_base_eur",
+    "batata_order_wallet_net_disbursed_eur",
+    "batata_order_wallet_reembolso_cents",
+    "batata_order_wallet_remaining_eur",
+    "batata_process_live_reservation_request",
+    "batata_process_partial_refund_dispute",
+    "batata_product_offer_is_consumed",
+    "batata_profile_can_claim_handle",
+    "batata_ps_claim_pairing",
+    "batata_ps_create_pairing",
+    "batata_ps_find_open_reservation",
+    "batata_recompact_reservation_queue",
+    "batata_record_buyer_refund_ledger",
+    "batata_refund_buyer_wallet_for_order",
+    "batata_release_seller_wallet_for_order",
+    "batata_reservation_effective_at",
+    "batata_reservation_source_priority",
+    "batata_send_live_tip_from_wallet",
+    "batata_settle_live_tip_from_stripe",
+    "batata_wallet_apply_tip_once",
+    "batata_wallet_payout_debit",
+    "batata_wallet_payout_finish"
+  ],
+  "findings": [
+    {
+      "id": "RTG-G7-001",
+      "lens": "G7",
+      "severity": "P2",
+      "title": "JWT comprador continua a escrever depois de logout",
+      "actor": "buyer JWT pós-logout",
+      "pre": "POST /auth/v1/logout com o mesmo access_token",
+      "repro": "POST orders com o JWT anterior",
+      "expected": "401 / sessão revogada",
+      "obtained": "201 [{\"id\":\"ce172017-2199-4b53-8862-0035da53c097\",\"created_at\":\"2026-08-31T12:02:40.945358+00:00\",\"product_id\":\"743c13fd-5b0d-48f8-98a4-f556cb8060b6\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a…",
+      "proven": true,
+      "evidence": {
+        "logout_http": 204,
+        "order_id": "ce172017-2199-4b53-8862-0035da53c097",
+        "product_id": "743c13fd-5b0d-48f8-98a4-f556cb8060b6"
+      }
+    }
+  ],
+  "notes": [
+    {
+      "id": "p1.rpcs",
+      "title": "RPCs tempo/dinheiro visíveis",
+      "ev": 50
+    },
+    {
+      "id": "p1.logout",
+      "lens": "G7",
+      "title": "POST logout",
+      "ev": "204 "
+    },
+    {
+      "id": "p1.g6.seller_cancel",
+      "lens": "G6",
+      "title": "seller cancela hold",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"order_wallet_release_flag_immutable\"}"
+    },
+    {
+      "id": "p1.g6.stale_pago",
+      "lens": "G6",
+      "title": "buyer PATCH pago pós-cancel",
+      "ev": "200 [{\"id\":\"5c513bab-f308-47d8-8047-93b1356cd386\",\"created_at\":\"2026-08-31T12:02:41.750466+00:00\",\"product_id\":\"bd96d730-85ba-4a53-8aaf-7dfccecdcb48\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a…"
+    },
+    {
+      "id": "p1.g6.stale_conc",
+      "lens": "G6",
+      "title": "buyer PATCH concluido pós-cancel",
+      "ev": "200 [{\"id\":\"5c513bab-f308-47d8-8047-93b1356cd386\",\"created_at\":\"2026-08-31T12:02:41.750466+00:00\",\"product_id\":\"bd96d730-85ba-4a53-8aaf-7dfccecdcb48\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a…"
+    },
+    {
+      "id": "p1.g6.stale_ship",
+      "lens": "G6",
+      "title": "seller PATCH enviado pós-cancel",
+      "ev": "200 [{\"id\":\"5c513bab-f308-47d8-8047-93b1356cd386\",\"created_at\":\"2026-08-31T12:02:41.750466+00:00\",\"product_id\":\"bd96d730-85ba-4a53-8aaf-7dfccecdcb48\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a…"
+    },
+    {
+      "id": "p1.g6.stale_price",
+      "lens": "G6",
+      "title": "checkout após seller subir preço 8.5→99",
+      "ev": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1RXvyMIad4lkpKSf0tiiD7B7npvOvMDREk6Bx1gz0mrhVEDij5Bi6pxah#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZ…"
+    },
+    {
+      "id": "p1.g6.price_requote",
+      "lens": "G6",
+      "title": "checkout requote/recusa",
+      "ev": {
+        "cents": -1,
+        "http": 200
+      }
+    },
+    {
+      "id": "p1.g5.offer_ins",
+      "lens": "G5",
+      "title": "INSERT offer",
+      "ev": "201 [{\"id\":\"16ed958f-b3f7-4095-b239-29668edccc03\",\"product_id\":\"a766e372-8a21-4f24-9f51-6b51e75a519b\",\"chat_id\":null,\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f…"
+    },
+    {
+      "id": "p1.g5.offer_acc",
+      "lens": "G5",
+      "title": "seller accept expired",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"offer_expired\"}"
+    },
+    {
+      "id": "p1.g5.live_item",
+      "lens": "G5",
+      "title": "live_items insert",
+      "ev": "400 {\"code\":\"23502\",\"details\":\"Failing row contains (daee2a32-22b5-4dbd-9e51-2f76e43057f3, c83e224f-749b-4f07-94d4-08509aacae08, 980f4fa1-0004-42f9-abca-69f1a9c29588, null, RTG-2026083…"
+    },
+    {
+      "id": "p1.g5.live_item2",
+      "lens": "G5",
+      "title": "live_items alt",
+      "ev": "400 {\"code\":\"23502\",\"details\":\"Failing row contains (4e646183-598e-4f74-af7a-bb690e4a26a5, c83e224f-749b-4f07-94d4-08509aacae08, null, null, null, null, 0.00, null, null, null, f, 0, a…"
+    },
+    {
+      "id": "p1.g5.pair_create",
+      "lens": "G5",
+      "title": "create pairing",
+      "ev": "200 {\"ok\": true, \"code\": \"616092\", \"live_id\": \"c83e224f-749b-4f07-94d4-08509aacae08\", \"device_id\": \"ps-reader-pc\", \"expires_at\": \"2026-08-31T12:04:47.896749+00:00\", \"live_title\": \"RTG-…"
+    },
+    {
+      "id": "p1.g5.pair_claim",
+      "lens": "G5",
+      "title": "claim expired pairing rpc",
+      "ev": "404 {\"code\":\"PGRST202\",\"details\":\"Searched for the function public.batata_ps_claim_pairing with parameters p_code, p_device_id, p_device_name or with a single unnamed json/jsonb parame…"
+    },
+    {
+      "id": "p1.g5.pair_edge",
+      "lens": "G5",
+      "title": "claim expired pairing edge",
+      "ev": "400 {\"ok\":false,\"error\":\"invalid_or_expired_code\"}"
+    },
+    {
+      "id": "p1.g8.expire_jwt",
+      "lens": "G8",
+      "title": "buyer chama expire offers",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_expire_product_offers\"}"
+    },
+    {
+      "id": "p1.g8.autofb_jwt",
+      "lens": "G8",
+      "title": "buyer chama auto-feedback futuro",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_generate_auto_feedback\"}"
+    },
+    {
+      "id": "p1.g1.co_seq",
+      "lens": "G1",
+      "title": "double checkout sequencial",
+      "ev": {
+        "a": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1C8kBU54ADApJZ2KWHaekBiakgUElyRSvnuu94VvMm7UMO5IZsnZOWuPo#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZ…",
+        "b": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1C8kBU54ADApJZ2KWHaekBiakgUElyRSvnuu94VvMm7UMO5IZsnZOWuPo#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZ…"
+      }
+    }
+  ],
+  "created": {
+    "products": [
+      "743c13fd-5b0d-48f8-98a4-f556cb8060b6",
+      "bd96d730-85ba-4a53-8aaf-7dfccecdcb48",
+      "cde4b08e-afa5-423a-85ef-ac6d27e86dc9",
+      "a766e372-8a21-4f24-9f51-6b51e75a519b",
+      "4e646183-598e-4f74-af7a-bb690e4a26a5",
+      "45ce6ee5-82e7-4b21-b3a4-e637f10de2ac"
+    ],
+    "orders": [
+      "ce172017-2199-4b53-8862-0035da53c097",
+      "5c513bab-f308-47d8-8047-93b1356cd386",
+      "585fe4bf-5244-48b4-8e82-9781caeb2369",
+      "c0b749aa-4418-42bc-9ed5-eef4ca6c0ff1"
+    ],
+    "lives": [
+      "c83e224f-749b-4f07-94d4-08509aacae08"
+    ]
+  }
+}

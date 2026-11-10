@@ -1,0 +1,251 @@
+{
+  "auditor": "REDTEAM_BLIND_INDEP_v4",
+  "stamp": "20260831T1251",
+  "project": "fxdknzrqjenzqcvnwqqq",
+  "production_touched": false,
+  "fase4": false,
+  "corrections_applied": false,
+  "fresh_id": "5a701c84-92fe-47c5-ad49-a111e85695fc",
+  "findings": [],
+  "holds": [
+    {
+      "id": "p4.connect.origin",
+      "title": "origens evil não ecoadas em Location (amostra)",
+      "well": "4",
+      "evidence": [
+        "https://evil.com",
+        "https://fleaber.pt.evil.com",
+        "https://evil.com/@fleaber.pt",
+        "http://fleaber.pt",
+        "https://fleaber.pt%2F%2Fevil.com",
+        "https://localhost.evil.com"
+      ]
+    },
+    {
+      "id": "p4.follows.select",
+      "title": "follows scoped",
+      "well": "4",
+      "evidence": {
+        "n": 0
+      }
+    },
+    {
+      "id": "p4.follows.hijack",
+      "title": "follow as other bloqueado",
+      "well": "4",
+      "evidence": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"new row violates row-level security policy for table \\\"follows\\\"\"}"
+    },
+    {
+      "id": "p4.favorites.select",
+      "title": "favorites scoped",
+      "well": "4",
+      "evidence": {
+        "n": 0
+      }
+    },
+    {
+      "id": "p4.device.buyer",
+      "title": "buyer device token negado",
+      "well": "4",
+      "evidence": "200 {\"ok\": false, \"error\": \"not_seller\"}"
+    },
+    {
+      "id": "p4.cron.cleanup",
+      "title": "cleanup JWT negado",
+      "well": "4",
+      "evidence": "401 {\"error\":\"Unauthorized.\"}"
+    },
+    {
+      "id": "p4.auto_feedback.jwt",
+      "title": "auto_feedback JWT negado",
+      "well": "4",
+      "evidence": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_generate_auto_feedback\"}"
+    },
+    {
+      "id": "p1.race.hold",
+      "title": "no máximo 1 hold qty=1",
+      "well": "1",
+      "evidence": {
+        "held": 0
+      }
+    }
+  ],
+  "notes": [
+    {
+      "id": "p4.connect.origin",
+      "title": "connect origin https://evil.com",
+      "well": "4",
+      "detail": {
+        "http": 200,
+        "loc": null,
+        "snip": "{\"stripeAccountId\":\"acct_1U5mYbQeUNx8ar08\",\"url\":\"https://connect.stripe.com/setup/e/acct_1U5mYbQeUNx8ar08/MHAK9vCyCKBY\"}"
+      }
+    },
+    {
+      "id": "p4.connect.origin",
+      "title": "connect origin https://fleaber.pt.evil.com",
+      "well": "4",
+      "detail": {
+        "http": 200,
+        "loc": null,
+        "snip": "{\"stripeAccountId\":\"acct_1U5mYbQeUNx8ar08\",\"url\":\"https://connect.stripe.com/setup/e/acct_1U5mYbQeUNx8ar08/W1psyAGLtNYL\"}"
+      }
+    },
+    {
+      "id": "p4.connect.origin",
+      "title": "connect origin https://evil.com/@fleaber.pt",
+      "well": "4",
+      "detail": {
+        "http": 200,
+        "loc": null,
+        "snip": "{\"stripeAccountId\":\"acct_1U5mYbQeUNx8ar08\",\"url\":\"https://connect.stripe.com/setup/e/acct_1U5mYbQeUNx8ar08/tcGqmuW9UTyi\"}"
+      }
+    },
+    {
+      "id": "p4.connect.origin",
+      "title": "connect origin http://fleaber.pt",
+      "well": "4",
+      "detail": {
+        "http": 200,
+        "loc": null,
+        "snip": "{\"stripeAccountId\":\"acct_1U5mYbQeUNx8ar08\",\"url\":\"https://connect.stripe.com/setup/e/acct_1U5mYbQeUNx8ar08/dVhiqx1YJmei\"}"
+      }
+    },
+    {
+      "id": "p4.connect.origin",
+      "title": "connect origin https://fleaber.pt%2F%2Fevil.com",
+      "well": "4",
+      "detail": {
+        "http": 200,
+        "loc": null,
+        "snip": "{\"stripeAccountId\":\"acct_1U5mYbQeUNx8ar08\",\"url\":\"https://connect.stripe.com/setup/e/acct_1U5mYbQeUNx8ar08/2R16ybjaZNEA\"}"
+      }
+    },
+    {
+      "id": "p4.connect.origin",
+      "title": "connect origin https://localhost.evil.com",
+      "well": "4",
+      "detail": {
+        "http": 200,
+        "loc": null,
+        "snip": "{\"stripeAccountId\":\"acct_1U5mYbQeUNx8ar08\",\"url\":\"https://connect.stripe.com/setup/e/acct_1U5mYbQeUNx8ar08/jb2kXVYOt0ng\"}"
+      }
+    },
+    {
+      "id": "p4.follows.select",
+      "title": "follows as fresh/buyer",
+      "well": "4",
+      "detail": {
+        "http": 200,
+        "n": 0
+      }
+    },
+    {
+      "id": "p4.follows.hijack",
+      "title": "INSERT follow as other uid",
+      "well": "4",
+      "detail": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"new row violates row-level security policy for table \\\"follows\\\"\"}"
+    },
+    {
+      "id": "p4.favorites.select",
+      "title": "favorites fresh",
+      "well": "4",
+      "detail": {
+        "http": 200,
+        "n": 0
+      }
+    },
+    {
+      "id": "p4.fav.unlist",
+      "title": "favorite unlist",
+      "well": "4",
+      "detail": "201 [{\"id\":\"0fb9b0c0-a18d-41d5-9717-2590a432cfa8\",\"user_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"product_id\":\"cedc0bc6-e85e-4593-868f-0808daa0bac5\",\"created_at\":\"2026-08-31T12:06:03.794498+00:00\"}]"
+    },
+    {
+      "id": "p4.device.buyer",
+      "title": "device token as buyer",
+      "well": "4",
+      "detail": "200 {\"ok\": false, \"error\": \"not_seller\"}"
+    },
+    {
+      "id": "p4.cron.cleanup",
+      "title": "egress cleanup JWT",
+      "well": "4",
+      "detail": "401 {\"error\":\"Unauthorized.\"}"
+    },
+    {
+      "id": "p4.webhook.nosig",
+      "title": "webhook sem stripe-signature",
+      "well": "4",
+      "detail": "400 {\"ok\":false,\"error\":\"missing_signature\"}"
+    },
+    {
+      "id": "p4.auto_feedback.jwt",
+      "title": "auto_feedback JWT",
+      "well": "4",
+      "detail": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_generate_auto_feedback\"}"
+    },
+    {
+      "id": "p1.race.hold",
+      "title": "parallel hold",
+      "well": "1",
+      "detail": "400 {\"code\":\"PGRST204\",\"details\":null,\"hint\":null,\"message\":\"Could not find the 'client_tag' column of 'orders' in the schema cache\"}"
+    },
+    {
+      "id": "p1.race.hold",
+      "title": "parallel hold",
+      "well": "1",
+      "detail": "400 {\"code\":\"PGRST204\",\"details\":null,\"hint\":null,\"message\":\"Could not find the 'client_tag' column of 'orders' in the schema cache\"}"
+    },
+    {
+      "id": "p1.race.hold",
+      "title": "parallel hold",
+      "well": "1",
+      "detail": "400 {\"code\":\"PGRST204\",\"details\":null,\"hint\":null,\"message\":\"Could not find the 'client_tag' column of 'orders' in the schema cache\"}"
+    },
+    {
+      "id": "p1.race.hold",
+      "title": "parallel hold",
+      "well": "1",
+      "detail": "400 {\"code\":\"PGRST204\",\"details\":null,\"hint\":null,\"message\":\"Could not find the 'client_tag' column of 'orders' in the schema cache\"}"
+    },
+    {
+      "id": "p1.race.result",
+      "title": "holds vs stock",
+      "well": "1",
+      "detail": {
+        "held": 0,
+        "product": {
+          "id": "54bc92c1-e19b-4969-a94b-f185e8437e9c",
+          "quantity": 1,
+          "is_sold": false
+        }
+      }
+    },
+    {
+      "id": "p3.hub.reviews",
+      "title": "hub_reviews_public",
+      "well": "3",
+      "detail": {
+        "http": 400,
+        "n": 0,
+        "snip": "{\"code\":\"42703\",\"details\":null,\"hint\":null,\"message\":\"column hub_reviews_public.buyer_id does not exist\"}"
+      }
+    },
+    {
+      "id": "p3.hub.profiles",
+      "title": "hub_profiles_public cols",
+      "well": "3",
+      "detail": {
+        "http": 400,
+        "n": 0
+      }
+    }
+  ],
+  "created_products": [
+    "cedc0bc6-e85e-4593-868f-0808daa0bac5",
+    "54bc92c1-e19b-4969-a94b-f185e8437e9c"
+  ],
+  "created_orders": [],
+  "created_lives": []
+}

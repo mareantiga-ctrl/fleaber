@@ -1,0 +1,384 @@
+{
+  "auditor": "REDTEAM_BLIND_DI_OFERTAS_CHAT_POS_DBDG_v1",
+  "stamp": "20260906T1610",
+  "prefix": "RTDI-20260906T1610",
+  "probes": [
+    {
+      "probe_id": "A1",
+      "poco": "DI-A",
+      "payload": "POST offer amount=0.01 status=accepted no body",
+      "http_rpc": "201 [{\"id\":\"3d4adc3d-c485-4156-b94f-ff508d80cba6\",\"product_id\":\"b618dbfc-ac3e-4694-abb0-5e00a15c8040\",\"chat_id\":null,\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"amount\":0.01,\"list_price\":18.00,\"offered_by\":\"buyer\",\"status\":\"pe…",
+      "bd_stripe": "status=pending amount=0.01",
+      "verdict": "FAIL",
+      "lens": "DI1"
+    },
+    {
+      "probe_id": "A1b",
+      "poco": "DI-A",
+      "payload": "oferta 8€ aceite + CPI amount=1 (fluxo terminal quote)",
+      "http_rpc": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1afshd9XD2BXSJdpGdPrdtaILSKVF7k09vm3elTX4y6ZaWvnSVI0eGDcO#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21oYWlsUnxrVkRhQUQyNlJjSWBCN3BXNXVvVT1haml…",
+      "bd_stripe": "amount_total=905",
+      "verdict": "PASS",
+      "lens": "DI1"
+    },
+    {
+      "probe_id": "A1c",
+      "poco": "DI-A",
+      "payload": "PATCH amount=0.01 em oferta pending",
+      "http_rpc": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"offer_amount_immutable\"}",
+      "bd_stripe": "amount=8.0",
+      "verdict": "FAIL",
+      "lens": "DI1"
+    },
+    {
+      "probe_id": "A2",
+      "poco": "DI-A",
+      "payload": "accept ∥ reject Future.wait",
+      "http_rpc": {
+        "acc": "200 [{\"id\":\"620aec69-f727-4fb6-851a-948387a09784\",\"product_id\":\"6ca04afe-62e7-45b3-8209-7f8b17531a1a\",\"chat_id\":null,\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"amount\":8.00,\"list_price\":18.00,\"offered_by\":\"buyer\",\"status\":\"ac…",
+        "rej": "200 [{\"id\":\"620aec69-f727-4fb6-851a-948387a09784\",\"product_id\":\"6ca04afe-62e7-45b3-8209-7f8b17531a1a\",\"chat_id\":null,\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"amount\":8.00,\"list_price\":18.00,\"offered_by\":\"buyer\",\"status\":\"ac…",
+        "ck": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1uJqDJ4J9pzEbJhgxhR4epkXCPJc0fsK43miVogBJfr61ucRDkKH9RJLh#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21oYWlsUnxrVkRhQUQyNlJjSWBCN3BXNXVvVT1haml…"
+      },
+      "bd_stripe": "status=accepted sealed=800 amt=905",
+      "verdict": "FAIL",
+      "lens": "DI2"
+    },
+    {
+      "probe_id": "A3",
+      "poco": "DI-A",
+      "payload": "offer rejected amount=2 + CPI",
+      "http_rpc": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1g2qJLBpqRfmypfIaZnXQRTytLkrS3TuKsjX2QNtmnxdfrRqMegVRTeZ3#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21oYWlsUnxrVkRhQUQyNlJjSWBCN3BXNXVvVT1haml…",
+      "bd_stripe": "offer_id=null sealed=1800 amt=1955",
+      "verdict": "FAIL",
+      "lens": "DI1"
+    },
+    {
+      "probe_id": "A4",
+      "poco": "DI-A",
+      "payload": "order qty=3 com product_offer_id aceite",
+      "http_rpc": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"offer_quantity_must_be_one\"}",
+      "bd_stripe": "recusado",
+      "verdict": "FAIL",
+      "lens": "DI4"
+    },
+    {
+      "probe_id": "A5",
+      "poco": "DI-A",
+      "payload": "offer unpublished INSERT + sold/unlist accept",
+      "http_rpc": {
+        "un": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"offer_product_not_listed\"}",
+        "soldAcc": "0 no",
+        "unlistAcc": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"offer_product_not_listed\"}"
+      },
+      "bd_stripe": "recusado",
+      "verdict": "FAIL",
+      "lens": "DI4"
+    },
+    {
+      "probe_id": "A6",
+      "poco": "DI-A",
+      "payload": "2.ª order mesmo product_offer_id aceite",
+      "http_rpc": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"offer_already_consumed\"}",
+      "bd_stripe": "recusado",
+      "verdict": "FAIL",
+      "lens": "DI2"
+    },
+    {
+      "probe_id": "B1",
+      "poco": "DI-B",
+      "payload": "bundle multi-SKU total_eur=0.01 vs linhas 10+12",
+      "http_rpc": {
+        "ins": "201 [{\"id\":\"52152a40-9a52-4259-b617-e88554bfb72d\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"chat_id\":null,\"product_ids\":[\"fc556f64-ce93-437d-af0f-463eee1e5c3a\",\"db164a6a-e11d-4d44-82ca-393bec2b12d5\"],\"subtotal_eur\":22.00,\"di…",
+        "ck": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a13Y8ETrKFi1qHBxDuIEgVD677laoCeB2ob0VY0UUd1BZqBaP96rT9EvoY#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21oYWlsUnxrVkRhQUQyNlJjSWBCN3BXNXVvVT1haml…"
+      },
+      "bd_stripe": "total=11.0 disc=50.0 amt=1220",
+      "verdict": "PASS",
+      "lens": "DI3"
+    },
+    {
+      "probe_id": "B2",
+      "poco": "DI-B",
+      "payload": "bundle accept com stock 0 numa linha",
+      "http_rpc": {
+        "acc": "200 [{\"id\":\"46757b4f-9125-4517-9010-79227962cda0\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"chat_id\":null,\"product_ids\":[\"2d34c9e2-ca4a-4e92-a5e5-cd6ed967f677\",\"9f2ed08f-9d8c-46ef-806d-911a0ce7d912\"],\"subtotal_eur\":22.00,\"di…",
+        "ck": "0 no"
+      },
+      "bd_stripe": "qty=0",
+      "verdict": "FAIL",
+      "lens": "DI4"
+    },
+    {
+      "probe_id": "B3",
+      "poco": "DI-B",
+      "payload": "2.ª proposta + mix de 2 bundle_id no saco",
+      "http_rpc": {
+        "insB": "201 [{\"id\":\"30fc5108-1120-43b1-a671-085ee0853ffe\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"chat_id\":null,\"product_ids\":[\"01ef0800-15b9-438d-8cb9-3926df4e64d4\",\"370e868a-8267-4bf1-871a-e58281f2eae2\"],\"subtotal_eur\":26.00,\"di…",
+        "mix": "400 {\"error\":\"Checkout blocked: bag cannot mix multiple bundle contracts.\"}"
+      },
+      "bd_stripe": "recusado",
+      "verdict": "FAIL",
+      "lens": "DI3"
+    },
+    {
+      "probe_id": "B4",
+      "poco": "DI-B",
+      "payload": "pagamento bundle aceite + CPI amount=1",
+      "http_rpc": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a17TWNSG8vu4WgraQsw1jzjaTtKo4RUf6p6ayRvXkvZE6PsZYlOGgsaD6N#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21oYWlsUnxrVkRhQUQyNlJjSWBCN3BXNXVvVT1haml…",
+      "bd_stripe": "total=22.0 amt=2375",
+      "verdict": "PASS",
+      "lens": "DI3"
+    },
+    {
+      "probe_id": "B5",
+      "poco": "DI-B",
+      "payload": "bundle aceite + saco só 1 de 2 SKUs",
+      "http_rpc": "400 {\"error\":\"Checkout blocked: bag must include all items in the accepted bundle.\"}",
+      "bd_stripe": "recusado",
+      "verdict": "FAIL",
+      "lens": "DI3"
+    },
+    {
+      "probe_id": "C1",
+      "poco": "DI-C",
+      "payload": "reservation_payment_submitted notes=ok (pago Stripe)",
+      "http_rpc": "201 [{\"id\":1768,\"created_at\":\"2026-09-06T15:17:07.058069+00:00\",\"chat_id\":\"edaaf8e8-1d09-43dd-bb91-f47fa9891bff\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"reservation_payment_submitted\\\",\\\"order_id\\\":\\\"b616e799-2d02-4637-bca7-7d5be56fd26c\\…",
+      "bd_stripe": "orders.status=pago",
+      "verdict": "PASS",
+      "lens": "DI5"
+    },
+    {
+      "probe_id": "C2",
+      "poco": "DI-C",
+      "payload": "card notes=pago + PATCH status=pago sem Stripe",
+      "http_rpc": {
+        "card": "201 [{\"id\":1769,\"created_at\":\"2026-09-06T15:17:07.533545+00:00\",\"chat_id\":\"8e41e90d-98ec-4682-8c37-3b39760c656f\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"reservation_payment_submitted\\\",\\\"order_id\\\":\\\"c2d9c027-4400-4b40-b873-f4c5158c985c\\…",
+        "patch": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"order_buyer_cannot_mark_pago\"}"
+      },
+      "bd_stripe": "status reserva_pendente → reserva_pendente wallet_s=37.0 (pre 37.0)",
+      "verdict": "FAIL",
+      "lens": "DI7"
+    },
+    {
+      "probe_id": "C3",
+      "poco": "DI-C",
+      "payload": "PATCH inbox last_message=pago 0,01 sem Stripe",
+      "http_rpc": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"chat_inbox_preview_forbidden\"}",
+      "bd_stripe": "last_message=null",
+      "verdict": "FAIL",
+      "lens": "DI6"
+    },
+    {
+      "probe_id": "C4",
+      "poco": "DI-C",
+      "payload": "seguro_fleaber_paid label=compra paga 0,01 €",
+      "http_rpc": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_label_mismatch\"}",
+      "bd_stripe": "recusado",
+      "verdict": "FAIL",
+      "lens": "DI5"
+    },
+    {
+      "probe_id": "C5",
+      "poco": "DI-C",
+      "payload": "OCR Edge sem x-device-token ocr_raw=paguei",
+      "http_rpc": "401 {\"ok\":false,\"error\":\"missing_device_token\"}",
+      "bd_stripe": "sem ingest",
+      "verdict": "FAIL",
+      "lens": "DI7"
+    },
+    {
+      "probe_id": "C6",
+      "poco": "DI-C",
+      "payload": "price_offer card amount=0.01 vs BD 8€",
+      "http_rpc": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_order_id_required\"}",
+      "bd_stripe": "recusado",
+      "verdict": "FAIL",
+      "lens": "DI5"
+    },
+    {
+      "probe_id": "C7",
+      "poco": "DI-C",
+      "payload": "bundle_proposal card total_eur=0.01 vs BD",
+      "http_rpc": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_bundle_total_mismatch\"}",
+      "bd_stripe": "total=22.0 recusado",
+      "verdict": "FAIL",
+      "lens": "DI5"
+    },
+    {
+      "probe_id": "C8",
+      "poco": "DI-C",
+      "payload": "notes=12,00 (residual exacto CQ — não contar)",
+      "http_rpc": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_notes_forbidden\"}",
+      "bd_stripe": "recusado",
+      "verdict": "HOLD",
+      "lens": "DI5"
+    }
+  ],
+  "n": 21,
+  "findings": [],
+  "blocked": [
+    {
+      "id": "A1",
+      "lens": "DI1",
+      "title": "INSERT não auto-aceita; amount persistido=0.01 status=pending",
+      "ev": "201 [{\"id\":\"3d4adc3d-c485-4156-b94f-ff508d80cba6\",\"product_id\":\"b618dbfc-ac3e-4694-abb0-5e00a15c8040\",\"chat_id\":null,\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"amount\":0.01,\"list_price\":18.00,\"offered_by\":\"buyer\",\"status\":\"pe…"
+    },
+    {
+      "id": "A1b",
+      "lens": "DI1",
+      "title": "CPI usou oferta 8€ (não body 1€)",
+      "ev": {
+        "amt": 905,
+        "status": 200
+      }
+    },
+    {
+      "id": "A1c",
+      "lens": "DI1",
+      "title": "amount imutável",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"offer_amount_immutable\"}"
+    },
+    {
+      "id": "A2",
+      "lens": "DI2",
+      "title": "corrida terminal única status=accepted",
+      "ev": {
+        "st": "accepted",
+        "amt": 905,
+        "sealed": 800
+      }
+    },
+    {
+      "id": "A3",
+      "lens": "DI1",
+      "title": "stale rejected não underpay",
+      "ev": {
+        "amt": 1955,
+        "bound": null,
+        "sealed": 1800
+      }
+    },
+    {
+      "id": "A4",
+      "lens": "DI4",
+      "title": "qty>1 recusada",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"offer_quantity_must_be_one\"}"
+    },
+    {
+      "id": "A5",
+      "lens": "DI4",
+      "title": "unpublished/sold recusados",
+      "ev": {
+        "un": 400,
+        "sold": 0,
+        "unlist": 400
+      }
+    },
+    {
+      "id": "A6",
+      "lens": "DI2",
+      "title": "one-shot: 2.ª recusada ou sem bind",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"offer_already_consumed\"}"
+    },
+    {
+      "id": "B1",
+      "lens": "DI3",
+      "title": "total reescrito; Session não underpay",
+      "ev": {
+        "total": 11.0,
+        "disc": 50.0,
+        "amt": 1220
+      }
+    },
+    {
+      "id": "B2",
+      "lens": "DI4",
+      "title": "stock 0: accept=true CPI bloqueado/sem cs",
+      "ev": {
+        "acc": 200,
+        "ck": 0,
+        "qty": 0
+      }
+    },
+    {
+      "id": "B3",
+      "lens": "DI3",
+      "title": "mix 2 bundles recusado",
+      "ev": "400 {\"error\":\"Checkout blocked: bag cannot mix multiple bundle contracts.\"}"
+    },
+    {
+      "id": "B4",
+      "lens": "DI3",
+      "title": "body 1€ não underpay do conjunto",
+      "ev": {
+        "amt": 2375,
+        "total": 22.0
+      }
+    },
+    {
+      "id": "B5",
+      "lens": "DI3",
+      "title": "saco incompleto recusado",
+      "ev": "400 {\"error\":\"Checkout blocked: bag must include all items in the accepted bundle.\"}"
+    },
+    {
+      "id": "C1",
+      "lens": "DI5",
+      "title": "card canónico persistiu; status=pago",
+      "ev": "201 [{\"id\":1768,\"created_at\":\"2026-09-06T15:17:07.058069+00:00\",\"chat_id\":\"edaaf8e8-1d09-43dd-bb91-f47fa9891bff\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"reservation_payment_submitted\\\",\\\"order_id\\\":\\\"b616e799-2d02-4637-bca7-7d5be56fd26c\\…"
+    },
+    {
+      "id": "C2",
+      "lens": "DI7",
+      "title": "FSM pago sem Stripe recusado",
+      "ev": {
+        "patch": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"order_buyer_cannot_mark_pago\"}",
+        "after": "reserva_pendente"
+      }
+    },
+    {
+      "id": "C3",
+      "lens": "DI6",
+      "title": "inbox hostil recusado",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"chat_inbox_preview_forbidden\"}"
+    },
+    {
+      "id": "C4",
+      "lens": "DI5",
+      "title": "label hostil recusado",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_label_mismatch\"}"
+    },
+    {
+      "id": "C5",
+      "lens": "DI7",
+      "title": "OCR sem token recusado",
+      "ev": "401 {\"ok\":false,\"error\":\"missing_device_token\"}"
+    },
+    {
+      "id": "C6",
+      "lens": "DI5",
+      "title": "card offer amount mismatch recusado",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_order_id_required\"}"
+    },
+    {
+      "id": "C7",
+      "lens": "DI5",
+      "title": "card bundle total mismatch recusado",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_bundle_total_mismatch\"}"
+    }
+  ],
+  "skipped": [],
+  "lenses": [
+    "DI1",
+    "DI2",
+    "DI3",
+    "DI4",
+    "DI5",
+    "DI6",
+    "DI7"
+  ],
+  "wells": [
+    "DI-A",
+    "DI-B",
+    "DI-C"
+  ]
+}

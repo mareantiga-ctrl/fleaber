@@ -1,0 +1,223 @@
+{
+  "auditor": "REDTEAM_BLIND_DM_CROSS_SURFACE_POS_DBDG_v1",
+  "pass": 2,
+  "probes": [
+    {
+      "probe_id": "B2r",
+      "surfaces": "Hub + products + CPI",
+      "action": "re-oracle qty=0 listed com S1 published",
+      "http": "{\"hubJwt\":\"200 []\",\"hubAnon\":\"200 []\",\"cpi\":null}",
+      "oracles": "{\"prod\":{\"id\":\"1d97f585-8a18-4c17-be7b-10a22abb434e\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"title\":\"RTDM-20260906T1610 B2 qty0\",\"price\":12.0,\"quantity\":0,\"is_sold\":false,\"list_on_marketplace\":true,\"available_for_live\":true},\"hubShows\":false,\"cpiCs\":false,\"s1_pub\":true}",
+      "result": "FAIL",
+      "lens": "DM2",
+      "residual": false,
+      "count_finding": false
+    },
+    {
+      "probe_id": "C1r",
+      "surfaces": "orders + Hub + products + chat",
+      "action": "re-oracle pago leftover no Hub com S1 published",
+      "http": "{\"hubJwt\":\"200 [{\\\"id\\\":\\\"e8f0b8f8-b50e-4d38-bdba-528c8a293a7d\\\",\\\"title\\\":\\\"Refund crash E2E 1788707884963\\\",\\\"seller_id\\\":\\\"980f4fa1-0004-42f9-abca-69f1a9c29588\\\",\\\"is_sold\\\":false,\\\"price\\\":5.9}]\",\"hubAnon\":\"200 [{\\\"id\\\":\\\"e8f0b8f8-b50e-4d38-bdba-528c8a293a7d\\\",\\\"title\\\":\\\"Refund crash E2E 1788707884963\\\",\\\"seller_i…",
+      "oracles": "{\"prod\":{\"id\":\"e8f0b8f8-b50e-4d38-bdba-528c8a293a7d\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"title\":\"Refund crash E2E 1788707884963\",\"price\":5.9,\"quantity\":1,\"is_sold\":false,\"list_on_marketplace\":true,\"available_for_live\":false},\"status\":\"pago\",\"hub_n\":1,\"shouldShow\":true,\"chats_n\":0,\"msgs_n\":0}",
+      "result": "FAIL",
+      "lens": "DM5",
+      "residual": false,
+      "count_finding": false
+    },
+    {
+      "probe_id": "B1r",
+      "surfaces": "Hub + live_reservation + CPI + products",
+      "action": "re-oracle hitch accepted vs Hub vs CPI",
+      "http": "{\"hub\":\"200 [{\\\"id\\\":\\\"a89de08c-05d8-483d-a6e5-638e0c915c0b\\\",\\\"title\\\":\\\"RTDM-20260906T1610 B1 hitch-bag\\\",\\\"seller_id\\\":\\\"980f4fa1-0004-42f9-abca-69f1a9c29588\\\",\\\"is_sold\\\":false,\\\"price\\\":12.0}]\",\"cpi\":null}",
+      "oracles": "{\"prod\":{\"id\":\"a89de08c-05d8-483d-a6e5-638e0c915c0b\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"title\":\"RTDM-20260906T1610 B1 hitch-bag\",\"price\":12.0,\"quantity\":1,\"is_sold\":false,\"list_on_marketplace\":true,\"available_for_live\":true},\"res\":{\"id\":\"48230d14-b663-400f-86c6-2074cb70035e\",\"status\":\"accepted\",\"requested_qty\":1,\"live_item_id\":\"31a1a5d4-19d5…",
+      "result": "HOLD",
+      "lens": "DM2",
+      "residual": false,
+      "count_finding": true
+    },
+    {
+      "probe_id": "D3r",
+      "surfaces": "refund-order + CPI + products + orders",
+      "action": "Future.wait refund pago ∥ CPI leftover qty=1",
+      "http": "{\"rf\":\"200 {\\\"ok\\\":true,\\\"already_refunded\\\":true,\\\"idempotent\\\":true,\\\"refund_id\\\":\\\"re_3UChsaH7FWYUN3jh0bgBUL2G\\\",\\\"status\\\":\\\"cancelado\\\",\\\"stock_units_applied\\\":null,\\\"amount_cents\\\":590,\\\"payment_intent\\\":\\\"pi_3UChsaH7FWYUN3jh00CnZTmq\\\",\\\"status_str…\",\"cpi\":\"200 {\\\"checkoutUrl\\\":\\\"https://checkout.stripe.com/c/pay…",
+      "oracles": "{\"qtyMid\":1,\"qtyEnd\":2,\"old\":\"cancelado\",\"new\":\"reserva_pendente\",\"newCs\":true,\"refunded\":true,\"pass1_d3\":\"retract — race não correu (qty0 insert deny)\"}",
+      "result": "FAIL",
+      "lens": "DM4",
+      "residual": false,
+      "count_finding": false
+    }
+  ],
+  "findings": [
+    {
+      "id": "P2-B1-HUB-HOLD",
+      "lens": "DM2",
+      "severity": "P2",
+      "title": "Reserva live accepted: Hub ainda lista SKU; CPI recusa",
+      "actor": "B1 Hub vs CPI vs live",
+      "pre": "qty produto=1; reservation accepted",
+      "repro": "GET hub + insertOrder/CPI vs live_reservation accepted",
+      "expected": "Hub esconde OU CPI alinha com vitrine",
+      "obtained": {
+        "prod": {
+          "id": "a89de08c-05d8-483d-a6e5-638e0c915c0b",
+          "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+          "title": "RTDM-20260906T1610 B1 hitch-bag",
+          "price": 12.0,
+          "quantity": 1,
+          "is_sold": false,
+          "list_on_marketplace": true,
+          "available_for_live": true
+        },
+        "res": {
+          "id": "48230d14-b663-400f-86c6-2074cb70035e",
+          "status": "accepted",
+          "requested_qty": 1,
+          "live_item_id": "31a1a5d4-19d5-4e19-a7b3-52539fa67238",
+          "buyer_id": "3c85bc07-abd5-4a6c-9b0b-b7814911ed7a"
+        },
+        "hub_n": 1,
+        "insert": null,
+        "cpi": null
+      },
+      "proven": true,
+      "count_exact_closed": false,
+      "evidence": {}
+    }
+  ],
+  "blocked": [
+    {
+      "id": "B2r",
+      "lens": "DM2",
+      "title": "qty0 published: Hub vazio + insert/CPI deny",
+      "ev": {
+        "prod": {
+          "id": "1d97f585-8a18-4c17-be7b-10a22abb434e",
+          "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+          "title": "RTDM-20260906T1610 B2 qty0",
+          "price": 12.0,
+          "quantity": 0,
+          "is_sold": false,
+          "list_on_marketplace": true,
+          "available_for_live": true
+        },
+        "hubJwt": "200 []",
+        "hubAnon": "200 []",
+        "oid": null,
+        "cpi": null
+      }
+    },
+    {
+      "id": "C1r",
+      "lens": "DM5",
+      "title": "pago leftover vs Hub coerente (ou qty0/sold)",
+      "ev": {
+        "qty": 1,
+        "hub_n": 1,
+        "shouldShow": true,
+        "status": "pago",
+        "chats": 0,
+        "msgs": 0
+      }
+    },
+    {
+      "id": "D3r",
+      "lens": "DM4",
+      "title": "refund∥CPI leftover stock coerente — retract pass1 D3",
+      "ev": {
+        "qtyMid": 1,
+        "qtyEnd": 2,
+        "refunded": true,
+        "newCs": true,
+        "old": "cancelado",
+        "new": "reserva_pendente"
+      }
+    }
+  ],
+  "skipped": [],
+  "notes": [
+    {
+      "id": "restore.before",
+      "lens": "DM1",
+      "title": "S1 before",
+      "ev": {
+        "id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+        "handle": "fleahub-demo-ux",
+        "hub_published": false,
+        "user_type": "vendedor",
+        "full_name": "Maria Demo FleaHub",
+        "is_live": false
+      }
+    },
+    {
+      "id": "restore.rpc",
+      "lens": "DM1",
+      "title": "batata_publish_hub true",
+      "ev": "200 {\"ok\": true, \"handle\": \"fleahub-demo-ux\", \"profile_id\": \"980f4fa1-0004-42f9-abca-69f1a9c29588\", \"hub_published\": true}"
+    },
+    {
+      "id": "restore.after",
+      "lens": "DM1",
+      "title": "S1 after",
+      "ev": {
+        "id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+        "handle": "fleahub-demo-ux",
+        "hub_published": true,
+        "user_type": "vendedor",
+        "full_name": "Maria Demo FleaHub",
+        "is_live": false
+      }
+    },
+    {
+      "id": "lives.ended",
+      "lens": "DM4",
+      "title": "fixture lives",
+      "ev": "200 [{\"id\":\"604fd231-b297-4a39-b63d-0cc513cf4db9\",\"status\":\"ended\",\"is_active\":false}, \n {\"id\":\"7cb5699c-a4c3-4e0b-a0fd-f74a78a1bbf2\",\"status\":\"ended\",\"is_active\":false}, \n {\"id\":\"7ed37fa8-142f-48c0-ad98-43e38109ae01\",\"statu…"
+    },
+    {
+      "id": "order.fail",
+      "title": "insertOrder",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"order_hold_exceeds_stock\"}"
+    },
+    {
+      "id": "order.fail",
+      "title": "insertOrder",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"order_hold_exceeds_stock\"}"
+    },
+    {
+      "id": "fixture.paid",
+      "lens": "DM4",
+      "title": "setup_paid_order Stripe TEST",
+      "ev": "200 {\n  \"ok\": true,\n  \"order_id\": \"393f1bf0-3336-4f57-8a39-dfbecc01da7d\",\n  \"product_id\": \"e5b59b4c-bacd-4d65-83a5-6109aead708e\",\n  \"payment_intent_id\": \"pi_3UChsaH7FWYUN3jh00CnZTmq\",\n  \"pi_status\": \"succeeded\",\n  \"pi_amount…"
+    },
+    {
+      "id": "final.s1",
+      "lens": "DM1",
+      "title": "S1 hub_published exit",
+      "ev": true
+    }
+  ],
+  "s1_before": {
+    "id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+    "handle": "fleahub-demo-ux",
+    "hub_published": false,
+    "user_type": "vendedor",
+    "full_name": "Maria Demo FleaHub",
+    "is_live": false
+  },
+  "s1_after": {
+    "id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+    "handle": "fleahub-demo-ux",
+    "hub_published": true,
+    "user_type": "vendedor",
+    "full_name": "Maria Demo FleaHub",
+    "is_live": false
+  },
+  "s1_exit": {
+    "id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+    "handle": "fleahub-demo-ux",
+    "hub_published": true,
+    "user_type": "vendedor",
+    "full_name": "Maria Demo FleaHub",
+    "is_live": false
+  }
+}

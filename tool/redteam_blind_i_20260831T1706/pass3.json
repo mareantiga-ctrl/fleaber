@@ -1,0 +1,152 @@
+{
+  "pass": 3,
+  "prefix": "RTI-20260831T1706",
+  "wallets_start": {
+    "buyer": 22.75,
+    "seller": 251.1,
+    "buyer2": 0,
+    "seller2": 0
+  },
+  "credited_eur": 5.000000000000028,
+  "payout_drain": {
+    "hit": "200 {\"success\":true,\"transferId\":\"tr_1UAXsoH7FWYUN3jhk50TAQfF\",\"balance\":251.1}",
+    "drained": true,
+    "seller_after": 251.1
+  },
+  "after_devolvida": {
+    "order": {
+      "id": "207d5aff-c7af-4783-b1e9-93dcc7b4ee2e",
+      "status": "devolvida",
+      "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+      "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+      "product_id": "5b936696-779c-4f8c-9c2c-616823ab6357",
+      "quantity": 1,
+      "price_total": 5.9,
+      "amount_paid_cents": 590,
+      "payment_method": "Pagamento na app",
+      "shipping_method": null,
+      "stripe_payment_intent_id": "pi_3UAXshH7FWYUN3jh0ulq5U7j",
+      "stripe_checkout_session_id": null,
+      "stripe_refund_id": null,
+      "wallet_release_processed_at": "2026-08-31T16:16:28.011482+00:00",
+      "wallet_refund_processed_at": "2026-08-31T16:16:32.757041+00:00",
+      "stock_units_applied": null,
+      "completed_at": null,
+      "returned_at": "2026-08-31T16:16:32.757041+00:00"
+    },
+    "buyer_before": 22.75,
+    "buyer_after": 28.65,
+    "seller_before": 251.1,
+    "seller_after_rel": 256.1,
+    "seller_after_drain": 251.1,
+    "seller_after_dev": 246.1,
+    "delta_buyer": 5.899999999999999,
+    "delta_seller_net": -5.0,
+    "drained_via_payout": true,
+    "simulated_drain": false,
+    "txns": [
+      {
+        "id": "ee8a7245-7174-4b5e-8e59-513abbac7862",
+        "wallet_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+        "amount": 5.0,
+        "type": "estorno",
+        "description": "Estorno venda encomenda #207d5aff (5.00€)",
+        "order_id": "207d5aff-c7af-4783-b1e9-93dcc7b4ee2e",
+        "created_at": "2026-08-31T16:16:32.757041+00:00"
+      },
+      {
+        "id": "30015e72-27ff-406b-8dc1-98ffa324a71a",
+        "wallet_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+        "amount": 5.9,
+        "type": "reembolso",
+        "description": "Reembolso Encomenda #207d5aff",
+        "order_id": "207d5aff-c7af-4783-b1e9-93dcc7b4ee2e",
+        "created_at": "2026-08-31T16:16:32.757041+00:00"
+      },
+      {
+        "id": "2d8f554e-73e3-4e04-9b98-2095f824925e",
+        "wallet_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+        "amount": 5.0,
+        "type": "venda",
+        "description": "Venda de Refund crash E2E 1788192983193",
+        "order_id": "207d5aff-c7af-4783-b1e9-93dcc7b4ee2e",
+        "created_at": "2026-08-31T16:16:28.011482+00:00"
+      }
+    ]
+  },
+  "wallets_end": {
+    "buyer": 28.65,
+    "seller": 246.1,
+    "buyer2": 0,
+    "seller2": 0
+  },
+  "findings": [],
+  "notes": [
+    {
+      "id": "fixture.paid",
+      "lens": "I3",
+      "title": "setup_paid_order",
+      "ev": "200 {\n  \"ok\": true,\n  \"order_id\": \"207d5aff-c7af-4783-b1e9-93dcc7b4ee2e\",\n  \"product_id\": \"5b936696-779c-4f8c-9c2c-616823ab6357\",\n  \"payment_intent_id\": \"pi_3UAXshH7FWYUN3jh0ulq5U7j\",\n…"
+    },
+    {
+      "id": "p3.release",
+      "lens": "I3",
+      "title": "release",
+      "ev": "200 true"
+    },
+    {
+      "id": "p3.i7.payout_drain",
+      "lens": "I7",
+      "title": "payout do release",
+      "ev": "200 {\"success\":true,\"transferId\":\"tr_1UAXsoH7FWYUN3jhk50TAQfF\",\"balance\":251.1}"
+    },
+    {
+      "id": "p3.i6.dispute_insert",
+      "lens": "I6",
+      "title": "buyer INSERT disputa com oferta forjada",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"new row violates row-level security policy for table \\\"order_disputes\\\"\"}"
+    },
+    {
+      "id": "p3.i5.refund",
+      "lens": "I5",
+      "title": "seller refund-order",
+      "ev": "403 {\"ok\":false,\"error\":\"Não é possível anular esta venda neste estado (já enviada ou concluída).\",\"code\":\"order_refund_blocked_status\",\"status\":\"concluido\"}"
+    },
+    {
+      "id": "p3.i3.devolvida",
+      "lens": "I3",
+      "title": "service_role status=devolvida",
+      "ev": "200 [{\"id\":\"207d5aff-c7af-4783-b1e9-93dcc7b4ee2e\",\"created_at\":\"2026-08-31T16:16:23.581426+00:00\",\"product_id\":\"5b936696-779c-4f8c-9c2c-616823ab6357\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a…"
+    },
+    {
+      "id": "p3.i7.books",
+      "lens": "I7",
+      "title": "livro após devolvida",
+      "ev": {
+        "buyer_gain": 5.899999999999999,
+        "seller_net": -5.0,
+        "venda_n": 1,
+        "estorno_n": 1,
+        "reemb_n": 1,
+        "release_flag": "2026-08-31T16:16:28.011482+00:00",
+        "refund_flag": "2026-08-31T16:16:32.757041+00:00",
+        "stripe_refund": null
+      }
+    },
+    {
+      "id": "p3.i6.refund_rpc_b2_after",
+      "lens": "I6",
+      "title": "buyer2 refund rpc pós-devolvida",
+      "ev": "200 false"
+    },
+    {
+      "id": "p3.i3.refund_replay",
+      "lens": "I3",
+      "title": "buyer 2.º refund_wallet",
+      "ev": {
+        "rpc": "200 false",
+        "buyer": 28.65
+      }
+    }
+  ]
+}

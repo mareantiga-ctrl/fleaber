@@ -1,0 +1,305 @@
+{
+  "stamp": "20260906T1612",
+  "prefix": "RTDL-20260906T1612",
+  "auditor": "REDTEAM_BLIND_DL_EDGE_SETTLE_POS_DBDG_v1",
+  "lenses": [
+    "DL1",
+    "DL2",
+    "DL3",
+    "DL4",
+    "DL5",
+    "DL6"
+  ],
+  "probes": [
+    {
+      "probe_id": "A3",
+      "edge_rpc": "create-payment-intent POST",
+      "payload": "POST checkout amount=1 total=50 server_amount_cents=50 vs quote SKU 12,00€",
+      "http": "400 {\"error\":\"Checkout blocked: order claim contention.\"} loc=\"\"",
+      "stripe_bd": "{\"sid\":\"\",\"stripe_amount_total\":\"\",\"meta.server_amount_cents\":\"\",\"meta.total\":\"\",\"meta.order_id\":\"\",\"order.status\":\"reserva_pendente\",\"order.price_total\":13.25}",
+      "result": "SKIP",
+      "lens": "DL1",
+      "count_finding": false
+    },
+    {
+      "probe_id": "A1",
+      "edge_rpc": "create-payment-intent GET settle",
+      "payload": "GET checkout_return=success Session unpaid null",
+      "http": "400 {\"error\":\"Checkout blocked: order claim contention.\"} loc=\"\"",
+      "stripe_bd": "{\"status\":\"\",\"amount_paid_cents\":\"\",\"pi\":\"\"}",
+      "result": "SKIP",
+      "lens": "DL1",
+      "count_finding": false
+    },
+    {
+      "probe_id": "A2",
+      "edge_rpc": "create-payment-intent GET + Stripe metadata swap",
+      "payload": "settle session A; metadata.order_id A→B; confirm PI TEST se possível",
+      "http": "{\"ckB\":\"200 {\\\"checkoutUrl\\\":\\\"https://checkout.stripe.com/c/pay/cs_test_a1LhPB34alCicE1iXmdFZ754Sjcuq0gIhKIZlyjsbGRaM79gkC4rkxHhaa#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21… loc=\\\"\\\"\",\"crossGet\":\"\",\"swapGet\":\"\",\"pay\":\"\",\"settlePaid\":\"\"}",
+      "stripe_bd": "{\"sidA\":\"\",\"sidB\":\"cs_test_a1LhPB34alCicE1iXmdFZ754Sjcuq0gIhKIZlyjsbGRaM79gkC4rkxHhaa\",\"oidA\":\"6d6e1fe6-7e2c-4e00-b536-e35e886e6629\",\"oidB\":\"440bc572-a3a9-408d-bb72-0c551c7b8e8b\",\"statusA\":\"reserva_pendente\",\"statusB\":\"reserva_pendente\",\"pi\":\"\"}",
+      "result": "SKIP",
+      "lens": "DL1",
+      "count_finding": false
+    },
+    {
+      "probe_id": "A4",
+      "edge_rpc": "create-payment-intent GET + sessions/expire",
+      "payload": "expire Session unpaid → GET settle + confirm PI",
+      "http": "{\"create\":\"200 {\\\"checkoutUrl\\\":\\\"https://checkout.stripe.com/c/pay/cs_test_a11BesEG7uKETpYAtkdKaYsXoPo0j8JnKgPZuIP8v4obeSGD5QZvZSyGgw#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21… loc=\\\"\\\"\",\"expire\":\"\",\"get\":\"\",\"confirm\":\"\"}",
+      "stripe_bd": "{\"sid\":\"cs_test_a11BesEG7uKETpYAtkdKaYsXoPo0j8JnKgPZuIP8v4obeSGD5QZvZSyGgw\",\"status\":\"\",\"sess_status\":\"\"}",
+      "result": "SKIP",
+      "lens": "DL1",
+      "count_finding": false
+    },
+    {
+      "probe_id": "A5",
+      "edge_rpc": "stripe-webhook POST",
+      "payload": "POST webhook assinatura forjada checkout.session.completed paid",
+      "http": "400 {\"ok\":false,\"error\":\"invalid_signature\"} loc=\"\"",
+      "stripe_bd": "{\"status\":\"reserva_pendente\"}",
+      "result": "HOLD",
+      "lens": "DL1",
+      "count_finding": false
+    },
+    {
+      "probe_id": "B1",
+      "edge_rpc": "create-live-tip-checkout POST",
+      "payload": "amount 0/0.01/-1/0.5/501 + tip_id cliente",
+      "http": "{\"amounts\":{\"0\":\"400 {\\\"error\\\":\\\"Invalid tip amount.\\\"} loc=\\\"\\\"\",\"0.01\":\"400 {\\\"error\\\":\\\"Invalid tip amount.\\\"} loc=\\\"\\\"\",\"-1\":\"400 {\\\"error\\\":\\\"Invalid tip amount.\\\"} loc=\\\"\\\"\",\"0.5\":\"400 {\\\"error\\\":\\\"Invalid tip amount.\\\"} loc=\\\"\\\"\",\"501\":\"400 {\\\"error\\\":\\\"Tip amount too high.\\\"} loc=\\\"\\\"\"},\"tip_id\":\"400 {\\\"error\\…",
+      "stripe_bd": "{\"accepted\":[]}",
+      "result": "HOLD",
+      "lens": "DL2",
+      "count_finding": false
+    },
+    {
+      "probe_id": "B2",
+      "edge_rpc": "create-live-tip-checkout GET settle",
+      "payload": "Session published → unpublish hub → GET unpaid",
+      "http": "{\"create\":\"200 {\\\"checkoutUrl\\\":\\\"https://checkout.stripe.com/c/pay/cs_test_a1ACQI2JbFIxvBQHCse7GmnZVfIs1caJosatMsNRdpLKCisyGow4IqHepy#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21… loc=\\\"\\\"\",\"unpub\":\"200 {\\\"ok\\\": true, \\\"handle\\\": \\\"fleahub-…",
+      "stripe_bd": "{\"hub_mid\":false,\"hub_after\":true,\"tipStatus\":\"pending\",\"delta\":0.0}",
+      "result": "HOLD",
+      "lens": "DL2",
+      "count_finding": false
+    },
+    {
+      "probe_id": "B3",
+      "edge_rpc": "create-live-tip-checkout POST",
+      "payload": "seller_id S2 na live S1; seller_id S1 na live S2",
+      "http": "{\"s2_on_s1_live\":\"400 {\\\"error\\\":\\\"Tip seller does not own this live.\\\"} loc=\\\"\\\"\",\"s1_on_s2_live\":\"400 {\\\"error\\\":\\\"Tip seller does not own this live.\\\"} loc=\\\"\\\"\"}",
+      "stripe_bd": "",
+      "result": "HOLD",
+      "lens": "DL2",
+      "count_finding": false
+    },
+    {
+      "probe_id": "C1",
+      "edge_rpc": "refund-order",
+      "payload": "POST refund-order JWT comprador order=ab76a649-41d6-4f63-bc15-387492e70f65",
+      "http": "403 {\"ok\":false,\"error\":\"Sem permissão.\"} loc=\"\"",
+      "stripe_bd": "{\"refund_id\":\"\",\"status\":\"pago\",\"deltaSeller\":0.0}",
+      "result": "HOLD",
+      "lens": "DL3",
+      "count_finding": false
+    },
+    {
+      "probe_id": "C2",
+      "edge_rpc": "refund-order ×2",
+      "payload": "seller refund pago 1d9ea733-2e80-4dbb-8cd8-bcb2379adf42 duas vezes",
+      "http": "{\"r1\":\"200 {\\\"ok\\\":true,\\\"already_refunded\\\":true,\\\"idempotent\\\":true,\\\"refund_id\\\":\\\"re_3UChoUH7FWYUN3jh12oWZmK8\\\",\\\"status\\\":\\\"cancelado\\\",\\\"stock_units_applied\\\":null,\\\"amount_cents\\\":590,\\\"payment_intent\\\":\\\"pi_3UChoUH7FWYUN3jh1fotxYar\\\",\\\"status_stripe\\\":\\\"succeeded\\\"} loc=\\\"\\\"\",\"r2\":\"200 {\\\"ok\\\":true,\\\"already_re…",
+      "stripe_bd": "{\"refund1\":\"re_3UChoUH7FWYUN3jh12oWZmK8\",\"refund2\":\"re_3UChoUH7FWYUN3jh12oWZmK8\",\"status1\":\"cancelado\",\"status2\":\"cancelado\",\"already\":true,\"idempotent\":true}",
+      "result": "HOLD",
+      "lens": "DL4",
+      "count_finding": false
+    },
+    {
+      "probe_id": "C3",
+      "edge_rpc": "refund-order ∥ batata_release_seller_wallet_for_order",
+      "payload": "Future.wait refund seller + release buyer/seller no pago",
+      "http": "[\"200 {\\\"ok\\\":true,\\\"already_refunded\\\":true,\\\"idempotent\\\":true,\\\"refund_id\\\":\\\"re_3UChoaH7FWYUN3jh168246Un\\\",\\\"status\\\":\\\"cancelado\\\",\\\"stock_units_applied\\\":null,\\\"amount_cents\\\":590,\\\"payment_intent\\\":\\\"pi_3UChoaH7FWYUN3jh1KGiblIw\\\",\\\"status_stripe\\\":\\\"succeeded\\\"} loc=\\\"\\\"\",\"200 false loc=\\\"\\\"\",\"200 false loc=\\\"\\\"…",
+      "stripe_bd": "{\"refunded\":true,\"released\":false,\"delta\":0.0}",
+      "result": "HOLD",
+      "lens": "DL5",
+      "count_finding": false
+    },
+    {
+      "probe_id": "C4",
+      "edge_rpc": "create-connect-account",
+      "payload": "mesma key amount 100 depois 500; S2 reutiliza key S1",
+      "http": "{\"p100\":\"200 {\\\"success\\\":true,\\\"transferId\\\":\\\"tr_1UChohH7FWYUN3jhhaPsRuq4\\\",\\\"balance\\\":36} loc=\\\"\\\"\",\"p500\":\"200 {\\\"success\\\":true,\\\"transferId\\\":\\\"tr_1UChohH7FWYUN3jhhaPsRuq4\\\",\\\"balance\\\":36,\\\"idempotent\\\":true} loc=\\\"\\\"\",\"s2\":\"400 {\\\"error\\\":\\\"Falta associar a conta bancária no Stripe. Abre outra vez Configurar c…",
+      "stripe_bd": "{\"new_tr\":[\"tr_1UChohH7FWYUN3jhhaPsRuq4\"],\"delta\":-1.0,\"idempotent500\":true}",
+      "result": "HOLD",
+      "lens": "DL6",
+      "count_finding": false
+    },
+    {
+      "probe_id": "C5",
+      "edge_rpc": "create-connect-account",
+      "payload": "destination=acct_1UChokHMTQUwRF3q currency=usd; amount=99999999 vs saldo 35.0",
+      "http": "{\"dest\":\"200 {\\\"success\\\":true,\\\"transferId\\\":\\\"tr_1UChoqH7FWYUN3jhGuB1mQnS\\\",\\\"balance\\\":35} loc=\\\"\\\"\",\"huge\":\"400 {\\\"error\\\":\\\"Saldo disponível insuficiente para este levantamento.\\\",\\\"code\\\":\\\"payout_failed\\\"} loc=\\\"\\\"\"}",
+      "stripe_bd": "{\"own\":\"acct_1U5mYbQeUNx8ar08\",\"other\":\"acct_1UChokHMTQUwRF3q\",\"new_tr\":[\"tr_1UChoqH7FWYUN3jhGuB1mQnS\"],\"deltaHuge\":0.0,\"destDiverted\":false}",
+      "result": "HOLD",
+      "lens": "DL6",
+      "count_finding": false
+    }
+  ],
+  "findings": [],
+  "blocked": [
+    {
+      "id": "A4.expire",
+      "lens": "DL1",
+      "title": "expire impede settle/confirm",
+      "ev": {
+        "get": "",
+        "pay": "",
+        "status": ""
+      }
+    },
+    {
+      "id": "A5.webhook",
+      "lens": "DL1",
+      "title": "assinatura forjada recusada",
+      "ev": "400 {\"ok\":false,\"error\":\"invalid_signature\"} loc=\"\""
+    },
+    {
+      "id": "B1.amount",
+      "lens": "DL2",
+      "title": "amount hostil + tip_id cliente 400",
+      "ev": {
+        "amounts": {
+          "0": "400 {\"error\":\"Invalid tip amount.\"} loc=\"\"",
+          "0.01": "400 {\"error\":\"Invalid tip amount.\"} loc=\"\"",
+          "-1": "400 {\"error\":\"Invalid tip amount.\"} loc=\"\"",
+          "0.5": "400 {\"error\":\"Invalid tip amount.\"} loc=\"\"",
+          "501": "400 {\"error\":\"Tip amount too high.\"} loc=\"\""
+        },
+        "tip_id": "400 {\"error\":\"Client tip_id is not allowed.\"} loc=\"\""
+      }
+    },
+    {
+      "id": "B2.midunpub",
+      "lens": "DL2",
+      "title": "GET unpaid mid-unpublish não creditou",
+      "ev": {
+        "status": "pending",
+        "delta": 0.0
+      }
+    },
+    {
+      "id": "B3.owner",
+      "lens": "DL2",
+      "title": "seller≠owner 400",
+      "ev": {
+        "wrong": "400 {\"error\":\"Tip seller does not own this live.\"} loc=\"\"",
+        "s2own": "400 {\"error\":\"Tip seller does not own this live.\"} loc=\"\""
+      }
+    },
+    {
+      "id": "C1.buyer",
+      "lens": "DL3",
+      "title": "buyer refund-order recusado (seller-only)",
+      "ev": "403 {\"ok\":false,\"error\":\"Sem permissão.\"} loc=\"\""
+    },
+    {
+      "id": "C2.idem",
+      "lens": "DL4",
+      "title": "2.º refund idempotente",
+      "ev": {
+        "r1": "200 {\"ok\":true,\"already_refunded\":true,\"idempotent\":true,\"refund_id\":\"re_3UChoUH7FWYUN3jh12oWZmK8\",\"status\":\"cancelado\",\"stock_units_applied\":null,\"amount_cents\":590,\"payment_intent\":\"pi_3UChoUH7FWYUN3jh1fotxYar\",\"status_stripe\":\"succeeded\"} loc=\"\"",
+        "r2": "200 {\"ok\":true,\"already_refunded\":true,\"idempotent\":true,\"refund_id\":\"re_3UChoUH7FWYUN3jh12oWZmK8\",\"status\":\"cancelado\",\"stock_units_applied\":null,\"amount_cents\":590,\"payment_intent\":\"pi_3UChoUH7FWYUN3jh1fotxYar\"} loc=\"\"",
+        "id1": "re_3UChoUH7FWYUN3jh12oWZmK8",
+        "id2": "re_3UChoUH7FWYUN3jh12oWZmK8"
+      }
+    },
+    {
+      "id": "C3.race",
+      "lens": "DL5",
+      "title": "race pago sem crédito+refund simultâneo",
+      "ev": {
+        "refunded": true,
+        "released": false,
+        "delta": 0.0
+      }
+    },
+    {
+      "id": "C4.idem",
+      "lens": "DL6",
+      "title": "amount mutate + cross-user key sem 2.ª Transfer",
+      "ev": {
+        "p100": "200 {\"success\":true,\"transferId\":\"tr_1UChohH7FWYUN3jhhaPsRuq4\",\"balance\":36} loc=\"\"",
+        "p500": "200 {\"success\":true,\"transferId\":\"tr_1UChohH7FWYUN3jhhaPsRuq4\",\"balance\":36,\"idempotent\":true} loc=\"\"",
+        "s2": "400 {\"error\":\"Falta associar a conta bancária no Stripe. Abre outra vez Configurar conta bancária e adiciona o IBAN de teste.\",\"code\":\"payout_failed\"} loc=\"\"",
+        "n_tr": 1
+      }
+    },
+    {
+      "id": "C5.dest.over",
+      "lens": "DL6",
+      "title": "dest própria; overbalance recusado",
+      "ev": {
+        "dest": "200 {\"success\":true,\"transferId\":\"tr_1UChoqH7FWYUN3jhGuB1mQnS\",\"balance\":35} loc=\"\"",
+        "huge": "400 {\"error\":\"Saldo disponível insuficiente para este levantamento.\",\"code\":\"payout_failed\"} loc=\"\"",
+        "deltaHuge": 0.0
+      }
+    }
+  ],
+  "skipped": [
+    {
+      "id": "A3",
+      "lens": "DL1",
+      "title": "checkout A3 não criou Session",
+      "ev": "400 {\"error\":\"Checkout blocked: order claim contention.\"} loc=\"\""
+    }
+  ],
+  "notes": [
+    {
+      "id": "fixture.paid",
+      "lens": "DL3",
+      "title": "setup_paid_order Stripe TEST",
+      "ev": "200 {\n  \"ok\": true,\n  \"order_id\": \"ab76a649-41d6-4f63-bc15-387492e70f65\",\n  \"product_id\": \"f9f6a11e-f943-42a3-9aa0-91aecf1cd397\",\n  \"payment_intent_id\": \"pi_3UChoQH7FWYUN3jh0evGWzQ5\",\n  \"pi_status\": \"succeeded\",\n  \"pi_amount_received\": 590,\n  \"… loc=\"\""
+    },
+    {
+      "id": "fixture.paid",
+      "lens": "DL4",
+      "title": "setup_paid_order Stripe TEST",
+      "ev": "200 {\n  \"ok\": true,\n  \"order_id\": \"1d9ea733-2e80-4dbb-8cd8-bcb2379adf42\",\n  \"product_id\": \"7127b828-2c7c-429b-b8ac-b429c8f593a3\",\n  \"payment_intent_id\": \"pi_3UChoUH7FWYUN3jh1fotxYar\",\n  \"pi_status\": \"succeeded\",\n  \"pi_amount_received\": 590,\n  \"… loc=\"\""
+    },
+    {
+      "id": "fixture.paid",
+      "lens": "DL5",
+      "title": "setup_paid_order Stripe TEST",
+      "ev": "200 {\n  \"ok\": true,\n  \"order_id\": \"1b083ff5-d729-4542-804e-055b75104eb3\",\n  \"product_id\": \"56f6e2fb-37f9-4997-a188-3724289b795c\",\n  \"payment_intent_id\": \"pi_3UChoaH7FWYUN3jh1KGiblIw\",\n  \"pi_status\": \"succeeded\",\n  \"pi_amount_received\": 590,\n  \"… loc=\"\""
+    }
+  ],
+  "actors": {
+    "buyer": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+    "seller": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+    "buyer2": "f04349ea-ece7-4112-be45-0a8c05ee5216",
+    "seller2": "b583876e-e6b5-4d2b-b97d-a7bb5e741b4b"
+  },
+  "created": {
+    "orders": [
+      "6d6e1fe6-7e2c-4e00-b536-e35e886e6629",
+      "440bc572-a3a9-408d-bb72-0c551c7b8e8b",
+      "fa65b4f4-9096-4fac-9c75-609db5438ff1",
+      "ab76a649-41d6-4f63-bc15-387492e70f65",
+      "1d9ea733-2e80-4dbb-8cd8-bcb2379adf42",
+      "1b083ff5-d729-4542-804e-055b75104eb3"
+    ],
+    "products": [
+      "076c7c85-bff8-4044-8ad1-cd48f9c411b5",
+      "668e881a-5f70-4bb7-a2db-7c139d6be7b1",
+      "8538428e-af9b-4f13-8d59-406202ace1aa",
+      "f9f6a11e-f943-42a3-9aa0-91aecf1cd397",
+      "7127b828-2c7c-429b-b8ac-b429c8f593a3",
+      "56f6e2fb-37f9-4997-a188-3724289b795c"
+    ],
+    "lives": [
+      "36de7c54-4eff-4efa-967c-758b05bf7fa8",
+      "111364dc-7cee-451b-9a4d-3919876113f6"
+    ],
+    "tips": [
+      "eecaf597-4cfa-4103-a299-2c33eae1a6b1"
+    ]
+  },
+  "has_sk_test": false
+}

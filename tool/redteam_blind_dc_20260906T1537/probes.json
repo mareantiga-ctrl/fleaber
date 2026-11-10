@@ -1,0 +1,589 @@
+{
+  "auditor": "REDTEAM_BLIND_DC_CHAT_POS_CVDA_v1",
+  "prefix": "RTDC-20260906T1537",
+  "probes": [
+    {
+      "probe_id": "DCA.A1-empty",
+      "superfície": "DC-A notes",
+      "payload": "(vazio)",
+      "http_rpc": "201 id=1734",
+      "bd_inbox": "orders.status=pago · notes persistidas",
+      "verdict": "PASS"
+    },
+    {
+      "probe_id": "DCA.A2-stripe",
+      "superfície": "DC-A notes",
+      "payload": "stripe_paid_direct",
+      "http_rpc": "201 id=1735",
+      "bd_inbox": "orders.status=pago · notes persistidas",
+      "verdict": "PASS"
+    },
+    {
+      "probe_id": "DCA.A3-obrigado",
+      "superfície": "DC-A notes",
+      "payload": "obrigado",
+      "http_rpc": "201 id=1736",
+      "bd_inbox": "orders.status=pago · notes persistidas",
+      "verdict": "PASS"
+    },
+    {
+      "probe_id": "DCA.A3b-ja-enviei",
+      "superfície": "DC-A notes",
+      "payload": "já enviei",
+      "http_rpc": "201 id=1737",
+      "bd_inbox": "orders.status=pago · notes persistidas",
+      "verdict": "PASS"
+    },
+    {
+      "probe_id": "DCB.B1-zwsp-prefix",
+      "superfície": "DC-B encoding",
+      "payload": "ZWSP + paguei",
+      "http_rpc": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_notes_forbidden\"}",
+      "bd_inbox": "orders.status=pago · recusado",
+      "verdict": "HOLD"
+    },
+    {
+      "probe_id": "DCB.B1-wj-mid",
+      "superfície": "DC-B encoding",
+      "payload": "pa WJ guei",
+      "http_rpc": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_notes_forbidden\"}",
+      "bd_inbox": "orders.status=pago · recusado",
+      "verdict": "HOLD"
+    },
+    {
+      "probe_id": "DCB.B1b-shy-mid",
+      "superfície": "DC-B encoding",
+      "payload": "pa SHY guei",
+      "http_rpc": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_notes_forbidden\"}",
+      "bd_inbox": "orders.status=pago · recusado",
+      "verdict": "HOLD"
+    },
+    {
+      "probe_id": "DCB.B1c-nbsp-ok",
+      "superfície": "DC-B encoding",
+      "payload": "o NBSP k",
+      "http_rpc": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_notes_forbidden\"}",
+      "bd_inbox": "orders.status=pago · recusado",
+      "verdict": "HOLD"
+    },
+    {
+      "probe_id": "DCB.B1d-zwnj",
+      "superfície": "DC-B encoding",
+      "payload": "pa ZWNJ guei",
+      "http_rpc": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_notes_forbidden\"}",
+      "bd_inbox": "orders.status=pago · recusado",
+      "verdict": "HOLD"
+    },
+    {
+      "probe_id": "DCB.B2-case-Paguei",
+      "superfície": "DC-B case",
+      "payload": "Paguei",
+      "http_rpc": "201 id=1743",
+      "bd_inbox": "persistido (lower→paguei)",
+      "verdict": "HOLD",
+      "note": "lower() é o contrato — ainda o token canónico"
+    },
+    {
+      "probe_id": "DCB.B2b-homoglyph-cyrA",
+      "superfície": "DC-B homoglyph",
+      "payload": "p + Cyrillic а + guei",
+      "http_rpc": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_notes_forbidden\"}",
+      "bd_inbox": "orders.status=pago · recusado",
+      "verdict": "HOLD"
+    },
+    {
+      "probe_id": "DCB.B2c-nfd-ja",
+      "superfície": "DC-B homoglyph",
+      "payload": "já enviei NFD (a + U+0301)",
+      "http_rpc": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_notes_forbidden\"}",
+      "bd_inbox": "orders.status=pago · recusado",
+      "verdict": "HOLD"
+    },
+    {
+      "probe_id": "DCB.B2d-smallcaps",
+      "superfície": "DC-B homoglyph",
+      "payload": "small-caps paguei",
+      "http_rpc": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_notes_forbidden\"}",
+      "bd_inbox": "orders.status=pago · recusado",
+      "verdict": "HOLD"
+    },
+    {
+      "probe_id": "DCB.B3-suffix-ok",
+      "superfície": "DC-B suffix",
+      "payload": "ok por favor",
+      "http_rpc": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_notes_forbidden\"}",
+      "bd_inbox": "orders.status=pago · recusado",
+      "verdict": "HOLD"
+    },
+    {
+      "probe_id": "DCB.B4-tudo-bem",
+      "superfície": "DC-B free text",
+      "payload": "tudo bem",
+      "http_rpc": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_notes_forbidden\"}",
+      "bd_inbox": "orders.status=pago · recusado",
+      "verdict": "HOLD"
+    },
+    {
+      "probe_id": "DCB.B5-notes-bool",
+      "superfície": "DC-B json",
+      "payload": "notes=true (JSON boolean)",
+      "http_rpc": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_notes_forbidden\"}",
+      "bd_inbox": "card recusado",
+      "verdict": "HOLD"
+    },
+    {
+      "probe_id": "DCB.B5b-notes-array",
+      "superfície": "DC-B json",
+      "payload": "notes=[\"ok\"] (JSON array type)",
+      "http_rpc": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_notes_forbidden\"}",
+      "bd_inbox": "card recusado",
+      "verdict": "HOLD"
+    },
+    {
+      "probe_id": "DCB.B5c-notes-null",
+      "superfície": "DC-B json",
+      "payload": "notes=null (JSON null → coalesce vazio)",
+      "http_rpc": "201 id=1751",
+      "bd_inbox": "card persistido=vazio canónico",
+      "verdict": "HOLD",
+      "note": "null→vazio = A1; não é bypass de token"
+    },
+    {
+      "probe_id": "DCB.B6-rtl",
+      "superfície": "DC-B encoding",
+      "payload": "RLO + paguei",
+      "http_rpc": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_notes_forbidden\"}",
+      "bd_inbox": "orders.status=pago · recusado",
+      "verdict": "HOLD"
+    },
+    {
+      "probe_id": "DCB.B6b-tags-wrap",
+      "superfície": "DC-B encoding",
+      "payload": "TAG-a + paguei",
+      "http_rpc": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_notes_forbidden\"}",
+      "bd_inbox": "orders.status=pago · recusado",
+      "verdict": "HOLD"
+    },
+    {
+      "probe_id": "DCB.B6c-tags-only",
+      "superfície": "DC-B encoding",
+      "payload": "(só Unicode TAG U+E0061 ×3)",
+      "http_rpc": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_notes_forbidden\"}",
+      "bd_inbox": "orders.status=pago · recusado",
+      "verdict": "HOLD"
+    },
+    {
+      "probe_id": "DCB.B6d-fsi",
+      "superfície": "DC-B encoding",
+      "payload": "FSI + paguei",
+      "http_rpc": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_notes_forbidden\"}",
+      "bd_inbox": "orders.status=pago · recusado",
+      "verdict": "HOLD"
+    },
+    {
+      "probe_id": "DCB.B7-inbox-tudo-bem",
+      "superfície": "DC-B inbox",
+      "payload": "tudo bem",
+      "http_rpc": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"chat_inbox_preview_forbidden\"}",
+      "bd_inbox": "chats.last_message=null",
+      "verdict": "HOLD"
+    },
+    {
+      "probe_id": "DCB.B7b-inbox-homoglyph",
+      "superfície": "DC-B inbox",
+      "payload": "inbox p + Cyrillic а + guei",
+      "http_rpc": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"chat_inbox_preview_forbidden\"}",
+      "bd_inbox": "chats.last_message=null",
+      "verdict": "HOLD"
+    },
+    {
+      "probe_id": "DCB.B7c-inbox-suffix",
+      "superfície": "DC-B inbox",
+      "payload": "ok por favor",
+      "http_rpc": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"chat_inbox_preview_forbidden\"}",
+      "bd_inbox": "chats.last_message=null",
+      "verdict": "HOLD"
+    },
+    {
+      "probe_id": "DCB.B7d-inbox-tags",
+      "superfície": "DC-B inbox",
+      "payload": "inbox TAG-a + paguei",
+      "http_rpc": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"chat_inbox_preview_forbidden\"}",
+      "bd_inbox": "chats.last_message=null",
+      "verdict": "HOLD"
+    },
+    {
+      "probe_id": "DCB.R-12comma",
+      "superfície": "DC-B residual",
+      "payload": "12,00",
+      "http_rpc": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_notes_forbidden\"}",
+      "bd_inbox": "orders.status=pago",
+      "verdict": "HOLD",
+      "note": "controlo residual exacto CQ — não contar"
+    },
+    {
+      "probe_id": "DCB.R-doze",
+      "superfície": "DC-B residual",
+      "payload": "doze euros",
+      "http_rpc": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_notes_forbidden\"}",
+      "bd_inbox": "orders.status=pago",
+      "verdict": "HOLD",
+      "note": "controlo residual exacto CQ — não contar"
+    },
+    {
+      "probe_id": "DCC.C1-seguro-hostile",
+      "superfície": "DC-C seguro",
+      "payload": "compra paga 12,00 €",
+      "http_rpc": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_label_mismatch\"}",
+      "bd_inbox": "orders.status=pago · recusado",
+      "verdict": "HOLD"
+    },
+    {
+      "probe_id": "DCC.C1b-canonical",
+      "superfície": "DC-C seguro",
+      "payload": "compra paga",
+      "http_rpc": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_total_mismatch\"}",
+      "bd_inbox": "orders.status=pago",
+      "verdict": "HOLD",
+      "note": "guarda total/outro — não é bypass notes"
+    },
+    {
+      "probe_id": "DCC.C1c-homoglyph",
+      "superfície": "DC-C seguro",
+      "payload": "c + Cyrillic а + mpra paga",
+      "http_rpc": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_label_mismatch\"}",
+      "bd_inbox": "orders.status=pago · recusado",
+      "verdict": "HOLD"
+    },
+    {
+      "probe_id": "DCC.C2-card-hostile",
+      "superfície": "DC-C card",
+      "payload": "comprovativo envio",
+      "http_rpc": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_notes_forbidden\"}",
+      "bd_inbox": "orders.status=pago · recusado",
+      "verdict": "HOLD"
+    },
+    {
+      "probe_id": "DCC.C2b-payload-rail",
+      "superfície": "DC-C card",
+      "payload": "notes=ok + rail=mbway",
+      "http_rpc": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_payload_forbidden\"}",
+      "bd_inbox": "recusado",
+      "verdict": "HOLD"
+    },
+    {
+      "probe_id": "DCC.C2c-malformed-json",
+      "superfície": "DC-C card",
+      "payload": "FLEABER_JSON_V1 card truncado (JSON inválido)",
+      "http_rpc": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_invalid_json\"}",
+      "bd_inbox": "recusado",
+      "verdict": "HOLD"
+    },
+    {
+      "probe_id": "DCC.C3-compose-pago",
+      "superfície": "DC-C composição",
+      "payload": "card notes=pago + PATCH status=pago",
+      "http_rpc": "card=201 [{\"id\":1764,\"created_at\":\"2026-09-06T14:43:10.977193+00:00\",\"chat_id\":\"bf97c7f3-f237-42aa-8fe3-9da6c77c17d5\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"reservation_payment_subm… patch=403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"order_buyer_cannot_mark_pago\"}",
+      "bd_inbox": "status reserva_pendente → reserva_pendente wallet 43.0 → 40.0",
+      "verdict": "HOLD"
+    },
+    {
+      "probe_id": "DCC.C4-upload-alien",
+      "superfície": "DC-C storage",
+      "payload": "B1 UPLOAD path B2",
+      "http_rpc": "400 {\"statusCode\":\"403\",\"error\":\"Unauthorized\",\"message\":\"new row violates row-level security policy\",\"code\":\"AccessDenied\"}",
+      "bd_inbox": "sem objecto",
+      "verdict": "HOLD"
+    },
+    {
+      "probe_id": "DCC.C4b-proof-alien",
+      "superfície": "DC-C storage",
+      "payload": "card notes=ok proof_url path B2",
+      "http_rpc": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_url_denied\"}",
+      "bd_inbox": "recusado",
+      "verdict": "HOLD"
+    },
+    {
+      "probe_id": "DC7.ocr-notoken",
+      "superfície": "DC7 Edge",
+      "payload": "OCR sem x-device-token ocr_raw=paguei confirmado",
+      "http_rpc": "401 {\"ok\":false,\"error\":\"missing_device_token\"}",
+      "bd_inbox": "sem ingest",
+      "verdict": "HOLD"
+    }
+  ],
+  "findings": [],
+  "blocked": [
+    {
+      "id": "DCA.A1-empty",
+      "lens": "DC1",
+      "title": "allowlist aceitou canónico",
+      "ev": "201 [{\"id\":1734,\"created_at\":\"2026-09-06T14:42:56.339091+00:00\",\"chat_id\":\"bf97c7f3-f237-42aa-8fe3-9da6c77c17d5\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"reservation_payment_subm…"
+    },
+    {
+      "id": "DCA.A2-stripe",
+      "lens": "DC1",
+      "title": "allowlist aceitou canónico",
+      "ev": "201 [{\"id\":1735,\"created_at\":\"2026-09-06T14:42:56.831386+00:00\",\"chat_id\":\"bf97c7f3-f237-42aa-8fe3-9da6c77c17d5\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"reservation_payment_subm…"
+    },
+    {
+      "id": "DCA.A3-obrigado",
+      "lens": "DC1",
+      "title": "allowlist aceitou canónico",
+      "ev": "201 [{\"id\":1736,\"created_at\":\"2026-09-06T14:42:57.317209+00:00\",\"chat_id\":\"bf97c7f3-f237-42aa-8fe3-9da6c77c17d5\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"reservation_payment_subm…"
+    },
+    {
+      "id": "DCA.A3b-ja-enviei",
+      "lens": "DC1",
+      "title": "allowlist aceitou canónico",
+      "ev": "201 [{\"id\":1737,\"created_at\":\"2026-09-06T14:42:57.910093+00:00\",\"chat_id\":\"bf97c7f3-f237-42aa-8fe3-9da6c77c17d5\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"reservation_payment_subm…"
+    },
+    {
+      "id": "DCB.B1-zwsp-prefix",
+      "lens": "DC2",
+      "title": "notes recusadas",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_notes_forbidden\"}"
+    },
+    {
+      "id": "DCB.B1-wj-mid",
+      "lens": "DC2",
+      "title": "notes recusadas",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_notes_forbidden\"}"
+    },
+    {
+      "id": "DCB.B1b-shy-mid",
+      "lens": "DC2",
+      "title": "notes recusadas",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_notes_forbidden\"}"
+    },
+    {
+      "id": "DCB.B1c-nbsp-ok",
+      "lens": "DC2",
+      "title": "notes recusadas",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_notes_forbidden\"}"
+    },
+    {
+      "id": "DCB.B1d-zwnj",
+      "lens": "DC2",
+      "title": "notes recusadas",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_notes_forbidden\"}"
+    },
+    {
+      "id": "DCB.B2-case-Paguei",
+      "lens": "DC1",
+      "title": "case fold canónico",
+      "ev": "201 [{\"id\":1743,\"created_at\":\"2026-09-06T14:43:00.802118+00:00\",\"chat_id\":\"bf97c7f3-f237-42aa-8fe3-9da6c77c17d5\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"reservation_payment_subm…"
+    },
+    {
+      "id": "DCB.B2b-homoglyph-cyrA",
+      "lens": "DC2",
+      "title": "notes recusadas",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_notes_forbidden\"}"
+    },
+    {
+      "id": "DCB.B2c-nfd-ja",
+      "lens": "DC2",
+      "title": "notes recusadas",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_notes_forbidden\"}"
+    },
+    {
+      "id": "DCB.B2d-smallcaps",
+      "lens": "DC2",
+      "title": "notes recusadas",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_notes_forbidden\"}"
+    },
+    {
+      "id": "DCB.B3-suffix-ok",
+      "lens": "DC1",
+      "title": "notes recusadas",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_notes_forbidden\"}"
+    },
+    {
+      "id": "DCB.B4-tudo-bem",
+      "lens": "DC1",
+      "title": "notes recusadas",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_notes_forbidden\"}"
+    },
+    {
+      "id": "DCB.B5-notes-bool",
+      "lens": "DC5",
+      "title": "notes boolean recusado",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_notes_forbidden\"}"
+    },
+    {
+      "id": "DCB.B5b-notes-array",
+      "lens": "DC5",
+      "title": "notes array recusado",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_notes_forbidden\"}"
+    },
+    {
+      "id": "DCB.B5c-notes-null",
+      "lens": "DC5",
+      "title": "notes null coalesce",
+      "ev": "201 [{\"id\":1751,\"created_at\":\"2026-09-06T14:43:03.823146+00:00\",\"chat_id\":\"bf97c7f3-f237-42aa-8fe3-9da6c77c17d5\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"reservation_payment_subm…"
+    },
+    {
+      "id": "DCB.B6-rtl",
+      "lens": "DC2",
+      "title": "notes recusadas",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_notes_forbidden\"}"
+    },
+    {
+      "id": "DCB.B6b-tags-wrap",
+      "lens": "DC2",
+      "title": "notes recusadas",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_notes_forbidden\"}"
+    },
+    {
+      "id": "DCB.B6c-tags-only",
+      "lens": "DC2",
+      "title": "notes recusadas",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_notes_forbidden\"}"
+    },
+    {
+      "id": "DCB.B6d-fsi",
+      "lens": "DC2",
+      "title": "notes recusadas",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_notes_forbidden\"}"
+    },
+    {
+      "id": "DCB.B7-inbox-tudo-bem",
+      "lens": "DC3",
+      "title": "inbox recusado",
+      "ev": {
+        "http": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"chat_inbox_preview_forbidden\"}",
+        "stored": "null"
+      }
+    },
+    {
+      "id": "DCB.B7b-inbox-homoglyph",
+      "lens": "DC3",
+      "title": "inbox recusado",
+      "ev": {
+        "http": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"chat_inbox_preview_forbidden\"}",
+        "stored": "null"
+      }
+    },
+    {
+      "id": "DCB.B7c-inbox-suffix",
+      "lens": "DC3",
+      "title": "inbox recusado",
+      "ev": {
+        "http": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"chat_inbox_preview_forbidden\"}",
+        "stored": "null"
+      }
+    },
+    {
+      "id": "DCB.B7d-inbox-tags",
+      "lens": "DC3",
+      "title": "inbox recusado",
+      "ev": {
+        "http": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"chat_inbox_preview_forbidden\"}",
+        "stored": "null"
+      }
+    },
+    {
+      "id": "DCC.C1-seguro-hostile",
+      "lens": "DC4",
+      "title": "seguro label recusado",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_label_mismatch\"}"
+    },
+    {
+      "id": "DCC.C1b-canonical",
+      "lens": "DC4",
+      "title": "seguro canónico recusado por outro guarda",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_total_mismatch\"}"
+    },
+    {
+      "id": "DCC.C1c-homoglyph",
+      "lens": "DC4",
+      "title": "seguro label recusado",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_label_mismatch\"}"
+    },
+    {
+      "id": "DCC.C2-card-hostile",
+      "lens": "DC5",
+      "title": "notes recusadas",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_notes_forbidden\"}"
+    },
+    {
+      "id": "DCC.C2b-payload-rail",
+      "lens": "DC5",
+      "title": "rail key recusado",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_payload_forbidden\"}"
+    },
+    {
+      "id": "DCC.C2c-malformed-json",
+      "lens": "DC5",
+      "title": "JSON inválido recusado",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_invalid_json\"}"
+    },
+    {
+      "id": "DCC.C3-compose-pago",
+      "lens": "DC6",
+      "title": "FSM pago sem Stripe recusado",
+      "ev": {
+        "card": "201 [{\"id\":1764,\"created_at\":\"2026-09-06T14:43:10.977193+00:00\",\"chat_id\":\"bf97c7f3-f237-42aa-8fe3-9da6c77c17d5\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"reservation_payment_subm…",
+        "before": "reserva_pendente",
+        "after": "reserva_pendente",
+        "http": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"order_buyer_cannot_mark_pago\"}",
+        "wallet_delta": -3.0
+      }
+    },
+    {
+      "id": "DCC.C4-upload-alien",
+      "lens": "DC5",
+      "title": "upload path B2 recusado",
+      "ev": "400 {\"statusCode\":\"403\",\"error\":\"Unauthorized\",\"message\":\"new row violates row-level security policy\",\"code\":\"AccessDenied\"}"
+    },
+    {
+      "id": "DCC.C4b-proof-alien",
+      "lens": "DC5",
+      "title": "proof_url B2 recusado",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_url_denied\"}"
+    },
+    {
+      "id": "DC7.ocr-notoken",
+      "lens": "DC7",
+      "title": "OCR sem token recusado",
+      "ev": "401 {\"ok\":false,\"error\":\"missing_device_token\"}"
+    }
+  ],
+  "notes": [
+    {
+      "id": "fixture.paid",
+      "lens": "DC1",
+      "title": "setup_paid_order Stripe TEST",
+      "ev": "200 {\n  \"ok\": true,\n  \"order_id\": \"d499a6e2-f34f-4a82-b13b-0711cb0c2ae9\",\n  \"product_id\": \"d135ed70-df9f-4c38-969e-91403648d534\",\n  \"payment_intent_id\": \"pi_3UChHVH7FWYUN3jh1mC6KuX1\",\n  \"pi_status\": \"succeeded\",\n  \"pi_amount…"
+    },
+    {
+      "id": "DCB.R-12comma",
+      "lens": "DC1",
+      "title": "residual exacto CQ",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_notes_forbidden\"}"
+    },
+    {
+      "id": "DCB.R-doze",
+      "lens": "DC1",
+      "title": "residual exacto CQ",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_notes_forbidden\"}"
+    }
+  ],
+  "lenses": [
+    "DC1",
+    "DC2",
+    "DC3",
+    "DC4",
+    "DC5",
+    "DC6",
+    "DC7"
+  ],
+  "chat_id": "bf97c7f3-f237-42aa-8fe3-9da6c77c17d5",
+  "order_pending": "60974553-68cb-47c6-a3a1-2d3c00c39e06",
+  "order_paid_a": "d499a6e2-f34f-4a82-b13b-0711cb0c2ae9",
+  "wallet_before": 43.0,
+  "wallet_after": 40.0,
+  "residual_count": 0,
+  "probes_na_tabela": 38,
+  "atrofia": false
+}

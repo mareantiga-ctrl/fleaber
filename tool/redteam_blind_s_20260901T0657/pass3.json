@@ -1,0 +1,136 @@
+{
+  "auditor": "REDTEAM_BLIND_S_IDENTIDADE_STAFF_v1",
+  "stamp": "20260901T0657",
+  "pass": 3,
+  "production_touched": false,
+  "fase4": false,
+  "findings": [],
+  "notes": [
+    {
+      "id": "p3.s5.list",
+      "lens": "S5",
+      "title": "ratings visíveis a buyer2",
+      "ev": {
+        "n": 8,
+        "snip": "[{\"id\":\"f74fef8b-ffab-4cc7-bf29-d699a89eb02c\",\"stars\":5,\"comment\":\"RTS-20260901T0657-alt-5\",\"author_role\":\"comprador\",\"is_automatic\":false}, \n {\"id\":\"5436100f-d0b0-4a39-9ac7-e65b522999fc\",\"stars\":1,\"comment\":\"RTS-20260901T0657-1star\",\"autho…"
+      }
+    },
+    {
+      "id": "p3.s5.target",
+      "lens": "S5",
+      "title": "review alvo",
+      "ev": {
+        "id": "a8528ec7-f0db-4906-b286-0d5a4320f1bf",
+        "stars_before": 5,
+        "auto": true
+      }
+    },
+    {
+      "id": "p3.s5.patch1",
+      "lens": "S5",
+      "title": "PATCH view → 1★ + comment",
+      "ev": {
+        "http": "200 [{\"id\":\"a8528ec7-f0db-4906-b286-0d5a4320f1bf\",\"created_at\":\"2026-08-31T17:12:04.579297+00:00\",\"target_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"stars\":5,\"comment\":\"Avaliação automática: venda concluída sem feedback no …",
+        "svc": "200 [{\"id\":\"a8528ec7-f0db-4906-b286-0d5a4320f1bf\",\"stars\":5,\"comment\":\"Avaliação automática: venda concluída sem feedback no prazo.\",\"is_automatic\":true,\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"target_id\":\"980f4fa1…"
+      }
+    },
+    {
+      "id": "p3.s5.frozen",
+      "lens": "S5",
+      "title": "PATCH 200 mas trigger congelou stars/comment",
+      "ev": {
+        "stars": 5,
+        "comment": "Avaliação automática: venda concluída sem feedback no prazo.",
+        "patch_http": 200
+      }
+    },
+    {
+      "id": "p3.s5.patch.tbl",
+      "lens": "S5",
+      "title": "PATCH tabela reviews",
+      "ev": "200 []"
+    },
+    {
+      "id": "p3.s5.own1",
+      "lens": "S5",
+      "title": "review 1★ do buyer1 (pass2)",
+      "ev": "200 [{\"id\":\"5436100f-d0b0-4a39-9ac7-e65b522999fc\",\"stars\":1,\"comment\":\"RTS-20260901T0657-1star\"}]"
+    },
+    {
+      "id": "p3.s5.own.patch",
+      "lens": "S5",
+      "title": "autor PATCH view 1★→5★",
+      "ev": {
+        "http": "200 [{\"id\":\"5436100f-d0b0-4a39-9ac7-e65b522999fc\",\"created_at\":\"2026-09-01T06:12:52.212141+00:00\",\"target_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"stars\":1,\"comment\":\"RTS-20260901T0657-1star\",\"is_automatic\":false,\"target_…",
+        "after": "200 [{\"id\":\"5436100f-d0b0-4a39-9ac7-e65b522999fc\",\"stars\":1,\"comment\":\"RTS-20260901T0657-1star\"}]"
+      }
+    },
+    {
+      "id": "p3.s7.orders",
+      "lens": "S7",
+      "title": "helper GET orders loja",
+      "ev": {
+        "n": 2,
+        "foreign_n": 0,
+        "own_only": true,
+        "snip": "[{\"id\":\"8352836c-2200-4ad5-894a-8e90b28a20f4\",\"buyer_id\":\"28b2cffd-5075-415e-9c29-dfe965663c9f\",\"status\":\"reserva_pendente\",\"price_total\":5.00}, \n {\"id\":\"2b7c289d-a6f6-4fee-9bcf-f190c18262fa\",\"buyer_i…"
+      }
+    },
+    {
+      "id": "p3.s7.b1.byid",
+      "lens": "S7",
+      "title": "buyer2 GET order do buyer1 (ID conhecido)",
+      "ev": "200 []"
+    },
+    {
+      "id": "p3.s7.msgs",
+      "lens": "S7",
+      "title": "chat_messages select=*",
+      "ev": {
+        "b2": {
+          "http": 200,
+          "n": 0,
+          "snip": "[]"
+        },
+        "owner": {
+          "http": 200,
+          "n": 1,
+          "keys": [
+            "id",
+            "created_at",
+            "chat_id",
+            "sender_id",
+            "text",
+            "is_reservation",
+            "is_read",
+            "receiver_id"
+          ]
+        }
+      }
+    },
+    {
+      "id": "p3.s3.get",
+      "lens": "S3",
+      "title": "path conhecido",
+      "ev": {
+        "b2": "400 {\"statusCode\":\"404\",\"error\":\"not_found\",\"message\":\"Object not found\",\"code\":\"NoSuchKey\"}",
+        "owner": 200
+      }
+    },
+    {
+      "id": "p3.s1.me",
+      "lens": "S1",
+      "title": "auth.user próprio",
+      "ev": {
+        "email": "rts-20260901t0657-b2@fleaber.test",
+        "id": "28b2cffd-5075-415e-9c29-dfe965663c9f"
+      }
+    },
+    {
+      "id": "p3.s8.release",
+      "lens": "S8",
+      "title": "buyer2 release order alheia",
+      "ev": "200 false"
+    }
+  ]
+}

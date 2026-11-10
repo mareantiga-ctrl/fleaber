@@ -1,0 +1,142 @@
+{
+  "frozen_at": "2026-08-30T17:53:12Z",
+  "project": "fxdknzrqjenzqcvnwqqq",
+  "environment": "staging",
+  "stripe": "TEST",
+  "production_touched": false,
+  "fase4_started": false,
+  "fixes_applied": false,
+  "prefix": "RT1837",
+  "verdict": "PASS_CEGO_SATURADO",
+  "saturation": true,
+  "p0_open": 0,
+  "p1_open": 0,
+  "p2_open": 0,
+  "p3_open": 2,
+  "identities": {
+    "anon": true,
+    "buyer_lab": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+    "seller_lab": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+    "service_role_used_for": ["fixture", "observe", "cleanup"]
+  },
+  "findings": [
+    {
+      "id": "RT1837-P3-01",
+      "severity": "P3",
+      "title": "batata_create_live_tip_pending persiste stripe_session_id do cliente",
+      "actor": "buyer",
+      "pre": "live_id existente",
+      "repro": "rpc batata_create_live_tip_pending p_stripe_session_id=cs_fake_RT1837",
+      "impact": "row pending com session lixo; settle JWT 403; sem crédito",
+      "estado": "ABERTO",
+      "evidence": "pass3 200 uuid; pass4 live_tips status=pending session=cs_fake_RT1837; settle 403"
+    },
+    {
+      "id": "RT1837-P3-02",
+      "severity": "P3",
+      "title": "batata_find_user_id_by_email enumeração limitada (vendedor, 2/h)",
+      "actor": "seller",
+      "pre": "JWT vendedor",
+      "repro": "rpc batata_find_user_id_by_email",
+      "impact": "rate_limited nesta hora; buyer recebe null",
+      "estado": "ABERTO",
+      "evidence": "pass1 seller 400 rate_limited; buyer 200 null"
+    }
+  ],
+  "discarded_false_positives": [
+    {
+      "id": "RT1837-P1-CHAT-LIST",
+      "reason": "SELECT chats.buyer_id inexistente; erro JSON tratado como row"
+    },
+    {
+      "id": "RT1837-P1-DISPUTE-READ",
+      "reason": "SELECT order_disputes.seller_id inexistente; reteste schema real sem leak"
+    }
+  ],
+  "invariants": [
+    {"id": "A", "result": "HOLD", "notes": "Session amount server-side; catalog drop 12eur->0.50 still 1325c; bag 1105c not 50c"},
+    {"id": "B", "result": "HOLD", "notes": "qty/price/prize/seller body ignored or blocked"},
+    {"id": "C", "result": "HOLD", "notes": "refund race 1 stripe refund; wallets unchanged; release false after refund"},
+    {"id": "D", "result": "HOLD", "notes": "stock=1 sequential 201+400; concurrent 1/10"},
+    {"id": "E", "result": "HOLD", "notes": "wallet patch empty; credit/debit/payout RPCs 403; fake paid insert blocked"},
+    {"id": "F", "result": "HOLD", "notes": "MB WAY pago+concluido+release true but seller balance unchanged"},
+    {"id": "G", "result": "HOLD", "notes": "6 concurrent refunds same re_ id"},
+    {"id": "H", "result": "HOLD", "notes": "foreign checkout blocked"},
+    {"id": "I", "result": "HOLD", "notes": "same payout key same transferId"},
+    {"id": "J", "result": "HOLD", "notes": "distinct keys distinct transfers"},
+    {"id": "K", "result": "HOLD", "notes": "contract sealed vs live catalog"},
+    {"id": "L", "result": "HOLD", "notes": "offer 0.01 pending; self-accept 403"}
+  ],
+  "races": [
+    {"name": "hold stock=1 x10", "ok": 1, "n": 10},
+    {"name": "checkout session x8 same order", "ok": 8, "unique_cs": 1},
+    {"name": "GET settle unpaid x8", "paidish": 0, "order_status": "reserva_pendente"},
+    {"name": "seller refund x6", "unique_refund": 1},
+    {"name": "payout mixed keys x4", "same_key_reuses_transfer": true}
+  ],
+  "stripe_test": {
+    "session_created": true,
+    "capture_real_test": true,
+    "capture_amount_cents": 590,
+    "refund_real_test": true,
+    "net_duplicate_capture": false
+  },
+  "surfaces": [
+    "AUTH", "PROFILES", "ORDERS", "FSM", "PRODUCTS", "CATALOG", "PRICE", "QTY",
+    "CHECKOUT", "STRIPE_SESSION", "SETTLE", "WEBHOOK", "BAG", "WALLET", "LEDGER",
+    "PAYOUT", "STOCK", "REFUNDS", "DISPUTES", "OFFERS", "BUNDLES", "LIVE",
+    "LIVE_ITEMS", "RESERVATIONS", "RAFFLES", "TIPS", "CHAT", "REVIEWS", "STORAGE",
+    "MUX", "LIVEKIT", "PS", "OCR", "RPC", "RLS", "EDGE"
+  ],
+  "gaps": [
+    "single lab buyer",
+    "could not birth two payable holds on stock=1",
+    "reviews_gerais schema miss",
+    "pairing space not exhausted",
+    "no live Mux create as buyer (403 expected)"
+  ],
+  "checklist": {
+    "1_p0_open": false,
+    "2_p0_count": 0,
+    "3_p1_open": false,
+    "4_p1_count": 0,
+    "5_buyer_price": false,
+    "6_buyer_qty": false,
+    "7_seller_fake_platform_pay": false,
+    "8_jwt_mint_balance": false,
+    "9_refund_gt_capture": false,
+    "10_release_refund_net": false,
+    "11_payout_dup_transfer": false,
+    "12_stock1_two_sales": "NO",
+    "13_stock1_two_net_captures": "NO",
+    "14_capacity_bypass": false,
+    "15_cross_user_financial": false,
+    "16_cross_user_sensitive": false,
+    "17_buyer_as_seller_admin": false,
+    "18_seller_as_buyer_admin": false,
+    "19_forged_reviews": false,
+    "20_dangerous_definer_jwt": false,
+    "21_critical_rls_break": false,
+    "22_edge_trusts_client_amount": false,
+    "23_critical_unproven": false,
+    "24_functional_regression": false,
+    "25_last_pass_new_p0_p1": false,
+    "26_saturation": true,
+    "27_production_touched": false,
+    "28_fase4_started": false
+  },
+  "probes": [
+    "tool/redteam_blind_indep_20260830T1837/_rt.dart",
+    "tool/redteam_blind_indep_20260830T1837/pass1.dart",
+    "tool/redteam_blind_indep_20260830T1837/pass2.dart",
+    "tool/redteam_blind_indep_20260830T1837/pass3.dart",
+    "tool/redteam_blind_indep_20260830T1837/pass4.dart"
+  ],
+  "raw": [
+    "tool/redteam_blind_indep_20260830T1837/out/pass1.json",
+    "tool/redteam_blind_indep_20260830T1837/out/pass2.json",
+    "tool/redteam_blind_indep_20260830T1837/out/pass3.json",
+    "tool/redteam_blind_indep_20260830T1837/out/pass4.json",
+    "tool/redteam_blind_indep_20260830T1837/out/openapi_svc.json"
+  ]
+}

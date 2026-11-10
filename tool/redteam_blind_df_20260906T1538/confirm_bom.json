@@ -1,0 +1,154 @@
+{
+  "stamp": "20260906T1538",
+  "prefix": "RTDF-20260906T1538",
+  "auditor": "REDTEAM_BLIND_DF_PAYOUT_POS_CVDA_v1",
+  "lenses": [
+    "DF1"
+  ],
+  "probes": [
+    {
+      "id": "DF-A3-BOM-PREFIX-PAIR",
+      "lens": "DF1",
+      "payload": "rtdfBomCnfxx1 vs U+FEFF+rtdfBomCnfxx1",
+      "http_bd": "n_tr=1 tids=[tr_1UChIWH7FWYUN3jhNHal9uWw] Δ=-1.0 A=200 {\"success\":true,\"transferId\":\"tr_1UChIWH7FWYUN3jhNHal9uWw\",\"balance\":38} loc=\"\" B=200 {\"success\":true,\"transferId\":\"tr_1UChIWH7FWYUN3jhNHal9uWw\",\"balance\":38,\"idempotent\":true} loc=\"\"",
+      "result": "HOLD"
+    },
+    {
+      "id": "DF-A3-BOM-SUFFIX-PAIR",
+      "lens": "DF1",
+      "payload": "rtdfBomSufxx1 vs rtdfBomSufxx1+U+FEFF",
+      "http_bd": "n_tr=1 tids=[tr_1UChIbH7FWYUN3jhlCmiggWS] Δ=-1.0 A=200 {\"success\":true,\"transferId\":\"tr_1UChIbH7FWYUN3jhlCmiggWS\",\"balance\":37} loc=\"\" B=200 {\"success\":true,\"transferId\":\"tr_1UChIbH7FWYUN3jhlCmiggWS\",\"balance\":37,\"idempotent\":true} loc=\"\"",
+      "result": "HOLD"
+    },
+    {
+      "id": "DF-A3-BOM-MIDDLE",
+      "lens": "DF1",
+      "payload": "BOM U+FEFF no meio rtdfBo<FEFF>mMidxx1",
+      "http_bd": "400 {\"error\":\"idempotency_key inválida. Reinicia o levantamento na app.\",\"code\":\"payout_failed\"} loc=\"\" Δ=0.0",
+      "result": "HOLD"
+    }
+  ],
+  "findings": [],
+  "blocked": [],
+  "skipped": [],
+  "notes": [
+    {
+      "id": "pair.BOM-PREFIX",
+      "lens": "DF1",
+      "title": "pair BOM-PREFIX",
+      "ev": {
+        "keyA": "rtdfBomCnfxx1",
+        "keyB": "﻿rtdfBomCnfxx1",
+        "keyA_units": [
+          114,
+          116,
+          100,
+          102,
+          66,
+          111,
+          109,
+          67,
+          110,
+          102,
+          120,
+          120,
+          49
+        ],
+        "keyB_units": [
+          65279,
+          114,
+          116,
+          100,
+          102,
+          66,
+          111,
+          109,
+          67,
+          110,
+          102,
+          120,
+          120,
+          49
+        ],
+        "hitA": "200 {\"success\":true,\"transferId\":\"tr_1UChIWH7FWYUN3jhNHal9uWw\",\"balance\":38} loc=\"\"",
+        "hitB": "200 {\"success\":true,\"transferId\":\"tr_1UChIWH7FWYUN3jhNHal9uWw\",\"balance\":38,\"idempotent\":true} loc=\"\"",
+        "tidA": "tr_1UChIWH7FWYUN3jhNHal9uWw",
+        "tidB": "tr_1UChIWH7FWYUN3jhNHal9uWw",
+        "new_transfer_ids": [
+          "tr_1UChIWH7FWYUN3jhNHal9uWw"
+        ],
+        "new_transfer_count": 1,
+        "wallet_before": 39.0,
+        "wallet_after": 38.0,
+        "delta_eur": -1.0,
+        "payoutOkA": true,
+        "payoutOkB": true,
+        "idempotentB": true
+      }
+    },
+    {
+      "id": "pair.BOM-SUFFIX",
+      "lens": "DF1",
+      "title": "pair BOM-SUFFIX",
+      "ev": {
+        "keyA": "rtdfBomSufxx1",
+        "keyB": "rtdfBomSufxx1﻿",
+        "keyA_units": [
+          114,
+          116,
+          100,
+          102,
+          66,
+          111,
+          109,
+          83,
+          117,
+          102,
+          120,
+          120,
+          49
+        ],
+        "keyB_units": [
+          114,
+          116,
+          100,
+          102,
+          66,
+          111,
+          109,
+          83,
+          117,
+          102,
+          120,
+          120,
+          49,
+          65279
+        ],
+        "hitA": "200 {\"success\":true,\"transferId\":\"tr_1UChIbH7FWYUN3jhlCmiggWS\",\"balance\":37} loc=\"\"",
+        "hitB": "200 {\"success\":true,\"transferId\":\"tr_1UChIbH7FWYUN3jhlCmiggWS\",\"balance\":37,\"idempotent\":true} loc=\"\"",
+        "tidA": "tr_1UChIbH7FWYUN3jhlCmiggWS",
+        "tidB": "tr_1UChIbH7FWYUN3jhlCmiggWS",
+        "new_transfer_ids": [
+          "tr_1UChIbH7FWYUN3jhlCmiggWS"
+        ],
+        "new_transfer_count": 1,
+        "wallet_before": 38.0,
+        "wallet_after": 37.0,
+        "delta_eur": -1.0,
+        "payoutOkA": true,
+        "payoutOkB": true,
+        "idempotentB": true
+      }
+    }
+  ],
+  "actors": {
+    "buyer": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+    "seller": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+    "buyer2": null,
+    "seller2": null
+  },
+  "created": {
+    "orders": [],
+    "products": []
+  }
+}

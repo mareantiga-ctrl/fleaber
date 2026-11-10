@@ -1,0 +1,116 @@
+{
+  "findings": [
+    {
+      "id": "AJ4-02c",
+      "lens": "AJ3",
+      "severity": "P1",
+      "title": "SKU Hub público de seller2 some após mark_sold alheio",
+      "actor": "seller A + anon/buyer Hub",
+      "pre": "seller2 hub_published=true, produto listado",
+      "repro": "live_only.checkout_product_id=victim + mark_sold JWT A",
+      "expected": "Hub continua a mostrar o SKU seller2",
+      "obtained": {
+        "hub0anonCount": 0,
+        "hub0buyerCount": 0,
+        "hub1anonCount": 0,
+        "hub1buyerCount": 0,
+        "prod": {
+          "id": "3edd2c61-7629-4bda-9d2b-38e3d4f00f10",
+          "seller_id": "698a9b96-ec6f-433c-808d-d3fde92f6bbb",
+          "title": "RTAJ-20260902T0728-hub-pub",
+          "price": 19.0,
+          "quantity": 1,
+          "is_sold": true,
+          "list_on_marketplace": false,
+          "available_for_live": true
+        },
+        "itemStatus": "available",
+        "shownThenHidden": false
+      },
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "AJ4-09",
+      "lens": "AJ4",
+      "severity": "P1",
+      "title": "Reuso do mesmo live_item (status available) para unlist segundo SKU",
+      "actor": "seller",
+      "pre": "mark_sold não deixou status=sold",
+      "repro": "PATCH checkout_product_id + mark_sold de novo",
+      "expected": "item sold impede segundo unlist",
+      "obtained": {
+        "patch": "200 [{\"id\":\"228dc1f6-be01-4693-864e-b79afbf709ba\",\"live_id\":\"794b7c07-bd49-400f-84a0-b2d4fc23086c\",\"seller_id\":null,\"ref_code\":\"HUBP\",\"title\":\"RTAJ-20260902T0728 live_only\",\"description\":null,\"price\":9.0,\"image_url\":null,\"size\":null,\"color\":nul…",
+        "ms2": "200 {\"ok\": true, \"price\": 9.0, \"live_id\": \"794b7c07-bd49-400f-84a0-b2d4fc23086c\", \"ref_code\": \"HUBP\", \"item_kind\": \"live_only\", \"total_qty\": 1, \"product_id\": null, \"blocked_qty\": 0, \"live_status\": \"live\", \"live_item_id\": \"228dc1f6-be01-4693-864…",
+        "prodB": {
+          "id": "9cf9e85a-2b39-4d83-91c9-38dd15079ea5",
+          "seller_id": "698a9b96-ec6f-433c-808d-d3fde92f6bbb",
+          "title": "RTAJ-20260902T0728-hub-pub-2",
+          "price": 18.0,
+          "quantity": 1,
+          "is_sold": true,
+          "list_on_marketplace": false,
+          "available_for_live": true
+        },
+        "item": {
+          "id": "228dc1f6-be01-4693-864e-b79afbf709ba",
+          "live_id": "794b7c07-bd49-400f-84a0-b2d4fc23086c",
+          "product_id": null,
+          "checkout_product_id": "9cf9e85a-2b39-4d83-91c9-38dd15079ea5",
+          "item_kind": "live_only",
+          "quantity": 1,
+          "status": "available",
+          "price": 9.0,
+          "ref_code": "HUBP",
+          "is_active": true
+        }
+      },
+      "proven": true,
+      "evidence": {}
+    }
+  ],
+  "blocked": [],
+  "notes": [
+    {
+      "id": "p3.hub",
+      "lens": "AJ3",
+      "title": "published hub unlist",
+      "ev": {
+        "hub0anon": "200 []",
+        "hub0buyer": "200 []",
+        "ms": "200 {\"ok\": true, \"price\": 9.0, \"live_id\": \"794b7c07-bd49-400f-84a0-b2d4fc23086c\", \"ref_code\": \"HUBP\", \"item_kind\": \"live_only\", \"total_qty\": 1, \"product_id\": null, \"blocked_qty\": 0, \"live_status\": \"live\", \"live_item_id\": \"228dc1f6-be01-4693-864…",
+        "itemStatus": "available",
+        "prod": {
+          "id": "3edd2c61-7629-4bda-9d2b-38e3d4f00f10",
+          "seller_id": "698a9b96-ec6f-433c-808d-d3fde92f6bbb",
+          "title": "RTAJ-20260902T0728-hub-pub",
+          "price": 19.0,
+          "quantity": 1,
+          "is_sold": true,
+          "list_on_marketplace": false,
+          "available_for_live": true
+        },
+        "hub1anon": "200 []",
+        "hub1buyer": "200 []"
+      }
+    },
+    {
+      "id": "p3.dup.accept",
+      "lens": "AJ5",
+      "title": "accept rpc",
+      "ev": {
+        "stock1": "200 {\"ok\": true, \"price\": 12.0, \"live_id\": \"794b7c07-bd49-400f-84a0-b2d4fc23086c\", \"ref_code\": \"P3D1\", \"item_kind\": \"marketplace_product\", \"total_qty\": 1, \"product_id\": \"c493ed6a-9299-4619-9e30-7cebaf76e530\", \"blocked_qty\": 1, \"live_status\": \"l…",
+        "stock2": "200 {\"ok\": true, \"price\": 12.0, \"live_id\": \"fae8558f-f402-42d8-9dfb-3d87ce723efb\", \"ref_code\": \"P3D2\", \"item_kind\": \"marketplace_product\", \"total_qty\": 1, \"product_id\": \"c493ed6a-9299-4619-9e30-7cebaf76e530\", \"blocked_qty\": 1, \"live_status\": \"l…",
+        "a1": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"qty_exceeds_stock\"}",
+        "a2": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"qty_exceeds_stock\"}",
+        "s1": "pending",
+        "s2": "pending"
+      }
+    }
+  ],
+  "lenses": [
+    "AJ3",
+    "AJ4",
+    "AJ5"
+  ]
+}

@@ -1,0 +1,148 @@
+{
+  "audit_id": "RT-INDEP-20260830",
+  "FROZEN_AT": "2026-08-30T10:32:00+01:00",
+  "project": "fxdknzrqjenzqcvnwqqq",
+  "stripe": "TEST",
+  "production_touched": false,
+  "fase4_started": false,
+  "fixes_applied": false,
+  "verdict": "PASS_CEGO_SATURADO",
+  "saturation": true,
+  "p0_count": 0,
+  "p1_count": 0,
+  "p2_count": 1,
+  "p3_count": 3,
+  "checklist": {
+    "1_p0_open": false,
+    "2_p0_count": 0,
+    "3_p1_open": false,
+    "4_p1_count": 0,
+    "5_buyer_price_authority": false,
+    "6_buyer_qty_authority": false,
+    "7_seller_fake_platform_payment": false,
+    "8_jwt_mint_balance": false,
+    "9_refund_exceeds_capture": false,
+    "10_release_refund_net_money": false,
+    "11_payout_duplicate_transfer": "NOT_PROVEN",
+    "12_stock1_two_valid_sales": false,
+    "13_stock1_two_permanent_captures": "NOT_PROVEN",
+    "14_capacity_bypass": false,
+    "15_cross_user_financial": false,
+    "16_cross_user_sensitive": false,
+    "17_buyer_seller_admin": false,
+    "18_seller_buyer_admin": false,
+    "19_forged_duplicate_reviews": false,
+    "20_dangerous_security_definer": false,
+    "21_critical_rls_break": false,
+    "22_edge_trusts_client_authority": false,
+    "23_critical_unproven": true,
+    "24_functional_regression": false,
+    "25_last_pass_new_p0_p1_class": false,
+    "26_saturation": true,
+    "27_production_touched": false,
+    "28_fase4_started": false
+  },
+  "findings": [
+    {
+      "id": "RT-INDEP-20260830-P2-01",
+      "severity": "P2",
+      "title": "Duas Checkout Sessions Stripe na mesma order",
+      "actor": "buyer JWT",
+      "preconditions": "order própria reserva_pendente",
+      "reproduction": "dois POST paralelos create-payment-intent no mesmo order_id com amount 1 e 999999",
+      "impact": "duas Sessions TEST a 1955 cêntimos; captura dupla não paga",
+      "state": "open",
+      "evidence": "out/03_pass3b.json dual session A/B"
+    },
+    {
+      "id": "RT-INDEP-20260830-P3-01",
+      "severity": "P3",
+      "title": "Seller RPC email → UUID",
+      "actor": "seller JWT",
+      "preconditions": "user_type vendedor",
+      "reproduction": "POST rpc/batata_find_user_id_by_email",
+      "impact": "enumeração de contas",
+      "state": "open",
+      "evidence": "out/01_hostile.json"
+    },
+    {
+      "id": "RT-INDEP-20260830-P3-02",
+      "severity": "P3",
+      "title": "GET settle anónimo consulta Stripe",
+      "actor": "anon",
+      "preconditions": "nenhuma",
+      "reproduction": "GET create-payment-intent?checkout_return=success&session_id=cs_test_fake",
+      "impact": "oráculo de session; sem settle forjado",
+      "state": "open",
+      "evidence": "out/01_hostile.json e out/02_pass23.json"
+    },
+    {
+      "id": "RT-INDEP-20260830-P3-03",
+      "severity": "P3",
+      "title": "Rifas e mensagens sistema de outros lives visíveis a autenticado",
+      "actor": "buyer JWT",
+      "preconditions": "JWT authenticated",
+      "reproduction": "GET live_raffles?seller_id=eq.<outro>; GET live_messages kind=system",
+      "impact": "metadados; draw_seed de rifas active observado null",
+      "state": "open",
+      "evidence": "out/01_hostile.json out/02_pass23.json out/03_pass3b.json"
+    }
+  ],
+  "invariants": {
+    "A_stripe_contract": "HELD",
+    "B_client_price_qty": "HELD",
+    "C_disburse_cap": "HELD_OBSERVED",
+    "D_unit_uniqueness": "HELD_INSERT",
+    "E_jwt_no_mint": "HELD",
+    "F_offplatform_no_wallet": "HELD",
+    "G_refund_cap": "HELD",
+    "H_party_coherence": "HELD",
+    "I_payout_one_transfer": "NOT_PROVEN",
+    "J_payout_two_intents": "NOT_PROVEN",
+    "K_catalog_no_retro": "HELD",
+    "L_offer_reservation_authority": "HELD"
+  },
+  "races": {
+    "stock1_10_parallel_inserts": {"created": 1, "rejected": 9},
+    "stock1_10_rounds_pairwise": [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+    "dual_checkout_same_order": {"sessions": 2, "amount_cents": [1955, 1955], "captures": 0},
+    "dual_refund": {"first": "in_progress_or_500", "second": "re_3UA5tzH7FWYUN3jh1OSGd1vr 590 cents", "retry": "idempotent true"},
+    "dual_payout": "blocked_connect_iban"
+  },
+  "stripe_test": {
+    "sessions_created": [
+      {"id": "cs_test_a1t3116PFSCNcKFHbMDD6RssOqXtM0O1Ij7acKPvH4I4wiywDYpLz3ar41", "amount_cents": 1115, "note": "client amount=50 ignored; contract 10 EUR"},
+      {"id": "cs_test_a1A8dP59VFy3WX9gn9CEvzzzYqGCVnbgB2Aqd0JvRg0j820C3oHYqNLKkg", "amount_cents": 1955, "note": "client amount=1 ignored"},
+      {"id": "cs_test_a1rluqDaAvaBbgEolexxoVmBAzwtbYTDv1FiEV7O1lWl1997XgpoCOpRFk", "amount_cents": 1955, "note": "dual A"},
+      {"id": "cs_test_a1vWOGLvFFLBw2sp7uotcgznkJYdncRKwDQ2JHAqIGYCLZAs2erq0eLI80", "amount_cents": 1955, "note": "dual B client 999999 ignored"},
+      {"id": "cs_test_a1F4gimWMzf1zeHjkq2oe5xYIEIfw7Oi0eN8irsqghWxMcuBcVce2gdbP1", "note": "tip 1 EUR"}
+    ],
+    "capture_real_test": {
+      "preexisting_pi": "pi_3UA5tzH7FWYUN3jh17CQQ1hU",
+      "refund": "re_3UA5tzH7FWYUN3jh1OSGd1vr",
+      "amount_cents": 590,
+      "new_sessions_paid": false
+    }
+  },
+  "gaps": [
+    "no local STRIPE_SECRET to pay dual sessions",
+    "Connect IBAN missing so payout transfer race unproven",
+    "stock race used one buyer JWT not two distinct buyers"
+  ],
+  "matrix": [
+    {"surface": "wallets", "attack": "PATCH balance", "identity": "buyer", "result": "200 empty / no persist", "impact": "none", "severity": null, "evidence": "01_hostile"},
+    {"surface": "orders", "attack": "INSERT pago+stripe", "identity": "buyer", "result": "201 stripped to reserva_pendente", "impact": "none", "severity": null, "evidence": "01_hostile"},
+    {"surface": "orders", "attack": "INSERT qty 999999", "identity": "buyer", "result": "400 hold", "impact": "none", "severity": null, "evidence": "01_hostile"},
+    {"surface": "orders", "attack": "PATCH money/status/qty", "identity": "buyer", "result": "200 reverted", "impact": "none", "severity": null, "evidence": "01_hostile"},
+    {"surface": "checkout", "attack": "amount=50 vs 10EUR contract", "identity": "buyer", "result": "session 1115 cents", "impact": "none", "severity": null, "evidence": "02_pass23"},
+    {"surface": "checkout", "attack": "dual session same order", "identity": "buyer", "result": "2 sessions 1955", "impact": "session sprawl", "severity": "P2", "evidence": "03_pass3b"},
+    {"surface": "refund", "attack": "dual + retry", "identity": "seller", "result": "1 refund 590 then idempotent", "impact": "none extra", "severity": null, "evidence": "03_pass3b 04_observe"},
+    {"surface": "stock", "attack": "10+10 races qty=1", "identity": "buyer", "result": "max 1 order", "impact": "none", "severity": null, "evidence": "02 03"},
+    {"surface": "wallet", "attack": "MB WAY seller pago + release", "identity": "seller", "result": "stock applied, wallet unchanged, release false", "impact": "none platform balance", "severity": null, "evidence": "02_pass23"},
+    {"surface": "rpc banking", "attack": "other seller IBAN", "identity": "buyer", "result": "[]", "impact": "none", "severity": null, "evidence": "02_pass23"},
+    {"surface": "rpc email", "attack": "find user by email", "identity": "seller", "result": "UUID", "impact": "enum", "severity": "P3", "evidence": "01_hostile"},
+    {"surface": "edge mux", "attack": "buyer create live", "identity": "buyer", "result": "403", "impact": "none", "severity": null, "evidence": "01_hostile"},
+    {"surface": "reviews", "attack": "insert without legit status", "identity": "buyer", "result": "400", "impact": "none", "severity": null, "evidence": "02_pass23"},
+    {"surface": "storage", "attack": "order_proofs other", "identity": "buyer", "result": "[] / not_found", "impact": "none", "severity": null, "evidence": "03_pass3b"}
+  ]
+}

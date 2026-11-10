@@ -1,0 +1,129 @@
+{
+  "stamp": "20260906T1317",
+  "prefix": "RTCO-20260906T1317",
+  "lenses": [
+    "CO2",
+    "CO3"
+  ],
+  "wells": [
+    "CO-A"
+  ],
+  "findings": [
+    {
+      "id": "CO-A.happy_path_proof_500",
+      "lens": "CO3",
+      "severity": "P2",
+      "title": "Proof URL limpo (PNG assinado próprio) recusado/500 no canonicalizer CDCI",
+      "actor": "buyer JWT",
+      "pre": "concluido+disputa 1ad6a600-aeea-43af-8a1d-f548c84cdfb8 signed PNG próprio",
+      "repro": "POST order_dispute_replies proof_photos=[signed ok.png]",
+      "expected": "201 persistido",
+      "obtained": {
+        "insert": "500 {\"code\":\"54000\",\"details\":null,\"hint\":null,\"message\":\"null character not permitted\"}",
+        "reply": "500 {\"code\":\"54000\",\"details\":null,\"hint\":null,\"message\":\"null character not permitted\"}",
+        "canon_clean": "500 {\"code\":\"54000\",\"details\":null,\"hint\":null,\"message\":\"null character not permitted\"}",
+        "canon_simple": "500 {\"code\":\"54000\",\"details\":null,\"hint\":null,\"message\":\"null character not permitted\"}"
+      },
+      "proven": true,
+      "evidence": {}
+    }
+  ],
+  "blocked": [],
+  "skipped": [],
+  "probes": [
+    {
+      "id": "CO-A.happy_path_proof_500",
+      "matrix": "CO-A",
+      "payload": "proof_photos=[signed PNG próprio, sem encoding]",
+      "http": "insert=500 {\"code\":\"54000\",\"details\":null,\"hint\":null,\"message\":\"null character not permitted\"} reply=500 {\"code\":\"54000\",\"details\":null,\"hint\":null,\"message\":\"null character not permitted\"} canon=500 {\"code\":\"54000\",\"details\":null,\"hint\":null,\"message\":\"null character not permitted\"}",
+      "bd": "",
+      "result": "HOLD"
+    }
+  ],
+  "notes": [
+    {
+      "id": "fixture.paid",
+      "lens": "CO3",
+      "title": "setup_paid_order Stripe TEST",
+      "ev": "200 {\n  \"ok\": true,\n  \"order_id\": \"1ad6a600-aeea-43af-8a1d-f548c84cdfb8\",\n  \"product_id\": \"ad9aa4e6-75f6-4568-85f1-77964b577b6b\",\n  \"payment_intent_id\": \"pi_3UCf9yH7FWYUN3jh1yQaHvWO\",\n  \"pi_status\": \"succeeded\",\n  \"pi_amount_received\": 590,\n  \"…"
+    },
+    {
+      "id": "fsm.enviado",
+      "lens": "CO2",
+      "title": "seller → enviado",
+      "ev": {
+        "hit": "200 [{\"id\":\"1ad6a600-aeea-43af-8a1d-f548c84cdfb8\",\"created_at\":\"2026-09-06T12:26:58.327107+00:00\",\"product_id\":\"ad9aa4e6-75f6-4568-85f1-77964b577b6b\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c…",
+        "status": "enviado",
+        "shipped_at": "2026-09-06T12:27:00.796119+00:00"
+      }
+    },
+    {
+      "id": "fsm.concluido",
+      "lens": "CO2",
+      "title": "buyer → concluido",
+      "ev": {
+        "hit": "200 [{\"id\":\"1ad6a600-aeea-43af-8a1d-f548c84cdfb8\",\"created_at\":\"2026-09-06T12:26:58.327107+00:00\",\"product_id\":\"ad9aa4e6-75f6-4568-85f1-77964b577b6b\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c…",
+        "status": "concluido"
+      }
+    },
+    {
+      "id": "CO3.control.upload",
+      "lens": "CO3",
+      "title": "upload png",
+      "ev": {
+        "hit": "200 {\"Key\":\"fleaber_private/order_disputes/bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96/1ad6a600-aeea-43af-8a1d-f548c84cdfb8/ok.png\",\"Id\":\"059c8b4e-af18-40dc-9f77-b2404179e966\"}",
+        "signed": "https://fxdknzrqjenzqcvnwqqq.supabase.co/storage/v1/object/sign/fleaber_private/order_disputes/bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96/1ad6a600-aeea-43af-8a1d-f548c84cdfb8/ok.png?token=eyJraWQiOiI3YmY5ZTQ0Ni1mOTg4LTRlNWEtYjM0Mi0zYTQ1ZTE5NTgzYzkiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJmbGVhYmVyX3ByaXZhdGUvb3JkZXJfZGlzcHV0ZXMvYmZjYmVlZWUtN2RjMS00Y2QxLWIyYTctZDNhMGE2Y2Y3Yzk2LzFhZDZhNjAwLWFlZWEtNDNhZi04YTFkLWY1NDhjODRjZGZiOC9vay5wbmciLCJzY29wZSI6ImRvd25sb2FkIiwiaWF0IjoxNzg4Njk3NjIyLCJleHAiOjE3ODg3MDEyMjJ9.Tt1cxWbbjTkjewLzJ-7m8Dv29lEjmgbKWMtvHSd7mr8"
+      }
+    },
+    {
+      "id": "CO3.control.canon_clean",
+      "lens": "CO3",
+      "title": "canonical URL limpo",
+      "ev": "500 {\"code\":\"54000\",\"details\":null,\"hint\":null,\"message\":\"null character not permitted\"}"
+    },
+    {
+      "id": "CO3.control.canon_simple",
+      "lens": "CO3",
+      "title": "canonical https://example.com/a",
+      "ev": "500 {\"code\":\"54000\",\"details\":null,\"hint\":null,\"message\":\"null character not permitted\"}"
+    },
+    {
+      "id": "CO3.control.insert_with_photo",
+      "lens": "CO3",
+      "title": "INSERT disputa proof_photos=[signed]",
+      "ev": {
+        "hit": "500 {\"code\":\"54000\",\"details\":null,\"hint\":null,\"message\":\"null character not permitted\"}",
+        "photos": ""
+      }
+    },
+    {
+      "id": "CO3.control.insert_empty",
+      "lens": "CO3",
+      "title": "INSERT vazio após falha com foto",
+      "ev": "201 [{\"id\":\"43a8fb96-eb71-47b7-b193-c291074acbe5\",\"order_id\":\"1ad6a600-aeea-43af-8a1d-f548c84cdfb8\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"reason\":\"danificado\",\"description\":\"RTCO prova disputa artigo danificado no envio.\",\"proof_ph…"
+    },
+    {
+      "id": "CO3.control.reply_clean",
+      "lens": "CO3",
+      "title": "reply proof_photos=[signed png]",
+      "ev": "500 {\"code\":\"54000\",\"details\":null,\"hint\":null,\"message\":\"null character not permitted\"}"
+    }
+  ],
+  "actors": {
+    "buyer": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+    "seller": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+    "buyer2": null,
+    "seller2": null
+  },
+  "created": {
+    "orders": [
+      "1ad6a600-aeea-43af-8a1d-f548c84cdfb8"
+    ],
+    "products": [
+      "ad9aa4e6-75f6-4568-85f1-77964b577b6b"
+    ],
+    "disputes": [
+      "43a8fb96-eb71-47b7-b193-c291074acbe5"
+    ]
+  }
+}

@@ -1,0 +1,427 @@
+{
+  "pass": 2,
+  "frozen_at": "2026-08-29T16:52:08.911012Z",
+  "findings": [
+    {
+      "id": "RTB-B-1755-P1-CHAT-ENUM",
+      "title": "Buyer lê mensagens de chat por UUID sem ser participante",
+      "severity": "P1",
+      "actor": "buyer JWT",
+      "preconditions": "chat_id conhecido",
+      "request": "GET chat_messages?chat_id=eq.{id}",
+      "before": {
+        "chat_id": "e083fd44-f8e0-4c9d-a64d-71f96fcef4cf"
+      },
+      "result": {
+        "status": 200,
+        "body": "[{\"id\":792,\"chat_id\":\"e083fd44-f8e0-4c9d-a64d-71f96fcef4cf\",\"sender_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"text\":\"FLEABER_JSON_V1:{\\\"v\\\": 1, \\\"kind\\\": \\\"auto_feedback_generated\\\", \\\"message\\\": \\\"O sistema gerou automaticamente avaliações de 5 estrelas para comprador e vendedor porque passou o prazo sem avaliação manual.\\\", \\\"order_id\\\": \\\"cc12ae00-1a73-4722-a74a-f8687a36cb39\\\"}\"}]"
+      },
+      "after": {
+        "status": 200,
+        "body": "[{\"id\":792,\"chat_id\":\"e083fd44-f8e0-4c9d-a64d-71f96fcef4cf\",\"sender_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"text\":\"FLEABER_JSON_V1:{\\\"v\\\": 1, \\\"kind\\\": \\\"auto_feedback_generated\\\", \\\"message\\\": \\\"O sistema gerou automaticamente avaliações de 5 estrelas para comprador e vendedor porque passou o prazo sem avaliação manual.\\\", \\\"order_id\\\": \\\"cc12ae00-1a73-4722-a74a-f8687a36cb39\\\"}\"}]"
+      },
+      "impact": "cross-user chat",
+      "reproduction": "GET messages by chat_id"
+    },
+    {
+      "id": "RTB-B-1755-P1-PRICE-TOTAL-SPLIT",
+      "title": "price_total cliente ≠ montante Stripe (contrato)",
+      "severity": "P1",
+      "actor": "buyer JWT",
+      "preconditions": "INSERT orders.price_total=0.01; catálogo 6.50€",
+      "request": "POST /orders price_total=0.01; POST create-payment-intent amount=1",
+      "before": {
+        "id": "3da12d4e-a3b4-43c5-a435-a79ea3b985f7",
+        "status": "reserva_pendente",
+        "price_total": 0.01,
+        "contract_unit_cents": 650,
+        "contract_qty": 1,
+        "quantity": 1
+      },
+      "result": {
+        "status": 200,
+        "body": "{\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1BWUACOveRUC1MN8jBDdXZerDF1rAv1U00Z4n0dcsl2dH7G8h7Hciy5DQ#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21oYWlsUnxrVkRhQUQyNlJjSWBCN3BXNXVvVT1hamlcf3Fjd1dRMGJmREk9Yz09PH1CMzVTY0pBXD1kMU5HZl1da05gf0s1XGQ1NWA3bVFBNzNMJyknY3dqaFZgd3Ngdyc%2FcXdwYCknZ2RmbmJ3anBrYUZqaWp3Jz8nJmNjY2NjYycpJ2lkfGpwcVF8dWAnPyd2bGtiaWBabHFgaCcpJ2BrZGdpYFVpZGZgbWppYWB3dic%2FcXdwYHgl\",\"checkoutSessionId\":\"cs_test_a1BWUACOveRUC1MN8jBDdXZerDF1rAv1U00Z4n0dcsl2dH7G8h7Hciy5DQ\",\"paidChatId\":\"3fcd6445-5f45-407b-b684-5109b8b6e732\",\"server_amount_cents\":748,\"amount_total\":748}"
+      },
+      "after": {
+        "price_total_cents": 1,
+        "stripe_quote_cents": 748,
+        "contract_unit_cents": 650
+      },
+      "impact": "oversell refund e fallback refund usam price_total; captura usa contrato. Desvio 747 cêntimos por unidade.",
+      "reproduction": "INSERT price_total mínimo; checkout; comparar server_amount_cents com orders.price_total; oversell refund em create-payment-intent usa euroToCents(price_total)."
+    },
+    {
+      "id": "RTB-B-1755-P2-DOUBLE-SESSION",
+      "title": "Duas Checkout Sessions no mesmo stock=1",
+      "severity": "P2",
+      "actor": "buyer JWT",
+      "preconditions": "quantity=1; duas orders",
+      "request": "2x create-payment-intent",
+      "before": {
+        "product": "1f12cda0-6a92-4d7b-839c-51b87ddeff98"
+      },
+      "result": {
+        "ck1": {
+          "status": 200,
+          "body": "{\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1BWUACOveRUC1MN8jBDdXZerDF1rAv1U00Z4n0dcsl2dH7G8h7Hciy5DQ#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21oYWlsUnxrVkRhQUQyNlJjSWBCN3BXNXVvVT1hamlcf3Fjd1dRMGJmREk9Yz0…"
+        },
+        "ck2": {
+          "status": 200,
+          "body": "{\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1soWKyi316BWDaVicNBnnFpF977wjoWKrkSpJRsD1xdnIpo0ERCHuiVQk#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21oYWlsUnxrVkRhQUQyNlJjSWBCN3BXNXVvVT1hamlcf3Fjd1dRMGJmREk9Yz0…"
+        }
+      },
+      "after": {
+        "sessions": 2
+      },
+      "impact": "hold não atómico; settle deve refund oversell. Combinado com price_total=0.01 o refund oversell é 1 cêntimo.",
+      "reproduction": "duas orders + dois checkouts antes de pagar"
+    },
+    {
+      "id": "RTB-B-1755-P1-OFFER-REUSE",
+      "title": "Uma oferta aceite gera duas orders seller-side",
+      "severity": "P1",
+      "actor": "seller JWT",
+      "preconditions": "product_offers.status=accepted; stock=1",
+      "request": "2x POST /orders product_offer_id=same",
+      "before": {
+        "offer": "e1f1eae0-8dd5-4cb5-ad7a-0cdb18bcfb92",
+        "product": "1f12cda0-6a92-4d7b-839c-51b87ddeff98"
+      },
+      "result": {
+        "order_ids": [
+          "dfba40f6-e14b-46ff-89fc-c7cf486cd4d1",
+          "ecc3b712-e310-4610-b699-01aa6426e5aa"
+        ]
+      },
+      "after": {
+        "orders": 2
+      },
+      "impact": "duas reservas económicas na mesma unidade; checkout/pago duplo",
+      "reproduction": "aceitar oferta; INSERT duas orders com o mesmo product_offer_id"
+    }
+  ],
+  "probes": [
+    {
+      "id": "p2.priv.buyer.profiles",
+      "title": "buyer SELECT * profiles",
+      "status": 200,
+      "body": "[{\"created_at\":\"2026-08-26T11:42:16.950611+00:00\",\"full_name\":\"Maestro Buyer\",\"user_type\":\"comprador\",\"phone\":null,\"id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"photo_url\":null,\"is_live\":false,\"next_live\":null,\"last_live\":null,\"location\":\"Portugal\",\"total_lives\":4,\"phone_verified_at\":null,\"vacation_mode\":false,\"shipping_line1\":null,\"shipping_line2\":null,\"shipping_postal_code\":null,\"shipping_city\":null,\"shipping_country\":\"PT\",\"mb_way\":null,\"iban\":null,\"external_payments_enabled\":false,\"legal_full_name\":null,\"handle\":null,\"hub_published\":false,\"handle_suggested\":null,\"handle_claimed_at\":null,\"handle_last_changed_at\":null,\"handle_change_count\":0,\"handle_changes_window_start\":null,\"hub_bio\":null,\"ocr_latency_buffer_ms\":3000}]"
+    },
+    {
+      "id": "p2.priv.buyer.orders",
+      "title": "buyer SELECT * orders",
+      "status": 200,
+      "body": "[{\"id\":\"5dcbbb4a-bec2-48c6-8466-54016e08fbfc\",\"created_at\":\"2026-08-26T11:48:56.932841+00:00\",\"product_id\":\"7fe16a85-be25-4555-98a3-99f51e438b3e\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"price_total\":0.5,\"shipping_method\":null,\"payment_method\":null,\"proof_url\":null,\"status\":\"cancelado\",\"reservation_expires_at\":null,\"is_reservation\":false,\"completed_at\":null,\"auto_feedback_processed_at\":null,\"returned_at\":null,\"wallet_release_processed_at\":null,\"wallet_refund_processed_at\":null,\"bundle_id\":null,\"quantity\":1,\"live_id\":null,\"live_item_id\":null,\"live_raffle_id\":null,\"stripe_checkout_session_id\":null,\"stripe_payment_intent_id\":\"pi_fase1_test_lock\",\"stripe_refund_id\":null,\"stripe_refunded_at\":null,\"stock_units_applied\":null,\"amount_paid_cents\":null,\"contract_unit_cents\":null,\"contract_qty\":null,\"product_offer_id\":null}, \n {\"id\":\"dfc5…"
+    },
+    {
+      "id": "p2.priv.buyer.chat_messages",
+      "title": "buyer SELECT * chat_messages",
+      "status": 200,
+      "body": "[{\"id\":792,\"created_at\":\"2026-08-29T13:18:00.022662+00:00\",\"chat_id\":\"e083fd44-f8e0-4c9d-a64d-71f96fcef4cf\",\"sender_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"text\":\"FLEABER_JSON_V1:{\\\"v\\\": 1, \\\"kind\\\": \\\"auto_feedback_generated\\\", \\\"message\\\": \\\"O sistema gerou automaticamente avaliações de 5 estrelas para comprador e vendedor porque passou o prazo sem avaliação manual.\\\", \\\"order_id\\\": \\\"cc12ae00-1a73-4722-a74a-f8687a36cb39\\\"}\",\"is_reservation\":true,\"is_read\":false,\"receiver_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\"}, \n {\"id\":793,\"created_at\":\"2026-08-29T13:56:21.537302+00:00\",\"chat_id\":\"99d9255d-78ac-4088-9021-c0f1366c91e2\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"seguro_fleaber_paid\\\",\\\"order_id\\\":\\\"9ff35b32-915b-418e-a916-f91ec76cc535\\\",\\\"total\\\":5.9,\\\"v\\\":1}\",\"is_reservation\":true,\"is_read\":false,\"receiver_id\":\"980f4fa1-0004-42f9-abca…"
+    },
+    {
+      "id": "p2.priv.buyer.chats",
+      "title": "buyer SELECT * chats",
+      "status": 200,
+      "body": "[{\"id\":\"ac2902d3-a3ca-4f82-b7de-2532db9cafba\",\"created_at\":\"2026-08-27T06:37:32.277448+00:00\",\"user_a\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"user_b\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"last_message\":\"CEGA-PRIO ping 1787850032788\",\"last_message_time\":\"2026-08-27T06:37:32.277448+00:00\",\"product_id\":\"19a9c25c-4d83-42e1-9451-54eb4c005425\"}, \n {\"id\":\"401b48f1-7d00-4293-ab98-55fdf2135cf7\",\"created_at\":\"2026-08-26T13:28:19.07901+00:00\",\"user_a\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"user_b\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"last_message\":\"INDEP27b ping\",\"last_message_time\":\"2026-08-26T13:28:19.07901+00:00\",\"product_id\":\"49b975ba-a7b1-4e66-81fc-1805059716ff\"}, \n {\"id\":\"e07f06d8-2847-4d95-873d-2bdaacc6ed8e\",\"created_at\":\"2026-08-27T07:15:35.632204+00:00\",\"user_a\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"user_b\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"last_message\":null,\"last_message_t…"
+    },
+    {
+      "id": "p2.priv.buyer.stripe_checkout_events",
+      "title": "buyer SELECT * stripe_checkout_events",
+      "status": 200,
+      "body": "[{\"id\":\"1acee782-49d0-4ecd-a101-eb26816de64e\",\"created_at\":\"2026-08-26T11:51:41.621115+00:00\",\"session_id\":null,\"order_id\":\"dce8ec48-c70c-488d-9e6b-ec61e2305a2d\",\"product_id\":\"0c71ab09-ae7a-4116-a279-ab2cd8dc81c7\",\"live_id\":null,\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"event\":\"checkout_request\",\"detail\":{\"amount\": 3583, \"live_id\": null, \"buyer_id\": \"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\", \"order_id\": \"dce8ec48-c70c-488d-9e6b-ec61e2305a2d\", \"product_id\": \"0c71ab09-ae7a-4116-a279-ab2cd8dc81c7\", \"bag_checkout\": true, \"prize_shipping\": false, \"has_web_return_origin\": false}}, \n {\"id\":\"72773ccd-5606-4d06-8e21-0840372d6d94\",\"created_at\":\"2026-08-26T11:51:42.481678+00:00\",\"session_id\":\"cs_test_a1tfykIgkmKntJhy7Xf6cXxAh9OP0plkbH73UChNQtNGU2FbftL1wc33Xq\",\"order_id\":\"dce8ec48-c70c-488d-9e6b-ec61e2305a2d\",\"product_id\":\"0c71ab09-ae7a-4116-a279-ab2cd8dc81c7\",\"live_id\":null,\"buyer_id\":\"bfcbee…"
+    },
+    {
+      "id": "p2.priv.buyer.wallets",
+      "title": "buyer SELECT * wallets",
+      "status": 200,
+      "body": "[{\"id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"stripe_account_id\":\"acct_1U8gAFQglI7kZRfq\",\"balance\":39.81,\"updated_at\":\"2026-08-29T14:00:15.854576+00:00\"}]"
+    },
+    {
+      "id": "p2.priv.buyer.wallet_transactions",
+      "title": "buyer SELECT * wallet_transactions",
+      "status": 200,
+      "body": "[{\"id\":\"21005c61-03d7-49f8-96ee-ea3e3fafa9bf\",\"wallet_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"amount\":-9.58,\"type\":\"compra\",\"description\":\"co-pago 1787750897113910\",\"created_at\":\"2026-08-26T13:28:17.256506+00:00\",\"order_id\":\"418ae815-6d5b-4d8f-ab55-b080ddd76301\",\"tip_id\":null}, \n {\"id\":\"a57aceed-b44a-4563-bc03-58b8648fa622\",\"wallet_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"amount\":0.50,\"type\":\"reembolso\",\"description\":\"Reembolso · P001 raffle probe 80e 1787735018960618\",\"created_at\":\"2026-08-26T13:29:02.651534+00:00\",\"order_id\":\"fe0455f6-d2fb-4975-930f-39675d37aae3\",\"tip_id\":null}, \n {\"id\":\"34d29a50-66f0-40b5-9df0-edcf862eeb59\",\"wallet_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"amount\":-5.00,\"type\":\"gorjeta_enviada\",\"description\":\"t10\",\"created_at\":\"2026-08-26T11:48:32.199432+00:00\",\"order_id\":null,\"tip_id\":\"d8e0a2bf-1a3f-41b8-bebf-dd7e74009768\"}, \n {\"id\":\"fde083c7-e653-48f1-a963-…"
+    },
+    {
+      "id": "p2.priv.buyer.order_disputes",
+      "title": "buyer SELECT * order_disputes",
+      "status": 200,
+      "body": "[{\"id\":\"e027d167-1df1-478b-a3fe-24c96dfb58c4\",\"order_id\":\"3691260e-15c9-47bc-af7f-4b3d2d77a669\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"reason\":\"outro\",\"description\":\"audit-dispute\",\"proof_photos\":[],\"status\":\"resolvida\",\"created_at\":\"2026-08-27T06:10:48.812303+00:00\",\"current_turn\":\"administracao\",\"next_deadline\":\"2026-08-27T06:10:48.937985+00:00\",\"seller_offer_type\":\"partial_refund\",\"seller_pays_return_shipping\":false,\"seller_refund_percent\":100.00,\"buyer_decision\":\"accepted_partial_refund\",\"return_label_created_at\":null,\"return_delivered_at\":null,\"seller_inspection_deadline\":null,\"seller_return_issue_at\":null,\"return_label_deadline\":null,\"return_label_url\":null,\"admin_resolution\":null,\"admin_resolution_note\":null,\"seller_offer_set_by\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"seller_offer_set_at\":\"2026-08-27T13:19:39.568075+00:00\"}, \n {\"id\":\"a49acccd-3fdd-4fba-ba40-d0d32e567d…"
+    },
+    {
+      "id": "p2.priv.buyer.reviews",
+      "title": "buyer SELECT * reviews",
+      "status": 200,
+      "body": "[{\"id\":\"aa90960c-d519-455d-8d48-d3dd675ab67e\",\"created_at\":\"2026-08-29T09:24:26.231187+00:00\",\"target_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"stars\":5,\"comment\":\"rtb collusion\",\"is_automatic\":false,\"target_type\":\"seller\",\"author_role\":\"comprador\",\"order_id\":\"0a4f5b08-b699-41e3-9071-95d9c97f4d86\",\"purchase_verified\":false}, \n {\"id\":\"21ea0f91-a1cb-49a1-baf2-a1a577d72bc3\",\"created_at\":\"2026-08-29T08:05:00.347312+00:00\",\"target_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"buyer_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"stars\":5,\"comment\":\"Avaliação automática: encomenda concluída sem feedback no prazo.\",\"is_automatic\":true,\"target_type\":\"buyer\",\"author_role\":\"vendedor\",\"order_id\":\"2d48d786-9be4-4b0c-b346-87533d1f2fb5\",\"purchase_verified\":true}, \n {\"id\":\"933c3958-73e2-49ab-83a3-30591de5bee6\",\"created_at\":\"2026-08-27T19:35:02.27911+00:00\",…"
+    },
+    {
+      "id": "p2.priv.buyer.ps_ingest_audit",
+      "title": "buyer SELECT * ps_ingest_audit",
+      "status": 200,
+      "body": "[]"
+    },
+    {
+      "id": "p2.priv.buyer.ps_pairing_sessions",
+      "title": "buyer SELECT * ps_pairing_sessions",
+      "status": 200,
+      "body": "[]"
+    },
+    {
+      "id": "p2.priv.buyer.live_private_messages",
+      "title": "buyer SELECT * live_private_messages",
+      "status": 200,
+      "body": "[]"
+    },
+    {
+      "id": "p2.priv.buyer.live_messages",
+      "title": "buyer SELECT * live_messages",
+      "status": 200,
+      "body": "[{\"id\":\"6b126a92-5ff0-444a-a6cf-687be76b6762\",\"live_id\":\"cf880adf-ea1e-42d2-946b-2214c264fd16\",\"user_id\":null,\"kind\":\"chat\",\"body\":\"cancela REF AM4\",\"sender_label\":\"Diogo Ferreira\",\"tip_amount\":null,\"tip_id\":null,\"created_at\":\"2026-07-22T14:55:04.160637+00:00\",\"channel\":\"facebook\"}, \n {\"id\":\"e82ef545-ed33-440b-8de4-07a060d72908\",\"live_id\":\"cf880adf-ea1e-42d2-946b-2214c264fd16\",\"user_id\":null,\"kind\":\"chat\",\"body\":\"quero REF AM5\",\"sender_label\":\"Inês Carvalho\",\"tip_amount\":null,\"tip_id\":null,\"created_at\":\"2026-07-22T15:02:47.606874+00:00\",\"channel\":\"facebook\"}, \n {\"id\":\"01c17b5e-ab32-4ab6-826d-015c3dbb7607\",\"live_id\":\"cf880adf-ea1e-42d2-946b-2214c264fd16\",\"user_id\":null,\"kind\":\"chat\",\"body\":\"cancela REF AM4\",\"sender_label\":\"Diogo Ferreira\",\"tip_amount\":null,\"tip_id\":null,\"created_at\":\"2026-07-22T15:04:17.90148+00:00\",\"channel\":\"facebook\"}, \n {\"id\":\"2d33567c-af8a-4ce5-bda8-a25ed547e012\",\"li…"
+    },
+    {
+      "id": "p2.priv.buyer.fleaber_commissions",
+      "title": "buyer SELECT * fleaber_commissions",
+      "status": 200,
+      "body": "[]"
+    },
+    {
+      "id": "p2.priv.buyer.batata_anon_rate_limits",
+      "title": "buyer SELECT * batata_anon_rate_limits",
+      "status": 403,
+      "body": "{\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table batata_anon_rate_limits\"}"
+    },
+    {
+      "id": "p2.priv.buyer.seller_device_tokens",
+      "title": "buyer SELECT * seller_device_tokens",
+      "status": 200,
+      "body": "[{\"id\":\"184fe09a-6f59-4076-af4a-82f34bf9c82e\",\"seller_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"device_id\":\"rtb-b-buyer\",\"token_hash\":\"0233718cff5df72e742fe8ac1512be6575b07bc6c88ef907a220e9db8a8985d2\",\"label\":\"x\",\"revoked_at\":null,\"created_at\":\"2026-08-29T15:42:42.943462+00:00\"}, \n {\"id\":\"c075ba3c-84a3-43a8-8fc3-e79df087b61e\",\"seller_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"device_id\":\"rtb-b-buyer-dev\",\"token_hash\":\"e22643f1b15559edaf5abc6aabaf5c039115c728027803c438929e1e5aaef4a5\",\"label\":\"x\",\"revoked_at\":null,\"created_at\":\"2026-08-29T15:42:48.429015+00:00\"}]"
+    },
+    {
+      "id": "p2.priv.buyer.live_raffle_audit_log",
+      "title": "buyer SELECT * live_raffle_audit_log",
+      "status": 200,
+      "body": "[]"
+    },
+    {
+      "id": "p2.priv.buyer.hub_profiles_public",
+      "title": "buyer SELECT * hub_profiles_public",
+      "status": 200,
+      "body": "[{\"id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"handle\":\"fleahub-demo-ux\",\"full_name\":\"Maria Demo FleaHub\",\"photo_url\":\"https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=800&auto=format&fit=crop\",\"location\":\"Lisboa, Portugal\",\"is_live\":true,\"next_live\":null,\"last_live\":null,\"total_lives\":174,\"vacation_mode\":false,\"phone_verified\":true,\"external_payments_enabled\":true,\"follower_count\":13,\"hub_bio\":\"✦ Dados de demonstração UX — não são dados reais de negócio. Roupa vintage e peças únicas curadas em Lisboa.\"}, \n {\"id\":\"69104e91-6a00-40d9-a7c9-b1571422ae43\",\"handle\":\"joao84\",\"full_name\":\"Joao84\",\"photo_url\":\"https://fxdknzrqjenzqcvnwqqq.supabase.co/storage/v1/object/public/chat_media/profile_photos/69104e91-6a00-40d9-a7c9-b1571422ae43/1779897329903_scaled_IMG_20260427_100524.jpg\",\"location\":\"São João dos Montes\",\"is_live\":false,\"next_live\":null,\"last_live\":null,\"total_lives\":389,…"
+    },
+    {
+      "id": "p2.priv.events_cross",
+      "title": "buyer GET events of others",
+      "status": 200,
+      "body": "[]"
+    },
+    {
+      "id": "p2.priv.profile_seller",
+      "title": "buyer GET seller profile PII cols",
+      "status": 200,
+      "body": "[]"
+    },
+    {
+      "id": "p2.priv.directory",
+      "title": "directory public seller",
+      "status": 200,
+      "body": "[{\"id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"created_at\":\"2026-06-04T05:09:48.457604+00:00\",\"full_name\":\"Maria Demo FleaHub\",\"photo_url\":\"https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=800&auto=format&fit=crop\",\"location\":\"Lisboa, Portugal\",\"is_live\":true,\"next_live\":null,\"last_live\":null,\"total_lives\":174,\"user_type\":\"vendedor\",\"handle\":\"fleahub-demo-ux\",\"vacation_mode\":false,\"external_payments_enabled\":true,\"phone_verified\":true}]"
+    },
+    {
+      "id": "p2.priv.foreign_obs",
+      "title": "observe foreign orders",
+      "status": 200,
+      "n": 5
+    },
+    {
+      "id": "p2.priv.order_uuid",
+      "title": "buyer GET foreign order *",
+      "status": 200,
+      "body": "[]"
+    },
+    {
+      "id": "p2.priv.order_uuid",
+      "title": "buyer GET foreign order *",
+      "status": 200,
+      "body": "[]"
+    },
+    {
+      "id": "p2.priv.order_uuid",
+      "title": "buyer GET foreign order *",
+      "status": 200,
+      "body": "[]"
+    },
+    {
+      "id": "p2.priv.seller_chats",
+      "title": "seller own messages sample",
+      "status": 200,
+      "body": "[{\"chat_id\":\"1f12a423-ae18-4570-a7db-cdaf95c1e275\",\"sender_id\":\"69104e91-6a00-40d9-a7c9-b1571422ae43\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"seguro_fleaber_paid\\\",\\\"order_id\\\":\\\"15c2abf9-c250-43aa-8086-6816ee0f6be3\\\",\\\"total\\\":13.77,\\\"v\\\":1}\"}, \n {\"chat_id\":\"a2725916-7669-4762-a86c-346edc01ee84\",\"sender_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"text\":\"{\\\"v\\\": 1, \\\"kind\\\": \\\"price_offer_outcome\\\", \\…"
+    },
+    {
+      "id": "p2.priv.chat_enum",
+      "title": "buyer GET chat 1f12a423-ae18-4570-a7db-cdaf95c1e275",
+      "status": 200,
+      "body": "[]"
+    },
+    {
+      "id": "p2.priv.chat_enum",
+      "title": "buyer GET chat a2725916-7669-4762-a86c-346edc01ee84",
+      "status": 200,
+      "body": "[]"
+    },
+    {
+      "id": "p2.priv.chat_enum",
+      "title": "buyer GET chat e083fd44-f8e0-4c9d-a64d-71f96fcef4cf",
+      "status": 200,
+      "body": "[{\"id\":792,\"chat_id\":\"e083fd44-f8e0-4c9d-a64d-71f96fcef4cf\",\"sender_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"text\":\"FLEABER_JSON_V1:{\\\"v\\\": 1, \\\"kind\\\": \\\"auto_feedback_generated\\\", \\\"message\\\": \\\"O sistema gerou automaticamente avaliações de 5 estrelas para comprador e vendedor porque passou o prazo sem avaliação manual.\\\", \\\"order_id\\\": \\\"cc12ae00-1a73-4722-a74a-f8687a36cb39\\\"}\"}]"
+    },
+    {
+      "id": "p2.fin.partial",
+      "title": "partial refund 100% fake order",
+      "status": 200,
+      "body": "false"
+    },
+    {
+      "id": "p2.fin.payout_finish",
+      "title": "payout_finish as buyer",
+      "status": 403,
+      "body": "{\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_wallet_payout_finish\"}"
+    },
+    {
+      "id": "p2.fin.hub_lives",
+      "title": "hub lives as seller",
+      "status": 200,
+      "body": "[{\"id\":\"5dd5cfd2-63b1-4cd8-82b1-c888e9dc5234\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\"}, \n {\"id\":\"301713b2-49b0-409c-b758-4c2153b2ddd1\",\"seller_id\":\"69104e91-6a00-40d9-a7c9-b1571422ae43\"}, \n {\"id\":\"ed8624e6-6920-4d12-8578-aa8599ebc6d0\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\"}, \n {\"id\":\"a60c1f73-e499-4c18-892f-08c3a33f3605\",\"seller_id\":\"69104e91-6a00-40d9-a7c9-b1571422ae43\"}, \n…"
+    },
+    {
+      "id": "p2.fin.tip_wallet",
+      "title": "tip from wallet real live",
+      "status": 403,
+      "body": "{\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"not_allowed\"}"
+    },
+    {
+      "id": "p2.stock.product",
+      "title": "create stock=1",
+      "status": 201,
+      "body": "[{\"id\":\"1f12cda0-6a92-4d7b-839c-51b87ddeff98\",\"created_at\":\"2026-08-29T16:52:00.342861+00:00\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"title\":\"RTB-B-20260829T1755-p2 stock1\",\"price\":6.5,\"ref_code\":null,\"category\":null,\"clothing_size\":null,\"gender\":null,\"description\":null,\"state\":null,\"image_urls\":null,\"list_on_marketplace\":true,\"available_for_live\":false,\"is_sold\":false,\"favorites_count\":0,\"quantity\":1}]"
+    },
+    {
+      "id": "p2.stock.o1",
+      "title": "order price_total=0.01",
+      "status": 201,
+      "body": "[{\"id\":\"3da12d4e-a3b4-43c5-a435-a79ea3b985f7\",\"created_at\":\"2026-08-29T16:52:00.455549+00:00\",\"product_id\":\"1f12cda0-6a92-4d7b-839c-51b87ddeff98\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"price_total\":0.01,\"shipping_method\":\"hand\",\"payment_method\":\"Pagamento na app\",\"proof_url\":null,\"status\":\"reserva_pendente\",\"reservation_expires_at\":null,\"is_reservation\":false,\"completed_at\":null,\"auto_feedback_processed_at\":null,\"returned_at\":null,\"wallet_release_processed_at\":null,\"wallet_refund_processed_at\":null,\"bundle_id\":null,\"quantity\":1,\"live_id\":null,\"live_item_id\":null,\"live_raffle_id\":null,\"stripe_checkout_session_id\":null,\"stripe_payment_intent_id\":null,\"stripe_refund_id\":null,\"stripe_refunded_at\":null,\"stock_units_applied\":null,\"amount_paid_cents\":null,\"contract_unit_cents\":650,\"contract_qty\":1,\"product_offer_id\":null}]"
+    },
+    {
+      "id": "p2.stock.sealed",
+      "title": "sealed vs client price_total",
+      "status": 200,
+      "body": "[{\"id\":\"3da12d4e-a3b4-43c5-a435-a79ea3b985f7\",\"status\":\"reserva_pendente\",\"price_total\":0.01,\"contract_unit_cents\":650,\"contract_qty\":1,\"quantity\":1}]"
+    },
+    {
+      "id": "p2.stock.ck1",
+      "title": "checkout spoof amount=1",
+      "status": 200,
+      "body": "{\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1BWUACOveRUC1MN8jBDdXZerDF1rAv1U00Z4n0dcsl2dH7G8h7Hciy5DQ#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21oYWlsUnxrVkRhQUQyNlJjSWBCN3BXNXVvVT1hamlcf3Fjd1dRMGJmREk9Yz09PH1CMzVTY0pBXD1kMU5HZl1da05gf0s1XGQ1NWA3bVFBNzNMJyknY3dqaFZgd3Ngdyc%2FcXdwYCknZ2RmbmJ3anBrYUZqaWp3Jz8nJmNjY2NjYycpJ2lkfGpwcVF8dWAnPyd2bGtiaWBabHFgaCcpJ2BrZGdpYFVpZGZgbWppYWB3dic%2FcXdwYHgl\",\"checkoutSessionId\":\"cs_test_a1BWUACOveRUC1MN8jBDdXZerDF1rAv1U00Z4n0dcsl2dH7G8h7Hciy5DQ\",\"paidChatId\":\"3fcd6445-5f45-407b-b684-5109b8b6e732\",\"server_amount_cents\":748,\"amount_total\":748}"
+    },
+    {
+      "id": "p2.stock.o2",
+      "title": "second order same SKU",
+      "status": 201,
+      "body": "[{\"id\":\"bfbfbb7b-1a2a-4ba2-a369-1d1b1838c0c6\",\"created_at\":\"2026-08-29T16:52:02.012457+00:00\",\"product_id\":\"1f12cda0-6a92-4d7b-839c-51b87ddeff98\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"price_total\":0.01,\"shipping_method\":\"hand\",\"payment_method\":\"Pagamento na app\",\"proof_url\":null,\"status\":\"reserva_pendente\",\"reservation_expires_at\":null,\"is_reservation\":false,\"completed_at\":null,\"auto_feedback_processed_at\":null,\"returned_at\":null,\"wallet_release_processed_at\":null,\"wallet_refund_processed_at\":null,\"bundle_id\":null,\"quantity\":1,\"live_id\":null,\"live_item_id\":null,\"live_raffle_id\":null,\"stripe_checkout_session_id\":null,\"stripe_payment_intent_id\":null,\"stripe_refund_id\":null,\"stripe_refunded_at\":null,\"stock_units_applied\":null,\"amount_paid_cents\":null,\"contract_unit_cents\":650,\"contract_qty\":1,\"product_offer_id\":null}]"
+    },
+    {
+      "id": "p2.stock.ck2",
+      "title": "second checkout stock=1",
+      "status": 200,
+      "body": "{\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1soWKyi316BWDaVicNBnnFpF977wjoWKrkSpJRsD1xdnIpo0ERCHuiVQk#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21oYWlsUnxrVkRhQUQyNlJjSWBCN3BXNXVvVT1hamlcf3Fjd1dRMGJmREk9Yz09PH1CMzVTY0pBXD1kMU5HZl1da05gf0s1XGQ1NWA3bVFBNzNMJyknY3dqaFZgd3Ngdyc%2FcXdwYCknZ2RmbmJ3anBrYUZqaWp3Jz8nJmNjY2NjYycpJ2lkfGpwcVF8dWAnPyd2bGtiaWBabHFgaCcpJ2BrZGdpYFVpZGZgbWppYWB3dic%2FcXdwYHgl\",\"checkoutSessionId\":\"cs_test_a1soWKyi316BWDaVicNBnnFpF977wjoWKrkSpJRsD1xdnIpo0ERCHuiVQk\",\"paidChatId\":\"7f1a2d92-d071-4245-ad68-e89546e4a5e3\",\"server_amount_cents\":748,\"amount_total\":748}"
+    },
+    {
+      "id": "p2.stock.bag_dup",
+      "title": "bag duplicate order2",
+      "status": 400,
+      "body": "{\"error\":\"Checkout blocked: quantity 2 exceeds available stock 1.\"}"
+    },
+    {
+      "id": "p2.offer.ins",
+      "title": "offer insert",
+      "status": 201,
+      "body": "[{\"id\":\"e1f1eae0-8dd5-4cb5-ad7a-0cdb18bcfb92\",\"product_id\":\"1f12cda0-6a92-4d7b-839c-51b87ddeff98\",\"chat_id\":null,\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"amount\":3.50,\"list_price\":null,\"offered_by\":\"buyer\",\"status\":\"pending\",\"parent_offer_id\":null,\"expires_at\":\"2026-08-31T16:52:03.795595+00:00\",\"created_at\":\"2026-08-29T16:52:03.795595+00:00\",\"responded_at\":null}]"
+    },
+    {
+      "id": "p2.offer.order_0",
+      "title": "seller order from offer 0",
+      "status": 201,
+      "body": "[{\"id\":\"dfba40f6-e14b-46ff-89fc-c7cf486cd4d1\",\"created_at\":\"2026-08-29T16:52:04.072725+00:00\",\"product_id\":\"1f12cda0-6a92-4d7b-839c-51b87ddeff98\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"price_total\":3.5,\"shipping_method\":\"hand\",\"payment_method\":\"MB WAY\",\"proof_url\":null,\"status\":\"reservado\",\"reservation_expires_at\":null,\"is_reservation\":false,\"completed_at\":null,\"auto_feedback_processed_at\":null,\"returned_at\":null,\"wallet_release_processed_at\":null,\"wallet_refund_processed_at\":null,\"bundle_id\":null,\"quantity\":1,\"live_id\":null,\"live_item_id\":null,\"live_raffle_id\":null,\"stripe_checkout_session_id\":null,\"stripe_payment_intent_id\":null,\"stripe_refund_id\":null,\"stripe_refunded_at\":null,\"stock_units_applied\":null,\"amount_paid_cents\":null,\"contract_unit_cents\":350,\"contract_qty\":1,\"product_offer_id\":\"e1f1eae0-8dd5-4cb5-ad7a-0cdb18bcf…"
+    },
+    {
+      "id": "p2.offer.order_1",
+      "title": "seller order from offer 1",
+      "status": 201,
+      "body": "[{\"id\":\"ecc3b712-e310-4610-b699-01aa6426e5aa\",\"created_at\":\"2026-08-29T16:52:04.186942+00:00\",\"product_id\":\"1f12cda0-6a92-4d7b-839c-51b87ddeff98\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"price_total\":3.5,\"shipping_method\":\"hand\",\"payment_method\":\"MB WAY\",\"proof_url\":null,\"status\":\"reservado\",\"reservation_expires_at\":null,\"is_reservation\":false,\"completed_at\":null,\"auto_feedback_processed_at\":null,\"returned_at\":null,\"wallet_release_processed_at\":null,\"wallet_refund_processed_at\":null,\"bundle_id\":null,\"quantity\":1,\"live_id\":null,\"live_item_id\":null,\"live_raffle_id\":null,\"stripe_checkout_session_id\":null,\"stripe_payment_intent_id\":null,\"stripe_refund_id\":null,\"stripe_refunded_at\":null,\"stock_units_applied\":null,\"amount_paid_cents\":null,\"contract_unit_cents\":350,\"contract_qty\":1,\"product_offer_id\":\"e1f1eae0-8dd5-4cb5-ad7a-0cdb18bcf…"
+    },
+    {
+      "id": "p2.live.create",
+      "title": "service insert live",
+      "status": 201,
+      "body": "[{\"id\":\"9fb1bd38-9b1c-4e57-a824-3ec78fa3c2fe\",\"created_at\":\"2026-08-29T16:52:04.291149+00:00\",\"vendedor_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"mux_live_id\":null,\"stream_key\":null,\"playback_id\":null,\"is_active\":false,\"title\":\"RTB-B-20260829T1755-p2 live\",\"status\":\"ended\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"mux_stream_key\":null,\"mux_playback_id\":null,\"publish_backend\":\"mux_rtmp\",\"livekit_room_name\":null,\"livekit_egress_id\":null,\"mux_asset_id\":null,\"mux_vod_playback_id\":null,\"viewer_count\":0,\"went_live_at\":null,\"ended_at\":null}]"
+    },
+    {
+      "id": "p2.live.item",
+      "title": "live_item qty=2 product qty=1",
+      "status": 400,
+      "body": "{\"code\":\"23502\",\"details\":\"Failing row contains (58632e4b-b569-4369-9487-63ef1fc6e5e7, 9fb1bd38-9b1c-4e57-a824-3ec78fa3c2fe, 980f4fa1-0004-42f9-abca-69f1a9c29588, null, RTB-B-20260829T1755-p2 li, null, 6.5, null, null, null, f, 0, available, 2026-08-29 16:52:04.397341+00, null, live_only, 1f12cda0-6a92-4d7b-839c-51b87ddeff98, null, 2, null, null, 2026-08-29 16:52:04.397341+00, null, null).\",\"hint\":null,\"message\":\"null value in column \\\"ref_code\\\" of relation \\\"live_items\\\" violates not-null constraint\"}"
+    },
+    {
+      "id": "p2.buyer2.order",
+      "title": "second buyer order stock=1",
+      "status": 201,
+      "body": "[{\"id\":\"b467ba7b-c020-4714-af43-d744f4a280da\",\"created_at\":\"2026-08-29T16:52:05.051484+00:00\",\"product_id\":\"1f12cda0-6a92-4d7b-839c-51b87ddeff98\",\"buyer_id\":\"02aca650-f1d9-4d9f-9a65-b74da8799e21\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"price_total\":6.5,\"shipping_method\":\"hand\",\"payment_method\":\"Pagamento na app\",\"proof_url\":null,\"status\":\"reserva_pendente\",\"reservation_expires_at\":null,\"is_reservation\":false,\"completed_at\":null,\"auto_feedback_processed_at\":null,\"returned_at\":null,\"wallet_release_processed_at\":null,\"wallet_refund_processed_at\":null,\"bundle_id\":null,\"quantity\":1,\"live_id\":null,\"live_item_id\":null,\"live_raffle_id\":null,\"stripe_checkout_session_id\":null,\"stripe_payment_intent_id\":null,\"stripe_refund_id\":null,\"stripe_refunded_at\":null,\"stock_units_applied\":null,\"amount_paid_cents\":null,\"contract_unit_cents\":650,\"contract_qty\":1,\"product_offer_id\":null}]"
+    },
+    {
+      "id": "p2.buyer2.ck",
+      "title": "second buyer checkout",
+      "status": 200,
+      "body": "{\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1sDyXRgjqVkrAueClFffePNznJ6I7MojQWYMeEaqrXQWXWXI8A0S11H0F#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21oYWlsUnxrVkRhQUQyNlJjSWBCN3BXNXVvVT1hamlcf3Fjd1dRMGJmREk9Yz09PH1CMzVTY0pBXD1kMU5HZl1da05gf0s1XGQ1NWA3bVFBNzNMJyknY3dqaFZgd3Ngdyc%2FcXdwYCknZ2RmbmJ3anBrYUZqaWp3Jz8nJmNjY2NjYycpJ2lkfGpwcVF8dWAnPyd2bGtiaWBabHFgaCcpJ2BrZGdpYFVpZGZgbWppYWB3dic%2FcXdwYHgl\",\"checkoutSessionId\":\"cs_test_a1sDyXRgjqVkrAueClFffePNznJ6I7MojQWYMeEaqrXQWXWXI8A0S11H0F\",\"paidChatId\":\"1d08bf62-d6af-469e-9cc6-f173a7199477\",\"server_amount_cents\":748,\"amount_total\":748}"
+    },
+    {
+      "id": "p2.rev.cols",
+      "title": "reviews sample",
+      "status": 200,
+      "body": "[{\"id\":\"aa90960c-d519-455d-8d48-d3dd675ab67e\",\"created_at\":\"2026-08-29T09:24:26.231187+00:00\",\"target_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"stars\":5,\"comment\":\"rtb collusion\",\"is_automatic\":false,\"target_type\":\"seller\",\"author_role\":\"comprador\",\"order_id\":\"0a4f5b08-b699-41e3-9071-95d9c97f4d86\",\"purchase_verified\":false}]"
+    },
+    {
+      "id": "p2.mb.order",
+      "title": "MB WAY order",
+      "status": 201,
+      "body": "[{\"id\":\"d8abac50-bbc1-4160-8cab-16363382b794\",\"created_at\":\"2026-08-29T16:52:06.498384+00:00\",\"product_id\":\"1f12cda0-6a92-4d7b-839c-51b87ddeff98\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"price_total\":6.5,\"shipping_method\":\"hand\",\"payment_method\":\"MB WAY\",\"proof_url\":null,\"status\":\"reserva_pendente\",\"reservation_expires_at\":null,\"is_reservation\":false,\"completed_at\":null,\"auto_feedback_processed_at\":null,\"returned_at\":null,\"wallet_release_processed_at\":null,\"wallet_refund_processed_at\":null,\"bundle_id\":null,\"quantity\":1,\"live_id\":null,\"live_item_id\":null,\"live_raffle_id\":null,\"stripe_checkout_session_id\":null,\"stripe_payment_intent_id\":null,\"stripe_refund_id\":null,\"stripe_refunded_at\":null,\"stock_units_applied\":null,\"amount_paid_cents\":null,\"contract_unit_cents\":350,\"contract_qty\":1,\"product_offer_id\":\"e1f1eae0-8dd5-4cb5-ad7a-0c…"
+    },
+    {
+      "id": "p2.mb.reservado",
+      "title": "seller reservado",
+      "status": 200,
+      "body": "[{\"id\":\"d8abac50-bbc1-4160-8cab-16363382b794\",\"created_at\":\"2026-08-29T16:52:06.498384+00:00\",\"product_id\":\"1f12cda0-6a92-4d7b-839c-51b87ddeff98\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"price_total\":6.5,\"shipping_method\":\"hand\",\"payment_method\":\"MB WAY\",\"proof_url\":null,\"status\":\"reservado\",\"reservation_expires_at\":null,\"is_reservation\":false,\"completed_at\":null,\"auto_feedback_processed_at\":null,\"returned_at\":null,\"wallet_release_processed_at\":null,\"wallet_refund_processed_at\":null,\"bundle_id\":null,\"quantity\":1,\"live_id\":null,\"live_item_id\":null,\"live_raffle_id\":null,\"stripe_checkout_session_id\":null,\"stripe_payment_intent_id\":null,\"stripe_refund_id\":null,\"stripe_refunded_at\":null,\"stock_units_applied\":null,\"amount_paid_cents\":null,\"contract_unit_cents\":350,\"contract_qty\":1,\"product_offer_id\":\"e1f1eae0-8dd5-4cb5-ad7a-0cdb18bcf…"
+    },
+    {
+      "id": "p2.mb.pago",
+      "title": "seller pago MB WAY",
+      "status": 200,
+      "body": "[{\"id\":\"d8abac50-bbc1-4160-8cab-16363382b794\",\"created_at\":\"2026-08-29T16:52:06.498384+00:00\",\"product_id\":\"1f12cda0-6a92-4d7b-839c-51b87ddeff98\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"price_total\":6.5,\"shipping_method\":\"hand\",\"payment_method\":\"MB WAY\",\"proof_url\":null,\"status\":\"pago\",\"reservation_expires_at\":null,\"is_reservation\":false,\"completed_at\":null,\"auto_feedback_processed_at\":null,\"returned_at\":null,\"wallet_release_processed_at\":null,\"wallet_refund_processed_at\":null,\"bundle_id\":null,\"quantity\":1,\"live_id\":null,\"live_item_id\":null,\"live_raffle_id\":null,\"stripe_checkout_session_id\":null,\"stripe_payment_intent_id\":null,\"stripe_refund_id\":null,\"stripe_refunded_at\":null,\"stock_units_applied\":null,\"amount_paid_cents\":null,\"contract_unit_cents\":350,\"contract_qty\":1,\"product_offer_id\":\"e1f1eae0-8dd5-4cb5-ad7a-0cdb18bcfb92\"}…"
+    },
+    {
+      "id": "p2.mb.after",
+      "title": "observe MB WAY pago",
+      "order": {
+        "status": 200,
+        "body": "[{\"id\":\"d8abac50-bbc1-4160-8cab-16363382b794\",\"status\":\"pago\",\"amount_paid_cents\":null,\"stock_units_applied\":1}]"
+      },
+      "product": {
+        "status": 200,
+        "body": "[{\"id\":\"1f12cda0-6a92-4d7b-839c-51b87ddeff98\",\"quantity\":0,\"is_sold\":true}]"
+      },
+      "ledger": {
+        "status": 200,
+        "body": "[]"
+      }
+    }
+  ]
+}

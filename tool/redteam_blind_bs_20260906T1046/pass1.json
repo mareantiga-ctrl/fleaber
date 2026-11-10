@@ -1,0 +1,816 @@
+{
+  "auditor": "REDTEAM_BLIND_BS_CHAT_POS_BLBQ_v1",
+  "stamp": "20260906T1046",
+  "production_touched": false,
+  "fase4": false,
+  "corrections_applied": false,
+  "lenses": [
+    "BS1",
+    "BS2",
+    "BS3",
+    "BS4",
+    "BS5",
+    "BS6",
+    "BS7",
+    "BS8"
+  ],
+  "fixtures": {
+    "sku": "7be94cea-412e-4ee6-8c54-751f2d27e235",
+    "chat": "3f0069dd-14cd-470c-9d34-50e3b17d75f7",
+    "mbway_order": "463c3d0b-e1bf-4dbd-8137-8ee4fddef5bd",
+    "paid_order": "c852914d-66d8-4028-8225-b9ae4bcae03c",
+    "paid_cents": 590,
+    "paid_chat": "fea2615d-3475-46c9-a42d-c4429b23ec11",
+    "paid2_order": "dd7b0688-bbce-4423-ac3c-edf852130079",
+    "paid2_chat": "5ee997c0-4164-40fb-ad0d-65a4140581f6",
+    "live": "aebf7c4a-7830-4a5b-b472-d24a713435f9",
+    "buyer2": "7defa406-f688-4310-ae64-076a3b662913"
+  },
+  "findings": [
+    {
+      "id": "BS1.notes-payoneer",
+      "lens": "BS1",
+      "severity": "P1",
+      "title": "card reservation_payment_submitted notes=Payoneer 12,00 €",
+      "actor": "buyer JWT",
+      "pre": "denylist BLBQ sem este rail/encoding/URL",
+      "repro": "POST chat_messages FLEABER_JSON_V1:{\"kind\":\"reservation_payment_submitted\",\"order_id\":\"463c3d0b-e1bf-4dbd-8137-8ee4fddef5bd\",\"notes\":\"Payoneer 12,00 €\"}",
+      "expected": "chat_system_card_notes_forbidden / url_denied / label_mismatch",
+      "obtained": "201 [{\"id\":1417,\"created_at\":\"2026-09-06T09:52:46.347739+00:00\",\"chat_id\":\"3f0069dd-14cd-470c-9d34-50e3b17d75f7\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"reservation_payment_subm…",
+      "proven": true,
+      "evidence": {
+        "id": "1417",
+        "kind": "reservation_payment_submitted",
+        "payload": {
+          "kind": "reservation_payment_submitted",
+          "order_id": "463c3d0b-e1bf-4dbd-8137-8ee4fddef5bd",
+          "notes": "Payoneer 12,00 €"
+        }
+      }
+    },
+    {
+      "id": "BS1.notes-wu",
+      "lens": "BS1",
+      "severity": "P1",
+      "title": "card reservation_payment_submitted notes=Western Union 12,00 €",
+      "actor": "buyer JWT",
+      "pre": "denylist BLBQ sem este rail/encoding/URL",
+      "repro": "POST chat_messages FLEABER_JSON_V1:{\"kind\":\"reservation_payment_submitted\",\"order_id\":\"463c3d0b-e1bf-4dbd-8137-8ee4fddef5bd\",\"notes\":\"Western Union 12,00 €\"}",
+      "expected": "chat_system_card_notes_forbidden / url_denied / label_mismatch",
+      "obtained": "201 [{\"id\":1418,\"created_at\":\"2026-09-06T09:52:46.564791+00:00\",\"chat_id\":\"3f0069dd-14cd-470c-9d34-50e3b17d75f7\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"reservation_payment_subm…",
+      "proven": true,
+      "evidence": {
+        "id": "1418",
+        "kind": "reservation_payment_submitted",
+        "payload": {
+          "kind": "reservation_payment_submitted",
+          "order_id": "463c3d0b-e1bf-4dbd-8137-8ee4fddef5bd",
+          "notes": "Western Union 12,00 €"
+        }
+      }
+    },
+    {
+      "id": "BS1.notes-interac",
+      "lens": "BS1",
+      "severity": "P1",
+      "title": "card reservation_payment_submitted notes=Interac 12,00 €",
+      "actor": "buyer JWT",
+      "pre": "denylist BLBQ sem este rail/encoding/URL",
+      "repro": "POST chat_messages FLEABER_JSON_V1:{\"kind\":\"reservation_payment_submitted\",\"order_id\":\"463c3d0b-e1bf-4dbd-8137-8ee4fddef5bd\",\"notes\":\"Interac 12,00 €\"}",
+      "expected": "chat_system_card_notes_forbidden / url_denied / label_mismatch",
+      "obtained": "201 [{\"id\":1419,\"created_at\":\"2026-09-06T09:52:46.776056+00:00\",\"chat_id\":\"3f0069dd-14cd-470c-9d34-50e3b17d75f7\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"reservation_payment_subm…",
+      "proven": true,
+      "evidence": {
+        "id": "1419",
+        "kind": "reservation_payment_submitted",
+        "payload": {
+          "kind": "reservation_payment_submitted",
+          "order_id": "463c3d0b-e1bf-4dbd-8137-8ee4fddef5bd",
+          "notes": "Interac 12,00 €"
+        }
+      }
+    },
+    {
+      "id": "BS1.notes-btc",
+      "lens": "BS1",
+      "severity": "P1",
+      "title": "card reservation_payment_submitted notes=BTC 12,00 €",
+      "actor": "buyer JWT",
+      "pre": "denylist BLBQ sem este rail/encoding/URL",
+      "repro": "POST chat_messages FLEABER_JSON_V1:{\"kind\":\"reservation_payment_submitted\",\"order_id\":\"463c3d0b-e1bf-4dbd-8137-8ee4fddef5bd\",\"notes\":\"BTC 12,00 €\"}",
+      "expected": "chat_system_card_notes_forbidden / url_denied / label_mismatch",
+      "obtained": "201 [{\"id\":1420,\"created_at\":\"2026-09-06T09:52:47.005462+00:00\",\"chat_id\":\"3f0069dd-14cd-470c-9d34-50e3b17d75f7\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"reservation_payment_subm…",
+      "proven": true,
+      "evidence": {
+        "id": "1420",
+        "kind": "reservation_payment_submitted",
+        "payload": {
+          "kind": "reservation_payment_submitted",
+          "order_id": "463c3d0b-e1bf-4dbd-8137-8ee4fddef5bd",
+          "notes": "BTC 12,00 €"
+        }
+      }
+    },
+    {
+      "id": "BS1.notes-usdt",
+      "lens": "BS1",
+      "severity": "P1",
+      "title": "card reservation_payment_submitted notes=USDT 12,00 €",
+      "actor": "buyer JWT",
+      "pre": "denylist BLBQ sem este rail/encoding/URL",
+      "repro": "POST chat_messages FLEABER_JSON_V1:{\"kind\":\"reservation_payment_submitted\",\"order_id\":\"463c3d0b-e1bf-4dbd-8137-8ee4fddef5bd\",\"notes\":\"USDT 12,00 €\"}",
+      "expected": "chat_system_card_notes_forbidden / url_denied / label_mismatch",
+      "obtained": "201 [{\"id\":1421,\"created_at\":\"2026-09-06T09:52:47.20077+00:00\",\"chat_id\":\"3f0069dd-14cd-470c-9d34-50e3b17d75f7\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"reservation_payment_submi…",
+      "proven": true,
+      "evidence": {
+        "id": "1421",
+        "kind": "reservation_payment_submitted",
+        "payload": {
+          "kind": "reservation_payment_submitted",
+          "order_id": "463c3d0b-e1bf-4dbd-8137-8ee4fddef5bd",
+          "notes": "USDT 12,00 €"
+        }
+      }
+    },
+    {
+      "id": "BS1.notes-paytm",
+      "lens": "BS1",
+      "severity": "P1",
+      "title": "card reservation_payment_submitted notes=Paytm 12,00 €",
+      "actor": "buyer JWT",
+      "pre": "denylist BLBQ sem este rail/encoding/URL",
+      "repro": "POST chat_messages FLEABER_JSON_V1:{\"kind\":\"reservation_payment_submitted\",\"order_id\":\"463c3d0b-e1bf-4dbd-8137-8ee4fddef5bd\",\"notes\":\"Paytm 12,00 €\"}",
+      "expected": "chat_system_card_notes_forbidden / url_denied / label_mismatch",
+      "obtained": "201 [{\"id\":1422,\"created_at\":\"2026-09-06T09:52:47.397723+00:00\",\"chat_id\":\"3f0069dd-14cd-470c-9d34-50e3b17d75f7\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"reservation_payment_subm…",
+      "proven": true,
+      "evidence": {
+        "id": "1422",
+        "kind": "reservation_payment_submitted",
+        "payload": {
+          "kind": "reservation_payment_submitted",
+          "order_id": "463c3d0b-e1bf-4dbd-8137-8ee4fddef5bd",
+          "notes": "Paytm 12,00 €"
+        }
+      }
+    },
+    {
+      "id": "BS1.notes-mpago",
+      "lens": "BS1",
+      "severity": "P1",
+      "title": "card reservation_payment_submitted notes=Mercado Pago 12,00 €",
+      "actor": "buyer JWT",
+      "pre": "denylist BLBQ sem este rail/encoding/URL",
+      "repro": "POST chat_messages FLEABER_JSON_V1:{\"kind\":\"reservation_payment_submitted\",\"order_id\":\"463c3d0b-e1bf-4dbd-8137-8ee4fddef5bd\",\"notes\":\"Mercado Pago 12,00 €\"}",
+      "expected": "chat_system_card_notes_forbidden / url_denied / label_mismatch",
+      "obtained": "201 [{\"id\":1423,\"created_at\":\"2026-09-06T09:52:47.63553+00:00\",\"chat_id\":\"3f0069dd-14cd-470c-9d34-50e3b17d75f7\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"reservation_payment_submi…",
+      "proven": true,
+      "evidence": {
+        "id": "1423",
+        "kind": "reservation_payment_submitted",
+        "payload": {
+          "kind": "reservation_payment_submitted",
+          "order_id": "463c3d0b-e1bf-4dbd-8137-8ee4fddef5bd",
+          "notes": "Mercado Pago 12,00 €"
+        }
+      }
+    },
+    {
+      "id": "BS1.notes-zw-payoneer",
+      "lens": "BS2",
+      "severity": "P1",
+      "title": "Payoneer com ZWSP (U+200B) nas notes",
+      "actor": "buyer JWT",
+      "pre": "denylist BLBQ sem este rail/encoding/URL",
+      "repro": "POST chat_messages FLEABER_JSON_V1:{\"kind\":\"reservation_payment_submitted\",\"order_id\":\"463c3d0b-e1bf-4dbd-8137-8ee4fddef5bd\",\"notes\":\"P​ayoneer 12,00 €\"}",
+      "expected": "chat_system_card_notes_forbidden / url_denied / label_mismatch",
+      "obtained": "201 [{\"id\":1426,\"created_at\":\"2026-09-06T09:52:48.277724+00:00\",\"chat_id\":\"3f0069dd-14cd-470c-9d34-50e3b17d75f7\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"reservation_payment_subm…",
+      "proven": true,
+      "evidence": {
+        "id": "1426",
+        "kind": "reservation_payment_submitted",
+        "payload": {
+          "kind": "reservation_payment_submitted",
+          "order_id": "463c3d0b-e1bf-4dbd-8137-8ee4fddef5bd",
+          "notes": "P​ayoneer 12,00 €"
+        }
+      }
+    },
+    {
+      "id": "BS1.notes-zw-clearpay",
+      "lens": "BS2",
+      "severity": "P1",
+      "title": "Clearpay com U+180E / U+3164 / U+2063 (encoding novo)",
+      "actor": "buyer JWT",
+      "pre": "denylist BLBQ sem este rail/encoding/URL",
+      "repro": "POST chat_messages FLEABER_JSON_V1:{\"kind\":\"reservation_payment_submitted\",\"order_id\":\"463c3d0b-e1bf-4dbd-8137-8ee4fddef5bd\",\"notes\":\"C᠎learpay 12,00 €\"}",
+      "expected": "chat_system_card_notes_forbidden / url_denied / label_mismatch",
+      "obtained": "201 [{\"id\":1427,\"created_at\":\"2026-09-06T09:52:48.504169+00:00\",\"chat_id\":\"3f0069dd-14cd-470c-9d34-50e3b17d75f7\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"reservation_payment_subm…",
+      "proven": true,
+      "evidence": {
+        "id": "1427",
+        "kind": "reservation_payment_submitted",
+        "payload": {
+          "kind": "reservation_payment_submitted",
+          "order_id": "463c3d0b-e1bf-4dbd-8137-8ee4fddef5bd",
+          "notes": "C᠎learpay 12,00 €"
+        }
+      }
+    },
+    {
+      "id": "BS1.notes-hangul-clearpay",
+      "lens": "BS2",
+      "severity": "P1",
+      "title": "Clearpay com Hangul filler U+3164",
+      "actor": "buyer JWT",
+      "pre": "denylist BLBQ sem este rail/encoding/URL",
+      "repro": "POST chat_messages FLEABER_JSON_V1:{\"kind\":\"reservation_payment_submitted\",\"order_id\":\"463c3d0b-e1bf-4dbd-8137-8ee4fddef5bd\",\"notes\":\"Cㅤlearpay 12,00 €\"}",
+      "expected": "chat_system_card_notes_forbidden / url_denied / label_mismatch",
+      "obtained": "201 [{\"id\":1428,\"created_at\":\"2026-09-06T09:52:48.708233+00:00\",\"chat_id\":\"3f0069dd-14cd-470c-9d34-50e3b17d75f7\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"reservation_payment_subm…",
+      "proven": true,
+      "evidence": {
+        "id": "1428",
+        "kind": "reservation_payment_submitted",
+        "payload": {
+          "kind": "reservation_payment_submitted",
+          "order_id": "463c3d0b-e1bf-4dbd-8137-8ee4fddef5bd",
+          "notes": "Cㅤlearpay 12,00 €"
+        }
+      }
+    },
+    {
+      "id": "BS1.notes-invsep-strike",
+      "lens": "BS2",
+      "severity": "P1",
+      "title": "Strike com invisible separator U+2063",
+      "actor": "buyer JWT",
+      "pre": "denylist BLBQ sem este rail/encoding/URL",
+      "repro": "POST chat_messages FLEABER_JSON_V1:{\"kind\":\"reservation_payment_submitted\",\"order_id\":\"463c3d0b-e1bf-4dbd-8137-8ee4fddef5bd\",\"notes\":\"Stri⁣ke 12,00 €\"}",
+      "expected": "chat_system_card_notes_forbidden / url_denied / label_mismatch",
+      "obtained": "201 [{\"id\":1429,\"created_at\":\"2026-09-06T09:52:48.911902+00:00\",\"chat_id\":\"3f0069dd-14cd-470c-9d34-50e3b17d75f7\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"reservation_payment_subm…",
+      "proven": true,
+      "evidence": {
+        "id": "1429",
+        "kind": "reservation_payment_submitted",
+        "payload": {
+          "kind": "reservation_payment_submitted",
+          "order_id": "463c3d0b-e1bf-4dbd-8137-8ee4fddef5bd",
+          "notes": "Stri⁣ke 12,00 €"
+        }
+      }
+    },
+    {
+      "id": "BS1.seguro-payoneer",
+      "lens": "BS1",
+      "severity": "P1",
+      "title": "seguro_fleaber_paid label=Payoneer 12,00 €",
+      "actor": "buyer JWT",
+      "pre": "denylist BLBQ sem este rail/encoding/URL",
+      "repro": "POST chat_messages FLEABER_JSON_V1:{\"kind\":\"seguro_fleaber_paid\",\"order_id\":\"c852914d-66d8-4028-8225-b9ae4bcae03c\",\"total\":\"5.90\",\"label\":\"Payoneer 12,00 €\"}",
+      "expected": "chat_system_card_notes_forbidden / url_denied / label_mismatch",
+      "obtained": "201 [{\"id\":1430,\"created_at\":\"2026-09-06T09:52:49.096995+00:00\",\"chat_id\":\"fea2615d-3475-46c9-a42d-c4429b23ec11\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"seguro_fleaber_paid\\\",\\\"…",
+      "proven": true,
+      "evidence": {
+        "id": "1430",
+        "kind": "seguro_fleaber_paid",
+        "payload": {
+          "kind": "seguro_fleaber_paid",
+          "order_id": "c852914d-66d8-4028-8225-b9ae4bcae03c",
+          "total": "5.90",
+          "label": "Payoneer 12,00 €"
+        }
+      }
+    },
+    {
+      "id": "BS1.seguro-wu",
+      "lens": "BS1",
+      "severity": "P1",
+      "title": "seguro_fleaber_paid label=Western Union 12,00 €",
+      "actor": "buyer JWT",
+      "pre": "denylist BLBQ sem este rail/encoding/URL",
+      "repro": "POST chat_messages FLEABER_JSON_V1:{\"kind\":\"seguro_fleaber_paid\",\"order_id\":\"c852914d-66d8-4028-8225-b9ae4bcae03c\",\"total\":\"5.90\",\"label\":\"Western Union 12,00 €\"}",
+      "expected": "chat_system_card_notes_forbidden / url_denied / label_mismatch",
+      "obtained": "201 [{\"id\":1431,\"created_at\":\"2026-09-06T09:52:49.307078+00:00\",\"chat_id\":\"fea2615d-3475-46c9-a42d-c4429b23ec11\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"seguro_fleaber_paid\\\",\\\"…",
+      "proven": true,
+      "evidence": {
+        "id": "1431",
+        "kind": "seguro_fleaber_paid",
+        "payload": {
+          "kind": "seguro_fleaber_paid",
+          "order_id": "c852914d-66d8-4028-8225-b9ae4bcae03c",
+          "total": "5.90",
+          "label": "Western Union 12,00 €"
+        }
+      }
+    },
+    {
+      "id": "BS1.seguro-interac",
+      "lens": "BS1",
+      "severity": "P1",
+      "title": "seguro_fleaber_paid label=Interac 12,00 €",
+      "actor": "buyer JWT",
+      "pre": "denylist BLBQ sem este rail/encoding/URL",
+      "repro": "POST chat_messages FLEABER_JSON_V1:{\"kind\":\"seguro_fleaber_paid\",\"order_id\":\"c852914d-66d8-4028-8225-b9ae4bcae03c\",\"total\":\"5.90\",\"label\":\"Interac 12,00 €\"}",
+      "expected": "chat_system_card_notes_forbidden / url_denied / label_mismatch",
+      "obtained": "201 [{\"id\":1432,\"created_at\":\"2026-09-06T09:52:49.486904+00:00\",\"chat_id\":\"fea2615d-3475-46c9-a42d-c4429b23ec11\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"seguro_fleaber_paid\\\",\\\"…",
+      "proven": true,
+      "evidence": {
+        "id": "1432",
+        "kind": "seguro_fleaber_paid",
+        "payload": {
+          "kind": "seguro_fleaber_paid",
+          "order_id": "c852914d-66d8-4028-8225-b9ae4bcae03c",
+          "total": "5.90",
+          "label": "Interac 12,00 €"
+        }
+      }
+    },
+    {
+      "id": "BS1.seguro-btc",
+      "lens": "BS1",
+      "severity": "P1",
+      "title": "seguro_fleaber_paid label=BTC 12,00 €",
+      "actor": "buyer JWT",
+      "pre": "denylist BLBQ sem este rail/encoding/URL",
+      "repro": "POST chat_messages FLEABER_JSON_V1:{\"kind\":\"seguro_fleaber_paid\",\"order_id\":\"c852914d-66d8-4028-8225-b9ae4bcae03c\",\"total\":\"5.90\",\"label\":\"BTC 12,00 €\"}",
+      "expected": "chat_system_card_notes_forbidden / url_denied / label_mismatch",
+      "obtained": "201 [{\"id\":1433,\"created_at\":\"2026-09-06T09:52:49.68117+00:00\",\"chat_id\":\"fea2615d-3475-46c9-a42d-c4429b23ec11\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"seguro_fleaber_paid\\\",\\\"o…",
+      "proven": true,
+      "evidence": {
+        "id": "1433",
+        "kind": "seguro_fleaber_paid",
+        "payload": {
+          "kind": "seguro_fleaber_paid",
+          "order_id": "c852914d-66d8-4028-8225-b9ae4bcae03c",
+          "total": "5.90",
+          "label": "BTC 12,00 €"
+        }
+      }
+    },
+    {
+      "id": "BS1.seguro-usdt",
+      "lens": "BS1",
+      "severity": "P1",
+      "title": "seguro_fleaber_paid label=USDT 12,00 €",
+      "actor": "buyer JWT",
+      "pre": "denylist BLBQ sem este rail/encoding/URL",
+      "repro": "POST chat_messages FLEABER_JSON_V1:{\"kind\":\"seguro_fleaber_paid\",\"order_id\":\"c852914d-66d8-4028-8225-b9ae4bcae03c\",\"total\":\"5.90\",\"label\":\"USDT 12,00 €\"}",
+      "expected": "chat_system_card_notes_forbidden / url_denied / label_mismatch",
+      "obtained": "201 [{\"id\":1434,\"created_at\":\"2026-09-06T09:52:49.889247+00:00\",\"chat_id\":\"fea2615d-3475-46c9-a42d-c4429b23ec11\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"seguro_fleaber_paid\\\",\\\"…",
+      "proven": true,
+      "evidence": {
+        "id": "1434",
+        "kind": "seguro_fleaber_paid",
+        "payload": {
+          "kind": "seguro_fleaber_paid",
+          "order_id": "c852914d-66d8-4028-8225-b9ae4bcae03c",
+          "total": "5.90",
+          "label": "USDT 12,00 €"
+        }
+      }
+    },
+    {
+      "id": "BS1.seguro-paytm",
+      "lens": "BS1",
+      "severity": "P1",
+      "title": "seguro_fleaber_paid label=Paytm 12,00 €",
+      "actor": "buyer JWT",
+      "pre": "denylist BLBQ sem este rail/encoding/URL",
+      "repro": "POST chat_messages FLEABER_JSON_V1:{\"kind\":\"seguro_fleaber_paid\",\"order_id\":\"c852914d-66d8-4028-8225-b9ae4bcae03c\",\"total\":\"5.90\",\"label\":\"Paytm 12,00 €\"}",
+      "expected": "chat_system_card_notes_forbidden / url_denied / label_mismatch",
+      "obtained": "201 [{\"id\":1435,\"created_at\":\"2026-09-06T09:52:50.082626+00:00\",\"chat_id\":\"fea2615d-3475-46c9-a42d-c4429b23ec11\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"seguro_fleaber_paid\\\",\\\"…",
+      "proven": true,
+      "evidence": {
+        "id": "1435",
+        "kind": "seguro_fleaber_paid",
+        "payload": {
+          "kind": "seguro_fleaber_paid",
+          "order_id": "c852914d-66d8-4028-8225-b9ae4bcae03c",
+          "total": "5.90",
+          "label": "Paytm 12,00 €"
+        }
+      }
+    },
+    {
+      "id": "BS1.seguro-mpago",
+      "lens": "BS1",
+      "severity": "P1",
+      "title": "seguro_fleaber_paid label=Mercado Pago 12,00 €",
+      "actor": "buyer JWT",
+      "pre": "denylist BLBQ sem este rail/encoding/URL",
+      "repro": "POST chat_messages FLEABER_JSON_V1:{\"kind\":\"seguro_fleaber_paid\",\"order_id\":\"c852914d-66d8-4028-8225-b9ae4bcae03c\",\"total\":\"5.90\",\"label\":\"Mercado Pago 12,00 €\"}",
+      "expected": "chat_system_card_notes_forbidden / url_denied / label_mismatch",
+      "obtained": "201 [{\"id\":1436,\"created_at\":\"2026-09-06T09:52:50.28625+00:00\",\"chat_id\":\"fea2615d-3475-46c9-a42d-c4429b23ec11\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"seguro_fleaber_paid\\\",\\\"o…",
+      "proven": true,
+      "evidence": {
+        "id": "1436",
+        "kind": "seguro_fleaber_paid",
+        "payload": {
+          "kind": "seguro_fleaber_paid",
+          "order_id": "c852914d-66d8-4028-8225-b9ae4bcae03c",
+          "total": "5.90",
+          "label": "Mercado Pago 12,00 €"
+        }
+      }
+    },
+    {
+      "id": "BS1.seguro-payoneer-plain",
+      "lens": "BS1",
+      "severity": "P1",
+      "title": "seguro_fleaber_paid label=Payoneer (sem montante)",
+      "actor": "buyer JWT",
+      "pre": "denylist BLBQ sem este rail/encoding/URL",
+      "repro": "POST chat_messages FLEABER_JSON_V1:{\"kind\":\"seguro_fleaber_paid\",\"order_id\":\"c852914d-66d8-4028-8225-b9ae4bcae03c\",\"total\":\"5.90\",\"label\":\"Payoneer\"}",
+      "expected": "chat_system_card_notes_forbidden / url_denied / label_mismatch",
+      "obtained": "201 [{\"id\":1437,\"created_at\":\"2026-09-06T09:52:50.480679+00:00\",\"chat_id\":\"fea2615d-3475-46c9-a42d-c4429b23ec11\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"seguro_fleaber_paid\\\",\\\"…",
+      "proven": true,
+      "evidence": {
+        "id": "1437",
+        "kind": "seguro_fleaber_paid",
+        "payload": {
+          "kind": "seguro_fleaber_paid",
+          "order_id": "c852914d-66d8-4028-8225-b9ae4bcae03c",
+          "total": "5.90",
+          "label": "Payoneer"
+        }
+      }
+    },
+    {
+      "id": "BS2.fullwidth-payoneer",
+      "lens": "BS2",
+      "severity": "P1",
+      "title": "Payoneer fullwidth notes",
+      "actor": "buyer JWT",
+      "pre": "denylist BLBQ sem este rail/encoding/URL",
+      "repro": "POST chat_messages FLEABER_JSON_V1:{\"kind\":\"reservation_payment_submitted\",\"order_id\":\"463c3d0b-e1bf-4dbd-8137-8ee4fddef5bd\",\"notes\":\"Ｐａｙｏｎｅｅｒ 12,00 €\"}",
+      "expected": "chat_system_card_notes_forbidden / url_denied / label_mismatch",
+      "obtained": "201 [{\"id\":1439,\"created_at\":\"2026-09-06T09:52:50.889048+00:00\",\"chat_id\":\"3f0069dd-14cd-470c-9d34-50e3b17d75f7\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"reservation_payment_subm…",
+      "proven": true,
+      "evidence": {
+        "id": "1439",
+        "kind": "reservation_payment_submitted",
+        "payload": {
+          "kind": "reservation_payment_submitted",
+          "order_id": "463c3d0b-e1bf-4dbd-8137-8ee4fddef5bd",
+          "notes": "Ｐａｙｏｎｅｅｒ 12,00 €"
+        }
+      }
+    },
+    {
+      "id": "BS4.fullwidth-dot-traversal",
+      "lens": "BS4",
+      "severity": "P1",
+      "title": "proof_url travessia com pontos fullwidth ．．",
+      "actor": "buyer JWT",
+      "pre": "denylist BLBQ sem este rail/encoding/URL",
+      "repro": "POST chat_messages FLEABER_JSON_V1:{\"kind\":\"reservation_payment_submitted\",\"order_id\":\"463c3d0b-e1bf-4dbd-8137-8ee4fddef5bd\",\"notes\":\"ok\",\"proof_url\":\"https://fxdknzrqjenzqcvnwqqq.supabase.co/storage/v1/object/fleaber_private/order_proofs/bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96/463c3d0b-e1bf-4dbd-8137-8ee4fddef5bd/．．/．．/order_proofs/bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96/dd7b0688-bbce-4423-ac3c-edf852130079/rtbs_b.png\"}",
+      "expected": "chat_system_card_notes_forbidden / url_denied / label_mismatch",
+      "obtained": "201 [{\"id\":1447,\"created_at\":\"2026-09-06T09:52:54.824421+00:00\",\"chat_id\":\"3f0069dd-14cd-470c-9d34-50e3b17d75f7\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"reservation_payment_subm…",
+      "proven": true,
+      "evidence": {
+        "id": "1447",
+        "kind": "reservation_payment_submitted",
+        "payload": {
+          "kind": "reservation_payment_submitted",
+          "order_id": "463c3d0b-e1bf-4dbd-8137-8ee4fddef5bd",
+          "notes": "ok",
+          "proof_url": "https://fxdknzrqjenzqcvnwqqq.supabase.co/storage/v1/object/fleaber_private/order_proofs/bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96/463c3d0b-e1bf-4dbd-8137-8ee4fddef5bd/．．/．．/order_proofs/bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96/dd7b0688-bbce-4423-ac3c-edf852130079/rtbs_b.png"
+        }
+      }
+    },
+    {
+      "id": "BS5.inbox-payoneer",
+      "lens": "BS5",
+      "severity": "P1",
+      "title": "inbox last_message forjado: Payoneer 12,00 €",
+      "actor": "buyer JWT",
+      "pre": "chats_update_participants",
+      "repro": "PATCH chats.last_message=Payoneer 12,00 €",
+      "expected": "chat_inbox_preview_forbidden",
+      "obtained": "Payoneer 12,00 €",
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "BS5.inbox-wu",
+      "lens": "BS5",
+      "severity": "P1",
+      "title": "inbox last_message forjado: Western Union 12,00 €",
+      "actor": "buyer JWT",
+      "pre": "chats_update_participants",
+      "repro": "PATCH chats.last_message=Western Union 12,00 €",
+      "expected": "chat_inbox_preview_forbidden",
+      "obtained": "Western Union 12,00 €",
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "BS5.inbox-interac",
+      "lens": "BS5",
+      "severity": "P1",
+      "title": "inbox last_message forjado: Interac 12,00 €",
+      "actor": "buyer JWT",
+      "pre": "chats_update_participants",
+      "repro": "PATCH chats.last_message=Interac 12,00 €",
+      "expected": "chat_inbox_preview_forbidden",
+      "obtained": "Interac 12,00 €",
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "BS5.inbox-btc",
+      "lens": "BS5",
+      "severity": "P1",
+      "title": "inbox last_message forjado: BTC 12,00 €",
+      "actor": "buyer JWT",
+      "pre": "chats_update_participants",
+      "repro": "PATCH chats.last_message=BTC 12,00 €",
+      "expected": "chat_inbox_preview_forbidden",
+      "obtained": "BTC 12,00 €",
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "BS5.inbox-usdt",
+      "lens": "BS5",
+      "severity": "P1",
+      "title": "inbox last_message forjado: USDT 12,00 €",
+      "actor": "buyer JWT",
+      "pre": "chats_update_participants",
+      "repro": "PATCH chats.last_message=USDT 12,00 €",
+      "expected": "chat_inbox_preview_forbidden",
+      "obtained": "USDT 12,00 €",
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "BS5.inbox-paytm",
+      "lens": "BS5",
+      "severity": "P1",
+      "title": "inbox last_message forjado: Paytm 12,00 €",
+      "actor": "buyer JWT",
+      "pre": "chats_update_participants",
+      "repro": "PATCH chats.last_message=Paytm 12,00 €",
+      "expected": "chat_inbox_preview_forbidden",
+      "obtained": "Paytm 12,00 €",
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "BS5.inbox-mpago",
+      "lens": "BS5",
+      "severity": "P1",
+      "title": "inbox last_message forjado: Mercado Pago 12,00 €",
+      "actor": "buyer JWT",
+      "pre": "chats_update_participants",
+      "repro": "PATCH chats.last_message=Mercado Pago 12,00 €",
+      "expected": "chat_inbox_preview_forbidden",
+      "obtained": "Mercado Pago 12,00 €",
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "BS5.inbox-zw-payoneer",
+      "lens": "BS5",
+      "severity": "P1",
+      "title": "inbox last_message forjado: P​ayoneer 12,00 €",
+      "actor": "buyer JWT",
+      "pre": "chats_update_participants",
+      "repro": "PATCH chats.last_message=P​ayoneer 12,00 €",
+      "expected": "chat_inbox_preview_forbidden",
+      "obtained": "P​ayoneer 12,00 €",
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "BS5.inbox-hangul-clearpay",
+      "lens": "BS5",
+      "severity": "P1",
+      "title": "inbox last_message forjado: Cㅤlearpay 12,00 €",
+      "actor": "buyer JWT",
+      "pre": "chats_update_participants",
+      "repro": "PATCH chats.last_message=Cㅤlearpay 12,00 €",
+      "expected": "chat_inbox_preview_forbidden",
+      "obtained": "Cㅤlearpay 12,00 €",
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "BS5.inbox-payoneer-plain",
+      "lens": "BS5",
+      "severity": "P1",
+      "title": "inbox last_message forjado: Payoneer",
+      "actor": "buyer JWT",
+      "pre": "chats_update_participants",
+      "repro": "PATCH chats.last_message=Payoneer",
+      "expected": "chat_inbox_preview_forbidden",
+      "obtained": "Payoneer",
+      "proven": true,
+      "evidence": {}
+    }
+  ],
+  "blocked": [
+    {
+      "id": "BS1.notes-clearpay-control",
+      "lens": "BS1",
+      "title": "recusado",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_notes_forbidden\"}"
+    },
+    {
+      "id": "BS1.notes-strike-control",
+      "lens": "BS1",
+      "title": "recusado",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_notes_forbidden\"}"
+    },
+    {
+      "id": "BS1.meta-extra-control",
+      "lens": "BS1",
+      "title": "recusado",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_payload_forbidden\"}"
+    },
+    {
+      "id": "BS2.overlong-utf8-clearpay",
+      "lens": "BS2",
+      "title": "overlong recusado",
+      "ev": "400 {\"code\":\"PGRST102\",\"details\":null,\"hint\":null,\"message\":\"Empty or invalid json\"}"
+    },
+    {
+      "id": "BS3.insert-created-at-past",
+      "lens": "BS3",
+      "title": "created_at forçado a now",
+      "ev": "2026-09-06T09:52:51.285779+00:00"
+    },
+    {
+      "id": "BS3.patch-created-at",
+      "lens": "BS3",
+      "title": "created_at imutável",
+      "ev": {
+        "http": "200 [{\"id\":1440,\"created_at\":\"2026-09-06T09:52:51.285779+00:00\",\"chat_id\":\"3f0069dd-14cd-470c-9d34-50e3b17d75f7\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"RTBS-20260906T1046 past-insert\",\"is_reservation\":fal…",
+        "stored": "2026-09-06T09:52:51.285779+00:00"
+      }
+    },
+    {
+      "id": "BS3.delete-json-card",
+      "lens": "BS3",
+      "title": "DELETE card recusado",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_immutable\"}"
+    },
+    {
+      "id": "BS4.unsigned-own-other-order",
+      "lens": "BS4",
+      "title": "recusado",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_url_denied\"}"
+    },
+    {
+      "id": "BS4.authenticated-own-other-order",
+      "lens": "BS4",
+      "title": "recusado",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_url_denied\"}"
+    },
+    {
+      "id": "BS4.authenticated-wrong-bucket",
+      "lens": "BS4",
+      "title": "recusado",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_url_denied\"}"
+    },
+    {
+      "id": "BS4.authenticated-chat-media",
+      "lens": "BS4",
+      "title": "recusado",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_url_denied\"}"
+    },
+    {
+      "id": "BS4.unicode-slash-other-order",
+      "lens": "BS4",
+      "title": "recusado",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_url_denied\"}"
+    },
+    {
+      "id": "BS4.dotdot-control",
+      "lens": "BS4",
+      "title": "recusado",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_url_denied\"}"
+    },
+    {
+      "id": "BS4.chat-image-wrong-bucket",
+      "lens": "BS4",
+      "title": "recusado",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_path_denied\"}"
+    },
+    {
+      "id": "BS5.inbox-clearpay-control",
+      "lens": "BS5",
+      "title": "inbox recusado",
+      "ev": {
+        "http": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"chat_inbox_preview_forbidden\"}",
+        "stored": "Mercado Pago 12,00 €"
+      }
+    },
+    {
+      "id": "BS6.list-cross-user",
+      "lens": "BS6",
+      "title": "list cross-user recusado",
+      "ev": {
+        "root": "200 []",
+        "b1": "200 []"
+      }
+    },
+    {
+      "id": "BS6.get-cross-user",
+      "lens": "BS6",
+      "title": "GET cross-user recusado",
+      "ev": "400 {\"statusCode\":\"404\",\"error\":\"not_found\",\"message\":\"Object not found\",\"code\":\"NoSuchKey\"}"
+    },
+    {
+      "id": "BS6.upload-cross-user",
+      "lens": "BS6",
+      "title": "upload B2 recusado",
+      "ev": "400 {\"statusCode\":\"415\",\"error\":\"invalid_mime_type\",\"message\":\"mime type application/octet-stream is not supported\",\"code\":\"InvalidMimeType\"}"
+    },
+    {
+      "id": "BS7.b2-insert-b1-chat",
+      "lens": "BS7",
+      "title": "B2 fora do chat",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"new row violates row-level security policy for table \\\"chat_messages\\\"\"}"
+    },
+    {
+      "id": "BS7.b2-read-b1-chat",
+      "lens": "BS7",
+      "title": "B2 não lê chat B1",
+      "ev": "200 []"
+    },
+    {
+      "id": "BS7.anon-read-chat",
+      "lens": "BS7",
+      "title": "anon sem mensagens",
+      "ev": "401 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_chat_is_participant\"}"
+    },
+    {
+      "id": "BS7.seller-seguro-label",
+      "lens": "BS7",
+      "title": "recusado",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_buyer_only\"}"
+    },
+    {
+      "id": "BS8.ocr-fake-token",
+      "lens": "BS8",
+      "title": "token falso recusado",
+      "ev": "401 {\"ok\":false,\"error\":\"invalid_token\"}"
+    },
+    {
+      "id": "BS8.ocr-rpc-jwt",
+      "lens": "BS8",
+      "title": "RPC OCR JWT recusado",
+      "ev": "200 {\"ok\": false, \"error\": \"invalid_token\"}"
+    },
+    {
+      "id": "BS8.ocr-anon",
+      "lens": "BS8",
+      "title": "anon OCR recusado",
+      "ev": "401 {\"ok\":false,\"error\":\"missing_device_token\"}"
+    }
+  ],
+  "notes": [
+    {
+      "id": "fixture.paid",
+      "lens": "BS1",
+      "title": "setup_paid_order Stripe TEST",
+      "ev": "200 {\n  \"ok\": true,\n  \"order_id\": \"c852914d-66d8-4028-8225-b9ae4bcae03c\",\n  \"product_id\": \"2c791541-fc13-45e0-8107-d36f715edf82\",\n  \"payment_intent_id\": \"pi_3UCckdH7FWYUN3jh0bE15Gvv\",\n  \"pi_status\": \"succeeded\",\n  \"pi_amount…"
+    },
+    {
+      "id": "fixture.paid",
+      "lens": "BS1",
+      "title": "setup_paid_order Stripe TEST",
+      "ev": "200 {\n  \"ok\": true,\n  \"order_id\": \"dd7b0688-bbce-4423-ac3c-edf852130079\",\n  \"product_id\": \"65737bbe-2f8d-4bb5-a6ab-1187b2923082\",\n  \"payment_intent_id\": \"pi_3UCckhH7FWYUN3jh08JVnfy2\",\n  \"pi_status\": \"succeeded\",\n  \"pi_amount…"
+    },
+    {
+      "id": "BS6.upload-a",
+      "lens": "BS6",
+      "title": "upload prova A",
+      "ev": "400 {\"statusCode\":\"415\",\"error\":\"invalid_mime_type\",\"message\":\"mime type application/octet-stream is not supported\",\"code\":\"InvalidMimeType\"}"
+    },
+    {
+      "id": "BS6.upload-b",
+      "lens": "BS6",
+      "title": "upload prova B (outra encomenda própria)",
+      "ev": "400 {\"statusCode\":\"415\",\"error\":\"invalid_mime_type\",\"message\":\"mime type application/octet-stream is not supported\",\"code\":\"InvalidMimeType\"}"
+    },
+    {
+      "id": "BS4.sign-b",
+      "lens": "BS4",
+      "title": "signed URL encomenda B",
+      "ev": "400 {\"statusCode\":\"404\",\"error\":\"not_found\",\"message\":\"Object not found\",\"code\":\"NoSuchKey\"}"
+    },
+    {
+      "id": "BS4.honest-path",
+      "lens": "BS4",
+      "title": "persistiu (exacto/controlo, não contar)",
+      "ev": "201 [{\"id\":1449,\"created_at\":\"2026-09-06T09:52:55.239143+00:00\",\"chat_id\":\"3f0069dd-14cd-470c-9d34-50e3b17d75f7\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"reservation_payment_subm…"
+    },
+    {
+      "id": "BS8.live",
+      "lens": "BS8",
+      "title": "live fixture",
+      "ev": "201 [{\"id\":\"aebf7c4a-7830-4a5b-b472-d24a713435f9\",\"created_at\":\"2026-09-06T09:53:06.025287+00:00\",\"vendedor_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"mux_live_id\":null,\"stream_key\":null,\"playback_id\":null,\"is_active\":true,…"
+    }
+  ]
+}

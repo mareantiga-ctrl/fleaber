@@ -1,0 +1,588 @@
+{
+  "lenses": [
+    "CG1",
+    "CG5"
+  ],
+  "findings": [
+    {
+      "id": "CG1-RESOLVE-REDIRECT-UNPUB",
+      "lens": "CG1",
+      "severity": "P2",
+      "title": "resolve_handle 301 para loja unpublished via redirect",
+      "actor": "anon",
+      "pre": "profile_handle_redirects old→rtcg1235s2 unpublished",
+      "repro": "POST batata_resolve_handle p_handle=rtcg-old-unpub-1235",
+      "expected": "found=false (destino unpublished)",
+      "obtained": "200 {\"found\": true, \"handle\": \"rtcg1235s2\", \"profile_id\": null, \"http_status\": 301, \"redirect_to\": \"rtcg1235s2\", \"hub_published\": null}",
+      "proven": true,
+      "count_exact_closed": false,
+      "evidence": {}
+    },
+    {
+      "id": "CG1-FOLLOW-UNPUB",
+      "lens": "CG1",
+      "severity": "P3",
+      "title": "seguir loja unpublished (oráculo de UUID + relação)",
+      "actor": "B1",
+      "pre": "S2 unpublished UUID conhecido",
+      "repro": "POST follows following_id=S2; GET follows",
+      "expected": "recusa se loja não é vitrine",
+      "obtained": {
+        "insert": "201 [{\"id\":\"7fc4b5bc-7fd9-4eda-883f-878e2f03b85d\",\"follower_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"following_id\":\"7574429a-0ffc-4dc5-a1d9-a2e6a1c9ccb0\",\"created_at\":\"2026-09-06T11:36:46.912396+00:00\"}]",
+        "get": "200 [{\"id\":\"7fc4b5bc-7fd9-4eda-883f-878e2f03b85d\",\"follower_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"following_id\":\"7574429a-0ffc-4dc5-a1d9-a2e6a1c9ccb0\"}]"
+      },
+      "proven": true,
+      "count_exact_closed": false,
+      "evidence": {}
+    },
+    {
+      "id": "CG1-FAV-UNPUB-SKU",
+      "lens": "CG1",
+      "severity": "P3",
+      "title": "favoritar SKU de loja unpublished",
+      "actor": "B1",
+      "pre": "produto S2 list_on_marketplace",
+      "repro": "POST favorites product_id unpublished",
+      "expected": "recusa / produto invisível",
+      "obtained": {
+        "insert": "201 [{\"id\":\"b78d5f2d-4c6b-4614-bec5-a6864e8910d3\",\"user_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"product_id\":\"16dec8a6-f72d-401f-bc73-e407c78e19ad\",\"created_at\":\"2026-09-06T11:36:47.397693+00:00\"}]",
+        "get": "200 [{\"id\":\"b78d5f2d-4c6b-4614-bec5-a6864e8910d3\",\"product_id\":\"16dec8a6-f72d-401f-bc73-e407c78e19ad\"}]"
+      },
+      "proven": true,
+      "count_exact_closed": false,
+      "evidence": {}
+    },
+    {
+      "id": "CG1-STOCK-REST-UNPUB",
+      "lens": "CG1",
+      "severity": "P2",
+      "title": "PostgREST products mostra SKU que Hub esconde (UNPUB)",
+      "actor": "B1",
+      "pre": "hub_products_public=[] UNPUB prod=16dec8a6-f72d-401f-bc73-e407c78e19ad",
+      "repro": "GET hub_products_public vs GET products?id=eq.16dec8a6-f72d-401f-bc73-e407c78e19ad&select=...,quantity",
+      "expected": "tabela base alinhada à vitrine Hub (sem montra morta)",
+      "obtained": {
+        "hub": "200 []",
+        "anon": "401 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table products\"}",
+        "b1": "200 [{\"id\":\"16dec8a6-f72d-401f-bc73-e407c78e19ad\",\"title\":\"RTCG-20260906T1235 unpub-mkt\",\"price\":22.0,\"quantity\":5,\"seller_id\":\"7574429a-0ffc-4dc5-a1d9-a2e6a1c9ccb0\",\"list_on_marketplace\":true,\"is_sold\":false}]",
+        "qty": 5
+      },
+      "proven": true,
+      "count_exact_closed": false,
+      "evidence": {}
+    },
+    {
+      "id": "CG1-STOCK-REST-QTY0",
+      "lens": "CG1",
+      "severity": "P2",
+      "title": "PostgREST products mostra SKU que Hub esconde (QTY0)",
+      "actor": "B1",
+      "pre": "hub_products_public=[] QTY0 prod=3a0d67e6-b6ce-499e-983d-487d806584da",
+      "repro": "GET hub_products_public vs GET products?id=eq.3a0d67e6-b6ce-499e-983d-487d806584da&select=...,quantity",
+      "expected": "tabela base alinhada à vitrine Hub (sem montra morta)",
+      "obtained": {
+        "hub": "200 []",
+        "anon": "401 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table products\"}",
+        "b1": "200 [{\"id\":\"3a0d67e6-b6ce-499e-983d-487d806584da\",\"title\":\"RTCG-20260906T1235 qty0-dead\",\"price\":33.0,\"quantity\":0,\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"list_on_marketplace\":true,\"is_sold\":false}]",
+        "qty": 0
+      },
+      "proven": true,
+      "count_exact_closed": false,
+      "evidence": {}
+    },
+    {
+      "id": "CG1-LIVEITEM-UNPUB-AIR",
+      "lens": "CG1",
+      "severity": "P2",
+      "title": "stock/preço de directo unpublished no ar via live_items/RPC",
+      "actor": "anon",
+      "pre": "S2 hub off + live broadcasting + item qty=4 price=17.5",
+      "repro": "GET hub_live_items_* vs GET live_items vs RPC batata_live_item_stock",
+      "expected": "alinhado a Hub (live_not_public / [])",
+      "obtained": {
+        "hub": "200 []",
+        "disc": "200 []",
+        "anon": "401 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table profiles\"}",
+        "b1": "200 [{\"id\":\"dd3ba0ed-2ae3-461c-8d50-5f5a417f8c9e\",\"title\":\"RTCG-20260906T1235 unpub-sku\",\"price\":17.5,\"quantity\":4,\"live_id\":\"ef845cc5-89bd-473d-bc4b-bb78a7e0eaa0\",\"status\":\"available\"}]",
+        "rpc_anon": "200 {\"ok\": true, \"price\": 17.5, \"live_id\": \"ef845cc5-89bd-473d-bc4b-bb78a7e0eaa0\", \"ref_code\": \"CG2808\", \"item_kind\": \"live_only\", \"total_qty\": 4, \"product_id\": null, \"blocked_qty\": 0, \"live_status\": \"live\", \"live_item_id\": …",
+        "rpc_b1": "200 {\"ok\": true, \"price\": 17.5, \"live_id\": \"ef845cc5-89bd-473d-bc4b-bb78a7e0eaa0\", \"ref_code\": \"CG2808\", \"item_kind\": \"live_only\", \"total_qty\": 4, \"product_id\": null, \"blocked_qty\": 0, \"live_status\": \"live\", \"live_item_id\": …"
+      },
+      "proven": true,
+      "count_exact_closed": false,
+      "evidence": {}
+    },
+    {
+      "id": "CG1-LIVES-DIR-UNPUB",
+      "lens": "CG1",
+      "severity": "P2",
+      "title": "JWT lista directos de loja unpublished (Hub discovery [])",
+      "actor": "B1",
+      "pre": "S2 hub off; lives air+sched+ended",
+      "repro": "GET lives?seller_id=eq.7574429a-0ffc-4dc5-a1d9-a2e6a1c9ccb0&select=id,status,title",
+      "expected": "[] ou só se Hub publicado",
+      "obtained": "200 [{\"id\":\"ef845cc5-89bd-473d-bc4b-bb78a7e0eaa0\",\"status\":\"live\",\"is_active\":true,\"seller_id\":\"7574429a-0ffc-4dc5-a1d9-a2e6a1c9ccb0\",\"title\":\"RTCG-20260906T1235 air-unpub\",\"viewer_count\":0}, \n {\"id\":\"f38c45fb-1396-475e-9787…",
+      "proven": true,
+      "count_exact_closed": false,
+      "evidence": {}
+    }
+  ],
+  "blocked": [
+    {
+      "id": "cg1.resolve.unpub",
+      "lens": "CG1",
+      "title": "resolve unpublished not_found",
+      "ev": "200 {\"error\": \"not_found\", \"found\": false, \"http_status\": 404}"
+    },
+    {
+      "id": "cg1.prof.disc",
+      "lens": "CG1",
+      "title": "profiles discovery esconde unpublished",
+      "ev": "200 []"
+    },
+    {
+      "id": "cg1.profiles.rest",
+      "lens": "CG1",
+      "title": "profiles REST esconde unpublished",
+      "ev": "200 []"
+    },
+    {
+      "id": "cg1.hubrev",
+      "lens": "CG1",
+      "title": "hub_reviews esconde unpublished",
+      "ev": "200 []"
+    },
+    {
+      "id": "cg1.stock.OK",
+      "lens": "CG1",
+      "title": "Hub mostra SKU vivo OK",
+      "ev": "200 [{\"id\":\"9c2386d2-b9a9-46af-8780-1de531b6ba9a\",\"title\":\"RTCG-20260906T1235 qty-ok\",\"price\":14.0,\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"seller_handle\":\"fleahub-demo-ux\",\"is_sold\":false}]"
+    },
+    {
+      "id": "cg1.fomo.unpub",
+      "lens": "CG1",
+      "title": "FOMO unpublished recusado",
+      "ev": "200 {\"ok\": false, \"error\": \"live_not_public\"}"
+    },
+    {
+      "id": "cg5.rm.unpub",
+      "lens": "CG5",
+      "title": "resolve-mux unpublished 404",
+      "ev": "404 acao=* {\"error\":\"live_not_public\"}"
+    },
+    {
+      "id": "cg5.rm.owner.split",
+      "lens": "CG5",
+      "title": "só dono resolve unpublished (studio)",
+      "ev": "200 acao=* {\"playback_id\":\"00ErJWBwqaXL00hlMxr015H4o00prdwhoNeSwu1959nO59c\",\"playback_url\":\"https://stream.mux.com/00ErJWBwqaXL00hlMxr015H4o00prdwhoNeSwu1959nO59c.m3u8?reduced_latency=true\",\"source\":\"live_active\",\"is_live\":true}"
+    },
+    {
+      "id": "cg5.embed",
+      "lens": "CG5",
+      "title": "embed sem mux",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table lives\"}"
+    }
+  ],
+  "notes": [
+    {
+      "id": "fix.s1",
+      "lens": "CG1",
+      "title": "S1 profile",
+      "ev": {
+        "id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+        "handle": "fleahub-demo-ux",
+        "handle_suggested": "axinoquaa",
+        "hub_published": true,
+        "user_type": "vendedor",
+        "full_name": "Maria Demo FleaHub",
+        "is_live": false,
+        "photo_url": "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=800&auto=format&fit=crop"
+      }
+    },
+    {
+      "id": "fix.s2",
+      "lens": "CG1",
+      "title": "S2 unpublished",
+      "ev": {
+        "id": "7574429a-0ffc-4dc5-a1d9-a2e6a1c9ccb0",
+        "handle": null,
+        "handle_suggested": null,
+        "hub_published": false,
+        "user_type": "vendedor",
+        "full_name": "rtcg-20260906t1235-s2",
+        "is_live": false,
+        "photo_url": null
+      }
+    },
+    {
+      "id": "fix.review",
+      "lens": "CG1",
+      "title": "review S2",
+      "ev": "201 [{\"id\":\"ff52243e-edbc-40b7-8e53-a534e453cc29\",\"created_at\":\"2026-09-06T11:36:42.885431+00:00\",\"target_id\":\"7574429a-0ffc-4dc5-a1d9-a2e6a1c9ccb0\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"stars\":5,\"comment\":\"RTCG…"
+    },
+    {
+      "id": "cg1.resolve.unpub",
+      "lens": "CG1",
+      "title": "resolve unpublished handle",
+      "ev": "200 {\"error\": \"not_found\", \"found\": false, \"http_status\": 404}"
+    },
+    {
+      "id": "cg1.resolve.slug",
+      "lens": "CG1",
+      "title": "resolve discovery slug S2",
+      "ev": "200 {\"error\": \"not_found\", \"found\": false, \"http_status\": 404}"
+    },
+    {
+      "id": "cg1.redirect.insert",
+      "lens": "CG1",
+      "title": "redirect to unpublished",
+      "ev": "201 [{\"old_handle\":\"rtcg-old-unpub-1235\",\"profile_id\":\"7574429a-0ffc-4dc5-a1d9-a2e6a1c9ccb0\",\"new_handle\":\"rtcg1235s2\",\"replaced_at\":\"2026-09-06T11:36:43.601529+00:00\",\"redirect_until\":null}]"
+    },
+    {
+      "id": "cg1.resolve.redirect",
+      "lens": "CG1",
+      "title": "resolve via redirect unpublished",
+      "ev": "200 {\"found\": true, \"handle\": \"rtcg1235s2\", \"profile_id\": null, \"http_status\": 301, \"redirect_to\": \"rtcg1235s2\", \"hub_published\": null}"
+    },
+    {
+      "id": "cg1.pub.airUnpub",
+      "lens": "CG1",
+      "title": "hub_lives_public",
+      "ev": "200 []"
+    },
+    {
+      "id": "cg1.disc.airUnpub",
+      "lens": "CG1",
+      "title": "hub_lives_discovery_public",
+      "ev": "200 []"
+    },
+    {
+      "id": "cg1.pub.schedUnpub",
+      "lens": "CG1",
+      "title": "hub_lives_public",
+      "ev": "200 []"
+    },
+    {
+      "id": "cg1.disc.schedUnpub",
+      "lens": "CG1",
+      "title": "hub_lives_discovery_public",
+      "ev": "200 []"
+    },
+    {
+      "id": "cg1.pub.endedUnpub",
+      "lens": "CG1",
+      "title": "hub_lives_public",
+      "ev": "200 []"
+    },
+    {
+      "id": "cg1.disc.endedUnpub",
+      "lens": "CG1",
+      "title": "hub_lives_discovery_public",
+      "ev": "200 []"
+    },
+    {
+      "id": "cg1.pub.airPub",
+      "lens": "CG1",
+      "title": "hub_lives_public",
+      "ev": "200 [{\"id\":\"0740061f-c380-4774-81c6-2d877ec36072\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"seller_handle\":\"fleahub-demo-ux\",\"title\":\"RTCG-20260906T1235 air-pub\",\"status\":\"live\",\"is_active\":true,\"mux_playback_id\":\"…"
+    },
+    {
+      "id": "cg1.disc.airPub",
+      "lens": "CG1",
+      "title": "hub_lives_discovery_public",
+      "ev": "200 [{\"id\":\"0740061f-c380-4774-81c6-2d877ec36072\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"seller_handle\":\"fleahub-demo-ux\",\"seller_name\":\"Maria Demo FleaHub\",\"seller_photo_url\":\"https://images.unsplash.com/photo-…"
+    },
+    {
+      "id": "cg1.prof.pub",
+      "lens": "CG1",
+      "title": "hub_profiles_public S2",
+      "ev": "200 []"
+    },
+    {
+      "id": "cg1.prof.disc",
+      "lens": "CG1",
+      "title": "hub_profiles_discovery S2",
+      "ev": "200 []"
+    },
+    {
+      "id": "cg1.profiles.anon",
+      "lens": "CG1",
+      "title": "profiles REST anon S2",
+      "ev": "401 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table profiles\"}"
+    },
+    {
+      "id": "cg1.profiles.b1",
+      "lens": "CG1",
+      "title": "profiles REST B1 S2",
+      "ev": "200 []"
+    },
+    {
+      "id": "cg1.profiles.search",
+      "lens": "CG1",
+      "title": "profiles handle eq B1",
+      "ev": "200 []"
+    },
+    {
+      "id": "cg1.search.ilike",
+      "lens": "CG1",
+      "title": "discovery ilike handle",
+      "ev": "200 []"
+    },
+    {
+      "id": "cg1.follow.insert",
+      "lens": "CG1",
+      "title": "B1 segue S2 unpublished",
+      "ev": "201 [{\"id\":\"7fc4b5bc-7fd9-4eda-883f-878e2f03b85d\",\"follower_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"following_id\":\"7574429a-0ffc-4dc5-a1d9-a2e6a1c9ccb0\",\"created_at\":\"2026-09-06T11:36:46.912396+00:00\"}]"
+    },
+    {
+      "id": "cg1.follow.get",
+      "lens": "CG1",
+      "title": "GET follows S2",
+      "ev": "200 [{\"id\":\"7fc4b5bc-7fd9-4eda-883f-878e2f03b85d\",\"follower_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"following_id\":\"7574429a-0ffc-4dc5-a1d9-a2e6a1c9ccb0\"}]"
+    },
+    {
+      "id": "cg1.fav.insert",
+      "lens": "CG1",
+      "title": "favorite produto unpublished",
+      "ev": "201 [{\"id\":\"b78d5f2d-4c6b-4614-bec5-a6864e8910d3\",\"user_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"product_id\":\"16dec8a6-f72d-401f-bc73-e407c78e19ad\",\"created_at\":\"2026-09-06T11:36:47.397693+00:00\"}]"
+    },
+    {
+      "id": "cg1.fav.get",
+      "lens": "CG1",
+      "title": "GET favorites unpublished sku",
+      "ev": "200 [{\"id\":\"b78d5f2d-4c6b-4614-bec5-a6864e8910d3\",\"product_id\":\"16dec8a6-f72d-401f-bc73-e407c78e19ad\"}]"
+    },
+    {
+      "id": "cg1.reviews.hub",
+      "lens": "CG1",
+      "title": "hub_reviews_public S2",
+      "ev": "200 []"
+    },
+    {
+      "id": "cg1.reviews.b1",
+      "lens": "CG1",
+      "title": "reviews_gerais B1 S2",
+      "ev": "200 [{\"id\":\"ff52243e-edbc-40b7-8e53-a534e453cc29\",\"stars\":5,\"comment\":\"RTCG-20260906T1235 review unpublished shop\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"target_id\":\"7574429a-0ffc-4dc5-a1d9-a2e6a1c9ccb0\"}]"
+    },
+    {
+      "id": "cg1.reviews.anon",
+      "lens": "CG1",
+      "title": "reviews_gerais anon S2",
+      "ev": "401 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for view reviews_gerais\"}"
+    },
+    {
+      "id": "cg1.stock.hub.UNPUB",
+      "lens": "CG1",
+      "title": "hub_products UNPUB",
+      "ev": "200 []"
+    },
+    {
+      "id": "cg1.stock.anon.UNPUB",
+      "lens": "CG1",
+      "title": "products anon UNPUB",
+      "ev": "401 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table products\"}"
+    },
+    {
+      "id": "cg1.stock.b1.UNPUB",
+      "lens": "CG1",
+      "title": "products B1 UNPUB",
+      "ev": "200 [{\"id\":\"16dec8a6-f72d-401f-bc73-e407c78e19ad\",\"title\":\"RTCG-20260906T1235 unpub-mkt\",\"price\":22.0,\"quantity\":5,\"seller_id\":\"7574429a-0ffc-4dc5-a1d9-a2e6a1c9ccb0\",\"list_on_marketplace\":true,\"is_sold\":false}]"
+    },
+    {
+      "id": "cg1.stock.hub.QTY0",
+      "lens": "CG1",
+      "title": "hub_products QTY0",
+      "ev": "200 []"
+    },
+    {
+      "id": "cg1.stock.anon.QTY0",
+      "lens": "CG1",
+      "title": "products anon QTY0",
+      "ev": "401 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table products\"}"
+    },
+    {
+      "id": "cg1.stock.b1.QTY0",
+      "lens": "CG1",
+      "title": "products B1 QTY0",
+      "ev": "200 [{\"id\":\"3a0d67e6-b6ce-499e-983d-487d806584da\",\"title\":\"RTCG-20260906T1235 qty0-dead\",\"price\":33.0,\"quantity\":0,\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"list_on_marketplace\":true,\"is_sold\":false}]"
+    },
+    {
+      "id": "cg1.stock.hub.OK",
+      "lens": "CG1",
+      "title": "hub_products OK",
+      "ev": "200 [{\"id\":\"9c2386d2-b9a9-46af-8780-1de531b6ba9a\",\"title\":\"RTCG-20260906T1235 qty-ok\",\"price\":14.0,\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"seller_handle\":\"fleahub-demo-ux\",\"is_sold\":false}]"
+    },
+    {
+      "id": "cg1.stock.anon.OK",
+      "lens": "CG1",
+      "title": "products anon OK",
+      "ev": "401 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table products\"}"
+    },
+    {
+      "id": "cg1.stock.b1.OK",
+      "lens": "CG1",
+      "title": "products B1 OK",
+      "ev": "200 [{\"id\":\"9c2386d2-b9a9-46af-8780-1de531b6ba9a\",\"title\":\"RTCG-20260906T1235 qty-ok\",\"price\":14.0,\"quantity\":2,\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"list_on_marketplace\":true,\"is_sold\":false}]"
+    },
+    {
+      "id": "cg1.li.hub",
+      "lens": "CG1",
+      "title": "hub_live_items unpublished",
+      "ev": "200 []"
+    },
+    {
+      "id": "cg1.li.disc",
+      "lens": "CG1",
+      "title": "hub_live_items_discovery unpublished",
+      "ev": "200 []"
+    },
+    {
+      "id": "cg1.li.anon",
+      "lens": "CG1",
+      "title": "live_items anon unpublished",
+      "ev": "401 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table profiles\"}"
+    },
+    {
+      "id": "cg1.li.b1",
+      "lens": "CG1",
+      "title": "live_items B1 unpublished",
+      "ev": "200 [{\"id\":\"dd3ba0ed-2ae3-461c-8d50-5f5a417f8c9e\",\"title\":\"RTCG-20260906T1235 unpub-sku\",\"price\":17.5,\"quantity\":4,\"live_id\":\"ef845cc5-89bd-473d-bc4b-bb78a7e0eaa0\",\"status\":\"available\"}]"
+    },
+    {
+      "id": "cg1.stockrpc.anon",
+      "lens": "CG1",
+      "title": "stock RPC anon unpublished",
+      "ev": "200 {\"ok\": true, \"price\": 17.5, \"live_id\": \"ef845cc5-89bd-473d-bc4b-bb78a7e0eaa0\", \"ref_code\": \"CG2808\", \"item_kind\": \"live_only\", \"total_qty\": 4, \"product_id\": null, \"blocked_qty\": 0, \"live_status\": \"live\", \"live_item_id\": …"
+    },
+    {
+      "id": "cg1.stockrpc.b1",
+      "lens": "CG1",
+      "title": "stock RPC B1 unpublished",
+      "ev": "200 {\"ok\": true, \"price\": 17.5, \"live_id\": \"ef845cc5-89bd-473d-bc4b-bb78a7e0eaa0\", \"ref_code\": \"CG2808\", \"item_kind\": \"live_only\", \"total_qty\": 4, \"product_id\": null, \"blocked_qty\": 0, \"live_status\": \"live\", \"live_item_id\": …"
+    },
+    {
+      "id": "cg5.anon.mux.airUnpub",
+      "lens": "CG5",
+      "title": "anon mux cols",
+      "ev": "401 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table profiles\"}"
+    },
+    {
+      "id": "cg5.b1.mux.airUnpub",
+      "lens": "CG5",
+      "title": "B1 mux cols",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table lives\"}"
+    },
+    {
+      "id": "cg5.b1.safe.airUnpub",
+      "lens": "CG5",
+      "title": "B1 safe cols",
+      "ev": "200 [{\"id\":\"ef845cc5-89bd-473d-bc4b-bb78a7e0eaa0\",\"status\":\"live\",\"is_active\":true,\"seller_id\":\"7574429a-0ffc-4dc5-a1d9-a2e6a1c9ccb0\",\"title\":\"RTCG-20260906T1235 air-unpub\",\"viewer_count\":0}]"
+    },
+    {
+      "id": "cg5.s2.mux.airUnpub",
+      "lens": "CG5",
+      "title": "S2 owner mux",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table lives\"}"
+    },
+    {
+      "id": "cg5.anon.mux.schedUnpub",
+      "lens": "CG5",
+      "title": "anon mux cols",
+      "ev": "401 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table profiles\"}"
+    },
+    {
+      "id": "cg5.b1.mux.schedUnpub",
+      "lens": "CG5",
+      "title": "B1 mux cols",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table lives\"}"
+    },
+    {
+      "id": "cg5.b1.safe.schedUnpub",
+      "lens": "CG5",
+      "title": "B1 safe cols",
+      "ev": "200 [{\"id\":\"f38c45fb-1396-475e-9787-aa1884105ac4\",\"status\":\"scheduled\",\"is_active\":false,\"seller_id\":\"7574429a-0ffc-4dc5-a1d9-a2e6a1c9ccb0\",\"title\":\"RTCG-20260906T1235 sched-unpub\",\"viewer_count\":0}]"
+    },
+    {
+      "id": "cg5.s2.mux.schedUnpub",
+      "lens": "CG5",
+      "title": "S2 owner mux",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table lives\"}"
+    },
+    {
+      "id": "cg5.anon.mux.endedUnpub",
+      "lens": "CG5",
+      "title": "anon mux cols",
+      "ev": "401 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table profiles\"}"
+    },
+    {
+      "id": "cg5.b1.mux.endedUnpub",
+      "lens": "CG5",
+      "title": "B1 mux cols",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table lives\"}"
+    },
+    {
+      "id": "cg5.b1.safe.endedUnpub",
+      "lens": "CG5",
+      "title": "B1 safe cols",
+      "ev": "200 []"
+    },
+    {
+      "id": "cg5.s2.mux.endedUnpub",
+      "lens": "CG5",
+      "title": "S2 owner mux",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table lives\"}"
+    },
+    {
+      "id": "cg1.lives.dir.b1",
+      "lens": "CG1",
+      "title": "B1 directory S2 lives",
+      "ev": "200 [{\"id\":\"ef845cc5-89bd-473d-bc4b-bb78a7e0eaa0\",\"status\":\"live\",\"is_active\":true,\"seller_id\":\"7574429a-0ffc-4dc5-a1d9-a2e6a1c9ccb0\",\"title\":\"RTCG-20260906T1235 air-unpub\",\"viewer_count\":0}, \n {\"id\":\"f38c45fb-1396-475e-9787…"
+    },
+    {
+      "id": "cg1.fomo.unpub",
+      "lens": "CG1",
+      "title": "FOMO unpublished air",
+      "ev": "200 {\"ok\": false, \"error\": \"live_not_public\"}"
+    },
+    {
+      "id": "cg5.rm.anon",
+      "lens": "CG5",
+      "title": "resolve-mux unpublished anon",
+      "ev": "404 acao=* {\"error\":\"live_not_public\"}"
+    },
+    {
+      "id": "cg5.rm.b1",
+      "lens": "CG5",
+      "title": "resolve-mux unpublished B1",
+      "ev": "404 acao=* {\"error\":\"live_not_public\"}"
+    },
+    {
+      "id": "cg5.rm.s2",
+      "lens": "CG5",
+      "title": "resolve-mux unpublished owner",
+      "ev": "200 acao=* {\"playback_id\":\"00ErJWBwqaXL00hlMxr015H4o00prdwhoNeSwu1959nO59c\",\"playback_url\":\"https://stream.mux.com/00ErJWBwqaXL00hlMxr015H4o00prdwhoNeSwu1959nO59c.m3u8?reduced_latency=true\",\"source\":\"live_active\",\"is_live\":true}"
+    },
+    {
+      "id": "cg5.embed",
+      "lens": "CG5",
+      "title": "embed lives(*) unpublished item",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table lives\"}"
+    }
+  ],
+  "skipped": [],
+  "createdLiveIds": [
+    "0740061f-c380-4774-81c6-2d877ec36072",
+    "ef845cc5-89bd-473d-bc4b-bb78a7e0eaa0",
+    "f38c45fb-1396-475e-9787-aa1884105ac4",
+    "485d3a24-aba2-43d3-9daa-08ed7bc60cc7",
+    "8ae1795b-46de-46fd-b225-00532e856aaf"
+  ],
+  "createdItemIds": [
+    "dd3ba0ed-2ae3-461c-8d50-5f5a417f8c9e",
+    "0c31506c-b833-4a2b-bafc-8c7d30fe35b3"
+  ],
+  "createdProductIds": [
+    "16dec8a6-f72d-401f-bc73-e407c78e19ad",
+    "3a0d67e6-b6ce-499e-983d-487d806584da",
+    "9c2386d2-b9a9-46af-8780-1de531b6ba9a"
+  ]
+}

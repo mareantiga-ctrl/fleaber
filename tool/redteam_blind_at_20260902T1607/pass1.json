@@ -1,0 +1,667 @@
+{
+  "stamp": "20260902T1607",
+  "prefix": "RTAT-20260902T1607",
+  "auditor": "REDTEAM_BLIND_AT_MARKETPLACE_POS_ANAS_v1",
+  "lenses": [
+    "AT1",
+    "AT2",
+    "AT3",
+    "AT4",
+    "AT5",
+    "AT6",
+    "AT7",
+    "AT8"
+  ],
+  "findings": [
+    {
+      "id": "AT3-03",
+      "lens": "AT3",
+      "severity": "P1",
+      "title": "Detach product_offer_id mantém contrato de oferta e reaplica tier do saco",
+      "actor": "buyer JWT",
+      "pre": "orders seladas a 10€ com oferta; PATCH offer_id=null",
+      "repro": "PATCH orders product_offer_id=null; bag checkout 2 linhas; comparar server_amount_cents",
+      "expected": "offer_id imutável OU checkout sem tier sobre preço de oferta (≈ 2165) OU regressão a catálogo",
+      "obtained": "server_amount_cents=1955 (stack oferta+tier ≈ 1955)",
+      "proven": true,
+      "evidence": {
+        "detach": "200 [{\"id\":\"9eabd932-e0e3-49ed-8829-ce8709696483\",\"created_at\":\"2026-09-02T15:18:53.843905+00:00\",\"product_id\":\"df46bfee-5114-4e34-866e-399dd3324437\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c…",
+        "cpi": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1X89zzofDScpfBM1EUfdMnyIZVPoc7je9BByCwpBMbwDJy6obqR7xvhx7#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21…",
+        "rowA": {
+          "id": "9eabd932-e0e3-49ed-8829-ce8709696483",
+          "status": "reserva_pendente",
+          "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+          "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+          "product_id": "df46bfee-5114-4e34-866e-399dd3324437",
+          "quantity": 1,
+          "price_total": 10.83,
+          "amount_paid_cents": "",
+          "payment_method": "Pagamento na app",
+          "shipping_method": "entrega em mão",
+          "stripe_payment_intent_id": "",
+          "stripe_checkout_session_id": "cs_test_a1nBVPXNe3kIEbSnCcGWh02ahY9JarZEaLdnnVsfN0W9pjc81dH144SV3B",
+          "stripe_refund_id": "",
+          "contract_unit_cents": 1000,
+          "contract_qty": 1,
+          "bundle_id": "",
+          "product_offer_id": "",
+          "stock_units_applied": ""
+        },
+        "rowB": {
+          "id": "b17d79ca-c045-4d1c-beed-9f770282f897",
+          "status": "reserva_pendente",
+          "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+          "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+          "product_id": "b3896674-b339-417c-b7c5-9bf0b340f2bc",
+          "quantity": 1,
+          "price_total": 10.82,
+          "amount_paid_cents": "",
+          "payment_method": "Pagamento na app",
+          "shipping_method": "entrega em mão",
+          "stripe_payment_intent_id": "",
+          "stripe_checkout_session_id": "cs_test_a1nBVPXNe3kIEbSnCcGWh02ahY9JarZEaLdnnVsfN0W9pjc81dH144SV3B",
+          "stripe_refund_id": "",
+          "contract_unit_cents": 1000,
+          "contract_qty": 1,
+          "bundle_id": "",
+          "product_offer_id": "",
+          "stock_units_applied": ""
+        }
+      }
+    },
+    {
+      "id": "AT2-01b",
+      "lens": "AT2",
+      "severity": "P3",
+      "title": "Compact UUID: reuse do saco nunca acerta (metadata sem hífens ≠ ids com hífens); expire ainda mata a 1.ª",
+      "actor": "buyer JWT",
+      "pre": "saco 2 orders; 2.º POST",
+      "repro": "2× bag_checkout; comparar cs_ e GET checkoutUrl",
+      "expected": "reused_session=true mesma cs_",
+      "obtained": "sid1≠sid2 reused=false alive1=expired (expire OK, reuse quebrado)",
+      "proven": true,
+      "evidence": {
+        "sid1": "cs_test_a1cHjpSfxbnCPx7t75bmJ9oOLn2N7kI96jZq5t2MLLdXuUg36BkFywV9s2",
+        "sid2": "cs_test_a1zF5n3eVXkUpl60Xj7RlUn1Q3uNBhZmLatC6IOoL5nZW0y51Q4blWMe4d",
+        "alive1": "expired"
+      }
+    },
+    {
+      "id": "AT6-02",
+      "lens": "AT6",
+      "severity": "P1",
+      "title": "Corrida: 2 Sessions no mesmo saco",
+      "actor": "buyer JWT",
+      "pre": "saco 2 orders",
+      "repro": "Future.wait 2× bag_checkout",
+      "expected": "1 cs_ partilhada",
+      "obtained": "sids={cs_test_a1gZVuung8MKncR4AKFrmE2OPUGSOAZhXDYlqbOcAmXkiB4ikKlj4EdfOd, cs_test_a1WkDAjhRVNMLtRJnVyJviPmQ6AZdJKWJ37oF09r7G6dLXkxLcyNT3pRON}",
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "AT7-03",
+      "lens": "AT7",
+      "severity": "P2",
+      "title": "B2 PATCH order de B1",
+      "actor": "buyer2 JWT",
+      "pre": "order buyer=B1",
+      "repro": "PATCH orders shipping_method",
+      "expected": "4xx",
+      "obtained": "200 []",
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "AT7-04",
+      "lens": "AT7",
+      "severity": "P1",
+      "title": "S2 aceita bundle de S1",
+      "actor": "seller2 JWT",
+      "pre": "bundle seller_id=S1",
+      "repro": "PATCH product_bundles status=accepted JWT S2",
+      "expected": "4xx",
+      "obtained": "200 []",
+      "proven": true,
+      "evidence": {}
+    }
+  ],
+  "blocked": [
+    {
+      "id": "AT3-01",
+      "lens": "AT3",
+      "title": "Buyer PATCH discounts sem mutação (HTTP 200 0-row)",
+      "ev": "before=10.0 after=10.0 body=200 []"
+    },
+    {
+      "id": "AT1-01",
+      "lens": "AT1",
+      "title": "INSERT contract_unit_cents=1",
+      "ev": "http=201 sealed=1200"
+    },
+    {
+      "id": "AT1-02",
+      "lens": "AT1",
+      "title": "PATCH contract_unit_cents",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"order_money_fields_immutable\"}"
+    },
+    {
+      "id": "AT1-03",
+      "lens": "AT1",
+      "title": "Order qty=2 com product_offer_id aceite",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"offer_quantity_must_be_one\"}"
+    },
+    {
+      "id": "AT3-02",
+      "lens": "AT3",
+      "title": "saco oferta sem tier extra",
+      "ev": "amt=2165 want=2165"
+    },
+    {
+      "id": "AT1-04",
+      "lens": "AT1",
+      "title": "body amount/currency ignorado ou bloqueado",
+      "ev": "http=400 amt=null Checkout blocked: only EUR is supported."
+    },
+    {
+      "id": "AT3-04",
+      "lens": "AT3",
+      "title": "INSERT bundle status=accepted total forjado (regressão ANAS)",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"bundle_status_pending_only\"}"
+    },
+    {
+      "id": "AT3-05",
+      "lens": "AT3",
+      "title": "buyer discount_pct forçado a 0",
+      "ev": {
+        "id": "bb79ec22-2452-42ed-bd32-45fc78209d18",
+        "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+        "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+        "chat_id": "",
+        "product_ids": [
+          "bcc3426c-4cfd-426e-af81-b1508007751b",
+          "ef07f02e-8a25-4450-869b-1021f963e345"
+        ],
+        "subtotal_eur": 16.0,
+        "discount_pct": 0.0,
+        "discount_eur": 0.0,
+        "total_eur": 16.0,
+        "status": "pending",
+        "created_at": "2026-09-02T15:18:59.945316+00:00",
+        "responded_at": ""
+      }
+    },
+    {
+      "id": "AT3-06",
+      "lens": "AT3",
+      "title": "Buyer PATCH bundle → accepted + total forjado",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"bundle_accept_seller_only\"}"
+    },
+    {
+      "id": "AT3-07",
+      "lens": "AT3",
+      "title": "seller total_eur recalculado ou negado",
+      "ev": "http=200 total=16.0"
+    },
+    {
+      "id": "AT3-08",
+      "lens": "AT3",
+      "title": "accepted freeze discount/total",
+      "ev": "http=200 frozen={id: bb79ec22-2452-42ed-bd32-45fc78209d18, status: accepted, total_eur: 8.0, discount_pct: 50.0}"
+    },
+    {
+      "id": "AT3-09",
+      "lens": "AT3",
+      "title": "mix 2 bundle_id bloqueado",
+      "ev": "400 {\"error\":\"Checkout blocked: bag cannot mix multiple bundle contracts.\"}"
+    },
+    {
+      "id": "AT2-02",
+      "lens": "AT2",
+      "title": "product_id drift bloqueado",
+      "ev": "400 {\"error\":\"Checkout blocked: bag product does not match order.\"}"
+    },
+    {
+      "id": "AT2-03",
+      "lens": "AT2",
+      "title": "bag_orders_json no body ignorado",
+      "ev": "legacy=292 base=292"
+    },
+    {
+      "id": "AT2-04",
+      "lens": "AT2",
+      "title": "saco 15 linhas cabe em metadata compacta",
+      "ev": "amt=1388"
+    },
+    {
+      "id": "AT2-05",
+      "lens": "AT2",
+      "title": "saco 16 linhas bloqueado (500 chars)",
+      "ev": "400 {\"error\":\"Checkout blocked: bag too large for payment metadata. Split the bag.\"}"
+    },
+    {
+      "id": "AT5-01",
+      "lens": "AT5",
+      "title": "2.ª hold stock=1 bloqueada",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"order_hold_exceeds_stock\"}"
+    },
+    {
+      "id": "AT5-02",
+      "lens": "AT5",
+      "title": "B2 hold no mesmo stock=1 já segurado por B1",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"order_hold_exceeds_stock\"}"
+    },
+    {
+      "id": "AT5-03",
+      "lens": "AT5",
+      "title": "INSERT qty=9 em stock=1",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"order_hold_exceeds_stock\"}"
+    },
+    {
+      "id": "AT6-01",
+      "lens": "AT6",
+      "title": "corrida single → 1 Session",
+      "ev": [
+        "cs_test_a1dme5pmLbHwaw9PHKFfMckHoL1shHErn8fpojXwU0SEG8qG37blicmbll"
+      ]
+    },
+    {
+      "id": "AT4-01",
+      "lens": "AT4",
+      "title": "CPI pós-pago bloqueado",
+      "ev": "400 {\"error\":\"Checkout blocked: order status 'pago' cannot start payment.\"}"
+    },
+    {
+      "id": "AT4-02",
+      "lens": "AT4",
+      "title": "Buyer PATCH cancelado após pago",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"order_cancel_denied_post_pay\"}"
+    },
+    {
+      "id": "AT4-03",
+      "lens": "AT4",
+      "title": "buyer refund-order recusado",
+      "ev": "403 {\"ok\":false,\"error\":\"Sem permissão.\"}"
+    },
+    {
+      "id": "AT7-01",
+      "lens": "AT7",
+      "title": "B2 refund-order da venda B1",
+      "ev": "403 {\"ok\":false,\"error\":\"Sem permissão.\"}"
+    },
+    {
+      "id": "AT7-02",
+      "lens": "AT7",
+      "title": "B2 CPI order B1 bloqueado",
+      "ev": "400 {\"error\":\"Invalid checkout user.\"}"
+    },
+    {
+      "id": "AT8-01",
+      "lens": "AT8",
+      "title": "amount_paid_cents proporcional no saco pago",
+      "ev": {
+        "paidA": 335,
+        "paidB": 780,
+        "pi": 1115
+      }
+    },
+    {
+      "id": "AT4-04",
+      "lens": "AT4",
+      "title": "CPI saco-pago bloqueado",
+      "ev": "400 {\"error\":\"Checkout blocked: order status 'pago' cannot start payment.\"}"
+    }
+  ],
+  "skipped": [],
+  "notes": [
+    {
+      "id": "actors",
+      "title": "JWT B1/S1/B2/S2",
+      "ev": {
+        "b1": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+        "s1": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+        "b2": "6dc33f8f-1560-481c-9142-7e09e5719bf1",
+        "s2": "7b116e98-7b43-487f-b8ad-8c011e6203c9",
+        "wallets0": {
+          "buyer": 61.1,
+          "seller": 15.0,
+          "buyer2": "",
+          "seller2": ""
+        }
+      }
+    },
+    {
+      "id": "tier.upsert",
+      "lens": "AT3",
+      "title": "seller_bundle_discounts",
+      "ev": "200 [{\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"enabled\":true,\"tier_2_pct\":10.00,\"tier_3_pct\":20.00,\"tier_5_pct\":30.00,\"updated_at\":\"2026-07-03T12:47:31.973436+00:00\",\"custom_tiers\":[{\"pct\": 25, \"min_items\": 4}]}]"
+    },
+    {
+      "id": "AT1.offer.seal",
+      "lens": "AT1",
+      "title": "contrato após oferta",
+      "ev": {
+        "A": 1000,
+        "B": 1000,
+        "offerA": "4339735a-23e4-48ae-a15d-6c87cad4b8d5",
+        "offerB": "c7b2f473-f06e-4b54-9a9b-8afbdf6c1442"
+      }
+    },
+    {
+      "id": "AT3.bag.offer",
+      "lens": "AT3",
+      "title": "saco com ofertas seladas",
+      "ev": {
+        "http": 200,
+        "amt": 2165,
+        "wantNoTier": 2165,
+        "wantPlusTier": 1955,
+        "err": "{\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1nBVPXNe3kIEbSnCcGWh02ahY9JarZEaLdnnVsfN0W9pjc81dH144SV3B#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21oYWlsUnxrVkRhQUQyNlJjSWBCN3BXNXVvVT1hamlcf3Fjd1dRMGJmREk9Yz09PH1CMzVTY0pBXD1kMU5HZl1da05gf0s1XGQ1NWA3bVFBNzNMJyknY3dqaFZ…"
+      }
+    },
+    {
+      "id": "AT3.detach",
+      "lens": "AT3",
+      "title": "PATCH product_offer_id null",
+      "ev": {
+        "httpA": 200,
+        "httpB": 200,
+        "offerA": "",
+        "offerB": "",
+        "centsA": 1000,
+        "centsB": 1000
+      }
+    },
+    {
+      "id": "AT3.detach.cpi",
+      "lens": "AT3",
+      "title": "checkout após detach",
+      "ev": {
+        "http": 200,
+        "amt": 1955,
+        "wantStack": 1955,
+        "wantOffer": 2165
+      }
+    },
+    {
+      "id": "AT3.bun.ins",
+      "lens": "AT3",
+      "title": "pending rewrite",
+      "ev": {
+        "status": "pending",
+        "total": 16.0,
+        "pct": 0.0
+      }
+    },
+    {
+      "id": "AT3.seller.total",
+      "lens": "AT3",
+      "title": "seller PATCH total_eur=0.50",
+      "ev": {
+        "http": 200,
+        "total": 16.0,
+        "row": {
+          "id": "bb79ec22-2452-42ed-bd32-45fc78209d18",
+          "status": "pending",
+          "total_eur": 16.0,
+          "discount_pct": 0.0,
+          "subtotal_eur": 16.0
+        }
+      }
+    },
+    {
+      "id": "AT3.seller.accept",
+      "lens": "AT3",
+      "title": "seller accept+50%",
+      "ev": {
+        "http": 200,
+        "row": {
+          "id": "bb79ec22-2452-42ed-bd32-45fc78209d18",
+          "status": "accepted",
+          "total_eur": 8.0,
+          "discount_pct": 50.0
+        }
+      }
+    },
+    {
+      "id": "AT2.n",
+      "lens": "AT2",
+      "title": "produtos/orders saco",
+      "ev": {
+        "products": 16,
+        "orders": 16
+      }
+    },
+    {
+      "id": "AT2.cpi1",
+      "lens": "AT2",
+      "title": "primeiro saco 2 linhas",
+      "ev": {
+        "http": 200,
+        "sid": "cs_test_a1cHjpSfxbnCPx7t75bmJ9oOLn2N7kI96jZq5t2MLLdXuUg36BkFywV9s2",
+        "amt": 292,
+        "reused": false,
+        "url": true
+      }
+    },
+    {
+      "id": "AT2.cpi2",
+      "lens": "AT2",
+      "title": "segundo saco mesmas linhas",
+      "ev": {
+        "http": 200,
+        "sid": "cs_test_a1zF5n3eVXkUpl60Xj7RlUn1Q3uNBhZmLatC6IOoL5nZW0y51Q4blWMe4d",
+        "amt": 292,
+        "reused": false
+      }
+    },
+    {
+      "id": "AT2.alive",
+      "lens": "AT2",
+      "title": "1.ª Session após 2.º POST",
+      "ev": {
+        "alive": "expired",
+        "sid1": "cs_test_a1cHjpSfxbnCPx7t75bmJ9oOLn2N7kI96jZq5t2MLLdXuUg36BkFywV9s2",
+        "sid2": "cs_test_a1zF5n3eVXkUpl60Xj7RlUn1Q3uNBhZmLatC6IOoL5nZW0y51Q4blWMe4d",
+        "row0": "cs_test_a1zF5n3eVXkUpl60Xj7RlUn1Q3uNBhZmLatC6IOoL5nZW0y51Q4blWMe4d",
+        "row1": "cs_test_a1zF5n3eVXkUpl60Xj7RlUn1Q3uNBhZmLatC6IOoL5nZW0y51Q4blWMe4d"
+      }
+    },
+    {
+      "id": "AT2.legacy",
+      "lens": "AT2",
+      "title": "body bag_orders_json extra",
+      "ev": {
+        "http": 200,
+        "amt": 292,
+        "sid": "cs_test_a1TgLOwaOehyYST1JS3xDiRqCFiAFn5Wzlv6AhzasbQylAhtAFMHNez4Sx"
+      }
+    },
+    {
+      "id": "AT2.15",
+      "lens": "AT2",
+      "title": "saco 15 UUIDs compactos (~494 chars)",
+      "ev": {
+        "http": 200,
+        "amt": 1388,
+        "err": "{\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1TARvfHCtfBhmWuasKAWIORJlWxbT6SRVZgPJj19SC628pArgf5BS2cFW#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21oYWlsUnxrVkRhQUQyNlJjSWBCN3BXNXVvVT1hamlcf3Fjd1dRMGJmREk9Yz09PH1CMzVTY0pBXD1kMU5HZl1da05gf0s1XGQ1NWA3bVFBNzNMJyknY3dqaFZ…"
+      }
+    },
+    {
+      "id": "AT6.parallel",
+      "lens": "AT6",
+      "title": "Future.wait 2× CPI same order",
+      "ev": {
+        "http": [
+          200,
+          200
+        ],
+        "sids": [
+          "cs_test_a1dme5pmLbHwaw9PHKFfMckHoL1shHErn8fpojXwU0SEG8qG37blicmbll"
+        ],
+        "reused": [
+          false,
+          true
+        ],
+        "amts": [
+          695,
+          695
+        ]
+      }
+    },
+    {
+      "id": "AT6.bag",
+      "lens": "AT6",
+      "title": "Future.wait 2× bag CPI",
+      "ev": {
+        "http": [
+          200,
+          200
+        ],
+        "sids": [
+          "cs_test_a1gZVuung8MKncR4AKFrmE2OPUGSOAZhXDYlqbOcAmXkiB4ikKlj4EdfOd",
+          "cs_test_a1WkDAjhRVNMLtRJnVyJviPmQ6AZdJKWJ37oF09r7G6dLXkxLcyNT3pRON"
+        ],
+        "reused": [
+          false,
+          false
+        ]
+      }
+    },
+    {
+      "id": "AT4.paid",
+      "lens": "AT4",
+      "title": "setup_paid_order Stripe TEST",
+      "ev": "200 {\n  \"ok\": true,\n  \"order_id\": \"f3e40be0-a12a-492c-8875-fd45c2216cd1\",\n  \"product_id\": \"8fcfe10c-0adc-43f0-8b2b-42f4d8ca0ce7\",\n  \"payment_intent_id\": \"pi_3UBFwmH7FWYUN3jh1wz0840m\",\n  \"pi_status\": \"succeeded\",\n  \"pi_amount_received\": 590,\n  \"…"
+    },
+    {
+      "id": "AT4.row",
+      "lens": "AT4",
+      "title": "order paga",
+      "ev": {
+        "id": "f3e40be0-a12a-492c-8875-fd45c2216cd1",
+        "status": "pago",
+        "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+        "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+        "product_id": "8fcfe10c-0adc-43f0-8b2b-42f4d8ca0ce7",
+        "quantity": 1,
+        "price_total": 5.9,
+        "amount_paid_cents": 590,
+        "payment_method": "Pagamento na app",
+        "shipping_method": "",
+        "stripe_payment_intent_id": "pi_3UBFwmH7FWYUN3jh1wz0840m",
+        "stripe_checkout_session_id": "",
+        "stripe_refund_id": "",
+        "contract_unit_cents": 590,
+        "contract_qty": 1,
+        "bundle_id": "",
+        "product_offer_id": "",
+        "stock_units_applied": 1
+      }
+    },
+    {
+      "id": "AT8.bag",
+      "lens": "AT8",
+      "title": "setup_paid_bag Stripe TEST",
+      "ev": "200 {\n  \"ok\": true,\n  \"probe\": \"setup_paid_bag\",\n  \"payment_intent_id\": \"pi_3UBFwsH7FWYUN3jh1SDOebof\",\n  \"pi_amount_cents\": 1115,\n  \"total_cents_quote\": 1115,\n  \"items_cents\": 1000,\n  \"protection_cents\": 115,\n  \"share_a_cents\": 335,\n  \"share_b_…"
+    },
+    {
+      "id": "AT8.wallets",
+      "lens": "AT8",
+      "title": "Δ wallet após bag pago",
+      "ev": {
+        "before": {
+          "buyer": 61.1,
+          "seller": 15.0,
+          "buyer2": "",
+          "seller2": ""
+        },
+        "after": {
+          "buyer": 61.1,
+          "seller": 20.0,
+          "buyer2": "",
+          "seller2": ""
+        }
+      }
+    }
+  ],
+  "actors": {
+    "buyer": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+    "seller": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+    "buyer2": "6dc33f8f-1560-481c-9142-7e09e5719bf1",
+    "seller2": "7b116e98-7b43-487f-b8ad-8c011e6203c9"
+  },
+  "created": {
+    "orders": [
+      "5eceac04-5659-41d4-af44-6d80db8fb300",
+      "9eabd932-e0e3-49ed-8829-ce8709696483",
+      "b17d79ca-c045-4d1c-beed-9f770282f897",
+      "9ac0d028-150f-424a-9f2e-397f161e2091",
+      "722b8ccd-bd2d-483e-9f5e-f42ecfcd5375",
+      "73685fc1-6007-4303-82c3-28daf17b8563",
+      "efffc8e6-e79f-4d2c-8a34-19aa85984373",
+      "93277382-9a20-4c3f-b6db-fc662ef319bb",
+      "e85054d3-3183-4738-b4c6-57aa17983e65",
+      "ec7301af-8e16-44b1-93b1-de58f24823c0",
+      "e1d36dc7-38cf-45a1-945d-f6446638c481",
+      "6b9f89de-f0db-44c8-a1ee-89daf23ddcd8",
+      "4fe7a035-fc88-46d9-aaa3-24bbcedebdca",
+      "438e3f9a-ebfd-4976-a6b7-ee1fe4208e7e",
+      "b24c1378-f694-454d-9c76-bdcb255008ac",
+      "0ef4b4f3-314e-4e7c-91bf-35e5b40ac244",
+      "cd93f989-152a-41b3-934b-6849a6adfb6e",
+      "76042be4-4438-4d96-92aa-ebedfaab799c",
+      "9bfcd684-0a7c-4429-8140-ac363bb191fe",
+      "db002d69-27f5-4746-a527-f70c1aab076c",
+      "f93093ba-a24c-4425-8fd2-94044a623e22",
+      "c4abf073-e8d9-473e-bae9-9b2500b95864",
+      "6e085294-731e-4202-a158-ae3da2feb4b9",
+      "2d0475c8-2566-4f9b-a1ba-5b352689bc6d",
+      "b9a47148-cde7-41e7-b8c9-4c53c0589870",
+      "f3e40be0-a12a-492c-8875-fd45c2216cd1",
+      "f985a79b-0049-4743-9e4e-8e55b94dfd34",
+      "9aa5a86c-e036-4ed9-87be-1ae80dea69c0",
+      "fa49b223-b98a-4306-8e75-4918e9d24ec3"
+    ],
+    "products": [
+      "70264e49-06cd-42c1-ab55-e9b945c96f25",
+      "df46bfee-5114-4e34-866e-399dd3324437",
+      "b3896674-b339-417c-b7c5-9bf0b340f2bc",
+      "bcc3426c-4cfd-426e-af81-b1508007751b",
+      "ef07f02e-8a25-4450-869b-1021f963e345",
+      "f29992eb-2ae4-407b-8c0b-cb98a7a0e791",
+      "bfc11436-2c1a-4098-8733-e57edeafaad4",
+      "852664d4-0129-4b0a-a703-675eb697d117",
+      "f39c3b8f-1cb2-4743-899b-08cde158bf51",
+      "b19b2951-b4b1-491d-9ea2-151d947d35a8",
+      "14ee16e1-a0c3-4475-bd4f-e25c1fdb1a27",
+      "b2c8a727-dd00-4550-ad90-11a8acea0769",
+      "2550a3a9-8e5f-4dd7-aa1b-da2b1e2eead3",
+      "30b025cd-7da8-4dd8-a35c-df77589e4de2",
+      "102a4105-8d4f-4523-aa0d-ce9516470cd6",
+      "d3538f9c-6322-47fd-bd4b-76cf6bc61642",
+      "3f559257-9cd5-4fe7-806e-d4491f12c8ec",
+      "ef678611-bfed-4da1-a08b-627b2feff8ca",
+      "d00fe3a8-c80b-436e-a49f-7a783d8d4be2",
+      "f2a03edc-22ba-448a-9c36-1944059b5b7e",
+      "53b89bda-a416-40e7-bb2f-f6d88102c689",
+      "615c673b-5e3e-48d9-a168-f4be996e013f",
+      "766f8d7e-7a05-49fd-b475-527d1e8d2528",
+      "02693be8-841e-41b2-b250-70ae9e1caf9d",
+      "8977a7f6-25d0-4f03-9b3b-376c5c5de091",
+      "8fcfe10c-0adc-43f0-8b2b-42f4d8ca0ce7",
+      "a6d19a9c-6e57-42fe-869c-80c4d2f9b242",
+      "a3474efb-e5f8-4787-955a-e544db80690c",
+      "7313cf6f-01d2-4dfa-b2d0-3ba21e2aced9"
+    ],
+    "bundles": [
+      "bb79ec22-2452-42ed-bd32-45fc78209d18",
+      "626e5a5f-7b55-4dad-a8cd-10daf8b328b4",
+      "acb503b6-164a-4ea8-9eb0-8a3af0ea5664"
+    ],
+    "offers": [
+      "4339735a-23e4-48ae-a15d-6c87cad4b8d5",
+      "c7b2f473-f06e-4b54-9a9b-8afbdf6c1442"
+    ]
+  }
+}

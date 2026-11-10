@@ -1,0 +1,219 @@
+{
+  "stamp": "20260902T0730",
+  "prefix": "RTAH-20260902T0730",
+  "lenses": [
+    "AH2",
+    "AH3",
+    "AH6"
+  ],
+  "findings": [
+    {
+      "id": "AH2-BAG-RECOMPOSE-ORPHAN",
+      "lens": "AH2",
+      "severity": "P2",
+      "title": "Saco A+B depois A+C: BD deixa S1 na order B (S2 em A e C) — URL Stripe inconclusivo",
+      "actor": "buyer JWT",
+      "pre": "bag A+B depois A+C",
+      "repro": "2× bag_checkout; GET orders",
+      "expected": "S1 expirada e desligada de B",
+      "obtained": {
+        "s1": "cs_test_a1mMqkh3eWr0dNRkNq7aDeqtQ7jT7pRIAdlG1olC8yu1rjmv2a85wJ56T7",
+        "s2": "cs_test_a1vDCqYfpR11GL4ZUUX2GFcoCYPvnzPmmUK3Va264aIQA04ME3FJOjXcWQ",
+        "ob": "cs_test_a1mMqkh3eWr0dNRkNq7aDeqtQ7jT7pRIAdlG1olC8yu1rjmv2a85wJ56T7",
+        "url1": {
+          "http": 200,
+          "len": 552890,
+          "expired_copy": true,
+          "pay_ui": true,
+          "loc": "",
+          "snip": "<!doctype html><html lang=\"en\" translate=\"no\" class=\"App--classic\"><head><link rel=\"dns-prefetch\" href=\"https://api.stripe.com\"/><link rel=\"dns-prefetch\" href=\"https://merchant-ui-…"
+        }
+      },
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "AH2-SAME-AMT-WRONG-REUSE",
+      "lens": "AH2",
+      "severity": "P1",
+      "title": "Reuse errado mesmo montante linhas diferentes",
+      "actor": "buyer JWT",
+      "pre": "3 SKUs 10€",
+      "repro": "bag A+B; bag A+C",
+      "expected": "não reuse",
+      "obtained": "",
+      "proven": true,
+      "evidence": {}
+    }
+  ],
+  "blocked": [
+    {
+      "id": "AH2-SINGLE-THEN-BAG-ORPHAN",
+      "lens": "AH2",
+      "title": "single não ficou pagável",
+      "ev": {
+        "ss1": "",
+        "ss2": "",
+        "url": ""
+      }
+    },
+    {
+      "id": "AH3-BUNDLE-PARTIAL",
+      "lens": "AH3",
+      "title": "parcial accepted bloqueado",
+      "ev": "502 <html>\r\n<head><title>502 Bad Gateway</title></head>\r\n<body>\r\n<center><h1>502 Bad Gateway</h1></center>\r\n</body>\r\n</html>\r\n"
+    },
+    {
+      "id": "AH6-BAG-RACE-TWO-OPEN",
+      "lens": "AH6",
+      "title": "1 session",
+      "ev": []
+    }
+  ],
+  "skipped": [],
+  "notes": [
+    {
+      "id": "P2.RECOMPOSE",
+      "lens": "AH2",
+      "title": "bag A+B then A+C + URL probe",
+      "ev": {
+        "s1": "cs_test_a1mMqkh3eWr0dNRkNq7aDeqtQ7jT7pRIAdlG1olC8yu1rjmv2a85wJ56T7",
+        "s2": "cs_test_a1vDCqYfpR11GL4ZUUX2GFcoCYPvnzPmmUK3Va264aIQA04ME3FJOjXcWQ",
+        "reused2": false,
+        "amt1": 2690,
+        "amt2": 3530,
+        "oa": "cs_test_a1vDCqYfpR11GL4ZUUX2GFcoCYPvnzPmmUK3Va264aIQA04ME3FJOjXcWQ",
+        "ob": "cs_test_a1mMqkh3eWr0dNRkNq7aDeqtQ7jT7pRIAdlG1olC8yu1rjmv2a85wJ56T7",
+        "oc": "cs_test_a1vDCqYfpR11GL4ZUUX2GFcoCYPvnzPmmUK3Va264aIQA04ME3FJOjXcWQ",
+        "url1": {
+          "http": 200,
+          "len": 552890,
+          "expired_copy": true,
+          "pay_ui": true,
+          "loc": "",
+          "snip": "<!doctype html><html lang=\"en\" translate=\"no\" class=\"App--classic\"><head><link rel=\"dns-prefetch\" href=\"https://api.stripe.com\"/><link rel=\"dns-prefetch\" href=\"https://merchant-ui-…"
+        },
+        "url2": {
+          "http": 200,
+          "len": 552890,
+          "expired_copy": true,
+          "pay_ui": true,
+          "loc": "",
+          "snip": "<!doctype html><html lang=\"en\" translate=\"no\" class=\"App--classic\"><head><link rel=\"dns-prefetch\" href=\"https://api.stripe.com\"/><link rel=\"dns-prefetch\" href=\"https://merchant-ui-…"
+        }
+      }
+    },
+    {
+      "id": "P2.S2B",
+      "lens": "AH2",
+      "title": "single then bag URL",
+      "ev": {
+        "ss1": "",
+        "ss2": "",
+        "od": "",
+        "url": ""
+      }
+    },
+    {
+      "id": "P2.SAMEAMT",
+      "lens": "AH2",
+      "title": "A+B vs A+C 10€",
+      "ev": {
+        "s1": "",
+        "s2": "",
+        "reused": false,
+        "ob": "",
+        "url": ""
+      }
+    },
+    {
+      "id": "P2.BUN.ins",
+      "lens": "AH3",
+      "title": "seller cria pending",
+      "ev": "201 [{\"id\":\"86ab17c5-db98-4268-b9e8-3209b9703a81\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"chat_id\":null,\"product_ids\":[\"e314fb06-0949-4786-b08e-08f7ac7cbce6\",\"5ac8ac1d-199f-4710-b670…"
+    },
+    {
+      "id": "P2.BUN.acc",
+      "lens": "AH3",
+      "title": "seller accept",
+      "ev": {
+        "patch": "200 [{\"id\":\"86ab17c5-db98-4268-b9e8-3209b9703a81\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"chat_id\":null,\"product_ids\":[\"e314fb06-0949-4786-b08e-08f7ac7cbce6\",\"5ac8ac1d-199f-4710-b670…",
+        "row": "200 [{\"id\":\"86ab17c5-db98-4268-b9e8-3209b9703a81\",\"status\":\"accepted\",\"total_eur\":23.40,\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"product_ids\":[\"e314fb06-0949-4786-b08e-08f7ac7cbce6\",\"5ac8ac1d-199f-4710-b670-f1bc6c64a525\"]}]",
+        "status": "accepted",
+        "total": 23.4
+      }
+    },
+    {
+      "id": "P2.BUN.ords",
+      "lens": "AH3",
+      "title": "orders",
+      "ev": {
+        "o1": "95f4a200-22bb-4cd3-a7ff-9fc8b2e1acf1",
+        "o2": "a74b98c4-49fe-4842-b01c-8b0b79ff0498"
+      }
+    },
+    {
+      "id": "P2.BUN.ck",
+      "lens": "AH3",
+      "title": "partial vs full accepted",
+      "ev": {
+        "partial": "502 <html>\r\n<head><title>502 Bad Gateway</title></head>\r\n<body>\r\n<center><h1>502 Bad Gateway</h1></center>\r\n</body>\r\n</html>\r\n",
+        "full": "false amt=null"
+      }
+    },
+    {
+      "id": "P2.RACE.BAG",
+      "lens": "AH6",
+      "title": "parallel bag",
+      "ev": {
+        "unique": 0,
+        "sids": [],
+        "oa": "",
+        "ob": "",
+        "urls": {}
+      }
+    }
+  ],
+  "actors": {
+    "buyer": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+    "seller": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+    "buyer2": "e9303656-e135-4fbc-a2ba-7503a0c4ea0c",
+    "seller2": null
+  },
+  "created": {
+    "lives": [],
+    "items": [],
+    "orders": [
+      "d274eafd-df84-4def-bafd-eefe62d9b80c",
+      "5f91d195-15b3-4e9c-bc99-adf2cf557e91",
+      "a01c81db-994a-4548-a5bc-96c0c274683d",
+      "a4fc483b-f19e-4257-8707-0486db200f5f",
+      "97e96242-54ed-4d43-9de9-2e0cbbf5d6eb",
+      "f627af81-5120-40ce-b378-aa431e0f7a28",
+      "b7bc2205-e44b-426a-9ccc-ac622ce32054",
+      "117a6878-a69b-4ca2-a954-44d1ae23f61d",
+      "95f4a200-22bb-4cd3-a7ff-9fc8b2e1acf1",
+      "a74b98c4-49fe-4842-b01c-8b0b79ff0498",
+      "85e1b431-9df1-43db-b1b5-c7036dbc1c8c",
+      "f1d16ed5-a7cf-41f5-bc27-dabc61396145"
+    ],
+    "products": [
+      "dbe805b4-0602-4780-bd0e-f00a54adafbf",
+      "8b6a21e1-6563-4364-b596-ad910c5eda7a",
+      "1e9cebbd-731b-4190-954c-fce7c3f2844d",
+      "9251ae9a-39a5-46fc-9d13-07ffa7cce40f",
+      "0f7f36e9-ee98-451f-aa02-3bb3820677c0",
+      "35adda7b-1068-418f-b7bd-7bf7a0c151cc",
+      "e9068954-962a-4624-a58a-2f22f4f09ce0",
+      "0c2dd0ce-c842-4318-93b7-f712e0faa135",
+      "e314fb06-0949-4786-b08e-08f7ac7cbce6",
+      "5ac8ac1d-199f-4710-b670-f1bc6c64a525",
+      "3af50c49-04fe-446a-9922-2e1e20aa5355",
+      "932f71cb-abb0-4b3f-98f4-299afe9fc79d"
+    ],
+    "bundles": [
+      "86ab17c5-db98-4268-b9e8-3209b9703a81"
+    ],
+    "offers": []
+  }
+}

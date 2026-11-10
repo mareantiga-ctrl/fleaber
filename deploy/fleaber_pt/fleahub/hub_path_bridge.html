@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Fleaber · A redireccionar…</title>
+  <meta name="robots" content="noindex" />
+  <!--
+    P12 — Bridge path limpo → hash Hub.
+    Nginx/Apache servem este ficheiro para /{handle}, /{handle}/live|shop|reviews
+    e o JS redirecciona para /fleahub/index.html#/...
+  -->
+  <script>
+(function () {
+  var path = (location.pathname || '/').replace(/\/+/g, '/');
+  var q = location.search || '';
+  var reserved = {
+    fleahub:1, login:1, registo:1, privacy:1, terms:1, cookies:1, refunds:1,
+    assets:1, css:1, js:1, api:1, www:1, app:1, admin:1, marketplace:1,
+    favoritos:1, mensagens:1, conta:1, perfil:1, home:1, help:1, ajuda:1,
+    'data-deletion':1, 'redefinir-senha':1, entrar:1, hub:1, live:1, shop:1,
+    reviews:1, fleahubdemo:1, 'fleahub-demo-ux':1
+  };
+  var parts = path.replace(/^\/+|\/+$/g, '').split('/').filter(Boolean);
+  if (!parts.length || reserved[parts[0].toLowerCase()]) {
+    location.replace('/fleahub/' + q);
+    return;
+  }
+  var handle = parts[0];
+  var section = parts[1] ? '/' + parts[1] : '';
+  location.replace('/fleahub/index.html#/' + encodeURIComponent(handle) + section + q);
+})();
+  </script>
+</head>
+<body>
+  <p style="font-family:system-ui,sans-serif;padding:2rem;color:#101518">
+    A abrir o FleaHub…
+  </p>
+</body>
+</html>

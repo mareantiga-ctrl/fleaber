@@ -1,0 +1,79 @@
+{
+  "stamp": "20260906T1317",
+  "prefix": "RTCN-20260906T1317",
+  "auditor": "REDTEAM_BLIND_CN_PAYOUT_POS_CDCI_v1",
+  "lenses": [
+    "CN2",
+    "CN4",
+    "CN5"
+  ],
+  "probes": [
+    {
+      "id": "CN-2-WR-EVILPT",
+      "lens": "CN2",
+      "payload": "POST web_return_origin=https://fleaber.pt.evil.pt",
+      "http_bd": "200 {\"stripeAccountId\":\"acct_1U5mYbQeUNx8ar08\",\"url\":\"https://connect.stripe.com/setup/e/acct_1U5mYbQeUNx8ar08/3skwkjbZEf84\"} loc=\"\"",
+      "result": "HOLD"
+    },
+    {
+      "id": "CN-5-WALLET-INS",
+      "lens": "CN5",
+      "payload": "JWT POST wallets {id:self, balance:99999.99}",
+      "http_bd": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table wallets\"} loc=\"\"",
+      "result": "HOLD"
+    },
+    {
+      "id": "CN-5-WALLET-PATCH",
+      "lens": "CN5",
+      "payload": "JWT PATCH wallets.balance=77777",
+      "http_bd": "200 [] loc=\"\" before=62.0 after=62.0",
+      "result": "HOLD"
+    },
+    {
+      "id": "CN-C-WH-OLDSIG",
+      "lens": "CN4",
+      "payload": "POST stripe-webhook t=2020 sig lixo",
+      "http_bd": "400 {\"ok\":false,\"error\":\"invalid_signature\"} loc=\"\"",
+      "result": "HOLD"
+    }
+  ],
+  "findings": [],
+  "blocked": [
+    {
+      "id": "wr.evilpt",
+      "lens": "CN2",
+      "title": "POST origin não vazou hostil",
+      "ev": "200 {\"stripeAccountId\":\"acct_1U5mYbQeUNx8ar08\",\"url\":\"https://connect.stripe.com/setup/e/acct_1U5mYbQeUNx8ar08/3skwkjbZEf84\"} loc=\"\""
+    },
+    {
+      "id": "CN-P0-WALLET-INS-OWN",
+      "lens": "CN5",
+      "title": "JWT INSERT wallets própria com saldo 99999",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table wallets\"} loc=\"\""
+    },
+    {
+      "id": "rls.patch.bal",
+      "lens": "CN5",
+      "title": "JWT PATCH balance recusado ou Δ=0",
+      "ev": "200 [] loc=\"\""
+    },
+    {
+      "id": "wh.oldsig",
+      "lens": "CN4",
+      "title": "evento antigo + sig inválida recusado",
+      "ev": "400 {\"ok\":false,\"error\":\"invalid_signature\"} loc=\"\""
+    }
+  ],
+  "skipped": [],
+  "notes": [],
+  "actors": {
+    "buyer": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+    "seller": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+    "buyer2": null,
+    "seller2": null
+  },
+  "created": {
+    "orders": [],
+    "products": []
+  }
+}

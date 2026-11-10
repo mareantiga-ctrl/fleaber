@@ -1,0 +1,120 @@
+{
+  "pass": 3,
+  "stamp": "20260902T0728",
+  "item_mp_full": "400 {\"code\":\"23514\",\"details\":\"Failing row contains (a5414e50-d7c4-4178-bb3c-ad615cc8015e, 5baa655b-872c-4102-b92e-f63fd2e2261b, 980f4fa1-0004-42f9-abca-69f1a9c29588, RTAKP3A, RTAK-20260902T0728 p3-mp, null, 5, null, null, null, t, 0, available, 2026-09-02 06:39:56.012185+00, null, marketplace_product, e1369e47-7985-43d1-874d-326ae2d6930b, null, 2, null, null, 2026-09-02 06:39:56.012185+00, null, null).\",\"hint\":null,\"message\":\"new row for relation \\\"live_items\\\" violates check constraint \\\"live_items_kind_stock_chk\\\"\"}",
+  "item_live_only": "201 [{\"id\":\"70c27f56-cc4d-4482-b36b-f85efab46a31\",\"live_id\":\"5baa655b-872c-4102-b92e-f63fd2e2261b\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"ref_code\":\"RTAKP3B\",\"title\":\"RTAK-20260902T0728 p3-lo\",\"description\":null,\"price\":5,\"image_url\":null,\"size\":null,\"color\":null,\"is_active\":true,\"order_index\":0,\"status\":\"available\",\"created_at\":\"2026-09-02T06:39:56.105148+00:00\",\"photo_url\":null,\"item_kind\":\"live_only\",\"product_id\":null,\"checkout_product_id\":null,\"quantity\":2,\"clothing_size\":null,\"gender\":null,\"updated_at\":\"2026-09-02T06:39:56.105148+00:00\",\"logical_item_id\":null,\"public_slot\":null}]",
+  "item_no_kind": "201 [{\"id\":\"55a8e123-5378-4650-8460-3f89a2c00552\",\"live_id\":\"5baa655b-872c-4102-b92e-f63fd2e2261b\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"ref_code\":\"RTAKP3C\",\"title\":\"RTAK-20260902T0728 p3-nk\",\"description\":null,\"price\":5,\"image_url\":null,\"size\":null,\"color\":null,\"is_active\":true,\"order_index\":0,\"status\":\"available\",\"created_at\":\"2026-09-02T06:39:56.197232+00:00\",\"photo_url\":null,\"item_kind\":\"live_only\",\"product_id\":null,\"checkout_product_id\":null,\"quantity\":1,\"clothing_size\":null,\"gender\":null,\"updated_at\":\"2026-09-02T06:39:56.197232+00:00\",\"logical_item_id\":null,\"public_slot\":null}]",
+  "rest_rf": {
+    "buyer": "200 loc=null acao=null []",
+    "seller": "200 loc=null acao=null [{\"id\":\"386a1d58-8834-4731-9f8e-c24aeda8c95f\",\"price\":7.0,\"status\":\"reserved_full\",\"quantity\":1}]",
+    "anon": "401 loc=null acao=null {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table live_items\"}"
+  },
+  "fomo": {
+    "ok": true,
+    "items": [
+      {
+        "status": "reserved_full",
+        "is_last_unit": false,
+        "live_item_id": "386a1d58-8834-4731-9f8e-c24aeda8c95f",
+        "available_qty": 1,
+        "pending_queue_count": 0,
+        "display_reserved_qty": 0
+      }
+    ],
+    "live_id": "7148ec4f-395d-476e-9ba5-bdee9a6738b2",
+    "is_active": false,
+    "live_status": "ended",
+    "viewer_count": 0
+  },
+  "tip_settle": "200 loc=null acao=https://fleaber.pt Pagamento ainda não confirmado. Se já pagaste, aguarda alguns segundos e volta à app Fleaber.",
+  "tip_row": "[{\"id\":\"c4124365-87b8-43cd-bffd-951dc4b091ce\",\"status\":\"pending\",\"amount\":1.00,\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"live_id\":\"7148ec4f-395d-476e-9ba5-bdee9a6738b2\"}]",
+  "order_lo": "400 loc=null acao=null {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"order_contract_price_missing\"}",
+  "findings": [],
+  "holds": [
+    {
+      "id": "RTAK-AK1-REST-RESERVED-FULL",
+      "lens": "AK1",
+      "title": "REST buyer esconde reserved_full; Hub JWT ainda mostra",
+      "actor": "buyer JWT",
+      "pre": "reserved_full",
+      "repro": "GET live_items",
+      "expected": "[]",
+      "obtained": "200 loc=null acao=null []"
+    },
+    {
+      "id": "RTAK-AK3-TIP-SETTLE-UNPAID",
+      "lens": "AK3",
+      "title": "Session gorjeta created ≠ captura (GET settle unpaid)",
+      "actor": "anon",
+      "pre": "cs unpaid",
+      "repro": "GET tip settle",
+      "expected": "pending",
+      "obtained": "http=200 loc=null acao=https://fleaber.pt Pagamento ainda não confirmado. Se já pagaste, aguarda alguns segundos e volta à app Fleaber. status=pending"
+    },
+    {
+      "id": "RTAK-AK7-ORDER-ENDED-LIVE-ONLY",
+      "lens": "AK7",
+      "title": "order live_only ended recusado",
+      "actor": "buyer JWT",
+      "pre": "ended",
+      "repro": "POST orders",
+      "expected": "denied",
+      "obtained": "400 loc=null acao=null {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"order_contract_price_missing\"}"
+    }
+  ],
+  "notes": [
+    {
+      "id": "fix.live",
+      "title": "RTAK-20260902T0728 p3-live 201",
+      "ev": "201 loc=null acao=null [{\"id\":\"5baa655b-872c-4102-b92e-f63fd2e2261b\",\"created_at\":\"2026-09-02T06:39:55.893453+00:00\",\"vendedor_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"mux_live_id\"…"
+    },
+    {
+      "id": "p3.item.mp_full",
+      "lens": "AK7",
+      "title": "mp_full",
+      "ev": "400 loc=null acao=null {\"code\":\"23514\",\"details\":\"Failing row contains (a5414e50-d7c4-4178-bb3c-ad615cc8015e, 5baa655b-872c-4102-b92e-f63fd2e2261b, 980f4fa1-0004-42f9-abca-69f1a9c2958…"
+    },
+    {
+      "id": "p3.item.live_only",
+      "lens": "AK7",
+      "title": "live_only",
+      "ev": "201 loc=null acao=null [{\"id\":\"70c27f56-cc4d-4482-b36b-f85efab46a31\",\"live_id\":\"5baa655b-872c-4102-b92e-f63fd2e2261b\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"ref_code\":\"RT…"
+    },
+    {
+      "id": "p3.item.no_kind",
+      "lens": "AK7",
+      "title": "no_kind",
+      "ev": "201 loc=null acao=null [{\"id\":\"55a8e123-5378-4650-8460-3f89a2c00552\",\"live_id\":\"5baa655b-872c-4102-b92e-f63fd2e2261b\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"ref_code\":\"RT…"
+    },
+    {
+      "id": "p3.rest_rf",
+      "lens": "AK1",
+      "title": "REST reserved_full B/S/anon",
+      "ev": "B=200 loc=null acao=null [] S=200 loc=null acao=null [{\"id\":\"386a1d58-8834-4731-9f8e-c24aeda8c95f\",\"price\":7.0,\"status\":\"reserved_full\",\"quantity\":1}] A=401 loc=null acao=null {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table live_items\"}"
+    },
+    {
+      "id": "p3.fomo",
+      "lens": "AK1",
+      "title": "FOMO ended still",
+      "ev": "200 loc=null acao=null {\"ok\": true, \"items\": [{\"status\": \"reserved_full\", \"is_last_unit\": false, \"live_item_id\": \"386a1d58-8834-4731-9f8e-c24aeda8c95f\", \"available_qty\": 1, \"pending_q…"
+    },
+    {
+      "id": "p3.tip_settle",
+      "lens": "AK3",
+      "title": "GET tip settle unpaid",
+      "ev": "200 loc=null acao=https://fleaber.pt Pagamento ainda não confirmado. Se já pagaste, aguarda alguns segundos e volta à app Fleaber."
+    },
+    {
+      "id": "p3.tip_row",
+      "lens": "AK3",
+      "title": "live_tips after GET settle",
+      "ev": "200 loc=null acao=null [{\"id\":\"c4124365-87b8-43cd-bffd-951dc4b091ce\",\"status\":\"pending\",\"amount\":1.00,\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9…"
+    },
+    {
+      "id": "p3.order_lo",
+      "lens": "AK7",
+      "title": "order live_only after end",
+      "ev": "400 loc=null acao=null {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"order_contract_price_missing\"}"
+    }
+  ]
+}

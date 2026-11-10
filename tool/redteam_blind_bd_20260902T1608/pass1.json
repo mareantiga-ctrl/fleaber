@@ -1,0 +1,451 @@
+{
+  "stamp": "20260902T1608",
+  "prefix": "RTBD-20260902T1608",
+  "lentes": [
+    "BD1",
+    "BD2",
+    "BD5",
+    "BD6"
+  ],
+  "findings": [
+    {
+      "id": "BD1-body-destination",
+      "lens": "BD1",
+      "severity": "P0",
+      "title": "Cliente forçou destination/currency no payout",
+      "actor": "seller JWT",
+      "pre": "extra destination=acct seller2 currency=usd",
+      "repro": "POST create-connect-account destination+currency",
+      "expected": "ignorar campos; ou 400",
+      "obtained": "200 {\"success\":true,\"transferId\":\"tr_1UBFqKH7FWYUN3jhU0gBeoME\",\"balance\":31.97}",
+      "proven": true,
+      "evidence": {}
+    }
+  ],
+  "blocked": [
+    {
+      "id": "BD1.user_id.s2",
+      "lens": "BD1",
+      "title": "user_id alheio recusado",
+      "ev": "400 {\"error\":\"Cannot create another user Stripe account.\",\"code\":\"payout_failed\"}"
+    },
+    {
+      "id": "BD1.patch.own_dest",
+      "lens": "BD1",
+      "title": "stripe_account_id próprio imutável",
+      "ev": "200 []"
+    },
+    {
+      "id": "BD1.patch.other",
+      "lens": "BD1",
+      "title": "wallet alheia não PATCH",
+      "ev": "200 []"
+    },
+    {
+      "id": "BD1.amount.1.5",
+      "lens": "BD1",
+      "title": "amount 1.5 recusado/sem Transfer",
+      "ev": "400 {\"error\":\"O valor do levantamento tem de ser em cêntimos.\",\"code\":\"payout_failed\"}"
+    },
+    {
+      "id": "BD1.amount.-5",
+      "lens": "BD1",
+      "title": "amount -5 recusado/sem Transfer",
+      "ev": "400 {\"error\":\"Valor de levantamento inválido.\",\"code\":\"payout_failed\"}"
+    },
+    {
+      "id": "BD1.amount.0",
+      "lens": "BD1",
+      "title": "amount 0 recusado/sem Transfer",
+      "ev": "400 {\"error\":\"Valor de levantamento inválido.\",\"code\":\"payout_failed\"}"
+    },
+    {
+      "id": "BD1.amount.1e+21",
+      "lens": "BD1",
+      "title": "amount 1e+21 recusado/sem Transfer",
+      "ev": "400 {\"error\":\"[object Object]\",\"code\":\"22P02\"}"
+    },
+    {
+      "id": "BD1.amount.2147483647",
+      "lens": "BD1",
+      "title": "amount 2147483647 recusado/sem Transfer",
+      "ev": "400 {\"error\":\"Saldo disponível insuficiente para este levantamento.\",\"code\":\"payout_failed\"}"
+    },
+    {
+      "id": "BD1.amount.sci",
+      "lens": "BD1",
+      "title": "string 1e2 observado (não P0 se=100¢)",
+      "ev": "200 {\"success\":true,\"transferId\":\"tr_1UBFqHH7FWYUN3jheQZjF5Mn\",\"balance\":32.97}"
+    },
+    {
+      "id": "BD2.ledger.insert",
+      "lens": "BD2",
+      "title": "INSERT ledger recusado",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"new row violates row-level security policy for table \\\"wallet_payout_ledger\\\"\"}"
+    },
+    {
+      "id": "BD2.wallet.patch",
+      "lens": "BD2",
+      "title": "balance imutável via JWT",
+      "ev": "200 []"
+    },
+    {
+      "id": "BD2.txn.insert",
+      "lens": "BD2",
+      "title": "INSERT txn recusado",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"new row violates row-level security policy for table \\\"wallet_transactions\\\"\"}"
+    },
+    {
+      "id": "BD2.ledger.read_other",
+      "lens": "BD2",
+      "title": "ledger alheio vazio/403",
+      "ev": "200 []"
+    },
+    {
+      "id": "BD2.debit.jwt",
+      "lens": "BD2",
+      "title": "debit JWT negado",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_wallet_payout_debit\"}"
+    },
+    {
+      "id": "BD2.finish.jwt",
+      "lens": "BD2",
+      "title": "finish JWT negado",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_wallet_payout_finish\"}"
+    },
+    {
+      "id": "BD2.credit.jwt",
+      "lens": "BD2",
+      "title": "credit JWT negado",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_credit_wallet_once\"}"
+    },
+    {
+      "id": "BD2.claw.jwt",
+      "lens": "BD2",
+      "title": "clawback JWT negado",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_clawback_seller_wallet_for_order\"}"
+    },
+    {
+      "id": "BD2.finalize.jwt",
+      "lens": "BD2",
+      "title": "finalize refund JWT negado",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_finalize_stripe_order_refund\"}"
+    },
+    {
+      "id": "BD5.get.https://evil.com",
+      "lens": "BD5",
+      "title": "origin https://evil.com não redireccionou hostil",
+      "ev": "200 null"
+    },
+    {
+      "id": "BD5.get.https://fleaber.pt.evil.com",
+      "lens": "BD5",
+      "title": "origin https://fleaber.pt.evil.com não redireccionou hostil",
+      "ev": "200 null"
+    },
+    {
+      "id": "BD5.get.https://evil.com/fleaber.pt",
+      "lens": "BD5",
+      "title": "origin https://evil.com/fleaber.pt não redireccionou hostil",
+      "ev": "200 null"
+    },
+    {
+      "id": "BD5.get.https://fleaber.pt%00.evil.com",
+      "lens": "BD5",
+      "title": "origin https://fleaber.pt%00.evil.com não redireccionou hostil",
+      "ev": "200 null"
+    },
+    {
+      "id": "BD5.get.javascript:alert(1)",
+      "lens": "BD5",
+      "title": "origin javascript:alert(1) não redireccionou hostil",
+      "ev": "403 null"
+    },
+    {
+      "id": "BD5.get.//evil.com",
+      "lens": "BD5",
+      "title": "origin //evil.com não redireccionou hostil",
+      "ev": "200 null"
+    },
+    {
+      "id": "BD5.get.https://user:pass@fleaber.pt",
+      "lens": "BD5",
+      "title": "origin https://user:pass@fleaber.pt não redireccionou hostil",
+      "ev": "200 null"
+    },
+    {
+      "id": "BD5.get.http://fleaber.pt",
+      "lens": "BD5",
+      "title": "origin http://fleaber.pt não redireccionou hostil",
+      "ev": "200 null"
+    },
+    {
+      "id": "BD5.get.https://127.0.0.1.nip.io",
+      "lens": "BD5",
+      "title": "origin https://127.0.0.1.nip.io não redireccionou hostil",
+      "ev": "200 null"
+    },
+    {
+      "id": "BD5.get.https://fleaber.pt.attacker.tld",
+      "lens": "BD5",
+      "title": "origin https://fleaber.pt.attacker.tld não redireccionou hostil",
+      "ev": "200 null"
+    },
+    {
+      "id": "BD5.onboard.other",
+      "lens": "BD5",
+      "title": "onboarding alheio recusado",
+      "ev": "400 {\"error\":\"Cannot create another user Stripe account.\",\"code\":\"payout_failed\"}"
+    },
+    {
+      "id": "BD6.crash.nosecret",
+      "lens": "BD6",
+      "title": "crash_inject ignorado sem secret",
+      "ev": "200 {\"success\":true,\"transferId\":\"tr_1UBFqQH7FWYUN3jhYmexBmHU\",\"balance\":30.97}"
+    }
+  ],
+  "skipped": [],
+  "notes": [
+    {
+      "id": "actors",
+      "title": "login",
+      "ev": {
+        "buyer": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+        "seller": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+        "buyer2": "da23f63d-2686-4cde-b93a-446fda8e6db4",
+        "seller2": "8bd92729-5797-440e-b9fe-fda969655a17",
+        "w0": {
+          "buyer": 61.1,
+          "seller": 33.97,
+          "buyer2": 0,
+          "seller2": 0
+        }
+      }
+    },
+    {
+      "id": "bd1.user_id.s2",
+      "lens": "BD1",
+      "title": "payout user_id=seller2",
+      "ev": "400 {\"error\":\"Cannot create another user Stripe account.\",\"code\":\"payout_failed\"}"
+    },
+    {
+      "id": "bd1.patch.own_dest",
+      "lens": "BD1",
+      "title": "PATCH stripe_account_id próprio → conta alheia",
+      "ev": {
+        "http": "200 []",
+        "before": "acct_1U5mYbQeUNx8ar08",
+        "after": "acct_1U5mYbQeUNx8ar08"
+      }
+    },
+    {
+      "id": "bd1.patch.other",
+      "lens": "BD1",
+      "title": "PATCH wallet seller2 via JWT seller1",
+      "ev": {
+        "http": "200 []",
+        "acct": ""
+      }
+    },
+    {
+      "id": "bd1.amount.1.5",
+      "lens": "BD1",
+      "title": "payout amount=1.5",
+      "ev": "400 {\"error\":\"O valor do levantamento tem de ser em cêntimos.\",\"code\":\"payout_failed\"}"
+    },
+    {
+      "id": "bd1.amount.-5",
+      "lens": "BD1",
+      "title": "payout amount=-5",
+      "ev": "400 {\"error\":\"Valor de levantamento inválido.\",\"code\":\"payout_failed\"}"
+    },
+    {
+      "id": "bd1.amount.0",
+      "lens": "BD1",
+      "title": "payout amount=0",
+      "ev": "400 {\"error\":\"Valor de levantamento inválido.\",\"code\":\"payout_failed\"}"
+    },
+    {
+      "id": "bd1.amount.1e+21",
+      "lens": "BD1",
+      "title": "payout amount=1e+21",
+      "ev": "400 {\"error\":\"[object Object]\",\"code\":\"22P02\"}"
+    },
+    {
+      "id": "bd1.amount.2147483647",
+      "lens": "BD1",
+      "title": "payout amount=2147483647",
+      "ev": "400 {\"error\":\"Saldo disponível insuficiente para este levantamento.\",\"code\":\"payout_failed\"}"
+    },
+    {
+      "id": "bd1.amount.sci",
+      "lens": "BD1",
+      "title": "payout amount=\"1e2\" (coerção)",
+      "ev": "200 {\"success\":true,\"transferId\":\"tr_1UBFqHH7FWYUN3jheQZjF5Mn\",\"balance\":32.97}"
+    },
+    {
+      "id": "bd1.body.dest",
+      "lens": "BD1",
+      "title": "payout extra destination/currency",
+      "ev": "200 {\"success\":true,\"transferId\":\"tr_1UBFqKH7FWYUN3jhU0gBeoME\",\"balance\":31.97}"
+    },
+    {
+      "id": "bd2.ledger.insert",
+      "lens": "BD2",
+      "title": "INSERT ledger JWT",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"new row violates row-level security policy for table \\\"wallet_payout_ledger\\\"\"}"
+    },
+    {
+      "id": "bd2.wallet.patch",
+      "lens": "BD2",
+      "title": "PATCH wallets.balance",
+      "ev": {
+        "http": "200 []",
+        "before": 33.97,
+        "after": 31.97
+      }
+    },
+    {
+      "id": "bd2.txn.insert",
+      "lens": "BD2",
+      "title": "INSERT wallet_transactions",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"new row violates row-level security policy for table \\\"wallet_transactions\\\"\"}"
+    },
+    {
+      "id": "bd2.ledger.read_other",
+      "lens": "BD2",
+      "title": "SELECT ledger seller2 via seller1",
+      "ev": "200 []"
+    },
+    {
+      "id": "bd2.debit.jwt",
+      "lens": "BD2",
+      "title": "rpc debit JWT",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_wallet_payout_debit\"}"
+    },
+    {
+      "id": "bd2.finish.jwt",
+      "lens": "BD2",
+      "title": "rpc finish JWT",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_wallet_payout_finish\"}"
+    },
+    {
+      "id": "bd2.credit.jwt",
+      "lens": "BD2",
+      "title": "rpc credit JWT",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_credit_wallet_once\"}"
+    },
+    {
+      "id": "bd2.claw.jwt",
+      "lens": "BD2",
+      "title": "rpc clawback JWT",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_clawback_seller_wallet_for_order\"}"
+    },
+    {
+      "id": "bd2.finalize.jwt",
+      "lens": "BD2",
+      "title": "rpc finalize refund JWT",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_finalize_stripe_order_refund\"}"
+    },
+    {
+      "id": "bd5.get.https://evil.com",
+      "lens": "BD5",
+      "title": "GET connect origin",
+      "ev": "200 loc=null"
+    },
+    {
+      "id": "bd5.get.https://fleaber.pt.evil.com",
+      "lens": "BD5",
+      "title": "GET connect origin",
+      "ev": "200 loc=null"
+    },
+    {
+      "id": "bd5.get.https://evil.com/fleaber.pt",
+      "lens": "BD5",
+      "title": "GET connect origin",
+      "ev": "200 loc=null"
+    },
+    {
+      "id": "bd5.get.https://fleaber.pt%00.evil.com",
+      "lens": "BD5",
+      "title": "GET connect origin",
+      "ev": "200 loc=null"
+    },
+    {
+      "id": "bd5.get.javascript:alert(1)",
+      "lens": "BD5",
+      "title": "GET connect origin",
+      "ev": "403 loc=null"
+    },
+    {
+      "id": "bd5.get.//evil.com",
+      "lens": "BD5",
+      "title": "GET connect origin",
+      "ev": "200 loc=null"
+    },
+    {
+      "id": "bd5.get.https://user:pass@fleaber.pt",
+      "lens": "BD5",
+      "title": "GET connect origin",
+      "ev": "200 loc=null"
+    },
+    {
+      "id": "bd5.get.http://fleaber.pt",
+      "lens": "BD5",
+      "title": "GET connect origin",
+      "ev": "200 loc=null"
+    },
+    {
+      "id": "bd5.get.https://127.0.0.1.nip.io",
+      "lens": "BD5",
+      "title": "GET connect origin",
+      "ev": "200 loc=null"
+    },
+    {
+      "id": "bd5.get.https://fleaber.pt.attacker.tld",
+      "lens": "BD5",
+      "title": "GET connect origin",
+      "ev": "200 loc=null"
+    },
+    {
+      "id": "bd5.onboard.other",
+      "lens": "BD5",
+      "title": "onboarding user_id=seller2",
+      "ev": "400 {\"error\":\"Cannot create another user Stripe account.\",\"code\":\"payout_failed\"}"
+    },
+    {
+      "id": "bd6.crash.nosecret",
+      "lens": "BD6",
+      "title": "crash_inject sem secret",
+      "ev": "200 {\"success\":true,\"transferId\":\"tr_1UBFqQH7FWYUN3jhYmexBmHU\",\"balance\":30.97}"
+    },
+    {
+      "id": "wallets.end.p1",
+      "title": "saldos após pass1",
+      "ev": {
+        "before": {
+          "buyer": 61.1,
+          "seller": 33.97,
+          "buyer2": 0,
+          "seller2": 0
+        },
+        "after": {
+          "buyer": 61.1,
+          "seller": 30.97,
+          "buyer2": 0,
+          "seller2": 0
+        }
+      }
+    }
+  ],
+  "actors": {
+    "buyer": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+    "seller": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+    "buyer2": "da23f63d-2686-4cde-b93a-446fda8e6db4",
+    "seller2": "8bd92729-5797-440e-b9fe-fda969655a17"
+  },
+  "created": {
+    "orders": [],
+    "products": []
+  }
+}

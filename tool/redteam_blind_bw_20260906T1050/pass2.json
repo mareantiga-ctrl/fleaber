@@ -1,0 +1,289 @@
+{
+  "stamp": "20260906T1050",
+  "prefix": "RTBW-20260906T1050",
+  "lenses": [
+    "BW2",
+    "BW3",
+    "BW7"
+  ],
+  "findings": [
+    {
+      "id": "BW3.reply_unicode_slash",
+      "lens": "BW3",
+      "severity": "P1",
+      "title": "reply proof_photos aceita signed + ／ + path alheio",
+      "actor": "buyer JWT",
+      "pre": "disputa feb47560-861e-48be-bae1-513dcb94f0fb",
+      "repro": "POST order_dispute_replies proof_photos=[signed／alien]",
+      "expected": "dispute_proof_url_denied",
+      "obtained": "201 [{\"id\":\"df86f81e-f9c1-40b1-a89e-04ea6779337c\",\"dispute_id\":\"feb47560-861e-48be-bae1-513dcb94f0fb\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"message\":\"RTBW reply\",\"proof_photos\":[\"https://fxdknzrqjenzqcvnwqqq.supabase.co/storage/v1…",
+      "proven": true,
+      "evidence": {}
+    }
+  ],
+  "blocked": [
+    {
+      "id": "BW3.unicode_slash_replaces_ascii",
+      "lens": "BW3",
+      "title": "proof_photos path com slash unicode ／ no sítio do /",
+      "ev": "200 []"
+    },
+    {
+      "id": "BW3.unicode_slash_append_alien",
+      "lens": "BW3",
+      "title": "proof_photos URL válida + ／ + path alheio",
+      "ev": "200 []"
+    },
+    {
+      "id": "BW3.unicode_slash_evil_host",
+      "lens": "BW3",
+      "title": "proof_photos host evil + ／ + needle ASCII",
+      "ev": "200 []"
+    },
+    {
+      "id": "BW3.unicode_slash_then_dotdot",
+      "lens": "BW3",
+      "title": "proof_photos ／ seguido de ../ path alheio",
+      "ev": "200 []"
+    },
+    {
+      "id": "BW3.division_slash",
+      "lens": "BW3",
+      "title": "proof_photos U+2215 division slash no path",
+      "ev": "200 []"
+    },
+    {
+      "id": "BW3.label_wrap_evil_needle_in_path",
+      "lens": "BW3",
+      "title": "return_label_url wrap evil.example + needle no path",
+      "ev": "200 []"
+    },
+    {
+      "id": "BW3.label_wrap_fleaber_app_https",
+      "lens": "BW3",
+      "title": "return_label_url wrap fleaber.app/https://evil + needle",
+      "ev": "200 []"
+    },
+    {
+      "id": "BW3.label_unicode_slash_wrap",
+      "lens": "BW3",
+      "title": "return_label_url wrap ／ + needle ASCII",
+      "ev": "200 []"
+    },
+    {
+      "id": "BW3.label_query_wrap",
+      "lens": "BW3",
+      "title": "return_label_url evil?needle (query deve ser cortada)",
+      "ev": "200 []"
+    },
+    {
+      "id": "BW7.storage_list_prefix_alheio",
+      "lens": "BW7",
+      "title": "list/get prefixo alheio recusado",
+      "ev": {
+        "list_b2_as_b1": "200 []",
+        "get_b1": "400 {\"statusCode\":\"404\",\"error\":\"not_found\",\"message\":\"Object not found\",\"code\":\"NoSuchKey\"}",
+        "b2_own_list_n": 1
+      }
+    }
+  ],
+  "skipped": [],
+  "notes": [
+    {
+      "id": "fixture.paid",
+      "lens": "BW3",
+      "title": "setup_paid_order Stripe TEST",
+      "ev": "200 {\n  \"ok\": true,\n  \"order_id\": \"748427f7-daf5-4640-9701-c81cfad7dfa5\",\n  \"product_id\": \"3cb6373f-a67b-46bb-8283-4820fa87a59c\",\n  \"payment_intent_id\": \"pi_3UCcozH7FWYUN3jh01hjx1WK\",\n  \"pi_status\": \"succeeded\",\n  \"pi_amount_received\": 590,\n  \"…"
+    },
+    {
+      "id": "fsm.enviado",
+      "lens": "BW2",
+      "title": "seller → enviado",
+      "ev": {
+        "hit": "200 [{\"id\":\"748427f7-daf5-4640-9701-c81cfad7dfa5\",\"created_at\":\"2026-09-06T09:57:08.797079+00:00\",\"product_id\":\"3cb6373f-a67b-46bb-8283-4820fa87a59c\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c…",
+        "status": "enviado",
+        "shipped_at": "2026-09-06T09:57:11.087018+00:00"
+      }
+    },
+    {
+      "id": "fsm.concluido",
+      "lens": "BW2",
+      "title": "buyer → concluido",
+      "ev": {
+        "hit": "200 [{\"id\":\"748427f7-daf5-4640-9701-c81cfad7dfa5\",\"created_at\":\"2026-09-06T09:57:08.797079+00:00\",\"product_id\":\"3cb6373f-a67b-46bb-8283-4820fa87a59c\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c…",
+        "status": "concluido"
+      }
+    },
+    {
+      "id": "BW3.fixture",
+      "lens": "BW3",
+      "title": "disputa para provas",
+      "ev": {
+        "oid": "748427f7-daf5-4640-9701-c81cfad7dfa5",
+        "did": "feb47560-861e-48be-bae1-513dcb94f0fb",
+        "b1": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+        "b2": "72fb28c3-63a5-43d5-9632-d2733aea4437"
+      }
+    },
+    {
+      "id": "BW3.upload_mine",
+      "lens": "BW3",
+      "title": "upload prova B1",
+      "ev": "200 {\"Key\":\"fleaber_private/order_disputes/bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96/748427f7-daf5-4640-9701-c81cfad7dfa5/rtbw-ok.png\",\"Id\":\"119d1447-4293-4d2c-a1da-0d49b004c8ac\"}"
+    },
+    {
+      "id": "BW3.upload_b2",
+      "lens": "BW3",
+      "title": "upload secreto B2 (prefixo alheio)",
+      "ev": "200 {\"Key\":\"fleaber_private/order_disputes/72fb28c3-63a5-43d5-9632-d2733aea4437/00000000-0000-0000-0000-00000000b2b2/rtbw-secret.png\",\"Id\":\"2b888c1d-e6ae-475b-af8c-f5577606b3bd\"}"
+    },
+    {
+      "id": "BW3.signed",
+      "lens": "BW3",
+      "title": "URLs assinadas",
+      "ev": {
+        "mine_ok": true,
+        "alien_ok": true
+      }
+    },
+    {
+      "id": "exacto.BQ.query_needle",
+      "lens": "BW3",
+      "title": "BQ exacto signed URL ?needle (NÃO contar)",
+      "ev": "200 []"
+    },
+    {
+      "id": "exacto.BQ.hash_needle",
+      "lens": "BW3",
+      "title": "BQ exacto signed URL #needle (NÃO contar)",
+      "ev": "200 []"
+    },
+    {
+      "id": "exacto.BQ.dotdot",
+      "lens": "BW3",
+      "title": "BQ exacto ../ em proof_photos (NÃO contar)",
+      "ev": "200 []"
+    },
+    {
+      "id": "exacto.BQ.fleaber_pt",
+      "lens": "BW3",
+      "title": "BQ exacto fleaber.pt (NÃO contar)",
+      "ev": "200 []"
+    },
+    {
+      "id": "BW3.unicode_slash_replaces_ascii",
+      "lens": "BW3",
+      "title": "proof_photos path com slash unicode ／ no sítio do /",
+      "ev": {
+        "hit": "200 []",
+        "photos": []
+      }
+    },
+    {
+      "id": "BW3.unicode_slash_append_alien",
+      "lens": "BW3",
+      "title": "proof_photos URL válida + ／ + path alheio",
+      "ev": {
+        "hit": "200 []",
+        "photos": []
+      }
+    },
+    {
+      "id": "BW3.unicode_slash_evil_host",
+      "lens": "BW3",
+      "title": "proof_photos host evil + ／ + needle ASCII",
+      "ev": {
+        "hit": "200 []",
+        "photos": []
+      }
+    },
+    {
+      "id": "BW3.unicode_slash_then_dotdot",
+      "lens": "BW3",
+      "title": "proof_photos ／ seguido de ../ path alheio",
+      "ev": {
+        "hit": "200 []",
+        "photos": []
+      }
+    },
+    {
+      "id": "BW3.division_slash",
+      "lens": "BW3",
+      "title": "proof_photos U+2215 division slash no path",
+      "ev": {
+        "hit": "200 []",
+        "photos": []
+      }
+    },
+    {
+      "id": "BW3.label_wrap_evil_needle_in_path",
+      "lens": "BW3",
+      "title": "return_label_url wrap evil.example + needle no path",
+      "ev": {
+        "hit": "200 []",
+        "stored": "null"
+      }
+    },
+    {
+      "id": "BW3.label_wrap_fleaber_app_https",
+      "lens": "BW3",
+      "title": "return_label_url wrap fleaber.app/https://evil + needle",
+      "ev": {
+        "hit": "200 []",
+        "stored": "null"
+      }
+    },
+    {
+      "id": "BW3.label_unicode_slash_wrap",
+      "lens": "BW3",
+      "title": "return_label_url wrap ／ + needle ASCII",
+      "ev": {
+        "hit": "200 []",
+        "stored": "null"
+      }
+    },
+    {
+      "id": "BW3.label_query_wrap",
+      "lens": "BW3",
+      "title": "return_label_url evil?needle (query deve ser cortada)",
+      "ev": {
+        "hit": "200 []",
+        "stored": "null"
+      }
+    },
+    {
+      "id": "BW7.storage_list",
+      "lens": "BW7",
+      "title": "list/get prefixo alheio",
+      "ev": {
+        "list_root_status": 200,
+        "list_root_n": 1,
+        "list_b2_as_b1": "200 []",
+        "list_b2_as_s1": "200 []",
+        "list_b2_as_b2_n": 1,
+        "get_b1": "400 {\"statusCode\":\"404\",\"error\":\"not_found\",\"message\":\"Object not found\",\"code\":\"NoSuchKey\"}",
+        "get_s1": "400 {\"statusCode\":\"404\",\"error\":\"not_found\",\"message\":\"Object not found\",\"code\":\"NoSuchKey\"}",
+        "leaked_root": false,
+        "leaked_prefix": false,
+        "leaked_get": false
+      }
+    }
+  ],
+  "actors": {
+    "buyer": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+    "seller": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+    "buyer2": "72fb28c3-63a5-43d5-9632-d2733aea4437",
+    "seller2": "7d9a8d72-9485-4be7-9248-2a33ae177c64"
+  },
+  "created": {
+    "orders": [
+      "748427f7-daf5-4640-9701-c81cfad7dfa5"
+    ],
+    "products": [
+      "3cb6373f-a67b-46bb-8283-4820fa87a59c"
+    ],
+    "disputes": [
+      "feb47560-861e-48be-bae1-513dcb94f0fb"
+    ]
+  }
+}

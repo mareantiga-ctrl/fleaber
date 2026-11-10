@@ -1,0 +1,676 @@
+{
+  "stamp": "20260906T1447",
+  "prefix": "RTCZ-20260906T1447",
+  "auditor": "REDTEAM_BLIND_CZ_PAYOUT_POS_CPCU_v1",
+  "lenses": [
+    "CZ1",
+    "CZ2",
+    "CZ3",
+    "CZ4",
+    "CZ6"
+  ],
+  "probes": [
+    {
+      "id": "CZ-A1-HANGUL",
+      "lens": "CZ1",
+      "payload": "key Hangul 한 U+D55C (script novo; não Coptic)",
+      "http_bd": "http=400 n_tr=0 Δ=0.0 tids=[] 400 {\"error\":\"idempotency_key inválida. Reinicia o levantamento na app.\",\"code\":\"payout_failed\"} loc=\"\"",
+      "result": "HOLD"
+    },
+    {
+      "id": "CZ-A1-COPTIC",
+      "lens": "CZ1",
+      "payload": "residual Coptic ⲟ U+2C9F — 1 linha; não contar se HOLD",
+      "http_bd": "http=400 n_tr=0 Δ=0.0 tids=[] 400 {\"error\":\"idempotency_key inválida. Reinicia o levantamento na app.\",\"code\":\"payout_failed\"} loc=\"\"",
+      "result": "HOLD"
+    },
+    {
+      "id": "CZ-A2-LATIN-ACCENT",
+      "lens": "CZ1",
+      "payload": "key Latin acento wd_caféCz047x",
+      "http_bd": "http=400 n_tr=0 Δ=0.0 tids=[] 400 {\"error\":\"idempotency_key inválida. Reinicia o levantamento na app.\",\"code\":\"payout_failed\"} loc=\"\"",
+      "result": "HOLD"
+    },
+    {
+      "id": "CZ-A2-FW-DIGIT",
+      "lens": "CZ1",
+      "payload": "rtczFw1Allowx vs fullwidth １ U+FF11 (NFKC→1)",
+      "http_bd": "n_tr=1 B400=false tids=[tr_1UCgVtH7FWYUN3jhYOoXNaXc] Δ=-1.0 A=200 {\"success\":true,\"transferId\":\"tr_1UCgVtH7FWYUN3jhYOoXNaXc\",\"balance\":55} loc=\"\" B=200 {\"success\":true,\"transferId\":\"tr_1UCgVtH7FWYUN3jhYOoXNaXc\",\"balance\":55,\"idempotent\":true} loc=\"\"",
+      "result": "HOLD"
+    },
+    {
+      "id": "CZ-A3-ZWSP",
+      "lens": "CZ1",
+      "payload": "ZWSP U+200B no meio rtczAl<ZWSP>ow05xx",
+      "http_bd": "http=400 n_tr=0 Δ=0.0 tids=[] 400 {\"error\":\"idempotency_key inválida. Reinicia o levantamento na app.\",\"code\":\"payout_failed\"} loc=\"\"",
+      "result": "HOLD"
+    },
+    {
+      "id": "CZ-A3-BIDI",
+      "lens": "CZ1",
+      "payload": "bidi RLO U+202E no meio",
+      "http_bd": "http=400 n_tr=0 Δ=0.0 tids=[] 400 {\"error\":\"idempotency_key inválida. Reinicia o levantamento na app.\",\"code\":\"payout_failed\"} loc=\"\"",
+      "result": "HOLD"
+    },
+    {
+      "id": "CZ-A3-TAG",
+      "lens": "CZ1",
+      "payload": "TAG LATIN SMALL A U+E0061 no meio (novo vs CT)",
+      "http_bd": "http=400 n_tr=0 Δ=0.0 tids=[] 400 {\"error\":\"idempotency_key inválida. Reinicia o levantamento na app.\",\"code\":\"payout_failed\"} loc=\"\"",
+      "result": "HOLD"
+    },
+    {
+      "id": "CZ-A4-PLUS",
+      "lens": "CZ1",
+      "payload": "key ASCII com + (novo vs CT %/space/newline)",
+      "http_bd": "http=400 n_tr=0 Δ=0.0 tids=[] 400 {\"error\":\"idempotency_key inválida. Reinicia o levantamento na app.\",\"code\":\"payout_failed\"} loc=\"\"",
+      "result": "HOLD"
+    },
+    {
+      "id": "CZ-A4-PERCENT",
+      "lens": "CZ1",
+      "payload": "key com %",
+      "http_bd": "http=400 n_tr=0 Δ=0.0 tids=[] 400 {\"error\":\"idempotency_key inválida. Reinicia o levantamento na app.\",\"code\":\"payout_failed\"} loc=\"\"",
+      "result": "HOLD"
+    },
+    {
+      "id": "CZ-A5-SOFT-HYPHEN",
+      "lens": "CZ1",
+      "payload": "soft hyphen U+00AD no meio vs ASCII (NFKC pode apagar)",
+      "http_bd": "n_tr=1 B400=true tids=[tr_1UCgW4H7FWYUN3jhY9L3gZfU] Δ=-1.0 A=200 {\"success\":true,\"transferId\":\"tr_1UCgW4H7FWYUN3jhY9L3gZfU\",\"balance\":54} loc=\"\" B=400 {\"error\":\"idempotency_key inválida. Reinicia o levantamento na app.\",\"code\":\"payout_failed\"} loc=\"\"",
+      "result": "HOLD"
+    },
+    {
+      "id": "CZ-A6-LIGATURE",
+      "lens": "CZ1",
+      "payload": "ligadura ﬁ U+FB01 NFKC→fi vs ASCII fi",
+      "http_bd": "n_tr=1 B400=false tids=[tr_1UCgW8H7FWYUN3jh3tmua1Qb] Δ=-1.0 A=200 {\"success\":true,\"transferId\":\"tr_1UCgW8H7FWYUN3jh3tmua1Qb\",\"balance\":53} loc=\"\" B=200 {\"success\":true,\"transferId\":\"tr_1UCgW8H7FWYUN3jh3tmua1Qb\",\"balance\":53,\"idempotent\":true} loc=\"\"",
+      "result": "HOLD"
+    },
+    {
+      "id": "CZ-A8-TYPE-NUM",
+      "lens": "CZ1",
+      "payload": "idempotency_key JSON number 12345678 (type confusion)",
+      "http_bd": "400 {\"error\":\"idempotency_key em falta. Reinicia o levantamento na app.\",\"code\":\"payout_failed\"} loc=\"\"",
+      "result": "HOLD"
+    },
+    {
+      "id": "CZ-B1-CASE-Ii",
+      "lens": "CZ2",
+      "payload": "RTCZCASEIKEY9 vs rtczcaseikey9 (ASCII I/i)",
+      "http_bd": "n_tr=1 tids=[tr_1UCgWEH7FWYUN3jhaFd85Bz1] Δ=-1.0 A=200 {\"success\":true,\"transferId\":\"tr_1UCgWEH7FWYUN3jhaFd85Bz1\",\"balance\":52} loc=\"\" B=200 {\"success\":true,\"transferId\":\"tr_1UCgWEH7FWYUN3jhaFd85Bz1\",\"balance\":52,\"idempotent\":true} loc=\"\"",
+      "result": "HOLD"
+    },
+    {
+      "id": "CZ-B2-WD-UUID",
+      "lens": "CZ3",
+      "payload": "wd_<sellerUuid>_100_<ms> ASCII canónica",
+      "http_bd": "http=200 n_tr=1 tids={tr_1UCgWJH7FWYUN3jhLSLxEMYW} Δ=-1.0 200 {\"success\":true,\"transferId\":\"tr_1UCgWJH7FWYUN3jhLSLxEMYW\",\"balance\":51} loc=\"\"",
+      "result": "HOLD"
+    },
+    {
+      "id": "CZ-B3-WD-RETRY",
+      "lens": "CZ4",
+      "payload": "retry mesma wd_<uuid> B2",
+      "http_bd": "http=200 n_tr=0 tids={} Δ=0.0 idempotent=true 200 {\"success\":true,\"transferId\":\"tr_1UCgWJH7FWYUN3jhLSLxEMYW\",\"balance\":51,\"idempotent\":true} loc=\"\"",
+      "result": "HOLD"
+    },
+    {
+      "id": "CZ-C1-DEST",
+      "lens": "CZ4",
+      "payload": "destination=acct_1UB7nWHKe5ETfHI5 currency=usd amount=100",
+      "http_bd": "200 {\"success\":true,\"transferId\":\"tr_1UCgWPH7FWYUN3jhGVvF3iK7\",\"balance\":50} loc=\"\"",
+      "result": "HOLD"
+    },
+    {
+      "id": "CZ-C1b-OVERBAL",
+      "lens": "CZ6",
+      "payload": "amount=99999999 vs saldo 50.0",
+      "http_bd": "400 {\"error\":\"Saldo disponível insuficiente para este levantamento.\",\"code\":\"payout_failed\"} loc=\"\" Δ=0.0",
+      "result": "HOLD"
+    }
+  ],
+  "findings": [],
+  "blocked": [
+    {
+      "id": "CZ-A1-HANGUL",
+      "lens": "CZ1",
+      "title": "charset deny n_tr=0 Δ=0.0",
+      "ev": "400 {\"error\":\"idempotency_key inválida. Reinicia o levantamento na app.\",\"code\":\"payout_failed\"} loc=\"\""
+    },
+    {
+      "id": "CZ-A1-COPTIC",
+      "lens": "CZ1",
+      "title": "charset deny n_tr=0 Δ=0.0",
+      "ev": "400 {\"error\":\"idempotency_key inválida. Reinicia o levantamento na app.\",\"code\":\"payout_failed\"} loc=\"\""
+    },
+    {
+      "id": "CZ-A2-LATIN-ACCENT",
+      "lens": "CZ1",
+      "title": "charset deny n_tr=0 Δ=0.0",
+      "ev": "400 {\"error\":\"idempotency_key inválida. Reinicia o levantamento na app.\",\"code\":\"payout_failed\"} loc=\"\""
+    },
+    {
+      "id": "CZ-A2-FW-DIGIT",
+      "lens": "CZ1",
+      "title": "nfkc pair n_tr=1 B400=false",
+      "ev": {
+        "keyA": "rtczFw1Allowx",
+        "keyB": "rtczFw１Allowx",
+        "keyA_units": [
+          114,
+          116,
+          99,
+          122,
+          70,
+          119,
+          49,
+          65,
+          108,
+          108,
+          111,
+          119,
+          120
+        ],
+        "keyB_units": [
+          114,
+          116,
+          99,
+          122,
+          70,
+          119,
+          65297,
+          65,
+          108,
+          108,
+          111,
+          119,
+          120
+        ],
+        "hitA": "200 {\"success\":true,\"transferId\":\"tr_1UCgVtH7FWYUN3jhYOoXNaXc\",\"balance\":55} loc=\"\"",
+        "hitB": "200 {\"success\":true,\"transferId\":\"tr_1UCgVtH7FWYUN3jhYOoXNaXc\",\"balance\":55,\"idempotent\":true} loc=\"\"",
+        "tidA": "tr_1UCgVtH7FWYUN3jhYOoXNaXc",
+        "tidB": "tr_1UCgVtH7FWYUN3jhYOoXNaXc",
+        "new_transfer_ids": [
+          "tr_1UCgVtH7FWYUN3jhYOoXNaXc"
+        ],
+        "new_transfer_count": 1,
+        "wallet_before": 56.0,
+        "wallet_after": 55.0,
+        "delta_eur": -1.0,
+        "payoutOkA": true,
+        "payoutOkB": true,
+        "idempotentB": true
+      }
+    },
+    {
+      "id": "CZ-A3-ZWSP",
+      "lens": "CZ1",
+      "title": "charset deny n_tr=0 Δ=0.0",
+      "ev": "400 {\"error\":\"idempotency_key inválida. Reinicia o levantamento na app.\",\"code\":\"payout_failed\"} loc=\"\""
+    },
+    {
+      "id": "CZ-A3-BIDI",
+      "lens": "CZ1",
+      "title": "charset deny n_tr=0 Δ=0.0",
+      "ev": "400 {\"error\":\"idempotency_key inválida. Reinicia o levantamento na app.\",\"code\":\"payout_failed\"} loc=\"\""
+    },
+    {
+      "id": "CZ-A3-TAG",
+      "lens": "CZ1",
+      "title": "charset deny n_tr=0 Δ=0.0",
+      "ev": "400 {\"error\":\"idempotency_key inválida. Reinicia o levantamento na app.\",\"code\":\"payout_failed\"} loc=\"\""
+    },
+    {
+      "id": "CZ-A4-PLUS",
+      "lens": "CZ1",
+      "title": "charset deny n_tr=0 Δ=0.0",
+      "ev": "400 {\"error\":\"idempotency_key inválida. Reinicia o levantamento na app.\",\"code\":\"payout_failed\"} loc=\"\""
+    },
+    {
+      "id": "CZ-A4-PERCENT",
+      "lens": "CZ1",
+      "title": "charset deny n_tr=0 Δ=0.0",
+      "ev": "400 {\"error\":\"idempotency_key inválida. Reinicia o levantamento na app.\",\"code\":\"payout_failed\"} loc=\"\""
+    },
+    {
+      "id": "CZ-A5-SOFT-HYPHEN",
+      "lens": "CZ1",
+      "title": "nfkc pair n_tr=1 B400=true",
+      "ev": {
+        "keyA": "rtczShyphen1",
+        "keyB": "rtczS­hyphen1",
+        "keyA_units": [
+          114,
+          116,
+          99,
+          122,
+          83,
+          104,
+          121,
+          112,
+          104,
+          101,
+          110,
+          49
+        ],
+        "keyB_units": [
+          114,
+          116,
+          99,
+          122,
+          83,
+          173,
+          104,
+          121,
+          112,
+          104,
+          101,
+          110,
+          49
+        ],
+        "hitA": "200 {\"success\":true,\"transferId\":\"tr_1UCgW4H7FWYUN3jhY9L3gZfU\",\"balance\":54} loc=\"\"",
+        "hitB": "400 {\"error\":\"idempotency_key inválida. Reinicia o levantamento na app.\",\"code\":\"payout_failed\"} loc=\"\"",
+        "tidA": "tr_1UCgW4H7FWYUN3jhY9L3gZfU",
+        "tidB": "",
+        "new_transfer_ids": [
+          "tr_1UCgW4H7FWYUN3jhY9L3gZfU"
+        ],
+        "new_transfer_count": 1,
+        "wallet_before": 55.0,
+        "wallet_after": 54.0,
+        "delta_eur": -1.0,
+        "payoutOkA": true,
+        "payoutOkB": false,
+        "idempotentB": false
+      }
+    },
+    {
+      "id": "CZ-A6-LIGATURE",
+      "lens": "CZ1",
+      "title": "nfkc pair n_tr=1 B400=false",
+      "ev": {
+        "keyA": "rtczfikeyxx1",
+        "keyB": "rtczﬁkeyxx1",
+        "keyA_units": [
+          114,
+          116,
+          99,
+          122,
+          102,
+          105,
+          107,
+          101,
+          121,
+          120,
+          120,
+          49
+        ],
+        "keyB_units": [
+          114,
+          116,
+          99,
+          122,
+          64257,
+          107,
+          101,
+          121,
+          120,
+          120,
+          49
+        ],
+        "hitA": "200 {\"success\":true,\"transferId\":\"tr_1UCgW8H7FWYUN3jh3tmua1Qb\",\"balance\":53} loc=\"\"",
+        "hitB": "200 {\"success\":true,\"transferId\":\"tr_1UCgW8H7FWYUN3jh3tmua1Qb\",\"balance\":53,\"idempotent\":true} loc=\"\"",
+        "tidA": "tr_1UCgW8H7FWYUN3jh3tmua1Qb",
+        "tidB": "tr_1UCgW8H7FWYUN3jh3tmua1Qb",
+        "new_transfer_ids": [
+          "tr_1UCgW8H7FWYUN3jh3tmua1Qb"
+        ],
+        "new_transfer_count": 1,
+        "wallet_before": 54.0,
+        "wallet_after": 53.0,
+        "delta_eur": -1.0,
+        "payoutOkA": true,
+        "payoutOkB": true,
+        "idempotentB": true
+      }
+    },
+    {
+      "id": "A8.type",
+      "lens": "CZ1",
+      "title": "key number recusada",
+      "ev": "400 {\"error\":\"idempotency_key em falta. Reinicia o levantamento na app.\",\"code\":\"payout_failed\"} loc=\"\""
+    },
+    {
+      "id": "B1.Ii",
+      "lens": "CZ2",
+      "title": "I vs i n_tr=1",
+      "ev": {
+        "keyA": "RTCZCASEIKEY9",
+        "keyB": "rtczcaseikey9",
+        "keyA_units": [
+          82,
+          84,
+          67,
+          90,
+          67,
+          65,
+          83,
+          69,
+          73,
+          75,
+          69,
+          89,
+          57
+        ],
+        "keyB_units": [
+          114,
+          116,
+          99,
+          122,
+          99,
+          97,
+          115,
+          101,
+          105,
+          107,
+          101,
+          121,
+          57
+        ],
+        "hitA": "200 {\"success\":true,\"transferId\":\"tr_1UCgWEH7FWYUN3jhaFd85Bz1\",\"balance\":52} loc=\"\"",
+        "hitB": "200 {\"success\":true,\"transferId\":\"tr_1UCgWEH7FWYUN3jhaFd85Bz1\",\"balance\":52,\"idempotent\":true} loc=\"\"",
+        "tidA": "tr_1UCgWEH7FWYUN3jhaFd85Bz1",
+        "tidB": "tr_1UCgWEH7FWYUN3jhaFd85Bz1",
+        "new_transfer_ids": [
+          "tr_1UCgWEH7FWYUN3jhaFd85Bz1"
+        ],
+        "new_transfer_count": 1,
+        "wallet_before": 53.0,
+        "wallet_after": 52.0,
+        "delta_eur": -1.0,
+        "payoutOkA": true,
+        "payoutOkB": true,
+        "idempotentB": true
+      }
+    },
+    {
+      "id": "B2.wd",
+      "lens": "CZ3",
+      "title": "wd_uuid Transfer OK [tr_1UCgWJH7FWYUN3jhLSLxEMYW]",
+      "ev": "200 {\"success\":true,\"transferId\":\"tr_1UCgWJH7FWYUN3jhLSLxEMYW\",\"balance\":51} loc=\"\""
+    },
+    {
+      "id": "B3.retry",
+      "lens": "CZ4",
+      "title": "retry idempotente n_tr=0",
+      "ev": "200 {\"success\":true,\"transferId\":\"tr_1UCgWJH7FWYUN3jhLSLxEMYW\",\"balance\":51,\"idempotent\":true} loc=\"\""
+    },
+    {
+      "id": "dest.body",
+      "lens": "CZ4",
+      "title": "Transfer própria; dest/currency ignorados",
+      "ev": "200 {\"success\":true,\"transferId\":\"tr_1UCgWPH7FWYUN3jhGVvF3iK7\",\"balance\":50} loc=\"\""
+    },
+    {
+      "id": "mint.huge",
+      "lens": "CZ6",
+      "title": "payout>balance recusado Δ≈0",
+      "ev": "400 {\"error\":\"Saldo disponível insuficiente para este levantamento.\",\"code\":\"payout_failed\"} loc=\"\""
+    }
+  ],
+  "skipped": [],
+  "notes": [
+    {
+      "id": "wallet0",
+      "lens": "CZ6",
+      "title": "seller wallet before",
+      "ev": {
+        "id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+        "balance": 56.0,
+        "stripe_account_id": "acct_1U5mYbQeUNx8ar08",
+        "updated_at": "2026-09-06T13:40:31.44337+00:00"
+      }
+    },
+    {
+      "id": "wallet.funded",
+      "lens": "CZ6",
+      "title": "seller after fixture",
+      "ev": {
+        "id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+        "balance": 56.0,
+        "stripe_account_id": "acct_1U5mYbQeUNx8ar08",
+        "updated_at": "2026-09-06T13:40:31.44337+00:00"
+      }
+    },
+    {
+      "id": "pair.CZ-A2-FW-DIGIT",
+      "lens": "CZ1",
+      "title": "pair CZ-A2-FW-DIGIT",
+      "ev": {
+        "keyA": "rtczFw1Allowx",
+        "keyB": "rtczFw１Allowx",
+        "keyA_units": [
+          114,
+          116,
+          99,
+          122,
+          70,
+          119,
+          49,
+          65,
+          108,
+          108,
+          111,
+          119,
+          120
+        ],
+        "keyB_units": [
+          114,
+          116,
+          99,
+          122,
+          70,
+          119,
+          65297,
+          65,
+          108,
+          108,
+          111,
+          119,
+          120
+        ],
+        "hitA": "200 {\"success\":true,\"transferId\":\"tr_1UCgVtH7FWYUN3jhYOoXNaXc\",\"balance\":55} loc=\"\"",
+        "hitB": "200 {\"success\":true,\"transferId\":\"tr_1UCgVtH7FWYUN3jhYOoXNaXc\",\"balance\":55,\"idempotent\":true} loc=\"\"",
+        "tidA": "tr_1UCgVtH7FWYUN3jhYOoXNaXc",
+        "tidB": "tr_1UCgVtH7FWYUN3jhYOoXNaXc",
+        "new_transfer_ids": [
+          "tr_1UCgVtH7FWYUN3jhYOoXNaXc"
+        ],
+        "new_transfer_count": 1,
+        "wallet_before": 56.0,
+        "wallet_after": 55.0,
+        "delta_eur": -1.0,
+        "payoutOkA": true,
+        "payoutOkB": true,
+        "idempotentB": true
+      }
+    },
+    {
+      "id": "pair.CZ-A5-SOFT-HYPHEN",
+      "lens": "CZ1",
+      "title": "pair CZ-A5-SOFT-HYPHEN",
+      "ev": {
+        "keyA": "rtczShyphen1",
+        "keyB": "rtczS­hyphen1",
+        "keyA_units": [
+          114,
+          116,
+          99,
+          122,
+          83,
+          104,
+          121,
+          112,
+          104,
+          101,
+          110,
+          49
+        ],
+        "keyB_units": [
+          114,
+          116,
+          99,
+          122,
+          83,
+          173,
+          104,
+          121,
+          112,
+          104,
+          101,
+          110,
+          49
+        ],
+        "hitA": "200 {\"success\":true,\"transferId\":\"tr_1UCgW4H7FWYUN3jhY9L3gZfU\",\"balance\":54} loc=\"\"",
+        "hitB": "400 {\"error\":\"idempotency_key inválida. Reinicia o levantamento na app.\",\"code\":\"payout_failed\"} loc=\"\"",
+        "tidA": "tr_1UCgW4H7FWYUN3jhY9L3gZfU",
+        "tidB": "",
+        "new_transfer_ids": [
+          "tr_1UCgW4H7FWYUN3jhY9L3gZfU"
+        ],
+        "new_transfer_count": 1,
+        "wallet_before": 55.0,
+        "wallet_after": 54.0,
+        "delta_eur": -1.0,
+        "payoutOkA": true,
+        "payoutOkB": false,
+        "idempotentB": false
+      }
+    },
+    {
+      "id": "pair.CZ-A6-LIGATURE",
+      "lens": "CZ1",
+      "title": "pair CZ-A6-LIGATURE",
+      "ev": {
+        "keyA": "rtczfikeyxx1",
+        "keyB": "rtczﬁkeyxx1",
+        "keyA_units": [
+          114,
+          116,
+          99,
+          122,
+          102,
+          105,
+          107,
+          101,
+          121,
+          120,
+          120,
+          49
+        ],
+        "keyB_units": [
+          114,
+          116,
+          99,
+          122,
+          64257,
+          107,
+          101,
+          121,
+          120,
+          120,
+          49
+        ],
+        "hitA": "200 {\"success\":true,\"transferId\":\"tr_1UCgW8H7FWYUN3jh3tmua1Qb\",\"balance\":53} loc=\"\"",
+        "hitB": "200 {\"success\":true,\"transferId\":\"tr_1UCgW8H7FWYUN3jh3tmua1Qb\",\"balance\":53,\"idempotent\":true} loc=\"\"",
+        "tidA": "tr_1UCgW8H7FWYUN3jh3tmua1Qb",
+        "tidB": "tr_1UCgW8H7FWYUN3jh3tmua1Qb",
+        "new_transfer_ids": [
+          "tr_1UCgW8H7FWYUN3jh3tmua1Qb"
+        ],
+        "new_transfer_count": 1,
+        "wallet_before": 54.0,
+        "wallet_after": 53.0,
+        "delta_eur": -1.0,
+        "payoutOkA": true,
+        "payoutOkB": true,
+        "idempotentB": true
+      }
+    },
+    {
+      "id": "pair.B1-Ii",
+      "lens": "CZ2",
+      "title": "pair B1-Ii",
+      "ev": {
+        "keyA": "RTCZCASEIKEY9",
+        "keyB": "rtczcaseikey9",
+        "keyA_units": [
+          82,
+          84,
+          67,
+          90,
+          67,
+          65,
+          83,
+          69,
+          73,
+          75,
+          69,
+          89,
+          57
+        ],
+        "keyB_units": [
+          114,
+          116,
+          99,
+          122,
+          99,
+          97,
+          115,
+          101,
+          105,
+          107,
+          101,
+          121,
+          57
+        ],
+        "hitA": "200 {\"success\":true,\"transferId\":\"tr_1UCgWEH7FWYUN3jhaFd85Bz1\",\"balance\":52} loc=\"\"",
+        "hitB": "200 {\"success\":true,\"transferId\":\"tr_1UCgWEH7FWYUN3jhaFd85Bz1\",\"balance\":52,\"idempotent\":true} loc=\"\"",
+        "tidA": "tr_1UCgWEH7FWYUN3jhaFd85Bz1",
+        "tidB": "tr_1UCgWEH7FWYUN3jhaFd85Bz1",
+        "new_transfer_ids": [
+          "tr_1UCgWEH7FWYUN3jhaFd85Bz1"
+        ],
+        "new_transfer_count": 1,
+        "wallet_before": 53.0,
+        "wallet_after": 52.0,
+        "delta_eur": -1.0,
+        "payoutOkA": true,
+        "payoutOkB": true,
+        "idempotentB": true
+      }
+    },
+    {
+      "id": "wallet.end.p1",
+      "lens": "CZ6",
+      "title": "seller wallet end pass1",
+      "ev": {
+        "id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+        "balance": 50.0,
+        "stripe_account_id": "acct_1U5mYbQeUNx8ar08",
+        "updated_at": "2026-09-06T13:54:12.843363+00:00"
+      }
+    }
+  ],
+  "actors": {
+    "buyer": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+    "seller": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+    "buyer2": null,
+    "seller2": "fcc2acff-a57f-4b57-bb38-6d5f1a75153f"
+  },
+  "created": {
+    "orders": [],
+    "products": []
+  }
+}

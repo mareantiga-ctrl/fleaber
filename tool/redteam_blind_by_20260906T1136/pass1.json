@@ -1,0 +1,952 @@
+{
+  "auditor": "REDTEAM_BLIND_BY_CHAT_POS_BRBW_v1",
+  "stamp": "20260906T1136",
+  "production_touched": false,
+  "fase4": false,
+  "corrections_applied": false,
+  "lenses": [
+    "BY1",
+    "BY2",
+    "BY3",
+    "BY4",
+    "BY5",
+    "BY6",
+    "BY7",
+    "BY8"
+  ],
+  "fixtures": {
+    "sku": "f8ef4848-cf83-4ff5-833b-e5746d6cedde",
+    "chat": "edb67d60-6e7f-4fee-8b69-44e9b69721a7",
+    "mbway_order": "52db2fa8-47d3-481c-85b5-de3b93380b63",
+    "paid_order": "193a6333-89a5-43a1-8df2-b7b49413a2a2",
+    "paid_cents": 590,
+    "paid_chat": "bf654459-f8b5-4899-8bec-38c0eaafd820",
+    "paid2_order": "c548838a-e478-4d67-9774-7e534926ceb8",
+    "paid2_chat": "4eb5c793-d9e5-4b5f-89d3-3a6661b75f06",
+    "live": "9e5dccf3-28fd-4807-9091-decc31ebecb5",
+    "buyer2": "39c7e4e9-41ab-4d6d-82ad-35dd3bdacc41",
+    "proof_a": "order_proofs/bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96/52db2fa8-47d3-481c-85b5-de3b93380b63/rtby_a.png",
+    "proof_b": "order_proofs/bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96/c548838a-e478-4d67-9774-7e534926ceb8/rtby_b.png"
+  },
+  "findings": [
+    {
+      "id": "BY1.notes-skrill",
+      "lens": "BY1",
+      "severity": "P1",
+      "title": "card reservation_payment_submitted notes=Skrill 12,00 €",
+      "actor": "buyer JWT",
+      "pre": "denylist BRBW sem este rail/encoding/URL",
+      "repro": "POST chat_messages FLEABER_JSON_V1:{\"kind\":\"reservation_payment_submitted\",\"order_id\":\"52db2fa8-47d3-481c-85b5-de3b93380b63\",\"notes\":\"Skrill 12,00 €\"}",
+      "expected": "chat_system_card_notes_forbidden / url_denied / label_mismatch",
+      "obtained": "201 [{\"id\":1461,\"created_at\":\"2026-09-06T10:41:44.092913+00:00\",\"chat_id\":\"edb67d60-6e7f-4fee-8b69-44e9b69721a7\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"reservation_payment_subm…",
+      "proven": true,
+      "evidence": {
+        "id": "1461",
+        "kind": "reservation_payment_submitted",
+        "payload": {
+          "kind": "reservation_payment_submitted",
+          "order_id": "52db2fa8-47d3-481c-85b5-de3b93380b63",
+          "notes": "Skrill 12,00 €"
+        }
+      }
+    },
+    {
+      "id": "BY1.notes-neteller",
+      "lens": "BY1",
+      "severity": "P1",
+      "title": "card reservation_payment_submitted notes=Neteller 12,00 €",
+      "actor": "buyer JWT",
+      "pre": "denylist BRBW sem este rail/encoding/URL",
+      "repro": "POST chat_messages FLEABER_JSON_V1:{\"kind\":\"reservation_payment_submitted\",\"order_id\":\"52db2fa8-47d3-481c-85b5-de3b93380b63\",\"notes\":\"Neteller 12,00 €\"}",
+      "expected": "chat_system_card_notes_forbidden / url_denied / label_mismatch",
+      "obtained": "201 [{\"id\":1462,\"created_at\":\"2026-09-06T10:41:44.332086+00:00\",\"chat_id\":\"edb67d60-6e7f-4fee-8b69-44e9b69721a7\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"reservation_payment_subm…",
+      "proven": true,
+      "evidence": {
+        "id": "1462",
+        "kind": "reservation_payment_submitted",
+        "payload": {
+          "kind": "reservation_payment_submitted",
+          "order_id": "52db2fa8-47d3-481c-85b5-de3b93380b63",
+          "notes": "Neteller 12,00 €"
+        }
+      }
+    },
+    {
+      "id": "BY1.notes-enviado-mb",
+      "lens": "BY1",
+      "severity": "P1",
+      "title": "card reservation_payment_submitted notes=enviado MB",
+      "actor": "buyer JWT",
+      "pre": "denylist BRBW sem este rail/encoding/URL",
+      "repro": "POST chat_messages FLEABER_JSON_V1:{\"kind\":\"reservation_payment_submitted\",\"order_id\":\"52db2fa8-47d3-481c-85b5-de3b93380b63\",\"notes\":\"enviado MB\"}",
+      "expected": "chat_system_card_notes_forbidden / url_denied / label_mismatch",
+      "obtained": "201 [{\"id\":1464,\"created_at\":\"2026-09-06T10:41:44.748086+00:00\",\"chat_id\":\"edb67d60-6e7f-4fee-8b69-44e9b69721a7\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"reservation_payment_subm…",
+      "proven": true,
+      "evidence": {
+        "id": "1464",
+        "kind": "reservation_payment_submitted",
+        "payload": {
+          "kind": "reservation_payment_submitted",
+          "order_id": "52db2fa8-47d3-481c-85b5-de3b93380b63",
+          "notes": "enviado MB"
+        }
+      }
+    },
+    {
+      "id": "BY1.notes-enviado-mb-amt",
+      "lens": "BY1",
+      "severity": "P1",
+      "title": "card reservation_payment_submitted notes=enviado MB 12,00 €",
+      "actor": "buyer JWT",
+      "pre": "denylist BRBW sem este rail/encoding/URL",
+      "repro": "POST chat_messages FLEABER_JSON_V1:{\"kind\":\"reservation_payment_submitted\",\"order_id\":\"52db2fa8-47d3-481c-85b5-de3b93380b63\",\"notes\":\"enviado MB 12,00 €\"}",
+      "expected": "chat_system_card_notes_forbidden / url_denied / label_mismatch",
+      "obtained": "201 [{\"id\":1465,\"created_at\":\"2026-09-06T10:41:44.94+00:00\",\"chat_id\":\"edb67d60-6e7f-4fee-8b69-44e9b69721a7\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"reservation_payment_submitte…",
+      "proven": true,
+      "evidence": {
+        "id": "1465",
+        "kind": "reservation_payment_submitted",
+        "payload": {
+          "kind": "reservation_payment_submitted",
+          "order_id": "52db2fa8-47d3-481c-85b5-de3b93380b63",
+          "notes": "enviado MB 12,00 €"
+        }
+      }
+    },
+    {
+      "id": "BY1.notes-paysafe",
+      "lens": "BY1",
+      "severity": "P1",
+      "title": "card reservation_payment_submitted notes=Paysafecard 12,00 €",
+      "actor": "buyer JWT",
+      "pre": "denylist BRBW sem este rail/encoding/URL",
+      "repro": "POST chat_messages FLEABER_JSON_V1:{\"kind\":\"reservation_payment_submitted\",\"order_id\":\"52db2fa8-47d3-481c-85b5-de3b93380b63\",\"notes\":\"Paysafecard 12,00 €\"}",
+      "expected": "chat_system_card_notes_forbidden / url_denied / label_mismatch",
+      "obtained": "201 [{\"id\":1466,\"created_at\":\"2026-09-06T10:41:45.156591+00:00\",\"chat_id\":\"edb67d60-6e7f-4fee-8b69-44e9b69721a7\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"reservation_payment_subm…",
+      "proven": true,
+      "evidence": {
+        "id": "1466",
+        "kind": "reservation_payment_submitted",
+        "payload": {
+          "kind": "reservation_payment_submitted",
+          "order_id": "52db2fa8-47d3-481c-85b5-de3b93380b63",
+          "notes": "Paysafecard 12,00 €"
+        }
+      }
+    },
+    {
+      "id": "BY1.notes-moneygram",
+      "lens": "BY1",
+      "severity": "P1",
+      "title": "card reservation_payment_submitted notes=MoneyGram 12,00 €",
+      "actor": "buyer JWT",
+      "pre": "denylist BRBW sem este rail/encoding/URL",
+      "repro": "POST chat_messages FLEABER_JSON_V1:{\"kind\":\"reservation_payment_submitted\",\"order_id\":\"52db2fa8-47d3-481c-85b5-de3b93380b63\",\"notes\":\"MoneyGram 12,00 €\"}",
+      "expected": "chat_system_card_notes_forbidden / url_denied / label_mismatch",
+      "obtained": "201 [{\"id\":1467,\"created_at\":\"2026-09-06T10:41:45.386488+00:00\",\"chat_id\":\"edb67d60-6e7f-4fee-8b69-44e9b69721a7\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"reservation_payment_subm…",
+      "proven": true,
+      "evidence": {
+        "id": "1467",
+        "kind": "reservation_payment_submitted",
+        "payload": {
+          "kind": "reservation_payment_submitted",
+          "order_id": "52db2fa8-47d3-481c-85b5-de3b93380b63",
+          "notes": "MoneyGram 12,00 €"
+        }
+      }
+    },
+    {
+      "id": "BY1.notes-gcash",
+      "lens": "BY1",
+      "severity": "P1",
+      "title": "card reservation_payment_submitted notes=GCash 12,00 €",
+      "actor": "buyer JWT",
+      "pre": "denylist BRBW sem este rail/encoding/URL",
+      "repro": "POST chat_messages FLEABER_JSON_V1:{\"kind\":\"reservation_payment_submitted\",\"order_id\":\"52db2fa8-47d3-481c-85b5-de3b93380b63\",\"notes\":\"GCash 12,00 €\"}",
+      "expected": "chat_system_card_notes_forbidden / url_denied / label_mismatch",
+      "obtained": "201 [{\"id\":1468,\"created_at\":\"2026-09-06T10:41:45.608122+00:00\",\"chat_id\":\"edb67d60-6e7f-4fee-8b69-44e9b69721a7\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"reservation_payment_subm…",
+      "proven": true,
+      "evidence": {
+        "id": "1468",
+        "kind": "reservation_payment_submitted",
+        "payload": {
+          "kind": "reservation_payment_submitted",
+          "order_id": "52db2fa8-47d3-481c-85b5-de3b93380b63",
+          "notes": "GCash 12,00 €"
+        }
+      }
+    },
+    {
+      "id": "BY1.seguro-skrill",
+      "lens": "BY1",
+      "severity": "P1",
+      "title": "seguro_fleaber_paid label=Skrill 12,00 €",
+      "actor": "buyer JWT",
+      "pre": "denylist BRBW sem este rail/encoding/URL",
+      "repro": "POST chat_messages FLEABER_JSON_V1:{\"kind\":\"seguro_fleaber_paid\",\"order_id\":\"193a6333-89a5-43a1-8df2-b7b49413a2a2\",\"total\":\"5.90\",\"label\":\"Skrill 12,00 €\"}",
+      "expected": "chat_system_card_notes_forbidden / url_denied / label_mismatch",
+      "obtained": "201 [{\"id\":1471,\"created_at\":\"2026-09-06T10:41:46.220878+00:00\",\"chat_id\":\"bf654459-f8b5-4899-8bec-38c0eaafd820\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"seguro_fleaber_paid\\\",\\\"…",
+      "proven": true,
+      "evidence": {
+        "id": "1471",
+        "kind": "seguro_fleaber_paid",
+        "payload": {
+          "kind": "seguro_fleaber_paid",
+          "order_id": "193a6333-89a5-43a1-8df2-b7b49413a2a2",
+          "total": "5.90",
+          "label": "Skrill 12,00 €"
+        }
+      }
+    },
+    {
+      "id": "BY1.seguro-neteller",
+      "lens": "BY1",
+      "severity": "P1",
+      "title": "seguro_fleaber_paid label=Neteller 12,00 €",
+      "actor": "buyer JWT",
+      "pre": "denylist BRBW sem este rail/encoding/URL",
+      "repro": "POST chat_messages FLEABER_JSON_V1:{\"kind\":\"seguro_fleaber_paid\",\"order_id\":\"193a6333-89a5-43a1-8df2-b7b49413a2a2\",\"total\":\"5.90\",\"label\":\"Neteller 12,00 €\"}",
+      "expected": "chat_system_card_notes_forbidden / url_denied / label_mismatch",
+      "obtained": "201 [{\"id\":1472,\"created_at\":\"2026-09-06T10:41:46.427301+00:00\",\"chat_id\":\"bf654459-f8b5-4899-8bec-38c0eaafd820\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"seguro_fleaber_paid\\\",\\\"…",
+      "proven": true,
+      "evidence": {
+        "id": "1472",
+        "kind": "seguro_fleaber_paid",
+        "payload": {
+          "kind": "seguro_fleaber_paid",
+          "order_id": "193a6333-89a5-43a1-8df2-b7b49413a2a2",
+          "total": "5.90",
+          "label": "Neteller 12,00 €"
+        }
+      }
+    },
+    {
+      "id": "BY1.seguro-enviado-mb",
+      "lens": "BY1",
+      "severity": "P1",
+      "title": "seguro_fleaber_paid label=enviado MB",
+      "actor": "buyer JWT",
+      "pre": "denylist BRBW sem este rail/encoding/URL",
+      "repro": "POST chat_messages FLEABER_JSON_V1:{\"kind\":\"seguro_fleaber_paid\",\"order_id\":\"193a6333-89a5-43a1-8df2-b7b49413a2a2\",\"total\":\"5.90\",\"label\":\"enviado MB\"}",
+      "expected": "chat_system_card_notes_forbidden / url_denied / label_mismatch",
+      "obtained": "201 [{\"id\":1474,\"created_at\":\"2026-09-06T10:41:46.837983+00:00\",\"chat_id\":\"bf654459-f8b5-4899-8bec-38c0eaafd820\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"seguro_fleaber_paid\\\",\\\"…",
+      "proven": true,
+      "evidence": {
+        "id": "1474",
+        "kind": "seguro_fleaber_paid",
+        "payload": {
+          "kind": "seguro_fleaber_paid",
+          "order_id": "193a6333-89a5-43a1-8df2-b7b49413a2a2",
+          "total": "5.90",
+          "label": "enviado MB"
+        }
+      }
+    },
+    {
+      "id": "BY1.seguro-enviado-mb-amt",
+      "lens": "BY1",
+      "severity": "P1",
+      "title": "seguro_fleaber_paid label=enviado MB 12,00 €",
+      "actor": "buyer JWT",
+      "pre": "denylist BRBW sem este rail/encoding/URL",
+      "repro": "POST chat_messages FLEABER_JSON_V1:{\"kind\":\"seguro_fleaber_paid\",\"order_id\":\"193a6333-89a5-43a1-8df2-b7b49413a2a2\",\"total\":\"5.90\",\"label\":\"enviado MB 12,00 €\"}",
+      "expected": "chat_system_card_notes_forbidden / url_denied / label_mismatch",
+      "obtained": "201 [{\"id\":1475,\"created_at\":\"2026-09-06T10:41:47.053798+00:00\",\"chat_id\":\"bf654459-f8b5-4899-8bec-38c0eaafd820\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"seguro_fleaber_paid\\\",\\\"…",
+      "proven": true,
+      "evidence": {
+        "id": "1475",
+        "kind": "seguro_fleaber_paid",
+        "payload": {
+          "kind": "seguro_fleaber_paid",
+          "order_id": "193a6333-89a5-43a1-8df2-b7b49413a2a2",
+          "total": "5.90",
+          "label": "enviado MB 12,00 €"
+        }
+      }
+    },
+    {
+      "id": "BY1.seguro-paysafe",
+      "lens": "BY1",
+      "severity": "P1",
+      "title": "seguro_fleaber_paid label=Paysafecard 12,00 €",
+      "actor": "buyer JWT",
+      "pre": "denylist BRBW sem este rail/encoding/URL",
+      "repro": "POST chat_messages FLEABER_JSON_V1:{\"kind\":\"seguro_fleaber_paid\",\"order_id\":\"193a6333-89a5-43a1-8df2-b7b49413a2a2\",\"total\":\"5.90\",\"label\":\"Paysafecard 12,00 €\"}",
+      "expected": "chat_system_card_notes_forbidden / url_denied / label_mismatch",
+      "obtained": "201 [{\"id\":1476,\"created_at\":\"2026-09-06T10:41:47.236459+00:00\",\"chat_id\":\"bf654459-f8b5-4899-8bec-38c0eaafd820\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"seguro_fleaber_paid\\\",\\\"…",
+      "proven": true,
+      "evidence": {
+        "id": "1476",
+        "kind": "seguro_fleaber_paid",
+        "payload": {
+          "kind": "seguro_fleaber_paid",
+          "order_id": "193a6333-89a5-43a1-8df2-b7b49413a2a2",
+          "total": "5.90",
+          "label": "Paysafecard 12,00 €"
+        }
+      }
+    },
+    {
+      "id": "BY1.seguro-moneygram",
+      "lens": "BY1",
+      "severity": "P1",
+      "title": "seguro_fleaber_paid label=MoneyGram 12,00 €",
+      "actor": "buyer JWT",
+      "pre": "denylist BRBW sem este rail/encoding/URL",
+      "repro": "POST chat_messages FLEABER_JSON_V1:{\"kind\":\"seguro_fleaber_paid\",\"order_id\":\"193a6333-89a5-43a1-8df2-b7b49413a2a2\",\"total\":\"5.90\",\"label\":\"MoneyGram 12,00 €\"}",
+      "expected": "chat_system_card_notes_forbidden / url_denied / label_mismatch",
+      "obtained": "201 [{\"id\":1477,\"created_at\":\"2026-09-06T10:41:47.455284+00:00\",\"chat_id\":\"bf654459-f8b5-4899-8bec-38c0eaafd820\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"seguro_fleaber_paid\\\",\\\"…",
+      "proven": true,
+      "evidence": {
+        "id": "1477",
+        "kind": "seguro_fleaber_paid",
+        "payload": {
+          "kind": "seguro_fleaber_paid",
+          "order_id": "193a6333-89a5-43a1-8df2-b7b49413a2a2",
+          "total": "5.90",
+          "label": "MoneyGram 12,00 €"
+        }
+      }
+    },
+    {
+      "id": "BY1.seguro-gcash",
+      "lens": "BY1",
+      "severity": "P1",
+      "title": "seguro_fleaber_paid label=GCash 12,00 €",
+      "actor": "buyer JWT",
+      "pre": "denylist BRBW sem este rail/encoding/URL",
+      "repro": "POST chat_messages FLEABER_JSON_V1:{\"kind\":\"seguro_fleaber_paid\",\"order_id\":\"193a6333-89a5-43a1-8df2-b7b49413a2a2\",\"total\":\"5.90\",\"label\":\"GCash 12,00 €\"}",
+      "expected": "chat_system_card_notes_forbidden / url_denied / label_mismatch",
+      "obtained": "201 [{\"id\":1478,\"created_at\":\"2026-09-06T10:41:47.665277+00:00\",\"chat_id\":\"bf654459-f8b5-4899-8bec-38c0eaafd820\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"seguro_fleaber_paid\\\",\\\"…",
+      "proven": true,
+      "evidence": {
+        "id": "1478",
+        "kind": "seguro_fleaber_paid",
+        "payload": {
+          "kind": "seguro_fleaber_paid",
+          "order_id": "193a6333-89a5-43a1-8df2-b7b49413a2a2",
+          "total": "5.90",
+          "label": "GCash 12,00 €"
+        }
+      }
+    },
+    {
+      "id": "BY2.isss-clearpay",
+      "lens": "BY2",
+      "severity": "P1",
+      "title": "notes encoding BY2.isss-clearpay",
+      "actor": "buyer JWT",
+      "pre": "denylist BRBW sem este rail/encoding/URL",
+      "repro": "POST chat_messages FLEABER_JSON_V1:{\"kind\":\"reservation_payment_submitted\",\"order_id\":\"52db2fa8-47d3-481c-85b5-de3b93380b63\",\"notes\":\"Clea⁪rpay 12,00 €\"}",
+      "expected": "chat_system_card_notes_forbidden / url_denied / label_mismatch",
+      "obtained": "201 [{\"id\":1485,\"created_at\":\"2026-09-06T10:41:49.086323+00:00\",\"chat_id\":\"edb67d60-6e7f-4fee-8b69-44e9b69721a7\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"reservation_payment_subm…",
+      "proven": true,
+      "evidence": {
+        "id": "1485",
+        "kind": "reservation_payment_submitted",
+        "payload": {
+          "kind": "reservation_payment_submitted",
+          "order_id": "52db2fa8-47d3-481c-85b5-de3b93380b63",
+          "notes": "Clea⁪rpay 12,00 €"
+        }
+      }
+    },
+    {
+      "id": "BY2.cgj-clearpay",
+      "lens": "BY2",
+      "severity": "P1",
+      "title": "notes encoding BY2.cgj-clearpay",
+      "actor": "buyer JWT",
+      "pre": "denylist BRBW sem este rail/encoding/URL",
+      "repro": "POST chat_messages FLEABER_JSON_V1:{\"kind\":\"reservation_payment_submitted\",\"order_id\":\"52db2fa8-47d3-481c-85b5-de3b93380b63\",\"notes\":\"Clea͏rpay 12,00 €\"}",
+      "expected": "chat_system_card_notes_forbidden / url_denied / label_mismatch",
+      "obtained": "201 [{\"id\":1486,\"created_at\":\"2026-09-06T10:41:49.282333+00:00\",\"chat_id\":\"edb67d60-6e7f-4fee-8b69-44e9b69721a7\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"reservation_payment_subm…",
+      "proven": true,
+      "evidence": {
+        "id": "1486",
+        "kind": "reservation_payment_submitted",
+        "payload": {
+          "kind": "reservation_payment_submitted",
+          "order_id": "52db2fa8-47d3-481c-85b5-de3b93380b63",
+          "notes": "Clea͏rpay 12,00 €"
+        }
+      }
+    },
+    {
+      "id": "BY2.hwhf-clearpay",
+      "lens": "BY2",
+      "severity": "P1",
+      "title": "notes encoding BY2.hwhf-clearpay",
+      "actor": "buyer JWT",
+      "pre": "denylist BRBW sem este rail/encoding/URL",
+      "repro": "POST chat_messages FLEABER_JSON_V1:{\"kind\":\"reservation_payment_submitted\",\"order_id\":\"52db2fa8-47d3-481c-85b5-de3b93380b63\",\"notes\":\"Cleaﾠrpay 12,00 €\"}",
+      "expected": "chat_system_card_notes_forbidden / url_denied / label_mismatch",
+      "obtained": "201 [{\"id\":1487,\"created_at\":\"2026-09-06T10:41:49.497817+00:00\",\"chat_id\":\"edb67d60-6e7f-4fee-8b69-44e9b69721a7\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"reservation_payment_subm…",
+      "proven": true,
+      "evidence": {
+        "id": "1487",
+        "kind": "reservation_payment_submitted",
+        "payload": {
+          "kind": "reservation_payment_submitted",
+          "order_id": "52db2fa8-47d3-481c-85b5-de3b93380b63",
+          "notes": "Cleaﾠrpay 12,00 €"
+        }
+      }
+    },
+    {
+      "id": "BY2.alm-clearpay",
+      "lens": "BY2",
+      "severity": "P1",
+      "title": "notes encoding BY2.alm-clearpay",
+      "actor": "buyer JWT",
+      "pre": "denylist BRBW sem este rail/encoding/URL",
+      "repro": "POST chat_messages FLEABER_JSON_V1:{\"kind\":\"reservation_payment_submitted\",\"order_id\":\"52db2fa8-47d3-481c-85b5-de3b93380b63\",\"notes\":\"Clea؜rpay 12,00 €\"}",
+      "expected": "chat_system_card_notes_forbidden / url_denied / label_mismatch",
+      "obtained": "201 [{\"id\":1488,\"created_at\":\"2026-09-06T10:41:49.709084+00:00\",\"chat_id\":\"edb67d60-6e7f-4fee-8b69-44e9b69721a7\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"reservation_payment_subm…",
+      "proven": true,
+      "evidence": {
+        "id": "1488",
+        "kind": "reservation_payment_submitted",
+        "payload": {
+          "kind": "reservation_payment_submitted",
+          "order_id": "52db2fa8-47d3-481c-85b5-de3b93380b63",
+          "notes": "Clea؜rpay 12,00 €"
+        }
+      }
+    },
+    {
+      "id": "BY2.fvs1-clearpay",
+      "lens": "BY2",
+      "severity": "P1",
+      "title": "notes encoding BY2.fvs1-clearpay",
+      "actor": "buyer JWT",
+      "pre": "denylist BRBW sem este rail/encoding/URL",
+      "repro": "POST chat_messages FLEABER_JSON_V1:{\"kind\":\"reservation_payment_submitted\",\"order_id\":\"52db2fa8-47d3-481c-85b5-de3b93380b63\",\"notes\":\"Clea᠋rpay 12,00 €\"}",
+      "expected": "chat_system_card_notes_forbidden / url_denied / label_mismatch",
+      "obtained": "201 [{\"id\":1489,\"created_at\":\"2026-09-06T10:41:50.10475+00:00\",\"chat_id\":\"edb67d60-6e7f-4fee-8b69-44e9b69721a7\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"reservation_payment_submi…",
+      "proven": true,
+      "evidence": {
+        "id": "1489",
+        "kind": "reservation_payment_submitted",
+        "payload": {
+          "kind": "reservation_payment_submitted",
+          "order_id": "52db2fa8-47d3-481c-85b5-de3b93380b63",
+          "notes": "Clea᠋rpay 12,00 €"
+        }
+      }
+    },
+    {
+      "id": "BY2.isss-payoneer",
+      "lens": "BY2",
+      "severity": "P1",
+      "title": "notes encoding BY2.isss-payoneer",
+      "actor": "buyer JWT",
+      "pre": "denylist BRBW sem este rail/encoding/URL",
+      "repro": "POST chat_messages FLEABER_JSON_V1:{\"kind\":\"reservation_payment_submitted\",\"order_id\":\"52db2fa8-47d3-481c-85b5-de3b93380b63\",\"notes\":\"Payo⁪neer 12,00 €\"}",
+      "expected": "chat_system_card_notes_forbidden / url_denied / label_mismatch",
+      "obtained": "201 [{\"id\":1490,\"created_at\":\"2026-09-06T10:41:50.35799+00:00\",\"chat_id\":\"edb67d60-6e7f-4fee-8b69-44e9b69721a7\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"reservation_payment_submi…",
+      "proven": true,
+      "evidence": {
+        "id": "1490",
+        "kind": "reservation_payment_submitted",
+        "payload": {
+          "kind": "reservation_payment_submitted",
+          "order_id": "52db2fa8-47d3-481c-85b5-de3b93380b63",
+          "notes": "Payo⁪neer 12,00 €"
+        }
+      }
+    },
+    {
+      "id": "BY2.shy-skrill",
+      "lens": "BY2",
+      "severity": "P1",
+      "title": "notes encoding BY2.shy-skrill",
+      "actor": "buyer JWT",
+      "pre": "denylist BRBW sem este rail/encoding/URL",
+      "repro": "POST chat_messages FLEABER_JSON_V1:{\"kind\":\"reservation_payment_submitted\",\"order_id\":\"52db2fa8-47d3-481c-85b5-de3b93380b63\",\"notes\":\"Skri­ll 12,00 €\"}",
+      "expected": "chat_system_card_notes_forbidden / url_denied / label_mismatch",
+      "obtained": "201 [{\"id\":1491,\"created_at\":\"2026-09-06T10:41:50.619731+00:00\",\"chat_id\":\"edb67d60-6e7f-4fee-8b69-44e9b69721a7\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"reservation_payment_subm…",
+      "proven": true,
+      "evidence": {
+        "id": "1491",
+        "kind": "reservation_payment_submitted",
+        "payload": {
+          "kind": "reservation_payment_submitted",
+          "order_id": "52db2fa8-47d3-481c-85b5-de3b93380b63",
+          "notes": "Skri­ll 12,00 €"
+        }
+      }
+    },
+    {
+      "id": "BY5.inbox-isss-clearpay",
+      "lens": "BY5",
+      "severity": "P1",
+      "title": "inbox last_message forjado: Clea⁪rpay 12,00 €",
+      "actor": "buyer JWT",
+      "pre": "chats_update_participants",
+      "repro": "PATCH chats.last_message=Clea⁪rpay 12,00 €",
+      "expected": "chat_inbox_preview_forbidden",
+      "obtained": "Clea⁪rpay 12,00 €",
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "BY5.inbox-cgj-clearpay",
+      "lens": "BY5",
+      "severity": "P1",
+      "title": "inbox last_message forjado: Clea͏rpay 12,00 €",
+      "actor": "buyer JWT",
+      "pre": "chats_update_participants",
+      "repro": "PATCH chats.last_message=Clea͏rpay 12,00 €",
+      "expected": "chat_inbox_preview_forbidden",
+      "obtained": "Clea͏rpay 12,00 €",
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "BY4.double-encoding-dot",
+      "lens": "BY4",
+      "severity": "P2",
+      "title": "proof_url double-encoding %252e%252e",
+      "actor": "buyer JWT",
+      "pre": "denylist BRBW sem este rail/encoding/URL",
+      "repro": "POST chat_messages FLEABER_JSON_V1:{\"kind\":\"reservation_payment_submitted\",\"order_id\":\"52db2fa8-47d3-481c-85b5-de3b93380b63\",\"notes\":\"ok\",\"proof_url\":\"https://fxdknzrqjenzqcvnwqqq.supabase.co/storage/v1/object/fleaber_private/order_proofs/bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96/52db2fa8-47d3-481c-85b5-de3b93380b63/%252e%252e/%252e%252e/order_proofs/bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96/c548838a-e478-4d67-9774-7e534926ceb8/rtby_b.png\"}",
+      "expected": "chat_system_card_notes_forbidden / url_denied / label_mismatch",
+      "obtained": "201 [{\"id\":1497,\"created_at\":\"2026-09-06T10:41:57.738353+00:00\",\"chat_id\":\"edb67d60-6e7f-4fee-8b69-44e9b69721a7\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"reservation_payment_subm…",
+      "proven": true,
+      "evidence": {
+        "id": "1497",
+        "kind": "reservation_payment_submitted",
+        "payload": {
+          "kind": "reservation_payment_submitted",
+          "order_id": "52db2fa8-47d3-481c-85b5-de3b93380b63",
+          "notes": "ok",
+          "proof_url": "https://fxdknzrqjenzqcvnwqqq.supabase.co/storage/v1/object/fleaber_private/order_proofs/bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96/52db2fa8-47d3-481c-85b5-de3b93380b63/%252e%252e/%252e%252e/order_proofs/bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96/c548838a-e478-4d67-9774-7e534926ceb8/rtby_b.png"
+        }
+      }
+    },
+    {
+      "id": "BY4.e0-80-ae-overlong-dot",
+      "lens": "BY4",
+      "severity": "P2",
+      "title": "proof_url %e0%80%ae (overlong 3-byte dot)",
+      "actor": "buyer JWT",
+      "pre": "denylist BRBW sem este rail/encoding/URL",
+      "repro": "POST chat_messages FLEABER_JSON_V1:{\"kind\":\"reservation_payment_submitted\",\"order_id\":\"52db2fa8-47d3-481c-85b5-de3b93380b63\",\"notes\":\"ok\",\"proof_url\":\"https://fxdknzrqjenzqcvnwqqq.supabase.co/storage/v1/object/fleaber_private/order_proofs/bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96/52db2fa8-47d3-481c-85b5-de3b93380b63/%e0%80%ae%e0%80%ae/%e0%80%ae%e0%80%ae/order_proofs/bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96/c548838a-e478-4d67-9774-7e534926ceb8/rtby_b.png\"}",
+      "expected": "chat_system_card_notes_forbidden / url_denied / label_mismatch",
+      "obtained": "201 [{\"id\":1498,\"created_at\":\"2026-09-06T10:41:57.95642+00:00\",\"chat_id\":\"edb67d60-6e7f-4fee-8b69-44e9b69721a7\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"reservation_payment_submi…",
+      "proven": true,
+      "evidence": {
+        "id": "1498",
+        "kind": "reservation_payment_submitted",
+        "payload": {
+          "kind": "reservation_payment_submitted",
+          "order_id": "52db2fa8-47d3-481c-85b5-de3b93380b63",
+          "notes": "ok",
+          "proof_url": "https://fxdknzrqjenzqcvnwqqq.supabase.co/storage/v1/object/fleaber_private/order_proofs/bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96/52db2fa8-47d3-481c-85b5-de3b93380b63/%e0%80%ae%e0%80%ae/%e0%80%ae%e0%80%ae/order_proofs/bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96/c548838a-e478-4d67-9774-7e534926ceb8/rtby_b.png"
+        }
+      }
+    },
+    {
+      "id": "BY5.inbox-skrill",
+      "lens": "BY5",
+      "severity": "P1",
+      "title": "inbox last_message forjado: Skrill 12,00 €",
+      "actor": "buyer JWT",
+      "pre": "chats_update_participants",
+      "repro": "PATCH chats.last_message=Skrill 12,00 €",
+      "expected": "chat_inbox_preview_forbidden",
+      "obtained": "Skrill 12,00 €",
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "BY5.inbox-neteller",
+      "lens": "BY5",
+      "severity": "P1",
+      "title": "inbox last_message forjado: Neteller 12,00 €",
+      "actor": "buyer JWT",
+      "pre": "chats_update_participants",
+      "repro": "PATCH chats.last_message=Neteller 12,00 €",
+      "expected": "chat_inbox_preview_forbidden",
+      "obtained": "Neteller 12,00 €",
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "BY5.inbox-enviado-mb",
+      "lens": "BY5",
+      "severity": "P1",
+      "title": "inbox last_message forjado: enviado MB",
+      "actor": "buyer JWT",
+      "pre": "chats_update_participants",
+      "repro": "PATCH chats.last_message=enviado MB",
+      "expected": "chat_inbox_preview_forbidden",
+      "obtained": "enviado MB",
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "BY5.inbox-enviado-mb-amt",
+      "lens": "BY5",
+      "severity": "P1",
+      "title": "inbox last_message forjado: enviado MB 12,00 €",
+      "actor": "buyer JWT",
+      "pre": "chats_update_participants",
+      "repro": "PATCH chats.last_message=enviado MB 12,00 €",
+      "expected": "chat_inbox_preview_forbidden",
+      "obtained": "enviado MB 12,00 €",
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "BY5.inbox-paysafe",
+      "lens": "BY5",
+      "severity": "P1",
+      "title": "inbox last_message forjado: Paysafecard 12,00 €",
+      "actor": "buyer JWT",
+      "pre": "chats_update_participants",
+      "repro": "PATCH chats.last_message=Paysafecard 12,00 €",
+      "expected": "chat_inbox_preview_forbidden",
+      "obtained": "Paysafecard 12,00 €",
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "BY5.inbox-moneygram",
+      "lens": "BY5",
+      "severity": "P1",
+      "title": "inbox last_message forjado: MoneyGram 12,00 €",
+      "actor": "buyer JWT",
+      "pre": "chats_update_participants",
+      "repro": "PATCH chats.last_message=MoneyGram 12,00 €",
+      "expected": "chat_inbox_preview_forbidden",
+      "obtained": "MoneyGram 12,00 €",
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "BY5.inbox-gcash",
+      "lens": "BY5",
+      "severity": "P1",
+      "title": "inbox last_message forjado: GCash 12,00 €",
+      "actor": "buyer JWT",
+      "pre": "chats_update_participants",
+      "repro": "PATCH chats.last_message=GCash 12,00 €",
+      "expected": "chat_inbox_preview_forbidden",
+      "obtained": "GCash 12,00 €",
+      "proven": true,
+      "evidence": {}
+    }
+  ],
+  "blocked": [
+    {
+      "id": "BY1.notes-revbiz",
+      "lens": "BY1",
+      "title": "recusado",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_notes_forbidden\"}"
+    },
+    {
+      "id": "BY1.notes-payoneer-control",
+      "lens": "BY1",
+      "title": "recusado",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_notes_forbidden\"}"
+    },
+    {
+      "id": "BY1.notes-wu-control",
+      "lens": "BY1",
+      "title": "recusado",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_notes_forbidden\"}"
+    },
+    {
+      "id": "BY1.seguro-revbiz",
+      "lens": "BY1",
+      "title": "recusado",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_label_mismatch\"}"
+    },
+    {
+      "id": "BY1.seguro-payoneer-control",
+      "lens": "BY1",
+      "title": "recusado",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_label_mismatch\"}"
+    },
+    {
+      "id": "BY2.bidi-clearpay",
+      "lens": "BY2",
+      "title": "recusado",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_notes_forbidden\"}"
+    },
+    {
+      "id": "BY2.shy-clearpay",
+      "lens": "BY2",
+      "title": "recusado",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_notes_forbidden\"}"
+    },
+    {
+      "id": "BY2.shy-payoneer",
+      "lens": "BY2",
+      "title": "recusado",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_notes_forbidden\"}"
+    },
+    {
+      "id": "BY2.bidi-payoneer",
+      "lens": "BY2",
+      "title": "recusado",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_notes_forbidden\"}"
+    },
+    {
+      "id": "BY2.u180e-clearpay-control",
+      "lens": "BY2",
+      "title": "recusado",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_notes_forbidden\"}"
+    },
+    {
+      "id": "BY5.inbox-bidi-clearpay",
+      "lens": "BY5",
+      "title": "inbox recusado",
+      "ev": {
+        "http": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"chat_inbox_preview_forbidden\"}",
+        "stored": "null"
+      }
+    },
+    {
+      "id": "BY5.inbox-shy-clearpay",
+      "lens": "BY5",
+      "title": "inbox recusado",
+      "ev": {
+        "http": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"chat_inbox_preview_forbidden\"}",
+        "stored": "null"
+      }
+    },
+    {
+      "id": "BY2.inbox-u180e-control",
+      "lens": "BY5",
+      "title": "inbox recusado",
+      "ev": {
+        "http": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"chat_inbox_preview_forbidden\"}",
+        "stored": "Clea͏rpay 12,00 €"
+      }
+    },
+    {
+      "id": "BY3.insert-created-at-past",
+      "lens": "BY3",
+      "title": "created_at forçado a now",
+      "ev": "2026-09-06T10:41:53.78961+00:00"
+    },
+    {
+      "id": "BY3.patch-created-at",
+      "lens": "BY3",
+      "title": "created_at imutável",
+      "ev": {
+        "http": "200 [{\"id\":1492,\"created_at\":\"2026-09-06T10:41:53.78961+00:00\",\"chat_id\":\"edb67d60-6e7f-4fee-8b69-44e9b69721a7\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"RTBY-20260906T1136 past-insert\",\"is_reservation\":fals…",
+        "stored": "2026-09-06T10:41:53.78961+00:00"
+      }
+    },
+    {
+      "id": "BY3.delete-json-card",
+      "lens": "BY3",
+      "title": "DELETE card recusado",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_immutable\"}"
+    },
+    {
+      "id": "BY4.signed-own-other-order",
+      "lens": "BY4",
+      "title": "recusado",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_url_denied\"}"
+    },
+    {
+      "id": "BY4.unsigned-own-other-order",
+      "lens": "BY4",
+      "title": "recusado",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_url_denied\"}"
+    },
+    {
+      "id": "BY4.c1-9c-backslash",
+      "lens": "BY4",
+      "title": "recusado",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_url_denied\"}"
+    },
+    {
+      "id": "BY4.fullwidth-dot-control",
+      "lens": "BY4",
+      "title": "recusado",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_url_denied\"}"
+    },
+    {
+      "id": "BY4.c0ae-control",
+      "lens": "BY4",
+      "title": "recusado",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_url_denied\"}"
+    },
+    {
+      "id": "BY4.authenticated-own-other-order",
+      "lens": "BY4",
+      "title": "recusado",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_url_denied\"}"
+    },
+    {
+      "id": "BY5.inbox-revbiz",
+      "lens": "BY5",
+      "title": "inbox recusado",
+      "ev": {
+        "http": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"chat_inbox_preview_forbidden\"}",
+        "stored": "Neteller 12,00 €"
+      }
+    },
+    {
+      "id": "BY5.inbox-payoneer-control",
+      "lens": "BY5",
+      "title": "inbox recusado",
+      "ev": {
+        "http": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"chat_inbox_preview_forbidden\"}",
+        "stored": "GCash 12,00 €"
+      }
+    },
+    {
+      "id": "BY5.inbox-wu-control",
+      "lens": "BY5",
+      "title": "inbox recusado",
+      "ev": {
+        "http": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"chat_inbox_preview_forbidden\"}",
+        "stored": "GCash 12,00 €"
+      }
+    },
+    {
+      "id": "BY6.list-cross-user",
+      "lens": "BY6",
+      "title": "list cross-user recusado",
+      "ev": {
+        "root": "200 []",
+        "b1": "200 []"
+      }
+    },
+    {
+      "id": "BY6.get-cross-user",
+      "lens": "BY6",
+      "title": "GET cross-user recusado",
+      "ev": "400 {\"statusCode\":\"404\",\"error\":\"not_found\",\"message\":\"Object not found\",\"code\":\"NoSuchKey\"}"
+    },
+    {
+      "id": "BY6.upload-cross-user",
+      "lens": "BY6",
+      "title": "upload B2 recusado",
+      "ev": "400 {\"statusCode\":\"415\",\"error\":\"invalid_mime_type\",\"message\":\"mime type application/octet-stream is not supported\",\"code\":\"InvalidMimeType\"}"
+    },
+    {
+      "id": "BY7.b2-insert-b1-chat",
+      "lens": "BY7",
+      "title": "B2 fora do chat",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"new row violates row-level security policy for table \\\"chat_messages\\\"\"}"
+    },
+    {
+      "id": "BY7.b2-read-b1-chat",
+      "lens": "BY7",
+      "title": "B2 não lê chat B1",
+      "ev": "200 []"
+    },
+    {
+      "id": "BY7.anon-read-chat",
+      "lens": "BY7",
+      "title": "anon sem mensagens",
+      "ev": "401 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_chat_is_participant\"}"
+    },
+    {
+      "id": "BY7.seller-seguro-label",
+      "lens": "BY7",
+      "title": "recusado",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_buyer_only\"}"
+    },
+    {
+      "id": "BY8.ocr-fake-token",
+      "lens": "BY8",
+      "title": "token falso recusado",
+      "ev": "401 {\"ok\":false,\"error\":\"invalid_token\"}"
+    },
+    {
+      "id": "BY8.ocr-rpc-jwt",
+      "lens": "BY8",
+      "title": "RPC OCR JWT recusado",
+      "ev": "200 {\"ok\": false, \"error\": \"invalid_token\"}"
+    },
+    {
+      "id": "BY8.ocr-anon",
+      "lens": "BY8",
+      "title": "anon OCR recusado",
+      "ev": "401 {\"ok\":false,\"error\":\"missing_device_token\"}"
+    }
+  ],
+  "notes": [
+    {
+      "id": "fixture.paid",
+      "lens": "BY1",
+      "title": "setup_paid_order Stripe TEST",
+      "ev": "200 {\n  \"ok\": true,\n  \"order_id\": \"193a6333-89a5-43a1-8df2-b7b49413a2a2\",\n  \"product_id\": \"12b27552-0a43-4782-8e8a-c5b8ce879fd3\",\n  \"payment_intent_id\": \"pi_3UCdW0H7FWYUN3jh1mH1S9Sg\",\n  \"pi_status\": \"succeeded\",\n  \"pi_amount…"
+    },
+    {
+      "id": "fixture.paid",
+      "lens": "BY1",
+      "title": "setup_paid_order Stripe TEST",
+      "ev": "200 {\n  \"ok\": true,\n  \"order_id\": \"c548838a-e478-4d67-9774-7e534926ceb8\",\n  \"product_id\": \"7815cd25-9802-4e0f-8ffe-693ebb2e46ba\",\n  \"payment_intent_id\": \"pi_3UCdW5H7FWYUN3jh0CUS1DCT\",\n  \"pi_status\": \"succeeded\",\n  \"pi_amount…"
+    },
+    {
+      "id": "BY6.upload-a",
+      "lens": "BY6",
+      "title": "upload prova A",
+      "ev": "200 {\"Key\":\"fleaber_private/order_proofs/bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96/52db2fa8-47d3-481c-85b5-de3b93380b63/rtby_a.png\",\"Id\":\"206e556d-277f-40be-8e71-c934e86668d9\"}"
+    },
+    {
+      "id": "BY6.upload-b",
+      "lens": "BY6",
+      "title": "upload prova B (outra encomenda própria)",
+      "ev": "200 {\"Key\":\"fleaber_private/order_proofs/bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96/c548838a-e478-4d67-9774-7e534926ceb8/rtby_b.png\",\"Id\":\"7585717c-d228-4c32-a611-61efa0e212e9\"}"
+    },
+    {
+      "id": "BY4.sign-b",
+      "lens": "BY4",
+      "title": "signed URL encomenda B",
+      "ev": "200 {\"signedURL\":\"/object/sign/fleaber_private/order_proofs/bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96/c548838a-e478-4d67-9774-7e534926ceb8/rtby_b.png?token=eyJraWQiOiI3YmY5ZTQ0Ni1mOTg4LTRlNWEtYjM0Mi0zYTQ1ZTE5NTgzYzkiLCJhbGciOiJIU…"
+    },
+    {
+      "id": "BY4.honest-path",
+      "lens": "BY4",
+      "title": "persistiu (exacto/controlo, não contar)",
+      "ev": "201 [{\"id\":1501,\"created_at\":\"2026-09-06T10:41:58.573968+00:00\",\"chat_id\":\"edb67d60-6e7f-4fee-8b69-44e9b69721a7\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"reservation_payment_subm…"
+    },
+    {
+      "id": "BY6.anon-signed-b",
+      "lens": "BY6",
+      "title": "anon GET signed B",
+      "ev": "200 len=10"
+    },
+    {
+      "id": "BY4.loot-c19c-auth",
+      "lens": "BY4",
+      "title": "GET loot",
+      "ev": "400 len=349 {\"error\":\"Bad Request\",\"code\":\"FST_ERR_BAD_URL\",\"message\":\"'/object/authenticated/fleaber_private/order_proofs/bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96/52db2fa8-47d3-481c-85b5-de3b93380b63/%C1%9C../%C1%9C../order_proofs/bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96/c548838a-e478-4d67-9774-7e534926ceb8/rtby_b.png' is not a valid url component\",\"statusCode\":400}"
+    },
+    {
+      "id": "BY4.loot-double-auth",
+      "lens": "BY4",
+      "title": "GET loot",
+      "ev": "400 len=285 {\"statusCode\":\"400\",\"error\":\"InvalidKey\",\"message\":\"Invalid key: order_proofs/bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96/52db2fa8-47d3-481c-85b5-de3b93380b63/%2e%2e/%2e%2e/order_proofs/bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96/c548838a-e478-4d67-9774-7e534926ceb8/rtby_b.png\",\"code\":\"InvalidKey\"}"
+    },
+    {
+      "id": "BY4.loot-e080ae-auth",
+      "lens": "BY4",
+      "title": "GET loot",
+      "ev": "400 len=369 {\"error\":\"Bad Request\",\"code\":\"FST_ERR_BAD_URL\",\"message\":\"'/object/authenticated/fleaber_private/order_proofs/bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96/52db2fa8-47d3-481c-85b5-de3b93380b63/%E0%80%AE%E0%80%AE/%E0%80%AE%E0%80%AE/order_proofs/bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96/c548838a-e478-4d67-9774-7e534926ceb8/rtby_b.png' is not a valid url component\",\"statusC…"
+    },
+    {
+      "id": "BY6.get-honest-b",
+      "lens": "BY6",
+      "title": "GET prova B (mesmo buyer)",
+      "ev": "200 len=10"
+    },
+    {
+      "id": "BY8.live",
+      "lens": "BY8",
+      "title": "live fixture",
+      "ev": "201 [{\"id\":\"9e5dccf3-28fd-4807-9091-decc31ebecb5\",\"created_at\":\"2026-09-06T10:42:11.286208+00:00\",\"vendedor_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"mux_live_id\":null,\"stream_key\":null,\"playback_id\":null,\"is_active\":true,…"
+    }
+  ]
+}

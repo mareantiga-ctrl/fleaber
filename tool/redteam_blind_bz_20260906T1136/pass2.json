@@ -1,0 +1,241 @@
+{
+  "auditor": "REDTEAM_BLIND_BZ_LIVE_POS_BRBW_v1",
+  "prefix": "RTBZ-20260906T1136",
+  "findings": [],
+  "blocked": [
+    {
+      "id": "p2.hitch.product_id.null_checkout",
+      "lens": "BZ4",
+      "title": "2º accept recusado (HOLD hitch product_id)",
+      "ev": {
+        "r1": {
+          "id": "f8a35858-1cf6-451f-aa31-e3e5752bda4e",
+          "status": "accepted",
+          "requested_qty": 1
+        },
+        "r2": {
+          "id": "b8d355e1-db4f-444b-b688-9f98ef906a9a",
+          "status": "pending",
+          "requested_qty": 1
+        },
+        "accept2": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"qty_exceeds_stock\"}",
+        "stock2": {
+          "ok": true,
+          "price": 9.0,
+          "live_id": "ace08fa2-c52d-4b4c-8634-6331c8572cf9",
+          "ref_code": "RTBZ-HB",
+          "item_kind": "live_only",
+          "total_qty": 1,
+          "product_id": null,
+          "blocked_qty": 1,
+          "live_status": "live",
+          "live_item_id": "0ac02cdf-2362-4c80-be9b-78f8275c60e0",
+          "available_qty": 0,
+          "pending_bag_qty": 0,
+          "sold_converted_qty": 0,
+          "checkout_product_id": "ab69b003-75f8-4d93-b02b-dfe173245520",
+          "reserved_accepted_qty": 0
+        }
+      }
+    },
+    {
+      "id": "p2.paused.still.accepts",
+      "lens": "BZ3",
+      "title": "paused recusado (exacto BRBW, não contar)",
+      "ev": {
+        "pending": null,
+        "accept": null,
+        "row": null,
+        "hub": "200 []"
+      }
+    },
+    {
+      "id": "p2.paused.accept_after_pending",
+      "lens": "BZ3",
+      "title": "accept após pause recusado",
+      "ev": {
+        "row": {
+          "id": "b2dd1002-d074-4b69-aec7-89a557dfb875",
+          "status": "pending"
+        },
+        "accept": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"live_item_not_sellable\"}"
+      }
+    },
+    {
+      "id": "p2.inactive_flag.still.accepts",
+      "lens": "BZ3",
+      "title": "is_active=false recusado",
+      "ev": {
+        "pending": null,
+        "accept": null,
+        "row": null
+      }
+    },
+    {
+      "id": "p2.hitch.cross_live.product_id",
+      "lens": "BZ4",
+      "title": "cross-live 2º accept recusado",
+      "ev": {
+        "liveB": {
+          "id": "937b75c7-b3c0-461b-921b-fbe3e9fd4e29",
+          "status": "pending"
+        },
+        "acceptB": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"qty_exceeds_stock\"}"
+      }
+    },
+    {
+      "id": "p2.patch.item.qty.after_accept",
+      "lens": "BZ5",
+      "title": "aumento qty item recusado",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"live_item_qty_increase_not_allowed\"}"
+    }
+  ],
+  "notes": [
+    {
+      "id": "p2.hitch.null_checkout.mp",
+      "lens": "BZ4",
+      "title": "anular checkout marketplace",
+      "ev": "200 [{\"id\":\"c59bc39e-3132-411a-8ad2-ff16555ae927\",\"live_id\":\"ace08fa2-c52d-4b4c-8634-6331c8572cf9\",\"seller_id\":null,\"ref_code\":\"RTBZ-HA\",\"title\":\"RTBZ-20260906T1136 hitch A\",\"description\":null,\"price\":9.0,\"image_url\":null,\"s…"
+    },
+    {
+      "id": "p2.hitch.stock.before",
+      "lens": "BZ4",
+      "title": "stock antes product_id-only",
+      "ev": {
+        "a": {
+          "ok": true,
+          "price": 9.0,
+          "live_id": "ace08fa2-c52d-4b4c-8634-6331c8572cf9",
+          "ref_code": "RTBZ-HA",
+          "item_kind": "marketplace_product",
+          "total_qty": 1,
+          "product_id": "ab69b003-75f8-4d93-b02b-dfe173245520",
+          "blocked_qty": 0,
+          "live_status": "live",
+          "live_item_id": "c59bc39e-3132-411a-8ad2-ff16555ae927",
+          "available_qty": 1,
+          "pending_bag_qty": 0,
+          "sold_converted_qty": 0,
+          "checkout_product_id": null,
+          "reserved_accepted_qty": 0
+        },
+        "b": {
+          "ok": true,
+          "price": 9.0,
+          "live_id": "ace08fa2-c52d-4b4c-8634-6331c8572cf9",
+          "ref_code": "RTBZ-HB",
+          "item_kind": "live_only",
+          "total_qty": 1,
+          "product_id": null,
+          "blocked_qty": 0,
+          "live_status": "live",
+          "live_item_id": "0ac02cdf-2362-4c80-be9b-78f8275c60e0",
+          "available_qty": 1,
+          "pending_bag_qty": 0,
+          "sold_converted_qty": 0,
+          "checkout_product_id": "ab69b003-75f8-4d93-b02b-dfe173245520",
+          "reserved_accepted_qty": 0
+        }
+      }
+    },
+    {
+      "id": "p2.hitch.accept1",
+      "lens": "BZ4",
+      "title": "accept LI1 product_id",
+      "ev": "200 [{\"id\":\"f8a35858-1cf6-451f-aa31-e3e5752bda4e\",\"live_id\":\"ace08fa2-c52d-4b4c-8634-6331c8572cf9\",\"live_item_id\":\"c59bc39e-3132-411a-8ad2-ff16555ae927\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"buyer_id\":\"bfcbeeee…"
+    },
+    {
+      "id": "p2.hitch.stock.after1",
+      "lens": "BZ4",
+      "title": "stock LI2 após accept LI1",
+      "ev": {
+        "ok": true,
+        "price": 9.0,
+        "live_id": "ace08fa2-c52d-4b4c-8634-6331c8572cf9",
+        "ref_code": "RTBZ-HB",
+        "item_kind": "live_only",
+        "total_qty": 1,
+        "product_id": null,
+        "blocked_qty": 1,
+        "live_status": "live",
+        "live_item_id": "0ac02cdf-2362-4c80-be9b-78f8275c60e0",
+        "available_qty": 0,
+        "pending_bag_qty": 0,
+        "sold_converted_qty": 0,
+        "checkout_product_id": "ab69b003-75f8-4d93-b02b-dfe173245520",
+        "reserved_accepted_qty": 0
+      }
+    },
+    {
+      "id": "p2.hitch.accept2",
+      "lens": "BZ4",
+      "title": "accept LI2 product_id",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"qty_exceeds_stock\"}"
+    },
+    {
+      "id": "p2.nullpool.two_units",
+      "lens": "BZ4",
+      "title": "dois live_only sem product (2 unidades)",
+      "ev": {
+        "n1": {
+          "id": "a9f8d3cd-8564-4b02-ac25-22c11587faa0",
+          "status": "accepted"
+        },
+        "n2": {
+          "id": "6662d96a-8a84-4ebe-89b3-202d85817bda",
+          "status": "accepted"
+        },
+        "a2": "200 [{\"id\":\"6662d96a-8a84-4ebe-89b3-202d85817bda\",\"live_id\":\"1e65c340-d650-4c38-961f-4de160c2a12b\",\"live_item_id\":\"80af7a08-49e8-470a-bf74-2f1b3642b45f\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"buyer_id\":\"27a912d9…"
+      }
+    },
+    {
+      "id": "p2.paused.patch",
+      "lens": "BZ3",
+      "title": "seller pause item",
+      "ev": "200 [{\"id\":\"b8ac6622-9f91-43d2-b81a-875eb3b0b5e8\",\"live_id\":\"88e9a382-8f4d-4441-bf73-011018f617f8\",\"seller_id\":null,\"ref_code\":\"RTBZ-PA\",\"title\":\"RTBZ-20260906T1136 paused item\",\"description\":null,\"price\":9.0,\"image_url\":nul…"
+    },
+    {
+      "id": "p2.paused.hub",
+      "lens": "BZ3",
+      "title": "Hub após pause",
+      "ev": "200 []"
+    },
+    {
+      "id": "res.fail",
+      "title": "insertReservation 403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"live_item_not_sellable\"}",
+      "ev": {
+        "live": "88e9a382-8f4d-4441-bf73-011018f617f8",
+        "item": "b8ac6622-9f91-43d2-b81a-875eb3b0b5e8",
+        "status": "pending",
+        "source": "fleaber_live"
+      }
+    },
+    {
+      "id": "p2.inactive.flag",
+      "lens": "BZ3",
+      "title": "is_active=false status=available",
+      "ev": "200 [{\"id\":\"9dcec398-c070-46d9-b550-2dd9c7b1f35b\",\"live_id\":\"58ca71f3-2c2b-41f4-820f-c1419d939b56\",\"seller_id\":null,\"ref_code\":\"RTBZ-IA\",\"title\":\"RTBZ-20260906T1136 inactive flag\",\"description\":null,\"price\":9.0,\"image_url\":n…"
+    },
+    {
+      "id": "res.fail",
+      "title": "insertReservation 403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"live_item_not_sellable\"}",
+      "ev": {
+        "live": "58ca71f3-2c2b-41f4-820f-c1419d939b56",
+        "item": "9dcec398-c070-46d9-b550-2dd9c7b1f35b",
+        "status": "pending",
+        "source": "fleaber_live"
+      }
+    },
+    {
+      "id": "p2.inactive.status",
+      "lens": "BZ3",
+      "title": "PATCH status=inactive",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"new row for relation \\\"live_items\\\" violates check constraint \\\"live_items_status_op_chk\\\"\"}"
+    }
+  ],
+  "lenses": [
+    "BZ3",
+    "BZ4",
+    "BZ5"
+  ]
+}

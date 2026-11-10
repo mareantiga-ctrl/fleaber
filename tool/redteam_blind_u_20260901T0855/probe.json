@@ -1,0 +1,563 @@
+{
+  "stamp": "20260901T0855",
+  "findings": [
+    {
+      "id": "RTU-U1-unlist-alheio",
+      "lens": "U1",
+      "severity": "P0",
+      "title": "Buyer unlista SKU de outro vendedor",
+      "actor": "buyer JWT",
+      "pre": "produto S2",
+      "repro": "PATCH products.list_on_marketplace=false",
+      "expected": "RLS deny",
+      "obtained": "200 []",
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "RTU-U2-bundle-partial-bag",
+      "lens": "U2",
+      "severity": "P0",
+      "title": "Checkout do conjunto aplica total_eur sem todos os artigos no saco",
+      "actor": "buyer JWT",
+      "pre": "bundle aceite 3 SKUs (20+1+1); 1 hold do artigo 20 €",
+      "repro": "POST create-payment-intent bag_checkout só order do SKU caro",
+      "expected": "cobrar catálogo do(s) artigo(s) no saco, ou exigir todos os product_ids",
+      "obtained": {
+        "bundle_total_eur": 11.0,
+        "checkout_cents": 1220,
+        "catalog_hi_cents": 2000,
+        "session": "cs_test_a1sQnlfCdPmNbx4tEtqWyTTkv9wr7nXEZKCvjn39ccaMC5Ogi69vCJZsDS"
+      },
+      "proven": true,
+      "evidence": {
+        "order": {
+          "id": "09d1ae07-641b-4c97-bf50-de9b0f38ee60",
+          "status": "reserva_pendente",
+          "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+          "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+          "product_id": "a5b2725c-e91e-4245-be52-f31966c1102b",
+          "quantity": 1,
+          "price_total": 20.0,
+          "amount_paid_cents": null,
+          "payment_method": "Pagamento na app",
+          "shipping_method": "entrega em mão",
+          "stripe_payment_intent_id": null,
+          "stripe_checkout_session_id": null,
+          "stripe_refund_id": null,
+          "wallet_release_processed_at": null,
+          "wallet_refund_processed_at": null,
+          "stock_units_applied": null,
+          "completed_at": null,
+          "contract_unit_cents": 2000,
+          "contract_qty": 1,
+          "product_offer_id": null,
+          "bundle_id": "5b5df00d-6fb3-45a3-8930-e9168486663c",
+          "proof_url": null
+        },
+        "bundle": {
+          "id": "5b5df00d-6fb3-45a3-8930-e9168486663c",
+          "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+          "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+          "chat_id": null,
+          "product_ids": [
+            "a5b2725c-e91e-4245-be52-f31966c1102b",
+            "dc173049-b466-498a-9dec-b5c793a8c920",
+            "2989955e-1edb-4394-86cd-2f6686cbcb82"
+          ],
+          "subtotal_eur": 22.0,
+          "discount_pct": 50.0,
+          "discount_eur": 11.0,
+          "total_eur": 11.0,
+          "status": "accepted",
+          "created_at": "2026-09-01T08:03:09.771641+00:00",
+          "responded_at": null
+        },
+        "checkout": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1sQnlfCdPmNbx4tEtqWyTTkv9wr7nXEZKCvjn39ccaMC5Ogi69vCJZsDS#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDR…"
+      }
+    },
+    {
+      "id": "RTU-U7-buyer-price",
+      "lens": "U7",
+      "severity": "P0",
+      "title": "Buyer PATCH preço do anúncio",
+      "actor": "buyer JWT",
+      "pre": "produto alheio",
+      "repro": "PATCH products.price=0.50",
+      "expected": "RLS deny",
+      "obtained": "200 []",
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "RTU-U8-offer-qty-checkout",
+      "lens": "U8",
+      "severity": "P0",
+      "title": "Cadeia: oferta 6 € × qty 3 gera Session abaixo do catálogo",
+      "actor": "buyer JWT",
+      "pre": "oferta aceite 6 €, SKU 25 € ×4",
+      "repro": "order qty=3 + create-payment-intent",
+      "expected": "recusar qty>1 ou cobrar 25×3",
+      "obtained": {
+        "server_amount_cents": 1955,
+        "catalog_3": 7500,
+        "session": "cs_test_a14RoqrBOnYJODZoUcMojUgtMA75ped5XgzNJMyQQsnp41VYLAn7RhICYS"
+      },
+      "proven": true,
+      "evidence": {}
+    }
+  ],
+  "blocked": [
+    {
+      "id": "RTU-U1-qty-9999",
+      "lens": "U1",
+      "title": "quantity=9999 recusado",
+      "ev": "no row"
+    },
+    {
+      "id": "RTU-U1-qty-99",
+      "lens": "U1",
+      "title": "qty=99 vs stock=2 recusado",
+      "ev": "no row"
+    },
+    {
+      "id": "RTU-U1-patch-qty",
+      "lens": "U1",
+      "title": "PATCH quantity bloqueado",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"order_money_fields_immutable\"}"
+    },
+    {
+      "id": "RTU-U1-cross-seller",
+      "lens": "U1",
+      "title": "cross-seller bag recusado",
+      "ev": "400 {\"error\":\"Checkout blocked: bag lines must share one seller. Pay each seller separately.\"}"
+    },
+    {
+      "id": "RTU-U2-insert-accepted",
+      "lens": "U2",
+      "title": "INSERT accepted recusado/forçado pending",
+      "ev": "201 [{\"id\":\"19e09640-420f-4034-b3ee-95693ff92f0f\",\"product_id\":\"be40e205-db5a-4130-8355-3330130f3b38\",\"chat_id\":\"e6f5002e-41a3-4422-87d1-3e01d302dd90\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0…"
+    },
+    {
+      "id": "RTU-U2-dead-offer",
+      "lens": "U2",
+      "title": "accept oferta caducada recusado",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"offer_expired\"}"
+    },
+    {
+      "id": "RTU-U2-bundle-buyer-total",
+      "lens": "U2",
+      "title": "buyer não muda total_eur",
+      "ev": "200 [{\"id\":\"5b5df00d-6fb3-45a3-8930-e9168486663c\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"chat_id\":null,\"product_ids\":[\"a5b2725c-e91e-4245-be52-f31966c1102b\",\"dc1…"
+    },
+    {
+      "id": "RTU-U3-body-amount",
+      "lens": "U3",
+      "title": "quote ignora body.amount",
+      "ev": {
+        "cents": 1693,
+        "brief": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1y4SwhiXF6gOMi9GrUZCZiJsTLPryvenihZcCS8pRHHC3bbxkYSVWDzdh#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDR…"
+      }
+    },
+    {
+      "id": "RTU-U3-ship-body",
+      "lens": "U3",
+      "title": "portes do selo prevalecem",
+      "ev": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1y4SwhiXF6gOMi9GrUZCZiJsTLPryvenihZcCS8pRHHC3bbxkYSVWDzdh#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDR…"
+    },
+    {
+      "id": "RTU-U3-prize",
+      "lens": "U3",
+      "title": "prize_shipping marketplace bloqueado",
+      "ev": "400 {\"error\":\"Checkout blocked: order is not a raffle prize.\"}"
+    },
+    {
+      "id": "RTU-U3-fake-session",
+      "lens": "U3",
+      "title": "settle session fake recusado",
+      "ev": "400 Pagamento ainda não confirmado. Se já pagaste, aguarda alguns segundos e volta à app Fleaber."
+    },
+    {
+      "id": "RTU-U3-e2e-jwt",
+      "lens": "U3",
+      "title": "e2e settle exige service_role",
+      "ev": "401 {\"ok\":false,\"error\":\"service_role required\"}"
+    },
+    {
+      "id": "RTU-U4-twoholds",
+      "lens": "U4",
+      "title": "2.º hold última unidade recusado",
+      "ev": {
+        "ok": 1,
+        "a": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"order_hold_exceeds_stock\"}",
+        "b": "201 [{\"id\":\"b8101c96-d942-4b6f-8447-a0100d1529b1\",\"created_at\":\"2026-09-01T08:03:16.295894+00:00\",\"product_id\":\"b827bfa4-415e-4f11-ba6b-4a4de324dee3\",\"buyer_id\":\"4daf4496-25fb-44ad-b5fc-a70c7f316f06\",\"seller_id\":\"980f4fa1-00…"
+      }
+    },
+    {
+      "id": "RTU-U4-ck-unlist",
+      "lens": "U4",
+      "title": "checkout∥unlist sem Session",
+      "ev": "400 {\"error\":\"Checkout blocked: product is not listed.\"}"
+    },
+    {
+      "id": "RTU-U5-mb-stripe",
+      "lens": "U5",
+      "title": "Stripe recusado em MB WAY",
+      "ev": "400 {\"error\":\"Checkout blocked: order is off-platform payment (no Stripe Session).\"}"
+    },
+    {
+      "id": "RTU-U5-buyer-pago",
+      "lens": "U5",
+      "title": "buyer não marca pago",
+      "ev": "200 [{\"id\":\"274ac914-4019-45f0-8d47-dfb79e3553b5\",\"created_at\":\"2026-09-01T08:03:17.725287+00:00\",\"product_id\":\"14cb3996-cf38-4515-b6d0-f2b402afb9cc\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-00…"
+    },
+    {
+      "id": "RTU-U5-concluido-early",
+      "lens": "U5",
+      "title": "concluido cedo bloqueado",
+      "ev": {
+        "status": "reserva_pendente",
+        "brief": "200 [{\"id\":\"274ac914-4019-45f0-8d47-dfb79e3553b5\",\"created_at\":\"2026-09-01T08:03:17.725287+00:00\",\"product_id\":\"14cb3996-cf38-4515-b6d0-f2b402afb9cc\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-00…"
+      }
+    },
+    {
+      "id": "RTU-U5-mb-wallet",
+      "lens": "U5",
+      "title": "MB WAY pago sem mint wallet",
+      "ev": 0.0
+    },
+    {
+      "id": "RTU-U6-cancel-paid",
+      "lens": "U6",
+      "title": "cancel pós-pago bloqueado",
+      "ev": "pago"
+    },
+    {
+      "id": "RTU-U6-buyer-refund",
+      "lens": "U6",
+      "title": "buyer refund-order recusado",
+      "ev": "403 {\"ok\":false,\"error\":\"Sem permissão.\"}"
+    },
+    {
+      "id": "RTU-U8-wallet-ins",
+      "lens": "U8",
+      "title": "wallet INSERT bloqueado",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"new row violates row-level security policy for table \\\"wallet_transactions\\\"\"}"
+    }
+  ],
+  "notes": [
+    {
+      "id": "actors",
+      "title": "login",
+      "ev": {
+        "buyer": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+        "seller": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+        "buyer2": "4daf4496-25fb-44ad-b5fc-a70c7f316f06",
+        "seller2": "51e135ab-dd42-4b59-a1e8-e416ec7361aa"
+      }
+    },
+    {
+      "id": "order.fail",
+      "title": "insertOrder 400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"order_hold_exceeds_stock\"}",
+      "ev": {
+        "product": "2b69adbf-b821-4818-970e-e55b8d2068c4",
+        "qty": 9999,
+        "payment": "Pagamento na app"
+      }
+    },
+    {
+      "id": "order.fail",
+      "title": "insertOrder 400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"order_hold_exceeds_stock\"}",
+      "ev": {
+        "product": "2b69adbf-b821-4818-970e-e55b8d2068c4",
+        "qty": 99,
+        "payment": "Pagamento na app"
+      }
+    },
+    {
+      "id": "u2.dead.insert",
+      "lens": "U2",
+      "title": "offer expires_at passado",
+      "ev": "201 [{\"id\":\"dde6dc9c-863d-48d6-95de-f42ca6d5a5b5\",\"product_id\":\"bf233923-8560-46d0-92b2-cd9dba29ebd3\",\"chat_id\":\"1cb52236-1527-4025-874b-924e44fd606c\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0…"
+    },
+    {
+      "id": "u2.bundle.ins",
+      "lens": "U2",
+      "title": "buyer bundle 3 SKUs",
+      "ev": "201 [{\"id\":\"5b5df00d-6fb3-45a3-8930-e9168486663c\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"chat_id\":null,\"product_ids\":[\"a5b2725c-e91e-4245-be52-f31966c1102b\",\"dc1…"
+    },
+    {
+      "id": "u2.bundle.acc",
+      "lens": "U2",
+      "title": "seller accept +50%",
+      "ev": "200 [{\"id\":\"5b5df00d-6fb3-45a3-8930-e9168486663c\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"chat_id\":null,\"product_ids\":[\"a5b2725c-e91e-4245-be52-f31966c1102b\",\"dc1…"
+    },
+    {
+      "id": "u2.bundle.partial.ck",
+      "lens": "U2",
+      "title": "bag só artigo caro",
+      "ev": {
+        "bundle_total": 11.0,
+        "order": {
+          "id": "09d1ae07-641b-4c97-bf50-de9b0f38ee60",
+          "status": "reserva_pendente",
+          "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+          "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+          "product_id": "a5b2725c-e91e-4245-be52-f31966c1102b",
+          "quantity": 1,
+          "price_total": 20.0,
+          "amount_paid_cents": null,
+          "payment_method": "Pagamento na app",
+          "shipping_method": "entrega em mão",
+          "stripe_payment_intent_id": null,
+          "stripe_checkout_session_id": null,
+          "stripe_refund_id": null,
+          "wallet_release_processed_at": null,
+          "wallet_refund_processed_at": null,
+          "stock_units_applied": null,
+          "completed_at": null,
+          "contract_unit_cents": 2000,
+          "contract_qty": 1,
+          "product_offer_id": null,
+          "bundle_id": "5b5df00d-6fb3-45a3-8930-e9168486663c",
+          "proof_url": null
+        },
+        "checkout": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1sQnlfCdPmNbx4tEtqWyTTkv9wr7nXEZKCvjn39ccaMC5Ogi69vCJZsDS#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDR…",
+        "server_amount": 1220
+      }
+    },
+    {
+      "id": "u3.body.amount",
+      "lens": "U3",
+      "title": "body amount=1 vs quote",
+      "ev": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1y4SwhiXF6gOMi9GrUZCZiJsTLPryvenihZcCS8pRHHC3bbxkYSVWDzdh#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDR…"
+    },
+    {
+      "id": "u3.ensure",
+      "lens": "U3",
+      "title": "ensure_checkout_product buyer",
+      "ev": "400 {\"code\":\"P0001\",\"details\":null,\"hint\":null,\"message\":\"live_item_not_found\"}"
+    },
+    {
+      "id": "u4.twoholds",
+      "lens": "U4",
+      "title": "2 buyers última unidade",
+      "ev": {
+        "a": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"order_hold_exceeds_stock\"}",
+        "b": "201 [{\"id\":\"b8101c96-d942-4b6f-8447-a0100d1529b1\",\"created_at\":\"2026-09-01T08:03:16.295894+00:00\",\"product_id\":\"b827bfa4-415e-4f11-ba6b-4a4de324dee3\",\"buyer_id\":\"4daf4496-25fb-44ad-b5fc-a70c7f316f06\",\"seller_id\":\"980f4fa1-00…",
+        "ok": 1
+      }
+    },
+    {
+      "id": "order.fail",
+      "title": "insertOrder 400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"order_hold_product_sold\"}",
+      "ev": {
+        "product": "a4842cd3-4662-4757-b47a-050cd2123a5c",
+        "qty": 1,
+        "payment": "Pagamento na app"
+      }
+    },
+    {
+      "id": "u4.hold-sold",
+      "lens": "U4",
+      "title": "hold ∥ is_sold",
+      "ev": {
+        "oid": null,
+        "sold": "200 [{\"id\":\"a4842cd3-4662-4757-b47a-050cd2123a5c\",\"created_at\":\"2026-09-01T08:03:16.501926+00:00\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"title\":\"RTU-20260901T0855 u4-hs\",\"price\":10.0,\"ref_code\":null,\"category\":n…"
+      }
+    },
+    {
+      "id": "u4.ck-unlist",
+      "lens": "U4",
+      "title": "checkout ∥ unlist",
+      "ev": {
+        "ck": "400 {\"error\":\"Checkout blocked: product is not listed.\"}",
+        "unlist": "200 [{\"id\":\"0d236082-765f-42ea-a32a-39f4734c7375\",\"created_at\":\"2026-09-01T08:03:16.70921+00:00\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"title\":\"RTU-20260901T0855 u4-ul\",\"price\":13.0,\"ref_code\":null,\"category\":nu…"
+      }
+    },
+    {
+      "id": "u4.dual.mkt",
+      "lens": "U4",
+      "title": "hold marketplace SKU live-capable",
+      "ev": {
+        "oid": "5dc45ef3-8ae3-4e3f-bf8b-8b45c7e836d7",
+        "pid": "61cdd3da-aa62-4392-9cf4-4da8327d454f"
+      }
+    },
+    {
+      "id": "u5.seller.pago",
+      "lens": "U5",
+      "title": "S marca pago MB WAY",
+      "ev": {
+        "patch": "200 [{\"id\":\"274ac914-4019-45f0-8d47-dfb79e3553b5\",\"created_at\":\"2026-09-01T08:03:17.725287+00:00\",\"product_id\":\"14cb3996-cf38-4515-b6d0-f2b402afb9cc\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-00…",
+        "status": "pago",
+        "amount_paid_cents": null,
+        "wallet_delta": 0.0,
+        "stock_units": 1
+      }
+    },
+    {
+      "id": "u5.refund.mb",
+      "lens": "U5",
+      "title": "refund-order MB WAY",
+      "ev": "200 {\"ok\":true,\"skipped\":true,\"reason\":\"not_seguro_fleaber\"}"
+    },
+    {
+      "id": "order.fail",
+      "title": "insertOrder 400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"order_hold_exceeds_stock\"}",
+      "ev": {
+        "product": "f7e763a8-55e8-452b-9531-fb96b8ca2548",
+        "qty": 1,
+        "payment": "MB WAY"
+      }
+    },
+    {
+      "id": "u5.mb.two",
+      "lens": "U5",
+      "title": "2 MB WAY holds stock=1",
+      "ev": [
+        "e905bbef-4802-46a5-84dd-a3eeff029ea5"
+      ]
+    },
+    {
+      "id": "fixture.paid",
+      "lens": "U6",
+      "title": "setup_paid_order Stripe TEST",
+      "ev": "200 {\n  \"ok\": true,\n  \"order_id\": \"db01f0bd-8723-44ad-9745-a67e70a11487\",\n  \"product_id\": \"2a9c46db-176d-449f-b07d-aeb537ee50dd\",\n  \"payment_intent_id\": \"pi_3UAmf7H7FWYUN3jh1BJzRs0e\",\n  \"pi_status\": \"succeeded\",\n  \"pi_amount…"
+    },
+    {
+      "id": "u6.cancel.paid",
+      "lens": "U6",
+      "title": "buyer cancel pós-pago",
+      "ev": {
+        "patch": "200 [{\"id\":\"db01f0bd-8723-44ad-9745-a67e70a11487\",\"created_at\":\"2026-09-01T08:03:20.812218+00:00\",\"product_id\":\"2a9c46db-176d-449f-b07d-aeb537ee50dd\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-00…",
+        "status": "pago"
+      }
+    },
+    {
+      "id": "u6.seller.refund",
+      "lens": "U6",
+      "title": "refund-order seller",
+      "ev": "200 {\"ok\":true,\"already_refunded\":true,\"idempotent\":true,\"refund_id\":\"re_3UAmf7H7FWYUN3jh12QD9rT2\",\"status\":\"cancelado\",\"stock_units_applied\":null,\"amount_cents\":590,\"payment_intent\":\"pi_3UAmf7H7FWYUN3jh1BJzRs0e\",\"status_str…"
+    },
+    {
+      "id": "u6.books",
+      "lens": "U6",
+      "title": "contabilidade refund",
+      "ev": {
+        "w_before": {
+          "buyer": 56.38,
+          "seller": 16.33,
+          "buyer2": 0,
+          "seller2": 0
+        },
+        "after": {
+          "status": "cancelado",
+          "refund": "re_3UAmf7H7FWYUN3jh12QD9rT2",
+          "stock_units": null,
+          "qty": 2,
+          "seller_estorno": 0
+        }
+      }
+    },
+    {
+      "id": "u6.refund2",
+      "lens": "U6",
+      "title": "refund repetido",
+      "ev": "200 {\"ok\":true,\"already_refunded\":true,\"idempotent\":true,\"refund_id\":\"re_3UAmf7H7FWYUN3jh12QD9rT2\",\"status\":\"cancelado\",\"stock_units_applied\":null,\"amount_cents\":590,\"payment_intent\":\"pi_3UAmf7H7FWYUN3jh1BJzRs0e\"}"
+    },
+    {
+      "id": "fixture.paid",
+      "lens": "U7",
+      "title": "setup_paid_order Stripe TEST",
+      "ev": "200 {\n  \"ok\": true,\n  \"order_id\": \"b5e6e256-bfa3-4289-a718-45134a108378\",\n  \"product_id\": \"33581ffd-673c-45d2-b97a-aa5d5c5c06fd\",\n  \"payment_intent_id\": \"pi_3UAmfEH7FWYUN3jh1e3zy2r1\",\n  \"pi_status\": \"succeeded\",\n  \"pi_amount…"
+    },
+    {
+      "id": "u7.cross",
+      "lens": "U7",
+      "title": "stock order vs product",
+      "ev": {
+        "order_status": "pago",
+        "order_qty": 1,
+        "stock_units_applied": 1,
+        "product_qty": 2,
+        "is_sold": false,
+        "listed": true
+      }
+    },
+    {
+      "id": "u8.chain",
+      "lens": "U8",
+      "title": "oferta×3 → Session",
+      "ev": {
+        "order": {
+          "id": "ba60d4f8-8424-499f-aee0-be254676b40b",
+          "status": "reserva_pendente",
+          "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+          "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+          "product_id": "68a3c3da-f0cb-41de-9faf-6a759f0e76c2",
+          "quantity": 3,
+          "price_total": 19.55,
+          "amount_paid_cents": null,
+          "payment_method": "Pagamento na app",
+          "shipping_method": "entrega em mão",
+          "stripe_payment_intent_id": null,
+          "stripe_checkout_session_id": "cs_test_a14RoqrBOnYJODZoUcMojUgtMA75ped5XgzNJMyQQsnp41VYLAn7RhICYS",
+          "stripe_refund_id": null,
+          "wallet_release_processed_at": null,
+          "wallet_refund_processed_at": null,
+          "stock_units_applied": null,
+          "completed_at": null,
+          "contract_unit_cents": 600,
+          "contract_qty": 3,
+          "product_offer_id": "30130856-917c-424c-be91-3798404ff8f2",
+          "bundle_id": null,
+          "proof_url": null
+        },
+        "checkout": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a14RoqrBOnYJODZoUcMojUgtMA75ped5XgzNJMyQQsnp41VYLAn7RhICYS#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDR…",
+        "wallets": {
+          "buyer": 56.38,
+          "seller": 16.33,
+          "buyer2": 0,
+          "seller2": 0
+        }
+      }
+    },
+    {
+      "id": "fixture.paid",
+      "lens": "U3",
+      "title": "setup_paid_order Stripe TEST",
+      "ev": "200 {\n  \"ok\": true,\n  \"order_id\": \"c73842ae-b5ca-4772-ac6f-557a74f4efdc\",\n  \"product_id\": \"ec4914a1-29e6-43c8-8623-c25d35af874d\",\n  \"payment_intent_id\": \"pi_3UAmfKH7FWYUN3jh1ydx3Dfw\",\n  \"pi_status\": \"succeeded\",\n  \"pi_amount…"
+    },
+    {
+      "id": "legit.paid",
+      "lens": "U3",
+      "title": "compra Stripe TEST marketplace",
+      "ev": {
+        "oid": "c73842ae-b5ca-4772-ac6f-557a74f4efdc",
+        "pid": "ec4914a1-29e6-43c8-8623-c25d35af874d",
+        "pi": "pi_3UAmfKH7FWYUN3jh1ydx3Dfw",
+        "status": "pago",
+        "amount_paid_cents": 590,
+        "stock_units_applied": 1,
+        "product_qty": 1
+      }
+    },
+    {
+      "id": "legit.bag",
+      "lens": "U3",
+      "title": "setup_paid_bag Stripe TEST",
+      "ev": "200 {\n  \"ok\": true,\n  \"probe\": \"setup_paid_bag\",\n  \"payment_intent_id\": \"pi_3UAmfOH7FWYUN3jh0Ji4tiLQ\",\n  \"pi_amount_cents\": 1115,\n  \"total_cents_quote\": 1115,\n  \"items_cents\": 1000,\n  \"protection_cents\": 115,\n  \"share_a_cent…"
+    }
+  ],
+  "lenses": [
+    "U1",
+    "U2",
+    "U3",
+    "U4",
+    "U5",
+    "U6",
+    "U7",
+    "U8"
+  ]
+}

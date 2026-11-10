@@ -1,0 +1,380 @@
+﻿<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Fleaber Seller Studio</title>
+  <link rel="stylesheet" href="studio.css" />
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-logo" aria-hidden="true"></div>
+        <div class="brand-text">
+          <span class="brand-mark">Fleaber</span>
+          <span class="brand-title">Seller Studio</span>
+        </div>
+      </div>
+      <nav class="nav" aria-label="Navegação">
+        <button type="button" class="nav-item active" data-panel="direto">
+          <span class="nav-ico" aria-hidden="true">&#9679;</span> Live
+        </button>
+        <button type="button" class="nav-item" data-panel="produtos">
+          <span class="nav-ico" aria-hidden="true">&#9635;</span> Produtos
+        </button>
+        <button type="button" class="nav-item" data-panel="reservas">
+          <span class="nav-ico" aria-hidden="true">&#9776;</span> Reservas
+          <span class="nav-badge hidden" id="badgeReservas">0</span>
+        </button>
+        <button type="button" class="nav-item" data-panel="analises">
+          <span class="nav-ico" aria-hidden="true">&#9638;</span> Análises
+        </button>
+        <button type="button" class="nav-item" data-panel="historico">
+          <span class="nav-ico" aria-hidden="true">&#9719;</span> Histórico
+        </button>
+      </nav>
+      <div class="sidebar-foot">
+        <button type="button" class="nav-item nav-tech" data-panel="tech" id="navTech">
+          <span class="nav-ico" aria-hidden="true">&lt;/&gt;</span> Modo Técnico
+        </button>
+        <div class="seller-side" id="sellerAuthBox">
+          <button type="button" class="seller-gate-btn" id="btnShowSellerLogin">Entrar na conta</button>
+          <div id="sellerLoginForm" class="seller-side-form hidden">
+            <input id="sellerEmail" type="email" placeholder="O teu e-mail" autocomplete="username" />
+            <input id="sellerPassword" type="password" placeholder="Palavra-passe" autocomplete="current-password" />
+            <button type="button" class="btn btn-primary btn-block" id="btnSellerLogin">Entrar</button>
+            <button type="button" class="btn btn-ghost btn-sm btn-block" id="btnCancelSellerLogin">Cancelar</button>
+          </div>
+          <div class="hidden" id="sellerLoggedBar">
+            <div class="seller-identity">
+              <div class="seller-name" id="sellerLoggedLabel">—</div>
+              <div class="seller-state">Conta ligada</div>
+              <div class="side-actions">
+                <button type="button" class="btn btn-ghost btn-sm" id="btnSellerLogout">Sair</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="version" id="studioVersion">v— · Staging</div>
+      </div>
+    </aside>
+
+    <div class="main">
+      <header class="topbar">
+        <div class="health">
+          <span class="live-chip hidden" id="liveChip"><span class="pulse"></span> LIVE</span>
+          <strong class="top-title" id="liveTitleShort">Seller Studio</strong>
+          <span class="meta-inline" id="durationChip"></span>
+          <span class="meta-inline" id="viewerChip"></span>
+          <span class="pill" id="healthPill"><span class="led"></span> <span id="healthText">…</span></span>
+          <span class="meta-inline" id="sellerChip"></span>
+        </div>
+        <div class="topbar-actions">
+          <a class="btn btn-ghost hidden" id="btnOpenHub" href="#" target="_blank" rel="noopener">Abrir loja</a>
+          <button type="button" class="btn btn-secondary hidden" id="btnUnpairTop">Desemparelhar</button>
+          <button type="button" class="btn btn-danger hidden" id="btnStopReading">Pausar leitura</button>
+        </div>
+      </header>
+
+      <div class="content">
+        <section class="panel active panel-ops" id="panel-direto">
+          <div class="ops-empty hidden" id="opsEmptyState">
+            <div class="ops-empty-card">
+              <strong>Nenhum directo activo</strong>
+              <p>Emparelha um directo com o código do telemóvel para ver produtos, reservas e métricas ao vivo.</p>
+              <p class="hint tight">Os directos anteriores estão no separador Histórico.</p>
+              <div class="pair-compact" style="margin-top:16px;justify-content:center">
+                <input id="codeEmpty" type="text" maxlength="6" inputmode="numeric" placeholder="Código 6 dígitos" autocomplete="off" />
+                <button type="button" class="btn btn-primary btn-sm" id="btnPairEmpty">Emparelhar</button>
+              </div>
+              <div class="status-msg" id="statusMsgEmpty"></div>
+            </div>
+          </div>
+          <div class="ops-grid" id="opsGrid">
+            <aside class="ops-col ops-face">
+              <div class="card face-card face-card-compact">
+                <div class="card-h">
+                  <h2>Facebook</h2>
+                  <span class="status-pill" id="faceStatusPill"><span class="led" id="ledFace"></span><span id="valFace">—</span></span>
+                </div>
+                <div class="face-stats face-stats-compact">
+                  <div><span class="k">Leitura</span><span id="valRead">—</span></div>
+                  <div><span class="k">Directo</span><span id="valLive">—</span></div>
+                </div>
+                <p class="hint tight" id="hintFace">Abre o directo no browser</p>
+                <p class="hint tight hidden" id="hintRead"></p>
+                <p class="hint tight hidden" id="hintLive"></p>
+                <div class="controls tight face-toolbar">
+                  <button type="button" class="btn btn-primary btn-sm" id="btnInject">Activar leitura</button>
+                  <button type="button" class="btn btn-secondary btn-sm hidden" id="btnToggle">Pausar</button>
+                  <button type="button" class="btn btn-ghost btn-sm" id="btnFocusFace">Abrir FB</button>
+                  <button type="button" class="btn btn-secondary btn-sm" id="btnRefreshHub">Actualizar</button>
+                </div>
+                <details class="face-setup" id="faceSetupDetails">
+                  <summary>Emparelhar / código</summary>
+                  <div class="pair-compact">
+                    <input id="code" type="text" maxlength="6" inputmode="numeric" placeholder="Código 6 dígitos" autocomplete="off" />
+                    <button type="button" class="btn btn-primary btn-sm" id="btnPair">Emparelhar</button>
+                  </div>
+                  <button type="button" class="btn btn-ghost btn-sm hidden" id="btnUnpair" title="Usar Desemparelhar no topo">Desemparelhar</button>
+                </details>
+                <div class="status-msg" id="statusMsg"></div>
+                <div class="tabs-mini">
+                  <span class="tab-mini on">Actividade</span>
+                  <span class="meta" id="fbFeedMeta"></span>
+                </div>
+                <ul class="feed feed-face" id="activityFeed"></ul>
+              </div>
+            </aside>
+
+            <main class="ops-col ops-center">
+              <div class="card live-hero">
+                <div class="card-h">
+                  <h2>Fleaber Live</h2>
+                  <span class="status-pill teal" id="fleaberStatusPill"><span class="led" id="ledFleaber"></span><span id="valFleaber">—</span></span>
+                </div>
+                <p class="hint tight" id="hintFleaber"></p>
+                <div class="live-stage" id="liveStage">
+                  <div class="video-column">
+                    <div class="video-stage" id="muxWrap">
+                      <video id="muxVideo" class="mux-video" playsinline></video>
+                      <div class="mux-live-pill hidden" id="muxLivePill" aria-hidden="true">EM DIRECTO</div>
+                      <div class="mux-live-chrome hidden" id="muxLiveChrome">
+                        <button type="button" class="mux-ctrl" id="muxBtnPlay" title="Play/Pausa">❚❚</button>
+                        <button type="button" class="mux-ctrl" id="muxBtnMute" title="Som">🔊</button>
+                        <button type="button" class="mux-ctrl" id="muxBtnLive" title="Voltar ao directo">Ao directo</button>
+                        <button type="button" class="mux-ctrl" id="muxBtnFs" title="Ecrã inteiro">⛶</button>
+                        <span class="mux-live-label" id="muxLiveLabel">Monitor em directo</span>
+                      </div>
+                      <div class="video-empty" id="muxEmpty">
+                        <div class="empty-illu" aria-hidden="true"></div>
+                        <strong>Sem preview de momento</strong>
+                        <span>Quando o directo estiver a transmitir, o vídeo aparece aqui.</span>
+                      </div>
+                      <div class="active-product hidden" id="activeProductCard"></div>
+                      <div class="video-meta" id="muxMeta"></div>
+                    </div>
+                  </div>
+                  <aside class="chat-column" aria-label="Chat do directo">
+                    <div class="chat-panel">
+                      <div class="chat-panel-h">
+                        <h3>Chat do directo</h3>
+                        <span class="meta" id="liveChatMeta">—</span>
+                      </div>
+                      <ul class="feed feed-chat" id="liveChatFeed"></ul>
+                    </div>
+                  </aside>
+                </div>
+                <div class="ops-kpi" id="opsKpiRow"></div>
+                <div class="mini-metrics hidden" id="fleaberMini"></div>
+              </div>
+              <div class="card products-card">
+                <div class="card-h">
+                  <h2>Produtos do directo</h2>
+                  <span class="meta" id="prodStripMeta"></span>
+                </div>
+                <div class="prod-strip" id="prodStrip"></div>
+              </div>
+            </main>
+
+            <aside class="ops-col ops-right">
+              <div class="card queue-card">
+                <div class="card-h">
+                  <h2>Reservas / Fila</h2>
+                  <span class="meta" id="queueMeta"></span>
+                </div>
+                <p class="hint tight" id="queueHint"></p>
+                <ul class="feed feed-queue" id="sellerQueueFeed"></ul>
+              </div>
+              <div class="card alerts-card">
+                <div class="card-h"><h2>Alertas</h2></div>
+                <div class="alerts" id="alertsList"></div>
+              </div>
+              <div class="card analytics-card">
+                <div class="card-h"><h2>Análises</h2></div>
+                <div class="ops-analytics" id="opsAnalytics"></div>
+              </div>
+            </aside>
+          </div>
+
+          <span class="hidden"><span class="led" id="ledRead"></span><span class="led" id="ledLive"></span></span>
+        </section>
+
+        <section class="panel" id="panel-produtos">
+          <div class="panel-empty-wrap" id="produtosEmpty">
+            <div class="panel-empty">
+              <strong>Sem produtos para mostrar</strong>
+              <p>Quando tiveres um directo activo, os artigos do catálogo aparecem aqui com stock e reservas.</p>
+            </div>
+          </div>
+          <div class="card hidden" id="produtosCard">
+            <div class="card-h"><h2>Produtos do directo</h2><span class="meta" id="produtosMeta">Artigos deste directo</span></div>
+            <div class="prod-grid" id="prodGrid"></div>
+          </div>
+        </section>
+
+        <section class="panel" id="panel-reservas">
+          <div class="panel-empty-wrap" id="reservasEmpty">
+            <div class="panel-empty">
+              <strong>Sem reservas de momento</strong>
+              <p>Com um directo activo e a conta ligada, vês aqui a fila para aceitar ou rejeitar. Reservas de Lives já terminadas estão no separador Histórico → Ver detalhes.</p>
+            </div>
+          </div>
+          <div class="card hidden" id="reservasCard">
+            <div class="card-h"><h2>Fila do directo</h2><span class="meta">Pedidos em aberto</span></div>
+            <p class="hint" id="queueHintDup">Fila com Aceitar / Rejeitar (igual ao Live).</p>
+            <ul class="feed dense" id="reservasFeed"></ul>
+            <ul class="feed dense hidden" id="filaFeed"></ul>
+            <div class="mini-metrics" id="payState" style="margin-top:10px"></div>
+          </div>
+        </section>
+
+        <section class="panel" id="panel-analises">
+          <div class="panel-empty-wrap" id="analisesEmpty">
+            <div class="panel-empty">
+              <strong>Sem métricas de momento</strong>
+              <p>Com um directo activo vês espectadores, duração, vendas e reservas. No Histórico podes consultar Lives anteriores.</p>
+            </div>
+          </div>
+          <div class="card hidden" id="analisesCard">
+            <div class="card-h"><h2>Desempenho do directo</h2><span class="meta">Números deste directo</span></div>
+            <div class="kpi-row" id="kpiRow"></div>
+            <p class="hint hidden" id="kpiSources"></p>
+            <p class="hint hidden" id="kpiFuture"></p>
+          </div>
+        </section>
+
+        <section class="panel" id="panel-historico">
+          <div class="card">
+            <div class="card-h">
+              <h2>Histórico de Lives</h2>
+              <span class="meta">Consulta</span>
+            </div>
+            <p class="hint tight" id="historyHint">Directos anteriores. Toca numa linha para ver o detalhe.</p>
+            <div class="history-list" id="historyList"></div>
+          </div>
+          <div class="card hidden" id="historyDetailCard">
+            <div class="hist-ended-banner" id="historyEndedBanner">
+              Live terminada — Histórico · só leitura
+            </div>
+            <div class="card-h">
+              <h2 id="historyDetailTitle">Live</h2>
+              <span class="meta history-ro-badge">Só leitura</span>
+            </div>
+            <p class="hint tight" id="historyDetailMeta"></p>
+            <div class="kpi-row" id="historyDetailKpis"></div>
+
+            <div class="hist-detail-stage">
+              <div class="hist-replay card-inner">
+                <div class="card-h tight">
+                  <h3>Replay</h3>
+                  <span class="meta" id="historyMuxMeta">—</span>
+                </div>
+                <div class="video-stage hist-video-stage" id="historyMuxWrap">
+                  <video id="historyMuxVideo" class="mux-video" controls playsinline></video>
+                  <div class="mux-empty" id="historyMuxEmpty">
+                    Gravação aparece aqui quando estiver disponível.
+                  </div>
+                </div>
+              </div>
+              <div class="hist-chat card-inner">
+                <div class="card-h tight">
+                  <h3>Chat histórico</h3>
+                  <span class="meta" id="historyChatMeta">—</span>
+                </div>
+                <ul class="feed feed-chat hist-chat-feed" id="historyChatFeed"></ul>
+              </div>
+            </div>
+
+            <div class="hist-section">
+              <div class="card-h tight"><h3>Reservas desta Live</h3><span class="meta">Só consulta</span></div>
+              <p class="hint tight" id="historyQueueHint"></p>
+              <ul class="feed feed-queue" id="historyQueueFeed"></ul>
+            </div>
+            <div class="hist-section">
+              <div class="card-h tight"><h3>Actividade</h3></div>
+              <ul class="feed dense" id="historyActivityFeed"></ul>
+            </div>
+            <div class="hist-section">
+              <div class="card-h tight"><h3>Produtos</h3></div>
+              <div class="prod-grid" id="historyDetailProds"></div>
+            </div>
+
+            <div class="controls tight" style="margin-top:12px">
+              <button type="button" class="btn btn-ghost btn-sm" id="btnHistoryClose">Fechar consulta</button>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel" id="panel-tech">
+          <div class="tech-banner"><strong>Modo Técnico</strong> — QA / diagnóstico. Fechado no uso normal.</div>
+          <div class="tech-grid">
+            <div class="card">
+              <div class="card-h"><h2>Parse / IA</h2></div>
+              <div class="tech-row"><input id="strictRef" type="checkbox" checked /><label for="strictRef">REF rígido</label></div>
+              <div class="tech-row"><input id="ollama" type="checkbox" /><label for="ollama">IA local (Ollama)</label></div>
+              <label for="aiTier" class="hint" style="display:block;margin-top:8px">Perfil IA</label>
+              <select id="aiTier">
+                <option value="auto">Auto</option>
+                <option value="lite">Lite</option>
+                <option value="pro">Pro</option>
+              </select>
+              <div class="hint" id="ollamaStatus">IA: …</div>
+            </div>
+            <div class="card">
+              <div class="card-h"><h2>Ferramentas QA</h2></div>
+              <div class="controls">
+                <button type="button" class="btn btn-secondary" id="btnProbe">Sondar identidade</button>
+                <button type="button" class="btn btn-secondary" id="btnExportIdentity">Exportar sonda</button>
+                <button type="button" class="btn btn-secondary" id="btnExportJournal">Exportar journal</button>
+                <button type="button" class="btn btn-secondary" id="btnClearJournal">Limpar journal</button>
+                <button type="button" class="btn btn-secondary" id="btnResetRun">Limpar corrida</button>
+                <button type="button" class="btn btn-secondary" id="btnRefreshQueueTech">Forçar refresh fila</button>
+                <button type="button" class="btn btn-ghost" id="btnOpenClassicTech">Interface clássica</button>
+                <button type="button" class="btn btn-ghost" id="btnClassic" title="Fallback">Abrir popup clássico</button>
+              </div>
+              <div class="status-msg" id="techStatus"></div>
+            </div>
+          </div>
+          <div class="card"><div class="card-h"><h2>Diagnóstico</h2></div><div class="diag-box" id="diagBox">…</div></div>
+          <div class="card">
+            <div class="card-h">
+              <h2>FB CHAT TRACE</h2>
+              <span class="meta" id="techChatTraceMeta">—</span>
+            </div>
+            <p class="hint tight">Diagnóstico temporário: CAPTURED → NORMALIZED → TRANSCRIPT / JOURNAL_CHAT → DISPLAYED, ou DROPPED com motivo. Só Modo Técnico.</p>
+            <ul class="feed dense mono" id="techChatTraceFeed"></ul>
+          </div>
+          <div class="card">
+            <div class="card-h">
+              <h2>Journal PS (completo)</h2>
+              <span class="meta" id="techJournalMeta">—</span>
+            </div>
+            <p class="hint tight">Inclui falhas técnicas (live_ended, item_not_found, retries). A área Live da vendedora só mostra confirmações.</p>
+            <ul class="feed dense" id="techJournalFeed"></ul>
+          </div>
+        </section>
+      </div>
+
+      <footer class="footer-bar">
+        <div class="footer-left">
+          <span class="footer-led"><span class="led" id="footFace"></span> Facebook</span>
+          <span class="footer-led"><span class="led" id="footRead"></span> Leitura</span>
+          <span class="footer-led"><span class="led" id="footFleaber"></span> Fleaber</span>
+          <span class="footer-led"><span class="led" id="footPair"></span> Emparelhamento</span>
+          <span id="footLastAction"></span>
+        </div>
+        <div id="footClock"></div>
+      </footer>
+    </div>
+  </div>
+  <script src="vendor/hls.min.js"></script>
+  <script src="studio_config.js"></script>
+  <script src="studio_hub.js"></script>
+  <script src="studio_seller_auth.js"></script>
+  <script src="studio_activity_model.js"></script>
+  <script src="studio_chat_model.js"></script>
+  <script src="studio.js"></script>
+</body>
+</html>

@@ -1,0 +1,65 @@
+{
+  "AUDITOR": "REDTEAM_BLIND_Q_POS_NOP_v1",
+  "FROZEN_AT": "2026-09-01T06:16:00+01:00",
+  "production_touched": false,
+  "fase4": false,
+  "corrections_applied": false,
+  "staging": "fxdknzrqjenzqcvnwqqq",
+  "stripe": "TEST",
+  "lentes_cobertas": ["Q1", "Q2", "Q3", "Q4", "Q5", "Q6", "Q7", "Q8"],
+  "VEREDICTO": "FAIL_P0",
+  "findings": [
+    {
+      "id": "RTQ-Q1-buyer-cross-live-s2-accept",
+      "severity": "P0",
+      "lens": "Q1",
+      "title": "S2 aceita reserva no artigo da live A via live_id da live B"
+    },
+    {
+      "id": "RTQ-Q8-convert-foreign-item",
+      "severity": "P0",
+      "lens": "Q8",
+      "title": "S2 converte stock do artigo de S1 sem pagar"
+    },
+    {
+      "id": "RTQ-Q8-wallet-and-stock-buyer-still-owns",
+      "severity": "P0",
+      "lens": "Q8",
+      "title": "process_partial 50% minta carteiras; stock relistado; PI sem refund; order entregue",
+      "order_id": "2560c21d-a0d5-47e1-a17e-6d9d65596895",
+      "payment_intent": "pi_3UAkv3H7FWYUN3jh1kzI1aNq",
+      "stripe_refund_id": null,
+      "buyer_delta": 2.95,
+      "seller_delta": 2.05,
+      "stock": "1→7"
+    },
+    {
+      "id": "RTQ-Q6-relist-while-buyer-holds",
+      "severity": "P1",
+      "lens": "Q6"
+    },
+    {
+      "id": "RTQ-Q5-seller-skip-to-resolvida",
+      "severity": "P1",
+      "lens": "Q5",
+      "note": "clássico — não conta para atrofia da onda"
+    },
+    {
+      "id": "RTQ-Q3-proof-url-fragment-evil",
+      "severity": "P2",
+      "lens": "Q3"
+    },
+    {
+      "id": "RTQ-Q3-label-url-fragment-evil",
+      "severity": "P2",
+      "lens": "Q3"
+    }
+  ],
+  "held": {
+    "N-P0_seller_id_spoof": "403 reservation_buyer_mismatch",
+    "N-P2_stop_egress_body": "403 egress_id não pertence a esta live",
+    "O3_devolvida": "403 order_devolvida_requires_refund",
+    "O4_partial_100": "403 dispute_full_refund_requires_stripe",
+    "Q2_lives_grant": "403 permission denied for table lives"
+  }
+}

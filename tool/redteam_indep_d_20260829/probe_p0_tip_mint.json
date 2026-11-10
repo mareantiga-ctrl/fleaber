@@ -1,0 +1,175 @@
+{
+  "buyer": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+  "tests": [
+    {
+      "name": "repro_credit_1",
+      "tip": {
+        "id": "c426d742-c6f6-4b96-a6c7-5fae61d469a6",
+        "live_id": null,
+        "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+        "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+        "amount": 1.0,
+        "processing_fee": 0.43,
+        "seller_amount": 0.57,
+        "message": null,
+        "payment_source": "stripe",
+        "status": "pending",
+        "stripe_session_id": "cs_test_a1hUgFt8rZmNbnbUn9sWDCjZhSNDzlkD1lwHX4GFqTXrxGJ5jUsMaIqzIQ",
+        "created_at": "2026-08-29T13:54:41.808087+00:00",
+        "completed_at": null
+      },
+      "rpc": {
+        "ok": true,
+        "status": 200,
+        "body": true
+      },
+      "w0": {
+        "id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+        "balance": 89.81,
+        "stripe_account_id": "acct_1U8gAFQglI7kZRfq",
+        "updated_at": "2026-08-29T13:53:54.455848+00:00"
+      },
+      "w1": {
+        "id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+        "balance": 90.81,
+        "stripe_account_id": "acct_1U8gAFQglI7kZRfq",
+        "updated_at": "2026-08-29T13:54:42.628609+00:00"
+      }
+    },
+    {
+      "name": "duplicate_same_tip_desc",
+      "rpc": {
+        "ok": true,
+        "status": 200,
+        "body": false
+      },
+      "w2": {
+        "id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+        "balance": 90.81,
+        "stripe_account_id": "acct_1U8gAFQglI7kZRfq",
+        "updated_at": "2026-08-29T13:54:42.628609+00:00"
+      }
+    },
+    {
+      "name": "second_credit_other_type_desc",
+      "rpc": {
+        "ok": true,
+        "status": 200,
+        "body": true
+      },
+      "w3": {
+        "id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+        "balance": 93.81,
+        "stripe_account_id": "acct_1U8gAFQglI7kZRfq",
+        "updated_at": "2026-08-29T13:54:44.123172+00:00"
+      }
+    },
+    {
+      "name": "payout_minted_100cents",
+      "pay": {
+        "ok": false,
+        "status": 400,
+        "body": {
+          "error": "Falta associar a conta banc\u00e1ria no Stripe. Abre outra vez Configurar conta banc\u00e1ria e adiciona o IBAN de teste.",
+          "code": "payout_failed"
+        }
+      },
+      "before": {
+        "id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+        "balance": 93.81,
+        "stripe_account_id": "acct_1U8gAFQglI7kZRfq",
+        "updated_at": "2026-08-29T13:54:44.123172+00:00"
+      },
+      "after": {
+        "id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+        "balance": 93.81,
+        "stripe_account_id": "acct_1U8gAFQglI7kZRfq",
+        "updated_at": "2026-08-29T13:54:44.123172+00:00"
+      }
+    },
+    {
+      "recent_tx": [
+        {
+          "id": "3df038f4-4aab-48fb-be8f-32181bff9230",
+          "wallet_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+          "amount": 3.0,
+          "type": "reembolso",
+          "description": "rt-d other desc",
+          "created_at": "2026-08-29T13:54:44.123172+00:00",
+          "order_id": null,
+          "tip_id": "c426d742-c6f6-4b96-a6c7-5fae61d469a6"
+        },
+        {
+          "id": "b35fdd8f-1ec1-4e45-9e18-3f3e49cb4f91",
+          "wallet_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+          "amount": 1.0,
+          "type": "venda",
+          "description": "rt-d repro 1eur",
+          "created_at": "2026-08-29T13:54:42.628609+00:00",
+          "order_id": null,
+          "tip_id": "c426d742-c6f6-4b96-a6c7-5fae61d469a6"
+        },
+        {
+          "id": "c1727924-a7a5-48df-8d48-a4f4a58f6075",
+          "wallet_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+          "amount": 50.0,
+          "type": "venda",
+          "description": "rt-d mint via tip",
+          "created_at": "2026-08-29T13:53:54.455848+00:00",
+          "order_id": null,
+          "tip_id": "2fa964d8-9a11-47f8-983a-227bfbe5cd12"
+        },
+        {
+          "id": "6cbc32d4-3542-488d-8ede-aff39d5d947f",
+          "wallet_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+          "amount": 0.36,
+          "type": "reembolso",
+          "description": "Reembolso parcial disputa #2cd1a63c",
+          "created_at": "2026-08-27T19:36:32.03082+00:00",
+          "order_id": "2cd1a63c-ac45-4f4a-8fc2-1c33af0d15b3",
+          "tip_id": null
+        },
+        {
+          "id": "596d8de6-e1ff-439c-8b92-baa5e0f9eefa",
+          "wallet_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+          "amount": 0.45,
+          "type": "reembolso",
+          "description": "Reembolso parcial disputa #6fbb7fe8",
+          "created_at": "2026-08-27T19:31:51.724951+00:00",
+          "order_id": "6fbb7fe8-cf25-4646-a554-b317c53899df",
+          "tip_id": null
+        },
+        {
+          "id": "2daaba98-b71d-44ef-a2c2-e6644534d2a1",
+          "wallet_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+          "amount": 5.0,
+          "type": "reembolso",
+          "description": "Reembolso parcial disputa #fd4573a3",
+          "created_at": "2026-08-27T09:45:27.010851+00:00",
+          "order_id": "fd4573a3-331e-4962-ac5d-0b397aaeafbd",
+          "tip_id": null
+        },
+        {
+          "id": "d90b324e-de22-4a97-9d92-33db9a09474f",
+          "wallet_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+          "amount": -5.0,
+          "type": "gorjeta_enviada",
+          "description": "t10",
+          "created_at": "2026-08-27T09:44:08.661097+00:00",
+          "order_id": null,
+          "tip_id": "43303768-1ae7-47b8-bccf-bb7c7caccecf"
+        },
+        {
+          "id": "7fb2bbf2-5764-4456-8dab-fd5b47197666",
+          "wallet_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+          "amount": 5.0,
+          "type": "reembolso",
+          "description": "Reembolso parcial disputa #6b1a606b",
+          "created_at": "2026-08-27T08:19:00.64719+00:00",
+          "order_id": "6b1a606b-80e4-45e2-ae4a-d251a68e651a",
+          "tip_id": null
+        }
+      ]
+    }
+  ]
+}

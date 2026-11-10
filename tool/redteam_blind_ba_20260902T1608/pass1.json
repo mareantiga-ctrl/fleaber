@@ -1,0 +1,655 @@
+{
+  "stamp": "20260902T1608",
+  "prefix": "RTBA-20260902T1608",
+  "auditor": "REDTEAM_BLIND_BA_CHAT_POS_ANAS_v1",
+  "lenses": [
+    "BA1",
+    "BA2",
+    "BA3",
+    "BA4",
+    "BA5",
+    "BA6",
+    "BA7",
+    "BA8"
+  ],
+  "findings": [
+    {
+      "id": "BA1.notes.klarna",
+      "lens": "BA1",
+      "severity": "P2",
+      "title": "reservation_payment_submitted notes Klarna 12€ (amount antes)",
+      "actor": "buyer JWT",
+      "pre": "chat B1-S1 + orders fixture",
+      "repro": "POST chat_messages text=FLEABER_JSON_V1:{\"kind\":\"reservation_payment_submitted\",\"order_id\":\"a6b7d377-fcb9-4704-a132-8f1e73b12500\",\"notes\":\"Klarn…",
+      "expected": "negado (kind/notes/display)",
+      "obtained": "201 [{\"id\":1259,\"created_at\":\"2026-09-02T15:12:59.543898+00:00\",\"chat_id\":\"ac2902d3-a3ca-4f82-b7de-2532db9cafba\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"reservation_payment_submitted\\\",\\\"order_id\\\"…",
+      "proven": true,
+      "evidence": {
+        "persisted_id": "1259",
+        "text_head": "FLEABER_JSON_V1:{\"kind\":\"reservation_payment_submitted\",\"order_id\":\"a6b7d377-fcb…"
+      }
+    },
+    {
+      "id": "BA1.notes.ideal",
+      "lens": "BA1",
+      "severity": "P2",
+      "title": "notes iDEAL 15 EUR aprovado (amount antes do keyword)",
+      "actor": "buyer JWT",
+      "pre": "chat B1-S1 + orders fixture",
+      "repro": "POST chat_messages text=FLEABER_JSON_V1:{\"kind\":\"reservation_payment_submitted\",\"order_id\":\"a6b7d377-fcb9-4704-a132-8f1e73b12500\",\"notes\":\"iDEAL…",
+      "expected": "negado (kind/notes/display)",
+      "obtained": "201 [{\"id\":1260,\"created_at\":\"2026-09-02T15:12:59.664596+00:00\",\"chat_id\":\"ac2902d3-a3ca-4f82-b7de-2532db9cafba\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"reservation_payment_submitted\\\",\\\"order_id\\\"…",
+      "proven": true,
+      "evidence": {
+        "persisted_id": "1260",
+        "text_head": "FLEABER_JSON_V1:{\"kind\":\"reservation_payment_submitted\",\"order_id\":\"a6b7d377-fcb…"
+      }
+    },
+    {
+      "id": "BA1.notes.twint",
+      "lens": "BA1",
+      "severity": "P2",
+      "title": "notes Twint pago 12 EUR",
+      "actor": "buyer JWT",
+      "pre": "chat B1-S1 + orders fixture",
+      "repro": "POST chat_messages text=FLEABER_JSON_V1:{\"kind\":\"reservation_payment_submitted\",\"order_id\":\"a6b7d377-fcb9-4704-a132-8f1e73b12500\",\"notes\":\"Twint…",
+      "expected": "negado (kind/notes/display)",
+      "obtained": "201 [{\"id\":1262,\"created_at\":\"2026-09-02T15:12:59.978761+00:00\",\"chat_id\":\"ac2902d3-a3ca-4f82-b7de-2532db9cafba\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"reservation_payment_submitted\\\",\\\"order_id\\\"…",
+      "proven": true,
+      "evidence": {
+        "persisted_id": "1262",
+        "text_head": "FLEABER_JSON_V1:{\"kind\":\"reservation_payment_submitted\",\"order_id\":\"a6b7d377-fcb…"
+      }
+    },
+    {
+      "id": "BA1.seguro.label.klarna",
+      "lens": "BA1",
+      "severity": "P2",
+      "title": "seguro_fleaber_paid label Klarna (rail gap)",
+      "actor": "buyer JWT",
+      "pre": "chat B1-S1 + orders fixture",
+      "repro": "POST chat_messages text=FLEABER_JSON_V1:{\"kind\":\"seguro_fleaber_paid\",\"order_id\":\"c99bf6b7-f2d3-4f28-ae20-a1ab077ddf6a\",\"total\":\"12.00\",\"label\":…",
+      "expected": "negado (kind/notes/display)",
+      "obtained": "201 [{\"id\":1264,\"created_at\":\"2026-09-02T15:13:00.191423+00:00\",\"chat_id\":\"ac2902d3-a3ca-4f82-b7de-2532db9cafba\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"seguro_fleaber_paid\\\",\\\"order_id\\\":\\\"c99bf6b…",
+      "proven": true,
+      "evidence": {
+        "persisted_id": "1264",
+        "text_head": "FLEABER_JSON_V1:{\"kind\":\"seguro_fleaber_paid\",\"order_id\":\"c99bf6b7-f2d3-4f28-ae2…"
+      }
+    },
+    {
+      "id": "BA1.cancel.display.ideal",
+      "lens": "BA1",
+      "severity": "P2",
+      "title": "cancel_request_outcome display iDEAL (seller)",
+      "actor": "buyer JWT",
+      "pre": "chat B1-S1 + orders fixture",
+      "repro": "POST chat_messages text=FLEABER_JSON_V1:{\"kind\":\"cancel_request_outcome\",\"order_id\":\"c99bf6b7-f2d3-4f28-ae20-a1ab077ddf6a\",\"outcome\":\"rejected\",…",
+      "expected": "negado (kind/notes/display)",
+      "obtained": "201 [{\"id\":1265,\"created_at\":\"2026-09-02T15:13:00.29488+00:00\",\"chat_id\":\"ac2902d3-a3ca-4f82-b7de-2532db9cafba\",\"sender_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"cancel_request_outcome\\\",\\\"order_id\\\":\\\"c99bf…",
+      "proven": true,
+      "evidence": {
+        "persisted_id": "1265",
+        "text_head": "FLEABER_JSON_V1:{\"kind\":\"cancel_request_outcome\",\"order_id\":\"c99bf6b7-f2d3-4f28-…"
+      }
+    },
+    {
+      "id": "BA2.plain.klarna_emoji",
+      "lens": "BA2",
+      "severity": "P3",
+      "title": "plain lie persiste: Klarna confirmado 12 💶",
+      "actor": "buyer JWT",
+      "pre": "denylist ANAS sem Klarna/iDEAL/💶",
+      "repro": "POST chat_messages plain",
+      "expected": "bloqueado se mentira de pagamento; senão P3 UI",
+      "obtained": "201 [{\"id\":1266,\"created_at\":\"2026-09-02T15:13:00.413784+00:00\",\"chat_id\":\"ac2902d3-a3ca-4f82-b7de-2532db9cafba\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"Klarna confirmado 12 💶\",\"is_reservation\":false,\"is_read\":false,\"receive…",
+      "proven": true,
+      "evidence": {
+        "text": "Klarna confirmado 12 💶",
+        "id": "1266"
+      }
+    },
+    {
+      "id": "BA2.plain.ideal_emoji",
+      "lens": "BA2",
+      "severity": "P3",
+      "title": "plain lie persiste: iDEAL aprovado 15 💶",
+      "actor": "buyer JWT",
+      "pre": "denylist ANAS sem Klarna/iDEAL/💶",
+      "repro": "POST chat_messages plain",
+      "expected": "bloqueado se mentira de pagamento; senão P3 UI",
+      "obtained": "201 [{\"id\":1267,\"created_at\":\"2026-09-02T15:13:00.511047+00:00\",\"chat_id\":\"ac2902d3-a3ca-4f82-b7de-2532db9cafba\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"iDEAL aprovado 15 💶\",\"is_reservation\":false,\"is_read\":false,\"receiver_i…",
+      "proven": true,
+      "evidence": {
+        "text": "iDEAL aprovado 15 💶",
+        "id": "1267"
+      }
+    },
+    {
+      "id": "BA2.plain.greek_klarna",
+      "lens": "BA2",
+      "severity": "P3",
+      "title": "plain lie persiste: Κlarna confirmado 12,00 €",
+      "actor": "buyer JWT",
+      "pre": "denylist ANAS sem Klarna/iDEAL/💶",
+      "repro": "POST chat_messages plain",
+      "expected": "bloqueado se mentira de pagamento; senão P3 UI",
+      "obtained": "201 [{\"id\":1268,\"created_at\":\"2026-09-02T15:13:00.611024+00:00\",\"chat_id\":\"ac2902d3-a3ca-4f82-b7de-2532db9cafba\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"Κlarna confirmado 12,00 €\",\"is_reservation\":false,\"is_read\":false,\"recei…",
+      "proven": true,
+      "evidence": {
+        "text": "Κlarna confirmado 12,00 €",
+        "id": "1268"
+      }
+    },
+    {
+      "id": "BA2.plain.fullwidth",
+      "lens": "BA2",
+      "severity": "P3",
+      "title": "plain lie persiste: Ｋｌａｒｎａ １２ € confirmado",
+      "actor": "buyer JWT",
+      "pre": "denylist ANAS sem Klarna/iDEAL/💶",
+      "repro": "POST chat_messages plain",
+      "expected": "bloqueado se mentira de pagamento; senão P3 UI",
+      "obtained": "201 [{\"id\":1269,\"created_at\":\"2026-09-02T15:13:00.720166+00:00\",\"chat_id\":\"ac2902d3-a3ca-4f82-b7de-2532db9cafba\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"Ｋｌａｒｎａ １２ € confirmado\",\"is_reservation\":false,\"is_read\":false,\"receiver…",
+      "proven": true,
+      "evidence": {
+        "text": "Ｋｌａｒｎａ １２ € confirmado",
+        "id": "1269"
+      }
+    },
+    {
+      "id": "BA2.plain.zwj_klarna",
+      "lens": "BA2",
+      "severity": "P3",
+      "title": "plain lie persiste: K‍larna 12€ pago",
+      "actor": "buyer JWT",
+      "pre": "denylist ANAS sem Klarna/iDEAL/💶",
+      "repro": "POST chat_messages plain",
+      "expected": "bloqueado se mentira de pagamento; senão P3 UI",
+      "obtained": "201 [{\"id\":1270,\"created_at\":\"2026-09-02T15:13:00.862235+00:00\",\"chat_id\":\"ac2902d3-a3ca-4f82-b7de-2532db9cafba\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"K‍larna 12€ pago\",\"is_reservation\":false,\"is_read\":false,\"receiver_id\":\"…",
+      "proven": true,
+      "evidence": {
+        "text": "K‍larna 12€ pago",
+        "id": "1270"
+      }
+    },
+    {
+      "id": "BA2.plain.dotless_i",
+      "lens": "BA2",
+      "severity": "P3",
+      "title": "plain lie persiste: ıDEAL 12 EUR confirmado",
+      "actor": "buyer JWT",
+      "pre": "denylist ANAS sem Klarna/iDEAL/💶",
+      "repro": "POST chat_messages plain",
+      "expected": "bloqueado se mentira de pagamento; senão P3 UI",
+      "obtained": "201 [{\"id\":1271,\"created_at\":\"2026-09-02T15:13:00.990367+00:00\",\"chat_id\":\"ac2902d3-a3ca-4f82-b7de-2532db9cafba\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"ıDEAL 12 EUR confirmado\",\"is_reservation\":false,\"is_read\":false,\"receive…",
+      "proven": true,
+      "evidence": {
+        "text": "ıDEAL 12 EUR confirmado",
+        "id": "1271"
+      }
+    },
+    {
+      "id": "BA2.notes.emoji_euro",
+      "lens": "BA2",
+      "severity": "P2",
+      "title": "notes Klarna confirmado 12 💶 (emoji ≠ €)",
+      "actor": "buyer JWT",
+      "pre": "chat B1-S1 + orders fixture",
+      "repro": "POST chat_messages text=FLEABER_JSON_V1:{\"kind\":\"reservation_payment_submitted\",\"order_id\":\"a6b7d377-fcb9-4704-a132-8f1e73b12500\",\"notes\":\"Klarn…",
+      "expected": "negado (kind/notes/display)",
+      "obtained": "201 [{\"id\":1272,\"created_at\":\"2026-09-02T15:13:01.105826+00:00\",\"chat_id\":\"ac2902d3-a3ca-4f82-b7de-2532db9cafba\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"reservation_payment_submitted\\\",\\\"order_id\\\"…",
+      "proven": true,
+      "evidence": {
+        "persisted_id": "1272",
+        "text_head": "FLEABER_JSON_V1:{\"kind\":\"reservation_payment_submitted\",\"order_id\":\"a6b7d377-fcb…"
+      }
+    },
+    {
+      "id": "BA4.proof_url.sign_alheio",
+      "lens": "BA4",
+      "severity": "P1",
+      "title": "reservation_payment_submitted proof_url = sign order_proofs B2",
+      "actor": "buyer JWT",
+      "pre": "chat B1-S1 + orders fixture",
+      "repro": "POST chat_messages text=FLEABER_JSON_V1:{\"kind\":\"reservation_payment_submitted\",\"order_id\":\"a6b7d377-fcb9-4704-a132-8f1e73b12500\",\"notes\":\"compr…",
+      "expected": "negado (kind/notes/display)",
+      "obtained": "201 [{\"id\":1281,\"created_at\":\"2026-09-02T15:13:04.147407+00:00\",\"chat_id\":\"ac2902d3-a3ca-4f82-b7de-2532db9cafba\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"reservation_payment_submitted\\\",\\\"order_id\\\"…",
+      "proven": true,
+      "evidence": {
+        "persisted_id": "1281",
+        "text_head": "FLEABER_JSON_V1:{\"kind\":\"reservation_payment_submitted\",\"order_id\":\"a6b7d377-fcb…"
+      }
+    },
+    {
+      "id": "BA5.inbox.klarna_amount_first",
+      "lens": "BA5",
+      "severity": "P2",
+      "title": "inbox last_message=\"Klarna 12,00 € confirmado\"",
+      "actor": "buyer JWT",
+      "pre": "forged_inbox_preview = payment_lie_text ANAS (sem Klarna/iDEAL/💶)",
+      "repro": "PATCH chats last_message",
+      "expected": "chat_inbox_preview_forbidden",
+      "obtained": "200 [{\"id\":\"ac2902d3-a3ca-4f82-b7de-2532db9cafba\",\"created_at\":\"2026-08-27T06:37:32.277448+00:00\",\"user_a\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"user_b\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"last_message\":\"Klarna 12,00 € confirmado\",\"last_m…",
+      "proven": true,
+      "evidence": {
+        "last_message": "Klarna 12,00 € confirmado",
+        "wanted": "Klarna 12,00 € confirmado"
+      }
+    },
+    {
+      "id": "BA5.inbox.ideal_amount_first",
+      "lens": "BA5",
+      "severity": "P2",
+      "title": "inbox last_message=\"iDEAL 15 EUR aprovado\"",
+      "actor": "buyer JWT",
+      "pre": "forged_inbox_preview = payment_lie_text ANAS (sem Klarna/iDEAL/💶)",
+      "repro": "PATCH chats last_message",
+      "expected": "chat_inbox_preview_forbidden",
+      "obtained": "200 [{\"id\":\"ac2902d3-a3ca-4f82-b7de-2532db9cafba\",\"created_at\":\"2026-08-27T06:37:32.277448+00:00\",\"user_a\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"user_b\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"last_message\":\"iDEAL 15 EUR aprovado\",\"last_messa…",
+      "proven": true,
+      "evidence": {
+        "last_message": "iDEAL 15 EUR aprovado",
+        "wanted": "iDEAL 15 EUR aprovado"
+      }
+    },
+    {
+      "id": "BA5.inbox.emoji",
+      "lens": "BA5",
+      "severity": "P2",
+      "title": "inbox last_message=\"Klarna confirmado 12 💶\"",
+      "actor": "buyer JWT",
+      "pre": "forged_inbox_preview = payment_lie_text ANAS (sem Klarna/iDEAL/💶)",
+      "repro": "PATCH chats last_message",
+      "expected": "chat_inbox_preview_forbidden",
+      "obtained": "200 [{\"id\":\"ac2902d3-a3ca-4f82-b7de-2532db9cafba\",\"created_at\":\"2026-08-27T06:37:32.277448+00:00\",\"user_a\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"user_b\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"last_message\":\"Klarna confirmado 12 💶\",\"last_mes…",
+      "proven": true,
+      "evidence": {
+        "last_message": "Klarna confirmado 12 💶",
+        "wanted": "Klarna confirmado 12 💶"
+      }
+    },
+    {
+      "id": "BA5.inbox.twint",
+      "lens": "BA5",
+      "severity": "P2",
+      "title": "inbox last_message=\"Twint 9,99 € pago\"",
+      "actor": "buyer JWT",
+      "pre": "forged_inbox_preview = payment_lie_text ANAS (sem Klarna/iDEAL/💶)",
+      "repro": "PATCH chats last_message",
+      "expected": "chat_inbox_preview_forbidden",
+      "obtained": "200 [{\"id\":\"ac2902d3-a3ca-4f82-b7de-2532db9cafba\",\"created_at\":\"2026-08-27T06:37:32.277448+00:00\",\"user_a\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"user_b\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"last_message\":\"Twint 9,99 € pago\",\"last_message_t…",
+      "proven": true,
+      "evidence": {
+        "last_message": "Twint 9,99 € pago",
+        "wanted": "Twint 9,99 € pago"
+      }
+    },
+    {
+      "id": "BA5.del.hangul",
+      "lens": "BA5",
+      "severity": "P2",
+      "title": "DELETE JSON card com prefixo exótico",
+      "actor": "buyer JWT",
+      "pre": "delete guard só NBSP/Zs + like FLEABER_JSON_V1",
+      "repro": "INSERT prefix+JSON; DELETE own row",
+      "expected": "chat_system_card_immutable",
+      "obtained": "200 [{\"id\":1283,\"created_at\":\"2026-09-02T15:13:05.931193+00:00\",\"chat_id\":\"ac2902d3-a3ca-4f82-b7de-2532db9cafba\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"ㅤFLEABER_JSON_V1:{\\\"kind\\\":\\\"chat_image\\\",\\\"path\\\":\\\"chat_uploads/bfcbee…",
+      "proven": true,
+      "evidence": {
+        "stored_head": "ㅤFLEABER_JSON_V1:{\"kind\":\"chat_image\",\"p…",
+        "delete": "200 [{\"id\":1283,\"created_at\":\"2026-09-02T15:13:05.931193+00:00\",\"chat_id\":\"ac2902d3-a3ca-4f82-b7de-2532db9cafba\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"ㅤFLEABER_JSON_V1:{\\\"kind\\\":\\\"chat_image\\\",\\\"path\\\":\\\"chat_uploads/bfcbee…",
+        "gone": true
+      }
+    },
+    {
+      "id": "BA5.del.braille",
+      "lens": "BA5",
+      "severity": "P2",
+      "title": "DELETE JSON card com prefixo exótico",
+      "actor": "buyer JWT",
+      "pre": "delete guard só NBSP/Zs + like FLEABER_JSON_V1",
+      "repro": "INSERT prefix+JSON; DELETE own row",
+      "expected": "chat_system_card_immutable",
+      "obtained": "200 [{\"id\":1284,\"created_at\":\"2026-09-02T15:13:06.368604+00:00\",\"chat_id\":\"ac2902d3-a3ca-4f82-b7de-2532db9cafba\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"⠀FLEABER_JSON_V1:{\\\"kind\\\":\\\"chat_image\\\",\\\"path\\\":\\\"chat_uploads/bfcbee…",
+      "proven": true,
+      "evidence": {
+        "stored_head": "⠀FLEABER_JSON_V1:{\"kind\":\"chat_image\",\"p…",
+        "delete": "200 [{\"id\":1284,\"created_at\":\"2026-09-02T15:13:06.368604+00:00\",\"chat_id\":\"ac2902d3-a3ca-4f82-b7de-2532db9cafba\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"⠀FLEABER_JSON_V1:{\\\"kind\\\":\\\"chat_image\\\",\\\"path\\\":\\\"chat_uploads/bfcbee…",
+        "gone": true
+      }
+    },
+    {
+      "id": "BA5.del.bom_zwsp",
+      "lens": "BA5",
+      "severity": "P2",
+      "title": "DELETE JSON card com prefixo exótico",
+      "actor": "buyer JWT",
+      "pre": "delete guard só NBSP/Zs + like FLEABER_JSON_V1",
+      "repro": "INSERT prefix+JSON; DELETE own row",
+      "expected": "chat_system_card_immutable",
+      "obtained": "200 [{\"id\":1285,\"created_at\":\"2026-09-02T15:13:06.773111+00:00\",\"chat_id\":\"ac2902d3-a3ca-4f82-b7de-2532db9cafba\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"​FLEABER_JSON_V1:{\\\"kind\\\":\\\"chat_image\\\",\\\"path\\\":\\\"chat_uploads/bfcbee…",
+      "proven": true,
+      "evidence": {
+        "stored_head": "​FLEABER_JSON_V1:{\"kind\":\"chat_image\",\"p…",
+        "delete": "200 [{\"id\":1285,\"created_at\":\"2026-09-02T15:13:06.773111+00:00\",\"chat_id\":\"ac2902d3-a3ca-4f82-b7de-2532db9cafba\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"​FLEABER_JSON_V1:{\\\"kind\\\":\\\"chat_image\\\",\\\"path\\\":\\\"chat_uploads/bfcbee…",
+        "gone": true
+      }
+    }
+  ],
+  "blocked": [
+    {
+      "id": "BA1.kind.klarna_receipt",
+      "lens": "BA1",
+      "title": "kind klarna_receipt (não allowlist)",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_kind_denied\"}"
+    },
+    {
+      "id": "BA1.kind.ideal_paid",
+      "lens": "BA1",
+      "title": "kind ideal_paid (não allowlist)",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_kind_denied\"}"
+    },
+    {
+      "id": "BA1.kind.order_paid",
+      "lens": "BA1",
+      "title": "kind order_paid (server-only) via JWT",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_server_only\"}"
+    },
+    {
+      "id": "BA1.notes.bancontact",
+      "lens": "BA1",
+      "title": "notes Bancontact recebido 9€",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_notes_forbidden\"}"
+    },
+    {
+      "id": "BA1.notes.klarna_confirmado_after",
+      "lens": "BA1",
+      "title": "notes «Klarna confirmado 12,00 €» (keyword depois método)",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_notes_forbidden\"}"
+    },
+    {
+      "id": "BA2.notes.homoglyph_k",
+      "lens": "BA2",
+      "title": "notes Κlarna (Greek Kappa) confirmado 12€",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_notes_forbidden\"}"
+    },
+    {
+      "id": "BA3.created_at.past",
+      "lens": "BA3",
+      "title": "INSERT created_at=2020 cola",
+      "ev": "201 [{\"id\":1274,\"created_at\":\"2026-09-02T15:13:01.310111+00:00\",\"chat_id\":\"ac2902d3-a3ca-4f82-b7de-2532db9cafba\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"RTBA-20260902T1608 chrono past\",\"is_reservation\":false,\"is_read\":false,\"…"
+    },
+    {
+      "id": "BA3.patch.created_at",
+      "lens": "BA3",
+      "title": "PATCH created_at=2020 cola",
+      "ev": "200 [{\"id\":1274,\"created_at\":\"2026-09-02T15:13:01.310111+00:00\",\"chat_id\":\"ac2902d3-a3ca-4f82-b7de-2532db9cafba\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"RTBA-20260902T1608 chrono past\",\"is_reservation\":false,\"is_read\":false,\"…"
+    },
+    {
+      "id": "BA3.inbox.future",
+      "lens": "BA3",
+      "title": "PATCH last_message_time=2035 cola",
+      "ev": "200 [{\"id\":\"ac2902d3-a3ca-4f82-b7de-2532db9cafba\",\"created_at\":\"2026-08-27T06:37:32.277448+00:00\",\"user_a\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"user_b\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"last_message\":\"RTAO audit ended\",\"last_message_ti…"
+    },
+    {
+      "id": "BA6.sign.victim_as_b1",
+      "lens": "BA6",
+      "title": "B1 cria signed URL do path B2",
+      "ev": "400 {\"statusCode\":\"404\",\"error\":\"not_found\",\"message\":\"Object not found\",\"code\":\"NoSuchKey\"}"
+    },
+    {
+      "id": "BA4.chat_image.own_sign",
+      "lens": "BA4",
+      "title": "chat_image sign próprio (controlo happy)",
+      "ev": "201 [{\"id\":1275,\"created_at\":\"2026-09-02T15:13:03.374857+00:00\",\"chat_id\":\"ac2902d3-a3ca-4f82-b7de-2532db9cafba\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"chat_image\\\",\\\"path\\\":\\\"chat_uploads/bfcbeee…"
+    },
+    {
+      "id": "BA4.chat_image.own_sign.ok",
+      "lens": "BA4",
+      "title": "happy sign próprio",
+      "ev": "201 [{\"id\":1276,\"created_at\":\"2026-09-02T15:13:03.472777+00:00\",\"chat_id\":\"ac2902d3-a3ca-4f82-b7de-2532db9cafba\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"chat_image\\\",\\\"path\\\":\\\"chat_uploads/bfcbeee…"
+    },
+    {
+      "id": "BA4.chat_image.victim_path",
+      "lens": "BA4",
+      "title": "chat_image path alheio (B2) no chat B1",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_path_denied\"}"
+    },
+    {
+      "id": "BA4.chat_image.own_path_victim_sign",
+      "lens": "BA4",
+      "title": "chat_image path próprio + signed URL alheia",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_url_denied\"}"
+    },
+    {
+      "id": "BA4.chat_image.evil_host",
+      "lens": "BA4",
+      "title": "chat_image host supabase.co.evil (suffix)",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_url_denied\"}"
+    },
+    {
+      "id": "BA4.chat_image.render_sign",
+      "lens": "BA4",
+      "title": "chat_image /render/image/sign/ (não object/sign)",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_url_denied\"}"
+    },
+    {
+      "id": "BA4.proof_url.authenticated_alheio",
+      "lens": "BA4",
+      "title": "proof_url authenticated fleaber_private path B2",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_url_denied\"}"
+    },
+    {
+      "id": "BA6.get.victim_object",
+      "lens": "BA6",
+      "title": "B1 GET object chat_uploads B2",
+      "ev": "400 {\"statusCode\":\"404\",\"error\":\"not_found\",\"message\":\"Object not found\",\"code\":\"NoSuchKey\"}"
+    },
+    {
+      "id": "BA6.upload.into_victim",
+      "lens": "BA6",
+      "title": "B1 INSERT storage path B2",
+      "ev": "400 {\"statusCode\":\"403\",\"error\":\"Unauthorized\",\"message\":\"new row violates row-level security policy\",\"code\":\"AccessDenied\"}"
+    },
+    {
+      "id": "BA5.inbox.greek",
+      "lens": "BA5",
+      "title": "inbox last_message=\"Κlarna confirmado 12€\"",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"chat_inbox_preview_forbidden\"}"
+    },
+    {
+      "id": "BA5.inbox.bancontact",
+      "lens": "BA5",
+      "title": "inbox last_message=\"Bancontact recebido 12 EUR\"",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"chat_inbox_preview_forbidden\"}"
+    },
+    {
+      "id": "BA7.insert.other_chat",
+      "lens": "BA7",
+      "title": "B1 INSERT mensagem no chat B2-S2",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"new row violates row-level security policy for table \\\"chat_messages\\\"\"}"
+    },
+    {
+      "id": "BA7.read.other_chat",
+      "lens": "BA7",
+      "title": "B1 SELECT mensagens do chat B2-S2",
+      "ev": "200 []"
+    },
+    {
+      "id": "BA7.patch.other_inbox",
+      "lens": "BA7",
+      "title": "B1 PATCH last_message do chat B2-S2",
+      "ev": "200 []"
+    },
+    {
+      "id": "BA7.delete.other_msg",
+      "lens": "BA7",
+      "title": "B2 DELETE mensagem de B1",
+      "ev": "200 []"
+    },
+    {
+      "id": "BA8.ocr.klarna_paid",
+      "lens": "BA8",
+      "title": "OCR ingest aceita linha Klarna pago (sem live)",
+      "ev": "401 {\"ok\":false,\"error\":\"missing_device_token\"}"
+    },
+    {
+      "id": "BA8.refund.buyer_klarna",
+      "lens": "BA8",
+      "title": "buyer refund-order 999999 no PI fixture",
+      "ev": "403 {\"ok\":false,\"error\":\"Sem permissão.\"}"
+    },
+    {
+      "id": "BA8.cpi.amount1_chat_inject",
+      "lens": "BA8",
+      "title": "CPI amount=1 + inject order_paid no body",
+      "ev": "400 {\"error\":\"Missing payment metadata.\"}"
+    }
+  ],
+  "skipped": [],
+  "notes": [
+    {
+      "id": "actors",
+      "title": "JWT B1/S1/B2/S2",
+      "ev": {
+        "b1": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+        "s1": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+        "b2": "7e196774-df33-457a-a667-e1d44c6a989a",
+        "s2": "c2c36b07-4b73-4d0d-a29d-72e30dd7732a"
+      }
+    },
+    {
+      "id": "orders",
+      "title": "fixtures",
+      "ev": {
+        "unpaid": "a6b7d377-fcb9-4704-a132-8f1e73b12500",
+        "paid": "c99bf6b7-f2d3-4f28-ae20-a1ab077ddf6a",
+        "unpaidB2": "acc22923-1760-4d68-b8d3-44c382c4b4e9",
+        "paidB2": "bf3acd32-56f3-4c9d-81e5-1aad8dff25f4"
+      }
+    },
+    {
+      "id": "chats",
+      "title": "B1-S1 / B2-S2",
+      "ev": {
+        "c1": "ac2902d3-a3ca-4f82-b7de-2532db9cafba",
+        "c2": "54259ece-9cf7-47d1-8946-120b239a894a"
+      }
+    },
+    {
+      "id": "BA6.upload.own",
+      "lens": "BA6",
+      "title": "upload chat B1",
+      "ev": "200 {\"Key\":\"fleaber_private/chat_uploads/bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96/ac2902d3-a3ca-4f82-b7de-2532db9cafba/rtba-own.png\",\"Id\":\"e323ea6a-2e50-4370-aef7-a87941e14f24\"}"
+    },
+    {
+      "id": "BA6.upload.victim",
+      "lens": "BA6",
+      "title": "upload chat B2",
+      "ev": "200 {\"Key\":\"fleaber_private/chat_uploads/7e196774-df33-457a-a667-e1d44c6a989a/54259ece-9cf7-47d1-8946-120b239a894a/rtba-secret.png\",\"Id\":\"a1967048-1d82-4b15-8a56-b2c796d3c800\"}"
+    },
+    {
+      "id": "BA6.upload.proof",
+      "lens": "BA6",
+      "title": "order_proofs B1",
+      "ev": "200 {\"Key\":\"fleaber_private/order_proofs/bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96/a6b7d377-fcb9-4704-a132-8f1e73b12500/rtba-proof.png\",\"Id\":\"162c2bed-6385-420a-9e23-fad741420e75\"}"
+    },
+    {
+      "id": "BA6.upload.vproof",
+      "lens": "BA6",
+      "title": "order_proofs B2",
+      "ev": "200 {\"Key\":\"fleaber_private/order_proofs/7e196774-df33-457a-a667-e1d44c6a989a/acc22923-1760-4d68-b8d3-44c382c4b4e9/rtba-b2-secret.png\",\"Id\":\"417a98b2-ab6b-460b-90ba-871381a3b97f\"}"
+    },
+    {
+      "id": "BA4.urls",
+      "lens": "BA4",
+      "title": "signed",
+      "ev": {
+        "own": "https://fxdknzrqjenzqcvnwqqq.supabase.co/storage/v1/object/sign/fleaber_private/chat_uploads/bfcbeeee-7dc1-4cd1-b2a7-d3a…",
+        "victim": "https://fxdknzrqjenzqcvnwqqq.supabase.co/storage/v1/object/sign/fleaber_private/chat_uploads/7e196774-df33-457a-a667-e1d…",
+        "signOwn": "200 {\"signedURL\":\"/object/sign/fleaber_private/chat_uploads/bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96/ac2902d3-a3ca-4f82-b7de-2532db9cafba/rtba-own.png?token=eyJraWQiOiI3YmY5ZTQ0Ni1mOTg4LTRlNWEtYjM0Mi0zYTQ1ZTE5NTgzYzkiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOi…",
+        "signVictim": "200 {\"signedURL\":\"/object/sign/fleaber_private/chat_uploads/7e196774-df33-457a-a667-e1d44c6a989a/54259ece-9cf7-47d1-8946-120b239a894a/rtba-secret.png?token=eyJraWQiOiI3YmY5ZTQ0Ni1mOTg4LTRlNWEtYjM0Mi0zYTQ1ZTE5NTgzYzkiLCJhbGciOiJIUzI1NiJ9.eyJ1cmw…"
+      }
+    },
+    {
+      "id": "BA5.del.hangul.insert",
+      "lens": "BA5",
+      "title": "insert prefixed JSON",
+      "ev": "201 [{\"id\":1283,\"created_at\":\"2026-09-02T15:13:05.931193+00:00\",\"chat_id\":\"ac2902d3-a3ca-4f82-b7de-2532db9cafba\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"ㅤFLEABER_JSON_V1:{\\\"kind\\\":\\\"chat_image\\\",\\\"path\\\":\\\"chat_uploads/bfcbee…"
+    },
+    {
+      "id": "BA5.del.braille.insert",
+      "lens": "BA5",
+      "title": "insert prefixed JSON",
+      "ev": "201 [{\"id\":1284,\"created_at\":\"2026-09-02T15:13:06.368604+00:00\",\"chat_id\":\"ac2902d3-a3ca-4f82-b7de-2532db9cafba\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"⠀FLEABER_JSON_V1:{\\\"kind\\\":\\\"chat_image\\\",\\\"path\\\":\\\"chat_uploads/bfcbee…"
+    },
+    {
+      "id": "BA5.del.bom_zwsp.insert",
+      "lens": "BA5",
+      "title": "insert prefixed JSON",
+      "ev": "201 [{\"id\":1285,\"created_at\":\"2026-09-02T15:13:06.773111+00:00\",\"chat_id\":\"ac2902d3-a3ca-4f82-b7de-2532db9cafba\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"​FLEABER_JSON_V1:{\\\"kind\\\":\\\"chat_image\\\",\\\"path\\\":\\\"chat_uploads/bfcbee…"
+    },
+    {
+      "id": "BA8.ocr",
+      "lens": "BA8",
+      "title": "ingest-ocr-reservation",
+      "ev": "401 {\"ok\":false,\"error\":\"missing_device_token\"}"
+    },
+    {
+      "id": "BA8.refund",
+      "lens": "BA8",
+      "title": "refund-order fixture PI",
+      "ev": "403 {\"ok\":false,\"error\":\"Sem permissão.\"}"
+    },
+    {
+      "id": "BA8.cpi",
+      "lens": "BA8",
+      "title": "create-payment-intent mutation",
+      "ev": "400 {\"error\":\"Missing payment metadata.\"}"
+    }
+  ],
+  "actors": {
+    "buyer": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+    "seller": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+    "buyer2": "7e196774-df33-457a-a667-e1d44c6a989a",
+    "seller2": "c2c36b07-4b73-4d0d-a29d-72e30dd7732a"
+  },
+  "created": {
+    "chats": [
+      "ac2902d3-a3ca-4f82-b7de-2532db9cafba",
+      "54259ece-9cf7-47d1-8946-120b239a894a"
+    ],
+    "orders": [
+      "a6b7d377-fcb9-4704-a132-8f1e73b12500",
+      "c99bf6b7-f2d3-4f28-ae20-a1ab077ddf6a",
+      "acc22923-1760-4d68-b8d3-44c382c4b4e9",
+      "bf3acd32-56f3-4c9d-81e5-1aad8dff25f4"
+    ],
+    "products": [
+      "0b82bb2e-bb30-4291-ad99-48602224a1d3",
+      "226242e2-eff0-4b04-a6fb-82bba720da9a"
+    ],
+    "messages": [
+      "1259",
+      "1260",
+      "1262",
+      "1264",
+      "1265",
+      "1266",
+      "1267",
+      "1268",
+      "1269",
+      "1270",
+      "1271",
+      "1272",
+      "1274",
+      "1275",
+      "1276",
+      "1281",
+      "1283",
+      "1284",
+      "1285"
+    ]
+  }
+}

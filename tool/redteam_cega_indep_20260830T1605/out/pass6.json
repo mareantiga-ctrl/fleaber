@@ -1,0 +1,126 @@
+{
+  "FROZEN_AT": "2026-08-30T15:24:51.040824Z",
+  "pass": 6,
+  "findings": [],
+  "matrix": [
+    {
+      "surface": "TIPS",
+      "attack": "observe wallet tip 900dbf33",
+      "identity": "service_observe",
+      "result": "tip=[{\"id\":\"900dbf33-8ad3-4101-a852-d5d3eafa51d4\",\"live_id\":\"5dd5cfd2-63b1-4cd8-82b1-c888e9dc5234\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"amo… wb=[{\"id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"balance\":12.0}] ws=[{\"id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"balance\":29.39}] tx=[{\"id\":\"fce4d4bd-4655-42b5-ba5b-a9e9ec779df4\",\"wallet_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"amount\":0.57,\"type\":\"gorjeta_recebida\",\"description\":\"Gorjeta recebida em direto\"},{\"id\":\"b3bc12d1-920…",
+      "impact": "débito+crédito?",
+      "severity": "info",
+      "evidence": {
+        "tip": [
+          {
+            "id": "900dbf33-8ad3-4101-a852-d5d3eafa51d4",
+            "live_id": "5dd5cfd2-63b1-4cd8-82b1-c888e9dc5234",
+            "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+            "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+            "amount": 1.0,
+            "seller_amount": 0.57,
+            "processing_fee": 0.43,
+            "payment_source": "wallet",
+            "status": "completed"
+          }
+        ],
+        "buyer_wallet": [
+          {
+            "id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+            "balance": 12.0
+          }
+        ],
+        "seller_wallet": [
+          {
+            "id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+            "balance": 29.39
+          }
+        ],
+        "txs": [
+          {
+            "id": "fce4d4bd-4655-42b5-ba5b-a9e9ec779df4",
+            "wallet_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+            "amount": 0.57,
+            "type": "gorjeta_recebida",
+            "description": "Gorjeta recebida em direto"
+          },
+          {
+            "id": "b3bc12d1-9201-422e-a9af-59cae2519386",
+            "wallet_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+            "amount": -1.0,
+            "type": "gorjeta_enviada",
+            "description": "Gorjeta em direto"
+          }
+        ]
+      }
+    },
+    {
+      "surface": "LIVE",
+      "attack": "B2 ps_create_pairing live alheia",
+      "identity": "buyer2",
+      "result": "http=200 {\"ok\": false, \"error\": \"not_allowed\"}",
+      "impact": "bloqueado",
+      "severity": "info",
+      "evidence": {
+        "ok": false,
+        "error": "not_allowed"
+      }
+    },
+    {
+      "surface": "PS/OCR",
+      "attack": "anon claim code 583096",
+      "identity": "anon",
+      "result": "http=200 {\"ok\":true,\"live_id\":\"336d37ad-23b5-4f19-8545-7b1a1805b9eb\",\"device_id\":\"hostile-b2\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"device_token\":\"d462a0a2c8d5c1df4f16a2ceb3a885f5def15bc3ad4c4966e0435d3c3f47c6f1\",\"l…",
+      "impact": "device_token?",
+      "severity": "info",
+      "evidence": {
+        "ok": true,
+        "live_id": "336d37ad-23b5-4f19-8545-7b1a1805b9eb",
+        "device_id": "hostile-b2",
+        "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+        "device_token": "d462a0a2c8d5c1df4f16a2ceb3a885f5def15bc3ad4c4966e0435d3c3f47c6f1",
+        "live_context": {
+          "ok": true,
+          "items": [],
+          "live_id": "336d37ad-23b5-4f19-8545-7b1a1805b9eb",
+          "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+          "live_title": "RT1605 20260830T1605 live",
+          "live_status": "ended",
+          "active_item_id": null,
+          "seller_handle": "fleahub-demo-ux",
+          "hub_live_url": "https://fleaber.pt/fleahub/index.html#/fleahub-demo-ux/live?liveId=336d37ad-23b5-4f19-8545-7b1a1805b9eb"
+        },
+        "seller_handle": "fleahub-demo-ux",
+        "hub_live_url": "https://fleaber.pt/fleahub/index.html#/fleahub-demo-ux/live?liveId=336d37ad-23b5-4f19-8545-7b1a1805b9eb",
+        "supabase_url": "https://fxdknzrqjenzqcvnwqqq.supabase.co"
+      }
+    },
+    {
+      "surface": "BAG / CART",
+      "attack": "bag 2x reserva_pendente amount=50",
+      "identity": "buyer",
+      "result": "http=200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1J1PLBUGajBrsVI69lBscSQtl42hoLq8cFHVV1qjvYqMAqUXRD4p4bGCM#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21oYWlsUnxrVkRhQUQyNlJjSWBCN3BXNXVvVT1haml…",
+      "impact": "server amount",
+      "severity": "info",
+      "evidence": {
+        "checkoutUrl": "https://checkout.stripe.com/c/pay/cs_test_a1J1PLBUGajBrsVI69lBscSQtl42hoLq8cFHVV1qjvYqMAqUXRD4p4bGCM#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21oYWlsUnxrVkRhQUQyNlJjSWBCN3BXNXVvVT1hamlcf3Fjd1dRMGJmREk9Yz09PH1CMzVTY0pBXD1kMU5HZl1da05gf0s1XGQ1NWA3bVFBNzNMJyknY3dqaFZgd3Ngdyc%2FcXdwYCknZ2RmbmJ3anBrYUZqaWp3Jz8nJmNjY2NjYycpJ2lkfGpwcVF8dWAnPyd2bGtiaWBabHFgaCcpJ2BrZGdpYFVpZGZgbWppYWB3dic%2FcXdwYHgl",
+        "checkoutSessionId": "cs_test_a1J1PLBUGajBrsVI69lBscSQtl42hoLq8cFHVV1qjvYqMAqUXRD4p4bGCM",
+        "paidChatId": null,
+        "server_amount_cents": 2144,
+        "amount_total": 2144
+      }
+    },
+    {
+      "surface": "LIVE",
+      "attack": "confirm ended",
+      "identity": "service_observe",
+      "result": "[{\"id\":\"336d37ad-23b5-4f19-8545-7b1a1805b9eb\",\"status\":\"ended\",\"is_active\":false}]",
+      "impact": "cleanup",
+      "severity": "info",
+      "evidence": null
+    }
+  ],
+  "notes": [
+    "bag keys=[checkoutUrl, checkoutSessionId, paidChatId, server_amount_cents, amount_total] amt=2144"
+  ]
+}

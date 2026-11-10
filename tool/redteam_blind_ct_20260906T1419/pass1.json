@@ -1,0 +1,458 @@
+{
+  "stamp": "20260906T1419",
+  "prefix": "RTCT-20260906T1419",
+  "auditor": "REDTEAM_BLIND_CT_PAYOUT_POS_ALLOW_v1",
+  "lenses": [
+    "CT1",
+    "CT2",
+    "CT3",
+    "CT4",
+    "CT6"
+  ],
+  "probes": [
+    {
+      "id": "CT-A1-COPTIC",
+      "lens": "CT1",
+      "payload": "key Coptic ⲟ (U+2C9F) rtcn-class; esperar 400",
+      "http_bd": "http=400 n_tr=0 Δ=0.0 tids=[] 400 {\"error\":\"idempotency_key inválida. Reinicia o levantamento na app.\",\"code\":\"payout_failed\"} loc=\"\"",
+      "result": "HOLD"
+    },
+    {
+      "id": "CT-A1b-EMOJI",
+      "lens": "CT1",
+      "payload": "key ASCII+emoji U+1F4B0",
+      "http_bd": "http=400 n_tr=0 Δ=0.0 tids=[] 400 {\"error\":\"idempotency_key inválida. Reinicia o levantamento na app.\",\"code\":\"payout_failed\"} loc=\"\"",
+      "result": "HOLD"
+    },
+    {
+      "id": "CT-A1c-CYRILLIC",
+      "lens": "CT1",
+      "payload": "key Cyrillic е U+0435 (não NFKC→e)",
+      "http_bd": "http=400 n_tr=0 Δ=0.0 tids=[] 400 {\"error\":\"idempotency_key inválida. Reinicia o levantamento na app.\",\"code\":\"payout_failed\"} loc=\"\"",
+      "result": "HOLD"
+    },
+    {
+      "id": "CT-A2-LATIN-ACCENT",
+      "lens": "CT1",
+      "payload": "key Latin acento wd_caféAllow04",
+      "http_bd": "http=400 n_tr=0 Δ=0.0 tids=[] 400 {\"error\":\"idempotency_key inválida. Reinicia o levantamento na app.\",\"code\":\"payout_failed\"} loc=\"\"",
+      "result": "HOLD"
+    },
+    {
+      "id": "CT-A3-ZWSP",
+      "lens": "CT1",
+      "payload": "ZWSP U+200B no meio rtctAll<ZWSP>ow05x",
+      "http_bd": "http=400 n_tr=0 Δ=0.0 tids=[] 400 {\"error\":\"idempotency_key inválida. Reinicia o levantamento na app.\",\"code\":\"payout_failed\"} loc=\"\"",
+      "result": "HOLD"
+    },
+    {
+      "id": "CT-A3b-BIDI",
+      "lens": "CT1",
+      "payload": "bidi RLO U+202E no meio",
+      "http_bd": "http=400 n_tr=0 Δ=0.0 tids=[] 400 {\"error\":\"idempotency_key inválida. Reinicia o levantamento na app.\",\"code\":\"payout_failed\"} loc=\"\"",
+      "result": "HOLD"
+    },
+    {
+      "id": "CT-A4-PERCENT",
+      "lens": "CT1",
+      "payload": "key com %",
+      "http_bd": "http=400 n_tr=0 Δ=0.0 tids=[] 400 {\"error\":\"idempotency_key inválida. Reinicia o levantamento na app.\",\"code\":\"payout_failed\"} loc=\"\"",
+      "result": "HOLD"
+    },
+    {
+      "id": "CT-A4-SPACE",
+      "lens": "CT1",
+      "payload": "key com espaço",
+      "http_bd": "http=400 n_tr=0 Δ=0.0 tids=[] 400 {\"error\":\"idempotency_key inválida. Reinicia o levantamento na app.\",\"code\":\"payout_failed\"} loc=\"\"",
+      "result": "HOLD"
+    },
+    {
+      "id": "CT-A4-NEWLINE",
+      "lens": "CT1",
+      "payload": "key com newline",
+      "http_bd": "http=400 n_tr=0 Δ=0.0 tids=[] 400 {\"error\":\"idempotency_key inválida. Reinicia o levantamento na app.\",\"code\":\"payout_failed\"} loc=\"\"",
+      "result": "HOLD"
+    },
+    {
+      "id": "CT-B1-CASE-Ii",
+      "lens": "CT2",
+      "payload": "RTCTCASEIKEY9 vs rtctcaseikey9 (ASCII I/i)",
+      "http_bd": "n_tr=1 tids=[tr_1UCfwMH7FWYUN3jhzxNcheqk] Δ=-1.0 A=200 {\"success\":true,\"transferId\":\"tr_1UCfwMH7FWYUN3jhzxNcheqk\",\"balance\":60} loc=\"\" B=200 {\"success\":true,\"transferId\":\"tr_1UCfwMH7FWYUN3jhzxNcheqk\",\"balance\":60,\"idempotent\":true} loc=\"\"",
+      "result": "HOLD"
+    },
+    {
+      "id": "CT-B2-WD-UUID",
+      "lens": "CT3",
+      "payload": "wd_<sellerUuid>_100_<ms> ASCII canónica",
+      "http_bd": "http=200 n_tr=1 tids={tr_1UCfwRH7FWYUN3jhSdbpUFO5} Δ=-1.0 200 {\"success\":true,\"transferId\":\"tr_1UCfwRH7FWYUN3jhSdbpUFO5\",\"balance\":59} loc=\"\"",
+      "result": "HOLD"
+    },
+    {
+      "id": "CT-B3-WD-RETRY",
+      "lens": "CT4",
+      "payload": "retry mesma wd_<uuid> B2",
+      "http_bd": "http=200 n_tr=0 tids={} Δ=0.0 idempotent=true 200 {\"success\":true,\"transferId\":\"tr_1UCfwRH7FWYUN3jhSdbpUFO5\",\"balance\":59,\"idempotent\":true} loc=\"\"",
+      "result": "HOLD"
+    },
+    {
+      "id": "CT-A7-FULLWIDTH-NFKC",
+      "lens": "CT1",
+      "payload": "rtctoFwAllow1 vs rtctｏFwAllow1 (U+FF4F NFKC→o)",
+      "http_bd": "n_tr=1 B400=false tids=[tr_1UCfwXH7FWYUN3jhWyJs1JU1] Δ=-1.0 A=200 {\"success\":true,\"transferId\":\"tr_1UCfwXH7FWYUN3jhWyJs1JU1\",\"balance\":58} loc=\"\" B=200 {\"success\":true,\"transferId\":\"tr_1UCfwXH7FWYUN3jhWyJs1JU1\",\"balance\":58,\"idempotent\":true} loc=\"\"",
+      "result": "HOLD"
+    },
+    {
+      "id": "CT-C1-DEST",
+      "lens": "CT4",
+      "payload": "destination=acct_1UB7nWHKe5ETfHI5 currency=usd amount=100",
+      "http_bd": "200 {\"success\":true,\"transferId\":\"tr_1UCfwbH7FWYUN3jh88oBkZU4\",\"balance\":57} loc=\"\"",
+      "result": "HOLD"
+    },
+    {
+      "id": "CT-C1b-OVERBAL",
+      "lens": "CT6",
+      "payload": "amount=99999999 vs saldo 57.0",
+      "http_bd": "400 {\"error\":\"Saldo disponível insuficiente para este levantamento.\",\"code\":\"payout_failed\"} loc=\"\" Δ=0.0",
+      "result": "HOLD"
+    }
+  ],
+  "findings": [],
+  "blocked": [
+    {
+      "id": "CT-A1-COPTIC",
+      "lens": "CT1",
+      "title": "charset 400 n_tr=0 Δ=0.0",
+      "ev": "400 {\"error\":\"idempotency_key inválida. Reinicia o levantamento na app.\",\"code\":\"payout_failed\"} loc=\"\""
+    },
+    {
+      "id": "CT-A1b-EMOJI",
+      "lens": "CT1",
+      "title": "charset 400 n_tr=0 Δ=0.0",
+      "ev": "400 {\"error\":\"idempotency_key inválida. Reinicia o levantamento na app.\",\"code\":\"payout_failed\"} loc=\"\""
+    },
+    {
+      "id": "CT-A1c-CYRILLIC",
+      "lens": "CT1",
+      "title": "charset 400 n_tr=0 Δ=0.0",
+      "ev": "400 {\"error\":\"idempotency_key inválida. Reinicia o levantamento na app.\",\"code\":\"payout_failed\"} loc=\"\""
+    },
+    {
+      "id": "CT-A2-LATIN-ACCENT",
+      "lens": "CT1",
+      "title": "charset 400 n_tr=0 Δ=0.0",
+      "ev": "400 {\"error\":\"idempotency_key inválida. Reinicia o levantamento na app.\",\"code\":\"payout_failed\"} loc=\"\""
+    },
+    {
+      "id": "CT-A3-ZWSP",
+      "lens": "CT1",
+      "title": "charset 400 n_tr=0 Δ=0.0",
+      "ev": "400 {\"error\":\"idempotency_key inválida. Reinicia o levantamento na app.\",\"code\":\"payout_failed\"} loc=\"\""
+    },
+    {
+      "id": "CT-A3b-BIDI",
+      "lens": "CT1",
+      "title": "charset 400 n_tr=0 Δ=0.0",
+      "ev": "400 {\"error\":\"idempotency_key inválida. Reinicia o levantamento na app.\",\"code\":\"payout_failed\"} loc=\"\""
+    },
+    {
+      "id": "CT-A4-PERCENT",
+      "lens": "CT1",
+      "title": "charset 400 n_tr=0 Δ=0.0",
+      "ev": "400 {\"error\":\"idempotency_key inválida. Reinicia o levantamento na app.\",\"code\":\"payout_failed\"} loc=\"\""
+    },
+    {
+      "id": "CT-A4-SPACE",
+      "lens": "CT1",
+      "title": "charset 400 n_tr=0 Δ=0.0",
+      "ev": "400 {\"error\":\"idempotency_key inválida. Reinicia o levantamento na app.\",\"code\":\"payout_failed\"} loc=\"\""
+    },
+    {
+      "id": "CT-A4-NEWLINE",
+      "lens": "CT1",
+      "title": "charset 400 n_tr=0 Δ=0.0",
+      "ev": "400 {\"error\":\"idempotency_key inválida. Reinicia o levantamento na app.\",\"code\":\"payout_failed\"} loc=\"\""
+    },
+    {
+      "id": "B1.Ii",
+      "lens": "CT2",
+      "title": "I vs i n_tr=1",
+      "ev": {
+        "keyA": "RTCTCASEIKEY9",
+        "keyB": "rtctcaseikey9",
+        "keyA_units": [
+          82,
+          84,
+          67,
+          84,
+          67,
+          65,
+          83,
+          69,
+          73,
+          75,
+          69,
+          89,
+          57
+        ],
+        "keyB_units": [
+          114,
+          116,
+          99,
+          116,
+          99,
+          97,
+          115,
+          101,
+          105,
+          107,
+          101,
+          121,
+          57
+        ],
+        "hitA": "200 {\"success\":true,\"transferId\":\"tr_1UCfwMH7FWYUN3jhzxNcheqk\",\"balance\":60} loc=\"\"",
+        "hitB": "200 {\"success\":true,\"transferId\":\"tr_1UCfwMH7FWYUN3jhzxNcheqk\",\"balance\":60,\"idempotent\":true} loc=\"\"",
+        "tidA": "tr_1UCfwMH7FWYUN3jhzxNcheqk",
+        "tidB": "tr_1UCfwMH7FWYUN3jhzxNcheqk",
+        "new_transfer_ids": [
+          "tr_1UCfwMH7FWYUN3jhzxNcheqk"
+        ],
+        "new_transfer_count": 1,
+        "wallet_before": 61.0,
+        "wallet_after": 60.0,
+        "delta_eur": -1.0,
+        "payoutOkA": true,
+        "payoutOkB": true,
+        "idempotentB": true
+      }
+    },
+    {
+      "id": "B2.wd",
+      "lens": "CT3",
+      "title": "wd_uuid Transfer OK [tr_1UCfwRH7FWYUN3jhSdbpUFO5]",
+      "ev": "200 {\"success\":true,\"transferId\":\"tr_1UCfwRH7FWYUN3jhSdbpUFO5\",\"balance\":59} loc=\"\""
+    },
+    {
+      "id": "B3.retry",
+      "lens": "CT4",
+      "title": "retry idempotente n_tr=0",
+      "ev": "200 {\"success\":true,\"transferId\":\"tr_1UCfwRH7FWYUN3jhSdbpUFO5\",\"balance\":59,\"idempotent\":true} loc=\"\""
+    },
+    {
+      "id": "A7.fw",
+      "lens": "CT1",
+      "title": "fullwidth n_tr=1 B400=false",
+      "ev": {
+        "keyA": "rtctoFwAllow1",
+        "keyB": "rtctｏFwAllow1",
+        "keyA_units": [
+          114,
+          116,
+          99,
+          116,
+          111,
+          70,
+          119,
+          65,
+          108,
+          108,
+          111,
+          119,
+          49
+        ],
+        "keyB_units": [
+          114,
+          116,
+          99,
+          116,
+          65359,
+          70,
+          119,
+          65,
+          108,
+          108,
+          111,
+          119,
+          49
+        ],
+        "hitA": "200 {\"success\":true,\"transferId\":\"tr_1UCfwXH7FWYUN3jhWyJs1JU1\",\"balance\":58} loc=\"\"",
+        "hitB": "200 {\"success\":true,\"transferId\":\"tr_1UCfwXH7FWYUN3jhWyJs1JU1\",\"balance\":58,\"idempotent\":true} loc=\"\"",
+        "tidA": "tr_1UCfwXH7FWYUN3jhWyJs1JU1",
+        "tidB": "tr_1UCfwXH7FWYUN3jhWyJs1JU1",
+        "new_transfer_ids": [
+          "tr_1UCfwXH7FWYUN3jhWyJs1JU1"
+        ],
+        "new_transfer_count": 1,
+        "wallet_before": 59.0,
+        "wallet_after": 58.0,
+        "delta_eur": -1.0,
+        "payoutOkA": true,
+        "payoutOkB": true,
+        "idempotentB": true
+      }
+    },
+    {
+      "id": "dest.body",
+      "lens": "CT4",
+      "title": "Transfer própria; dest/currency ignorados",
+      "ev": "200 {\"success\":true,\"transferId\":\"tr_1UCfwbH7FWYUN3jh88oBkZU4\",\"balance\":57} loc=\"\""
+    },
+    {
+      "id": "mint.huge",
+      "lens": "CT6",
+      "title": "payout>balance recusado Δ≈0",
+      "ev": "400 {\"error\":\"Saldo disponível insuficiente para este levantamento.\",\"code\":\"payout_failed\"} loc=\"\""
+    }
+  ],
+  "skipped": [],
+  "notes": [
+    {
+      "id": "wallet0",
+      "lens": "CT6",
+      "title": "seller wallet before",
+      "ev": {
+        "id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+        "balance": 61.0,
+        "stripe_account_id": "acct_1U5mYbQeUNx8ar08",
+        "updated_at": "2026-09-06T12:59:34.56011+00:00"
+      }
+    },
+    {
+      "id": "wallet.funded",
+      "lens": "CT6",
+      "title": "seller after fixture",
+      "ev": {
+        "id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+        "balance": 61.0,
+        "stripe_account_id": "acct_1U5mYbQeUNx8ar08",
+        "updated_at": "2026-09-06T12:59:34.56011+00:00"
+      }
+    },
+    {
+      "id": "pair.B1-Ii",
+      "lens": "CT2",
+      "title": "pair B1-Ii",
+      "ev": {
+        "keyA": "RTCTCASEIKEY9",
+        "keyB": "rtctcaseikey9",
+        "keyA_units": [
+          82,
+          84,
+          67,
+          84,
+          67,
+          65,
+          83,
+          69,
+          73,
+          75,
+          69,
+          89,
+          57
+        ],
+        "keyB_units": [
+          114,
+          116,
+          99,
+          116,
+          99,
+          97,
+          115,
+          101,
+          105,
+          107,
+          101,
+          121,
+          57
+        ],
+        "hitA": "200 {\"success\":true,\"transferId\":\"tr_1UCfwMH7FWYUN3jhzxNcheqk\",\"balance\":60} loc=\"\"",
+        "hitB": "200 {\"success\":true,\"transferId\":\"tr_1UCfwMH7FWYUN3jhzxNcheqk\",\"balance\":60,\"idempotent\":true} loc=\"\"",
+        "tidA": "tr_1UCfwMH7FWYUN3jhzxNcheqk",
+        "tidB": "tr_1UCfwMH7FWYUN3jhzxNcheqk",
+        "new_transfer_ids": [
+          "tr_1UCfwMH7FWYUN3jhzxNcheqk"
+        ],
+        "new_transfer_count": 1,
+        "wallet_before": 61.0,
+        "wallet_after": 60.0,
+        "delta_eur": -1.0,
+        "payoutOkA": true,
+        "payoutOkB": true,
+        "idempotentB": true
+      }
+    },
+    {
+      "id": "pair.A7-fullwidth",
+      "lens": "CT1",
+      "title": "pair A7-fullwidth",
+      "ev": {
+        "keyA": "rtctoFwAllow1",
+        "keyB": "rtctｏFwAllow1",
+        "keyA_units": [
+          114,
+          116,
+          99,
+          116,
+          111,
+          70,
+          119,
+          65,
+          108,
+          108,
+          111,
+          119,
+          49
+        ],
+        "keyB_units": [
+          114,
+          116,
+          99,
+          116,
+          65359,
+          70,
+          119,
+          65,
+          108,
+          108,
+          111,
+          119,
+          49
+        ],
+        "hitA": "200 {\"success\":true,\"transferId\":\"tr_1UCfwXH7FWYUN3jhWyJs1JU1\",\"balance\":58} loc=\"\"",
+        "hitB": "200 {\"success\":true,\"transferId\":\"tr_1UCfwXH7FWYUN3jhWyJs1JU1\",\"balance\":58,\"idempotent\":true} loc=\"\"",
+        "tidA": "tr_1UCfwXH7FWYUN3jhWyJs1JU1",
+        "tidB": "tr_1UCfwXH7FWYUN3jhWyJs1JU1",
+        "new_transfer_ids": [
+          "tr_1UCfwXH7FWYUN3jhWyJs1JU1"
+        ],
+        "new_transfer_count": 1,
+        "wallet_before": 59.0,
+        "wallet_after": 58.0,
+        "delta_eur": -1.0,
+        "payoutOkA": true,
+        "payoutOkB": true,
+        "idempotentB": true
+      }
+    },
+    {
+      "id": "wallet.end.p1",
+      "lens": "CT6",
+      "title": "seller wallet end pass1",
+      "ev": {
+        "id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+        "balance": 57.0,
+        "stripe_account_id": "acct_1U5mYbQeUNx8ar08",
+        "updated_at": "2026-09-06T13:17:13.775612+00:00"
+      }
+    }
+  ],
+  "actors": {
+    "buyer": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+    "seller": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+    "buyer2": null,
+    "seller2": "dfb35f04-1acd-4960-ac4e-d2d049a46adc"
+  },
+  "created": {
+    "orders": [],
+    "products": []
+  }
+}

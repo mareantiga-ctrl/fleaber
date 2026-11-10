@@ -1,0 +1,244 @@
+{
+  "stamp": "20260902T1905",
+  "prefix": "RTBQ-20260902T1905",
+  "auditor": "REDTEAM_BLIND_BQ_DISPUTA_POS_BFBK_v1",
+  "lenses": [
+    "BQ3",
+    "BQ4",
+    "BQ7"
+  ],
+  "findings": [
+    {
+      "id": "BQ3-03c-traversal-stored-no-loot",
+      "lens": "BQ3",
+      "severity": "P2",
+      "title": "proof_photos guarda path com ../ (sem loot storage)",
+      "actor": "buyer JWT",
+      "pre": "needle próprio no prefixo",
+      "repro": "PATCH ../ cross-buyer; GET 4xx",
+      "expected": "path canonicalizado / denied",
+      "obtained": {
+        "photos": [
+          "https://fxdknzrqjenzqcvnwqqq.supabase.co/storage/v1/object/authenticated/fleaber_private/order_disputes/bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96/e5aa4737-7f6a-45a9-9176-562b173bd34a/ok.png/../../../order_disputes/9689195d-b210-4f50-b7aa-4f1d24a617e5/0b25cdc7-618d-43b7-abd2-c991b988fcaf/rtbq-secret.png"
+        ],
+        "get_lit": 400,
+        "get_norm_b1": 400
+      },
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "BQ3-08-percent-encoded-dotdot",
+      "lens": "BQ3",
+      "severity": "P2",
+      "title": "proof_photos aceita %2e%2e (dot-dot encoded)",
+      "actor": "buyer JWT",
+      "pre": "needle no prefixo",
+      "repro": "PATCH %2e%2e path",
+      "expected": "denied",
+      "obtained": {
+        "hit": "200 [{\"id\":\"296fcdd8-be3a-48a8-92fa-fcb92b50544d\",\"order_id\":\"e5aa4737-7f6a-45a9-9176-562b173bd34a\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"reason\":\"danificado\",\"description\":\"RTBQ B1 disputa para wrap/traversal\",\"proof_photos\":[\"htt…",
+        "photos": [
+          "https://fxdknzrqjenzqcvnwqqq.supabase.co/storage/v1/object/authenticated/fleaber_private/order_disputes/bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96/e5aa4737-7f6a-45a9-9176-562b173bd34a/ok.png/%2e%2e/%2e%2e/%2e%2e/order_disputes/9689195d-b210-4f50-b7aa-4f1d24a617e5/0b25cdc7-618d-43b7-abd2-c991b988fcaf/rtbq-secret.png"
+        ]
+      },
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "BQ3-05b-reply-insert-fragment",
+      "lens": "BQ3",
+      "severity": "P1",
+      "title": "INSERT reply prova: path B2 + needle B1 no fragmento #",
+      "actor": "buyer JWT",
+      "pre": "replies guard position(needle) no URL inteiro",
+      "repro": "POST proof_photos=[storage/B2#order_disputes/B1/oid/]",
+      "expected": "denied (strip # como na disputa)",
+      "obtained": "201 [{\"id\":\"72b0f9d1-7b36-4e02-8580-5819ad98642b\",\"dispute_id\":\"296fcdd8-be3a-48a8-92fa-fcb92b50544d\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"message\":\"RTBQ insert fragment wrap\",\"proof_photos\":[\"https://fxdknzrqjenzqcvnwqqq.supabas…",
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "BQ3-06b-reply-insert-query",
+      "lens": "BQ3",
+      "severity": "P1",
+      "title": "INSERT reply prova: path B2 + needle B1 na query",
+      "actor": "buyer JWT",
+      "pre": "replies não strip ?",
+      "repro": "POST proof_photos=[storage/B2?q=needle]",
+      "expected": "denied",
+      "obtained": "201 [{\"id\":\"8077bb21-b75c-4153-af34-b7257c7b6066\",\"dispute_id\":\"296fcdd8-be3a-48a8-92fa-fcb92b50544d\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"message\":\"RTBQ insert query wrap\",\"proof_photos\":[\"https://fxdknzrqjenzqcvnwqqq.supabase.c…",
+      "proven": true,
+      "evidence": {}
+    }
+  ],
+  "blocked": [
+    {
+      "id": "BQ7-03b-second-dispute-concluido",
+      "lens": "BQ7",
+      "title": "2.ª disputa concluido",
+      "ev": {
+        "hit": "409 {\"code\":\"23505\",\"details\":null,\"hint\":null,\"message\":\"dispute_already_exists_for_order\"}",
+        "count": 1
+      }
+    },
+    {
+      "id": "BQ7-04b-race-concluido",
+      "lens": "BQ7",
+      "title": "race concluido",
+      "ev": {
+        "count": 1,
+        "hits": [
+          "409 {\"code\":\"23505\",\"details\":null,\"hint\":null,\"message\":\"dispute_already_exists_for_order\"}",
+          "409 {\"code\":\"23505\",\"details\":null,\"hint\":null,\"message\":\"dispute_already_exists_for_order\"}"
+        ]
+      }
+    },
+    {
+      "id": "BQ7-09-b2-select-dispute",
+      "lens": "BQ7",
+      "title": "B2 select",
+      "ev": "200 []"
+    },
+    {
+      "id": "BQ3-04b-reply-insert-javascript",
+      "lens": "BQ3",
+      "title": "INSERT reply javascript: com needle",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"dispute_proof_url_denied\"}"
+    },
+    {
+      "id": "BQ4-05b-refund-concluido-open-dispute",
+      "lens": "BQ4",
+      "title": "refund concluido disputa",
+      "ev": "403 {\"ok\":false,\"error\":\"Não é possível anular esta venda neste estado (já enviada ou concluída).\",\"code\":\"order_refund_blocked_shipped\",\"status\":\"concluido\"}"
+    }
+  ],
+  "skipped": [],
+  "notes": [
+    {
+      "id": "fixture.paid",
+      "lens": "BQ3",
+      "title": "setup_paid_order Stripe TEST",
+      "ev": "200 {\n  \"ok\": true,\n  \"order_id\": \"0b25cdc7-618d-43b7-abd2-c991b988fcaf\",\n  \"product_id\": \"988d56f6-6208-4f6d-aa68-1e5ceb2da5ee\",\n  \"payment_intent_id\": \"pi_3UBIdrH7FWYUN3jh0rTROSrb\",\n  \"pi_status\": \"succeeded\",\n  \"pi_amount_received\": 590,\n  \"…"
+    },
+    {
+      "id": "p2.b2.dispute",
+      "lens": "BQ3",
+      "title": "B2 disputa",
+      "ev": "201 [{\"id\":\"9afa2512-370f-4ca9-8522-c3ce114308f8\",\"order_id\":\"0b25cdc7-618d-43b7-abd2-c991b988fcaf\",\"buyer_id\":\"9689195d-b210-4f50-b7aa-4f1d24a617e5\",\"reason\":\"danificado\",\"description\":\"RTBQ B2 secret dispute\",\"proof_photos\":[],\"status\":\"abert…"
+    },
+    {
+      "id": "p2.b2.upload",
+      "lens": "BQ3",
+      "title": "upload secret B2",
+      "ev": "200 {\"Key\":\"fleaber_private/order_disputes/9689195d-b210-4f50-b7aa-4f1d24a617e5/0b25cdc7-618d-43b7-abd2-c991b988fcaf/rtbq-secret.png\",\"Id\":\"092deac2-f5e5-49ab-9933-3b9da745b2ff\"}"
+    },
+    {
+      "id": "p2.stor.direct",
+      "lens": "BQ3",
+      "title": "GET secret directo",
+      "ev": {
+        "b2": 200,
+        "b1": 400,
+        "s1": 400,
+        "b2_len": 10
+      }
+    },
+    {
+      "id": "fixture.paid",
+      "lens": "BQ3",
+      "title": "setup_paid_order Stripe TEST",
+      "ev": "200 {\n  \"ok\": true,\n  \"order_id\": \"e5aa4737-7f6a-45a9-9176-562b173bd34a\",\n  \"product_id\": \"1d4d8fc1-1d70-4a6d-81eb-e16c3553067e\",\n  \"payment_intent_id\": \"pi_3UBIdvH7FWYUN3jh1KLOBk7w\",\n  \"pi_status\": \"succeeded\",\n  \"pi_amount_received\": 590,\n  \"…"
+    },
+    {
+      "id": "p2.b1.dispute",
+      "lens": "BQ7",
+      "title": "B1 disputa",
+      "ev": "201 [{\"id\":\"296fcdd8-be3a-48a8-92fa-fcb92b50544d\",\"order_id\":\"e5aa4737-7f6a-45a9-9176-562b173bd34a\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"reason\":\"danificado\",\"description\":\"RTBQ B1 disputa para wrap/traversal\",\"proof_photos\":[],\"s…"
+    },
+    {
+      "id": "p2.trav.store",
+      "lens": "BQ3",
+      "title": "guard aceita ../ cross-buyer",
+      "ev": {
+        "hit": "200 [{\"id\":\"296fcdd8-be3a-48a8-92fa-fcb92b50544d\",\"order_id\":\"e5aa4737-7f6a-45a9-9176-562b173bd34a\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"reason\":\"danificado\",\"description\":\"RTBQ B1 disputa para wrap/traversal\",\"proof_photos\":[\"htt…",
+        "stored": true,
+        "photos": [
+          "https://fxdknzrqjenzqcvnwqqq.supabase.co/storage/v1/object/authenticated/fleaber_private/order_disputes/bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96/e5aa4737-7f6a-45a9-9176-562b173bd34a/ok.png/../../../order_disputes/9689195d-b210-4f50-b7aa-4f1d24a617e5/0b25cdc7-618d-43b7-abd2-c991b988fcaf/rtbq-secret.png"
+        ]
+      }
+    },
+    {
+      "id": "p2.trav.get",
+      "lens": "BQ3",
+      "title": "GET traversal vs normalizado",
+      "ev": {
+        "lit_b1": "400 88b {\"statusCode\":\"404\",\"error\":\"not_found\",\"message\":\"Object not found\",\"code\":\"NoS…",
+        "lit_s1": "400 88b",
+        "norm_b1": "400 {\"statusCode\":\"404\",\"error\":\"not_found\",\"message\":\"Object not found\",\"code\":\"NoS…",
+        "norm_s1": "400 {\"statusCode\":\"404\",\"error\":\"not_found\",\"message\":\"Object not found\",\"code\":\"NoS…",
+        "secret_ok_b2": 200
+      }
+    },
+    {
+      "id": "p2.trav.nolooot",
+      "lens": "BQ3",
+      "title": "URL ../ gravada mas GET não entrega PNG B2",
+      "ev": {
+        "lit_b1": 400,
+        "norm_b1": 400
+      }
+    },
+    {
+      "id": "fixture.paid",
+      "lens": "BQ4",
+      "title": "setup_paid_order Stripe TEST",
+      "ev": "200 {\n  \"ok\": true,\n  \"order_id\": \"6ebee113-a6e5-4864-9926-c81acf8c2acc\",\n  \"product_id\": \"aa705925-35c2-4d54-9237-007704143cd5\",\n  \"payment_intent_id\": \"pi_3UBIe1H7FWYUN3jh1cfNpKNt\",\n  \"pi_status\": \"succeeded\",\n  \"pi_amount_received\": 590,\n  \"…"
+    },
+    {
+      "id": "p2.amt.huge",
+      "lens": "BQ4",
+      "title": "refund amount=999999",
+      "ev": {
+        "hit": "200 {\"ok\":true,\"already_refunded\":true,\"idempotent\":true,\"refund_id\":\"re_3UBIe1H7FWYUN3jh1P9xWvi8\",\"status\":\"cancelado\",\"stock_units_applied\":null,\"amount_cents\":590,\"payment_intent\":\"pi_3UBIe1H7FWYUN3jh1cfNpKNt\",\"status_stripe\":\"succeeded\"}",
+        "cents": 590,
+        "paid": 590,
+        "refunded": true
+      }
+    },
+    {
+      "id": "p2.gate.jwt",
+      "lens": "BQ4",
+      "title": "buyer RPC refund gate",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_order_allows_seller_stripe_refund\"}"
+    },
+    {
+      "id": "p2.gate.b2",
+      "lens": "BQ7",
+      "title": "B2 RPC refund gate order B1",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_order_allows_seller_stripe_refund\"}"
+    }
+  ],
+  "actors": {
+    "buyer": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+    "seller": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+    "buyer2": "9689195d-b210-4f50-b7aa-4f1d24a617e5",
+    "seller2": "de13db92-4f7a-47b9-b6bb-24b80fd898a2"
+  },
+  "created": {
+    "orders": [
+      "0b25cdc7-618d-43b7-abd2-c991b988fcaf",
+      "e5aa4737-7f6a-45a9-9176-562b173bd34a",
+      "6ebee113-a6e5-4864-9926-c81acf8c2acc"
+    ],
+    "products": [
+      "988d56f6-6208-4f6d-aa68-1e5ceb2da5ee",
+      "1d4d8fc1-1d70-4a6d-81eb-e16c3553067e",
+      "aa705925-35c2-4d54-9237-007704143cd5"
+    ],
+    "disputes": [
+      "9afa2512-370f-4ca9-8522-c3ce114308f8",
+      "296fcdd8-be3a-48a8-92fa-fcb92b50544d"
+    ]
+  }
+}

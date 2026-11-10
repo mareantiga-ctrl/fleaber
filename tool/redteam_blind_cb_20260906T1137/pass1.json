@@ -1,0 +1,1448 @@
+{
+  "stamp": "20260906T1137",
+  "prefix": "RTCB-20260906T1137",
+  "auditor": "REDTEAM_BLIND_CB_PAYOUT_POS_BRBW_v1",
+  "lenses": [
+    "CB1",
+    "CB2",
+    "CB4",
+    "CB6",
+    "CB7"
+  ],
+  "findings": [
+    {
+      "id": "CB-DESIGN-CASEFOLD",
+      "lens": "CB4",
+      "severity": "P3",
+      "title": "casefold Payout vs payout (desenho; só contar se app mudou)",
+      "actor": "seller JWT",
+      "pre": "Edge sem toLowerCase; Flutter wd_{uuid}_{cents}_{ms}",
+      "repro": "PayoutRtcb1 vs payoutRtcb1",
+      "expected": "1 Transfer (mesma intenção visual / fold) OU desenho documentado",
+      "obtained": {
+        "keyA": "PayoutRtcb1",
+        "keyB": "payoutRtcb1",
+        "keyA_units": [
+          80,
+          97,
+          121,
+          111,
+          117,
+          116,
+          82,
+          116,
+          99,
+          98,
+          49
+        ],
+        "keyB_units": [
+          112,
+          97,
+          121,
+          111,
+          117,
+          116,
+          82,
+          116,
+          99,
+          98,
+          49
+        ],
+        "hitA": "200 {\"success\":true,\"transferId\":\"tr_1UCdZ7H7FWYUN3jhdO3L1fg9\",\"balance\":77.33} loc=\"\"",
+        "hitB": "200 {\"success\":true,\"transferId\":\"tr_1UCdZAH7FWYUN3jhQl0UOkSg\",\"balance\":76.33} loc=\"\"",
+        "tidA": "tr_1UCdZ7H7FWYUN3jhdO3L1fg9",
+        "tidB": "tr_1UCdZAH7FWYUN3jhQl0UOkSg",
+        "new_transfer_ids": [
+          "tr_1UCdZAH7FWYUN3jhQl0UOkSg",
+          "tr_1UCdZ7H7FWYUN3jhdO3L1fg9"
+        ],
+        "new_transfer_count": 2,
+        "wallet_before": 78.33,
+        "wallet_after": 76.33,
+        "delta_eur": -2.0,
+        "payoutOkA": true,
+        "payoutOkB": true,
+        "idempotentB": false
+      },
+      "proven": true,
+      "count": false,
+      "evidence": {}
+    },
+    {
+      "id": "CB-P2-GREEK-ALPHA",
+      "lens": "CB4",
+      "severity": "P2",
+      "title": "homóglifo grego α vs a na idempotency_key → 2 Transfers",
+      "actor": "seller JWT",
+      "pre": "payoutIdempotencyKey fold só cirílico; resto non-ASCII stripped (α≠a)",
+      "repro": "rtcbGREEKa1 vs rtcbGREEKalpha1 (U+03B1)",
+      "expected": "1 Transfer (mesma intenção visual / fold) OU desenho documentado",
+      "obtained": {
+        "keyA": "rtcbGREEKa1",
+        "keyB": "rtcbGREEKα1",
+        "keyA_units": [
+          114,
+          116,
+          99,
+          98,
+          71,
+          82,
+          69,
+          69,
+          75,
+          97,
+          49
+        ],
+        "keyB_units": [
+          114,
+          116,
+          99,
+          98,
+          71,
+          82,
+          69,
+          69,
+          75,
+          945,
+          49
+        ],
+        "hitA": "200 {\"success\":true,\"transferId\":\"tr_1UCdZDH7FWYUN3jhjqVq8nR2\",\"balance\":75.33} loc=\"\"",
+        "hitB": "200 {\"success\":true,\"transferId\":\"tr_1UCdZGH7FWYUN3jhlzW02WDN\",\"balance\":74.33} loc=\"\"",
+        "tidA": "tr_1UCdZDH7FWYUN3jhjqVq8nR2",
+        "tidB": "tr_1UCdZGH7FWYUN3jhlzW02WDN",
+        "new_transfer_ids": [
+          "tr_1UCdZGH7FWYUN3jhlzW02WDN",
+          "tr_1UCdZDH7FWYUN3jhjqVq8nR2"
+        ],
+        "new_transfer_count": 2,
+        "wallet_before": 76.33,
+        "wallet_after": 74.33,
+        "delta_eur": -2.0,
+        "payoutOkA": true,
+        "payoutOkB": true,
+        "idempotentB": false
+      },
+      "proven": true,
+      "count": true,
+      "evidence": {}
+    }
+  ],
+  "blocked": [
+    {
+      "id": "cb1.put",
+      "lens": "CB1",
+      "title": "PUT create-connect-account cria Transfer",
+      "ev": "405 {\"error\":\"Method not allowed.\"} loc=\"\""
+    },
+    {
+      "id": "cb1.del",
+      "lens": "CB1",
+      "title": "DELETE create-connect-account cria Transfer",
+      "ev": "405 {\"error\":\"Method not allowed.\"} loc=\"\""
+    },
+    {
+      "id": "dest.spoof",
+      "lens": "CB6",
+      "title": "destination no body: Transfer (destino cliente ignorado ou Connect próprio)",
+      "ev": "200 {\"success\":true,\"transferId\":\"tr_1UCdYZH7FWYUN3jh4N3qTSYR\",\"balance\":83.33} loc=\"\""
+    },
+    {
+      "id": "cb6.uid",
+      "lens": "CB6",
+      "title": "seller JWT + user_id=buyer cria levantamento na conta alheia",
+      "ev": "400 {\"error\":\"Cannot create another user Stripe account.\",\"code\":\"payout_failed\"} loc=\"\""
+    },
+    {
+      "id": "buyer.payout",
+      "lens": "CB6",
+      "title": "buyer payout recusado/sem Connect",
+      "ev": "400 {\"error\":\"Falta associar a conta bancária no Stripe. Abre outra vez Configurar conta bancária e adiciona o IBAN de teste.\",\"code\":\"payout_failed\"} loc=\"\""
+    },
+    {
+      "id": "cb6.debit.jwt",
+      "lens": "CB6",
+      "title": "JWT autenticado executou batata_wallet_payout_debit",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_wallet_payout_debit\"} loc=\"\""
+    },
+    {
+      "id": "cb6.finish.jwt",
+      "lens": "CB6",
+      "title": "JWT autenticado executou batata_wallet_payout_finish",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_wallet_payout_finish\"} loc=\"\""
+    },
+    {
+      "id": "cb4.amt.arr",
+      "lens": "CB4",
+      "title": "amount=[100] criou Transfer",
+      "ev": "400 {\"error\":\"Valor de levantamento inválido.\",\"code\":\"payout_failed\"} loc=\"\""
+    },
+    {
+      "id": "cb4.amt.nested",
+      "lens": "CB4",
+      "title": "amount=[[100]] criou Transfer",
+      "ev": "400 {\"error\":\"Valor de levantamento inválido.\",\"code\":\"payout_failed\"} loc=\"\""
+    },
+    {
+      "id": "cb4.amt.obj",
+      "lens": "CB4",
+      "title": "amount={cents: 100} criou Transfer",
+      "ev": "400 {\"error\":\"Valor de levantamento inválido.\",\"code\":\"payout_failed\"} loc=\"\""
+    },
+    {
+      "id": "cb4.amt.neg",
+      "lens": "CB4",
+      "title": "amount=-100 criou Transfer",
+      "ev": "400 {\"error\":\"Valor de levantamento inválido.\",\"code\":\"payout_failed\"} loc=\"\""
+    },
+    {
+      "id": "cb4.amt.hex",
+      "lens": "CB4",
+      "title": "amount=0x64 criou Transfer",
+      "ev": "400 {\"error\":\"Valor de levantamento inválido.\",\"code\":\"payout_failed\"} loc=\"\""
+    },
+    {
+      "id": "cb4.amt.fwstr",
+      "lens": "CB4",
+      "title": "amount=１００ criou Transfer",
+      "ev": "400 {\"error\":\"Valor de levantamento inválido.\",\"code\":\"payout_failed\"} loc=\"\""
+    },
+    {
+      "id": "amt.str100",
+      "lens": "CB4",
+      "title": "amount \"100\" aceite como 100 cents (desenho)",
+      "ev": "200 {\"success\":true,\"transferId\":\"tr_1UCdYhH7FWYUN3jhMIQiP3V5\",\"balance\":82.33} loc=\"\""
+    },
+    {
+      "id": "crash.nosec",
+      "lens": "CB4",
+      "title": "crash_inject ignorado sem secret",
+      "ev": "200 {\"success\":true,\"transferId\":\"tr_1UCdYjH7FWYUN3jh6Si7xEWT\",\"balance\":81.33} loc=\"\""
+    },
+    {
+      "id": "crash.retry",
+      "lens": "CB4",
+      "title": "retry após crash não duplicou Transfer",
+      "ev": {
+        "crash": "500 {\"success\":false,\"error\":\"crash_inject:after_debit_before_stripe\",\"code\":\"payout_pending_reconcile\",\"needs_reconcile\":true,\"idempotency_key\":\"p_947759827fbdd40a65b1b0fcc3208b85bb85715df980fe855d011cda7d9650\",\"crash_injec… loc=\"\"",
+        "retry": "200 {\"success\":true,\"transferId\":\"tr_1UCdYnH7FWYUN3jhNy6e2RmQ\",\"balance\":80.33} loc=\"\""
+      }
+    },
+    {
+      "id": "wh.nosig",
+      "lens": "CB4",
+      "title": "webhook recusou replay sem assinatura",
+      "ev": "400 {\"ok\":false,\"error\":\"missing_signature\"} loc=\"\""
+    },
+    {
+      "id": "wh.refund.nosig",
+      "lens": "CB4",
+      "title": "charge.refunded recusado sem assinatura",
+      "ev": "400 {\"ok\":false,\"error\":\"missing_signature\"} loc=\"\""
+    },
+    {
+      "id": "wh.badsig",
+      "lens": "CB4",
+      "title": "assinatura inválida recusada",
+      "ev": "400 {\"ok\":false,\"error\":\"invalid_signature\"} loc=\"\""
+    },
+    {
+      "id": "wh.get",
+      "lens": "CB4",
+      "title": "GET webhook recusado",
+      "ev": "405 {\"ok\":false,\"error\":\"method_not_allowed\"} loc=\"\""
+    },
+    {
+      "id": "wr.get.trail",
+      "lens": "CB2",
+      "title": "web_return https://fleaber.pt. sem Location hostil",
+      "ev": "200 <!DOCTYPE html><html lang=\"pt\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Fleaber</title><script>window.setTimeout(function(){ window.location.href = \"fleaber:/… loc=\"\""
+    },
+    {
+      "id": "wr.get.httpallow",
+      "lens": "CB2",
+      "title": "web_return http://fleaber.pt sem Location hostil",
+      "ev": "200 <!DOCTYPE html><html lang=\"pt\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Fleaber</title><script>window.setTimeout(function(){ window.location.href = \"fleaber:/… loc=\"\""
+    },
+    {
+      "id": "wr.get.zero",
+      "lens": "CB2",
+      "title": "web_return https://0.0.0.0 sem Location hostil",
+      "ev": "200 <!DOCTYPE html><html lang=\"pt\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Fleaber</title><script>window.setTimeout(function(){ window.location.href = \"fleaber:/… loc=\"\""
+    },
+    {
+      "id": "wr.get.v6loop",
+      "lens": "CB2",
+      "title": "web_return https://[::1] sem Location hostil",
+      "ev": "200 <!DOCTYPE html><html lang=\"pt\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Fleaber</title><script>window.setTimeout(function(){ window.location.href = \"fleaber:/… loc=\"\""
+    },
+    {
+      "id": "wr.get.short127",
+      "lens": "CB2",
+      "title": "web_return https://127.1 sem Location hostil",
+      "ev": "200 <!DOCTYPE html><html lang=\"pt\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Fleaber</title><script>window.setTimeout(function(){ window.location.href = \"fleaber:/… loc=\"\""
+    },
+    {
+      "id": "wr.get.meta",
+      "lens": "CB2",
+      "title": "web_return https://169.254.169.254 sem Location hostil",
+      "ev": "200 <!DOCTYPE html><html lang=\"pt\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Fleaber</title><script>window.setTimeout(function(){ window.location.href = \"fleaber:/… loc=\"\""
+    },
+    {
+      "id": "wr.get.suffix",
+      "lens": "CB2",
+      "title": "web_return https://fleaber.pt.evil.com sem Location hostil",
+      "ev": "200 <!DOCTYPE html><html lang=\"pt\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Fleaber</title><script>window.setTimeout(function(){ window.location.href = \"fleaber:/… loc=\"\""
+    },
+    {
+      "id": "wr.get.prefix",
+      "lens": "CB2",
+      "title": "web_return https://notfleaber.pt sem Location hostil",
+      "ev": "200 <!DOCTYPE html><html lang=\"pt\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Fleaber</title><script>window.setTimeout(function(){ window.location.href = \"fleaber:/… loc=\"\""
+    },
+    {
+      "id": "wr.get.userinfo",
+      "lens": "CB2",
+      "title": "web_return https://evil.com@fleaber.pt sem Location hostil",
+      "ev": "200 <!DOCTYPE html><html lang=\"pt\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Fleaber</title><script>window.setTimeout(function(){ window.location.href = \"fleaber:/… loc=\"\""
+    },
+    {
+      "id": "wr.get.atcolon",
+      "lens": "CB2",
+      "title": "web_return https://fleaber.pt:443@evil.com sem Location hostil",
+      "ev": "200 <!DOCTYPE html><html lang=\"pt\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Fleaber</title><script>window.setTimeout(function(){ window.location.href = \"fleaber:/… loc=\"\""
+    },
+    {
+      "id": "wr.get.data",
+      "lens": "CB2",
+      "title": "web_return data:text/html,hi sem Location hostil",
+      "ev": "200 <!DOCTYPE html><html lang=\"pt\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Fleaber</title><script>window.setTimeout(function(){ window.location.href = \"fleaber:/… loc=\"\""
+    },
+    {
+      "id": "wr.get.blob",
+      "lens": "CB2",
+      "title": "web_return blob:https://fleaber.pt/uuid sem Location hostil",
+      "ev": "200 <!DOCTYPE html><html lang=\"pt\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Fleaber</title><script>window.setTimeout(function(){ window.location.href = \"fleaber:/… loc=\"\""
+    },
+    {
+      "id": "wr.get.about",
+      "lens": "CB2",
+      "title": "web_return about:blank sem Location hostil",
+      "ev": "200 <!DOCTYPE html><html lang=\"pt\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Fleaber</title><script>window.setTimeout(function(){ window.location.href = \"fleaber:/… loc=\"\""
+    },
+    {
+      "id": "wr.get.encodedslash",
+      "lens": "CB2",
+      "title": "web_return https://fleaber.pt%2F%2Fevil.com sem Location hostil",
+      "ev": "200 <!DOCTYPE html><html lang=\"pt\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Fleaber</title><script>window.setTimeout(function(){ window.location.href = \"fleaber:/… loc=\"\""
+    },
+    {
+      "id": "CB-HOLD-CYR",
+      "lens": "CB4",
+      "title": "exacto cirílico а→a (não contar) — não gerou 2 Transfers",
+      "ev": {
+        "keyA": "rtcblatinx1",
+        "keyB": "rtcblаtinx1",
+        "keyA_units": [
+          114,
+          116,
+          99,
+          98,
+          108,
+          97,
+          116,
+          105,
+          110,
+          120,
+          49
+        ],
+        "keyB_units": [
+          114,
+          116,
+          99,
+          98,
+          108,
+          1072,
+          116,
+          105,
+          110,
+          120,
+          49
+        ],
+        "hitA": "200 {\"success\":true,\"transferId\":\"tr_1UCdYxH7FWYUN3jhrZPOrVp6\",\"balance\":79.33} loc=\"\"",
+        "hitB": "200 {\"success\":true,\"transferId\":\"tr_1UCdYxH7FWYUN3jhrZPOrVp6\",\"balance\":79.33,\"idempotent\":true} loc=\"\"",
+        "tidA": "tr_1UCdYxH7FWYUN3jhrZPOrVp6",
+        "tidB": "tr_1UCdYxH7FWYUN3jhrZPOrVp6",
+        "new_transfer_ids": [
+          "tr_1UCdYxH7FWYUN3jhrZPOrVp6"
+        ],
+        "new_transfer_count": 1,
+        "wallet_before": 80.33,
+        "wallet_after": 79.33,
+        "delta_eur": -1.0,
+        "payoutOkA": true,
+        "payoutOkB": true,
+        "idempotentB": true
+      }
+    },
+    {
+      "id": "CB-HOLD-NBSP",
+      "lens": "CB4",
+      "title": "exacto NBSP mid-key (não contar) — não gerou 2 Transfers",
+      "ev": {
+        "keyA": "rtcbnbsp88x",
+        "keyB": "rtcb nbsp88x",
+        "keyA_units": [
+          114,
+          116,
+          99,
+          98,
+          110,
+          98,
+          115,
+          112,
+          56,
+          56,
+          120
+        ],
+        "keyB_units": [
+          114,
+          116,
+          99,
+          98,
+          160,
+          110,
+          98,
+          115,
+          112,
+          56,
+          56,
+          120
+        ],
+        "hitA": "200 {\"success\":true,\"transferId\":\"tr_1UCdZ2H7FWYUN3jhHmDDu5XB\",\"balance\":78.33} loc=\"\"",
+        "hitB": "200 {\"success\":true,\"transferId\":\"tr_1UCdZ2H7FWYUN3jhHmDDu5XB\",\"balance\":78.33,\"idempotent\":true} loc=\"\"",
+        "tidA": "tr_1UCdZ2H7FWYUN3jhHmDDu5XB",
+        "tidB": "tr_1UCdZ2H7FWYUN3jhHmDDu5XB",
+        "new_transfer_ids": [
+          "tr_1UCdZ2H7FWYUN3jhHmDDu5XB"
+        ],
+        "new_transfer_count": 1,
+        "wallet_before": 79.33,
+        "wallet_after": 78.33,
+        "delta_eur": -1.0,
+        "payoutOkA": true,
+        "payoutOkB": true,
+        "idempotentB": true
+      }
+    },
+    {
+      "id": "CB-P2-GREEK-OMICRON",
+      "lens": "CB4",
+      "title": "homóglifo grego ο vs o na key → 2 Transfers — não gerou 2 Transfers",
+      "ev": {
+        "keyA": "rtcbGREEKo1",
+        "keyB": "rtcbGREEKο1",
+        "keyA_units": [
+          114,
+          116,
+          99,
+          98,
+          71,
+          82,
+          69,
+          69,
+          75,
+          111,
+          49
+        ],
+        "keyB_units": [
+          114,
+          116,
+          99,
+          98,
+          71,
+          82,
+          69,
+          69,
+          75,
+          959,
+          49
+        ],
+        "hitA": "200 {\"success\":true,\"transferId\":\"tr_1UCdZLH7FWYUN3jhQ6u9khvi\",\"balance\":73.33} loc=\"\"",
+        "hitB": "200 {\"success\":true,\"transferId\":\"tr_1UCdZGH7FWYUN3jhlzW02WDN\",\"balance\":74.33,\"idempotent\":true} loc=\"\"",
+        "tidA": "tr_1UCdZLH7FWYUN3jhQ6u9khvi",
+        "tidB": "tr_1UCdZGH7FWYUN3jhlzW02WDN",
+        "new_transfer_ids": [
+          "tr_1UCdZLH7FWYUN3jhQ6u9khvi"
+        ],
+        "new_transfer_count": 1,
+        "wallet_before": 74.33,
+        "wallet_after": 73.33,
+        "delta_eur": -1.0,
+        "payoutOkA": true,
+        "payoutOkB": true,
+        "idempotentB": true
+      }
+    },
+    {
+      "id": "CB-P2-FULLWIDTH-DIGIT",
+      "lens": "CB4",
+      "title": "fullwidth １ substitui ASCII 1 na key → 2 Transfers — não gerou 2 Transfers",
+      "ev": {
+        "keyA": "rtcbkeyn1xx",
+        "keyB": "rtcbkeyn１xx",
+        "keyA_units": [
+          114,
+          116,
+          99,
+          98,
+          107,
+          101,
+          121,
+          110,
+          49,
+          120,
+          120
+        ],
+        "keyB_units": [
+          114,
+          116,
+          99,
+          98,
+          107,
+          101,
+          121,
+          110,
+          65297,
+          120,
+          120
+        ],
+        "hitA": "200 {\"success\":true,\"transferId\":\"tr_1UCdZQH7FWYUN3jhCzLHHuFE\",\"balance\":72.33} loc=\"\"",
+        "hitB": "200 {\"success\":true,\"transferId\":\"tr_1UCdZQH7FWYUN3jhCzLHHuFE\",\"balance\":72.33,\"idempotent\":true} loc=\"\"",
+        "tidA": "tr_1UCdZQH7FWYUN3jhCzLHHuFE",
+        "tidB": "tr_1UCdZQH7FWYUN3jhCzLHHuFE",
+        "new_transfer_ids": [
+          "tr_1UCdZQH7FWYUN3jhCzLHHuFE"
+        ],
+        "new_transfer_count": 1,
+        "wallet_before": 73.33,
+        "wallet_after": 72.33,
+        "delta_eur": -1.0,
+        "payoutOkA": true,
+        "payoutOkB": true,
+        "idempotentB": true
+      }
+    },
+    {
+      "id": "CB-P2-WJ",
+      "lens": "CB4",
+      "title": "WORD JOINER U+2060 no meio da key → 2 Transfers — não gerou 2 Transfers",
+      "ev": {
+        "keyA": "rtcbwjkey88",
+        "keyB": "rtcb⁠wjkey88",
+        "keyA_units": [
+          114,
+          116,
+          99,
+          98,
+          119,
+          106,
+          107,
+          101,
+          121,
+          56,
+          56
+        ],
+        "keyB_units": [
+          114,
+          116,
+          99,
+          98,
+          8288,
+          119,
+          106,
+          107,
+          101,
+          121,
+          56,
+          56
+        ],
+        "hitA": "200 {\"success\":true,\"transferId\":\"tr_1UCdZWH7FWYUN3jho1WX0SaO\",\"balance\":71.33} loc=\"\"",
+        "hitB": "200 {\"success\":true,\"transferId\":\"tr_1UCdZWH7FWYUN3jho1WX0SaO\",\"balance\":71.33,\"idempotent\":true} loc=\"\"",
+        "tidA": "tr_1UCdZWH7FWYUN3jho1WX0SaO",
+        "tidB": "tr_1UCdZWH7FWYUN3jho1WX0SaO",
+        "new_transfer_ids": [
+          "tr_1UCdZWH7FWYUN3jho1WX0SaO"
+        ],
+        "new_transfer_count": 1,
+        "wallet_before": 72.33,
+        "wallet_after": 71.33,
+        "delta_eur": -1.0,
+        "payoutOkA": true,
+        "payoutOkB": true,
+        "idempotentB": true
+      }
+    },
+    {
+      "id": "CB-P2-SOFT-HYPHEN",
+      "lens": "CB4",
+      "title": "SOFT HYPHEN U+00AD no meio da key → 2 Transfers — não gerou 2 Transfers",
+      "ev": {
+        "keyA": "rtcbshykey8",
+        "keyB": "rtcb­shykey8",
+        "keyA_units": [
+          114,
+          116,
+          99,
+          98,
+          115,
+          104,
+          121,
+          107,
+          101,
+          121,
+          56
+        ],
+        "keyB_units": [
+          114,
+          116,
+          99,
+          98,
+          173,
+          115,
+          104,
+          121,
+          107,
+          101,
+          121,
+          56
+        ],
+        "hitA": "200 {\"success\":true,\"transferId\":\"tr_1UCdZbH7FWYUN3jh4XssaHZW\",\"balance\":70.33} loc=\"\"",
+        "hitB": "200 {\"success\":true,\"transferId\":\"tr_1UCdZbH7FWYUN3jh4XssaHZW\",\"balance\":70.33,\"idempotent\":true} loc=\"\"",
+        "tidA": "tr_1UCdZbH7FWYUN3jh4XssaHZW",
+        "tidB": "tr_1UCdZbH7FWYUN3jh4XssaHZW",
+        "new_transfer_ids": [
+          "tr_1UCdZbH7FWYUN3jh4XssaHZW"
+        ],
+        "new_transfer_count": 1,
+        "wallet_before": 71.33,
+        "wallet_after": 70.33,
+        "delta_eur": -1.0,
+        "payoutOkA": true,
+        "payoutOkB": true,
+        "idempotentB": true
+      }
+    },
+    {
+      "id": "CB-P2-HANGUL-FILL",
+      "lens": "CB4",
+      "title": "Hangul filler U+3164 no meio da key → 2 Transfers — não gerou 2 Transfers",
+      "ev": {
+        "keyA": "rtcbhgfill8",
+        "keyB": "rtcbㅤhgfill8",
+        "keyA_units": [
+          114,
+          116,
+          99,
+          98,
+          104,
+          103,
+          102,
+          105,
+          108,
+          108,
+          56
+        ],
+        "keyB_units": [
+          114,
+          116,
+          99,
+          98,
+          12644,
+          104,
+          103,
+          102,
+          105,
+          108,
+          108,
+          56
+        ],
+        "hitA": "200 {\"success\":true,\"transferId\":\"tr_1UCdZgH7FWYUN3jhJEMFa2GV\",\"balance\":69.33} loc=\"\"",
+        "hitB": "200 {\"success\":true,\"transferId\":\"tr_1UCdZgH7FWYUN3jhJEMFa2GV\",\"balance\":69.33,\"idempotent\":true} loc=\"\"",
+        "tidA": "tr_1UCdZgH7FWYUN3jhJEMFa2GV",
+        "tidB": "tr_1UCdZgH7FWYUN3jhJEMFa2GV",
+        "new_transfer_ids": [
+          "tr_1UCdZgH7FWYUN3jhJEMFa2GV"
+        ],
+        "new_transfer_count": 1,
+        "wallet_before": 70.33,
+        "wallet_after": 69.33,
+        "delta_eur": -1.0,
+        "payoutOkA": true,
+        "payoutOkB": true,
+        "idempotentB": true
+      }
+    },
+    {
+      "id": "race.same",
+      "lens": "CB4",
+      "title": "race mesma key ≤1 Transfer",
+      "ev": {
+        "tids": [
+          "tr_1UCdZkH7FWYUN3jhC8Xv1WJV"
+        ],
+        "hits": [
+          "200 {\"success\":true,\"transferId\":\"tr_1UCdZkH7FWYUN3jhC8Xv1WJV\",\"balance\":68.33} loc=\"\"",
+          "200 {\"success\":true,\"transferId\":\"tr_1UCdZkH7FWYUN3jhC8Xv1WJV\",\"balance\":68.33} loc=\"\"",
+          "200 {\"success\":true,\"transferId\":\"tr_1UCdZkH7FWYUN3jhC8Xv1WJV\",\"balance\":68.33} loc=\"\""
+        ]
+      }
+    }
+  ],
+  "skipped": [],
+  "notes": [
+    {
+      "id": "wallet0",
+      "lens": "CB7",
+      "title": "seller wallet before",
+      "ev": {
+        "id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+        "balance": 84.33,
+        "stripe_account_id": "acct_1U5mYbQeUNx8ar08",
+        "updated_at": "2026-09-06T10:28:45.286926+00:00"
+      }
+    },
+    {
+      "id": "wallet.funded",
+      "lens": "CB7",
+      "title": "seller wallet after fixture",
+      "ev": {
+        "id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+        "balance": 84.33,
+        "stripe_account_id": "acct_1U5mYbQeUNx8ar08",
+        "updated_at": "2026-09-06T10:28:45.286926+00:00"
+      }
+    },
+    {
+      "id": "dest.spoof",
+      "lens": "CB6",
+      "title": "body destination spoof",
+      "ev": "200 {\"success\":true,\"transferId\":\"tr_1UCdYZH7FWYUN3jh4N3qTSYR\",\"balance\":83.33} loc=\"\""
+    },
+    {
+      "id": "dest.spoof.ok",
+      "lens": "CB6",
+      "title": "Transfer criada — confirmar se destino é o Connect do JWT",
+      "ev": {
+        "hit": "200 {\"success\":true,\"transferId\":\"tr_1UCdYZH7FWYUN3jh4N3qTSYR\",\"balance\":83.33} loc=\"\"",
+        "wallet": {
+          "id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+          "balance": 83.33,
+          "stripe_account_id": "acct_1U5mYbQeUNx8ar08",
+          "updated_at": "2026-09-06T10:44:15.073716+00:00"
+        },
+        "tid": "tr_1UCdYZH7FWYUN3jh4N3qTSYR"
+      }
+    },
+    {
+      "id": "buyer.payout",
+      "lens": "CB6",
+      "title": "buyer JWT payout 100c",
+      "ev": "400 {\"error\":\"Falta associar a conta bancária no Stripe. Abre outra vez Configurar conta bancária e adiciona o IBAN de teste.\",\"code\":\"payout_failed\"} loc=\"\""
+    },
+    {
+      "id": "amt.arr",
+      "lens": "CB4",
+      "title": "amount=[100]",
+      "ev": "400 {\"error\":\"Valor de levantamento inválido.\",\"code\":\"payout_failed\"} loc=\"\""
+    },
+    {
+      "id": "amt.nested",
+      "lens": "CB4",
+      "title": "amount=[[100]]",
+      "ev": "400 {\"error\":\"Valor de levantamento inválido.\",\"code\":\"payout_failed\"} loc=\"\""
+    },
+    {
+      "id": "amt.obj",
+      "lens": "CB4",
+      "title": "amount={cents: 100}",
+      "ev": "400 {\"error\":\"Valor de levantamento inválido.\",\"code\":\"payout_failed\"} loc=\"\""
+    },
+    {
+      "id": "amt.neg",
+      "lens": "CB4",
+      "title": "amount=-100",
+      "ev": "400 {\"error\":\"Valor de levantamento inválido.\",\"code\":\"payout_failed\"} loc=\"\""
+    },
+    {
+      "id": "amt.hex",
+      "lens": "CB4",
+      "title": "amount=0x64",
+      "ev": "400 {\"error\":\"Valor de levantamento inválido.\",\"code\":\"payout_failed\"} loc=\"\""
+    },
+    {
+      "id": "amt.fwstr",
+      "lens": "CB4",
+      "title": "amount=１００",
+      "ev": "400 {\"error\":\"Valor de levantamento inválido.\",\"code\":\"payout_failed\"} loc=\"\""
+    },
+    {
+      "id": "amt.str100",
+      "lens": "CB4",
+      "title": "amount=\"100\" desenho JS",
+      "ev": "200 {\"success\":true,\"transferId\":\"tr_1UCdYhH7FWYUN3jhMIQiP3V5\",\"balance\":82.33} loc=\"\""
+    },
+    {
+      "id": "crash.nosec",
+      "lens": "CB4",
+      "title": "crash_inject sem header secret",
+      "ev": "200 {\"success\":true,\"transferId\":\"tr_1UCdYjH7FWYUN3jh6Si7xEWT\",\"balance\":81.33} loc=\"\""
+    },
+    {
+      "id": "crash.secret",
+      "lens": "CB4",
+      "title": "crash_inject COM secret",
+      "ev": "500 {\"success\":false,\"error\":\"crash_inject:after_debit_before_stripe\",\"code\":\"payout_pending_reconcile\",\"needs_reconcile\":true,\"idempotency_key\":\"p_947759827fbdd40a65b1b0fcc3208b85bb85715df980fe855d011cda7d9650\",\"crash_injec… loc=\"\""
+    },
+    {
+      "id": "crash.retry",
+      "lens": "CB4",
+      "title": "retry mesma key após crash debit",
+      "ev": "200 {\"success\":true,\"transferId\":\"tr_1UCdYnH7FWYUN3jhNy6e2RmQ\",\"balance\":80.33} loc=\"\""
+    },
+    {
+      "id": "wh.nosig",
+      "lens": "CB4",
+      "title": "transfer.created sem stripe-signature",
+      "ev": "400 {\"ok\":false,\"error\":\"missing_signature\"} loc=\"\""
+    },
+    {
+      "id": "wh.refund.nosig",
+      "lens": "CB4",
+      "title": "charge.refunded sem assinatura",
+      "ev": "400 {\"ok\":false,\"error\":\"missing_signature\"} loc=\"\""
+    },
+    {
+      "id": "wh.get",
+      "lens": "CB4",
+      "title": "GET stripe-webhook",
+      "ev": "405 {\"ok\":false,\"error\":\"method_not_allowed\"} loc=\"\""
+    },
+    {
+      "id": "wr.get.trail",
+      "lens": "CB2",
+      "title": "GET https://fleaber.pt.",
+      "ev": "200 <!DOCTYPE html><html lang=\"pt\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Fleaber</title><script>window.setTimeout(function(){ window.location.href = \"fleaber:/… loc=\"\""
+    },
+    {
+      "id": "wr.get.httpallow",
+      "lens": "CB2",
+      "title": "GET http://fleaber.pt",
+      "ev": "200 <!DOCTYPE html><html lang=\"pt\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Fleaber</title><script>window.setTimeout(function(){ window.location.href = \"fleaber:/… loc=\"\""
+    },
+    {
+      "id": "wr.get.zero",
+      "lens": "CB2",
+      "title": "GET https://0.0.0.0",
+      "ev": "200 <!DOCTYPE html><html lang=\"pt\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Fleaber</title><script>window.setTimeout(function(){ window.location.href = \"fleaber:/… loc=\"\""
+    },
+    {
+      "id": "wr.get.v6loop",
+      "lens": "CB2",
+      "title": "GET https://[::1]",
+      "ev": "200 <!DOCTYPE html><html lang=\"pt\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Fleaber</title><script>window.setTimeout(function(){ window.location.href = \"fleaber:/… loc=\"\""
+    },
+    {
+      "id": "wr.get.short127",
+      "lens": "CB2",
+      "title": "GET https://127.1",
+      "ev": "200 <!DOCTYPE html><html lang=\"pt\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Fleaber</title><script>window.setTimeout(function(){ window.location.href = \"fleaber:/… loc=\"\""
+    },
+    {
+      "id": "wr.get.meta",
+      "lens": "CB2",
+      "title": "GET https://169.254.169.254",
+      "ev": "200 <!DOCTYPE html><html lang=\"pt\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Fleaber</title><script>window.setTimeout(function(){ window.location.href = \"fleaber:/… loc=\"\""
+    },
+    {
+      "id": "wr.get.suffix",
+      "lens": "CB2",
+      "title": "GET https://fleaber.pt.evil.com",
+      "ev": "200 <!DOCTYPE html><html lang=\"pt\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Fleaber</title><script>window.setTimeout(function(){ window.location.href = \"fleaber:/… loc=\"\""
+    },
+    {
+      "id": "wr.get.prefix",
+      "lens": "CB2",
+      "title": "GET https://notfleaber.pt",
+      "ev": "200 <!DOCTYPE html><html lang=\"pt\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Fleaber</title><script>window.setTimeout(function(){ window.location.href = \"fleaber:/… loc=\"\""
+    },
+    {
+      "id": "wr.get.userinfo",
+      "lens": "CB2",
+      "title": "GET https://evil.com@fleaber.pt",
+      "ev": "200 <!DOCTYPE html><html lang=\"pt\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Fleaber</title><script>window.setTimeout(function(){ window.location.href = \"fleaber:/… loc=\"\""
+    },
+    {
+      "id": "wr.get.atcolon",
+      "lens": "CB2",
+      "title": "GET https://fleaber.pt:443@evil.com",
+      "ev": "200 <!DOCTYPE html><html lang=\"pt\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Fleaber</title><script>window.setTimeout(function(){ window.location.href = \"fleaber:/… loc=\"\""
+    },
+    {
+      "id": "wr.get.data",
+      "lens": "CB2",
+      "title": "GET data:text/html,hi",
+      "ev": "200 <!DOCTYPE html><html lang=\"pt\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Fleaber</title><script>window.setTimeout(function(){ window.location.href = \"fleaber:/… loc=\"\""
+    },
+    {
+      "id": "wr.get.blob",
+      "lens": "CB2",
+      "title": "GET blob:https://fleaber.pt/uuid",
+      "ev": "200 <!DOCTYPE html><html lang=\"pt\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Fleaber</title><script>window.setTimeout(function(){ window.location.href = \"fleaber:/… loc=\"\""
+    },
+    {
+      "id": "wr.get.about",
+      "lens": "CB2",
+      "title": "GET about:blank",
+      "ev": "200 <!DOCTYPE html><html lang=\"pt\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Fleaber</title><script>window.setTimeout(function(){ window.location.href = \"fleaber:/… loc=\"\""
+    },
+    {
+      "id": "wr.get.encodedslash",
+      "lens": "CB2",
+      "title": "GET https://fleaber.pt%2F%2Fevil.com",
+      "ev": "200 <!DOCTYPE html><html lang=\"pt\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Fleaber</title><script>window.setTimeout(function(){ window.location.href = \"fleaber:/… loc=\"\""
+    },
+    {
+      "id": "pair.CB-HOLD-CYR",
+      "lens": "CB4",
+      "title": "pair CB-HOLD-CYR",
+      "ev": {
+        "keyA": "rtcblatinx1",
+        "keyB": "rtcblаtinx1",
+        "keyA_units": [
+          114,
+          116,
+          99,
+          98,
+          108,
+          97,
+          116,
+          105,
+          110,
+          120,
+          49
+        ],
+        "keyB_units": [
+          114,
+          116,
+          99,
+          98,
+          108,
+          1072,
+          116,
+          105,
+          110,
+          120,
+          49
+        ],
+        "hitA": "200 {\"success\":true,\"transferId\":\"tr_1UCdYxH7FWYUN3jhrZPOrVp6\",\"balance\":79.33} loc=\"\"",
+        "hitB": "200 {\"success\":true,\"transferId\":\"tr_1UCdYxH7FWYUN3jhrZPOrVp6\",\"balance\":79.33,\"idempotent\":true} loc=\"\"",
+        "tidA": "tr_1UCdYxH7FWYUN3jhrZPOrVp6",
+        "tidB": "tr_1UCdYxH7FWYUN3jhrZPOrVp6",
+        "new_transfer_ids": [
+          "tr_1UCdYxH7FWYUN3jhrZPOrVp6"
+        ],
+        "new_transfer_count": 1,
+        "wallet_before": 80.33,
+        "wallet_after": 79.33,
+        "delta_eur": -1.0,
+        "payoutOkA": true,
+        "payoutOkB": true,
+        "idempotentB": true
+      }
+    },
+    {
+      "id": "pair.CB-HOLD-NBSP",
+      "lens": "CB4",
+      "title": "pair CB-HOLD-NBSP",
+      "ev": {
+        "keyA": "rtcbnbsp88x",
+        "keyB": "rtcb nbsp88x",
+        "keyA_units": [
+          114,
+          116,
+          99,
+          98,
+          110,
+          98,
+          115,
+          112,
+          56,
+          56,
+          120
+        ],
+        "keyB_units": [
+          114,
+          116,
+          99,
+          98,
+          160,
+          110,
+          98,
+          115,
+          112,
+          56,
+          56,
+          120
+        ],
+        "hitA": "200 {\"success\":true,\"transferId\":\"tr_1UCdZ2H7FWYUN3jhHmDDu5XB\",\"balance\":78.33} loc=\"\"",
+        "hitB": "200 {\"success\":true,\"transferId\":\"tr_1UCdZ2H7FWYUN3jhHmDDu5XB\",\"balance\":78.33,\"idempotent\":true} loc=\"\"",
+        "tidA": "tr_1UCdZ2H7FWYUN3jhHmDDu5XB",
+        "tidB": "tr_1UCdZ2H7FWYUN3jhHmDDu5XB",
+        "new_transfer_ids": [
+          "tr_1UCdZ2H7FWYUN3jhHmDDu5XB"
+        ],
+        "new_transfer_count": 1,
+        "wallet_before": 79.33,
+        "wallet_after": 78.33,
+        "delta_eur": -1.0,
+        "payoutOkA": true,
+        "payoutOkB": true,
+        "idempotentB": true
+      }
+    },
+    {
+      "id": "pair.CB-DESIGN-CASEFOLD",
+      "lens": "CB4",
+      "title": "pair CB-DESIGN-CASEFOLD",
+      "ev": {
+        "keyA": "PayoutRtcb1",
+        "keyB": "payoutRtcb1",
+        "keyA_units": [
+          80,
+          97,
+          121,
+          111,
+          117,
+          116,
+          82,
+          116,
+          99,
+          98,
+          49
+        ],
+        "keyB_units": [
+          112,
+          97,
+          121,
+          111,
+          117,
+          116,
+          82,
+          116,
+          99,
+          98,
+          49
+        ],
+        "hitA": "200 {\"success\":true,\"transferId\":\"tr_1UCdZ7H7FWYUN3jhdO3L1fg9\",\"balance\":77.33} loc=\"\"",
+        "hitB": "200 {\"success\":true,\"transferId\":\"tr_1UCdZAH7FWYUN3jhQl0UOkSg\",\"balance\":76.33} loc=\"\"",
+        "tidA": "tr_1UCdZ7H7FWYUN3jhdO3L1fg9",
+        "tidB": "tr_1UCdZAH7FWYUN3jhQl0UOkSg",
+        "new_transfer_ids": [
+          "tr_1UCdZAH7FWYUN3jhQl0UOkSg",
+          "tr_1UCdZ7H7FWYUN3jhdO3L1fg9"
+        ],
+        "new_transfer_count": 2,
+        "wallet_before": 78.33,
+        "wallet_after": 76.33,
+        "delta_eur": -2.0,
+        "payoutOkA": true,
+        "payoutOkB": true,
+        "idempotentB": false
+      }
+    },
+    {
+      "id": "CB-DESIGN-CASEFOLD.design",
+      "lens": "CB4",
+      "title": "2 Transfers = desenho case-sensitive; app não gera mixed-case lookalike",
+      "ev": {
+        "keyA": "PayoutRtcb1",
+        "keyB": "payoutRtcb1",
+        "keyA_units": [
+          80,
+          97,
+          121,
+          111,
+          117,
+          116,
+          82,
+          116,
+          99,
+          98,
+          49
+        ],
+        "keyB_units": [
+          112,
+          97,
+          121,
+          111,
+          117,
+          116,
+          82,
+          116,
+          99,
+          98,
+          49
+        ],
+        "hitA": "200 {\"success\":true,\"transferId\":\"tr_1UCdZ7H7FWYUN3jhdO3L1fg9\",\"balance\":77.33} loc=\"\"",
+        "hitB": "200 {\"success\":true,\"transferId\":\"tr_1UCdZAH7FWYUN3jhQl0UOkSg\",\"balance\":76.33} loc=\"\"",
+        "tidA": "tr_1UCdZ7H7FWYUN3jhdO3L1fg9",
+        "tidB": "tr_1UCdZAH7FWYUN3jhQl0UOkSg",
+        "new_transfer_ids": [
+          "tr_1UCdZAH7FWYUN3jhQl0UOkSg",
+          "tr_1UCdZ7H7FWYUN3jhdO3L1fg9"
+        ],
+        "new_transfer_count": 2,
+        "wallet_before": 78.33,
+        "wallet_after": 76.33,
+        "delta_eur": -2.0,
+        "payoutOkA": true,
+        "payoutOkB": true,
+        "idempotentB": false
+      }
+    },
+    {
+      "id": "pair.CB-P2-GREEK-ALPHA",
+      "lens": "CB4",
+      "title": "pair CB-P2-GREEK-ALPHA",
+      "ev": {
+        "keyA": "rtcbGREEKa1",
+        "keyB": "rtcbGREEKα1",
+        "keyA_units": [
+          114,
+          116,
+          99,
+          98,
+          71,
+          82,
+          69,
+          69,
+          75,
+          97,
+          49
+        ],
+        "keyB_units": [
+          114,
+          116,
+          99,
+          98,
+          71,
+          82,
+          69,
+          69,
+          75,
+          945,
+          49
+        ],
+        "hitA": "200 {\"success\":true,\"transferId\":\"tr_1UCdZDH7FWYUN3jhjqVq8nR2\",\"balance\":75.33} loc=\"\"",
+        "hitB": "200 {\"success\":true,\"transferId\":\"tr_1UCdZGH7FWYUN3jhlzW02WDN\",\"balance\":74.33} loc=\"\"",
+        "tidA": "tr_1UCdZDH7FWYUN3jhjqVq8nR2",
+        "tidB": "tr_1UCdZGH7FWYUN3jhlzW02WDN",
+        "new_transfer_ids": [
+          "tr_1UCdZGH7FWYUN3jhlzW02WDN",
+          "tr_1UCdZDH7FWYUN3jhjqVq8nR2"
+        ],
+        "new_transfer_count": 2,
+        "wallet_before": 76.33,
+        "wallet_after": 74.33,
+        "delta_eur": -2.0,
+        "payoutOkA": true,
+        "payoutOkB": true,
+        "idempotentB": false
+      }
+    },
+    {
+      "id": "pair.CB-P2-GREEK-OMICRON",
+      "lens": "CB4",
+      "title": "pair CB-P2-GREEK-OMICRON",
+      "ev": {
+        "keyA": "rtcbGREEKo1",
+        "keyB": "rtcbGREEKο1",
+        "keyA_units": [
+          114,
+          116,
+          99,
+          98,
+          71,
+          82,
+          69,
+          69,
+          75,
+          111,
+          49
+        ],
+        "keyB_units": [
+          114,
+          116,
+          99,
+          98,
+          71,
+          82,
+          69,
+          69,
+          75,
+          959,
+          49
+        ],
+        "hitA": "200 {\"success\":true,\"transferId\":\"tr_1UCdZLH7FWYUN3jhQ6u9khvi\",\"balance\":73.33} loc=\"\"",
+        "hitB": "200 {\"success\":true,\"transferId\":\"tr_1UCdZGH7FWYUN3jhlzW02WDN\",\"balance\":74.33,\"idempotent\":true} loc=\"\"",
+        "tidA": "tr_1UCdZLH7FWYUN3jhQ6u9khvi",
+        "tidB": "tr_1UCdZGH7FWYUN3jhlzW02WDN",
+        "new_transfer_ids": [
+          "tr_1UCdZLH7FWYUN3jhQ6u9khvi"
+        ],
+        "new_transfer_count": 1,
+        "wallet_before": 74.33,
+        "wallet_after": 73.33,
+        "delta_eur": -1.0,
+        "payoutOkA": true,
+        "payoutOkB": true,
+        "idempotentB": true
+      }
+    },
+    {
+      "id": "pair.CB-P2-FULLWIDTH-DIGIT",
+      "lens": "CB4",
+      "title": "pair CB-P2-FULLWIDTH-DIGIT",
+      "ev": {
+        "keyA": "rtcbkeyn1xx",
+        "keyB": "rtcbkeyn１xx",
+        "keyA_units": [
+          114,
+          116,
+          99,
+          98,
+          107,
+          101,
+          121,
+          110,
+          49,
+          120,
+          120
+        ],
+        "keyB_units": [
+          114,
+          116,
+          99,
+          98,
+          107,
+          101,
+          121,
+          110,
+          65297,
+          120,
+          120
+        ],
+        "hitA": "200 {\"success\":true,\"transferId\":\"tr_1UCdZQH7FWYUN3jhCzLHHuFE\",\"balance\":72.33} loc=\"\"",
+        "hitB": "200 {\"success\":true,\"transferId\":\"tr_1UCdZQH7FWYUN3jhCzLHHuFE\",\"balance\":72.33,\"idempotent\":true} loc=\"\"",
+        "tidA": "tr_1UCdZQH7FWYUN3jhCzLHHuFE",
+        "tidB": "tr_1UCdZQH7FWYUN3jhCzLHHuFE",
+        "new_transfer_ids": [
+          "tr_1UCdZQH7FWYUN3jhCzLHHuFE"
+        ],
+        "new_transfer_count": 1,
+        "wallet_before": 73.33,
+        "wallet_after": 72.33,
+        "delta_eur": -1.0,
+        "payoutOkA": true,
+        "payoutOkB": true,
+        "idempotentB": true
+      }
+    },
+    {
+      "id": "pair.CB-P2-WJ",
+      "lens": "CB4",
+      "title": "pair CB-P2-WJ",
+      "ev": {
+        "keyA": "rtcbwjkey88",
+        "keyB": "rtcb⁠wjkey88",
+        "keyA_units": [
+          114,
+          116,
+          99,
+          98,
+          119,
+          106,
+          107,
+          101,
+          121,
+          56,
+          56
+        ],
+        "keyB_units": [
+          114,
+          116,
+          99,
+          98,
+          8288,
+          119,
+          106,
+          107,
+          101,
+          121,
+          56,
+          56
+        ],
+        "hitA": "200 {\"success\":true,\"transferId\":\"tr_1UCdZWH7FWYUN3jho1WX0SaO\",\"balance\":71.33} loc=\"\"",
+        "hitB": "200 {\"success\":true,\"transferId\":\"tr_1UCdZWH7FWYUN3jho1WX0SaO\",\"balance\":71.33,\"idempotent\":true} loc=\"\"",
+        "tidA": "tr_1UCdZWH7FWYUN3jho1WX0SaO",
+        "tidB": "tr_1UCdZWH7FWYUN3jho1WX0SaO",
+        "new_transfer_ids": [
+          "tr_1UCdZWH7FWYUN3jho1WX0SaO"
+        ],
+        "new_transfer_count": 1,
+        "wallet_before": 72.33,
+        "wallet_after": 71.33,
+        "delta_eur": -1.0,
+        "payoutOkA": true,
+        "payoutOkB": true,
+        "idempotentB": true
+      }
+    },
+    {
+      "id": "pair.CB-P2-SOFT-HYPHEN",
+      "lens": "CB4",
+      "title": "pair CB-P2-SOFT-HYPHEN",
+      "ev": {
+        "keyA": "rtcbshykey8",
+        "keyB": "rtcb­shykey8",
+        "keyA_units": [
+          114,
+          116,
+          99,
+          98,
+          115,
+          104,
+          121,
+          107,
+          101,
+          121,
+          56
+        ],
+        "keyB_units": [
+          114,
+          116,
+          99,
+          98,
+          173,
+          115,
+          104,
+          121,
+          107,
+          101,
+          121,
+          56
+        ],
+        "hitA": "200 {\"success\":true,\"transferId\":\"tr_1UCdZbH7FWYUN3jh4XssaHZW\",\"balance\":70.33} loc=\"\"",
+        "hitB": "200 {\"success\":true,\"transferId\":\"tr_1UCdZbH7FWYUN3jh4XssaHZW\",\"balance\":70.33,\"idempotent\":true} loc=\"\"",
+        "tidA": "tr_1UCdZbH7FWYUN3jh4XssaHZW",
+        "tidB": "tr_1UCdZbH7FWYUN3jh4XssaHZW",
+        "new_transfer_ids": [
+          "tr_1UCdZbH7FWYUN3jh4XssaHZW"
+        ],
+        "new_transfer_count": 1,
+        "wallet_before": 71.33,
+        "wallet_after": 70.33,
+        "delta_eur": -1.0,
+        "payoutOkA": true,
+        "payoutOkB": true,
+        "idempotentB": true
+      }
+    },
+    {
+      "id": "pair.CB-P2-HANGUL-FILL",
+      "lens": "CB4",
+      "title": "pair CB-P2-HANGUL-FILL",
+      "ev": {
+        "keyA": "rtcbhgfill8",
+        "keyB": "rtcbㅤhgfill8",
+        "keyA_units": [
+          114,
+          116,
+          99,
+          98,
+          104,
+          103,
+          102,
+          105,
+          108,
+          108,
+          56
+        ],
+        "keyB_units": [
+          114,
+          116,
+          99,
+          98,
+          12644,
+          104,
+          103,
+          102,
+          105,
+          108,
+          108,
+          56
+        ],
+        "hitA": "200 {\"success\":true,\"transferId\":\"tr_1UCdZgH7FWYUN3jhJEMFa2GV\",\"balance\":69.33} loc=\"\"",
+        "hitB": "200 {\"success\":true,\"transferId\":\"tr_1UCdZgH7FWYUN3jhJEMFa2GV\",\"balance\":69.33,\"idempotent\":true} loc=\"\"",
+        "tidA": "tr_1UCdZgH7FWYUN3jhJEMFa2GV",
+        "tidB": "tr_1UCdZgH7FWYUN3jhJEMFa2GV",
+        "new_transfer_ids": [
+          "tr_1UCdZgH7FWYUN3jhJEMFa2GV"
+        ],
+        "new_transfer_count": 1,
+        "wallet_before": 70.33,
+        "wallet_after": 69.33,
+        "delta_eur": -1.0,
+        "payoutOkA": true,
+        "payoutOkB": true,
+        "idempotentB": true
+      }
+    },
+    {
+      "id": "race.same",
+      "lens": "CB4",
+      "title": "3x mesma key",
+      "ev": {
+        "hits": [
+          "200 {\"success\":true,\"transferId\":\"tr_1UCdZkH7FWYUN3jhC8Xv1WJV\",\"balance\":68.33} loc=\"\"",
+          "200 {\"success\":true,\"transferId\":\"tr_1UCdZkH7FWYUN3jhC8Xv1WJV\",\"balance\":68.33} loc=\"\"",
+          "200 {\"success\":true,\"transferId\":\"tr_1UCdZkH7FWYUN3jhC8Xv1WJV\",\"balance\":68.33} loc=\"\""
+        ],
+        "tids": [
+          "tr_1UCdZkH7FWYUN3jhC8Xv1WJV"
+        ]
+      }
+    },
+    {
+      "id": "wallet.end.p1",
+      "lens": "CB7",
+      "title": "seller wallet end pass1",
+      "ev": {
+        "id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+        "balance": 68.33,
+        "stripe_account_id": "acct_1U5mYbQeUNx8ar08",
+        "updated_at": "2026-09-06T10:45:28.618962+00:00"
+      }
+    }
+  ],
+  "actors": {
+    "buyer": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+    "seller": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+    "buyer2": "d6477f0d-9cbe-454f-a5d3-c083f6fe0703",
+    "seller2": "864aa211-891e-443c-8f0f-c313a95281b7"
+  },
+  "created": {
+    "orders": [],
+    "products": []
+  }
+}

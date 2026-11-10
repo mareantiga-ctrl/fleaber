@@ -1,0 +1,486 @@
+{
+  "pass": 2,
+  "s2_handle": "rtm-20260831t1802-s2",
+  "prof_star_keys": null,
+  "prof_star_snip": "[]",
+  "lives_auth": "{\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table lives\"}",
+  "ghost": "[]",
+  "disc_star": "[]",
+  "chat_top_anon": [
+    "live_item_photos",
+    "live_raffle_prize",
+    "product_photos",
+    "profile_photos"
+  ],
+  "priv_order_disputes": {
+    "anon_n": 0,
+    "auth_n": 1,
+    "svc_n": 2,
+    "svc_names": [
+      "980f4fa1-0004-42f9-abca-69f1a9c29588",
+      "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96"
+    ]
+  },
+  "priv_order_proofs": {
+    "anon_n": 0,
+    "auth_n": 1,
+    "svc_n": 2,
+    "svc_names": [
+      "3850d982-b164-4b7a-908b-4126cbc8d1ca",
+      "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96"
+    ]
+  },
+  "priv_chat_uploads": {
+    "anon_n": 0,
+    "auth_n": 1,
+    "svc_n": 9,
+    "svc_names": [
+      "1779801739106_ChatGPT Image 19_05_2026, 16_25_10.png",
+      "1779804487683_IMG_20260524_095613.jpg",
+      "1779804515133_Screenshot_2026-05-26-08-04-26-290.jpg",
+      "1785859802524_IMG_20260803_080809.jpg",
+      "1785859816294_IMG_20260803_080809.jpg",
+      "1786992203564_c6_buyer2.png"
+    ]
+  },
+  "mux_write": {
+    "resp": "200 loc=null acao=* {\"playback_id\":\"rtm_write_pb_20260831T1802\",\"playback_url\":\"https://stream.mux.com/rtm_write_pb_20260831T1802.m3u8\",\"source\":\"live_playback_only\",\"is_live\":fals…",
+    "row": "[{\"id\":\"b44b5451-567a-4aae-827e-526ffb73bf1a\",\"mux_vod_playback_id\":null,\"mux_asset_id\":null,\"mux_playback_id\":\"rtm_write_pb_20260831T1802\"}]"
+  },
+  "tip_huge": "200 loc=null acao=* {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1nl4JwatVZauQ34h8d5Sv6X1S8jKK3GBtcjYqwCGUqSU9MXneGu8Znixp#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZ…",
+  "tip_session": {
+    "http": 200,
+    "cs": "cs_test_a1uRjdlJsnutJ0FyUbp8v2cnD4V2a7FdozMUgLlGxygAVaDAZArHEmRbBD",
+    "body": "{\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1uRjdlJsnutJ0FyUbp8v2cnD4V2a7FdozMUgLlGxygAVaDAZArHEmRbBD#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21oYWlsUnxrVkRhQUQyNlJjSWBCN3BXNXVvVT1hamlcf3Fjd1dRMGJmREk9Yz09PH1CMzVTY0pBXD1kMU5HZl1da05gf0s1XGQ1NWA3bVFBNzNMJyknY3dqaFZ…"
+  },
+  "tip_settle_unpaid": "200 loc=null acao=* Pagamento ainda não confirmado. Se já pagaste, aguarda alguns segundos e volta à app Fleaber.",
+  "pi_attacker": "400 loc=null acao=* {\"error\":\"Missing payment metadata.\"}",
+  "steal_b2": "402 loc=null acao=* Pagamento ainda não confirmado. Se já pagaste, aguarda alguns segundos e volta à app Fleaber.",
+  "findings": [
+    {
+      "id": "RTM-M1-011",
+      "lens": "M1",
+      "severity": "P1",
+      "title": "anon resolve_handle devolve UUID de vitrine não publicada (handle real)",
+      "actor": "anon",
+      "pre": "handle=rtm-20260831t1802-s2 hub_published=false",
+      "repro": "POST rpc/batata_resolve_handle p_handle=rtm-20260831t1802-s2",
+      "expected": "404 not_found",
+      "obtained": "{\"found\": true, \"handle\": \"rtm-20260831t1802-s2\", \"profile_id\": \"e9c92729-ad4c-48f4-9c97-d38845a4fb45\", \"http_status\": 200, \"redirect_to\": null, \"hub_published\": false}",
+      "proven": true,
+      "evidence": {
+        "map": {
+          "found": true,
+          "handle": "rtm-20260831t1802-s2",
+          "profile_id": "e9c92729-ad4c-48f4-9c97-d38845a4fb45",
+          "http_status": 200,
+          "redirect_to": null,
+          "hub_published": false
+        }
+      }
+    },
+    {
+      "id": "RTM-M6-005",
+      "lens": "M6",
+      "severity": "P1",
+      "title": "anon lista prefixo chat_media/live_item_photos (n=1)",
+      "actor": "anon",
+      "pre": "POST object/list/chat_media prefix=live_item_photos",
+      "repro": "storage list chat_media/live_item_photos",
+      "expected": "lista vazia para quem não é dono (excepto catálogo intencional documentado)",
+      "obtained": "[\"69104e91-6a00-40d9-a7c9-b1571422ae43\"]",
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "RTM-M6-006",
+      "lens": "M6",
+      "severity": "P1",
+      "title": "anon GET público chat_media/live_item_photos/69104e91-6a00-40d9-a7c9-b1571422ae43/1781154945357_scaled_IMG_20260601_144232.jpg após listar UUID de outro user",
+      "actor": "anon",
+      "pre": "listou live_item_photos/<otherUserId>/",
+      "repro": "GET /storage/v1/object/public/chat_media/live_item_photos/69104e91-6a00-40d9-a7c9-b1571422ae43/1781154945357_scaled_IMG_20260601_144232.jpg",
+      "expected": "403 se foto de live/item não for catálogo marketplace",
+      "obtained": "HTTP 200 bytes=3099865 ct=[image/jpeg]",
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "RTM-M6-005",
+      "lens": "M6",
+      "severity": "P1",
+      "title": "anon lista prefixo chat_media/live_raffle_prize (n=1)",
+      "actor": "anon",
+      "pre": "POST object/list/chat_media prefix=live_raffle_prize",
+      "repro": "storage list chat_media/live_raffle_prize",
+      "expected": "lista vazia para quem não é dono (excepto catálogo intencional documentado)",
+      "obtained": "[\"69104e91-6a00-40d9-a7c9-b1571422ae43\"]",
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "RTM-M6-006",
+      "lens": "M6",
+      "severity": "P1",
+      "title": "anon GET público chat_media/live_raffle_prize/69104e91-6a00-40d9-a7c9-b1571422ae43/1781248259528_scaled_1000003657.jpg após listar UUID de outro user",
+      "actor": "anon",
+      "pre": "listou live_item_photos/<otherUserId>/",
+      "repro": "GET /storage/v1/object/public/chat_media/live_raffle_prize/69104e91-6a00-40d9-a7c9-b1571422ae43/1781248259528_scaled_1000003657.jpg",
+      "expected": "403 se foto de live/item não for catálogo marketplace",
+      "obtained": "HTTP 200 bytes=317048 ct=[image/jpeg]",
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "RTM-M6-005",
+      "lens": "M6",
+      "severity": "P1",
+      "title": "anon lista prefixo chat_media/profile_photos (n=3)",
+      "actor": "anon",
+      "pre": "POST object/list/chat_media prefix=profile_photos",
+      "repro": "storage list chat_media/profile_photos",
+      "expected": "lista vazia para quem não é dono (excepto catálogo intencional documentado)",
+      "obtained": "[\"69104e91-6a00-40d9-a7c9-b1571422ae43\",\"97f3089e-6a84-4f9e-9d4a-4d68b2894fd6\",\"b27d30dd-73b6-4d27-a693-6df1ececffac\"]",
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "RTM-M6-006",
+      "lens": "M6",
+      "severity": "P1",
+      "title": "anon GET público chat_media/profile_photos/69104e91-6a00-40d9-a7c9-b1571422ae43/1779778824777_scaled_1000003109.jpg após listar UUID de outro user",
+      "actor": "anon",
+      "pre": "listou live_item_photos/<otherUserId>/",
+      "repro": "GET /storage/v1/object/public/chat_media/profile_photos/69104e91-6a00-40d9-a7c9-b1571422ae43/1779778824777_scaled_1000003109.jpg",
+      "expected": "403 se foto de live/item não for catálogo marketplace",
+      "obtained": "HTTP 200 bytes=202652 ct=[image/jpeg]",
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "RTM-M6-005",
+      "lens": "M6",
+      "severity": "P1",
+      "title": "anon lista prefixo chat_media/product_photos (n=6)",
+      "actor": "anon",
+      "pre": "POST object/list/chat_media prefix=product_photos",
+      "repro": "storage list chat_media/product_photos",
+      "expected": "lista vazia para quem não é dono (excepto catálogo intencional documentado)",
+      "obtained": "[\"69104e91-6a00-40d9-a7c9-b1571422ae43\",\"97f3089e-6a84-4f9e-9d4a-4d68b2894fd6\",\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"b27d30dd-73b6-4d27-a693-6df1ececffac\",\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"f2bc3050-962f-43f1-b362-1cc32db363e0\"]",
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "RTM-M6-006",
+      "lens": "M6",
+      "severity": "P1",
+      "title": "anon GET público chat_media/product_photos/69104e91-6a00-40d9-a7c9-b1571422ae43/1778588031250_0_scaled_1000000018.jpg após listar UUID de outro user",
+      "actor": "anon",
+      "pre": "listou live_item_photos/<otherUserId>/",
+      "repro": "GET /storage/v1/object/public/chat_media/product_photos/69104e91-6a00-40d9-a7c9-b1571422ae43/1778588031250_0_scaled_1000000018.jpg",
+      "expected": "403 se foto de live/item não for catálogo marketplace",
+      "obtained": "HTTP 200 bytes=1543080 ct=[image/jpeg]",
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "RTM-M6-008",
+      "lens": "M6",
+      "severity": "P0",
+      "title": "comprador lista fleaber_private/order_disputes alheio n=1",
+      "actor": "buyer JWT",
+      "pre": "prefix=order_disputes",
+      "repro": "POST object/list/fleaber_private",
+      "expected": "só objectos do próprio / contra-parte da encomenda",
+      "obtained": "[\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\"]",
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "RTM-M6-008",
+      "lens": "M6",
+      "severity": "P0",
+      "title": "comprador lista fleaber_private/order_proofs alheio n=1",
+      "actor": "buyer JWT",
+      "pre": "prefix=order_proofs",
+      "repro": "POST object/list/fleaber_private",
+      "expected": "só objectos do próprio / contra-parte da encomenda",
+      "obtained": "[\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\"]",
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "RTM-M6-008",
+      "lens": "M6",
+      "severity": "P0",
+      "title": "comprador lista fleaber_private/chat_uploads alheio n=1",
+      "actor": "buyer JWT",
+      "pre": "prefix=chat_uploads",
+      "repro": "POST object/list/fleaber_private",
+      "expected": "só objectos do próprio / contra-parte da encomenda",
+      "obtained": "[\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\"]",
+      "proven": true,
+      "evidence": {}
+    }
+  ],
+  "notes": [
+    {
+      "id": "p2.s2.row",
+      "lens": "M1",
+      "title": "seller2 profile svc",
+      "ev": "200 loc=null acao=null [{\"id\":\"e9c92729-ad4c-48f4-9c97-d38845a4fb45\",\"handle\":null,\"full_name\":\"rtm-20260831t1802-s2\",\"hub_published\":false,\"is_live\":true,\"location\":\"Portugal\",\"phone…"
+    },
+    {
+      "id": "p2.m1.resolve.real",
+      "lens": "M1",
+      "title": "anon resolve actual unpublished handle",
+      "ev": "200 loc=null acao=null {\"found\": true, \"handle\": \"rtm-20260831t1802-s2\", \"profile_id\": \"e9c92729-ad4c-48f4-9c97-d38845a4fb45\", \"http_status\": 200, \"redirect_to\": null, \"hub_published\"…"
+    },
+    {
+      "id": "p2.m1.prof.star",
+      "lens": "M1",
+      "title": "buyer GET profiles * unpublished",
+      "ev": "200 keys=null"
+    },
+    {
+      "id": "p2.m1.lives.auth",
+      "lens": "M1",
+      "title": "buyer GET lives seller2",
+      "ev": "403 loc=null acao=null {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table lives\"}"
+    },
+    {
+      "id": "p2.m1.ghost",
+      "lens": "M1",
+      "title": "discovery with is_live flag, no active live",
+      "ev": "200 loc=null acao=null []"
+    },
+    {
+      "id": "p2.m1.disc.star",
+      "lens": "M1",
+      "title": "discovery * seller2",
+      "ev": "200 loc=null acao=null []"
+    },
+    {
+      "id": "p2.m6.list",
+      "lens": "M6",
+      "title": "chat_media/ svc=false jwt=false",
+      "ev": "200 n=4 [{\"name\":\"live_item_photos\",\"id\":null,\"updated_at\":null,\"created_at\":null,\"last_accessed_at\":null,\"metadata\":null},{\"name\":\"live_raffle_prize\",\"id\":null,\"updated_at\":null,\"created_at\":null,\"last_accessed_at\":null,\"metadata\":null},{\"name\":\"product_photos\",\"id\":null,\"updated_at\":null,\"created_at\":null,\"last_accessed_at\":null,\"metadata\":null},{\"name\":\"profile_p…"
+    },
+    {
+      "id": "p2.m6.list",
+      "lens": "M6",
+      "title": "chat_media/live_item_photos svc=false jwt=false",
+      "ev": "200 n=1 [{\"name\":\"69104e91-6a00-40d9-a7c9-b1571422ae43\",\"id\":null,\"updated_at\":null,\"created_at\":null,\"last_accessed_at\":null,\"metadata\":null}]"
+    },
+    {
+      "id": "p2.m6.list",
+      "lens": "M6",
+      "title": "chat_media/live_item_photos/69104e91-6a00-40d9-a7c9-b1571422ae43 svc=false jwt=false",
+      "ev": "200 n=29 [{\"name\":\"1781154945357_scaled_IMG_20260601_144232.jpg\",\"id\":\"82990135-d905-4fc7-80d9-c3ad04cfba1b\",\"updated_at\":\"2026-06-11T05:15:48.286Z\",\"created_at\":\"2026-06-11T05:15:48.286Z\",\"last_accessed_at\":\"2026-06-11T05:15:48.286Z\",\"metadata\":{\"eTag\":\"\\\"b3946c3f0b2c2ea12f210b2abe36d93c\\\"\",\"size\":3099865,\"mimetype\":\"image/jpeg\",\"cacheControl\":\"max-age=3600\",\"lastMo…"
+    },
+    {
+      "id": "p2.m6.get.public",
+      "lens": "M6",
+      "title": "live_item_photos/69104e91-6a00-40d9-a7c9-b1571422ae43/1781154945357_scaled_IMG_20260601_144232.jpg",
+      "ev": "200 len=28"
+    },
+    {
+      "id": "p2.m6.list",
+      "lens": "M6",
+      "title": "chat_media/live_raffle_prize svc=false jwt=false",
+      "ev": "200 n=1 [{\"name\":\"69104e91-6a00-40d9-a7c9-b1571422ae43\",\"id\":null,\"updated_at\":null,\"created_at\":null,\"last_accessed_at\":null,\"metadata\":null}]"
+    },
+    {
+      "id": "p2.m6.list",
+      "lens": "M6",
+      "title": "chat_media/live_raffle_prize/69104e91-6a00-40d9-a7c9-b1571422ae43 svc=false jwt=false",
+      "ev": "200 n=1 [{\"name\":\"1781248259528_scaled_1000003657.jpg\",\"id\":\"bea23de7-2997-4a5d-a6d2-2821f9607756\",\"updated_at\":\"2026-06-12T07:11:00.474Z\",\"created_at\":\"2026-06-12T07:11:00.474Z\",\"last_accessed_at\":\"2026-06-12T07:11:00.474Z\",\"metadata\":{\"eTag\":\"\\\"8606320af87f6e236f0e92d8480976ab\\\"\",\"size\":317048,\"mimetype\":\"image/jpeg\",\"cacheControl\":\"max-age=3600\",\"lastModified\":\"2…"
+    },
+    {
+      "id": "p2.m6.get.public",
+      "lens": "M6",
+      "title": "live_raffle_prize/69104e91-6a00-40d9-a7c9-b1571422ae43/1781248259528_scaled_1000003657.jpg",
+      "ev": "200 len=27"
+    },
+    {
+      "id": "p2.m6.list",
+      "lens": "M6",
+      "title": "chat_media/profile_photos svc=false jwt=false",
+      "ev": "200 n=3 [{\"name\":\"69104e91-6a00-40d9-a7c9-b1571422ae43\",\"id\":null,\"updated_at\":null,\"created_at\":null,\"last_accessed_at\":null,\"metadata\":null},{\"name\":\"97f3089e-6a84-4f9e-9d4a-4d68b2894fd6\",\"id\":null,\"updated_at\":null,\"created_at\":null,\"last_accessed_at\":null,\"metadata\":null},{\"name\":\"b27d30dd-73b6-4d27-a693-6df1ececffac\",\"id\":null,\"updated_at\":null,\"created_at\":nul…"
+    },
+    {
+      "id": "p2.m6.list",
+      "lens": "M6",
+      "title": "chat_media/profile_photos/69104e91-6a00-40d9-a7c9-b1571422ae43 svc=false jwt=false",
+      "ev": "200 n=16 [{\"name\":\"1779778824777_scaled_1000003109.jpg\",\"id\":\"870e9d13-53d1-434a-a24a-f1a78814ad54\",\"updated_at\":\"2026-05-26T07:00:26.375Z\",\"created_at\":\"2026-05-26T07:00:26.375Z\",\"last_accessed_at\":\"2026-05-26T07:00:26.375Z\",\"metadata\":{\"eTag\":\"\\\"a6bc8a5f2c582ca5959740ee1c459b24\\\"\",\"size\":202652,\"mimetype\":\"image/jpeg\",\"cacheControl\":\"max-age=3600\",\"lastModified\":\"2…"
+    },
+    {
+      "id": "p2.m6.get.public",
+      "lens": "M6",
+      "title": "profile_photos/69104e91-6a00-40d9-a7c9-b1571422ae43/1779778824777_scaled_1000003109.jpg",
+      "ev": "200 len=27"
+    },
+    {
+      "id": "p2.m6.list",
+      "lens": "M6",
+      "title": "chat_media/product_photos svc=false jwt=false",
+      "ev": "200 n=6 [{\"name\":\"69104e91-6a00-40d9-a7c9-b1571422ae43\",\"id\":null,\"updated_at\":null,\"created_at\":null,\"last_accessed_at\":null,\"metadata\":null},{\"name\":\"97f3089e-6a84-4f9e-9d4a-4d68b2894fd6\",\"id\":null,\"updated_at\":null,\"created_at\":null,\"last_accessed_at\":null,\"metadata\":null},{\"name\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"id\":null,\"updated_at\":null,\"created_at\":nul…"
+    },
+    {
+      "id": "p2.m6.list",
+      "lens": "M6",
+      "title": "chat_media/product_photos/69104e91-6a00-40d9-a7c9-b1571422ae43 svc=false jwt=false",
+      "ev": "200 n=30 [{\"name\":\"1778588031250_0_scaled_1000000018.jpg\",\"id\":\"66f77dcc-1fbf-41ac-9f77-2e64392d930a\",\"updated_at\":\"2026-05-12T12:13:59.306Z\",\"created_at\":\"2026-05-12T12:13:59.306Z\",\"last_accessed_at\":\"2026-05-12T12:13:59.306Z\",\"metadata\":{\"eTag\":\"\\\"d91730a4e60c8ca1a6a91d806250c164\\\"\",\"size\":1543080,\"mimetype\":\"image/jpeg\",\"cacheControl\":\"max-age=3600\",\"lastModified\"…"
+    },
+    {
+      "id": "p2.m6.get.public",
+      "lens": "M6",
+      "title": "product_photos/69104e91-6a00-40d9-a7c9-b1571422ae43/1778588031250_0_scaled_1000000018.jpg",
+      "ev": "200 len=28"
+    },
+    {
+      "id": "p2.m6.list",
+      "lens": "M6",
+      "title": "chat_media/catalog svc=false jwt=false",
+      "ev": "200 n=0 []"
+    },
+    {
+      "id": "p2.m6.list",
+      "lens": "M6",
+      "title": "fleaber_private/order_disputes svc=false jwt=false",
+      "ev": "200 n=0 []"
+    },
+    {
+      "id": "p2.m6.list",
+      "lens": "M6",
+      "title": "fleaber_private/order_disputes svc=false jwt=true",
+      "ev": "200 n=1 [{\"name\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"id\":null,\"updated_at\":null,\"created_at\":null,\"last_accessed_at\":null,\"metadata\":null}]"
+    },
+    {
+      "id": "p2.m6.list",
+      "lens": "M6",
+      "title": "fleaber_private/order_disputes svc=true jwt=false",
+      "ev": "200 n=2 [{\"name\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"id\":null,\"updated_at\":null,\"created_at\":null,\"last_accessed_at\":null,\"metadata\":null},{\"name\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"id\":null,\"updated_at\":null,\"created_at\":null,\"last_accessed_at\":null,\"metadata\":null}]"
+    },
+    {
+      "id": "p2.m6.priv.get",
+      "lens": "M6",
+      "title": "order_disputes/980f4fa1-0004-42f9-abca-69f1a9c29588",
+      "ev": "pub=400 b2=400 blen=88"
+    },
+    {
+      "id": "p2.m6.list",
+      "lens": "M6",
+      "title": "fleaber_private/order_proofs svc=false jwt=false",
+      "ev": "200 n=0 []"
+    },
+    {
+      "id": "p2.m6.list",
+      "lens": "M6",
+      "title": "fleaber_private/order_proofs svc=false jwt=true",
+      "ev": "200 n=1 [{\"name\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"id\":null,\"updated_at\":null,\"created_at\":null,\"last_accessed_at\":null,\"metadata\":null}]"
+    },
+    {
+      "id": "p2.m6.list",
+      "lens": "M6",
+      "title": "fleaber_private/order_proofs svc=true jwt=false",
+      "ev": "200 n=2 [{\"name\":\"3850d982-b164-4b7a-908b-4126cbc8d1ca\",\"id\":null,\"updated_at\":null,\"created_at\":null,\"last_accessed_at\":null,\"metadata\":null},{\"name\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"id\":null,\"updated_at\":null,\"created_at\":null,\"last_accessed_at\":null,\"metadata\":null}]"
+    },
+    {
+      "id": "p2.m6.priv.get",
+      "lens": "M6",
+      "title": "order_proofs/3850d982-b164-4b7a-908b-4126cbc8d1ca",
+      "ev": "pub=400 b2=400 blen=88"
+    },
+    {
+      "id": "p2.m6.list",
+      "lens": "M6",
+      "title": "fleaber_private/chat_uploads svc=false jwt=false",
+      "ev": "200 n=0 []"
+    },
+    {
+      "id": "p2.m6.list",
+      "lens": "M6",
+      "title": "fleaber_private/chat_uploads svc=false jwt=true",
+      "ev": "200 n=1 [{\"name\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"id\":null,\"updated_at\":null,\"created_at\":null,\"last_accessed_at\":null,\"metadata\":null}]"
+    },
+    {
+      "id": "p2.m6.list",
+      "lens": "M6",
+      "title": "fleaber_private/chat_uploads svc=true jwt=false",
+      "ev": "200 n=9 [{\"name\":\"1779801739106_ChatGPT Image 19_05_2026, 16_25_10.png\",\"id\":\"97aec5a0-824e-425c-9ad9-a7e1332a5a9c\",\"updated_at\":\"2026-08-29T12:07:52.512Z\",\"created_at\":\"2026-08-29T12:06:11.174Z\",\"last_accessed_at\":\"2026-08-29T12:06:11.174Z\",\"metadata\":{\"eTag\":\"\\\"9c9cba5c952beaf23dd2fc69212e8a44\\\"\",\"size\":2082808,\"mimetype\":\"image/png\",\"cacheControl\":\"no-cache\",\"las…"
+    },
+    {
+      "id": "p2.m6.priv.get",
+      "lens": "M6",
+      "title": "chat_uploads/1779801739106_ChatGPT Image 19_05_2026, 16_25_10.png",
+      "ev": "pub=400 b2=400 blen=88"
+    },
+    {
+      "id": "p2.m5.mux.write",
+      "lens": "M5",
+      "title": "anon resolve ended unpublished",
+      "ev": "200 loc=null acao=* {\"playback_id\":\"rtm_write_pb_20260831T1802\",\"playback_url\":\"https://stream.mux.com/rtm_write_pb_20260831T1802.m3u8\",\"source\":\"live_playback_only\",\"is_live\":fals…"
+    },
+    {
+      "id": "p2.m5.mux.after",
+      "lens": "M5",
+      "title": "live after anon resolve",
+      "ev": "200 loc=null acao=null [{\"id\":\"b44b5451-567a-4aae-827e-526ffb73bf1a\",\"mux_vod_playback_id\":null,\"mux_asset_id\":null,\"mux_playback_id\":\"rtm_write_pb_20260831T1802\"}]"
+    },
+    {
+      "id": "p2.m5.stream_key.inject",
+      "lens": "M5",
+      "title": "owner inject foreign stream_key",
+      "ev": "400 loc=null acao=* {\"error\":\"stream_key em falta para egress Mux.\",\"step\":\"validation\"}"
+    },
+    {
+      "id": "p2.m5.buyer.complete",
+      "lens": "M5",
+      "title": "buyer complete seller live",
+      "ev": "403 loc=null acao=* {\"error\":\"Sem permissão para esta live.\",\"step\":\"auth\"}"
+    },
+    {
+      "id": "p2.m4.tip.huge_origin",
+      "lens": "M4",
+      "title": "tip 499€ attacker.fleaber.pt",
+      "ev": "200 loc=null acao=* {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1nl4JwatVZauQ34h8d5Sv6X1S8jKK3GBtcjYqwCGUqSU9MXneGu8Znixp#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZ…"
+    },
+    {
+      "id": "p2.m7.tip.session",
+      "lens": "M7",
+      "title": "ONE tip Session",
+      "ev": "200 loc=null acao=* {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1uRjdlJsnutJ0FyUbp8v2cnD4V2a7FdozMUgLlGxygAVaDAZArHEmRbBD#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZ…"
+    },
+    {
+      "id": "p2.m7.settle.unpaid",
+      "lens": "M7",
+      "title": "GET settle unpaid Session",
+      "ev": "200 loc=null acao=* Pagamento ainda não confirmado. Se já pagaste, aguarda alguns segundos e volta à app Fleaber."
+    },
+    {
+      "id": "p2.m2.pi.attacker_sub",
+      "lens": "M2",
+      "title": "PI web_return attacker.fleaber.pt",
+      "ev": "400 loc=null acao=* {\"error\":\"Missing payment metadata.\"}"
+    },
+    {
+      "id": "p2.m3.steal.b2",
+      "lens": "M3",
+      "title": "B2 settle stolen order cs",
+      "ev": "402 loc=null acao=* Pagamento ainda não confirmado. Se já pagaste, aguarda alguns segundos e volta à app Fleaber."
+    },
+    {
+      "id": "p2.m4.nuke",
+      "lens": "M4",
+      "title": "buyer nuke with seller user_id",
+      "ev": "403 loc=null acao=* {\"ok\":false,\"error\":\"Nuke bloqueado: define TEST_NUKE_ALLOWLIST_USER_IDS (UUIDs) no staging.\"}"
+    },
+    {
+      "id": "p2.m4.sms",
+      "lens": "M4",
+      "title": "anon send-sms",
+      "ev": "200 loc=null acao=null {\"error\":{\"http_code\":500,\"message\":\"Hook failed: Missing required headers\"}}"
+    }
+  ]
+}

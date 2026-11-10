@@ -1,0 +1,245 @@
+﻿import 'dart:async';
+
+import 'package:flutter/material.dart';
+import 'package:flutter_rating_bar/flutter_rating_bar.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
+
+import '/flutter_flow/nav/nav.dart';
+import '/utils/fleaber_colors.dart';
+import '/utils/fleaber_elevation.dart';
+import '/utils/fleaber_radius.dart';
+import '/utils/live_cover_assign.dart';
+import '/utils/mux_urls.dart';
+import '/widgets/batata_cached_image.dart';
+import '/widgets/fleaber_cookie_consent_banner.dart';
+import '/widgets/fleaber_primary_button.dart';
+import '/widgets/live_cover_image.dart';
+import '/widgets/profile_avatar.dart';
+
+import '../data/hub_models.dart';
+import '../data/hub_public_repository.dart';
+import '../hub_actions.dart';
+import '../hub_navigation.dart';
+import '../routing/hub_route_paths.dart';
+import '../seo/hub_seo_meta.dart';
+import '../seo/hub_seo_policy.dart';
+import '../widgets/fleahub_site_chrome.dart';
+import '../widgets/hub_seo_scope.dart';
+import '../widgets/hub_shared_widgets.dart';
+import 'hub_loading_page.dart';
+
+/// Home FleaHub — `https://fleaber.pt/{handle}` (H02 · superfície FleaHub H01).
+class HubProfilePage extends StatefulWidget {
+  const HubProfilePage({
+    super.key,
+    required this.handle,
+    required this.profileId,
+  });
+
+  final String handle;
+  final String profileId;
+
+  /// Largura útil desktop — alinhada à shell H01.
+  static const double desktopMaxWidthFactor = 0.94;
+
+  static const double desktopBreakpoint = 900;
+
+  @override
+  State<HubProfilePage> createState() => _HubProfilePageState();
+}
+
+class _HubProfilePageState extends State<HubProfilePage> {
+  final _repo = HubPublicRepository();
+  final _scrollCtrl = ScrollController();
+  final _searchCtrl = TextEditingController();
+  late Future<HubProfileBundle?> _future;
+  bool? _isFollowing;
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+    AppStateNotifier.instance.addListener(_onAuthSessionChanged);
+  }
+
+  @override
+  void dispose() {
+    AppStateNotifier.instance.removeListener(_onAuthSessionChanged);
+    _scrollCtrl.dispose();
+    _searchCtrl.dispose();
+    super.dispose();
+  }
+
+  void _onAuthSessionChanged() {
+    unawaited(_refreshFollow());
+    if (mounted) setState(() {});
+  }
+
+  void _load() {
+    _future = _repo.fetchProfileBundle(widget.profileId);
+    _refreshFollow();
+  }
+
+  Future<void> _refresh() async {
+    setState(() {
+      _future = _repo.fetchProfileBundle(widget.profileId);
+    });
+    await _future;
+    await _refreshFollow();
+  }
+
+  Future<void> _refreshFollow() async {
+    final v = await HubActions.queryIsFollowing(widget.profileId);
+    if (mounted) setState(() => _isFollowing = v);
+  }
+
+  void _onSearchSubmitted(String raw) {
+    final q = raw.trim();
+    if (q.length < 2) {
+      context.go(HubRoutePaths.landing);
+      return;
+    }
+    context.go(
+      '${HubRoutePaths.landing}?q=${Uri.encodeQueryComponent(q)}',
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ListenableBuilder(
+      listenable: AppStateNotifier.instance,
+      builder: (context, _) {
+        return FutureBuilder<HubProfileBundle?>(
+          future: _future,
+          builder: (context, snap) {
+            if (snap.connectionState != ConnectionState.done) {
+              return const HubLoadingPage();
+            }
+            if (snap.hasError) {
+              return _fleahubShell(
+                context,
+                child: _LightEmpty(
+                  message: 'Não foi possível carregar.',
+                  action: TextButton(
+                    onPressed: () => setState(_load),
+                    child: const Text('Tentar novamente'),
+                  ),
+                ),
+              );
+            }
+            final bundle = snap.data;
+            if (bundle == null) {
+              return _fleahubShell(
+                context,
+                child: const _LightEmpty(
+                  message: 'Perfil indisponível.',
+                  icon: Icons.person_off_outlined,
+                ),
+              );
+            }
+            return HubSeoScope(
+              meta: HubSeoMeta.forProfile(
+                profile: bundle.profile,
+                bundle: bundle,
+                indexable: HubSeoPolicy.allowHubIndexing(),
+              ),
+              child: _fleahubShell(
+                context,
+                child: _ProfileBody(
+                  bundle: bundle,
+                  handle: widget.handle,
+                  isFollowing: _isFollowing ?? false,
+                  onFollow: () async {
+                    await HubActions.toggleFollow(
+                      context,
+                      sellerId: bundle.profile.id,
+                      isFollowing: _isFollowing == true,
+                    );
+                    await _refreshFollow();
+                  },
+                  onShare: () => HubActions.shareProfileOrLive(
+                    context,
+                    handle: widget.handle,
+                    activeLiveId: bundle.activeLive?.id,
+                  ),
+                ),
+                onRefresh: _refresh,
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Widget _fleahubShell(
+    BuildContext context, {
+    required Widget child,
+    Future<void> Function()? onRefresh,
+  }) {
+    final pad = FleaHubSiteLayout.pagePadding(context);
+    final maxW = FleaHubSiteLayout.maxContentWidth(context);
+    final leftInset = HubNavigation.hasInternalBack(context)
+        ? (HubNavigation.overlayLeft + 28).clamp(pad.left, 72.0)
+        : pad.left;
+
+    final scroll = CustomScrollView(
+      controller: _scrollCtrl,
+      physics: const AlwaysScrollableScrollPhysics(),
+      slivers: [
+        SliverToBoxAdapter(
+          child: FleaHubSiteTopBar(
+            searchController: _searchCtrl,
+            onSearchSubmitted: _onSearchSubmitted,
+          ),
+        ),
+        SliverToBoxAdapter(
+          child: Padding(
+            padding: EdgeInsets.fromLTRB(leftInset > pad.left ? 0 : 0, 0, 0, 0),
+            child: child,
+          ),
+        ),
+        const SliverToBoxAdapter(child: FleaHubSiteFooter()),
+        SliverToBoxAdapter(
+          child: ListenableBuilder(
+            listenable: FleaberCookieConsentBanner.consentAccepted,
+            builder: (context, _) {
+              final size = MediaQuery.sizeOf(context);
+              final reserve = FleaberCookieConsentBanner.consentAccepted.value
+                  ? 28.0
+                  : FleaberCookieConsentBanner.scrollReserveForViewport(
+                      width: size.width,
+                      height: size.height,
+                    );
+              return SizedBox(height: reserve);
+            },
+          ),
+        ),
+      ],
+    );
+
+    return Scaffold(
+      backgroundColor: FleaberColors.bgTint,
+      body: SafeArea(
+        child: Stack(
+          children: [
+            Center(
+              child: ConstrainedBox(
+                constraints: BoxConstraints(maxWidth: maxW),
+                child: onRefresh == null
+                    ? scroll
+                    : RefreshIndicator(
+                        color: FleaberColors.teal,
+                        onRefresh: onRefresh,
+                        child: scroll,
+                      ),
+              ),
+            ),
+            HubBackButton.topLeftOverlay(context),
+          ],
+        ),
+      ),
+    );
+  }
+}

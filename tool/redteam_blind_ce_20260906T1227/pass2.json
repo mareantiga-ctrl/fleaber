@@ -1,0 +1,346 @@
+{
+  "pass": 2,
+  "pocos": [
+    "CE-B",
+    "CE-C",
+    "CE-D",
+    "CE-E"
+  ],
+  "findings": [
+    {
+      "id": "CEB.proof-triple-encode",
+      "lens": "CE4",
+      "severity": "P1",
+      "title": "proof_url triple-encode",
+      "actor": "buyer JWT",
+      "pre": "canonical BXCC + prefix order_proofs",
+      "repro": "POST chat_messages {\"kind\":\"reservation_payment_submitted\",\"order_id\":\"a0dc08bc-9c16-446a-aa18-00741e9bf7c0\",\"notes\":\"comprovativo envio\",\"proof_url\":\"https://fxdknzrqjenzqcvnwqqq.supabase.co/storage/v1/object/fleaber_private/order_proofs/bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96/a0dc08bc-9c16-446a-aa18-00741e9bf7c0/%25252e%25252e/%25252e%25252e/order_proofs/bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96/ae2846f3-0588-45e6-82ce-91c5d460bbce/rtce_b.png\"}",
+      "expected": "chat_system_card_url_denied / notes_forbidden",
+      "obtained": "201 [{\"id\":1565,\"created_at\":\"2026-09-06T11:35:54.728142+00:00\",\"chat_id\":\"cf32974d-5935-4d33-8db0-3ea6e297f05a\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"reservation_payment_subm…",
+      "proven": true,
+      "evidence": {
+        "id": "1565",
+        "payload": {
+          "kind": "reservation_payment_submitted",
+          "order_id": "a0dc08bc-9c16-446a-aa18-00741e9bf7c0",
+          "notes": "comprovativo envio",
+          "proof_url": "https://fxdknzrqjenzqcvnwqqq.supabase.co/storage/v1/object/fleaber_private/order_proofs/bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96/a0dc08bc-9c16-446a-aa18-00741e9bf7c0/%25252e%25252e/%25252e%25252e/order_proofs/bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96/ae2846f3-0588-45e6-82ce-91c5d460bbce/rtce_b.png"
+        }
+      }
+    },
+    {
+      "id": "CEB.proof-two-dot-leader",
+      "lens": "CE4",
+      "severity": "P1",
+      "title": "proof_url two-dot-leader",
+      "actor": "buyer JWT",
+      "pre": "canonical BXCC + prefix order_proofs",
+      "repro": "POST chat_messages {\"kind\":\"reservation_payment_submitted\",\"order_id\":\"a0dc08bc-9c16-446a-aa18-00741e9bf7c0\",\"notes\":\"comprovativo envio\",\"proof_url\":\"https://fxdknzrqjenzqcvnwqqq.supabase.co/storage/v1/object/fleaber_private/order_proofs/bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96/a0dc08bc-9c16-446a-aa18-00741e9bf7c0/‥/‥/order_proofs/bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96/ae2846f3-0588-45e6-82ce-91c5d460bbce/rtce_b.png\"}",
+      "expected": "chat_system_card_url_denied / notes_forbidden",
+      "obtained": "201 [{\"id\":1567,\"created_at\":\"2026-09-06T11:35:55.134951+00:00\",\"chat_id\":\"cf32974d-5935-4d33-8db0-3ea6e297f05a\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"reservation_payment_subm…",
+      "proven": true,
+      "evidence": {
+        "id": "1567",
+        "payload": {
+          "kind": "reservation_payment_submitted",
+          "order_id": "a0dc08bc-9c16-446a-aa18-00741e9bf7c0",
+          "notes": "comprovativo envio",
+          "proof_url": "https://fxdknzrqjenzqcvnwqqq.supabase.co/storage/v1/object/fleaber_private/order_proofs/bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96/a0dc08bc-9c16-446a-aa18-00741e9bf7c0/‥/‥/order_proofs/bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96/ae2846f3-0588-45e6-82ce-91c5d460bbce/rtce_b.png"
+        }
+      }
+    },
+    {
+      "id": "CEB.proof-overlong4",
+      "lens": "CE4",
+      "severity": "P1",
+      "title": "proof_url overlong4",
+      "actor": "buyer JWT",
+      "pre": "canonical BXCC + prefix order_proofs",
+      "repro": "POST chat_messages {\"kind\":\"reservation_payment_submitted\",\"order_id\":\"a0dc08bc-9c16-446a-aa18-00741e9bf7c0\",\"notes\":\"comprovativo envio\",\"proof_url\":\"https://fxdknzrqjenzqcvnwqqq.supabase.co/storage/v1/object/fleaber_private/order_proofs/bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96/a0dc08bc-9c16-446a-aa18-00741e9bf7c0/%f0%80%80%ae%f0%80%80%ae/order_proofs/bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96/ae2846f3-0588-45e6-82ce-91c5d460bbce/rtce_b.png\"}",
+      "expected": "chat_system_card_url_denied / notes_forbidden",
+      "obtained": "201 [{\"id\":1568,\"created_at\":\"2026-09-06T11:35:55.350943+00:00\",\"chat_id\":\"cf32974d-5935-4d33-8db0-3ea6e297f05a\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"reservation_payment_subm…",
+      "proven": true,
+      "evidence": {
+        "id": "1568",
+        "payload": {
+          "kind": "reservation_payment_submitted",
+          "order_id": "a0dc08bc-9c16-446a-aa18-00741e9bf7c0",
+          "notes": "comprovativo envio",
+          "proof_url": "https://fxdknzrqjenzqcvnwqqq.supabase.co/storage/v1/object/fleaber_private/order_proofs/bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96/a0dc08bc-9c16-446a-aa18-00741e9bf7c0/%f0%80%80%ae%f0%80%80%ae/order_proofs/bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96/ae2846f3-0588-45e6-82ce-91c5d460bbce/rtce_b.png"
+        }
+      }
+    },
+    {
+      "id": "CEB.proof-iis-u",
+      "lens": "CE4",
+      "severity": "P1",
+      "title": "proof_url iis-u",
+      "actor": "buyer JWT",
+      "pre": "canonical BXCC + prefix order_proofs",
+      "repro": "POST chat_messages {\"kind\":\"reservation_payment_submitted\",\"order_id\":\"a0dc08bc-9c16-446a-aa18-00741e9bf7c0\",\"notes\":\"comprovativo envio\",\"proof_url\":\"https://fxdknzrqjenzqcvnwqqq.supabase.co/storage/v1/object/fleaber_private/order_proofs/bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96/a0dc08bc-9c16-446a-aa18-00741e9bf7c0/%u002e%u002e/%u002e%u002e/order_proofs/bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96/ae2846f3-0588-45e6-82ce-91c5d460bbce/rtce_b.png\"}",
+      "expected": "chat_system_card_url_denied / notes_forbidden",
+      "obtained": "201 [{\"id\":1569,\"created_at\":\"2026-09-06T11:35:55.55148+00:00\",\"chat_id\":\"cf32974d-5935-4d33-8db0-3ea6e297f05a\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"reservation_payment_submi…",
+      "proven": true,
+      "evidence": {
+        "id": "1569",
+        "payload": {
+          "kind": "reservation_payment_submitted",
+          "order_id": "a0dc08bc-9c16-446a-aa18-00741e9bf7c0",
+          "notes": "comprovativo envio",
+          "proof_url": "https://fxdknzrqjenzqcvnwqqq.supabase.co/storage/v1/object/fleaber_private/order_proofs/bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96/a0dc08bc-9c16-446a-aa18-00741e9bf7c0/%u002e%u002e/%u002e%u002e/order_proofs/bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96/ae2846f3-0588-45e6-82ce-91c5d460bbce/rtce_b.png"
+        }
+      }
+    }
+  ],
+  "blocked": [
+    {
+      "id": "CEB.proof-overlong2",
+      "lens": "CE4",
+      "title": "recusado",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_url_denied\"}"
+    },
+    {
+      "id": "CEB.proof-dotdot-slash",
+      "lens": "CE4",
+      "title": "recusado",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_url_denied\"}"
+    },
+    {
+      "id": "CEB.proof-fullwidth-dots",
+      "lens": "CE4",
+      "title": "recusado",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_url_denied\"}"
+    },
+    {
+      "id": "CEB.proof-rlo-path",
+      "lens": "CE4",
+      "title": "recusado",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_url_denied\"}"
+    },
+    {
+      "id": "CEB.proof-file-scheme",
+      "lens": "CE4",
+      "title": "recusado",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_url_denied\"}"
+    },
+    {
+      "id": "CEB.proof-javascript",
+      "lens": "CE4",
+      "title": "recusado",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_url_denied\"}"
+    },
+    {
+      "id": "CEB.proof-data-url",
+      "lens": "CE4",
+      "title": "recusado",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_url_denied\"}"
+    },
+    {
+      "id": "CEB.proof-evil-host",
+      "lens": "CE4",
+      "title": "recusado",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_url_denied\"}"
+    },
+    {
+      "id": "CEB.proof-other-order",
+      "lens": "CE4",
+      "title": "recusado",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_url_denied\"}"
+    },
+    {
+      "id": "CEB.img-file",
+      "lens": "CE4",
+      "title": "recusado",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_url_denied\"}"
+    },
+    {
+      "id": "CEB.img-js",
+      "lens": "CE4",
+      "title": "recusado",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_url_denied\"}"
+    },
+    {
+      "id": "CEB.proof-disputes-other",
+      "lens": "CE4",
+      "title": "recusado",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_url_denied\"}"
+    },
+    {
+      "id": "CEC.list-alien",
+      "lens": "CE6",
+      "title": "list B2 recusado/vazio",
+      "ev": "200 []"
+    },
+    {
+      "id": "CEC.upload-alien",
+      "lens": "CE6",
+      "title": "upload path B2 recusado",
+      "ev": "400 {\"statusCode\":\"403\",\"error\":\"Unauthorized\",\"message\":\"new row violates row-level security policy\",\"code\":\"AccessDenied\"}"
+    },
+    {
+      "id": "CEC.get-cross",
+      "lens": "CE6",
+      "title": "GET prova alheia recusado",
+      "ev": "400 {\"statusCode\":\"404\",\"error\":\"not_found\",\"message\":\"Object not found\",\"code\":\"NoSuchKey\"}"
+    },
+    {
+      "id": "CEC.overwrite",
+      "lens": "CE6",
+      "title": "overwrite alheio recusado",
+      "ev": "400 {\"statusCode\":\"403\",\"error\":\"Unauthorized\",\"message\":\"new row violates row-level security policy\",\"code\":\"AccessDenied\"}"
+    },
+    {
+      "id": "CEC.ocr-notoken",
+      "lens": "CE8",
+      "title": "OCR sem token recusado",
+      "ev": "401 {\"ok\":false,\"error\":\"missing_device_token\"}"
+    },
+    {
+      "id": "CEC.ocr-fake",
+      "lens": "CE8",
+      "title": "OCR token fake recusado",
+      "ev": "401 {\"ok\":false,\"error\":\"invalid_token\"}"
+    },
+    {
+      "id": "CEC.ocr-replay",
+      "lens": "CE8",
+      "title": "OCR replay recusado",
+      "ev": "401 {\"ok\":false,\"error\":\"invalid_token\"}"
+    },
+    {
+      "id": "CED.chrono-insert",
+      "lens": "CE3",
+      "title": "insert passado recusado ou now()",
+      "ev": {
+        "http": "201 [{\"id\":1579,\"created_at\":\"2026-09-06T11:36:00.123978+00:00\",\"chat_id\":\"cf32974d-5935-4d33-8db0-3ea6e297f05a\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"RTCE card no meio da timeline\",\"is_reservation\":fals…",
+        "stored": "2026-09-06T11:36:00.123978+00:00"
+      }
+    },
+    {
+      "id": "CED.chrono-patch",
+      "lens": "CE3",
+      "title": "PATCH created_at recusado/clamped",
+      "ev": {
+        "http": "200 [{\"id\":1579,\"created_at\":\"2026-09-06T11:36:00.123978+00:00\",\"chat_id\":\"cf32974d-5935-4d33-8db0-3ea6e297f05a\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"RTCE card no meio da timeline\",\"is_reservation\":fals…",
+        "stored": "2026-09-06T11:36:00.123978+00:00"
+      }
+    },
+    {
+      "id": "CED.inject-b2",
+      "lens": "CE7",
+      "title": "inject B2 recusado",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"new row violates row-level security policy for table \\\"chat_messages\\\"\"}"
+    },
+    {
+      "id": "CED.read-thread",
+      "lens": "CE5",
+      "title": "read thread alheia recusada",
+      "ev": "200 []"
+    },
+    {
+      "id": "CED.inbox-alien",
+      "lens": "CE5",
+      "title": "PATCH inbox alheio recusado",
+      "ev": {
+        "http": "200 []",
+        "stored": null
+      }
+    },
+    {
+      "id": "CEE.fsm-pago",
+      "lens": "CE1",
+      "title": "FSM pago sem Stripe recusado",
+      "ev": {
+        "before": "reserva_pendente",
+        "after": "reserva_pendente",
+        "http": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"order_buyer_cannot_mark_pago\"}"
+      }
+    }
+  ],
+  "notes": [
+    {
+      "id": "fixture.paid",
+      "lens": "CE1",
+      "title": "setup_paid_order Stripe TEST",
+      "ev": "200 {\n  \"ok\": true,\n  \"order_id\": \"a0dc08bc-9c16-446a-aa18-00741e9bf7c0\",\n  \"product_id\": \"6ddd3403-bb8c-42ca-9b7e-b289010b30cb\",\n  \"payment_intent_id\": \"pi_3UCeMRH7FWYUN3jh1YzT1ATC\",\n  \"pi_status\": \"succeeded\",\n  \"pi_amount…"
+    },
+    {
+      "id": "fixture.paid",
+      "lens": "CE1",
+      "title": "setup_paid_order Stripe TEST",
+      "ev": "200 {\n  \"ok\": true,\n  \"order_id\": \"ae2846f3-0588-45e6-82ce-91c5d460bbce\",\n  \"product_id\": \"63dac61b-77e7-4285-bfbd-6b3cfc474553\",\n  \"payment_intent_id\": \"pi_3UCeMVH7FWYUN3jh1m9Isg6G\",\n  \"pi_status\": \"succeeded\",\n  \"pi_amount…"
+    },
+    {
+      "id": "CEC.upload-a",
+      "lens": "CE6",
+      "title": "upload prova própria A",
+      "ev": "200 {\"Key\":\"fleaber_private/order_proofs/bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96/a0dc08bc-9c16-446a-aa18-00741e9bf7c0/rtce_a.png\",\"Id\":\"78441737-7828-49fd-9b36-3d98aa0398df\"}"
+    },
+    {
+      "id": "CEC.list-b2",
+      "lens": "CE6",
+      "title": "B1 lista prefixo B2",
+      "ev": "200 []"
+    },
+    {
+      "id": "CEC.ocr-notoken",
+      "lens": "CE8",
+      "title": "OCR sem x-device-token",
+      "ev": "401 {\"ok\":false,\"error\":\"missing_device_token\"}"
+    },
+    {
+      "id": "CEC.ocr-fake",
+      "lens": "CE8",
+      "title": "OCR token inventado",
+      "ev": "401 {\"ok\":false,\"error\":\"invalid_token\"}"
+    },
+    {
+      "id": "CEC.ocr-replay",
+      "lens": "CE8",
+      "title": "OCR replay token fake como seller",
+      "ev": "401 {\"ok\":false,\"error\":\"invalid_token\"}"
+    },
+    {
+      "id": "CEE.compose",
+      "lens": "CE1",
+      "title": "WeChat card + PATCH pago",
+      "ev": {
+        "card": "201 [{\"id\":1581,\"created_at\":\"2026-09-06T11:36:01.779994+00:00\",\"chat_id\":\"5ce49022-9ed9-446c-b280-9ce325030f1f\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"reservation_payment_subm…",
+        "before": "pago",
+        "after_buyer_patch": "pago",
+        "buyer_patch_http": "200 [{\"id\":\"a0dc08bc-9c16-446a-aa18-00741e9bf7c0\",\"created_at\":\"2026-09-06T11:35:47.491606+00:00\",\"product_id\":\"6ddd3403-bb8c-42ca-9b7e-b289010b30cb\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-00…",
+        "after_seller_patch": "pago",
+        "seller_patch_http": "200 [{\"id\":\"a0dc08bc-9c16-446a-aa18-00741e9bf7c0\",\"created_at\":\"2026-09-06T11:35:47.491606+00:00\",\"product_id\":\"6ddd3403-bb8c-42ca-9b7e-b289010b30cb\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-00…",
+        "wallet_before": 70.33,
+        "wallet_after": 70.33
+      }
+    },
+    {
+      "id": "CEE.pending",
+      "lens": "CE1",
+      "title": "PATCH reserva_pendente → pago",
+      "ev": {
+        "before": "reserva_pendente",
+        "http": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"order_buyer_cannot_mark_pago\"}",
+        "after": "reserva_pendente"
+      }
+    },
+    {
+      "id": "CEE.card-only",
+      "lens": "CE1",
+      "title": "composição saturada: card sem FSM",
+      "ev": "201 [{\"id\":1581,\"created_at\":\"2026-09-06T11:36:01.779994+00:00\",\"chat_id\":\"5ce49022-9ed9-446c-b280-9ce325030f1f\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"reservation_payment_subm…"
+    }
+  ],
+  "lenses": [
+    "CE1",
+    "CE3",
+    "CE4",
+    "CE5",
+    "CE6",
+    "CE7",
+    "CE8"
+  ],
+  "unused_guess": "order_proofs/dd04c7a2-851f-4f73-83cc-2400d63f16a3/ae2846f3-0588-45e6-82ce-91c5d460bbce/rtce_steal.png",
+  "fsm_moved_paidA": true
+}

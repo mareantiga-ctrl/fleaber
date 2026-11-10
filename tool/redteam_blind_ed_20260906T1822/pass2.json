@@ -1,0 +1,62 @@
+{
+  "stamp": "20260906T1822",
+  "prefix": "RTED-20260906T1822",
+  "auditor": "REDTEAM_BLIND_ED_EDGE_POS_DTDY_v1",
+  "lenses": [
+    "ED7"
+  ],
+  "probes": [
+    {
+      "probe_id": "D1",
+      "edge_rpc": "setup_paid_order + GET settle + fase2 JWT",
+      "payload": "PI 4242 pago 2364e83d-cbfc-473a-8435-994bcc2478a5; GET settle cs_morta + pi_ como session; POST fase2_e2e_settle JWT B2",
+      "http": "{\"missing\":\"400 acao=* Pagamento ainda não confirmado. Se já pagaste, aguarda alguns segundos e volta à app Fleaber. loc=\\\"\\\"\",\"pi_as_sid\":\"400 acao=* Pagamento ainda não confirmado. Se já pagaste, aguarda alguns segundos e volta à app Fleaber. loc=\\\"\\\"\",\"fase2\":\"401 acao=* {\\\"ok\\\":false,\\\"error\\\":\\\"service_role required\\\"} loc=\\\"\\\"\"}",
+      "stripe_bd": "{\"oid\":\"2364e83d-cbfc-473a-8435-994bcc2478a5\",\"pi\":\"pi_3UCju8H7FWYUN3jh1zFL83sP\",\"status0\":\"pago\",\"status1\":\"pago\",\"amount0\":590,\"amount1\":590,\"refund_id\":\"\",\"delta_wallet\":0.0,\"fase2_status\":401}",
+      "result": "HOLD",
+      "lens": "ED7",
+      "count_finding": false,
+      "classe_nova": true,
+      "race": false
+    }
+  ],
+  "findings": [],
+  "blocked": [
+    {
+      "id": "D1.pago",
+      "lens": "ED7",
+      "title": "pago 4242; settle extra sem mint/refund; fase2 JWT 401",
+      "ev": {
+        "pi": "pi_3UCju8H7FWYUN3jh1zFL83sP",
+        "status": "pago",
+        "amount": 590,
+        "delta": 0.0,
+        "fase2": 401
+      }
+    }
+  ],
+  "skipped": [],
+  "notes": [
+    {
+      "id": "fixture.paid",
+      "lens": "ED7",
+      "title": "setup_paid_order Stripe TEST",
+      "ev": "200 acao=* {\n  \"ok\": true,\n  \"order_id\": \"2364e83d-cbfc-473a-8435-994bcc2478a5\",\n  \"product_id\": \"505de9f4-7c45-41db-bd6c-552ad3ec62e8\",\n  \"payment_intent_id\": \"pi_3UCju8H7FWYUN3jh1zFL83sP\",\n  \"pi_status\": \"succ… loc=\"\""
+    }
+  ],
+  "actors": {
+    "buyer": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+    "seller": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+    "buyer2": "7e0529b9-be58-4024-a3d0-d4a59ae98e7b",
+    "seller2": null
+  },
+  "created": {
+    "orders": [
+      "2364e83d-cbfc-473a-8435-994bcc2478a5"
+    ],
+    "products": [
+      "505de9f4-7c45-41db-bd6c-552ad3ec62e8"
+    ],
+    "lives": [],
+    "tips": []
+  }
+}

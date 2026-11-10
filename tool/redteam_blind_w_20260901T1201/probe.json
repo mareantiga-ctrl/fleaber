@@ -1,0 +1,825 @@
+{
+  "stamp": "20260901T1201",
+  "prefix": "RTW-20260901T1201",
+  "production_touched": false,
+  "fase4": false,
+  "findings": [
+    {
+      "id": "W6.P1.cancel_lie",
+      "lens": "W6",
+      "severity": "P1",
+      "title": "Vendedor INSERT cancel_request_outcome accepted sem refund Stripe",
+      "actor": "seller JWT",
+      "pre": "order Stripe capturada status=pago",
+      "repro": "POST chat_messages FLEABER_JSON_V1 kind=cancel_request_outcome outcome=accepted",
+      "expected": "bloqueado, ou só aceite se BD/Stripe já cancelados",
+      "obtained": "msg=935 status=pago refund_id=null wallets={buyer: 61.1, seller: 18.97, buyer2: 0}",
+      "proven": true,
+      "evidence": {
+        "order_before": {
+          "id": "e2ea277d-58f3-4776-a003-0d970c435142",
+          "status": "pago",
+          "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+          "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+          "product_id": "4a4ba593-a18e-421f-b554-b7493b4664ef",
+          "quantity": 1,
+          "price_total": 5.9,
+          "amount_paid_cents": 590,
+          "payment_method": "Pagamento na app",
+          "shipping_method": null,
+          "stripe_payment_intent_id": "pi_3UAqXHH7FWYUN3jh0so9MNHT",
+          "stripe_checkout_session_id": null,
+          "stripe_refund_id": null,
+          "wallet_release_processed_at": null,
+          "wallet_refund_processed_at": null,
+          "proof_url": null,
+          "completed_at": null
+        },
+        "order_after": {
+          "id": "e2ea277d-58f3-4776-a003-0d970c435142",
+          "status": "pago",
+          "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+          "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+          "product_id": "4a4ba593-a18e-421f-b554-b7493b4664ef",
+          "quantity": 1,
+          "price_total": 5.9,
+          "amount_paid_cents": 590,
+          "payment_method": "Pagamento na app",
+          "shipping_method": null,
+          "stripe_payment_intent_id": "pi_3UAqXHH7FWYUN3jh0so9MNHT",
+          "stripe_checkout_session_id": null,
+          "stripe_refund_id": null,
+          "wallet_release_processed_at": null,
+          "wallet_refund_processed_at": null,
+          "proof_url": null,
+          "completed_at": null
+        },
+        "wallets_before": {
+          "buyer": 61.1,
+          "seller": 18.97,
+          "buyer2": 0
+        },
+        "wallets_after": {
+          "buyer": 61.1,
+          "seller": 18.97,
+          "buyer2": 0
+        },
+        "money_unchanged": true,
+        "ui_display": "Compra cancelada — Reembolso Stripe de 9999,99 € concluído na hora."
+      }
+    },
+    {
+      "id": "W5.P1.created_at_insert",
+      "lens": "W5",
+      "severity": "P1",
+      "title": "JWT escolhe created_at — inject na cronologia do chat",
+      "actor": "buyer JWT",
+      "pre": "participante",
+      "repro": "POST chat_messages created_at=2020-01-01T00:00:00Z",
+      "expected": "created_at = now() (servidor)",
+      "obtained": "2020-01-01T00:00:00+00:00",
+      "proven": true,
+      "evidence": {
+        "msg": {
+          "id": 940,
+          "chat_id": "f3b6fa36-c761-4d7b-a1dc-119b30d2d0ce",
+          "sender_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+          "text": "FLEABER_JSON_V1:{\"kind\":\"order_dispute_opened\",\"order_id\":\"e2ea277d-58f3-4776-a003-0d970c435142\",\"reason\":\"RTW backdate\"}",
+          "created_at": "2020-01-01T00:00:00+00:00",
+          "is_read": false,
+          "is_reservation": false,
+          "receiver_id": null
+        }
+      }
+    },
+    {
+      "id": "W5.P1.patch_created_at",
+      "lens": "W5",
+      "severity": "P1",
+      "title": "PATCH created_at de card JSON — reordena timeline",
+      "actor": "seller JWT (própria msg)",
+      "pre": "card cancel_request_outcome imutável no text",
+      "repro": "PATCH chat_messages created_at=2019-06-01",
+      "expected": "created_at congelado em cards sistema",
+      "obtained": "2019-06-01T12:00:00+00:00",
+      "proven": true,
+      "evidence": {
+        "patch": "200 [{\"id\":935,\"created_at\":\"2019-06-01T12:00:00+00:00\",\"chat_id\":\"f3b6fa36-c761-4d7b-a1dc-119b30d2d0ce\",\"sender_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"cancel_request_outcome\\\",\\\"order…",
+        "row": {
+          "id": 935,
+          "chat_id": "f3b6fa36-c761-4d7b-a1dc-119b30d2d0ce",
+          "sender_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+          "text": "FLEABER_JSON_V1:{\"kind\":\"cancel_request_outcome\",\"order_id\":\"e2ea277d-58f3-4776-a003-0d970c435142\",\"outcome\":\"accepted\",\"display\":\"Compra cancelada — Reembolso Stripe de 9999,99 € concluído na hora.\",\"v\":1}",
+          "created_at": "2019-06-01T12:00:00+00:00",
+          "is_read": false,
+          "is_reservation": false,
+          "receiver_id": null
+        }
+      }
+    },
+    {
+      "id": "W2.P1.counterparty_meta",
+      "lens": "W2",
+      "severity": "P1",
+      "title": "Participante PATCH created_at/is_reservation da mensagem do outro",
+      "actor": "seller JWT",
+      "pre": "RLS update_participants; guard só restaura text se sender≠uid",
+      "repro": "PATCH chat_messages id=msg_do_buyer created_at+is_reservation",
+      "expected": "só o autor altera metadados; text alheio já congelado",
+      "obtained": {
+        "id": 941,
+        "chat_id": "f3b6fa36-c761-4d7b-a1dc-119b30d2d0ce",
+        "sender_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+        "text": "rtw-plain-marker",
+        "created_at": "2018-01-01T00:00:00+00:00",
+        "is_read": false,
+        "is_reservation": true,
+        "receiver_id": null
+      },
+      "proven": true,
+      "evidence": {
+        "text_kept": true,
+        "created_at_moved": true
+      }
+    },
+    {
+      "id": "W2.P1.delete_receipt",
+      "lens": "W2",
+      "severity": "P1",
+      "title": "Buyer DELETE do próprio card recibo JSON",
+      "actor": "buyer JWT",
+      "pre": "sender_id=buyer no card seguro_fleaber_paid",
+      "repro": "DELETE chat_messages?id=eq.932",
+      "expected": "cards sistema não apagáveis por JWT",
+      "obtained": "200 [{\"id\":932,\"created_at\":\"2026-09-01T12:11:35.620718+00:00\",\"chat_id\":\"f3b6fa36-c761-4d7b-a1dc-119b30d2d0ce\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"seguro_fleaber_paid\\\",\\\"o…",
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "W2.P0.delete_server_receipt",
+      "lens": "W2",
+      "severity": "P0",
+      "title": "Buyer apaga recibo order_paid inserido pelo servidor",
+      "actor": "buyer JWT",
+      "pre": "service_role INSERT kind=order_paid sender=buyer",
+      "repro": "DELETE chat_messages id=recibo_servidor",
+      "expected": "recibo servidor imutável/não apagável",
+      "obtained": "200 [{\"id\":942,\"created_at\":\"2026-09-01T12:11:38.367717+00:00\",\"chat_id\":\"f3b6fa36-c761-4d7b-a1dc-119b30d2d0ce\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"order_paid\\\",\\\"order_id\\\"…",
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "W4.P1.proof_url_insert",
+      "lens": "W4",
+      "severity": "P1",
+      "title": "INSERT orders.proof_url externo — trigger só cobre UPDATE",
+      "actor": "buyer JWT",
+      "pre": "trg_batata_orders_guard_proof_url BEFORE UPDATE OF proof_url",
+      "repro": "POST orders proof_url=https://evil.example/receipt.png",
+      "expected": "proof_url negado ou null",
+      "obtained": "https://evil.example/receipt.png",
+      "proven": true,
+      "evidence": {
+        "order_id": "95619427-dcbc-44b3-a6fc-98bcb771c341"
+      }
+    },
+    {
+      "id": "W4.P1.proof_url_userinfo",
+      "lens": "W4",
+      "severity": "P1",
+      "title": "PATCH proof_url variante userinfo persistida",
+      "actor": "buyer JWT",
+      "pre": "order hold; guard host allowlist só se paid",
+      "repro": "PATCH orders proof_url=https://fxdknzrqjenzqcvnwqqq.supabase.co%2estage.evil.example/x",
+      "expected": "denied",
+      "obtained": "https://fxdknzrqjenzqcvnwqqq.supabase.co%2estage.evil.example/x",
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "W4.P1.proof_url_subdomain",
+      "lens": "W4",
+      "severity": "P1",
+      "title": "PATCH proof_url variante subdomain persistida",
+      "actor": "buyer JWT",
+      "pre": "order hold; guard host allowlist só se paid",
+      "repro": "PATCH orders proof_url=https://fxdknzrqjenzqcvnwqqq.supabase.co.evil.example/storage/v1/x",
+      "expected": "denied",
+      "obtained": "https://fxdknzrqjenzqcvnwqqq.supabase.co.evil.example/storage/v1/x",
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "W4.P1.proof_url_fleaber_typo",
+      "lens": "W4",
+      "severity": "P1",
+      "title": "PATCH proof_url variante fleaber_typo persistida",
+      "actor": "buyer JWT",
+      "pre": "order hold; guard host allowlist só se paid",
+      "repro": "PATCH orders proof_url=https://fleaber.app.evil.example/p.png",
+      "expected": "denied",
+      "obtained": "https://fleaber.app.evil.example/p.png",
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "W4.P1.proof_url_data",
+      "lens": "W4",
+      "severity": "P1",
+      "title": "PATCH proof_url variante data persistida",
+      "actor": "buyer JWT",
+      "pre": "order hold; guard host allowlist só se paid",
+      "repro": "PATCH orders proof_url=data:image/png;base64,aaaa",
+      "expected": "denied",
+      "obtained": "data:image/png;base64,aaaa",
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "W4.P1.proof_url_protocol_rel",
+      "lens": "W4",
+      "severity": "P1",
+      "title": "PATCH proof_url variante protocol_rel persistida",
+      "actor": "buyer JWT",
+      "pre": "order hold; guard host allowlist só se paid",
+      "repro": "PATCH orders proof_url=//evil.example/p.png",
+      "expected": "denied",
+      "obtained": "//evil.example/p.png",
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "W4.P1.proof_url_javascript",
+      "lens": "W4",
+      "severity": "P1",
+      "title": "PATCH proof_url variante javascript persistida",
+      "actor": "buyer JWT",
+      "pre": "order hold; guard host allowlist só se paid",
+      "repro": "PATCH orders proof_url=javascript:alert(1)",
+      "expected": "denied",
+      "obtained": "javascript:alert(1)",
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "W4.P1.proof_url_unicode_slash",
+      "lens": "W4",
+      "severity": "P1",
+      "title": "PATCH proof_url variante unicode_slash persistida",
+      "actor": "buyer JWT",
+      "pre": "order hold; guard host allowlist só se paid",
+      "repro": "PATCH orders proof_url=https://fxdknzrqjenzqcvnwqqq.supabase.co/storage/v1/object/public/chat_media/∕∕e…",
+      "expected": "denied",
+      "obtained": "https://fxdknzrqjenzqcvnwqqq.supabase.co/storage/v1/object/public/chat_media/∕∕evil.example",
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "W4.P1.proof_url_encoded_nl",
+      "lens": "W4",
+      "severity": "P1",
+      "title": "PATCH proof_url variante encoded_nl persistida",
+      "actor": "buyer JWT",
+      "pre": "order hold; guard host allowlist só se paid",
+      "repro": "PATCH orders proof_url=https://fleaber.app/a%0d%0aLocation:%20https://evil.example",
+      "expected": "denied",
+      "obtained": "https://fleaber.app/a%0d%0aLocation:%20https://evil.example",
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "W4.P1.proof_url_backslash",
+      "lens": "W4",
+      "severity": "P1",
+      "title": "PATCH proof_url variante backslash persistida",
+      "actor": "buyer JWT",
+      "pre": "order hold; guard host allowlist só se paid",
+      "repro": "PATCH orders proof_url=https://fleaber.app\\@evil.example/p",
+      "expected": "denied",
+      "obtained": "https://fleaber.app\\@evil.example/p",
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "W4.P1.paid_proof_other_uid",
+      "lens": "W4",
+      "severity": "P1",
+      "title": "Order paga aceita proof_url storage apontando à pasta de outro uid",
+      "actor": "buyer JWT",
+      "pre": "allowlist host supabase.co/storage sem amarrar uid",
+      "repro": "PATCH orders.proof_url …/order_proofs/{seller}/…",
+      "expected": "path só order_proofs/{auth.uid()}/{order_id}/",
+      "obtained": "https://fxdknzrqjenzqcvnwqqq.supabase.co/storage/v1/object/authenticated/fleaber_private/order_proofs/980f4fa1-0004-42f9-abca-69f1a9c29588/not-mine.png",
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "W4.P1.dispute_proof_photos_any_url",
+      "lens": "W4",
+      "severity": "P1",
+      "title": "order_dispute_replies.proof_photos aceita URLs arbitrárias (evil/js)",
+      "actor": "buyer JWT",
+      "pre": "disputa aberta; sem guard de URL no array",
+      "repro": "POST order_dispute_replies proof_photos=[https://evil.example/…]",
+      "expected": "só storage fleaber_private/order_disputes/{uid}/",
+      "obtained": "201 [{\"id\":\"f811f964-85c6-4872-a3f7-56123cc1d930\",\"dispute_id\":\"0b1ad280-7ac7-42fe-b59d-fbecce3b4b29\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"message\":\"prova anexada\",\"proof_photos\":[\"https://evil.example/stolen-…",
+      "proven": true,
+      "evidence": {
+        "dispute_id": "0b1ad280-7ac7-42fe-b59d-fbecce3b4b29",
+        "msg_id": "f811f964-85c6-4872-a3f7-56123cc1d930"
+      }
+    },
+    {
+      "id": "W1.P2.inbox_preview_lie",
+      "lens": "W1",
+      "severity": "P2",
+      "title": "Participante PATCH last_message da thread (pré-visualização)",
+      "actor": "buyer JWT",
+      "pre": "chats_update_participants",
+      "repro": "PATCH chats last_message=Compra paga… 9999€",
+      "expected": "last_message só via servidor/trigger",
+      "obtained": "200 [{\"id\":\"f3b6fa36-c761-4d7b-a1dc-119b30d2d0ce\",\"created_at\":\"2026-09-01T12:11:34.304388+00:00\",\"user_a\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"user_b\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"last_message\":\"Compra paga pe…",
+      "proven": true,
+      "evidence": {}
+    }
+  ],
+  "closed": [
+    {
+      "id": "W1.order_paid.unpaid",
+      "lens": "W1",
+      "title": "Buyer INSERT order_paid em hold sem captura",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_server_only\"}"
+    },
+    {
+      "id": "W1.seguro.unpaid",
+      "lens": "W1",
+      "title": "Buyer INSERT seguro_fleaber_paid em hold sem captura",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_order_not_paid\"}"
+    },
+    {
+      "id": "W1.bag.unpaid",
+      "lens": "W1",
+      "title": "Buyer INSERT marketplace_bag_paid",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_server_only\"}"
+    },
+    {
+      "id": "W1.plain.seguro",
+      "lens": "W1",
+      "title": "Buyer INSERT plain legado Seguro",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"chat_seguro_legacy_plain_forbidden\"}"
+    },
+    {
+      "id": "W1.plain.conjunto",
+      "lens": "W1",
+      "title": "Buyer INSERT plain conjunto Seguro",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"chat_seguro_legacy_plain_forbidden\"}"
+    },
+    {
+      "id": "W1.kind.case",
+      "lens": "W1",
+      "title": "kind ORDER_PAID (lower→server_only)",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_server_only\"}"
+    },
+    {
+      "id": "W1.seguro.seller",
+      "lens": "W1",
+      "title": "Seller INSERT seguro_fleaber_paid (buyer-only)",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_buyer_only\"}"
+    },
+    {
+      "id": "W1.order_paid.captured",
+      "lens": "W1",
+      "title": "Buyer INSERT order_paid em order capturada",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_server_only\"}"
+    },
+    {
+      "id": "W6.buyer.cancel_outcome",
+      "lens": "W6",
+      "title": "Buyer INSERT cancel_request_outcome",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_seller_only\"}"
+    },
+    {
+      "id": "W2.json_text",
+      "lens": "W2",
+      "title": "JSON text imutável",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_immutable\"}"
+    },
+    {
+      "id": "W8.buyer_refund",
+      "lens": "W8",
+      "title": "buyer refund-order recusado",
+      "ev": "403 {\"ok\":false,\"error\":\"Sem permissão.\"}"
+    },
+    {
+      "id": "W3.b2_read",
+      "lens": "W3",
+      "title": "B2 não lê thread alheia",
+      "ev": "200 []"
+    },
+    {
+      "id": "W3.b2_write",
+      "lens": "W3",
+      "title": "B2 INSERT thread alheia bloqueado",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"new row violates row-level security policy for table \\\"chat_messages\\\"\"}"
+    },
+    {
+      "id": "W3.anon_read",
+      "lens": "W3",
+      "title": "anon não lê chat",
+      "ev": "401 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_chat_is_participant\"}"
+    },
+    {
+      "id": "W4.list_other_proofs",
+      "lens": "W4",
+      "title": "B2 não lista proofs B1",
+      "ev": "200 []"
+    },
+    {
+      "id": "W4.sign_other",
+      "lens": "W4",
+      "title": "B2 não assina prova alheia",
+      "ev": "400 {\"statusCode\":\"404\",\"error\":\"not_found\",\"message\":\"Object not found\",\"code\":\"NoSuchKey\"}"
+    },
+    {
+      "id": "W4.get_other",
+      "lens": "W4",
+      "title": "B2 GET prova alheia recusado",
+      "ev": "400 {\"statusCode\":\"404\",\"error\":\"not_found\",\"message\":\"Object not found\",\"code\":\"NoSuchKey\"}"
+    },
+    {
+      "id": "W4.path_trav",
+      "lens": "W4",
+      "title": "traversal não serviu o ficheiro",
+      "ev": "400 {\"statusCode\":\"404\",\"error\":\"not_found\",\"message\":\"Object not found\",\"code\":\"NoSuchKey\"}"
+    },
+    {
+      "id": "W3.b2_dispute",
+      "lens": "W3",
+      "title": "B2 não lê disputa alheia",
+      "ev": "200 []"
+    },
+    {
+      "id": "W4.upload_other_folder",
+      "lens": "W4",
+      "title": "upload pasta seller bloqueado",
+      "ev": "400 {\"statusCode\":\"403\",\"error\":\"Unauthorized\",\"message\":\"new row violates row-level security policy\",\"code\":\"AccessDenied\"}"
+    },
+    {
+      "id": "W4.sign_seller_disp",
+      "lens": "W4",
+      "title": "buyer não assina pasta seller",
+      "ev": "400 {\"statusCode\":\"404\",\"error\":\"not_found\",\"message\":\"Object not found\",\"code\":\"NoSuchKey\"}"
+    }
+  ],
+  "notes": [
+    {
+      "id": "w0.wallets",
+      "lens": "W8",
+      "title": "saldos iniciais",
+      "ev": {
+        "buyer": 61.1,
+        "seller": 18.97,
+        "buyer2": 0
+      }
+    },
+    {
+      "id": "fx.hold",
+      "lens": "W1",
+      "title": "hold order+chat",
+      "ev": {
+        "oid": "65ed4032-425e-4c58-a22e-86f2b835baed",
+        "chat": "29c061de-a6fa-423e-a0b6-dca8b2e9bd4a",
+        "prod": "c13190bc-0064-4e50-ad21-6e7cded0384b"
+      }
+    },
+    {
+      "id": "fixture.paid",
+      "lens": "W1",
+      "title": "setup_paid_order Stripe TEST",
+      "ev": "200 {\n  \"ok\": true,\n  \"order_id\": \"e2ea277d-58f3-4776-a003-0d970c435142\",\n  \"product_id\": \"4a4ba593-a18e-421f-b554-b7493b4664ef\",\n  \"payment_intent_id\": \"pi_3UAqXHH7FWYUN3jh0so9MNHT\",\n  \"pi_status\": \"succeeded\",\n  \"pi_amount…"
+    },
+    {
+      "id": "fx.paid",
+      "lens": "W1",
+      "title": "stripe paid",
+      "ev": {
+        "oid": "e2ea277d-58f3-4776-a003-0d970c435142",
+        "chat": "f3b6fa36-c761-4d7b-a1dc-119b30d2d0ce",
+        "pi": "pi_3UAqXHH7FWYUN3jh0so9MNHT",
+        "status": "pago",
+        "paid_cents": 590
+      }
+    },
+    {
+      "id": "W1.plain.nbsp",
+      "lens": "W1",
+      "title": "Buyer INSERT Seguro com NBSP (bypass regex)",
+      "ev": "201 [{\"id\":925,\"created_at\":\"2026-09-01T12:11:34.924527+00:00\",\"chat_id\":\"29c061de-a6fa-423e-a0b6-dca8b2e9bd4a\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"Compra paga através do Seguro Fleaber: artigo (88,00 …"
+    },
+    {
+      "id": "W1.plain.dblspace",
+      "lens": "W1",
+      "title": "Buyer INSERT Seguro com espaço duplo",
+      "ev": "201 [{\"id\":926,\"created_at\":\"2026-09-01T12:11:35.027687+00:00\",\"chat_id\":\"29c061de-a6fa-423e-a0b6-dca8b2e9bd4a\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"Compra  paga através do Seguro Fleaber: artigo (77,00…"
+    },
+    {
+      "id": "W1.bom.order_paid",
+      "lens": "W1",
+      "title": "BOM + FLEABER_JSON_V1 order_paid",
+      "ev": "201 [{\"id\":928,\"created_at\":\"2026-09-01T12:11:35.217939+00:00\",\"chat_id\":\"29c061de-a6fa-423e-a0b6-dca8b2e9bd4a\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"﻿FLEABER_JSON_V1:{\\\"kind\\\":\\\"order_paid\\\",\\\"order_id\\…"
+    },
+    {
+      "id": "W1.lower.prefix",
+      "lens": "W1",
+      "title": "prefixo minúsculo order_paid",
+      "ev": "201 [{\"id\":929,\"created_at\":\"2026-09-01T12:11:35.322316+00:00\",\"chat_id\":\"29c061de-a6fa-423e-a0b6-dca8b2e9bd4a\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"fleaber_json_v1:{\\\"kind\\\":\\\"order_paid\\\",\\\"order_id\\\"…"
+    },
+    {
+      "id": "W1.payment_submitted.unpaid",
+      "lens": "W1",
+      "title": "Buyer INSERT reservation_payment_submitted em hold",
+      "ev": "201 [{\"id\":931,\"created_at\":\"2026-09-01T12:11:35.514784+00:00\",\"chat_id\":\"29c061de-a6fa-423e-a0b6-dca8b2e9bd4a\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"reservation_payment_submi…"
+    },
+    {
+      "id": "W1.seguro.fake_total",
+      "lens": "W1",
+      "title": "Buyer INSERT seguro_fleaber_paid com total JSON ≠ order",
+      "ev": "201 [{\"id\":932,\"created_at\":\"2026-09-01T12:11:35.620718+00:00\",\"chat_id\":\"f3b6fa36-c761-4d7b-a1dc-119b30d2d0ce\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"seguro_fleaber_paid\\\",\\\"o…"
+    },
+    {
+      "id": "W6.cancel.ins",
+      "lens": "W6",
+      "title": "seller cancel_request_outcome",
+      "ev": "201 [{\"id\":935,\"created_at\":\"2026-09-01T12:11:36.183151+00:00\",\"chat_id\":\"f3b6fa36-c761-4d7b-a1dc-119b30d2d0ce\",\"sender_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"cancel_request_outcome\\\",…"
+    },
+    {
+      "id": "W5.shipped.lie",
+      "lens": "W5",
+      "title": "Seller INSERT reservation_order_shipped sem BD enviado",
+      "ev": "201 [{\"id\":937,\"created_at\":\"2026-09-01T12:11:36.740127+00:00\",\"chat_id\":\"f3b6fa36-c761-4d7b-a1dc-119b30d2d0ce\",\"sender_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"reservation_order_shipped…"
+    },
+    {
+      "id": "W5.completed.lie",
+      "lens": "W5",
+      "title": "Buyer INSERT reservation_order_completed sem BD concluido",
+      "ev": "201 [{\"id\":938,\"created_at\":\"2026-09-01T12:11:36.844747+00:00\",\"chat_id\":\"f3b6fa36-c761-4d7b-a1dc-119b30d2d0ce\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"reservation_order_complet…"
+    },
+    {
+      "id": "W5.seller_receipt.lie",
+      "lens": "W5",
+      "title": "Seller INSERT confirmed_receipt sem BD",
+      "ev": "201 [{\"id\":939,\"created_at\":\"2026-09-01T12:11:36.93554+00:00\",\"chat_id\":\"f3b6fa36-c761-4d7b-a1dc-119b30d2d0ce\",\"sender_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"reservation_seller_confirm…"
+    },
+    {
+      "id": "W5.bd.unchanged",
+      "lens": "W5",
+      "title": "status BD inalterado após cards operacionais",
+      "ev": "pago"
+    },
+    {
+      "id": "W2.svc.order_paid",
+      "lens": "W2",
+      "title": "service insert order_paid (recibo oficial)",
+      "ev": "201 [{\"id\":942,\"created_at\":\"2026-09-01T12:11:38.367717+00:00\",\"chat_id\":\"f3b6fa36-c761-4d7b-a1dc-119b30d2d0ce\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"order_paid\\\",\\\"order_id\\\"…"
+    },
+    {
+      "id": "W8.release.after_chat_lie",
+      "lens": "W8",
+      "title": "release após cards falsos",
+      "ev": "200 false"
+    },
+    {
+      "id": "W8.refund.buyer",
+      "lens": "W8",
+      "title": "refund-order buyer após cancel lie",
+      "ev": "403 {\"ok\":false,\"error\":\"Sem permissão.\"}"
+    },
+    {
+      "id": "W8.refund.seller",
+      "lens": "W8",
+      "title": "refund-order seller após cancel lie",
+      "ev": "200 {\"ok\":true,\"already_refunded\":true,\"idempotent\":true,\"refund_id\":\"re_3UAqXHH7FWYUN3jh0Uyq9p4j\",\"status\":\"cancelado\",\"stock_units_applied\":null,\"amount_cents\":590,\"payment_intent\":\"pi_3UAqXHH7FWYUN3jh0so9MNHT\",\"status_str…"
+    },
+    {
+      "id": "W8.seller.refund.happened",
+      "lens": "W8",
+      "title": "seller refund-order moveu Stripe — Edge ignora o chat",
+      "ev": {
+        "id": "e2ea277d-58f3-4776-a003-0d970c435142",
+        "status": "cancelado",
+        "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+        "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+        "product_id": "4a4ba593-a18e-421f-b554-b7493b4664ef",
+        "quantity": 1,
+        "price_total": 5.9,
+        "amount_paid_cents": 590,
+        "payment_method": "Pagamento na app",
+        "shipping_method": null,
+        "stripe_payment_intent_id": "pi_3UAqXHH7FWYUN3jh0so9MNHT",
+        "stripe_checkout_session_id": null,
+        "stripe_refund_id": "re_3UAqXHH7FWYUN3jh0Uyq9p4j",
+        "wallet_release_processed_at": "2026-09-01T12:11:41.500405+00:00",
+        "wallet_refund_processed_at": "2026-09-01T12:11:41.500405+00:00",
+        "proof_url": null,
+        "completed_at": null
+      }
+    },
+    {
+      "id": "W3.b2_patch",
+      "lens": "W3",
+      "title": "B2 PATCH msg alheia",
+      "ev": "200 []"
+    },
+    {
+      "id": "W3.gql",
+      "lens": "W3",
+      "title": "graphql chatMessagesCollection",
+      "ev": "200 {\"errors\": [{\"message\": \"pg_graphql extension is not enabled.\"}]}"
+    },
+    {
+      "id": "W4.chat_image.http",
+      "lens": "W4",
+      "title": "INSERT chat_image URL arbitrária",
+      "ev": "201 [{\"id\":944,\"created_at\":\"2026-09-01T12:11:42.260316+00:00\",\"chat_id\":\"f3b6fa36-c761-4d7b-a1dc-119b30d2d0ce\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"chat_image\\\",\\\"url\\\":\\\"ht…"
+    },
+    {
+      "id": "W4.chat_image.other_path",
+      "lens": "W4",
+      "title": "INSERT chat_image path da pasta do outro",
+      "ev": "201 [{\"id\":945,\"created_at\":\"2026-09-01T12:11:42.357004+00:00\",\"chat_id\":\"f3b6fa36-c761-4d7b-a1dc-119b30d2d0ce\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"chat_image\\\",\\\"path\\\":\\\"c…"
+    },
+    {
+      "id": "W7.bundle.ins",
+      "lens": "W7",
+      "title": "product_bundles INSERT",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"bundle_products_required\"}"
+    },
+    {
+      "id": "W7.price_outcome.fake",
+      "lens": "W7",
+      "title": "Seller INSERT price_offer_outcome accepted amount=0.01",
+      "ev": "201 [{\"id\":946,\"created_at\":\"2026-09-01T12:11:42.553114+00:00\",\"chat_id\":\"f3b6fa36-c761-4d7b-a1dc-119b30d2d0ce\",\"sender_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"price_offer_outcome\\\",\\\"o…"
+    },
+    {
+      "id": "W4.upload.proof",
+      "lens": "W4",
+      "title": "buyer upload order_proofs",
+      "ev": "200 {\"Key\":\"fleaber_private/order_proofs/bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96/65ed4032-425e-4c58-a22e-86f2b835baed/rtw-proof.png\",\"Id\":\"14e65ad7-2171-452b-ae85-daa611bcda73\"}"
+    },
+    {
+      "id": "W4.list.chat_media",
+      "lens": "W4",
+      "title": "B2 list chat_media público",
+      "ev": "200 []"
+    },
+    {
+      "id": "W4.list.private.b2",
+      "lens": "W4",
+      "title": "B2 lista pasta proofs B1",
+      "ev": "200 []"
+    },
+    {
+      "id": "W4.sign.b2",
+      "lens": "W4",
+      "title": "B2 createSignedUrl path B1",
+      "ev": "400 {\"statusCode\":\"404\",\"error\":\"not_found\",\"message\":\"Object not found\",\"code\":\"NoSuchKey\"}"
+    },
+    {
+      "id": "W4.trav.get",
+      "lens": "W4",
+      "title": "path .. no GET",
+      "ev": "400 {\"statusCode\":\"404\",\"error\":\"not_found\",\"message\":\"Object not found\",\"code\":\"NoSuchKey\"}"
+    },
+    {
+      "id": "W4.proof.userinfo",
+      "lens": "W4",
+      "title": "PATCH proof_url userinfo",
+      "ev": "200 [{\"id\":\"65ed4032-425e-4c58-a22e-86f2b835baed\",\"created_at\":\"2026-09-01T12:11:30.04328+00:00\",\"product_id\":\"c13190bc-0064-4e50-ad21-6e7cded0384b\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-000… stored=https://fxdknzrqjenzqcvnwqqq.supabase.co%2estage.evil.example/x"
+    },
+    {
+      "id": "W4.proof.subdomain",
+      "lens": "W4",
+      "title": "PATCH proof_url subdomain",
+      "ev": "200 [{\"id\":\"65ed4032-425e-4c58-a22e-86f2b835baed\",\"created_at\":\"2026-09-01T12:11:30.04328+00:00\",\"product_id\":\"c13190bc-0064-4e50-ad21-6e7cded0384b\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-000… stored=https://fxdknzrqjenzqcvnwqqq.supabase.co.evil.example/storage/v1/x"
+    },
+    {
+      "id": "W4.proof.fleaber_typo",
+      "lens": "W4",
+      "title": "PATCH proof_url fleaber_typo",
+      "ev": "200 [{\"id\":\"65ed4032-425e-4c58-a22e-86f2b835baed\",\"created_at\":\"2026-09-01T12:11:30.04328+00:00\",\"product_id\":\"c13190bc-0064-4e50-ad21-6e7cded0384b\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-000… stored=https://fleaber.app.evil.example/p.png"
+    },
+    {
+      "id": "W4.proof.data",
+      "lens": "W4",
+      "title": "PATCH proof_url data",
+      "ev": "200 [{\"id\":\"65ed4032-425e-4c58-a22e-86f2b835baed\",\"created_at\":\"2026-09-01T12:11:30.04328+00:00\",\"product_id\":\"c13190bc-0064-4e50-ad21-6e7cded0384b\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-000… stored=data:image/png;base64,aaaa"
+    },
+    {
+      "id": "W4.proof.protocol_rel",
+      "lens": "W4",
+      "title": "PATCH proof_url protocol_rel",
+      "ev": "200 [{\"id\":\"65ed4032-425e-4c58-a22e-86f2b835baed\",\"created_at\":\"2026-09-01T12:11:30.04328+00:00\",\"product_id\":\"c13190bc-0064-4e50-ad21-6e7cded0384b\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-000… stored=//evil.example/p.png"
+    },
+    {
+      "id": "W4.proof.javascript",
+      "lens": "W4",
+      "title": "PATCH proof_url javascript",
+      "ev": "200 [{\"id\":\"65ed4032-425e-4c58-a22e-86f2b835baed\",\"created_at\":\"2026-09-01T12:11:30.04328+00:00\",\"product_id\":\"c13190bc-0064-4e50-ad21-6e7cded0384b\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-000… stored=javascript:alert(1)"
+    },
+    {
+      "id": "W4.proof.unicode_slash",
+      "lens": "W4",
+      "title": "PATCH proof_url unicode_slash",
+      "ev": "200 [{\"id\":\"65ed4032-425e-4c58-a22e-86f2b835baed\",\"created_at\":\"2026-09-01T12:11:30.04328+00:00\",\"product_id\":\"c13190bc-0064-4e50-ad21-6e7cded0384b\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-000… stored=https://fxdknzrqjenzqcvnwqqq.supabase.co/storage/v1/object/public/chat_media/∕∕e…"
+    },
+    {
+      "id": "W4.proof.encoded_nl",
+      "lens": "W4",
+      "title": "PATCH proof_url encoded_nl",
+      "ev": "200 [{\"id\":\"65ed4032-425e-4c58-a22e-86f2b835baed\",\"created_at\":\"2026-09-01T12:11:30.04328+00:00\",\"product_id\":\"c13190bc-0064-4e50-ad21-6e7cded0384b\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-000… stored=https://fleaber.app/a%0d%0aLocation:%20https://evil.example"
+    },
+    {
+      "id": "W4.proof.backslash",
+      "lens": "W4",
+      "title": "PATCH proof_url backslash",
+      "ev": "200 [{\"id\":\"65ed4032-425e-4c58-a22e-86f2b835baed\",\"created_at\":\"2026-09-01T12:11:30.04328+00:00\",\"product_id\":\"c13190bc-0064-4e50-ad21-6e7cded0384b\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-000… stored=https://fleaber.app\\@evil.example/p"
+    },
+    {
+      "id": "W4.proof.own_storage_other_user",
+      "lens": "W4",
+      "title": "PATCH proof_url own_storage_other_user",
+      "ev": "200 [{\"id\":\"65ed4032-425e-4c58-a22e-86f2b835baed\",\"created_at\":\"2026-09-01T12:11:30.04328+00:00\",\"product_id\":\"c13190bc-0064-4e50-ad21-6e7cded0384b\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-000… stored=https://fxdknzrqjenzqcvnwqqq.supabase.co/storage/v1/object/sign/fleaber_private/…"
+    },
+    {
+      "id": "W4.dispute.jwt",
+      "lens": "W4",
+      "title": "buyer INSERT disputa",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"new row violates row-level security policy for table \\\"order_disputes\\\"\"}"
+    },
+    {
+      "id": "W4.dispute.fixture",
+      "lens": "W4",
+      "title": "service INSERT disputa",
+      "ev": "201 [{\"id\":\"0b1ad280-7ac7-42fe-b59d-fbecce3b4b29\",\"order_id\":\"e2ea277d-58f3-4776-a003-0d970c435142\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"reason\":\"nao_corresponde\",\"description\":\"RTW-20260901T1201 disputa fixtur…"
+    },
+    {
+      "id": "W4.reply.photos",
+      "lens": "W4",
+      "title": "INSERT dispute reply proof_photos",
+      "ev": "201 [{\"id\":\"f811f964-85c6-4872-a3f7-56123cc1d930\",\"dispute_id\":\"0b1ad280-7ac7-42fe-b59d-fbecce3b4b29\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"message\":\"prova anexada\",\"proof_photos\":[\"https://evil.example/stolen-…"
+    },
+    {
+      "id": "W4.seller.resolvida",
+      "lens": "W4",
+      "title": "seller PATCH resolvida (known exact)",
+      "ev": "200 [{\"id\":\"0b1ad280-7ac7-42fe-b59d-fbecce3b4b29\",\"order_id\":\"e2ea277d-58f3-4776-a003-0d970c435142\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"reason\":\"nao_corresponde\",\"description\":\"RTW-20260901T1201 disputa fixtur…"
+    },
+    {
+      "id": "W4.upload.seller_folder",
+      "lens": "W4",
+      "title": "buyer upload into seller dispute folder",
+      "ev": "400 {\"statusCode\":\"403\",\"error\":\"Unauthorized\",\"message\":\"new row violates row-level security policy\",\"code\":\"AccessDenied\"}"
+    },
+    {
+      "id": "W1.inbox.last_message",
+      "lens": "W1",
+      "title": "PATCH chats.last_message",
+      "ev": "200 [{\"id\":\"f3b6fa36-c761-4d7b-a1dc-119b30d2d0ce\",\"created_at\":\"2026-09-01T12:11:34.304388+00:00\",\"user_a\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"user_b\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"last_message\":\"Compra paga pe…"
+    },
+    {
+      "id": "W8.release.buyer",
+      "lens": "W8",
+      "title": "buyer tenta release",
+      "ev": "200 false"
+    },
+    {
+      "id": "wEnd.wallets",
+      "lens": "W8",
+      "title": "saldos finais",
+      "ev": {
+        "start": {
+          "buyer": 61.1,
+          "seller": 18.97,
+          "buyer2": 0
+        },
+        "end": {
+          "buyer": 61.1,
+          "seller": 18.97,
+          "buyer2": 0
+        }
+      }
+    }
+  ],
+  "wallets_start": {
+    "buyer": 61.1,
+    "seller": 18.97,
+    "buyer2": 0
+  },
+  "wallets_end": {
+    "buyer": 61.1,
+    "seller": 18.97,
+    "buyer2": 0
+  },
+  "paid_order": "e2ea277d-58f3-4776-a003-0d970c435142",
+  "hold_order": "65ed4032-425e-4c58-a22e-86f2b835baed"
+}

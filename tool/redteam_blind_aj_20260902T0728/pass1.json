@@ -1,0 +1,481 @@
+{
+  "findings": [
+    {
+      "id": "AJ4-01",
+      "lens": "AJ4",
+      "severity": "P2",
+      "title": "mark_sold live_only deslista checkout_product_id sem PI",
+      "actor": "seller",
+      "pre": "live_only com checkout_product_id do próprio SKU, sem order paga",
+      "repro": "rpc batata_mark_live_item_sold",
+      "expected": "produto permanece listado (sem PI)",
+      "obtained": {
+        "rpc": "200 {\"ok\": true, \"price\": 9.0, \"live_id\": \"47770883-565d-46dc-ba46-14fb5ede53c8\", \"ref_code\": \"CKOWN\", \"item_kind\": \"live_only\", \"total_qty\": 1, \"product_id\": null, \"blocked_qty\": 0, \"live_status\": \"live\", \"live_item_id\": \"4f008d96-2449-4e3b-88…",
+        "before": {
+          "id": "d5d09e94-d1a8-4bd3-b429-a17b4ec8b3cb",
+          "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+          "title": "RTAJ-20260902T0728-own-ck",
+          "price": 8.0,
+          "quantity": 1,
+          "is_sold": false,
+          "list_on_marketplace": true,
+          "available_for_live": true
+        },
+        "after": {
+          "id": "d5d09e94-d1a8-4bd3-b429-a17b4ec8b3cb",
+          "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+          "title": "RTAJ-20260902T0728-own-ck",
+          "price": 8.0,
+          "quantity": 1,
+          "is_sold": true,
+          "list_on_marketplace": false,
+          "available_for_live": true
+        },
+        "item": {
+          "id": "4f008d96-2449-4e3b-8820-f8aee5308f7c",
+          "live_id": "47770883-565d-46dc-ba46-14fb5ede53c8",
+          "product_id": null,
+          "checkout_product_id": "d5d09e94-d1a8-4bd3-b429-a17b4ec8b3cb",
+          "item_kind": "live_only",
+          "quantity": 1,
+          "status": "available",
+          "price": 9.0,
+          "ref_code": "CKOWN",
+          "is_active": true
+        }
+      },
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "AJ4-02",
+      "lens": "AJ4",
+      "severity": "P1",
+      "title": "mark_sold deslista produto de outro vendedor via checkout_product_id",
+      "actor": "seller",
+      "pre": "live_only.checkout_product_id = SKU seller2",
+      "repro": "INSERT live_only + mark_sold",
+      "expected": "blocked insert ou unlist só do próprio",
+      "obtained": {
+        "item": "1af71481-774e-4e3c-b74d-77b6b76f645a",
+        "rpc": "200 {\"ok\": true, \"price\": 9.0, \"live_id\": \"47770883-565d-46dc-ba46-14fb5ede53c8\", \"ref_code\": \"CKX\", \"item_kind\": \"live_only\", \"total_qty\": 1, \"product_id\": null, \"blocked_qty\": 0, \"live_status\": \"live\", \"live_item_id\": \"1af71481-774e-4e3c-b74d…",
+        "before": {
+          "id": "33c0358d-dfb6-4321-b1a5-9d25bb5b06b1",
+          "seller_id": "698a9b96-ec6f-433c-808d-d3fde92f6bbb",
+          "title": "RTAJ-20260902T0728-s2sku",
+          "price": 15.0,
+          "quantity": 1,
+          "is_sold": false,
+          "list_on_marketplace": true,
+          "available_for_live": true
+        },
+        "after": {
+          "id": "33c0358d-dfb6-4321-b1a5-9d25bb5b06b1",
+          "seller_id": "698a9b96-ec6f-433c-808d-d3fde92f6bbb",
+          "title": "RTAJ-20260902T0728-s2sku",
+          "price": 15.0,
+          "quantity": 1,
+          "is_sold": true,
+          "list_on_marketplace": false,
+          "available_for_live": true
+        }
+      },
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "AJ4-03",
+      "lens": "AJ4",
+      "severity": "P2",
+      "title": "INSERT live_item status=sold (guard só no UPDATE)",
+      "actor": "seller",
+      "pre": "item novo",
+      "repro": "POST live_items status=sold",
+      "expected": "live_item_status_sold_rpc_only ou status!=sold",
+      "obtained": {
+        "id": "116e1c9d-4fcc-4fa1-a923-688377477357",
+        "live_id": "47770883-565d-46dc-ba46-14fb5ede53c8",
+        "seller_id": null,
+        "ref_code": "SOLDINS",
+        "title": "RTAJ-20260902T0728 insert-sold",
+        "description": null,
+        "price": 4,
+        "image_url": null,
+        "size": null,
+        "color": null,
+        "is_active": true,
+        "order_index": 0,
+        "status": "sold",
+        "created_at": "2026-09-02T06:39:18.808317+00:00",
+        "photo_url": null,
+        "item_kind": "live_only",
+        "product_id": null,
+        "checkout_product_id": null,
+        "quantity": 1,
+        "clothing_size": null,
+        "gender": null,
+        "updated_at": "2026-09-02T06:39:18.808317+00:00",
+        "logical_item_id": null,
+        "public_slot": null
+      },
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "AJ5-02",
+      "lens": "AJ5",
+      "severity": "P3",
+      "title": "INSERT live_only qty=99 (inflate só bloqueado no UPDATE)",
+      "actor": "seller",
+      "pre": "item novo",
+      "repro": "POST live_items quantity=99",
+      "expected": "cap ou 1 (se política = não inflar live_only)",
+      "obtained": {
+        "id": "534a76b3-a782-432b-83e3-e0ceaa9d5dba",
+        "live_id": "47770883-565d-46dc-ba46-14fb5ede53c8",
+        "product_id": null,
+        "checkout_product_id": null,
+        "item_kind": "live_only",
+        "quantity": 99,
+        "status": "available",
+        "price": 9.0,
+        "ref_code": "HUGE",
+        "is_active": true
+      },
+      "proven": true,
+      "evidence": {}
+    }
+  ],
+  "blocked": [
+    {
+      "id": "AJ1-01",
+      "lens": "AJ1",
+      "title": "stripe_convert JWT",
+      "ev": {
+        "rpc": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_live_reservation_stripe_convert\"}",
+        "status": "pending"
+      }
+    },
+    {
+      "id": "AJ1-02",
+      "lens": "AJ1",
+      "title": "stripe_convert seller",
+      "ev": {
+        "rpc": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_live_reservation_stripe_convert\"}",
+        "status": "pending"
+      }
+    },
+    {
+      "id": "AJ1-03",
+      "lens": "AJ1",
+      "title": "process convert pending",
+      "ev": {
+        "rpc": "200 {\"ok\": false, \"error\": \"convert_requires_paid_order\"}",
+        "status": "pending"
+      }
+    },
+    {
+      "id": "AJ1-04",
+      "lens": "AJ1",
+      "title": "INSERT converted ocr_manual",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"convert_requires_paid_order\"}"
+    },
+    {
+      "id": "AJ1-05",
+      "lens": "AJ1",
+      "title": "INSERT accepted instagram",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"new row violates row-level security policy for table \\\"live_reservation_requests\\\"\"}"
+    },
+    {
+      "id": "AJ1-08",
+      "lens": "AJ1",
+      "title": "one PI two convert",
+      "ev": {
+        "convCount": 0,
+        "cA": "200 {\"ok\": false, \"error\": \"convert_requires_paid_order\"}",
+        "cB": "200 {\"ok\": false, \"error\": \"convert_requires_paid_order\"}",
+        "stA": "accepted",
+        "stB": "rejected"
+      }
+    },
+    {
+      "id": "AJ5-03",
+      "lens": "AJ5",
+      "title": "move live_id",
+      "ev": {
+        "patch": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"live_item_live_id_immutable\"}",
+        "live_id": "47770883-565d-46dc-ba46-14fb5ede53c8"
+      }
+    },
+    {
+      "id": "AJ5-04",
+      "lens": "AJ7",
+      "title": "attach other product",
+      "ev": "blocked"
+    },
+    {
+      "id": "AJ2-01",
+      "lens": "AJ2",
+      "title": "view mark_sold",
+      "ev": "200 {\"ok\": false, \"error\": \"not_allowed\"}"
+    },
+    {
+      "id": "AJ2-02",
+      "lens": "AJ2",
+      "title": "view PATCH item",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"live_item_not_authorized\"}"
+    },
+    {
+      "id": "AJ2-02b",
+      "lens": "AJ2",
+      "title": "view end live",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table lives\"}"
+    },
+    {
+      "id": "AJ2-04",
+      "lens": "AJ2",
+      "title": "self-escalate",
+      "ev": {
+        "patch": "200 []",
+        "perms": {
+          "can_mark_items_sold": false,
+          "can_change_current_item": false,
+          "can_manage_reservations": false,
+          "can_view_live_dashboard": true
+        }
+      }
+    },
+    {
+      "id": "AJ2-05",
+      "lens": "AJ2",
+      "title": "helper INSERT item",
+      "ev": "blocked"
+    },
+    {
+      "id": "AJ7-01",
+      "lens": "AJ7",
+      "title": "PATCH other live",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table lives\"}"
+    },
+    {
+      "id": "AJ7-02",
+      "lens": "AJ7",
+      "title": "mux token other live",
+      "ev": "403 {\"error\":\"Sem permissão para esta live.\",\"step\":\"auth\"}"
+    },
+    {
+      "id": "AJ7-03",
+      "lens": "AJ7",
+      "title": "complete-mux other",
+      "ev": "403 {\"error\":\"Sem permissão para esta live.\",\"step\":\"auth\"}"
+    },
+    {
+      "id": "AJ7-04",
+      "lens": "AJ7",
+      "title": "stream_key REST",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table lives\"}"
+    },
+    {
+      "id": "AJ7-05",
+      "lens": "AJ7",
+      "title": "system message other live",
+      "ev": "200 {\"ok\": false, \"error\": \"not_allowed\"}"
+    },
+    {
+      "id": "AJ7-06",
+      "lens": "AJ7",
+      "title": "insert item other live",
+      "ev": "blocked"
+    },
+    {
+      "id": "AJ6-01",
+      "lens": "AJ6",
+      "title": "race accept",
+      "ev": {
+        "accN": 1,
+        "rpc": [
+          "200 {\"ok\": true, \"item_qty\": 1, \"request_id\": \"ad66576b-382b-4701-91b0-c6533701c333\", \"item_status\": \"reserved_full\", \"reserved_qty\": 1}",
+          "200 {\"ok\": false, \"error\": \"qty_exceeds_stock\", \"requested\": 1, \"available_qty\": 0}"
+        ]
+      }
+    },
+    {
+      "id": "AJ8-02",
+      "lens": "AJ8",
+      "title": "wallet delta zero",
+      "ev": {
+        "before": {
+          "buyer": 61.1,
+          "seller": 17.97,
+          "buyer2": 0,
+          "seller2": 0,
+          "helper": 0
+        },
+        "after": {
+          "buyer": 61.1,
+          "seller": 17.97,
+          "buyer2": 0,
+          "seller2": 0,
+          "helper": 0
+        }
+      }
+    }
+  ],
+  "notes": [
+    {
+      "id": "item.fail",
+      "title": "insertMarketItem",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"new row for relation \\\"live_items\\\" violates check constraint \\\"live_items_kind_stock_chk\\\"\"}"
+    },
+    {
+      "id": "staff.invite.ops",
+      "lens": "AJ2",
+      "title": "ops helper accept",
+      "ev": "200 [{\"id\":\"323ae75c-725c-43be-b3a3-c97b0d730fc5\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"helper_user_id\":\"2e536d17-b37a-4534-8fc0-e52f18862083\",\"display_name\":\"RTAJ-20260902T0728 helper\",\"active\":true,\"permissions\":{\"can_manage_res…"
+    },
+    {
+      "id": "staff.invite.view",
+      "lens": "AJ2",
+      "title": "view helper accept",
+      "ev": "200 [{\"id\":\"51d9cd9c-36fa-4771-a218-43be67928baa\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"helper_user_id\":\"14cb5925-7d1c-45c1-b42f-754c5048e445\",\"display_name\":\"RTAJ-20260902T0728 helper\",\"active\":true,\"permissions\":{\"can_mark_items…"
+    },
+    {
+      "id": "aj1.buyer.pending",
+      "lens": "AJ1",
+      "title": "buyer pending",
+      "ev": "201 [{\"id\":\"663eb66c-5e9a-413a-89e3-b2ac3f3e4e39\",\"live_id\":\"47770883-565d-46dc-ba46-14fb5ede53c8\",\"live_item_id\":\"3ca8deb0-80b5-4657-a202-33a0aa8d5b4c\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0…"
+    },
+    {
+      "id": "aj1.insert.accepted.ig",
+      "lens": "AJ1",
+      "title": "INSERT accepted source instagram",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"new row violates row-level security policy for table \\\"live_reservation_requests\\\"\"}"
+    },
+    {
+      "id": "aj1.paid.fixture",
+      "lens": "AJ1",
+      "title": "service paid order qty=1",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"order_live_item_product_missing\"}"
+    },
+    {
+      "id": "aj4.lo.ck.own",
+      "lens": "AJ4",
+      "title": "live_only + checkout own sku",
+      "ev": "4f008d96-2449-4e3b-8820-f8aee5308f7c"
+    },
+    {
+      "id": "aj4.lo.ck.x",
+      "lens": "AJ4",
+      "title": "live_only checkout OTHER sku",
+      "ev": "1af71481-774e-4e3c-b74d-77b6b76f645a"
+    },
+    {
+      "id": "item.fail",
+      "title": "insertMarketItem",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"new row for relation \\\"live_items\\\" violates check constraint \\\"live_items_kind_stock_chk\\\"\"}"
+    },
+    {
+      "id": "item.fail",
+      "title": "insertMarketItem",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"new row for relation \\\"live_items\\\" violates check constraint \\\"live_items_kind_stock_chk\\\"\"}"
+    },
+    {
+      "id": "aj5.dup.items",
+      "lens": "AJ5",
+      "title": "two live_items same sku",
+      "ev": {
+        "dup1": null,
+        "dup2": null
+      }
+    },
+    {
+      "id": "item.fail",
+      "title": "insertMarketItem",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"live_item_product_seller_mismatch\"}"
+    },
+    {
+      "id": "item.fail",
+      "title": "insertLiveOnlyItem",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"new row violates row-level security policy for table \\\"live_items\\\"\"}"
+    },
+    {
+      "id": "item.fail",
+      "title": "insertLiveOnlyItem",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"live_item_not_authorized\"}"
+    },
+    {
+      "id": "aj6.mark_sold.race",
+      "lens": "AJ6",
+      "title": "double mark_sold",
+      "ev": [
+        "200 {\"ok\": true, \"price\": 9.0, \"live_id\": \"47770883-565d-46dc-ba46-14fb5ede53c8\", \"ref_code\": \"RACE\", \"item_kind\": \"live_only\", \"total_qty\": 1, \"product_id\": null, \"blocked_qty\": 0, \"live_status\": \"live\", \"live_item_id\": \"c12f6930-2602-444a-946…",
+        "200 {\"ok\": true, \"price\": 9.0, \"live_id\": \"47770883-565d-46dc-ba46-14fb5ede53c8\", \"ref_code\": \"RACE\", \"item_kind\": \"live_only\", \"total_qty\": 1, \"product_id\": null, \"blocked_qty\": 0, \"live_status\": \"live\", \"live_item_id\": \"c12f6930-2602-444a-946…"
+      ]
+    },
+    {
+      "id": "aj8.wallet.delta",
+      "lens": "AJ8",
+      "title": "wallets",
+      "ev": {
+        "before": {
+          "buyer": 61.1,
+          "seller": 17.97,
+          "buyer2": 0,
+          "seller2": 0,
+          "helper": 0
+        },
+        "after": {
+          "buyer": 61.1,
+          "seller": 17.97,
+          "buyer2": 0,
+          "seller2": 0,
+          "helper": 0
+        }
+      }
+    },
+    {
+      "id": "aj8.tip.other",
+      "lens": "AJ8",
+      "title": "tip checkout live alheia",
+      "ev": "400 {\"error\":\"Missing seller_id.\"}"
+    }
+  ],
+  "skipped": [],
+  "lenses": [
+    "AJ1",
+    "AJ2",
+    "AJ4",
+    "AJ5",
+    "AJ6",
+    "AJ7",
+    "AJ8"
+  ],
+  "ids": {
+    "liveA": "47770883-565d-46dc-ba46-14fb5ede53c8",
+    "liveB": "315e066f-09b9-4a6c-8899-c72efd3b37de",
+    "liveS2": "d5f9acf2-20c0-481a-9a61-93d647bc33b9",
+    "products": [
+      "69eaa5e4-1ae4-41f7-8091-335bfe1f16aa",
+      "f1a98735-3cef-47ab-a630-3fbb678cd98a",
+      "33c0358d-dfb6-4321-b1a5-9d25bb5b06b1",
+      "d5d09e94-d1a8-4bd3-b429-a17b4ec8b3cb"
+    ],
+    "items": [
+      "3ca8deb0-80b5-4657-a202-33a0aa8d5b4c",
+      "a9a4e020-4565-4898-a97f-75ccbad000b3",
+      "4f008d96-2449-4e3b-8820-f8aee5308f7c",
+      "1af71481-774e-4e3c-b74d-77b6b76f645a",
+      "116e1c9d-4fcc-4fa1-a923-688377477357",
+      "534a76b3-a782-432b-83e3-e0ceaa9d5dba",
+      "c12f6930-2602-444a-946c-54f2c9a04009"
+    ],
+    "reqs": [
+      "663eb66c-5e9a-413a-89e3-b2ac3f3e4e39",
+      "29f14f1d-de0c-45ff-a809-c7901feadc42",
+      "7134df95-fa8b-40ab-920a-c427079c2fb0",
+      "ad66576b-382b-4701-91b0-c6533701c333",
+      "15de4bc3-c404-4445-bc65-725be6846d29"
+    ],
+    "orders": []
+  }
+}

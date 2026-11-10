@@ -1,0 +1,63 @@
+{
+  "auditor": "REDTEAM_BLIND_BH_LIVE_POS_ATBE_v1",
+  "frozen_at": "2026-09-02T17:40:00Z",
+  "production_touched": false,
+  "fase4": false,
+  "corrections_applied": false,
+  "prefix": "RTBH-20260902T1821",
+  "staging": "fxdknzrqjenzqcvnwqqq",
+  "lentes_cobertas": ["BH1", "BH2", "BH3", "BH4", "BH5", "BH6", "BH7", "BH8"],
+  "veredicto": "FAIL_P2",
+  "contagem": {
+    "P0_aberto": false,
+    "P0_quantos": 0,
+    "P1_aberto": false,
+    "P1_quantos": 0,
+    "P2_aberto": true,
+    "P2_quantos": 2,
+    "P3_aberto": true,
+    "P3_quantos": 2,
+    "P4_aberto": false,
+    "P4_quantos": 0,
+    "TOTAL_P0_P3_abertos": 4
+  },
+  "findings": [
+    {
+      "id": "BH-P2-01",
+      "severity": "P2",
+      "lens": "BH1",
+      "title": "system_message FOMO por sinónimo / zw / leet",
+      "proof": "pass1.json BH1-02 BH2-02"
+    },
+    {
+      "id": "BH-P2-02",
+      "severity": "P2",
+      "lens": "BH8",
+      "title": "reconcile MB WAY aguarda_confirmacao insere pending stripe_paid_direct",
+      "proof": "pass3c.json BH8-02"
+    },
+    {
+      "id": "BH-P3-01",
+      "severity": "P3",
+      "lens": "BH3",
+      "title": "total_qty JWT buyer em live ended",
+      "proof": "pass1.json BH3-07"
+    },
+    {
+      "id": "BH-P3-02",
+      "severity": "P3",
+      "lens": "BH3",
+      "title": "stock gate quantity NULL esconde marketplace_product a buyer/anon",
+      "proof": "pass3c.json BH3-08"
+    }
+  ],
+  "not_counted_exacts": [
+    "system_message ✅ comprou",
+    "purchase_broadcast sem pago"
+  ],
+  "false_positives_discarded": [
+    "pass2 BH6-01/02 end JWT 403 live ainda live",
+    "pass1 BH2-04 PATCH 200 []",
+    "pass2b BH6-03 service reopen (não actor JWT)"
+  ]
+}

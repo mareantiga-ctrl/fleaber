@@ -1,0 +1,156 @@
+{
+  "auditor": "REDTEAM_BLIND_CF_LIVE_POS_BXCC_v1",
+  "prefix": "RTCF-20260906T1228",
+  "findings": [],
+  "blocked": [
+    {
+      "id": "p2.broadcast.buyer.nopi",
+      "lens": "CF1",
+      "title": "broadcast sem PI recusado",
+      "ev": "200 false"
+    },
+    {
+      "id": "p2.broadcast.seller.nopi",
+      "lens": "CF1",
+      "title": "broadcast sem PI recusado",
+      "ev": "200 false"
+    },
+    {
+      "id": "p2.broadcast.helper.nopi",
+      "lens": "CF1",
+      "title": "broadcast sem PI recusado",
+      "ev": "200 false"
+    },
+    {
+      "id": "p2.accept_broadcast.buyer",
+      "lens": "CF1",
+      "title": "buyer accept_broadcast recusado (HOLD)",
+      "ev": "200 false"
+    },
+    {
+      "id": "p2.convert.seller.nopi",
+      "lens": "CF1",
+      "title": "convert sem PI recusado",
+      "ev": {
+        "rpc": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_live_reservation_stripe_convert\"}",
+        "status": "accepted"
+      }
+    },
+    {
+      "id": "p2.patch.converted.nopi",
+      "lens": "CF8",
+      "title": "PATCH converted recusado",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"convert_requires_paid_order\"}"
+    },
+    {
+      "id": "p2.broadcast.pi_other_live",
+      "lens": "CF1",
+      "title": "broadcast PI live errada recusado",
+      "ev": "200 false"
+    },
+    {
+      "id": "p2.reconcile.pi_other_live",
+      "lens": "CF1",
+      "title": "reconcile PI live errada recusado",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"convert_requires_paid_order\"}"
+    },
+    {
+      "id": "p2.helper.self_escalate",
+      "lens": "CF1",
+      "title": "helper self-escalate recusado",
+      "ev": {
+        "patch": "200 []",
+        "before": {
+          "can_manage_chat": true,
+          "can_mark_items_sold": false,
+          "can_manage_reservations": false
+        },
+        "after": {
+          "can_manage_chat": true,
+          "can_mark_items_sold": false,
+          "can_manage_reservations": false
+        }
+      }
+    },
+    {
+      "id": "p2.helper.sold.convert",
+      "lens": "CF1",
+      "title": "helper sold convert recusado",
+      "ev": "200 []"
+    },
+    {
+      "id": "p2.helper.ocr",
+      "lens": "CF1",
+      "title": "OCR helper recusado",
+      "ev": "401 {\"ok\":false,\"error\":\"missing_device_token\"}"
+    },
+    {
+      "id": "p2.qty.over_stock.accept",
+      "lens": "CF5",
+      "title": "qty>stock não accepted",
+      "ev": {
+        "row": {
+          "id": "0eba48b1-cbee-492a-8139-8fcf199cbc04",
+          "status": "accepted",
+          "requested_qty": 1
+        },
+        "accept": "200 [{\"id\":\"0eba48b1-cbee-492a-8139-8fcf199cbc04\",\"live_id\":\"5f8e88f2-c91b-4650-a64d-c6e90d11d744\",\"live_item_id\":\"5bd19257-3877-40a4-9853-68185abf505f\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"buyer_id\":\"bfcbeeee…",
+        "pending_id": "0eba48b1-cbee-492a-8139-8fcf199cbc04"
+      }
+    },
+    {
+      "id": "p2.hitch.two_accepts",
+      "lens": "CF4",
+      "title": "2º accept recusado (HOLD hitch)",
+      "ev": {
+        "r1": {
+          "id": "4961cc01-9cd4-47b7-a4e4-73d4c119b282",
+          "status": "accepted"
+        },
+        "r2": {
+          "id": "fde9347e-31f3-40e8-8902-331f0dfc7de7",
+          "status": "pending"
+        },
+        "a2": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"qty_exceeds_stock\"}"
+      }
+    }
+  ],
+  "notes": [
+    {
+      "id": "p2.accept.A",
+      "lens": "CF1",
+      "title": "seller accept A",
+      "ev": "200 [{\"id\":\"2616cf7d-187d-4d69-bf67-b40b690d2b67\",\"live_id\":\"6a54a785-7d33-4a06-a061-e71a0690d080\",\"live_item_id\":\"0636e9e3-097c-435b-9aaa-075d76d7ac0b\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"buyer_id\":\"bfcbeeee…"
+    },
+    {
+      "id": "p2.accept.B",
+      "lens": "CF1",
+      "title": "seller accept B",
+      "ev": "200 [{\"id\":\"e869de3c-363d-4de6-85c5-8457ea83c577\",\"live_id\":\"e7909dd5-4ff1-4312-b5a2-e96c632161b1\",\"live_item_id\":\"58b3e7a8-cbb4-4904-a7b9-a6049b2a3a1f\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"buyer_id\":\"eab0d007…"
+    },
+    {
+      "id": "p2.plant.orderA",
+      "lens": "CF1",
+      "title": "plant pago+PI live A",
+      "ev": "201 [{\"id\":\"3db0da79-9bc5-4801-9747-c13471994b4c\",\"created_at\":\"2026-09-06T11:36:50.387747+00:00\",\"product_id\":\"c8e9fa32-95b7-4873-9603-14a912bc46a5\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-00…"
+    },
+    {
+      "id": "p2.orderB.pendente",
+      "lens": "CF1",
+      "title": "POST order B pendente",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"order_live_item_exhausted\"}"
+    },
+    {
+      "id": "p2.helper0.accept",
+      "lens": "CF1",
+      "title": "helper zero accept",
+      "ev": "200 []"
+    }
+  ],
+  "lenses": [
+    "CF1",
+    "CF4",
+    "CF5",
+    "CF8"
+  ]
+}

@@ -1,0 +1,141 @@
+{
+  "pass": 2,
+  "probes": {
+    "actors": {
+      "b1": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+      "s1": "980f4fa1-0004-42f9-abca-69f1a9c29588"
+    },
+    "setup.paid": {
+      "http": 200,
+      "snip": "{   \"ok\": true,   \"order_id\": \"da64ec26-32fa-468b-9f58-57dd07f2ae63\",   \"product_id\": \"ba6b0897-e738-4cda-8749-34b0c8d7361c\",   \"payment_intent_id\": \"pi_3UAPfCH7FWYUN3jh12afzAJm\",   \"pi_status\": \"succeeded\",   \"pi_amount_received\": 590,   \"initial_qty\": 2,   \"settle_http\": 200,  "
+    },
+    "p2.em_devolucao_persist": {
+      "http": 200,
+      "status": "em_devolucao"
+    },
+    "p2.devolucao_entregue_no_dispute": {
+      "http": 200,
+      "status": "devolucao_entregue"
+    },
+    "p2.devolvida_no_dispute": {
+      "http": 200,
+      "status": "devolucao_entregue",
+      "qty": [
+        1,
+        1
+      ],
+      "dB": 0.0
+    },
+    "p2.dispute_from_entregue": {
+      "status": "entregue",
+      "disp": {
+        "http": 400,
+        "snip": "{\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"new row for relation \\\"order_disputes\\\" violates check constraint \\\"order_disputes_reason_check\\\"\"}"
+      }
+    },
+    "p2.reopen_after_release": {
+      "rel": {
+        "http": 200,
+        "snip": "true"
+      },
+      "dS": 5.0,
+      "status": "enviado",
+      "released": "2026-08-31T07:29:43.478537+00:00",
+      "disp": {
+        "http": 403,
+        "snip": "{\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"new row violates row-level security policy for table \\\"order_disputes\\\"\"}"
+      },
+      "relB2": {
+        "http": 200,
+        "snip": "false"
+      }
+    },
+    "setup.bag": {
+      "http": 200,
+      "snip": "{   \"ok\": true,   \"probe\": \"setup_paid_bag\",   \"payment_intent_id\": \"pi_3UAPf2H7FWYUN3jh1dYN76ry\",   \"pi_amount_cents\": 1115,   \"total_cents_quote\": 1115,   \"items_cents\": 1000,   \"protection_cents\": 115,   \"share_a_cents\": 335,   \"share_b_cents\": 780,   \"expected_paid_a\": 335,  "
+    },
+    "p2.refund_bag_while_pago": {
+      "http": 200,
+      "snip": "{\"ok\":true,\"already_refunded\":true,\"idempotent\":true,\"refund_id\":\"re_3UAPf2H7FWYUN3jh1U6vhdzQ\",\"status\":\"cancelado\",\"stock_units_applied\":null,\"amount_cents\":335,\"payment_intent\":\"pi_3UAPf2H7FWYUN3jh1dYN76ry\",\"status_str",
+      "A0": "pago",
+      "A1": "cancelado",
+      "B0": "pago",
+      "B1": "pago",
+      "A_ref": "re_3UAPf2H7FWYUN3jh1U6vhdzQ",
+      "B_ref": null,
+      "qtyA": [
+        2,
+        3
+      ],
+      "qtyB": [
+        2,
+        2
+      ],
+      "B_paid": 780,
+      "B_st": 1
+    },
+    "p2.refund_bag_B_intact": true,
+    "p2.partial_disp": {
+      "http": 201,
+      "snip": "[{\"id\":\"0040ef79-58da-4699-bdec-93cdcd245fb2\",\"order_id\":\"87a74be6-95cc-4cf9-9715-78357da2c344\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"reason\":\"danificado\",\"description\":\"RTD2 pass2 oferta parcial real do vendedor cinquenta por cento.\",\"proof_photos\":[],\"status\":\"aber"
+    },
+    "p2.seller_offer_50": {
+      "http": 200,
+      "percent": 50.0,
+      "set_by": "980f4fa1-0004-42f9-abca-69f1a9c29588"
+    },
+    "p2.partial_rpc_50": {
+      "rpc": {
+        "http": 200,
+        "snip": "true"
+      },
+      "dB": 2.9499999999999993,
+      "dS": 2.049999999999983,
+      "refund_id": null,
+      "w_ref": "2026-08-31T07:29:53.157718+00:00",
+      "w_rel": "2026-08-31T07:29:53.157718+00:00"
+    },
+    "p2.review_on_enviado": {
+      "http": 400,
+      "snip": "{\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"review_order_invalid_status\"}"
+    },
+    "p2.patch_auto_feedback_at": {
+      "http": 200,
+      "auto": "[{\"auto_feedback_processed_at\":\"2020-01-01T00:00:00+00:00\"}]"
+    },
+    "p2.release_s2_on_b1": {
+      "http": 200,
+      "snip": "false"
+    },
+    "p2.s2_enviado_alien": {
+      "http": 200,
+      "snip": "[]"
+    }
+  },
+  "findings": [
+    {
+      "id": "RTD2-0820-D2-2-02",
+      "title": "Buyer pago→em_devolucao sem disputa nem enviado",
+      "sev": "P1",
+      "actor": "B1 JWT",
+      "lens": "D2-2",
+      "after": "em_devolucao",
+      "impact": "FSM de devolução acessível sem disputa. Sem Δ sozinho; encadeia com etiqueta/devolvida.",
+      "repro": "setup_paid_order → PATCH em_devolucao"
+    },
+    {
+      "id": "RTD2-0820-D2-1-05b",
+      "title": "Após payout, seller reabre enviado e bloqueia disputa",
+      "sev": "P1",
+      "actor": "S1 JWT",
+      "lens": "D2-1",
+      "after": {
+        "status": "enviado",
+        "disp_http": 403,
+        "dS": 5.0
+      },
+      "impact": "Dinheiro libertado; comprador já não abre disputa (RLS concluido/entregue + release null).",
+      "repro": "enviado→concluido→release→seller PATCH enviado→INSERT disputa"
+    }
+  ]
+}

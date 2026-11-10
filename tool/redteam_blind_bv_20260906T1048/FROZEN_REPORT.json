@@ -1,0 +1,50 @@
+{
+  "auditor": "REDTEAM_BLIND_BV_PAYOUT_POS_BLBQ_v1",
+  "frozen_at": "2026-09-06T10:00:00Z",
+  "prefix": "RTBV-20260906T1048",
+  "staging": "fxdknzrqjenzqcvnwqqq",
+  "production_touched": false,
+  "fase4": false,
+  "corrections_applied": false,
+  "veredicto": "FAIL_P2",
+  "lentes": ["BV1", "BV2", "BV3", "BV4", "BV5", "BV6", "BV7"],
+  "contagem": {
+    "P0": 0,
+    "P1": 0,
+    "P2": 2,
+    "P3": 0,
+    "P4": 0,
+    "total_p0_p3": 2
+  },
+  "findings_open": [
+    {
+      "id": "BV-P2-01",
+      "severity": "P2",
+      "lens": "BV4",
+      "title": "homóglifo cirílico na idempotency_key → 2 Transfers",
+      "count": true,
+      "transfers": ["tr_1UCcnGH7FWYUN3jhGZflgUfV", "tr_1UCcnJH7FWYUN3jhFhLFQuav"],
+      "delta_eur": -2.0,
+      "proof": "pass1.json pair.homo"
+    },
+    {
+      "id": "BV-P2-02",
+      "severity": "P2",
+      "lens": "BV4",
+      "title": "NBSP no meio da key vs sem espaço → 2 Transfers",
+      "count": true,
+      "transfers": ["tr_1UCcnMH7FWYUN3jhz7FqHU1y", "tr_1UCcnOH7FWYUN3jhUCTbbDKe"],
+      "delta_eur": -2.0,
+      "proof": "pass1.json pair.nbsp-none"
+    }
+  ],
+  "not_counted": {
+    "exact_put": "405",
+    "exact_amount_true": "400",
+    "exact_web_return_2130706433": "200 HTML wallet",
+    "casefold_Payout_vs_payout": "2 Transfers design (no toLowerCase)",
+    "nbsp_vs_space": "1 Transfer NFKC HOLD",
+    "destination_spoof": "FP — ignored, own Connect",
+    "unship_pass2": "FP — order stayed pago"
+  }
+}

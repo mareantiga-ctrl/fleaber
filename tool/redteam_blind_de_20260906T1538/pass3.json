@@ -1,0 +1,71 @@
+{
+  "probes": [
+    {
+      "probe_id": "C1",
+      "poco": "DE-C",
+      "payload": "create-mux-live B1+B2(comprador)+S2 body seller_id=S1",
+      "http": "{\"buyer\":\"403 acao=* 1280ms {\\\"error\\\":\\\"Apenas contas de vendedor podem criar directos.\\\",\\\"step\\\":\\\"authz\\\"}\",\"b2\":\"403 acao=* 534ms {\\\"error\\\":\\\"Apenas contas de vendedor podem criar directos.\\\",\\\"step\\\":\\\"authz\\\"}\",\"b2_type\":\"comprador\",\"s2\":\"200 acao=* 1458ms {\\\"live\\\":{\\\"id…",
+      "bd": "{\"live\":\"9fdd06e0-2cb5-4de6-a8c8-9693b7b5acaf\",\"owner\":\"98252485-94ef-42c5-94ca-ddc4436b006f\"}",
+      "result": "HOLD",
+      "lens": "DE4",
+      "residual": false,
+      "count_finding": false
+    },
+    {
+      "probe_id": "C2",
+      "poco": "DE-C",
+      "payload": "OPTIONS Origin chrome-extension + https://evil.fleaber.pt → ACAO fleaber.pt (não eco)",
+      "http": "{\"opt.mux.ext\":\"200 acao=https://fleaber.pt 272ms ok\",\"opt.tip.ext\":\"200 acao=https://fleaber.pt 351ms ok\",\"post.ext\":\"200 acao=https://fleaber.pt 569ms {\\\"playback_id\\\":\\\"rtdePbLive1538aaaa\\\",\\\"playback_url\\\":\\\"https://stream.mux.com/rtdePbLive1538aaaa.m3u8?reduced_latency=true\\…",
+      "bd": "",
+      "result": "HOLD",
+      "lens": "DE5",
+      "residual": false,
+      "count_finding": false
+    },
+    {
+      "probe_id": "C3",
+      "poco": "DE-C",
+      "payload": "resolve-mux-playback unpublished anon/B1/dono S2",
+      "http": "{\"anon\":\"404 acao=* 646ms {\\\"error\\\":\\\"live_not_public\\\"}\",\"b1\":\"404 acao=* 476ms {\\\"error\\\":\\\"live_not_public\\\"}\",\"owner\":\"200 acao=* 550ms {\\\"playback_id\\\":\\\"rtdePbLive1538bbbb\\\",\\\"playback_url\\\":\\\"https://stream.mux.com/rtdePbLive1538bbbb.m3u8?reduced_latency=true\\\",\\\"source\\\"…",
+      "bd": "",
+      "result": "HOLD",
+      "lens": "DE4",
+      "residual": false,
+      "count_finding": false
+    }
+  ],
+  "findings": [],
+  "notes": [
+    {
+      "id": "c.b2.type",
+      "lens": "DE4",
+      "title": "B2 user_type",
+      "ev": "comprador"
+    },
+    {
+      "id": "c1.s2",
+      "lens": "DE4",
+      "title": "create-mux S2 body seller=S1",
+      "ev": "200 acao=* 1458ms {\"live\":{\"id\":\"9fdd06e0-2cb5-4de6-a8c8-9693b7b5acaf\",\"created_at\":\"2026-09-06T14:43:56.191839+00:00\",\"vendedor_id\":\"98252485-94ef-42c5-94ca-ddc4436b006f\",\"mux_live_id\":\"VvT9k9RdAbpot0101523WNRiANHqI5OSEVi8L2V1xeU4A\",\"str…"
+    },
+    {
+      "id": "c1.s2.live",
+      "lens": "DE4",
+      "title": "live created by hostile body",
+      "ev": "200 253ms [{\"id\":\"9fdd06e0-2cb5-4de6-a8c8-9693b7b5acaf\",\"seller_id\":\"98252485-94ef-42c5-94ca-ddc4436b006f\",\"vendedor_id\":\"98252485-94ef-42c5-94ca-ddc4436b006f\",\"title\":\"RTDE-20260906T1538 s2-for-s1\",\"mux_live_id\":\"VvT9k9RdAbpot010…"
+    },
+    {
+      "id": "end.s1",
+      "lens": "DE1",
+      "title": "S1 hub restored",
+      "ev": true
+    }
+  ],
+  "skipped": [],
+  "lenses": [
+    "DE1",
+    "DE4",
+    "DE5"
+  ],
+  "s1_hub_final": true
+}

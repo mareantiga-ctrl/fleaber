@@ -1,0 +1,499 @@
+{
+  "auditor": "REDTEAM_BLIND_DU_RAFFLE_HUB_POS_DNDS_v1",
+  "prefix": "RTDU-20260906T1736",
+  "staging": "fxdknzrqjenzqcvnwqqq",
+  "probes": [
+    {
+      "probe_id": "A5",
+      "surfaces": "rifa RPC",
+      "action": "JWT buyer tenta batata_draw_live_raffle_winners",
+      "http": "400 {\"code\":\"P0001\",\"details\":null,\"hint\":null,\"message\":\"not_allowed\"}",
+      "oracles": "{\"winners_pre\":0,\"buyer_ok\":false}",
+      "result": "HOLD",
+      "lens": "DU6",
+      "residual": false,
+      "count_finding": false,
+      "classe_nova": false,
+      "race": false
+    },
+    {
+      "probe_id": "A1",
+      "surfaces": "Hub + products + live_item + orders",
+      "action": "draw qty=1 marketplace hitch → Hub 0 + insert deny",
+      "http": "{\"award\":\"200 {\\\"ok\\\": false, \\\"error\\\": \\\"raffle_ended\\\"}\",\"close\":\"200 {\\\"ok\\\": true, \\\"status\\\": \\\"closed\\\"}\",\"draw\":\"400 {\\\"code\\\":\\\"P0001\\\",\\\"details\\\":null,\\\"hint\\\":null,\\\"message\\\":\\\"no_participants\\\"}\",\"ins\":\"201 [{\\\"id\\\":\\\"e9ce299b-c40a-4420-8cc9-17faa01e3be6\\\",\\\"created_at\\\":\\\"2026-09-06T16:45:57.069226+00:00…",
+      "oracles": "{\"qty\":\"1→1\",\"hub_n\":1,\"sold\":false,\"listed\":true,\"winners\":0,\"prize_n\":0,\"tickets\":0,\"li\":\"available\"}",
+      "result": "FAIL",
+      "lens": "DU2",
+      "residual": true,
+      "count_finding": true,
+      "classe_nova": false,
+      "race": false
+    },
+    {
+      "probe_id": "A4",
+      "surfaces": "rifa winners",
+      "action": "draw 2× idempotente",
+      "http": "400 {\"code\":\"P0001\",\"details\":null,\"hint\":null,\"message\":\"no_participants\"} | 400 {\"code\":\"P0001\",\"details\":null,\"hint\":null,\"message\":\"no_participants\"}",
+      "oracles": "{\"nWin\":0,\"status\":\"closed\"}",
+      "result": "HOLD",
+      "lens": "DU1",
+      "residual": true,
+      "count_finding": false,
+      "classe_nova": false,
+      "race": false
+    },
+    {
+      "probe_id": "D2",
+      "surfaces": "draw return + products + Hub + orders",
+      "action": "prize_orders[] vs seal.ok no retorno draw",
+      "http": "{\"draw\":\"400 {\\\"code\\\":\\\"P0001\\\",\\\"details\\\":null,\\\"hint\\\":null,\\\"message\\\":\\\"no_participants\\\"}\",\"seal\":\"200 {\\\"ok\\\": false, \\\"error\\\": \\\"no_winners\\\"}\"}",
+      "oracles": "{\"prize_n\":0,\"seal_ok\":false,\"hub_n\":1,\"qty\":1}",
+      "result": "HOLD",
+      "lens": "DU7",
+      "residual": false,
+      "count_finding": false,
+      "classe_nova": true,
+      "race": false
+    },
+    {
+      "probe_id": "D3",
+      "surfaces": "live_item + rifa",
+      "action": "live_item status após draw",
+      "http": "400 {\"code\":\"P0001\",\"details\":null,\"hint\":null,\"message\":\"no_participants\"}",
+      "oracles": "{\"status\":\"available\",\"active\":true,\"drawn\":\"closed\"}",
+      "result": "HOLD",
+      "lens": "DU2",
+      "residual": false,
+      "count_finding": false,
+      "classe_nova": true,
+      "race": false
+    },
+    {
+      "probe_id": "B2",
+      "surfaces": "orders + CPI + Hub",
+      "action": "after drawn: CPI / insert order nova",
+      "http": "{\"ins\":\"201 [{\\\"id\\\":\\\"e9ce299b-c40a-4420-8cc9-17faa01e3be6\\\",\\\"created_at\\\":\\\"2026-09-06T16:45:57.069226+00:00\\\",\\\"product_id\\\":\\\"21ade692-dac3-4b57-87d0-8ea09131227d\\\",\\\"buyer_id\\\":\\\"56f10f8d-3951-4e80-b263-a64b164b447a\\\",\\\"seller_id\\\":\\\"980f4fa1-00…\",\"cpi\":\"200 {\\\"checkoutUrl\\\":\\\"https://checkout.stripe.com/c/pay/cs…",
+      "oracles": "{\"hub_n\":1,\"held\":\"200 1\"}",
+      "result": "SKIP",
+      "lens": "DU3",
+      "residual": false,
+      "count_finding": true,
+      "classe_nova": true,
+      "race": false
+    },
+    {
+      "probe_id": "A2",
+      "surfaces": "Hub + products + winners + orders",
+      "action": "draw winner_count=2 stock=2 → Hub qty / 2.º insert",
+      "http": "{\"a1\":\"200 {\\\"ok\\\": false, \\\"error\\\": \\\"raffle_ended\\\"}\",\"a2\":\"200 {\\\"ok\\\": false, \\\"error\\\": \\\"raffle_ended\\\"}\",\"draw\":\"400 {\\\"code\\\":\\\"P0001\\\",\\\"details\\\":null,\\\"hint\\\":null,\\\"message\\\":\\\"no_participants\\\"}\",\"ins\":\"201 [{\\\"id\\\":\\\"4917acea-51d9-45eb-886e-053b3055de21\\\",\\\"created_at\\\":\\\"2026-09-06T16:46:01.389967+00:00…",
+      "oracles": "{\"nWin\":0,\"qty\":2,\"hub_n\":1,\"sold\":false,\"prize_n\":0}",
+      "result": "HOLD",
+      "lens": "DU5",
+      "residual": false,
+      "count_finding": false,
+      "classe_nova": true,
+      "race": false
+    },
+    {
+      "probe_id": "A3",
+      "surfaces": "live_item + rifa (sem product)",
+      "action": "draw sem product_id (live_only) skipped vs leak",
+      "http": "{\"award\":\"200 {\\\"ok\\\": false, \\\"error\\\": \\\"raffle_ended\\\"}\",\"draw\":\"400 {\\\"code\\\":\\\"P0001\\\",\\\"details\\\":null,\\\"hint\\\":null,\\\"message\\\":\\\"no_participants\\\"}\"}",
+      "oracles": "{\"li\":{\"id\":\"7df876d9-d9dd-47b0-9fd3-96c1a2f00203\",\"live_id\":\"90ae9a51-a7be-4fb3-9b8d-5ed917ca86b1\",\"product_id\":null,\"checkout_product_id\":null,\"quantity\":1,\"status\":\"available\",\"is_active\":true,\"item_kind\":\"live_only\",\"title\":\"RTDU-20260906T1736 A3 live_only-li\"},\"status\":\"closed\",\"skipped\":false,\"nWin\":0,\"product_id\":null}",
+      "result": "HOLD",
+      "lens": "DU1",
+      "residual": false,
+      "count_finding": false,
+      "classe_nova": true,
+      "race": false
+    },
+    {
+      "probe_id": "B1",
+      "surfaces": "rifa + CPI + Hub + products",
+      "action": "award tickets + draw∥CPI marketplace paralelo",
+      "http": "{\"award\":\"200 {\\\"ok\\\": false, \\\"error\\\": \\\"raffle_ended\\\"}\",\"close\":\"200 {\\\"ok\\\": true, \\\"status\\\": \\\"closed\\\"}\",\"draw\":\"400 {\\\"code\\\":\\\"P0001\\\",\\\"details\\\":null,\\\"hint\\\":null,\\\"message\\\":\\\"no_participants\\\"}\",\"cpi\":\"200 {\\\"checkoutUrl\\\":\\\"https://checkout.stripe.com/c/pay/cs_test_a1D3e0Jcvb6yfsVCljt6rfgDdj3bY6WhW2fgw4…",
+      "oracles": "{\"qty\":1,\"hub_n\":0,\"nWin\":0,\"cs\":\"cs_test_a1D3e0Jcvb6yfsVCljt6rfgDdj3bY6WhW2fgw46rr0Y7xZWkEkTQZItcMr\"}",
+      "result": "HOLD",
+      "lens": "DU4",
+      "residual": false,
+      "count_finding": false,
+      "classe_nova": true,
+      "race": true
+    },
+    {
+      "probe_id": "B3",
+      "surfaces": "Hub + products + winners",
+      "action": "leftover stock=3 winners=1 → Hub ainda lista? qty",
+      "http": "{\"draw\":\"400 {\\\"code\\\":\\\"P0001\\\",\\\"details\\\":null,\\\"hint\\\":null,\\\"message\\\":\\\"no_participants\\\"}\",\"ins\":\"201 [{\\\"id\\\":\\\"a7e397d1-576f-425d-8b48-f8b01d09db07\\\",\\\"created_at\\\":\\\"2026-09-06T16:46:09.238092+00:00\\\",\\\"product_id\\\":\\\"4dc0adf9-d9ef-403b-8e34-ad4913b496cb\\\",\\\"buyer_id\\\":\\\"56f10f8d-3951-4e80-b263-a64b164b447a\\\"…",
+      "oracles": "{\"qty\":3,\"hub_n\":1,\"nWin\":0,\"listed\":true}",
+      "result": "HOLD",
+      "lens": "DU2",
+      "residual": false,
+      "count_finding": false,
+      "classe_nova": true,
+      "race": false
+    },
+    {
+      "probe_id": "B4",
+      "surfaces": "orders premio_rifa + Hub + products",
+      "action": "refund/cancel premio_rifa vs Hub restore",
+      "http": "{\"draw\":\"400 {\\\"code\\\":\\\"P0001\\\",\\\"details\\\":null,\\\"hint\\\":null,\\\"message\\\":\\\"no_participants\\\"}\",\"rf\":null}",
+      "oracles": "{\"prize_n\":0,\"qty\":\"1→1\",\"hub_n\":1,\"prize_status\":null}",
+      "result": "HOLD",
+      "lens": "DU3",
+      "residual": false,
+      "count_finding": false,
+      "classe_nova": true,
+      "race": false
+    },
+    {
+      "probe_id": "C1",
+      "surfaces": "live reservation + convert RPC",
+      "action": "convert pending sem pago → deny (race convert∥accept)",
+      "http": "{\"conv\":\"403 {\\\"code\\\":\\\"42501\\\",\\\"details\\\":null,\\\"hint\\\":null,\\\"message\\\":\\\"permission denied for function batata_live_reservation_stripe_convert\\\"}\",\"acc\":\"200 [{\\\"id\\\":\\\"ba869cbe-de9a-4e51-821a-321b8e49268d\\\",\\\"live_id\\\":\\\"5c3a2d75-8022-44c8-8054-ac417559d476\\\",\\\"live_item_id\\\":\\\"91b51a49-f8a4-4b2c-9ba0-39390ad1e39…",
+      "oracles": "{\"r1\":\"pending\",\"r2\":\"accepted\"}",
+      "result": "HOLD",
+      "lens": "DU4",
+      "residual": false,
+      "count_finding": false,
+      "classe_nova": false,
+      "race": true
+    },
+    {
+      "probe_id": "C2",
+      "surfaces": "live accept + rifa + Hub + products",
+      "action": "accept hitch + rifa mesmo SKU (award∥unlist)",
+      "http": "{\"award\":\"200 {\\\"ok\\\": false, \\\"error\\\": \\\"raffle_ended\\\"}\",\"unlist\":\"200 [{\\\"id\\\":\\\"0b6077cc-1f67-43e1-bf42-735422c7b0a6\\\",\\\"created_at\\\":\\\"2026-09-06T16:46:13.16718+00:00\\\",\\\"seller_id\\\":\\\"980f4fa1-0004-42f9-abca-69f1a9c29588\\\",\\\"title\\\":\\\"RTDU-20260906T1736 C2 hitch+rifa\\\",\\\"price\\\":9.0,\\\"ref_code\\\":null,\\\"cate…\",\"a…",
+      "oracles": "{\"res\":\"accepted\",\"nWin\":0,\"qty\":1,\"hub_n\":0,\"listed\":false,\"double_claim\":false}",
+      "result": "HOLD",
+      "lens": "DU5",
+      "residual": false,
+      "count_finding": false,
+      "classe_nova": true,
+      "race": true
+    },
+    {
+      "probe_id": "C3",
+      "surfaces": "rifa social",
+      "action": "partilhar sem rifa activa → sem bilhetes",
+      "http": "200 {\"ok\": false, \"error\": \"raffle_not_found\"} | 200 {\"ok\": false, \"error\": \"raffle_not_found\"}",
+      "oracles": "{\"tickets\":0,\"winners\":0}",
+      "result": "HOLD",
+      "lens": "DU6",
+      "residual": true,
+      "count_finding": false,
+      "classe_nova": false,
+      "race": false
+    },
+    {
+      "probe_id": "C4",
+      "surfaces": "rifa social + entries RLS",
+      "action": "partilhar com rifa → elegível + forge entry alheia",
+      "http": "{\"join\":\"200 {\\\"ok\\\": true, \\\"joined\\\": true, \\\"duplicate\\\": false, \\\"ticket_balance\\\": 1}\",\"share\":\"200 {\\\"ok\\\": true, \\\"duplicate\\\": false, \\\"ticket_balance\\\": 2}\",\"forgeIns\":\"403 {\\\"code\\\":\\\"42501\\\",\\\"details\\\":null,\\\"hint\\\":null,\\\"message\\\":\\\"new row violates row-level security policy for table \\\\\\\"live_raffle_entr…",
+      "oracles": "{\"tJoin\":1,\"tShare\":2,\"tAfter\":2}",
+      "result": "HOLD",
+      "lens": "DU6",
+      "residual": false,
+      "count_finding": false,
+      "classe_nova": true,
+      "race": false
+    },
+    {
+      "probe_id": "D1",
+      "surfaces": "orders + Hub + products + Stripe",
+      "action": "pago 4242 SKU não-prémio + Hub leftover",
+      "http": "200 {\n  \"ok\": true,\n  \"order_id\": \"d35a49b8-8e43-45a6-b93b-e3ea27bacff9\",\n  \"product_id\": \"7232ecdb-f9c3-404a-8af4-def42d0f8d3c\",\n  \"payment_intent_id\": \"pi_3UCjCxH7FWYUN3jh0fZhGehE\",\n  \"pi_status\": \"succeeded\",\n  \"pi_amount…",
+      "oracles": "{\"status\":\"pago\",\"qty\":1,\"hub_n\":1,\"pi\":\"pi_3UCjCxH7FWYUN3jh0fZhGehE\",\"amount\":590}",
+      "result": "HOLD",
+      "lens": "DU7",
+      "residual": false,
+      "count_finding": false,
+      "classe_nova": false,
+      "race": false
+    }
+  ],
+  "findings": [
+    {
+      "id": "P2-A1-DRAW-FAIL",
+      "lens": "DU1",
+      "severity": "P2",
+      "title": "Draw qty=1 hitch não fechou drawn",
+      "actor": "seller JWT",
+      "pre": "SKU qty=1 listed hitch + tickets",
+      "repro": "close + batata_draw_live_raffle_winners",
+      "expected": "drawn + Hub 0",
+      "obtained": {
+        "draw": "400 {\"code\":\"P0001\",\"details\":null,\"hint\":null,\"message\":\"no_participants\"}",
+        "status": "closed"
+      },
+      "proven": true,
+      "count_exact_closed": false,
+      "evidence": {}
+    }
+  ],
+  "blocked": [
+    {
+      "id": "A5",
+      "lens": "DU6",
+      "title": "buyer draw recusado",
+      "ev": "400 {\"code\":\"P0001\",\"details\":null,\"hint\":null,\"message\":\"not_allowed\"}"
+    },
+    {
+      "id": "A4",
+      "lens": "DU1",
+      "title": "2.º draw deny / 1 winner",
+      "ev": {
+        "d2": "400 {\"code\":\"P0001\",\"details\":null,\"hint\":null,\"message\":\"no_participants\"}",
+        "nWin": 0
+      }
+    },
+    {
+      "id": "D2",
+      "lens": "DU7",
+      "title": "prize_orders vs seal observados",
+      "ev": {
+        "prize_n": 0,
+        "seal": "200 {\"ok\": false, \"error\": \"no_winners\"}",
+        "hub_n": 1,
+        "qty": 1
+      }
+    },
+    {
+      "id": "D3",
+      "lens": "DU2",
+      "title": "live_item pós-draw ≠ available",
+      "ev": {
+        "id": "48206c22-9be5-4ae4-9710-037688a875a6",
+        "live_id": "e5ac0b21-b423-4467-b75b-a6139549d67d",
+        "product_id": "21ade692-dac3-4b57-87d0-8ea09131227d",
+        "checkout_product_id": "21ade692-dac3-4b57-87d0-8ea09131227d",
+        "quantity": null,
+        "status": "available",
+        "is_active": true,
+        "item_kind": "marketplace_product",
+        "title": "RTDU-20260906T1736 A1 qty1 hitch-li"
+      }
+    },
+    {
+      "id": "A2",
+      "lens": "DU5",
+      "title": "wc=2 selou / 2.º insert deny",
+      "ev": {
+        "nWin": 0,
+        "qty": 2,
+        "hub_n": 1,
+        "ins": "201 [{\"id\":\"4917acea-51d9-45eb-886e-053b3055de21\",\"created_at\":\"2026-09-06T16:46:01.389967+00:00\",\"product_id\":\"c4b21a90-a9c3-4700-bc67-3fd35529f050\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-00…"
+      }
+    },
+    {
+      "id": "A3",
+      "lens": "DU1",
+      "title": "live_only skipped vs selo item",
+      "ev": {
+        "draw": "400 {\"code\":\"P0001\",\"details\":null,\"hint\":null,\"message\":\"no_participants\"}",
+        "li": "available",
+        "skipped": false,
+        "nWin": 0
+      }
+    },
+    {
+      "id": "B1",
+      "lens": "DU4",
+      "title": "draw∥CPI sem oversell visível",
+      "ev": {
+        "draw": "400 {\"code\":\"P0001\",\"details\":null,\"hint\":null,\"message\":\"no_participants\"}",
+        "cpi": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1D3e0Jcvb6yfsVCljt6rfgDdj3bY6WhW2fgw46rr0Y7xZWkEkTQZItcMr#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDR…",
+        "ins": "201 [{\"id\":\"98281ce7-befb-4b21-bfeb-143c9e11bed6\",\"created_at\":\"2026-09-06T16:46:05.028679+00:00\",\"product_id\":\"2caf9390-8a2c-4523-ac81-aac8b84d0811\",\"buyer_id\":\"56f10f8d-3951-4e80-b263-a64b164b447a\",\"seller_id\":\"980f4fa1-00…",
+        "qty": 1,
+        "hub_n": 0,
+        "cs": true
+      }
+    },
+    {
+      "id": "B3",
+      "lens": "DU2",
+      "title": "leftover qty observado",
+      "ev": {
+        "qty": 3,
+        "hub_n": 1,
+        "nWin": 0,
+        "ins_ok": true
+      }
+    },
+    {
+      "id": "B4",
+      "lens": "DU3",
+      "title": "sem premio_rifa — Hub não restaurou sozinho",
+      "ev": {
+        "draw": "400 {\"code\":\"P0001\",\"details\":null,\"hint\":null,\"message\":\"no_participants\"}",
+        "qty": "1→1",
+        "hub_n": 1
+      }
+    },
+    {
+      "id": "C1",
+      "lens": "DU4",
+      "title": "convert pending deny; race convert∥accept",
+      "ev": {
+        "conv": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_live_reservation_stripe_convert\"}",
+        "acc": "200 [{\"id\":\"ba869cbe-de9a-4e51-821a-321b8e49268d\",\"live_id\":\"5c3a2d75-8022-44c8-8054-ac417559d476\",\"live_item_id\":\"91b51a49-f8a4-4b2c-9ba0-39390ad1e39e\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"buyer_id\":\"56f10f8d…",
+        "r1": "pending",
+        "r2": "accepted"
+      }
+    },
+    {
+      "id": "C2",
+      "lens": "DU5",
+      "title": "hitch+rifa mesmo SKU observado",
+      "ev": {
+        "acc": "200 [{\"id\":\"6fc78115-5dc9-43e1-b451-f48f4758034d\",\"live_id\":\"d9b1c224-2300-4930-b03d-361a06ede106\",\"live_item_id\":\"dd041f11-8613-4d46-ac1c-94b8a356b139\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"buyer_id\":\"56f10f8d…",
+        "res": "accepted",
+        "nWin": 0,
+        "qty": 1,
+        "hub_n": 0,
+        "award": "200 {\"ok\": false, \"error\": \"raffle_ended\"}",
+        "unlist": "200 [{\"id\":\"0b6077cc-1f67-43e1-bf42-735422c7b0a6\",\"created_at\":\"2026-09-06T16:46:13.16718+00:00\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"title\":\"RTDU-20260906T1736 C2 hitch+rifa\",\"price\":9.0,\"ref_code\":null,\"cate…",
+        "double_claim": false
+      }
+    },
+    {
+      "id": "C3",
+      "lens": "DU6",
+      "title": "sem rifa = sem bilhetes",
+      "ev": {
+        "share": "200 {\"ok\": false, \"error\": \"raffle_not_found\"}",
+        "join": "200 {\"ok\": false, \"error\": \"raffle_not_found\"}",
+        "live": "cd85947a-efa7-47e9-8e8e-d0b3baccbc9a"
+      }
+    },
+    {
+      "id": "C4",
+      "lens": "DU6",
+      "title": "share OK; forge entry recusado",
+      "ev": {
+        "share": "200 {\"ok\": true, \"duplicate\": false, \"ticket_balance\": 2}",
+        "tJoin": 1,
+        "tShare": 2,
+        "ins": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"new row violates row-level security policy for table \\\"live_raffle_entries\\\"\"}",
+        "award": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_award_live_raffle_tickets\"}"
+      }
+    },
+    {
+      "id": "D1",
+      "lens": "DU7",
+      "title": "pago 4242 + Hub leftover",
+      "ev": {
+        "status": "pago",
+        "qty": 1,
+        "hub_n": 1,
+        "pi": "pi_3UCjCxH7FWYUN3jh0fZhGehE",
+        "oid": "d35a49b8-8e43-45a6-b93b-e3ea27bacff9"
+      }
+    }
+  ],
+  "skipped": [
+    {
+      "id": "B2",
+      "lens": "DU3",
+      "title": "no drawn sku",
+      "ev": "400 {\"code\":\"P0001\",\"details\":null,\"hint\":null,\"message\":\"no_participants\"}"
+    }
+  ],
+  "notes": [
+    {
+      "id": "fixture.paid",
+      "lens": "DU7",
+      "title": "setup_paid_order Stripe TEST",
+      "ev": "200 {\n  \"ok\": true,\n  \"order_id\": \"d35a49b8-8e43-45a6-b93b-e3ea27bacff9\",\n  \"product_id\": \"7232ecdb-f9c3-404a-8af4-def42d0f8d3c\",\n  \"payment_intent_id\": \"pi_3UCjCxH7FWYUN3jh0fZhGehE\",\n  \"pi_status\": \"succeeded\",\n  \"pi_amount…"
+    }
+  ],
+  "lenses": [
+    "DU1",
+    "DU2",
+    "DU3",
+    "DU4",
+    "DU5",
+    "DU6",
+    "DU7"
+  ],
+  "classe_nova": [
+    "A2",
+    "A3",
+    "B1",
+    "B2",
+    "B3",
+    "B4",
+    "C2",
+    "C4",
+    "D2",
+    "D3"
+  ],
+  "counts": {
+    "probes": 16,
+    "classe_nova": 10,
+    "races": 3,
+    "residual": 3,
+    "findings": 1
+  },
+  "actors": {
+    "b1": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+    "s1": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+    "b2": "56f10f8d-3951-4e80-b263-a64b164b447a",
+    "s2": "8e817a55-277f-4a61-813b-e730e26c4cfa"
+  },
+  "created": {
+    "products": [
+      "21ade692-dac3-4b57-87d0-8ea09131227d",
+      "c4b21a90-a9c3-4700-bc67-3fd35529f050",
+      "2caf9390-8a2c-4523-ac81-aac8b84d0811",
+      "4dc0adf9-d9ef-403b-8e34-ad4913b496cb",
+      "7283978b-7cd3-423d-9186-40242f13f986",
+      "0b6077cc-1f67-43e1-bf42-735422c7b0a6",
+      "7232ecdb-f9c3-404a-8af4-def42d0f8d3c"
+    ],
+    "orders": [
+      "e9ce299b-c40a-4420-8cc9-17faa01e3be6",
+      "4917acea-51d9-45eb-886e-053b3055de21",
+      "98281ce7-befb-4b21-bfeb-143c9e11bed6",
+      "a7e397d1-576f-425d-8b48-f8b01d09db07",
+      "d35a49b8-8e43-45a6-b93b-e3ea27bacff9"
+    ],
+    "lives": [
+      "e5ac0b21-b423-4467-b75b-a6139549d67d",
+      "83316566-fef6-4729-ac4b-e17881363c2d",
+      "90ae9a51-a7be-4fb3-9b8d-5ed917ca86b1",
+      "f1432abf-8822-4ce0-8ff7-aee274d42f6b",
+      "4a474199-34ba-49d3-98f8-076aacb76faf",
+      "a2d881a3-1e40-41cb-a3c6-ec1caec285ad",
+      "5c3a2d75-8022-44c8-8054-ac417559d476",
+      "d9b1c224-2300-4930-b03d-361a06ede106",
+      "cd85947a-efa7-47e9-8e8e-d0b3baccbc9a",
+      "d009c258-ad00-43a5-9ee6-5c690f3019f4"
+    ],
+    "items": [
+      "48206c22-9be5-4ae4-9710-037688a875a6",
+      "598df033-0b55-4832-b048-947849ccebdd",
+      "7df876d9-d9dd-47b0-9fd3-96c1a2f00203",
+      "a310494b-328b-43ae-af47-1c47a511cf0b",
+      "a3f631b7-9f59-4666-8c92-60cb5321b227",
+      "c057ea39-20e8-43bc-9215-6450721ca7f0",
+      "91b51a49-f8a4-4b2c-9ba0-39390ad1e39e",
+      "dd041f11-8613-4d46-ac1c-94b8a356b139"
+    ],
+    "res": [
+      "e96d9491-70e9-497c-8dc6-4caa9c40f01a",
+      "ba869cbe-de9a-4e51-821a-321b8e49268d",
+      "6fc78115-5dc9-43e1-b451-f48f4758034d"
+    ],
+    "raffles": [
+      "fa5e231a-9f05-44e4-bf0e-c347751f60ed",
+      "56dd8852-d231-4afa-b485-eefee0b3a1ab",
+      "f44b44a6-fe0c-4cbf-9c05-f5ff4097cc82",
+      "58afd0ee-bbbc-4834-95f7-c7fa2261eec3",
+      "2134c3e7-735c-4002-99b2-a48279553a73",
+      "6a5801f6-9496-43b1-920c-106d86873bcc",
+      "62949b5c-a6d8-430f-860a-c7de336eb489",
+      "1e1bff18-8f3e-49f1-878f-3872caf8a4d8"
+    ]
+  }
+}

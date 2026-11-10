@@ -1,0 +1,131 @@
+{
+  "stamp": "20260906T1952",
+  "prefix": "RTEO-20260906T1952",
+  "auditor": "REDTEAM_BLIND_EO_MONEY_MARATHON_POS_OPEN_v1",
+  "lenses": [
+    "EO7",
+    "EO8"
+  ],
+  "classe_nova": [],
+  "probes": [
+    {
+      "probe_id": "B3-confirm",
+      "edge_rpc": "PATCH profiles hub_published JWT B2 → S1",
+      "payload": "hub_published=false",
+      "http": "200 acao=\"\" [] loc=\"\"",
+      "stripe_bd": "pub true→true empty=true",
+      "result": "HOLD",
+      "lens": "EO7",
+      "classe_nova": false,
+      "count_finding": false,
+      "race": false
+    },
+    {
+      "probe_id": "D3-confirm",
+      "edge_rpc": "wallet_payout_ledger tr_ D3",
+      "payload": "tr_1UClHTH7FWYUN3jhkAnpAHI3 vs tr_1UClHWH7FWYUN3jhrjrRgB5T",
+      "http": "same_n=1 other_n=1 keys=p_85675e786448dbf8c75b0560e235faa5f8dd8466f7e1799825a6d7e61efe1a / p_418008805881f21b07cafc6bd209554457b5135944af0c3be418e13fef3274",
+      "stripe_bd": "{\"same\":[{\"idempotency_key\":\"p_85675e786448dbf8c75b0560e235faa5f8dd8466f7e1799825a6d7e61efe1a\",\"user_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"amount_cents\":100,\"amount_eur\":1.0,\"status\":\"transferred\",\"stripe_transfer_id\":\"tr_1UClHTH7FWYUN3jhkAnpAHI3\",\"balance_after\":22.0,\"created_at\":\"2026-09-06T18:59:07.465034+00:0…",
+      "result": "HOLD",
+      "lens": "EO8",
+      "classe_nova": false,
+      "count_finding": false,
+      "race": false
+    },
+    {
+      "probe_id": "D5-confirm",
+      "edge_rpc": "oracle release∥disputa 0ms + 50ms",
+      "payload": "10f26682-6074-431d-917f-4c550744c7cb / c3016c96-e63c-4d0a-be54-25b8014910c7",
+      "http": "both0=false both50=false",
+      "stripe_bd": "{\"0ms\":{\"venda\":5.0,\"estorno\":5.0,\"net\":0.0,\"open_n\":1,\"open_status\":[\"aberta\"],\"disp_n\":1,\"disp_status\":[\"aberta\"],\"both\":false,\"release_at\":\"\",\"status\":\"concluido\",\"pi\":\"pi_3UClHYH7FWYUN3jh0HqezEoW\",\"refund_id\":\"\",\"txns\":[{\"id\":\"f4afe5a3-0bd8-47f0-8fe3-0b7d689f171b\",\"type\":\"estorno\",\"amount\":5.0,\"created_at\":\"2026-09…",
+      "result": "HOLD",
+      "lens": "EO7",
+      "classe_nova": false,
+      "count_finding": false,
+      "race": false
+    }
+  ],
+  "findings": [],
+  "blocked": [
+    {
+      "id": "B3.unpub-confirm",
+      "lens": "EO7",
+      "title": "200 [] sem flip hub S1",
+      "ev": {
+        "status": 200,
+        "empty": true,
+        "pub": true
+      }
+    },
+    {
+      "id": "D3.ledger",
+      "lens": "EO8",
+      "title": "1 tr_ por key",
+      "ev": {
+        "same_n": 1,
+        "other_n": 1
+      }
+    },
+    {
+      "id": "D5.oracle",
+      "lens": "EO7",
+      "title": "both=false 0ms+50ms",
+      "ev": {
+        "net0": 0.0,
+        "open0": 1,
+        "net50": 0,
+        "open50": 1,
+        "venda50": 0
+      }
+    }
+  ],
+  "skipped": [],
+  "notes": [
+    {
+      "id": "confirm.D3",
+      "lens": "EO8",
+      "title": "ledger 2 tr_ duas keys",
+      "ev": {
+        "same": [
+          {
+            "idempotency_key": "p_85675e786448dbf8c75b0560e235faa5f8dd8466f7e1799825a6d7e61efe1a",
+            "user_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+            "amount_cents": 100,
+            "amount_eur": 1.0,
+            "status": "transferred",
+            "stripe_transfer_id": "tr_1UClHTH7FWYUN3jhkAnpAHI3",
+            "balance_after": 22.0,
+            "created_at": "2026-09-06T18:59:07.465034+00:00"
+          }
+        ],
+        "other": [
+          {
+            "idempotency_key": "p_418008805881f21b07cafc6bd209554457b5135944af0c3be418e13fef3274",
+            "user_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+            "amount_cents": 100,
+            "amount_eur": 1.0,
+            "status": "transferred",
+            "stripe_transfer_id": "tr_1UClHWH7FWYUN3jhrjrRgB5T",
+            "balance_after": 21.0,
+            "created_at": "2026-09-06T18:59:10.185608+00:00"
+          }
+        ],
+        "same_key": "p_85675e786448dbf8c75b0560e235faa5f8dd8466f7e1799825a6d7e61efe1a",
+        "other_key": "p_418008805881f21b07cafc6bd209554457b5135944af0c3be418e13fef3274"
+      }
+    }
+  ],
+  "actors": {
+    "buyer": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+    "seller": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+    "buyer2": "6112c155-509d-4a1c-848d-0a786227f49b",
+    "seller2": null
+  },
+  "created": {
+    "orders": [],
+    "products": [],
+    "lives": [],
+    "tips": [],
+    "disputes": []
+  }
+}

@@ -1,0 +1,60 @@
+{
+  "pass": 4,
+  "offline": {
+    "handle": null,
+    "full_name": "rtm-20260831t1802-s2",
+    "slug": "rtm-20260831t1802-s2",
+    "hub_published": false,
+    "disc_n": 0,
+    "hub_n": 0,
+    "rhHandle": null,
+    "rhSlug": {
+      "found": true,
+      "handle": "rtm-20260831t1802-s2",
+      "profile_id": "e9c92729-ad4c-48f4-9c97-d38845a4fb45",
+      "http_status": 200,
+      "redirect_to": null,
+      "hub_published": false
+    }
+  },
+  "session_created_has_origin": false,
+  "findings": [
+    {
+      "id": "RTM-M1-015",
+      "lens": "M1",
+      "severity": "P1",
+      "title": "resolve_handle enumera UUID com vitrine OFF e sem directo (só slug do nome)",
+      "actor": "anon",
+      "pre": "hub_published=false is_live=false discovery vazia",
+      "repro": "POST rpc/batata_resolve_handle p_handle=rtm-20260831t1802-s2",
+      "expected": "404 — perfil invisível em todas as superfícies Hub",
+      "obtained": "{\"found\": true, \"handle\": \"rtm-20260831t1802-s2\", \"profile_id\": \"e9c92729-ad4c-48f4-9c97-d38845a4fb45\", \"http_status\": 200, \"redirect_to\": null, \"hub_published\": false}",
+      "proven": true,
+      "evidence": {}
+    }
+  ],
+  "notes": [
+    {
+      "id": "p4.m1.offline",
+      "lens": "M1",
+      "title": "unpublished + not live",
+      "ev": {
+        "handle": null,
+        "slug": "rtm-20260831t1802-s2",
+        "disc": "[]",
+        "hub": "[]",
+        "rhHandle": null,
+        "rhSlug": "{\"found\": true, \"handle\": \"rtm-20260831t1802-s2\", \"profile_id\": \"e9c92729-ad4c-48f4-9c97-d38845a4fb45\", \"http_status\": 200, \"redirect_to\": null, \"hub_published\": false}"
+      }
+    },
+    {
+      "id": "p4.m2.session_created",
+      "lens": "M2",
+      "title": "created events origin?",
+      "ev": {
+        "has_origin_field": false,
+        "snip": "[{\"event\":\"tip_checkout_session_created\",\"session_id\":\"cs_test_a1uRjdlJsnutJ0FyUbp8v2cnD4V2a7FdozMUgLlGxygAVaDAZArHEmRbBD\",\"detail\":{\"tip_id\": \"5058991b-5f7a-4465-9696-bc8fff01d9d7\", \"live_id\": \"64e87b32-8e9a-492f-99ea-f85ac34feb33\", \"buyer_id\": \"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\", \"seller_id\": \"980f4fa1-0004-42f9-abca-69f1a9c29588\", \"amount_eur\": 1, \"ses…"
+      }
+    }
+  ]
+}

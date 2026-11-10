@@ -1,0 +1,204 @@
+import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+
+import '/utils/dpd_pudo_service.dart';
+import '/utils/fleaber_colors.dart';
+import '/widgets/fleaber_primary_button.dart';
+
+/// Folha para o comprador escolher um ponto Pickup DPD (MyPudo).
+Future<DpdPudoPoint?> showDpdPickupPickerSheet(
+  BuildContext context, {
+  required String initialZip,
+  required String initialCity,
+}) {
+  return showModalBottomSheet<DpdPudoPoint>(
+    context: context,
+    isScrollControlled: true,
+    backgroundColor: Colors.white,
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+    ),
+    builder: (ctx) => _DpdPickupPickerBody(
+      initialZip: initialZip,
+      initialCity: initialCity,
+    ),
+  );
+}
+
+class _DpdPickupPickerBody extends StatefulWidget {
+  const _DpdPickupPickerBody({
+    required this.initialZip,
+    required this.initialCity,
+  });
+
+  final String initialZip;
+  final String initialCity;
+
+  @override
+  State<_DpdPickupPickerBody> createState() => _DpdPickupPickerBodyState();
+}
+
+class _DpdPickupPickerBodyState extends State<_DpdPickupPickerBody> {
+  late final TextEditingController _zip;
+  late final TextEditingController _city;
+  bool _loading = false;
+  String? _error;
+  List<DpdPudoPoint> _points = const [];
+
+  @override
+  void initState() {
+    super.initState();
+    _zip = TextEditingController(text: widget.initialZip);
+    _city = TextEditingController(text: widget.initialCity);
+    if (widget.initialZip.trim().isNotEmpty &&
+        widget.initialCity.trim().isNotEmpty) {
+      WidgetsBinding.instance.addPostFrameCallback((_) => _search());
+    }
+  }
+
+  @override
+  void dispose() {
+    _zip.dispose();
+    _city.dispose();
+    super.dispose();
+  }
+
+  Future<void> _search() async {
+    setState(() {
+      _loading = true;
+      _error = null;
+      _points = const [];
+    });
+    try {
+      final list = await DpdPudoService.search(
+        zipCode: _zip.text,
+        city: _city.text,
+      );
+      if (!mounted) return;
+      setState(() {
+        _points = list;
+        if (list.isEmpty) {
+          _error = 'Não encontrámos pontos Pickup neste código postal.';
+        }
+      });
+    } catch (e) {
+      if (!mounted) return;
+      setState(() => _error = e.toString().replaceFirst('Exception: ', ''));
+    } finally {
+      if (mounted) setState(() => _loading = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final bottom = MediaQuery.paddingOf(context).bottom;
+    return Padding(
+      padding: EdgeInsets.fromLTRB(20, 12, 20, 16 + bottom),
+      child: SizedBox(
+        height: MediaQuery.sizeOf(context).height * 0.78,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Center(
+              child: Container(
+                width: 44,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: const Color(0xFFD1D5DB),
+                  borderRadius: BorderRadius.circular(99),
+                ),
+              ),
+            ),
+            const SizedBox(height: 14),
+            Text(
+              'Escolher loja Pickup DPD',
+              style: GoogleFonts.inter(
+                fontSize: 18,
+                fontWeight: FontWeight.w800,
+                color: FleaberColors.text,
+              ),
+            ),
+            const SizedBox(height: 6),
+            Text(
+              'Pesquisa por código postal e cidade (rede Pickup).',
+              style: GoogleFonts.inter(
+                fontSize: 13,
+                color: FleaberColors.muted,
+              ),
+            ),
+            const SizedBox(height: 14),
+            TextField(
+              controller: _zip,
+              decoration: const InputDecoration(
+                labelText: 'Código postal',
+                border: OutlineInputBorder(),
+                isDense: true,
+              ),
+              textInputAction: TextInputAction.next,
+            ),
+            const SizedBox(height: 10),
+            TextField(
+              controller: _city,
+              decoration: const InputDecoration(
+                labelText: 'Cidade',
+                border: OutlineInputBorder(),
+                isDense: true,
+              ),
+              textInputAction: TextInputAction.search,
+              onSubmitted: (_) => _search(),
+            ),
+            const SizedBox(height: 12),
+            FleaberPrimaryButton(
+              label: 'Procurar lojas',
+              loading: _loading,
+              onPressed: _loading ? null : _search,
+            ),
+            if (_error != null) ...[
+              const SizedBox(height: 10),
+              Text(
+                _error!,
+                style: GoogleFonts.inter(
+                  fontSize: 13,
+                  color: const Color(0xFFB45309),
+                ),
+              ),
+            ],
+            const SizedBox(height: 12),
+            Expanded(
+              child: _loading
+                  ? const Center(child: CircularProgressIndicator())
+                  : ListView.separated(
+                      itemCount: _points.length,
+                      separatorBuilder: (_, __) => const Divider(height: 1),
+                      itemBuilder: (context, i) {
+                        final p = _points[i];
+                        return ListTile(
+                          contentPadding: EdgeInsets.zero,
+                          title: Text(
+                            p.name,
+                            style: GoogleFonts.inter(
+                              fontWeight: FontWeight.w700,
+                              fontSize: 14,
+                            ),
+                          ),
+                          subtitle: Text(
+                            '${p.subtitle}\n${p.pudoId}',
+                            style: GoogleFonts.inter(
+                              fontSize: 12,
+                              height: 1.35,
+                              color: FleaberColors.muted,
+                            ),
+                          ),
+                          isThreeLine: true,
+                          trailing: const Icon(Icons.chevron_right_rounded),
+                          onTap: () => Navigator.pop(context, p),
+                        );
+                      },
+                    ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}

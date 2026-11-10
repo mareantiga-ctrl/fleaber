@@ -1,0 +1,336 @@
+{
+  "stamp": "20260902T1821",
+  "prefix": "RTBH-20260902T1821",
+  "auditor": "REDTEAM_BLIND_BH_LIVE_POS_ATBE_v1",
+  "lenses": [
+    "BH1",
+    "BH2",
+    "BH3",
+    "BH5",
+    "BH7"
+  ],
+  "findings": [
+    {
+      "id": "BH1-02",
+      "lens": "BH2",
+      "severity": "P2",
+      "title": "system_message aceita anúncio FOMO por sinónimo/homoglyph",
+      "actor": "seller JWT",
+      "pre": "filtro só comprou|purchased|bought",
+      "repro": "rpc batata_live_system_message levou/sold/esgotou/cyrillic/ZW/c0mprou",
+      "expected": "purchase_announce_via_broadcast_only",
+      "obtained": {
+        "rpc_ok": {
+          "levou": "200 {\"ok\": true}",
+          "sold": "200 {\"ok\": true}",
+          "esgotou": "200 {\"ok\": true}",
+          "zwj": "200 {\"ok\": true}",
+          "leet": "200 {\"ok\": true}",
+          "cart": "200 {\"ok\": true}"
+        },
+        "bodies": [
+          "🛒 vendido agora mesmo",
+          "Ana esgotou a última unidade",
+          "✅ Ana sold the jacket",
+          "🛒 Ana levou o casaco"
+        ]
+      },
+      "proven": true,
+      "evidence": {
+        "persisted_keys": [
+          "levou",
+          "sold",
+          "esgotou",
+          "zwj",
+          "leet",
+          "cart"
+        ]
+      }
+    },
+    {
+      "id": "BH2-02",
+      "lens": "BH2",
+      "severity": "P2",
+      "title": "Helper chat-only anuncia FOMO «levou» via system_message",
+      "actor": "helper can_manage_chat",
+      "pre": "perms só chat",
+      "repro": "rpc batata_live_system_message levou",
+      "expected": "purchase_announce_via_broadcast_only",
+      "obtained": "200 {\"ok\": true}",
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "BH3-07",
+      "lens": "BH3",
+      "severity": "P3",
+      "title": "buyer JWT batata_live_item_total_qty devolve qty em live ended",
+      "actor": "buyer JWT",
+      "pre": "stock gated; total_qty ainda GRANT authenticated sem gate broadcasting",
+      "repro": "rpc batata_live_item_total_qty JWT buyer após ended",
+      "expected": "0 / not_found / 403",
+      "obtained": "200 2",
+      "proven": true,
+      "evidence": {}
+    }
+  ],
+  "blocked": [
+    {
+      "id": "BH1-00",
+      "lens": "BH1",
+      "title": "system_message exact comprou (baseline ATBE — não contar se HOLD)",
+      "ev": "200 {\"ok\": false, \"error\": \"purchase_announce_via_broadcast_only\"}"
+    },
+    {
+      "id": "BH1-01",
+      "lens": "BH1",
+      "title": "purchase_broadcast unpaid (exact — não contar)",
+      "ev": "200 false"
+    },
+    {
+      "id": "BH1-02-homoglyph",
+      "lens": "BH1",
+      "title": "FOMO homoglyph blocked",
+      "ev": "200 {\"ok\": false, \"error\": \"purchase_announce_via_broadcast_only\"}"
+    },
+    {
+      "id": "BH1-03",
+      "lens": "BH1",
+      "title": "INSERT REST live_messages kind=system FOMO",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"new row violates row-level security policy for table \\\"live_messages\\\"\"}"
+    },
+    {
+      "id": "BH1-05",
+      "lens": "BH1",
+      "title": "PATCH converted sem order paga",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"convert_requires_paid_order\"}"
+    },
+    {
+      "id": "BH1-07",
+      "lens": "BH1",
+      "title": "PATCH accepted→converted sem PI",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"convert_requires_paid_order\"}"
+    },
+    {
+      "id": "BH1-08",
+      "lens": "BH1",
+      "title": "stripe_convert JWT sem order paga",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_live_reservation_stripe_convert\"}"
+    },
+    {
+      "id": "BH1-09",
+      "lens": "BH1",
+      "title": "INSERT accepted forçado a pending",
+      "ev": "201 [{\"id\":\"b266f221-4c8c-4df5-a79a-9b1d0345f767\",\"live_id\":\"7a93ee52-2268-4a66-b27b-e17e0d805a7c\",\"live_item_id\":\"e02d5304-2ec5-406c-b4fe-fd6c1241bf2a\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0…"
+    },
+    {
+      "id": "BH1-10",
+      "lens": "BH1",
+      "title": "INSERT converted caiu para pending",
+      "ev": "201 [{\"id\":\"49b493a4-cace-4586-8c38-cf6de2c1cd68\",\"live_id\":\"7a93ee52-2268-4a66-b27b-e17e0d805a7c\",\"live_item_id\":\"e02d5304-2ec5-406c-b4fe-fd6c1241bf2a\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0…"
+    },
+    {
+      "id": "BH1-11",
+      "lens": "BH1",
+      "title": "broadcast cancelada+PI",
+      "ev": "200 false"
+    },
+    {
+      "id": "BH1-12",
+      "lens": "BH5",
+      "title": "purchase_broadcast item A com PI noutro item",
+      "ev": "200 false"
+    },
+    {
+      "id": "BH2-03",
+      "lens": "BH2",
+      "title": "Helper can_manage_chat only executa mark_sold",
+      "ev": "200 {\"ok\": false, \"error\": \"not_allowed\"}"
+    },
+    {
+      "id": "BH2-04",
+      "lens": "BH2",
+      "title": "Helper chat-only accept reserva",
+      "ev": "200 []"
+    },
+    {
+      "id": "BH2-05",
+      "lens": "BH5",
+      "title": "Helper chat-only infla qty 2→40",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"live_item_not_authorized\"}"
+    },
+    {
+      "id": "BH2-06",
+      "lens": "BH2",
+      "title": "Helper view/change_item mark_sold",
+      "ev": "200 {\"ok\": false, \"error\": \"not_allowed\"}"
+    },
+    {
+      "id": "BH2-07",
+      "lens": "BH2",
+      "title": "Helper view-only system_message",
+      "ev": "200 {\"ok\": false, \"error\": \"not_allowed\"}"
+    },
+    {
+      "id": "BH2-08",
+      "lens": "BH2",
+      "title": "Helper mark_sold-only envia system_message",
+      "ev": "200 {\"ok\": false, \"error\": \"not_allowed\"}"
+    },
+    {
+      "id": "BH2-09",
+      "lens": "BH2",
+      "title": "Helper reservations-only mark_sold",
+      "ev": "200 {\"ok\": false, \"error\": \"not_allowed\"}"
+    },
+    {
+      "id": "BH2-10",
+      "lens": "BH7",
+      "title": "Helper seller1 system_message na live seller2",
+      "ev": "200 {\"ok\": false, \"error\": \"not_allowed\"}"
+    },
+    {
+      "id": "BH3-02",
+      "lens": "BH3",
+      "title": "anon stock ended gated",
+      "ev": "200 {\"ok\": false, \"error\": \"live_item_not_found\"}"
+    },
+    {
+      "id": "BH3-03",
+      "lens": "BH3",
+      "title": "buyer stock ended gated",
+      "ev": "200 {\"ok\": false, \"error\": \"live_item_not_found\"}"
+    },
+    {
+      "id": "BH3-05",
+      "lens": "BH3",
+      "title": "Hub discovery ended vazio",
+      "ev": "200 []"
+    },
+    {
+      "id": "BH3-06",
+      "lens": "BH3",
+      "title": "anon total_qty ended",
+      "ev": "401 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_live_item_total_qty\"}"
+    }
+  ],
+  "skipped": [],
+  "notes": [
+    {
+      "id": "actors",
+      "title": "JWT lab",
+      "ev": {
+        "b1": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+        "s1": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+        "b2": "7d12f556-007f-40fd-9671-c07eb3bd354f",
+        "s2": "e725febc-f8bb-40a8-812d-bcbf50808ca8",
+        "hchat": "e58bbcbd-3b6a-433c-8761-902e0aee7b10",
+        "hmark": "0afed221-1913-44b0-8afd-f23873c977bb",
+        "hview": "75bbea44-18b3-48fe-83a0-3c09a9d67069",
+        "hres": "35e26df6-32c3-4dc9-952e-131d69cef20a"
+      }
+    },
+    {
+      "id": "fixture",
+      "lens": "BH1",
+      "title": "live A items",
+      "ev": {
+        "liveA": "7a93ee52-2268-4a66-b27b-e17e0d805a7c",
+        "liveB": "3bb98786-5f5e-4c11-8769-9365044c71d1",
+        "only": "e02d5304-2ec5-406c-b4fe-fd6c1241bf2a",
+        "sku": "7c762963-577e-45fc-ab8f-0fa7afd8552a",
+        "mkt": "1e5bdc0c-2849-4522-9395-0aa29e74eb67"
+      }
+    },
+    {
+      "id": "BH1-04",
+      "lens": "BH1",
+      "title": "chat REST com texto FOMO (não system) persistiu",
+      "ev": "201 [{\"id\":\"587b715a-7ce9-4780-a95e-170449ffae56\",\"live_id\":\"7a93ee52-2268-4a66-b27b-e17e0d805a7c\",\"user_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"kind\":\"chat\",\"body\":\"✅ Ana levou o casaco\",\"sender_label\":null,\"tip_amount\":null,\"tip_id\":null,…"
+    },
+    {
+      "id": "BH1-06",
+      "lens": "BH1",
+      "title": "accept pending→accepted (legítimo hold)",
+      "ev": "200 [{\"id\":\"f2d923ed-3ef3-4e8d-b316-f0840767c35b\",\"live_id\":\"7a93ee52-2268-4a66-b27b-e17e0d805a7c\",\"live_item_id\":\"e02d5304-2ec5-406c-b4fe-fd6c1241bf2a\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0…"
+    },
+    {
+      "id": "BH1-11a",
+      "lens": "BH1",
+      "title": "order cancelada+PI fixture",
+      "ev": "201 [{\"id\":\"eab667f0-10df-4f5e-bc19-6e590e177ff0\",\"created_at\":\"2026-09-02T17:32:15.851202+00:00\",\"product_id\":\"7c762963-577e-45fc-ab8f-0fa7afd8552a\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c…"
+    },
+    {
+      "id": "BH2-01",
+      "lens": "BH2",
+      "title": "helper can_manage_chat envia system_message não-FOMO",
+      "ev": "200 {\"ok\": true}"
+    },
+    {
+      "id": "BH3-01",
+      "lens": "BH3",
+      "title": "stock anon enquanto broadcasting",
+      "ev": "200 {\"ok\": true, \"price\": 12.5, \"live_id\": \"7a93ee52-2268-4a66-b27b-e17e0d805a7c\", \"ref_code\": \"BH512817\", \"item_kind\": \"live_only\", \"total_qty\": 2, \"product_id\": null, \"blocked_qty\": 0, \"live_status\": \"live\", \"live_item_id\": \"e02d5304-2ec5-406…"
+    },
+    {
+      "id": "BH3-end",
+      "lens": "BH3",
+      "title": "endLive service",
+      "ev": {
+        "patch": "200 [{\"id\":\"7a93ee52-2268-4a66-b27b-e17e0d805a7c\",\"created_at\":\"2026-09-02T17:32:12.200534+00:00\",\"vendedor_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"mux_live_id\":null,\"stream_key\":null,\"playback_id\":null,\"is_active\":false,\"title\":\"RTBH-20260…",
+        "row": {
+          "status": "ended",
+          "active": false
+        }
+      }
+    },
+    {
+      "id": "BH3-04",
+      "lens": "BH3",
+      "title": "seller stock ended (gestão)",
+      "ev": "200 {\"ok\": true, \"price\": 12.5, \"live_id\": \"7a93ee52-2268-4a66-b27b-e17e0d805a7c\", \"ref_code\": \"BH512817\", \"item_kind\": \"live_only\", \"total_qty\": 2, \"product_id\": null, \"blocked_qty\": 0, \"live_status\": \"ended\", \"live_item_id\": \"e02d5304-2ec5-40…"
+    },
+    {
+      "id": "BH3-06",
+      "lens": "BH3",
+      "title": "total_qty anon/buyer ended",
+      "ev": {
+        "anon": "401 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_live_item_total_qty\"}",
+        "buyer": "200 2"
+      }
+    }
+  ],
+  "actors": {
+    "buyer": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+    "seller": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+    "buyer2": "7d12f556-007f-40fd-9671-c07eb3bd354f",
+    "seller2": "e725febc-f8bb-40a8-812d-bcbf50808ca8",
+    "helperChat": "e58bbcbd-3b6a-433c-8761-902e0aee7b10",
+    "helperMark": "0afed221-1913-44b0-8afd-f23873c977bb",
+    "helperView": "75bbea44-18b3-48fe-83a0-3c09a9d67069",
+    "helperRes": "35e26df6-32c3-4dc9-952e-131d69cef20a"
+  },
+  "created": {
+    "orders": [
+      "eab667f0-10df-4f5e-bc19-6e590e177ff0"
+    ],
+    "products": [
+      "7c762963-577e-45fc-ab8f-0fa7afd8552a"
+    ],
+    "lives": [
+      "7a93ee52-2268-4a66-b27b-e17e0d805a7c",
+      "3bb98786-5f5e-4c11-8769-9365044c71d1"
+    ],
+    "items": [
+      "e02d5304-2ec5-406c-b4fe-fd6c1241bf2a",
+      "1e5bdc0c-2849-4522-9395-0aa29e74eb67"
+    ],
+    "reservations": [
+      "f2d923ed-3ef3-4e8d-b316-f0840767c35b",
+      "b266f221-4c8c-4df5-a79a-9b1d0345f767",
+      "49b493a4-cace-4586-8c38-cf6de2c1cd68",
+      "75a958cf-be29-4a43-908b-42da7e6dcdec"
+    ],
+    "helpers": []
+  }
+}

@@ -1,0 +1,103 @@
+{
+  "FROZEN_AT": "2026-08-30T16:35:00+01:00",
+  "project_ref": "fxdknzrqjenzqcvnwqqq",
+  "production_touched": false,
+  "fase4_started": false,
+  "fixes_applied": false,
+  "verdict": "FAIL_P1",
+  "saturation": true,
+  "saturation_note": "Pass 4 reproduced the same P1 class; no new P0/P1 class. Stripe capture and dual paid oversell remain unproven.",
+  "p0_count": 0,
+  "p1_count": 1,
+  "findings": [
+    {
+      "id": "RT1719-20",
+      "severity": "P1",
+      "title": "Buyer mutates seller pending offer amount then accepts; Stripe session charges mutated price",
+      "actor": "buyer JWT",
+      "estado": "ABERTO",
+      "reproductions": [
+        {
+          "offer_id": "0cbdf2a8-89c3-4794-8e9b-d99c472260e4",
+          "order_id": "c26c23a2-0ce9-44da-a429-90e78eaecb1c",
+          "session_id": "cs_test_a1DdLsL1QPf2PryyMAHMtg93K7ZsBydFzwoL2uWGCie3q2eWNSiEXeR3D1",
+          "seller_offered_eur": 28,
+          "catalog_eur": 30,
+          "accepted_amount": 0.5,
+          "contract_unit_cents": 50,
+          "server_amount_cents": 118,
+          "stripe_stage": "SESSION_CREATED"
+        },
+        {
+          "id": "RT1719-20b",
+          "helper_id": "3469d715-ff7a-4519-9971-f29b6e7a2462",
+          "offer_id": "916bbbfb-de5f-4295-b8c4-edb5953fa51b",
+          "order_id": "725f4e09-24e9-4d3e-8ef0-13bd60d60de4",
+          "session_id": "cs_test_a1C3j4fSp6RZtZaeQMqwZiITsMMGbyVzlrDjsXHJ27yf44JToOlmM7FNzj",
+          "seller_offered_eur": 20,
+          "catalog_eur": 25,
+          "accepted_amount": 0.5,
+          "contract_unit_cents": 50,
+          "server_amount_cents": 118,
+          "stripe_stage": "SESSION_CREATED"
+        }
+      ]
+    },
+    {
+      "id": "RT1719-11",
+      "severity": "P2",
+      "title": "Pending offer amount is JWT-mutable; accept does not pin client-supplied amount",
+      "actor": "buyer+seller",
+      "estado": "ABERTO",
+      "race_cheap_accepts": "5/10"
+    },
+    {
+      "id": "RT1719-30",
+      "severity": "P3",
+      "title": "Buyer can insert live reservation requested_qty=99 (status forced pending)",
+      "actor": "buyer JWT",
+      "estado": "ABERTO",
+      "reservation_id": "f9df80dd-60d6-4e9e-8e2a-2aa61c9a41ff"
+    }
+  ],
+  "checklist": {
+    "1_p0": false,
+    "2_p0_count": 0,
+    "3_p1": true,
+    "4_p1_count": 1,
+    "5_buyer_price": true,
+    "6_buyer_qty_order": false,
+    "7_seller_fake_platform_pay": false,
+    "8_jwt_mint_balance": false,
+    "9_refund_exceeds_capture": false,
+    "10_release_refund_mint": false,
+    "11_payout_dup_transfer": false,
+    "12_stock1_two_valid_sales": false,
+    "13_stock1_two_permanent_captures": "NOT_PROVEN",
+    "14_capacity_bypass": "PARTIAL_QTY99_PENDING",
+    "15_cross_user_financial": true,
+    "16_cross_user_sensitive_data": false,
+    "17_buyer_as_seller_admin": false,
+    "18_seller_as_buyer_admin": false,
+    "19_forged_reviews": false,
+    "20_dangerous_definer_rpc": false,
+    "21_critical_rls_break": false,
+    "22_edge_trusts_client_checkout_amount": false,
+    "23_critical_unproven": true,
+    "24_functional_regression": false,
+    "25_last_pass_new_p0_p1_class": false,
+    "26_saturation": true,
+    "27_production_touched": false,
+    "28_fase4": false
+  },
+  "probes": [
+    "tool/redteam_blind_indep_20260830T1719/pass1_discover.dart",
+    "tool/redteam_blind_indep_20260830T1719/pass2_money_races.dart",
+    "tool/redteam_blind_indep_20260830T1719/pass3_compose.dart",
+    "tool/redteam_blind_indep_20260830T1719/pass4_repro.dart",
+    "tool/redteam_blind_indep_20260830T1719/out/pass1.json",
+    "tool/redteam_blind_indep_20260830T1719/out/pass2.json",
+    "tool/redteam_blind_indep_20260830T1719/out/pass3.json",
+    "tool/redteam_blind_indep_20260830T1719/out/pass4.json"
+  ]
+}

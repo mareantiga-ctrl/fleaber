@@ -1,0 +1,224 @@
+{
+  "stamp": "20260831T1802",
+  "order_id": "29bff199-7770-4152-9be6-292f7464d1b6",
+  "notes": [
+    {
+      "id": "p2.w0",
+      "lens": "L7",
+      "title": "wallets antes",
+      "ev": {
+        "buyer": 40.45,
+        "seller": 0.0,
+        "buyer2": 0,
+        "seller2": 0
+      }
+    },
+    {
+      "id": "fixture.paid",
+      "lens": "L2",
+      "title": "setup_paid_order Stripe TEST",
+      "ev": "200 {\n  \"ok\": true,\n  \"order_id\": \"29bff199-7770-4152-9be6-292f7464d1b6\",\n  \"product_id\": \"0e94071f-c3d7-49bc-a705-cde1880d2044\",\n  \"payment_intent_id\": \"pi_3UAYiwH7FWYUN3jh0lndd7Bl\",\n  \"pi_status\": \"succeeded\",\n  \"pi_amount…"
+    },
+    {
+      "id": "fixture.concluido",
+      "lens": "L2",
+      "title": "buyer confirma receção mão",
+      "ev": "200 [{\"id\":\"29bff199-7770-4152-9be6-292f7464d1b6\",\"created_at\":\"2026-08-31T17:10:22.243512+00:00\",\"product_id\":\"0e94071f-c3d7-49bc-a705-cde1880d2044\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-00…"
+    },
+    {
+      "id": "p2.order",
+      "lens": "L2",
+      "title": "após concluido mão",
+      "ev": {
+        "id": "29bff199-7770-4152-9be6-292f7464d1b6",
+        "status": "concluido",
+        "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+        "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+        "product_id": "0e94071f-c3d7-49bc-a705-cde1880d2044",
+        "quantity": 1,
+        "price_total": 5.9,
+        "amount_paid_cents": 590,
+        "payment_method": "Pagamento na app",
+        "shipping_method": null,
+        "stripe_payment_intent_id": "pi_3UAYiwH7FWYUN3jh0lndd7Bl",
+        "stripe_checkout_session_id": null,
+        "stripe_refund_id": null,
+        "wallet_release_processed_at": null,
+        "wallet_refund_processed_at": null,
+        "stock_units_applied": 1,
+        "completed_at": "2026-08-31T17:10:25.967364+00:00",
+        "auto_feedback_processed_at": null,
+        "reservation_expires_at": null,
+        "bundle_id": null
+      }
+    },
+    {
+      "id": "p2.l6.completed_at.jwt",
+      "lens": "L6",
+      "title": "PATCH completed_at JWT",
+      "ev": {
+        "http": "200 [{\"id\":\"29bff199-7770-4152-9be6-292f7464d1b6\",\"created_at\":\"2026-08-31T17:10:22.243512+00:00\",\"product_id\":\"0e94071f-c3d7-49bc-a705-cde1880d2044\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-00…",
+        "completed_at": "2026-08-31T17:10:25.967364+00:00"
+      }
+    },
+    {
+      "id": "p2.l6.af_flag.jwt",
+      "lens": "L6",
+      "title": "PATCH auto_feedback_processed_at JWT",
+      "ev": {
+        "http": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"order_auto_feedback_flag_immutable\"}",
+        "flag": null
+      }
+    },
+    {
+      "id": "p2.l6.release_flag.jwt",
+      "lens": "L6",
+      "title": "PATCH wallet_release JWT",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"order_wallet_release_flag_immutable\"}"
+    },
+    {
+      "id": "p2.l2.jwt.now",
+      "lens": "L2",
+      "title": "auto_feedback JWT now",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_generate_auto_feedback\"}"
+    },
+    {
+      "id": "p2.l2.jwt.pnow",
+      "lens": "L2",
+      "title": "auto_feedback JWT p_now+30d",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_generate_auto_feedback\"}"
+    },
+    {
+      "id": "p2.l2.svc.now",
+      "lens": "L2",
+      "title": "cron service now() em order recente",
+      "ev": {
+        "rpc": "200 0",
+        "reviews": 0,
+        "af_at": null,
+        "release_at": null
+      }
+    },
+    {
+      "id": "p2.l2.sem_concluido",
+      "lens": "L2",
+      "title": "cron em pago + completed_at antigo",
+      "ev": {
+        "status": "pago",
+        "rpc": "200 45",
+        "reviews": 0,
+        "af": null,
+        "before_status": "pago"
+      }
+    },
+    {
+      "id": "p2.l2.svc.48h",
+      "lens": "L2",
+      "title": "cron após 48h simuladas",
+      "ev": {
+        "rpc": "200 0",
+        "reviews": [
+          {
+            "id": "431ce13d-24b6-4ea8-9280-837e53556edd",
+            "stars": 5,
+            "author_role": "vendedor",
+            "is_automatic": true,
+            "buyer_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+            "target_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+            "comment": "Avaliação automática: encomenda concluída sem feedback no prazo.",
+            "created_at": "2026-08-31T17:10:33.712091+00:00"
+          },
+          {
+            "id": "130b4b09-269b-4993-a44a-ffbcc035892a",
+            "stars": 5,
+            "author_role": "comprador",
+            "is_automatic": true,
+            "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+            "target_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+            "comment": "Avaliação automática: venda concluída sem feedback no prazo.",
+            "created_at": "2026-08-31T17:10:33.712091+00:00"
+          }
+        ],
+        "af": "2026-09-02T17:10:33.357073+00:00",
+        "release": "2026-08-31T17:10:33.712091+00:00",
+        "w_before": {
+          "buyer": 40.45,
+          "seller": 70.0,
+          "buyer2": 0,
+          "seller2": 0
+        },
+        "w_after": {
+          "buyer": 40.45,
+          "seller": 70.0,
+          "buyer2": 0,
+          "seller2": 0
+        },
+        "tx": [
+          {
+            "id": "758b1878-866d-418b-b1ff-ed17e5c1e9d1",
+            "wallet_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+            "amount": 5.0,
+            "type": "venda",
+            "description": "Venda de Refund crash E2E 1788196221722",
+            "order_id": "29bff199-7770-4152-9be6-292f7464d1b6",
+            "created_at": "2026-08-31T17:10:33.712091+00:00"
+          }
+        ]
+      }
+    },
+    {
+      "id": "p2.l2.duplo",
+      "lens": "L2",
+      "title": "2.º cron auto_feedback",
+      "ev": {
+        "rpc": "200 0",
+        "reviews": 2,
+        "seller_delta": 0.0
+      }
+    },
+    {
+      "id": "p2.l7.delta",
+      "lens": "L7",
+      "title": "Δ seller no 1.º cron",
+      "ev": {
+        "d_seller": 0.0,
+        "tx": [
+          {
+            "id": "758b1878-866d-418b-b1ff-ed17e5c1e9d1",
+            "wallet_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+            "amount": 5.0,
+            "type": "venda",
+            "description": "Venda de Refund crash E2E 1788196221722",
+            "order_id": "29bff199-7770-4152-9be6-292f7464d1b6",
+            "created_at": "2026-08-31T17:10:33.712091+00:00"
+          }
+        ]
+      }
+    }
+  ],
+  "findings": [],
+  "w0": {
+    "buyer": 40.45,
+    "seller": 0.0,
+    "buyer2": 0,
+    "seller2": 0
+  },
+  "w_before_cron": {
+    "buyer": 40.45,
+    "seller": 70.0,
+    "buyer2": 0,
+    "seller2": 0
+  },
+  "w_after1": {
+    "buyer": 40.45,
+    "seller": 70.0,
+    "buyer2": 0,
+    "seller2": 0
+  },
+  "w_after2": {
+    "buyer": 40.45,
+    "seller": 70.0,
+    "buyer2": 0,
+    "seller2": 0
+  }
+}

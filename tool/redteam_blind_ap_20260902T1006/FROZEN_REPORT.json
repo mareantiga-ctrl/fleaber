@@ -1,0 +1,39 @@
+{
+  "auditor": "REDTEAM_BLIND_AP_LIVE_POS_AHAM_v1",
+  "frozen_at": "2026-09-02T10:25:00+01:00",
+  "production_touched": false,
+  "fase4": false,
+  "corrections_applied": false,
+  "lentes_cobertas": ["AP1", "AP2", "AP3", "AP4", "AP5", "AP6", "AP7", "AP8"],
+  "contagem": {
+    "P0": 0,
+    "P1": 0,
+    "P2": 1,
+    "P3": 1,
+    "P4": 0
+  },
+  "veredicto": "FAIL_P2",
+  "findings": [
+    {
+      "id": "AP-P2-01",
+      "severity": "P2",
+      "lenses": ["AP1", "AP7"],
+      "title": "Buyer injeta system «comprou» sem PI (live própria e alheia)",
+      "rpc": "batata_live_purchase_broadcast",
+      "proofs": ["pass2.json AP1-11b", "pass2.json AP7-09", "pass3.json AP7-09b", "pass3.json AP1-11d"]
+    },
+    {
+      "id": "AP-P3-01",
+      "severity": "P3",
+      "lenses": ["AP3"],
+      "title": "INSERT pending em live ended; accept só após reabrir",
+      "proofs": ["pass1.json AP3-06", "pass2.json AP3-06b HOLD live_ended", "pass2.json AP3-06e"]
+    }
+  ],
+  "discarded": [
+    {
+      "id": "AP8-01-seller",
+      "reason": "Δ −2 € na wallet partilhada não reproduzido; fixture pago e broadcast Δ=0"
+    }
+  ]
+}

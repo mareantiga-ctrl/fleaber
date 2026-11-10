@@ -1,0 +1,301 @@
+{
+  "auditor": "REDTEAM_BLIND_INDEP_v4",
+  "stamp": "20260831T1251",
+  "project": "fxdknzrqjenzqcvnwqqq",
+  "production_touched": false,
+  "fase4": false,
+  "corrections_applied": false,
+  "fresh_id": "ffa601b0-0c79-492f-b3db-5235563ea313",
+  "findings": [],
+  "holds": [
+    {
+      "id": "p2.buyer.concluido",
+      "title": "buyer não concluiu desde pago",
+      "well": "2",
+      "evidence": {
+        "id": "bedc6a59-bd37-45e5-8704-72a6f57d8f34",
+        "status": "pago",
+        "wallet_release_processed_at": null,
+        "amount_paid_cents": 590
+      }
+    },
+    {
+      "id": "p2.buyer.entregue",
+      "title": "entregue desde pago bloqueado",
+      "well": "2",
+      "evidence": {
+        "id": "bedc6a59-bd37-45e5-8704-72a6f57d8f34",
+        "status": "pago"
+      }
+    },
+    {
+      "id": "p2.buyer.enviado",
+      "title": "buyer não marca enviado",
+      "well": "2",
+      "evidence": {
+        "id": "bedc6a59-bd37-45e5-8704-72a6f57d8f34",
+        "status": "pago"
+      }
+    },
+    {
+      "id": "p2.seller.concluido",
+      "title": "seller não conclui",
+      "well": "2",
+      "evidence": {
+        "id": "bedc6a59-bd37-45e5-8704-72a6f57d8f34",
+        "status": "pago"
+      }
+    },
+    {
+      "id": "p2.jwt.release.flag",
+      "title": "flag release imutável",
+      "well": "2",
+      "evidence": {
+        "id": "bedc6a59-bd37-45e5-8704-72a6f57d8f34",
+        "status": "pago",
+        "wallet_release_processed_at": null
+      }
+    },
+    {
+      "id": "p2.jwt.money",
+      "title": "money cols imutáveis",
+      "well": "2",
+      "evidence": {
+        "id": "bedc6a59-bd37-45e5-8704-72a6f57d8f34",
+        "amount_paid_cents": 590,
+        "stripe_payment_intent_id": "pi_3UATx7H7FWYUN3jh0SX9MSQV"
+      }
+    },
+    {
+      "id": "p2.refund.buyer",
+      "title": "buyer refund negado ou skipped",
+      "well": "2",
+      "evidence": "403 {\"ok\":false,\"error\":\"Sem permissão.\"}"
+    },
+    {
+      "id": "p2.refund.fresh",
+      "title": "fresh refund negado",
+      "well": "2",
+      "evidence": "403 {\"ok\":false,\"error\":\"Sem permissão.\"}"
+    },
+    {
+      "id": "p2.review.pago",
+      "title": "review pago bloqueada",
+      "well": "2",
+      "evidence": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"review_order_invalid_status\"}"
+    },
+    {
+      "id": "p2.dispute.fresh",
+      "title": "dispute cross bloqueada",
+      "well": "2",
+      "evidence": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"new row violates row-level security policy for table \\\"order_disputes\\\"\"}"
+    },
+    {
+      "id": "p2.settle.unpaid",
+      "title": "GET settle unpaid ≠ pago",
+      "well": "2",
+      "evidence": {
+        "id": "409bb925-9659-43ee-832b-14f62cedbf43",
+        "status": "reserva_pendente",
+        "amount_paid_cents": null
+      }
+    }
+  ],
+  "notes": [
+    {
+      "id": "p2.setup_paid",
+      "title": "e2e setup_paid_order",
+      "well": "2",
+      "detail": "{ \"ok\": true, \"order_id\": \"bedc6a59-bd37-45e5-8704-72a6f57d8f34\", \"product_id\": \"ea6dde8d-534d-49a9-9ae5-f9008d16404b\", \"payment_intent_id\": \"pi_3UATx7H7FWYUN3jh0SX9MSQV\", \"pi_status\": \"succeeded\", \"pi_amount_received\": 590, \"initial_qty\": 2, \"settle_http\": 200, \"settle_body\": { \"ok\": true, \"settleResult\": \"paid\", \"order\": { \"id\": \"bedc6a59-bd37-45e5-8704-72a6f57d8f34\", \"status\": \"pago\", \"stock_units_applied\": 1, \"stripe_refund_id\": null, \"stripe_payment_intent_id\": \"pi_3UATx7H7FWYUN3jh0SX9MSQV\", \"price_total\": 5.9, \"amount_paid_cents\": 590 }, \"payment_intent\": { \"id\": \"pi_3UATx7H7FWYUN3jh0SX9…"
+    },
+    {
+      "id": "p2.paid.row",
+      "title": "order after setup",
+      "well": "2",
+      "detail": {
+        "id": "bedc6a59-bd37-45e5-8704-72a6f57d8f34",
+        "status": "pago",
+        "amount_paid_cents": 590,
+        "stripe_payment_intent_id": "pi_3UATx7H7FWYUN3jh0SX9MSQV",
+        "wallet_release_processed_at": null,
+        "payment_method": "Pagamento na app",
+        "shipping_method": null,
+        "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+        "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+        "product_id": "ea6dde8d-534d-49a9-9ae5-f9008d16404b",
+        "quantity": 1
+      }
+    },
+    {
+      "id": "p2.buyer.concluido",
+      "title": "buyer pago→concluido",
+      "well": "2",
+      "detail": {
+        "http": 403,
+        "after": {
+          "id": "bedc6a59-bd37-45e5-8704-72a6f57d8f34",
+          "status": "pago",
+          "wallet_release_processed_at": null,
+          "amount_paid_cents": 590
+        }
+      }
+    },
+    {
+      "id": "p2.buyer.entregue",
+      "title": "buyer pago→entregue",
+      "well": "2",
+      "detail": {
+        "http": 403,
+        "after": {
+          "id": "bedc6a59-bd37-45e5-8704-72a6f57d8f34",
+          "status": "pago"
+        }
+      }
+    },
+    {
+      "id": "p2.buyer.enviado",
+      "title": "buyer marca enviado",
+      "well": "2",
+      "detail": {
+        "http": 200,
+        "after": {
+          "id": "bedc6a59-bd37-45e5-8704-72a6f57d8f34",
+          "status": "pago"
+        }
+      }
+    },
+    {
+      "id": "p2.seller.concluido",
+      "title": "seller→concluido",
+      "well": "2",
+      "detail": {
+        "http": 200,
+        "after": {
+          "id": "bedc6a59-bd37-45e5-8704-72a6f57d8f34",
+          "status": "pago"
+        }
+      }
+    },
+    {
+      "id": "p2.jwt.release.flag",
+      "title": "PATCH wallet_release_processed_at",
+      "well": "2",
+      "detail": {
+        "http": 403,
+        "after": {
+          "id": "bedc6a59-bd37-45e5-8704-72a6f57d8f34",
+          "status": "pago",
+          "wallet_release_processed_at": null
+        }
+      }
+    },
+    {
+      "id": "p2.jwt.money",
+      "title": "PATCH money cols",
+      "well": "2",
+      "detail": {
+        "http": 403,
+        "after": {
+          "id": "bedc6a59-bd37-45e5-8704-72a6f57d8f34",
+          "amount_paid_cents": 590,
+          "stripe_payment_intent_id": "pi_3UATx7H7FWYUN3jh0SX9MSQV"
+        }
+      }
+    },
+    {
+      "id": "p2.seller.ship",
+      "title": "seller enviado",
+      "well": "2",
+      "detail": {
+        "http": 200,
+        "after": {
+          "id": "bedc6a59-bd37-45e5-8704-72a6f57d8f34",
+          "status": "enviado"
+        }
+      }
+    },
+    {
+      "id": "p2.refund.buyer",
+      "title": "refund as buyer",
+      "well": "2",
+      "detail": "403 {\"ok\":false,\"error\":\"Sem permissão.\"}"
+    },
+    {
+      "id": "p2.refund.fresh",
+      "title": "refund fresh JWT",
+      "well": "2",
+      "detail": "403 {\"ok\":false,\"error\":\"Sem permissão.\"}"
+    },
+    {
+      "id": "p2.review.pago",
+      "title": "review while pago",
+      "well": "2",
+      "detail": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"review_order_invalid_status\"}"
+    },
+    {
+      "id": "p2.dispute.fresh",
+      "title": "dispute as other",
+      "well": "2",
+      "detail": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"new row violates row-level security policy for table \\\"order_disputes\\\"\"}"
+    },
+    {
+      "id": "p2.settle.fake.cs",
+      "title": "GET settle fake cs",
+      "well": "2",
+      "detail": "400 Pagamento ainda não confirmado. Se já pagaste, aguarda alguns segundos e volta à app Fleaber."
+    },
+    {
+      "id": "p2.session.create",
+      "title": "Session listed",
+      "well": "2",
+      "detail": "{\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1i7M1nuRWdNVOH5MwLJrcvJ3ILsdAs7QUWt1ciBNxHqGm1ur02Bl898Y4#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21oYWlsUnxrVkRhQUQyNlJjSWBCN3BXNXVvVT1hamlcf3Fjd1dRMGJmREk9Yz09PH1CMzVTY0pBXD1kMU5HZl1da05gf0s1XGQ1NWA3bVFBNzNMJyknY3dqaFZgd3Ngdyc%2FcXdwYCknZ2RmbmJ3anBrYUZqaWp3Jz8nJmNjY2NjYycpJ2lkfGpwcVF8dWAnPyd2bGtiaWBabHFgaCcpJ2BrZGdpYFVpZGZgbWppYWB3dic%2FcXdwYHgl\",\"checkout…"
+    },
+    {
+      "id": "p2.settle.unpaid.unlist",
+      "title": "GET settle unpaid after unlist",
+      "well": "2",
+      "detail": {
+        "http": 402,
+        "loc": null,
+        "order": {
+          "id": "409bb925-9659-43ee-832b-14f62cedbf43",
+          "status": "reserva_pendente",
+          "amount_paid_cents": null
+        }
+      }
+    },
+    {
+      "id": "p2.hand.concluido",
+      "title": "mão pago→concluido",
+      "well": "2",
+      "detail": {
+        "http": 200,
+        "after": {
+          "id": "e0c09e65-25bd-45d5-978d-3d0bc25bf000",
+          "status": "concluido",
+          "wallet_release_processed_at": null,
+          "shipping_method": "hand"
+        }
+      }
+    },
+    {
+      "id": "p2.wallet.seller",
+      "title": "seller wallet after hand concluido",
+      "well": "2",
+      "detail": {
+        "id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+        "balance": 234.6
+      }
+    }
+  ],
+  "created_products": [
+    "ea6dde8d-534d-49a9-9ae5-f9008d16404b",
+    "92e4b58b-c28b-45cd-9d7d-16bc3c0d22c1"
+  ],
+  "created_orders": [
+    "bedc6a59-bd37-45e5-8704-72a6f57d8f34",
+    "409bb925-9659-43ee-832b-14f62cedbf43",
+    "e0c09e65-25bd-45d5-978d-3d0bc25bf000"
+  ],
+  "created_lives": []
+}

@@ -1,0 +1,156 @@
+{
+  "prefix": "RTBT-20260906T1048",
+  "findings": [],
+  "blocked": [
+    {
+      "id": "p3.race.pending.after.end",
+      "lens": "BT6",
+      "title": "pending pós-end recusado",
+      "ev": [
+        {
+          "id": "res.fail",
+          "title": "insertReservation 403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"live_ended\"}",
+          "ev": {
+            "live": "6a0f98e6-aa90-432b-830f-ba49216fb79b",
+            "item": "5e7abc23-e4d9-410b-b130-8ae99dd6d38a",
+            "status": "pending"
+          }
+        }
+      ]
+    },
+    {
+      "id": "p3.accept.after.end",
+      "lens": "BT6",
+      "title": "accept pós-end recusado",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"live_ended\"}"
+    },
+    {
+      "id": "p3.race.two.accepts.qty1",
+      "lens": "BT6",
+      "title": "só um accepted",
+      "ev": {
+        "d1": {
+          "id": "9cee8f48-6a8e-4923-be27-0fe3e629b098",
+          "status": "accepted",
+          "requested_qty": 1
+        },
+        "d2": {
+          "id": "fd87ded1-d283-4364-8a05-d8430e236fa2",
+          "status": "pending",
+          "requested_qty": 1
+        }
+      }
+    },
+    {
+      "id": "p3.mux.anon",
+      "lens": "BT7",
+      "title": "anon sem colunas Mux secretas",
+      "ev": "401 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table profiles\"}"
+    },
+    {
+      "id": "p3.mux.buyer.stream_key",
+      "lens": "BT7",
+      "title": "buyer sem stream_key",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table lives\"}"
+    },
+    {
+      "id": "p3.mux.seller2.stream_key",
+      "lens": "BT7",
+      "title": "seller2 sem stream_key",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table lives\"}"
+    },
+    {
+      "id": "p3.mux.buyer.mux_live_id",
+      "lens": "BT7",
+      "title": "buyer sem mux_live_id",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table lives\"}"
+    },
+    {
+      "id": "p3.mux.plant.own",
+      "lens": "BT7",
+      "title": "PATCH mux_live_id próprio falhou",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table lives\"}"
+    },
+    {
+      "id": "p3.mux.patch.foreign",
+      "lens": "BT7",
+      "title": "PATCH live alheia recusado",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table lives\"}"
+    },
+    {
+      "id": "p3.mux.complete.foreign",
+      "lens": "BT7",
+      "title": "complete alheio recusado",
+      "ev": "403 {\"error\":\"Sem permissão para esta live.\",\"step\":\"auth\"}"
+    },
+    {
+      "id": "p3.mux.publish.foreign",
+      "lens": "BT7",
+      "title": "publish alheio recusado",
+      "ev": "403 {\"error\":\"Sem permissão para esta live.\",\"step\":\"auth\"}"
+    },
+    {
+      "id": "p3.mark_sold.hitch.foreign.sku",
+      "lens": "BT4",
+      "title": "SKU alheio intacto (insert item ou mark recusado)",
+      "ev": {
+        "item": "e6512c49-a6e3-45ef-9036-aad780e51bfb",
+        "rpc": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"live_item_checkout_product_seller_mismatch\"}",
+        "product": {
+          "id": "e7a857cc-4904-4f88-aecb-f9770b2c1e99",
+          "is_sold": false,
+          "list_on_marketplace": true,
+          "seller_id": "4f5f5b8a-0c50-46a4-939b-e2aaf53271cd",
+          "quantity": 3
+        }
+      }
+    }
+  ],
+  "notes": [
+    {
+      "id": "p3.race.raw",
+      "lens": "BT6",
+      "title": "end∥accept hits",
+      "ev": {
+        "accept1": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"live_ended\"}",
+        "end": "200 [{\"id\":\"6a0f98e6-aa90-432b-830f-ba49216fb79b\",\"created_at\":\"2026-09-06T09:57:26.950533+00:00\",\"vendedor_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"mux_live_id\":null,\"stream_key\":null,\"playback_id\":null,\"is_active\":false…",
+        "accept2": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"live_ended\"}",
+        "res": {
+          "id": "943ce125-fb71-4e3a-899c-53dbf5f37a56",
+          "status": "pending",
+          "updated_at": "2026-09-06T09:57:27.690783+00:00"
+        },
+        "live": {
+          "id": "6a0f98e6-aa90-432b-830f-ba49216fb79b",
+          "status": "ended",
+          "is_active": false
+        }
+      }
+    },
+    {
+      "id": "res.fail",
+      "title": "insertReservation 403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"live_ended\"}",
+      "ev": {
+        "live": "6a0f98e6-aa90-432b-830f-ba49216fb79b",
+        "item": "5e7abc23-e4d9-410b-b130-8ae99dd6d38a",
+        "status": "pending"
+      }
+    },
+    {
+      "id": "p3.mux.read",
+      "lens": "BT7",
+      "title": "leituras Mux",
+      "ev": {
+        "anon": "401 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table profiles\"}",
+        "buyer": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table lives\"}",
+        "seller2": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table lives\"}",
+        "owner": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table lives\"}"
+      }
+    }
+  ],
+  "lenses": [
+    "BT4",
+    "BT6",
+    "BT7"
+  ]
+}

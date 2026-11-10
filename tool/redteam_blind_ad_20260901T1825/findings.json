@@ -1,0 +1,1189 @@
+{
+  "stamp": "20260901T1825",
+  "prefix": "RTAD-20260901T1825",
+  "lenses": [
+    "AD1",
+    "AD2",
+    "AD3",
+    "AD4",
+    "AD5",
+    "AD6",
+    "AD7",
+    "AD8"
+  ],
+  "findings": [
+    {
+      "id": "RTAD-AD1-insert-fleaber-self-converted",
+      "lens": "AD1",
+      "severity": "P1",
+      "title": "vendedor INSERT fleaber_live já converted (buyer=self) sem PI",
+      "actor": "seller",
+      "pre": "live activa; item live_only; zero order paga",
+      "repro": "POST live_reservation_requests source=fleaber_live status=converted buyer_id=seller",
+      "expected": "pending ou 403; converted só com order paga",
+      "obtained": {
+        "id": "63fb5a02-7ee9-4693-a16e-6ce71a3dec08",
+        "live_id": "20d9f79d-b0bf-4140-9713-544e04a18b4a",
+        "live_item_id": "b0af4d16-7914-4a59-b1ca-5d876318281a",
+        "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+        "buyer_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+        "source": "fleaber_live",
+        "status": "converted",
+        "requested_qty": 1,
+        "processed_by_user_id": null,
+        "notes": null
+      },
+      "proven": true,
+      "evidence": {
+        "insert": "201 [{\"id\":\"63fb5a02-7ee9-4693-a16e-6ce71a3dec08\",\"live_id\":\"20d9f79d-b0bf-4140-9713-544e04a18b4a\",\"live_item_id\":\"b0af4d16-7914-4a59-b1ca-5d876318281a\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"buyer_id\":\"980f4fa1-0004-42f9-abca-69f1…",
+        "row": {
+          "id": "63fb5a02-7ee9-4693-a16e-6ce71a3dec08",
+          "live_id": "20d9f79d-b0bf-4140-9713-544e04a18b4a",
+          "live_item_id": "b0af4d16-7914-4a59-b1ca-5d876318281a",
+          "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+          "buyer_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+          "source": "fleaber_live",
+          "status": "converted",
+          "requested_qty": 1,
+          "processed_by_user_id": null,
+          "notes": null
+        }
+      }
+    },
+    {
+      "id": "RTAD-AD1-patch-accepted-to-converted",
+      "lens": "AD1",
+      "severity": "P1",
+      "title": "PATCH accepted→converted sem order paga (guard só cobre pending→converted)",
+      "actor": "seller",
+      "pre": "facebook_manual accepted via RPC; zero PI",
+      "repro": "PATCH live_reservation_requests.status=converted sobre row accepted",
+      "expected": "convert_requires_paid_order; status permanece accepted",
+      "obtained": {
+        "id": "3f1fa58e-44d7-42d5-9f25-33d961e37d8d",
+        "live_id": "20d9f79d-b0bf-4140-9713-544e04a18b4a",
+        "live_item_id": "b0af4d16-7914-4a59-b1ca-5d876318281a",
+        "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+        "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+        "source": "facebook_manual",
+        "status": "converted",
+        "requested_qty": 2,
+        "processed_by_user_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+        "notes": ""
+      },
+      "proven": true,
+      "evidence": {
+        "patch": "200 [{\"id\":\"3f1fa58e-44d7-42d5-9f25-33d961e37d8d\",\"live_id\":\"20d9f79d-b0bf-4140-9713-544e04a18b4a\",\"live_item_id\":\"b0af4d16-7914-4a59-b1ca-5d876318281a\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0…",
+        "stock": {
+          "http": 200,
+          "ok": true,
+          "available": 1,
+          "sold": 3,
+          "reserved": 0,
+          "status": null
+        },
+        "orders": []
+      }
+    },
+    {
+      "id": "RTAD-AD3-discovery-shows-exhausted",
+      "lens": "AD3",
+      "severity": "P2",
+      "title": "Hub discovery ainda mostra item com available_qty=0 (view sem filtro stock)",
+      "actor": "buyer",
+      "pre": "facebook_manual accepted qty=1 em item qty=1; sem convert/PI",
+      "repro": "GET hub_live_items_discovery_public?id=eq.<item>",
+      "expected": "vazio (paridade hub_live_items_public available_qty>0)",
+      "obtained": {
+        "available": 0,
+        "hub_public": null,
+        "discovery": {
+          "id": "53f31415-b4f9-406e-a4d5-d484b253c303",
+          "title": "RTAD-20260901T1825 live_only",
+          "is_active": true,
+          "status": "reserved_full",
+          "item_kind": "live_only",
+          "price": 9.0
+        }
+      },
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "RTAD-AD3-live-items-rest-exhausted",
+      "lens": "AD3",
+      "severity": "P2",
+      "title": "REST live_items ainda devolve item esgotado ao comprador",
+      "actor": "buyer",
+      "pre": "available_qty=0; status não sold",
+      "repro": "GET live_items?id=eq.<item> JWT buyer",
+      "expected": "escondido ou status sold",
+      "obtained": {
+        "id": "53f31415-b4f9-406e-a4d5-d484b253c303",
+        "status": "reserved_full",
+        "is_active": true,
+        "quantity": 1,
+        "title": "RTAD-20260901T1825 live_only"
+      },
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "RTAD-AD3-patch-item-status-sold",
+      "lens": "AD3",
+      "severity": "P1",
+      "title": "PATCH live_items.status=sold esconde Hub sem PI / sem mark_sold",
+      "actor": "seller",
+      "pre": "live_only qty=1; zero order",
+      "repro": "PATCH live_items.status=sold",
+      "expected": "status imutável sem RPC mark_sold + order paga",
+      "obtained": {
+        "item": {
+          "id": "25bf2ef3-ebad-4a13-999f-13eeafbf65c2",
+          "live_id": "20d9f79d-b0bf-4140-9713-544e04a18b4a",
+          "product_id": null,
+          "item_kind": "live_only",
+          "quantity": 1,
+          "status": "sold",
+          "price": 9.0,
+          "ref_code": "AD3"
+        },
+        "hub": null
+      },
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "RTAD-AD4-patch-product-unlist",
+      "lens": "AD4",
+      "severity": "P1",
+      "title": "PATCH products is_sold/list_on_marketplace deslista SKU sem PI",
+      "actor": "seller",
+      "pre": "SKU marketplace qty=1; zero order paga",
+      "repro": "PATCH products is_sold=true list_on_marketplace=false",
+      "expected": "guard recusa unlist sem order paga (paridade mark_sold)",
+      "obtained": {
+        "id": "bd6c8f1d-6013-4584-beed-1901b1106cd0",
+        "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+        "title": "RTAD-20260901T1825-mkt",
+        "price": 12.0,
+        "quantity": 1,
+        "is_sold": true,
+        "list_on_marketplace": false,
+        "available_for_live": true
+      },
+      "proven": true,
+      "evidence": {
+        "hub_products": null,
+        "patch": "200 [{\"id\":\"bd6c8f1d-6013-4584-beed-1901b1106cd0\",\"created_at\":\"2026-09-01T17:34:03.389648+00:00\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"title\":\"RTAD-20260901T1825-mkt\",\"price\":12.0,\"ref_code\":null,\"category\":null,\"clothing_size\":n…"
+      }
+    },
+    {
+      "id": "RTAD-AD5-move-live-id-no-reservation",
+      "lens": "AD5",
+      "severity": "P2",
+      "title": "item sem reservas muda de live (live_id mutável até 1ª reserva)",
+      "actor": "seller",
+      "pre": "live_only novo; zero reservas",
+      "repro": "PATCH live_items.live_id",
+      "expected": "live_id imutável sempre, ou só via RPC dono com auditoria",
+      "obtained": {
+        "id": "8e382608-dbe2-4761-ad01-defc3347fab6",
+        "live_id": "fb38b77b-c970-40d0-a67d-9f06faeb7cfc",
+        "product_id": null,
+        "item_kind": "live_only",
+        "quantity": 1,
+        "status": "available",
+        "price": 9.0,
+        "ref_code": "AD5"
+      },
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "RTAD-AD5-helper-mark-inflate-qty",
+      "lens": "AD5",
+      "severity": "P2",
+      "title": "helper can_mark_items_sold infla quantity (perm serve dois fins)",
+      "actor": "helper",
+      "pre": "seller concedeu can_mark_items_sold",
+      "repro": "PATCH live_items.quantity=40",
+      "expected": "mark_sold ≠ inflate stock",
+      "obtained": {
+        "id": "bec521b4-6424-4d00-a8f0-8d50680d3059",
+        "live_id": "20d9f79d-b0bf-4140-9713-544e04a18b4a",
+        "product_id": null,
+        "item_kind": "live_only",
+        "quantity": 40,
+        "status": "available",
+        "price": 9.0,
+        "ref_code": "AD5q"
+      },
+      "proven": true,
+      "evidence": {}
+    }
+  ],
+  "blocked": [
+    {
+      "id": "RTAD-AD1-buyer-insert-fleaber-converted",
+      "lens": "AD1",
+      "title": "buyer INSERT converted forçado a pending/recusado",
+      "ev": {
+        "http": "201 [{\"id\":\"e3409e25-d9ad-440e-858a-7155a1fb2d36\",\"live_id\":\"20d9f79d-b0bf-4140-9713-544e04a18b4a\",\"live_item_id\":\"b0af4d16-7914-4a59-b1ca-5d876318281a\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0…",
+        "status": "pending"
+      }
+    },
+    {
+      "id": "RTAD-AD1-stripe-convert-seller",
+      "lens": "AD1",
+      "title": "stripe_convert seller recusado",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_live_reservation_stripe_convert\"}"
+    },
+    {
+      "id": "RTAD-AD1-stripe-convert-buyer",
+      "lens": "AD1",
+      "title": "stripe_convert buyer recusado",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_live_reservation_stripe_convert\"}"
+    },
+    {
+      "id": "RTAD-AD1-stripe-convert-helper",
+      "lens": "AD1",
+      "title": "stripe_convert helper recusado",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_live_reservation_stripe_convert\"}"
+    },
+    {
+      "id": "RTAD-AD1-jwt-insert-paid-order",
+      "lens": "AD1",
+      "title": "INSERT pago forçado a não-pago",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"order_live_item_product_missing\"}"
+    },
+    {
+      "id": "RTAD-AD1-rpc-convert-nopi",
+      "lens": "AD1",
+      "title": "RPC convert sem PI recusado",
+      "ev": "200 {\"ok\": false, \"error\": \"convert_requires_paid_order\"}"
+    },
+    {
+      "id": "RTAD-AD2-helper-self-escalate",
+      "lens": "AD2",
+      "title": "helper não alargou permissions",
+      "ev": {
+        "http": "200 []",
+        "perms": {
+          "can_manage_reservations": true,
+          "can_view_live_dashboard": true
+        }
+      }
+    },
+    {
+      "id": "RTAD-AD2-view-accept",
+      "lens": "AD2",
+      "title": "view-only accept recusado",
+      "ev": "200 {\"ok\": false, \"error\": \"not_allowed\"}"
+    },
+    {
+      "id": "RTAD-AD2-view-convert",
+      "lens": "AD2",
+      "title": "view-only convert recusado",
+      "ev": "200 {\"ok\": false, \"error\": \"not_allowed\"}"
+    },
+    {
+      "id": "RTAD-AD2-view-mark-sold",
+      "lens": "AD2",
+      "title": "view-only mark_sold recusado",
+      "ev": "200 {\"ok\": false, \"error\": \"not_allowed\"}"
+    },
+    {
+      "id": "RTAD-AD2-view-inflate-qty",
+      "lens": "AD2",
+      "title": "view-only inflate recusado",
+      "ev": {
+        "rpc": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"live_item_not_authorized\"}",
+        "qty": 2
+      }
+    },
+    {
+      "id": "RTAD-AD2-helper-patch-accepted-converted",
+      "lens": "AD2",
+      "title": "helper PATCH accepted→converted recusado",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"convert_requires_paid_order\"}"
+    },
+    {
+      "id": "RTAD-AD2-change-item-mark-sold",
+      "lens": "AD2",
+      "title": "can_change_current_item mark_sold recusado",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"live_item_not_authorized\"}"
+    },
+    {
+      "id": "RTAD-AD4-mark-sold-live-only-no-pi",
+      "lens": "AD4",
+      "title": "mark_sold live_only recusado",
+      "ev": "200 {\"ok\": true, \"price\": 9.0, \"live_id\": \"20d9f79d-b0bf-4140-9713-544e04a18b4a\", \"ref_code\": \"AD4\", \"item_kind\": \"live_only\", \"total_qty\": 2, \"product_id\": null, \"blocked_qty\": 0, \"live_status\": \"live\", \"live_item_id\": \"cf24fa58-8cc5-4678-b46a…"
+    },
+    {
+      "id": "RTAD-AD4-mark-sold-mkt-kills-live",
+      "lens": "AD4",
+      "title": "mark_sold mkt não sold na live",
+      "ev": "200 {\"ok\": true, \"price\": 12.0, \"live_id\": \"20d9f79d-b0bf-4140-9713-544e04a18b4a\", \"ref_code\": \"ADM2\", \"item_kind\": \"marketplace_product\", \"total_qty\": 1, \"product_id\": \"8d9f35b0-82c6-4cae-8d2f-d67ce7c904b0\", \"blocked_qty\": 0, \"live_status\": \"l…"
+    },
+    {
+      "id": "RTAD-AD5-move-to-foreign-live",
+      "lens": "AD5",
+      "title": "move para live alheia recusado",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"live_item_not_authorized\"}"
+    },
+    {
+      "id": "RTAD-AD5-insert-item-live-mismatch",
+      "lens": "AD5",
+      "title": "INSERT mismatch recusado",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"live_item_live_mismatch\"}"
+    },
+    {
+      "id": "RTAD-AD5-patch-reservation-live-id",
+      "lens": "AD5",
+      "title": "PATCH reserva.live_id recusado",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"live_item_live_mismatch\"}"
+    },
+    {
+      "id": "RTAD-AD5-helper-patch-qty",
+      "lens": "AD5",
+      "title": "helper PATCH qty recusado",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"live_item_qty_increase_not_allowed\"}"
+    },
+    {
+      "id": "RTAD-AD6-race-double-accept",
+      "lens": "AD6",
+      "title": "race accept não oversell",
+      "ev": {
+        "accepted": 0,
+        "reserved": 0,
+        "sold": 0
+      }
+    },
+    {
+      "id": "RTAD-AD6-race-patch-converted",
+      "lens": "AD6",
+      "title": "race PATCH converted não passou",
+      "ev": [
+        "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"convert_requires_paid_order\"}",
+        "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"convert_requires_paid_order\"}"
+      ]
+    },
+    {
+      "id": "RTAD-AD7-seller2-accept-foreign",
+      "lens": "AD7",
+      "title": "seller2 accept recusado",
+      "ev": "200 {\"ok\": false, \"error\": \"not_allowed\"}"
+    },
+    {
+      "id": "RTAD-AD7-seller2-patch-converted",
+      "lens": "AD7",
+      "title": "seller2 PATCH converted recusado",
+      "ev": "200 []"
+    },
+    {
+      "id": "RTAD-AD7-seller2-mark-sold",
+      "lens": "AD7",
+      "title": "seller2 mark_sold recusado",
+      "ev": "200 {\"ok\": false, \"error\": \"not_allowed\"}"
+    },
+    {
+      "id": "RTAD-AD7-helper-mark-sold-foreign",
+      "lens": "AD7",
+      "title": "helper mark_sold foreign recusado",
+      "ev": "200 {\"ok\": false, \"error\": \"not_allowed\"}"
+    },
+    {
+      "id": "RTAD-AD7-seller-inflate-foreign-qty",
+      "lens": "AD7",
+      "title": "inflate foreign recusado",
+      "ev": "200 {\"ok\": false, \"error\": \"not_allowed\"}"
+    },
+    {
+      "id": "RTAD-AD8-wallet-delta",
+      "lens": "AD8",
+      "title": "sem Δ wallet",
+      "ev": {
+        "buyer": 61.1,
+        "seller": 18.97,
+        "buyer2": 0,
+        "seller2": 0,
+        "helper": 0
+      }
+    }
+  ],
+  "skipped": [],
+  "notes": [
+    {
+      "id": "fix.w0",
+      "title": "wallets before",
+      "ev": {
+        "buyer": 61.1,
+        "seller": 18.97,
+        "buyer2": 0,
+        "seller2": 0,
+        "helper": 0
+      }
+    },
+    {
+      "id": "fix.items",
+      "title": "items",
+      "ev": {
+        "A1": "b0af4d16-7914-4a59-b1ca-5d876318281a",
+        "A2": "53f31415-b4f9-406e-a4d5-d484b253c303",
+        "A3": "25bf2ef3-ebad-4a13-999f-13eeafbf65c2",
+        "A4": "cf24fa58-8cc5-4678-b46a-b36d91004d7f",
+        "B1": "39eea8ed-f0c6-4d8e-8c93-82db4fabac5c",
+        "S2": "1e05ff75-eaad-4058-a8d5-9234c64e1791",
+        "mkt": "245e4494-5727-4b06-8dfe-aa1d6a3441d9",
+        "pid": "bd6c8f1d-6013-4584-beed-1901b1106cd0",
+        "mkt2": "326f3605-a64e-45b6-b286-9c3f1db0151e",
+        "pid2": "8d9f35b0-82c6-4cae-8d2f-d67ce7c904b0"
+      }
+    },
+    {
+      "id": "staff.rows",
+      "lens": "AD2",
+      "title": "helpers",
+      "ev": {
+        "h1": {
+          "id": "fc412f92-87fe-4141-b482-91005053b389",
+          "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+          "helper_user_id": "1d92fde8-4fe1-4559-8d4c-4e55ab78465c",
+          "active": true,
+          "invitation_status": "accepted",
+          "permissions": {
+            "can_manage_reservations": true,
+            "can_view_live_dashboard": true
+          }
+        },
+        "hv": {
+          "id": "4ce5d75a-b104-43a2-8ce6-c5ca4065c900",
+          "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+          "helper_user_id": "13eaf809-b3dd-4053-997c-d45775868166",
+          "active": true,
+          "invitation_status": "accepted",
+          "permissions": {
+            "can_mark_items_sold": false,
+            "can_change_current_item": false,
+            "can_manage_reservations": false,
+            "can_view_live_dashboard": true
+          }
+        }
+      }
+    },
+    {
+      "id": "ad1.insert.fleaber.self.converted",
+      "lens": "AD1",
+      "title": "seller INSERT fleaber_live converted",
+      "ev": {
+        "http": "201 [{\"id\":\"63fb5a02-7ee9-4693-a16e-6ce71a3dec08\",\"live_id\":\"20d9f79d-b0bf-4140-9713-544e04a18b4a\",\"live_item_id\":\"b0af4d16-7914-4a59-b1ca-5d876318281a\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"buyer_id\":\"980f4fa1-0004-42f9-abca-69f1…",
+        "row": {
+          "id": "63fb5a02-7ee9-4693-a16e-6ce71a3dec08",
+          "live_id": "20d9f79d-b0bf-4140-9713-544e04a18b4a",
+          "live_item_id": "b0af4d16-7914-4a59-b1ca-5d876318281a",
+          "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+          "buyer_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+          "source": "fleaber_live",
+          "status": "converted",
+          "requested_qty": 1,
+          "processed_by_user_id": null,
+          "notes": null
+        }
+      }
+    },
+    {
+      "id": "ad1.insert.buyer.fleaber.converted",
+      "lens": "AD1",
+      "title": "buyer INSERT fleaber_live converted",
+      "ev": {
+        "http": "201 [{\"id\":\"e3409e25-d9ad-440e-858a-7155a1fb2d36\",\"live_id\":\"20d9f79d-b0bf-4140-9713-544e04a18b4a\",\"live_item_id\":\"b0af4d16-7914-4a59-b1ca-5d876318281a\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0…",
+        "row": {
+          "id": "e3409e25-d9ad-440e-858a-7155a1fb2d36",
+          "live_id": "20d9f79d-b0bf-4140-9713-544e04a18b4a",
+          "live_item_id": "b0af4d16-7914-4a59-b1ca-5d876318281a",
+          "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+          "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+          "source": "fleaber_live",
+          "status": "pending",
+          "requested_qty": 1,
+          "processed_by_user_id": null,
+          "notes": null
+        }
+      }
+    },
+    {
+      "id": "ad1.accept.fb",
+      "lens": "AD1",
+      "title": "RPC accept facebook_manual",
+      "ev": "200 {\"ok\": true, \"item_qty\": 4, \"request_id\": \"3f1fa58e-44d7-42d5-9f25-33d961e37d8d\", \"item_status\": \"reserved_partial\", \"reserved_qty\": 3}"
+    },
+    {
+      "id": "ad1.patch.accepted-to-converted",
+      "lens": "AD1",
+      "title": "PATCH accepted→converted",
+      "ev": {
+        "after_accept": {
+          "id": "3f1fa58e-44d7-42d5-9f25-33d961e37d8d",
+          "live_id": "20d9f79d-b0bf-4140-9713-544e04a18b4a",
+          "live_item_id": "b0af4d16-7914-4a59-b1ca-5d876318281a",
+          "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+          "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+          "source": "facebook_manual",
+          "status": "accepted",
+          "requested_qty": 2,
+          "processed_by_user_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+          "notes": ""
+        },
+        "patch": "200 [{\"id\":\"3f1fa58e-44d7-42d5-9f25-33d961e37d8d\",\"live_id\":\"20d9f79d-b0bf-4140-9713-544e04a18b4a\",\"live_item_id\":\"b0af4d16-7914-4a59-b1ca-5d876318281a\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0…",
+        "after": {
+          "id": "3f1fa58e-44d7-42d5-9f25-33d961e37d8d",
+          "live_id": "20d9f79d-b0bf-4140-9713-544e04a18b4a",
+          "live_item_id": "b0af4d16-7914-4a59-b1ca-5d876318281a",
+          "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+          "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+          "source": "facebook_manual",
+          "status": "converted",
+          "requested_qty": 2,
+          "processed_by_user_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+          "notes": ""
+        },
+        "stock": {
+          "http": 200,
+          "ok": true,
+          "available": 1,
+          "sold": 3,
+          "reserved": 0,
+          "status": null
+        }
+      }
+    },
+    {
+      "id": "ad1.stripe_convert.seller",
+      "lens": "AD1",
+      "title": "stripe_convert seller",
+      "ev": {
+        "rpc": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_live_reservation_stripe_convert\"}",
+        "status": "accepted"
+      }
+    },
+    {
+      "id": "ad1.stripe_convert.buyer",
+      "lens": "AD1",
+      "title": "stripe_convert buyer",
+      "ev": {
+        "rpc": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_live_reservation_stripe_convert\"}",
+        "status": "accepted"
+      }
+    },
+    {
+      "id": "ad1.stripe_convert.helper",
+      "lens": "AD1",
+      "title": "stripe_convert helper",
+      "ev": {
+        "rpc": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_live_reservation_stripe_convert\"}",
+        "status": "accepted"
+      }
+    },
+    {
+      "id": "ad1.order.insert.pago",
+      "lens": "AD1",
+      "title": "buyer INSERT order status=pago",
+      "ev": {
+        "http": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"order_live_item_product_missing\"}",
+        "row": null
+      }
+    },
+    {
+      "id": "ad1.rpc.convert.nopi",
+      "lens": "AD1",
+      "title": "RPC convert sem PI (baseline)",
+      "ev": {
+        "rpc": "200 {\"ok\": false, \"error\": \"convert_requires_paid_order\"}",
+        "status": "accepted"
+      }
+    },
+    {
+      "id": "ad2.helper.self-escalate",
+      "lens": "AD2",
+      "title": "helper PATCH permissions",
+      "ev": {
+        "http": "200 []",
+        "row": {
+          "id": "fc412f92-87fe-4141-b482-91005053b389",
+          "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+          "helper_user_id": "1d92fde8-4fe1-4559-8d4c-4e55ab78465c",
+          "active": true,
+          "invitation_status": "accepted",
+          "permissions": {
+            "can_manage_reservations": true,
+            "can_view_live_dashboard": true
+          }
+        }
+      }
+    },
+    {
+      "id": "ad2.view.accept",
+      "lens": "AD2",
+      "title": "view-only RPC accept",
+      "ev": "200 {\"ok\": false, \"error\": \"not_allowed\"}"
+    },
+    {
+      "id": "ad2.view.convert",
+      "lens": "AD2",
+      "title": "view-only RPC convert",
+      "ev": "200 {\"ok\": false, \"error\": \"not_allowed\"}"
+    },
+    {
+      "id": "ad2.view.mark_sold",
+      "lens": "AD2",
+      "title": "view-only mark_sold",
+      "ev": {
+        "rpc": "200 {\"ok\": false, \"error\": \"not_allowed\"}",
+        "item": {
+          "id": "cf24fa58-8cc5-4678-b46a-b36d91004d7f",
+          "live_id": "20d9f79d-b0bf-4140-9713-544e04a18b4a",
+          "product_id": null,
+          "item_kind": "live_only",
+          "quantity": 2,
+          "status": "available",
+          "price": 9.0,
+          "ref_code": "AD4"
+        }
+      }
+    },
+    {
+      "id": "ad2.view.inflate",
+      "lens": "AD2",
+      "title": "view-only update_live_item qty=40",
+      "ev": {
+        "rpc": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"live_item_not_authorized\"}",
+        "before": 2,
+        "after": 2
+      }
+    },
+    {
+      "id": "ad2.helper.patch.accepted-converted",
+      "lens": "AD2",
+      "title": "helper PATCH accepted→converted",
+      "ev": {
+        "patch": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"convert_requires_paid_order\"}",
+        "row": {
+          "id": "c34ac5a9-9a6b-4c6f-b1b3-78b45b55a5fd",
+          "live_id": "20d9f79d-b0bf-4140-9713-544e04a18b4a",
+          "live_item_id": "b0af4d16-7914-4a59-b1ca-5d876318281a",
+          "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+          "buyer_id": "32b3602e-8ae1-43cf-84da-2a271588a10c",
+          "source": "facebook_manual",
+          "status": "pending",
+          "requested_qty": 1,
+          "processed_by_user_id": null,
+          "notes": null
+        }
+      }
+    },
+    {
+      "id": "ad2.change-item.mark_sold",
+      "lens": "AD2",
+      "title": "helper can_change_current_item mark_sold",
+      "ev": {
+        "rpc": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"live_item_not_authorized\"}",
+        "item": {
+          "id": "cf24fa58-8cc5-4678-b46a-b36d91004d7f",
+          "live_id": "20d9f79d-b0bf-4140-9713-544e04a18b4a",
+          "product_id": null,
+          "item_kind": "live_only",
+          "quantity": 2,
+          "status": "available",
+          "price": 9.0,
+          "ref_code": "AD4"
+        }
+      }
+    },
+    {
+      "id": "ad3.accept.surfaces",
+      "lens": "AD3",
+      "title": "accept qty=1 → Hub/discovery/REST",
+      "ev": {
+        "stock": {
+          "http": 200,
+          "ok": true,
+          "available": 0,
+          "sold": 0,
+          "reserved": 1,
+          "status": null
+        },
+        "hub_public": null,
+        "discovery_buyer": {
+          "id": "53f31415-b4f9-406e-a4d5-d484b253c303",
+          "title": "RTAD-20260901T1825 live_only",
+          "is_active": true,
+          "status": "reserved_full",
+          "item_kind": "live_only",
+          "price": 9.0
+        },
+        "discovery_anon": {
+          "id": "53f31415-b4f9-406e-a4d5-d484b253c303",
+          "title": "RTAD-20260901T1825 live_only",
+          "is_active": true,
+          "status": "reserved_full",
+          "item_kind": "live_only",
+          "price": 9.0
+        },
+        "live_items_buyer": "200 [{\"id\":\"53f31415-b4f9-406e-a4d5-d484b253c303\",\"status\":\"reserved_full\",\"is_active\":true,\"quantity\":1,\"title\":\"RTAD-20260901T1825 live_only\"}]"
+      }
+    },
+    {
+      "id": "ad3.patch.status-sold",
+      "lens": "AD3",
+      "title": "PATCH live_items.status=sold",
+      "ev": {
+        "patch": "200 [{\"id\":\"25bf2ef3-ebad-4a13-999f-13eeafbf65c2\",\"live_id\":\"20d9f79d-b0bf-4140-9713-544e04a18b4a\",\"seller_id\":null,\"ref_code\":\"AD3\",\"title\":\"RTAD-20260901T1825 live_only\",\"description\":null,\"price\":9.0,\"image_url\":null,\"size\":null,\"color\":null…",
+        "item": {
+          "id": "25bf2ef3-ebad-4a13-999f-13eeafbf65c2",
+          "live_id": "20d9f79d-b0bf-4140-9713-544e04a18b4a",
+          "product_id": null,
+          "item_kind": "live_only",
+          "quantity": 1,
+          "status": "sold",
+          "price": 9.0,
+          "ref_code": "AD3"
+        },
+        "hub": null,
+        "discovery": null
+      }
+    },
+    {
+      "id": "ad4.patch.product.unlist",
+      "lens": "AD4",
+      "title": "PATCH products is_sold+unlist",
+      "ev": {
+        "before": {
+          "id": "bd6c8f1d-6013-4584-beed-1901b1106cd0",
+          "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+          "title": "RTAD-20260901T1825-mkt",
+          "price": 12.0,
+          "quantity": 1,
+          "is_sold": false,
+          "list_on_marketplace": true,
+          "available_for_live": true
+        },
+        "patch": "200 [{\"id\":\"bd6c8f1d-6013-4584-beed-1901b1106cd0\",\"created_at\":\"2026-09-01T17:34:03.389648+00:00\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"title\":\"RTAD-20260901T1825-mkt\",\"price\":12.0,\"ref_code\":null,\"category\":null,\"clothing_size\":n…",
+        "after": {
+          "id": "bd6c8f1d-6013-4584-beed-1901b1106cd0",
+          "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+          "title": "RTAD-20260901T1825-mkt",
+          "price": 12.0,
+          "quantity": 1,
+          "is_sold": true,
+          "list_on_marketplace": false,
+          "available_for_live": true
+        },
+        "hub": null
+      }
+    },
+    {
+      "id": "ad4.mark_sold.live_only",
+      "lens": "AD4",
+      "title": "mark_sold live_only sem PI",
+      "ev": {
+        "before": {
+          "id": "cf24fa58-8cc5-4678-b46a-b36d91004d7f",
+          "live_id": "20d9f79d-b0bf-4140-9713-544e04a18b4a",
+          "product_id": null,
+          "item_kind": "live_only",
+          "quantity": 2,
+          "status": "available",
+          "price": 9.0,
+          "ref_code": "AD4"
+        },
+        "rpc": "200 {\"ok\": true, \"price\": 9.0, \"live_id\": \"20d9f79d-b0bf-4140-9713-544e04a18b4a\", \"ref_code\": \"AD4\", \"item_kind\": \"live_only\", \"total_qty\": 2, \"product_id\": null, \"blocked_qty\": 0, \"live_status\": \"live\", \"live_item_id\": \"cf24fa58-8cc5-4678-b46a…",
+        "after": {
+          "id": "cf24fa58-8cc5-4678-b46a-b36d91004d7f",
+          "live_id": "20d9f79d-b0bf-4140-9713-544e04a18b4a",
+          "product_id": null,
+          "item_kind": "live_only",
+          "quantity": 2,
+          "status": "available",
+          "price": 9.0,
+          "ref_code": "AD4"
+        },
+        "stock": {
+          "http": 200,
+          "ok": true,
+          "available": 2,
+          "sold": 0,
+          "reserved": 0,
+          "status": null
+        }
+      }
+    },
+    {
+      "id": "ad4.mark_sold.mkt.live-effect",
+      "lens": "AD4",
+      "title": "mark_sold mkt sem PI — efeito live/Hub",
+      "ev": {
+        "rpc": "200 {\"ok\": true, \"price\": 12.0, \"live_id\": \"20d9f79d-b0bf-4140-9713-544e04a18b4a\", \"ref_code\": \"ADM2\", \"item_kind\": \"marketplace_product\", \"total_qty\": 1, \"product_id\": \"8d9f35b0-82c6-4cae-8d2f-d67ce7c904b0\", \"blocked_qty\": 0, \"live_status\": \"l…",
+        "item": {
+          "id": "326f3605-a64e-45b6-b286-9c3f1db0151e",
+          "live_id": "20d9f79d-b0bf-4140-9713-544e04a18b4a",
+          "product_id": "8d9f35b0-82c6-4cae-8d2f-d67ce7c904b0",
+          "item_kind": "marketplace_product",
+          "quantity": null,
+          "status": "available",
+          "price": 12.0,
+          "ref_code": "ADM2"
+        },
+        "prod": {
+          "id": "8d9f35b0-82c6-4cae-8d2f-d67ce7c904b0",
+          "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+          "title": "RTAD-20260901T1825-mkt2",
+          "price": 12.0,
+          "quantity": 1,
+          "is_sold": false,
+          "list_on_marketplace": true,
+          "available_for_live": true
+        },
+        "hub_item": null,
+        "hub_prod": {
+          "id": "8d9f35b0-82c6-4cae-8d2f-d67ce7c904b0",
+          "title": "RTAD-20260901T1825-mkt2",
+          "price": 12.0,
+          "is_sold": false
+        }
+      }
+    },
+    {
+      "id": "ad5.move.no-res",
+      "lens": "AD5",
+      "title": "PATCH live_id sem reservas liveA→liveB",
+      "ev": {
+        "patch": "200 [{\"id\":\"8e382608-dbe2-4761-ad01-defc3347fab6\",\"live_id\":\"fb38b77b-c970-40d0-a67d-9f06faeb7cfc\",\"seller_id\":null,\"ref_code\":\"AD5\",\"title\":\"RTAD-20260901T1825 live_only\",\"description\":null,\"price\":9.0,\"image_url\":null,\"size\":null,\"color\":null…",
+        "after": {
+          "id": "8e382608-dbe2-4761-ad01-defc3347fab6",
+          "live_id": "fb38b77b-c970-40d0-a67d-9f06faeb7cfc",
+          "product_id": null,
+          "item_kind": "live_only",
+          "quantity": 1,
+          "status": "available",
+          "price": 9.0,
+          "ref_code": "AD5"
+        }
+      }
+    },
+    {
+      "id": "ad5.move.cross-seller",
+      "lens": "AD5",
+      "title": "PATCH live_id → live seller2",
+      "ev": {
+        "patch": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"live_item_not_authorized\"}",
+        "after": {
+          "id": "8e382608-dbe2-4761-ad01-defc3347fab6",
+          "live_id": "fb38b77b-c970-40d0-a67d-9f06faeb7cfc",
+          "product_id": null,
+          "item_kind": "live_only",
+          "quantity": 1,
+          "status": "available",
+          "price": 9.0,
+          "ref_code": "AD5"
+        }
+      }
+    },
+    {
+      "id": "ad5.res.mismatch.insert",
+      "lens": "AD5",
+      "title": "INSERT reserva item liveB via liveA",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"live_item_live_mismatch\"}"
+    },
+    {
+      "id": "ad5.patch.req.live_id",
+      "lens": "AD5",
+      "title": "PATCH reserva.live_id para outra live",
+      "ev": {
+        "patch": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"live_item_live_mismatch\"}",
+        "row": {
+          "id": "f981d630-bf4f-4956-95c2-0431334c87b9",
+          "live_id": "fb38b77b-c970-40d0-a67d-9f06faeb7cfc",
+          "live_item_id": "39eea8ed-f0c6-4d8e-8c93-82db4fabac5c",
+          "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+          "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+          "source": "facebook_manual",
+          "status": "pending",
+          "requested_qty": 1,
+          "processed_by_user_id": null,
+          "notes": null
+        }
+      }
+    },
+    {
+      "id": "ad5.helper.patch.qty",
+      "lens": "AD5",
+      "title": "helper PATCH live_items.quantity=40",
+      "ev": {
+        "patch": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"live_item_qty_increase_not_allowed\"}",
+        "after": {
+          "id": "bec521b4-6424-4d00-a8f0-8d50680d3059",
+          "live_id": "20d9f79d-b0bf-4140-9713-544e04a18b4a",
+          "product_id": null,
+          "item_kind": "live_only",
+          "quantity": 1,
+          "status": "available",
+          "price": 9.0,
+          "ref_code": "AD5q"
+        }
+      }
+    },
+    {
+      "id": "ad5.helper.mark.inflate",
+      "lens": "AD5",
+      "title": "helper can_mark PATCH qty=40",
+      "ev": {
+        "patch": "200 [{\"id\":\"bec521b4-6424-4d00-a8f0-8d50680d3059\",\"live_id\":\"20d9f79d-b0bf-4140-9713-544e04a18b4a\",\"seller_id\":null,\"ref_code\":\"AD5q\",\"title\":\"RTAD-20260901T1825 live_only\",\"description\":null,\"price\":9.0,\"image_url\":null,\"size\":null,\"color\":nul…",
+        "after": {
+          "id": "bec521b4-6424-4d00-a8f0-8d50680d3059",
+          "live_id": "20d9f79d-b0bf-4140-9713-544e04a18b4a",
+          "product_id": null,
+          "item_kind": "live_only",
+          "quantity": 40,
+          "status": "available",
+          "price": 9.0,
+          "ref_code": "AD5q"
+        }
+      }
+    },
+    {
+      "id": "ad6.race.accept",
+      "lens": "AD6",
+      "title": "dois RPC accept paralelos qty=1",
+      "ev": {
+        "a1": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"live_item_qty_below_reservations\"}",
+        "a2": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"live_item_qty_below_reservations\"}",
+        "r1": {
+          "id": "50bab682-2f18-4559-a073-793eedc9d878",
+          "live_id": "20d9f79d-b0bf-4140-9713-544e04a18b4a",
+          "live_item_id": "e2fffbdc-5fba-4344-bf5b-775568330342",
+          "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+          "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+          "source": "facebook_manual",
+          "status": "pending",
+          "requested_qty": 1,
+          "processed_by_user_id": null,
+          "notes": null
+        },
+        "r2": {
+          "id": "2072987d-fb57-4597-855d-edbed38b86f4",
+          "live_id": "20d9f79d-b0bf-4140-9713-544e04a18b4a",
+          "live_item_id": "e2fffbdc-5fba-4344-bf5b-775568330342",
+          "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+          "buyer_id": "32b3602e-8ae1-43cf-84da-2a271588a10c",
+          "source": "facebook_manual",
+          "status": "pending",
+          "requested_qty": 1,
+          "processed_by_user_id": null,
+          "notes": null
+        },
+        "stock": {
+          "http": 200,
+          "ok": true,
+          "available": 1,
+          "sold": 0,
+          "reserved": 0,
+          "status": null
+        }
+      }
+    },
+    {
+      "id": "ad6.race.patch.converted",
+      "lens": "AD6",
+      "title": "PATCH converted paralelo",
+      "ev": {
+        "patches": [
+          "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"convert_requires_paid_order\"}",
+          "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"convert_requires_paid_order\"}"
+        ],
+        "rows": [
+          {
+            "id": "50bab682-2f18-4559-a073-793eedc9d878",
+            "live_id": "20d9f79d-b0bf-4140-9713-544e04a18b4a",
+            "live_item_id": "e2fffbdc-5fba-4344-bf5b-775568330342",
+            "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+            "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+            "source": "facebook_manual",
+            "status": "pending",
+            "requested_qty": 1,
+            "processed_by_user_id": null,
+            "notes": null
+          },
+          {
+            "id": "2072987d-fb57-4597-855d-edbed38b86f4",
+            "live_id": "20d9f79d-b0bf-4140-9713-544e04a18b4a",
+            "live_item_id": "e2fffbdc-5fba-4344-bf5b-775568330342",
+            "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+            "buyer_id": "32b3602e-8ae1-43cf-84da-2a271588a10c",
+            "source": "facebook_manual",
+            "status": "pending",
+            "requested_qty": 1,
+            "processed_by_user_id": null,
+            "notes": null
+          }
+        ],
+        "n_converted": 0
+      }
+    },
+    {
+      "id": "ad7.s2.accept",
+      "lens": "AD7",
+      "title": "seller2 RPC accept reserva seller1",
+      "ev": "200 {\"ok\": false, \"error\": \"not_allowed\"}"
+    },
+    {
+      "id": "ad7.s2.patch.converted",
+      "lens": "AD7",
+      "title": "seller2 PATCH converted alheio",
+      "ev": {
+        "patch": "200 []",
+        "row": {
+          "id": "4380549e-3888-47ef-9dd8-a2ae62bea8ae",
+          "live_id": "20d9f79d-b0bf-4140-9713-544e04a18b4a",
+          "live_item_id": "b0af4d16-7914-4a59-b1ca-5d876318281a",
+          "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+          "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+          "source": "facebook_manual",
+          "status": "pending",
+          "requested_qty": 1,
+          "processed_by_user_id": null,
+          "notes": null
+        }
+      }
+    },
+    {
+      "id": "ad7.s2.mark_sold",
+      "lens": "AD7",
+      "title": "seller2 mark_sold item seller1",
+      "ev": "200 {\"ok\": false, \"error\": \"not_allowed\"}"
+    },
+    {
+      "id": "ad7.helper.mark.s2",
+      "lens": "AD7",
+      "title": "helper seller1 mark_sold item seller2",
+      "ev": "200 {\"ok\": false, \"error\": \"not_allowed\"}"
+    },
+    {
+      "id": "ad7.s1.inflate.s2",
+      "lens": "AD7",
+      "title": "seller1 update_live_item qty no item seller2",
+      "ev": {
+        "rpc": "200 {\"ok\": false, \"error\": \"not_allowed\"}",
+        "after": {
+          "id": "1e05ff75-eaad-4058-a8d5-9234c64e1791",
+          "live_id": "2e4fc18b-218b-4f39-a8d1-01905d9dd3ef",
+          "product_id": null,
+          "item_kind": "live_only",
+          "quantity": 2,
+          "status": "available",
+          "price": 9.0,
+          "ref_code": "ADS"
+        }
+      }
+    },
+    {
+      "id": "ad8.wallets.mid",
+      "lens": "AD8",
+      "title": "wallets vs baseline",
+      "ev": {
+        "w0": {
+          "buyer": 61.1,
+          "seller": 18.97,
+          "buyer2": 0,
+          "seller2": 0,
+          "helper": 0
+        },
+        "now": {
+          "buyer": 61.1,
+          "seller": 18.97,
+          "buyer2": 0,
+          "seller2": 0,
+          "helper": 0
+        },
+        "orders_itemA1": []
+      }
+    },
+    {
+      "id": "ad8.checkout.after.probes",
+      "lens": "AD8",
+      "title": "edge create-live-checkout pós probes",
+      "ev": "404 {\"code\":\"NOT_FOUND\",\"message\":\"Requested function was not found\"}"
+    },
+    {
+      "id": "fix.w1",
+      "title": "wallets after",
+      "ev": {
+        "before": {
+          "buyer": 61.1,
+          "seller": 18.97,
+          "buyer2": 0,
+          "seller2": 0,
+          "helper": 0
+        },
+        "after": {
+          "buyer": 61.1,
+          "seller": 18.97,
+          "buyer2": 0,
+          "seller2": 0,
+          "helper": 0
+        }
+      }
+    }
+  ],
+  "actors": {
+    "buyer": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+    "seller": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+    "buyer2": "32b3602e-8ae1-43cf-84da-2a271588a10c",
+    "seller2": "54df6f22-c843-47c5-92ef-e274ad0264b0",
+    "helper": "1d92fde8-4fe1-4559-8d4c-4e55ab78465c",
+    "view": "13eaf809-b3dd-4053-997c-d45775868166"
+  },
+  "created": {
+    "lives": [
+      "20d9f79d-b0bf-4140-9713-544e04a18b4a",
+      "fb38b77b-c970-40d0-a67d-9f06faeb7cfc",
+      "2e4fc18b-218b-4f39-a8d1-01905d9dd3ef"
+    ],
+    "items": [
+      "b0af4d16-7914-4a59-b1ca-5d876318281a",
+      "53f31415-b4f9-406e-a4d5-d484b253c303",
+      "25bf2ef3-ebad-4a13-999f-13eeafbf65c2",
+      "cf24fa58-8cc5-4678-b46a-b36d91004d7f",
+      "39eea8ed-f0c6-4d8e-8c93-82db4fabac5c",
+      "1e05ff75-eaad-4058-a8d5-9234c64e1791",
+      "245e4494-5727-4b06-8dfe-aa1d6a3441d9",
+      "326f3605-a64e-45b6-b286-9c3f1db0151e",
+      "8e382608-dbe2-4761-ad01-defc3347fab6",
+      "bec521b4-6424-4d00-a8f0-8d50680d3059",
+      "e2fffbdc-5fba-4344-bf5b-775568330342"
+    ],
+    "reqs": [
+      "63fb5a02-7ee9-4693-a16e-6ce71a3dec08",
+      "e3409e25-d9ad-440e-858a-7155a1fb2d36",
+      "3f1fa58e-44d7-42d5-9f25-33d961e37d8d",
+      "b227cb50-42f8-4ecd-bbcd-e1f4c6e1d4a1",
+      "bb8df847-31d2-42d0-b547-a68bafdd22f6",
+      "c34ac5a9-9a6b-4c6f-b1b3-78b45b55a5fd",
+      "e0e2d131-4afe-403f-925e-1cd184bd260b",
+      "f981d630-bf4f-4956-95c2-0431334c87b9",
+      "50bab682-2f18-4559-a073-793eedc9d878",
+      "2072987d-fb57-4597-855d-edbed38b86f4",
+      "4380549e-3888-47ef-9dd8-a2ae62bea8ae"
+    ],
+    "orders": [],
+    "products": [
+      "bd6c8f1d-6013-4584-beed-1901b1106cd0",
+      "8d9f35b0-82c6-4cae-8d2f-d67ce7c904b0",
+      "302f0f42-d9bf-4376-86ff-d65dcf371224"
+    ],
+    "helpers": [
+      "fc412f92-87fe-4141-b482-91005053b389",
+      "4ce5d75a-b104-43a2-8ce6-c5ca4065c900"
+    ]
+  }
+}

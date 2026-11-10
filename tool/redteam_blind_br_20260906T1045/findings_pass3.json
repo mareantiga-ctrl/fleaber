@@ -1,0 +1,78 @@
+{
+  "stamp": "20260906T1045",
+  "prefix": "RTBR-20260906T1045",
+  "lenses": [
+    "BR3",
+    "BR7"
+  ],
+  "findings": [
+    {
+      "id": "BR3-BUYER-PATCH-TIER",
+      "lens": "BR3",
+      "severity": "P0",
+      "title": "Buyer PATCH seller_bundle_discounts",
+      "actor": "buyer JWT",
+      "pre": "tier_2=10 do vendedor",
+      "repro": "PATCH tier_2_pct=90",
+      "expected": "403",
+      "obtained": "200 []",
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "BR7-S2-PATCH-S1-TIER",
+      "lens": "BR7",
+      "severity": "P0",
+      "title": "Seller2 PATCH descontos do seller1",
+      "actor": "seller2 JWT",
+      "pre": "S1 discounts",
+      "repro": "PATCH seller_bundle_discounts",
+      "expected": "403",
+      "obtained": "200 []",
+      "proven": true,
+      "evidence": {}
+    }
+  ],
+  "blocked": [],
+  "skipped": [],
+  "notes": [
+    {
+      "id": "P3.DISC.buyer",
+      "lens": "BR3",
+      "title": "buyer PATCH tier 90",
+      "ev": "200 []"
+    },
+    {
+      "id": "P3.DISC.s2",
+      "lens": "BR7",
+      "title": "S2 PATCH S1 tier 90",
+      "ev": "200 []"
+    },
+    {
+      "id": "P3.DISC.self",
+      "lens": "BR3",
+      "title": "S1 PATCH próprio (restore 10)",
+      "ev": "200 [{\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"enabled\":true,\"tier_2_pct\":10.00,\"tier_3_pct\":20.00,\"tier_5_pct\":30.00,\"updated_at\":\"2026-07-03T12:47:31.973436+00:00\",\"custom_tiers\":[{\"pct\": 25, \"min_items\": 4}]}]"
+    },
+    {
+      "id": "P3.DISC.after",
+      "lens": "BR3",
+      "title": "row",
+      "ev": "200 [{\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"enabled\":true,\"tier_2_pct\":10.00,\"tier_3_pct\":20.00}]"
+    }
+  ],
+  "actors": {
+    "buyer": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+    "seller": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+    "buyer2": "76b6d470-2dc3-412f-be96-25773ac092e0",
+    "seller2": "7169220a-18dc-4777-a935-117d2ab9d3aa"
+  },
+  "created": {
+    "lives": [],
+    "items": [],
+    "orders": [],
+    "products": [],
+    "bundles": [],
+    "offers": []
+  }
+}

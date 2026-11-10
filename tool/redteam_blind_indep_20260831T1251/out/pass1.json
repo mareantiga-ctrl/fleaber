@@ -1,0 +1,357 @@
+{
+  "auditor": "REDTEAM_BLIND_INDEP_v4",
+  "stamp": "20260831T1251",
+  "project": "fxdknzrqjenzqcvnwqqq",
+  "production_touched": false,
+  "fase4": false,
+  "corrections_applied": false,
+  "fresh_id": "b34d49a1-363c-403c-bd33-300e026e98d4",
+  "findings": [
+    {
+      "id": "P1-OFFER-UNLIST",
+      "title": "Oferta+accept em produto unlist persiste",
+      "actor": "buyer+seller JWT",
+      "sev": "P2",
+      "well": "1",
+      "pre": "unlist; offer INSERT+accept",
+      "request": "POST product_offers; PATCH accepted; POST orders",
+      "before": {
+        "id": "4c585698-2940-46ed-a7ce-145b3db552b2",
+        "created_at": "2026-08-31T12:01:09.722592+00:00",
+        "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+        "title": "RTI4-20260831T1251--UNLIST",
+        "price": 4.5,
+        "ref_code": "RTI4-1788177669683-0",
+        "category": null,
+        "clothing_size": null,
+        "gender": null,
+        "description": null,
+        "state": null,
+        "image_urls": [],
+        "list_on_marketplace": false,
+        "available_for_live": false,
+        "is_sold": false,
+        "favorites_count": 0,
+        "quantity": 1
+      },
+      "after": {
+        "offer": "201 [{\"id\":\"9e2097dd-0dc4-4078-bd98-90b5bdbb80b4\",\"product_id\":\"4c585698-2940-46ed-a7ce-145b3db552b2\",\"chat_id\":null,\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"amount\":2.00,\"list_price\":null,\"offered_by\":\"buyer\",\"status\":\"pen…",
+        "accept": "200 [{\"id\":\"9e2097dd-0dc4-4078-bd98-90b5bdbb80b4\",\"product_id\":\"4c585698-2940-46ed-a7ce-145b3db552b2\",\"chat_id\":null,\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"amount\":2.00,\"list_price\":null,\"offered_by\":\"buyer\",\"status\":\"acc…",
+        "order": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"order_hold_product_not_listed\"}"
+      },
+      "impact": "Contrato em SKU fora da montra",
+      "repro": "offer unlist → accept → order"
+    },
+    {
+      "id": "P1-BUNDLE-ACCEPT-AFTER-UNLIST",
+      "title": "Seller aceita bundle depois de unlist de um SKU",
+      "actor": "seller JWT",
+      "sev": "P2",
+      "well": "1",
+      "pre": "bundle pending; PATCH list_on_marketplace=false; accept",
+      "request": "PATCH product_bundles status=accepted",
+      "before": "201 [{\"id\":\"d58fc492-08d5-4cec-adb5-9534dbe0464f\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"chat_id\":null,\"product_ids\":[\"5b1dc049-43e9-433b-9410-a8beeeab906a\",\"e365458f-c3eb-4ecc-8c7c-cb23787c62f5\"],\"subtotal_eur\":10.00,\"di…",
+      "after": "200 [{\"id\":\"d58fc492-08d5-4cec-adb5-9534dbe0464f\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"chat_id\":null,\"product_ids\":[\"5b1dc049-43e9-433b-9410-a8beeeab906a\",\"e365458f-c3eb-4ecc-8c7c-cb23787c62f5\"],\"subtotal_eur\":4.50,\"dis…",
+      "impact": "Aceitação sobre conjunto já morto; checkout posterior a validar",
+      "repro": "bundle → unlist member → seller accept"
+    }
+  ],
+  "holds": [
+    {
+      "id": "p3.products.anon",
+      "title": "anon sem SELECT products",
+      "well": "3",
+      "evidence": "400 {\"code\":\"42703\",\"details\":null,\"hint\":null,\"message\":\"column products.cost_price does not exist\"}"
+    },
+    {
+      "id": "p1.hub.unlisted",
+      "title": "Hub vazio para unlist",
+      "well": "1",
+      "evidence": "200 []"
+    },
+    {
+      "id": "p1.hub.sold",
+      "title": "Hub vazio para is_sold",
+      "well": "1",
+      "evidence": "200 []"
+    },
+    {
+      "id": "p1.buyer.unlist.select",
+      "title": "buyer não vê unlist",
+      "well": "1",
+      "evidence": "400 {\"code\":\"42703\",\"details\":null,\"hint\":null,\"message\":\"column products.cost_price does not exist\"}"
+    },
+    {
+      "id": "p1.buyer.sold.select",
+      "title": "buyer não vê is_sold",
+      "well": "1",
+      "evidence": "400 {\"code\":\"42703\",\"details\":null,\"hint\":null,\"message\":\"column products.cost_price does not exist\"}"
+    },
+    {
+      "id": "p1.order.unlist",
+      "title": "INSERT unlist bloqueado",
+      "well": "1",
+      "evidence": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"order_hold_product_not_listed\"}"
+    },
+    {
+      "id": "p1.order.sold",
+      "title": "INSERT is_sold bloqueado",
+      "well": "1",
+      "evidence": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"order_hold_product_sold\"}"
+    },
+    {
+      "id": "p1.order.fake.live",
+      "title": "fake live_id não bypassa",
+      "well": "1",
+      "evidence": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"order_live_not_found\"}"
+    },
+    {
+      "id": "p1.order.raffle",
+      "title": "raffle JWT ignorado",
+      "well": "1",
+      "evidence": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"order_hold_product_not_listed\"}"
+    },
+    {
+      "id": "p1.bundle.unlist",
+      "title": "bundle unlist rejeitado",
+      "well": "1",
+      "evidence": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"bundle_product_not_listed\"}"
+    },
+    {
+      "id": "p1.catalog.subtotal",
+      "title": "subtotal JWT não soma mortos",
+      "well": "1",
+      "evidence": "200 4.50"
+    },
+    {
+      "id": "p3.patch.pago",
+      "title": "PATCH pago rejeitado",
+      "well": "3",
+      "evidence": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"order_money_fields_immutable\"}"
+    },
+    {
+      "id": "p4.notify.anon",
+      "title": "anon sem notifications_view",
+      "well": "4",
+      "evidence": "401 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for view notifications_view\"}"
+    },
+    {
+      "id": "p3.discovery.ghost",
+      "title": "is_live sozinho não entra na discovery",
+      "well": "3",
+      "evidence": "200 []"
+    },
+    {
+      "id": "p2.review.pending",
+      "title": "review pending bloqueada",
+      "well": "2",
+      "evidence": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"review_order_invalid_status\"}"
+    }
+  ],
+  "notes": [
+    {
+      "id": "schema.products",
+      "title": "products columns probe",
+      "well": "3",
+      "detail": "400 {\"code\":\"42703\",\"details\":null,\"hint\":null,\"message\":\"column products.cost_price does not exist\"}"
+    },
+    {
+      "id": "p3.hub.products.anon",
+      "title": "hub_products_public anon",
+      "well": "3",
+      "detail": {
+        "http": 200,
+        "n": 20
+      }
+    },
+    {
+      "id": "p3.products.anon",
+      "title": "products table anon",
+      "well": "3",
+      "detail": "400 {\"code\":\"42703\",\"details\":null,\"hint\":null,\"message\":\"column products.cost_price does not exist\"}"
+    },
+    {
+      "id": "p3.lives.anon",
+      "title": "lives table anon",
+      "well": "3",
+      "detail": "401 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table lives\"}"
+    },
+    {
+      "id": "p3.profiles.anon",
+      "title": "profiles anon",
+      "well": "3",
+      "detail": "400 {\"code\":\"42703\",\"details\":null,\"hint\":null,\"message\":\"column profiles.email does not exist\"}"
+    },
+    {
+      "id": "p1.hub.unlisted",
+      "title": "hub unlist",
+      "well": "1",
+      "detail": {
+        "n": 0,
+        "http": 200
+      }
+    },
+    {
+      "id": "p1.hub.sold",
+      "title": "hub sold",
+      "well": "1",
+      "detail": {
+        "n": 0,
+        "http": 200
+      }
+    },
+    {
+      "id": "p1.buyer.unlist.select",
+      "title": "buyer select unlist",
+      "well": "1",
+      "detail": "400 {\"code\":\"42703\",\"details\":null,\"hint\":null,\"message\":\"column products.cost_price does not exist\"}"
+    },
+    {
+      "id": "p1.order.unlist",
+      "title": "INSERT order unlist",
+      "well": "1",
+      "detail": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"order_hold_product_not_listed\"}"
+    },
+    {
+      "id": "p1.order.sold",
+      "title": "INSERT order is_sold",
+      "well": "1",
+      "detail": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"order_hold_product_sold\"}"
+    },
+    {
+      "id": "p1.order.fake.live",
+      "title": "unlist + live_id fake",
+      "well": "1",
+      "detail": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"order_live_not_found\"}"
+    },
+    {
+      "id": "p1.order.raffle",
+      "title": "unlist + live_raffle_id JWT",
+      "well": "1",
+      "detail": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"order_hold_product_not_listed\"}"
+    },
+    {
+      "id": "p1.live.insert",
+      "title": "INSERT ended live",
+      "well": "1",
+      "detail": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table lives\"}"
+    },
+    {
+      "id": "p1.offer.unlist",
+      "title": "offer unlist",
+      "well": "1",
+      "detail": "201 [{\"id\":\"9e2097dd-0dc4-4078-bd98-90b5bdbb80b4\",\"product_id\":\"4c585698-2940-46ed-a7ce-145b3db552b2\",\"chat_id\":null,\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"amount\":2.00,\"list_price\":null,\"offered_by\":\"buyer\",\"status\":\"pen…"
+    },
+    {
+      "id": "p1.offer.accept.unlist",
+      "title": "seller accept unlist offer",
+      "well": "1",
+      "detail": "200 [{\"id\":\"9e2097dd-0dc4-4078-bd98-90b5bdbb80b4\",\"product_id\":\"4c585698-2940-46ed-a7ce-145b3db552b2\",\"chat_id\":null,\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"amount\":2.00,\"list_price\":null,\"offered_by\":\"buyer\",\"status\":\"acc…"
+    },
+    {
+      "id": "p1.bundle.unlist",
+      "title": "bundle unlist",
+      "well": "1",
+      "detail": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"bundle_product_not_listed\"}"
+    },
+    {
+      "id": "p1.bundle.listed",
+      "title": "bundle listed pair",
+      "well": "1",
+      "detail": "201 [{\"id\":\"d58fc492-08d5-4cec-adb5-9534dbe0464f\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"chat_id\":null,\"product_ids\":[\"5b1dc049-43e9-433b-9410-a8beeeab906a\",\"e365458f-c3eb-4ecc-8c7c-cb23787c62f5\"],\"subtotal_eur\":10.00,\"di…"
+    },
+    {
+      "id": "p1.bundle.accept.after.unlist",
+      "title": "accept after unlist",
+      "well": "1",
+      "detail": "200 [{\"id\":\"d58fc492-08d5-4cec-adb5-9534dbe0464f\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"chat_id\":null,\"product_ids\":[\"5b1dc049-43e9-433b-9410-a8beeeab906a\",\"e365458f-c3eb-4ecc-8c7c-cb23787c62f5\"],\"subtotal_eur\":4.50,\"dis…"
+    },
+    {
+      "id": "p1.catalog.subtotal",
+      "title": "subtotal JWT mortos+vivo",
+      "well": "1",
+      "detail": "200 4.50"
+    },
+    {
+      "id": "p3.silent.pago",
+      "title": "PATCH pago pending",
+      "well": "3",
+      "detail": {
+        "http": 403,
+        "after": {
+          "id": "664245cf-25c4-4d11-93ce-9957fb1f84be",
+          "status": "reserva_pendente",
+          "amount_paid_cents": null,
+          "stripe_payment_intent_id": null
+        }
+      }
+    },
+    {
+      "id": "p3.anon.rpc.batata_generate_auto_feedback",
+      "title": "anon rpc",
+      "well": "3",
+      "detail": "401 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_generate_auto_feedback\"}"
+    },
+    {
+      "id": "p3.anon.rpc.batata_wallet_payout_debit",
+      "title": "anon rpc",
+      "well": "3",
+      "detail": "404 {\"code\":\"PGRST202\",\"details\":\"Searched for the function public.batata_wallet_payout_debit without parameters or with a single unnamed json/jsonb parameter, but no matches were found in the schema cache.\",\"hint\":null,\"message\":\"Could not find the function public.batata_wallet_payo…"
+    },
+    {
+      "id": "p3.anon.rpc.batata_refund_buyer_wallet_for_order",
+      "title": "anon rpc",
+      "well": "3",
+      "detail": "404 {\"code\":\"PGRST202\",\"details\":\"Searched for the function public.batata_refund_buyer_wallet_for_order without parameters or with a single unnamed json/jsonb parameter, but no matches were found in the schema cache.\",\"hint\":null,\"message\":\"Could not find the function public.batata_r…"
+    },
+    {
+      "id": "p3.anon.rpc.batata_create_live_tip_pending",
+      "title": "anon rpc",
+      "well": "3",
+      "detail": "404 {\"code\":\"PGRST202\",\"details\":\"Searched for the function public.batata_create_live_tip_pending without parameters or with a single unnamed json/jsonb parameter, but no matches were found in the schema cache.\",\"hint\":null,\"message\":\"Could not find the function public.batata_create_…"
+    },
+    {
+      "id": "p4.notify.anon",
+      "title": "notifications_view anon",
+      "well": "4",
+      "detail": "401 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for view notifications_view\"}"
+    },
+    {
+      "id": "p4.notify.buyer",
+      "title": "notifications_view buyer",
+      "well": "4",
+      "detail": {
+        "http": 200,
+        "n": 0
+      }
+    },
+    {
+      "id": "p3.fresh.is_live",
+      "title": "PATCH is_live fresh",
+      "well": "3",
+      "detail": "200 [{\"created_at\":\"2026-08-31T12:01:07.559112+00:00\",\"full_name\":\"RTI4-20260831T1251--ghost\",\"user_type\":\"vendedor\",\"phone\":null,\"id\":\"b34d49a1-363c-403c-bd33-300e026e98d4\",\"photo_url\":null,\"is_live\":true,\"next_live\":null,\"last_live\":null,\"location\":\"Portugal\",\"total_lives\":0,\"phone…"
+    },
+    {
+      "id": "p3.discovery.ghost",
+      "title": "discovery fresh is_live",
+      "well": "3",
+      "detail": "200 []"
+    },
+    {
+      "id": "p2.review.pending",
+      "title": "review on pending",
+      "well": "2",
+      "detail": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"review_order_invalid_status\"}"
+    }
+  ],
+  "created_products": [
+    "4c585698-2940-46ed-a7ce-145b3db552b2",
+    "e9d4b288-28c2-45dd-a452-8b26a77e9882",
+    "e365458f-c3eb-4ecc-8c7c-cb23787c62f5",
+    "5b1dc049-43e9-433b-9410-a8beeeab906a"
+  ],
+  "created_orders": [
+    "664245cf-25c4-4d11-93ce-9957fb1f84be"
+  ],
+  "created_lives": []
+}

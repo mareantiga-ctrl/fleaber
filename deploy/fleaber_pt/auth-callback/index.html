@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Fleaber — a confirmar…</title>
+  <meta name="robots" content="noindex" />
+  <style>
+    body { font-family: system-ui, sans-serif; margin: 0; min-height: 100vh;
+      display: grid; place-items: center; background: #0f1719; color: #e8f2f3; }
+    .box { max-width: 28rem; padding: 1.5rem; text-align: center; }
+    a { color: #00a3ad; }
+    a.btn { display: inline-block; margin-top: 12px; background: #007782; color: #fff;
+      text-decoration: none; padding: 12px 20px; border-radius: 14px; font-weight: 700; }
+  </style>
+</head>
+<body>
+  <div class="box">
+    <p>A concluir autenticação…</p>
+    <p><a class="btn" id="openApp" href="#">Abrir na app Fleaber</a></p>
+    <p><a id="goWeb" href="/fleahub/">Continuar no browser</a></p>
+  </div>
+  <script>
+    (function () {
+      var q = window.location.search || '';
+      var h = window.location.hash || '';
+      var app = 'fleaber://fleaber.com/auth-callback' + q + h;
+      var web = '/fleahub/index.html' + q + h;
+      var openApp = document.getElementById('openApp');
+      var goWeb = document.getElementById('goWeb');
+      openApp.href = app;
+      goWeb.href = web;
+      var isAndroid = /Android/i.test(navigator.userAgent || '');
+      if (isAndroid) {
+        // App Links falhou → tentar scheme; se a app não abrir, cair no Hub.
+        window.location.replace(app);
+        setTimeout(function () { window.location.replace(web); }, 1600);
+      } else {
+        window.location.replace(web);
+      }
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,109 @@
+{
+  "stamp": "20260902T1007",
+  "prefix": "RTAS-20260902T1007",
+  "lenses": [
+    "AS8"
+  ],
+  "findings": [
+    {
+      "id": "AS8.payout_never_shipped",
+      "lens": "AS8",
+      "severity": "P0",
+      "title": "Seller salto pago→entregue→concluido (sem enviado/shipped_at) e release credita a carteira",
+      "actor": "seller JWT hops + buyer JWT release",
+      "pre": "pago capturado 5,90 €",
+      "repro": "PATCH entregue; PATCH concluido JWT=seller; rpc release JWT=buyer",
+      "expected": "hop bloqueado e/ou release false sem shipped_at",
+      "obtained": {
+        "status": "concluido",
+        "shipped_at": "",
+        "release": "200 true",
+        "delta_seller_eur": 5.0,
+        "wallet_release_processed_at": "",
+        "pi": "pi_3UBAKBH7FWYUN3jh1jxv2EsN",
+        "amount_paid_cents": 590
+      },
+      "proven": true,
+      "evidence": {}
+    }
+  ],
+  "blocked": [],
+  "skipped": [],
+  "notes": [
+    {
+      "id": "fixture.paid",
+      "lens": "AS8",
+      "title": "setup_paid_order Stripe TEST",
+      "ev": "200 {\n  \"ok\": true,\n  \"order_id\": \"0f4a4af7-4938-40cd-8be7-6320eb35b17d\",\n  \"product_id\": \"78794036-66e3-415b-9646-9a1df6264de8\",\n  \"payment_intent_id\": \"pi_3UBAKBH7FWYUN3jh1jxv2EsN\",\n  \"pi_status\": \"succeeded\",\n  \"pi_amount_received\": 590,\n  \"…"
+    },
+    {
+      "id": "AS8.no_ship_payout",
+      "lens": "AS8",
+      "title": "pago→entregue→concluido seller + release buyer",
+      "ev": {
+        "entregue": "200 [{\"id\":\"0f4a4af7-4938-40cd-8be7-6320eb35b17d\",\"created_at\":\"2026-09-02T09:19:19.170868+00:00\",\"product_id\":\"78794036-66e3-415b-9646-9a1df6264de8\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c…",
+        "concluido": "200 [{\"id\":\"0f4a4af7-4938-40cd-8be7-6320eb35b17d\",\"created_at\":\"2026-09-02T09:19:19.170868+00:00\",\"product_id\":\"78794036-66e3-415b-9646-9a1df6264de8\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c…",
+        "order": {
+          "id": "0f4a4af7-4938-40cd-8be7-6320eb35b17d",
+          "status": "concluido",
+          "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+          "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+          "product_id": "78794036-66e3-415b-9646-9a1df6264de8",
+          "quantity": 1,
+          "price_total": 5.9,
+          "amount_paid_cents": 590,
+          "payment_method": "Pagamento na app",
+          "shipping_method": "",
+          "stripe_payment_intent_id": "pi_3UBAKBH7FWYUN3jh1jxv2EsN",
+          "stripe_checkout_session_id": "",
+          "stripe_refund_id": "",
+          "live_item_id": "",
+          "live_id": "",
+          "stock_units_applied": 1,
+          "contract_unit_cents": 590,
+          "contract_qty": 1,
+          "bundle_id": "",
+          "product_offer_id": "",
+          "shipped_at": "",
+          "wallet_release_processed_at": "",
+          "wallet_refund_processed_at": "",
+          "completed_at": "2026-09-02T09:19:22.014572+00:00",
+          "returned_at": "",
+          "proof_url": ""
+        },
+        "release": "200 true",
+        "w0": {
+          "buyer": 61.1,
+          "seller": 28.97,
+          "buyer2": 0,
+          "seller2": 0
+        },
+        "w1": {
+          "buyer": 61.1,
+          "seller": 33.97,
+          "buyer2": 0,
+          "seller2": 0
+        },
+        "delta_seller": 5.0,
+        "pi": "pi_3UBAKBH7FWYUN3jh1jxv2EsN"
+      }
+    }
+  ],
+  "actors": {
+    "buyer": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+    "seller": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+    "buyer2": null,
+    "seller2": null
+  },
+  "created": {
+    "lives": [],
+    "items": [],
+    "orders": [
+      "0f4a4af7-4938-40cd-8be7-6320eb35b17d"
+    ],
+    "products": [
+      "78794036-66e3-415b-9646-9a1df6264de8"
+    ],
+    "bundles": []
+  }
+}

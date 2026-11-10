@@ -1,0 +1,58 @@
+{
+  "auditor": "REDTEAM_BLIND_CC_DISPUTA_POS_BRBW_v1",
+  "frozen_at": "2026-09-06T11:48:00+01:00",
+  "production_touched": false,
+  "fase4": false,
+  "corrections_applied": false,
+  "lentes_cobertas": ["CC1", "CC2", "CC3", "CC4", "CC5", "CC6", "CC7", "CC8"],
+  "veredicto": "FAIL_P2",
+  "prefix": "RTCC-20260906T1137",
+  "staging": "fxdknzrqjenzqcvnwqqq",
+  "contagem": {
+    "P0_aberto": false,
+    "P0_quantos": 0,
+    "P1_aberto": false,
+    "P1_quantos": 0,
+    "P2_aberto": true,
+    "P2_quantos": 1,
+    "P3_aberto": false,
+    "P3_quantos": 0,
+    "P4_aberto": false,
+    "P4_quantos": 0,
+    "total_P0_P3": 1
+  },
+  "findings": [
+    {
+      "id": "RTCC-CC3-canonical-path-incomplete",
+      "lens": "CC3",
+      "severity": "P2",
+      "title": "batata_storage_url_path_canonical incompleto após BRBW: bidi / %c1%9c / slashes unicode persistem sem loot",
+      "actor": "buyer JWT",
+      "proven": true,
+      "loot": false,
+      "variants": [
+        "U+202E RLO",
+        "U+202D LRO",
+        "U+2067 RLI",
+        "U+200E LRM",
+        "%c1%9c",
+        "%e0%80%af",
+        "U+2215",
+        "U+2044",
+        "U+29F8",
+        "U+FF3C",
+        "%5c",
+        "%252e%252e%252f",
+        "U+2024"
+      ],
+      "surfaces": ["order_dispute_replies.proof_photos", "order_disputes.proof_photos", "order_disputes.return_label_url"],
+      "evidence": "tool/redteam_blind_cc_20260906T1137/pass2.json"
+    }
+  ],
+  "exactos_nao_contados": [
+    "seller pago→pedido_devolucao 403",
+    "／ U+FF0F ainda 201 (BRBW check não rejeita após convert)",
+    "%c0%af ainda 201",
+    "reply ?/# wrap 201"
+  ]
+}

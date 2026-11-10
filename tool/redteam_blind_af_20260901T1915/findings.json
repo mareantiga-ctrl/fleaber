@@ -1,0 +1,940 @@
+{
+  "stamp": "20260901T1915",
+  "prefix": "RTAF-20260901T1915",
+  "lenses": [
+    "AF1",
+    "AF2",
+    "AF3",
+    "AF4",
+    "AF5",
+    "AF6",
+    "AF7",
+    "AF8"
+  ],
+  "findings": [
+    {
+      "id": "AF2.ENC.ff",
+      "lens": "AF2",
+      "severity": "P1",
+      "title": "JSON cru bundle_proposal prefixado com ff passa o trigger e o Flutter parseia o card (total_eur=6543.21 sem bundle_id)",
+      "actor": "buyer JWT",
+      "pre": "tryParseBundleProposalChatPayload faz trim()+jsonDecode se começa por `{`; strip SQL não cobre FF/VT/Ogham/LS/PS",
+      "repro": "POST chat_messages text=<ff>{\"kind\":\"bundle_proposal\",\"total_eur\":6543.21,...}",
+      "expected": "chat_system_card_prefix_required",
+      "obtained": {
+        "http": 201,
+        "id": "1027",
+        "flutter_parses": true
+      },
+      "proven": true,
+      "evidence": {
+        "variant": "ff",
+        "stored_prefix_cp": 12
+      }
+    },
+    {
+      "id": "AF2.ENC.vt",
+      "lens": "AF2",
+      "severity": "P1",
+      "title": "JSON cru bundle_proposal prefixado com vt passa o trigger e o Flutter parseia o card (total_eur=6543.21 sem bundle_id)",
+      "actor": "buyer JWT",
+      "pre": "tryParseBundleProposalChatPayload faz trim()+jsonDecode se começa por `{`; strip SQL não cobre FF/VT/Ogham/LS/PS",
+      "repro": "POST chat_messages text=<vt>{\"kind\":\"bundle_proposal\",\"total_eur\":6543.21,...}",
+      "expected": "chat_system_card_prefix_required",
+      "obtained": {
+        "http": 201,
+        "id": "1028",
+        "flutter_parses": true
+      },
+      "proven": true,
+      "evidence": {
+        "variant": "vt",
+        "stored_prefix_cp": 11
+      }
+    },
+    {
+      "id": "AF2.ENC.ogham",
+      "lens": "AF2",
+      "severity": "P1",
+      "title": "JSON cru bundle_proposal prefixado com ogham passa o trigger e o Flutter parseia o card (total_eur=6543.21 sem bundle_id)",
+      "actor": "buyer JWT",
+      "pre": "tryParseBundleProposalChatPayload faz trim()+jsonDecode se começa por `{`; strip SQL não cobre FF/VT/Ogham/LS/PS",
+      "repro": "POST chat_messages text=<ogham>{\"kind\":\"bundle_proposal\",\"total_eur\":6543.21,...}",
+      "expected": "chat_system_card_prefix_required",
+      "obtained": {
+        "http": 201,
+        "id": "1029",
+        "flutter_parses": true
+      },
+      "proven": true,
+      "evidence": {
+        "variant": "ogham",
+        "stored_prefix_cp": 5760
+      }
+    },
+    {
+      "id": "AF2.ENC.ls",
+      "lens": "AF2",
+      "severity": "P1",
+      "title": "JSON cru bundle_proposal prefixado com ls passa o trigger e o Flutter parseia o card (total_eur=6543.21 sem bundle_id)",
+      "actor": "buyer JWT",
+      "pre": "tryParseBundleProposalChatPayload faz trim()+jsonDecode se começa por `{`; strip SQL não cobre FF/VT/Ogham/LS/PS",
+      "repro": "POST chat_messages text=<ls>{\"kind\":\"bundle_proposal\",\"total_eur\":6543.21,...}",
+      "expected": "chat_system_card_prefix_required",
+      "obtained": {
+        "http": 201,
+        "id": "1030",
+        "flutter_parses": true
+      },
+      "proven": true,
+      "evidence": {
+        "variant": "ls",
+        "stored_prefix_cp": 8232
+      }
+    },
+    {
+      "id": "AF2.ENC.ps",
+      "lens": "AF2",
+      "severity": "P1",
+      "title": "JSON cru bundle_proposal prefixado com ps passa o trigger e o Flutter parseia o card (total_eur=6543.21 sem bundle_id)",
+      "actor": "buyer JWT",
+      "pre": "tryParseBundleProposalChatPayload faz trim()+jsonDecode se começa por `{`; strip SQL não cobre FF/VT/Ogham/LS/PS",
+      "repro": "POST chat_messages text=<ps>{\"kind\":\"bundle_proposal\",\"total_eur\":6543.21,...}",
+      "expected": "chat_system_card_prefix_required",
+      "obtained": {
+        "http": 201,
+        "id": "1031",
+        "flutter_parses": true
+      },
+      "proven": true,
+      "evidence": {
+        "variant": "ps",
+        "stored_prefix_cp": 8233
+      }
+    },
+    {
+      "id": "AF5.DEL.zwsp",
+      "lens": "AF5",
+      "severity": "P2",
+      "title": "Mensagem JSON cru zwsp é apagável — DELETE só imutabiliza FLEABER_JSON_V1 e btrim `{`",
+      "actor": "buyer JWT",
+      "pre": "trg_batata_chat_messages_guard_delete",
+      "repro": "DELETE chat_messages?id=eq.1032",
+      "expected": "chat_system_card_immutable",
+      "obtained": {
+        "http": 200,
+        "gone": true
+      },
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "AF5.DEL.zwnj",
+      "lens": "AF5",
+      "severity": "P2",
+      "title": "Mensagem JSON cru zwnj é apagável — DELETE só imutabiliza FLEABER_JSON_V1 e btrim `{`",
+      "actor": "buyer JWT",
+      "pre": "trg_batata_chat_messages_guard_delete",
+      "repro": "DELETE chat_messages?id=eq.1033",
+      "expected": "chat_system_card_immutable",
+      "obtained": {
+        "http": 200,
+        "gone": true
+      },
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "AF5.DEL.soft_hyphen",
+      "lens": "AF5",
+      "severity": "P2",
+      "title": "Mensagem JSON cru soft_hyphen é apagável — DELETE só imutabiliza FLEABER_JSON_V1 e btrim `{`",
+      "actor": "buyer JWT",
+      "pre": "trg_batata_chat_messages_guard_delete",
+      "repro": "DELETE chat_messages?id=eq.1034",
+      "expected": "chat_system_card_immutable",
+      "obtained": {
+        "http": 200,
+        "gone": true
+      },
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "AF5.DEL.word_joiner",
+      "lens": "AF5",
+      "severity": "P2",
+      "title": "Mensagem JSON cru word_joiner é apagável — DELETE só imutabiliza FLEABER_JSON_V1 e btrim `{`",
+      "actor": "buyer JWT",
+      "pre": "trg_batata_chat_messages_guard_delete",
+      "repro": "DELETE chat_messages?id=eq.1035",
+      "expected": "chat_system_card_immutable",
+      "obtained": {
+        "http": 200,
+        "gone": true
+      },
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "AF5.DEL.rtl",
+      "lens": "AF5",
+      "severity": "P2",
+      "title": "Mensagem JSON cru rtl é apagável — DELETE só imutabiliza FLEABER_JSON_V1 e btrim `{`",
+      "actor": "buyer JWT",
+      "pre": "trg_batata_chat_messages_guard_delete",
+      "repro": "DELETE chat_messages?id=eq.1036",
+      "expected": "chat_system_card_immutable",
+      "obtained": {
+        "http": 200,
+        "gone": true
+      },
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "AF5.DEL.fullwidth_brace",
+      "lens": "AF5",
+      "severity": "P2",
+      "title": "Mensagem JSON cru fullwidth_brace é apagável — DELETE só imutabiliza FLEABER_JSON_V1 e btrim `{`",
+      "actor": "buyer JWT",
+      "pre": "trg_batata_chat_messages_guard_delete",
+      "repro": "DELETE chat_messages?id=eq.1037",
+      "expected": "chat_system_card_immutable",
+      "obtained": {
+        "http": 200,
+        "gone": true
+      },
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "AF5.DEL.json_array",
+      "lens": "AF5",
+      "severity": "P2",
+      "title": "Mensagem JSON cru json_array é apagável — DELETE só imutabiliza FLEABER_JSON_V1 e btrim `{`",
+      "actor": "buyer JWT",
+      "pre": "trg_batata_chat_messages_guard_delete",
+      "repro": "DELETE chat_messages?id=eq.1038",
+      "expected": "chat_system_card_immutable",
+      "obtained": {
+        "http": 200,
+        "gone": true
+      },
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "AF1.RES.OUTCOME-OMIT",
+      "lens": "AF1",
+      "severity": "P1",
+      "title": "reservation_request_outcome sem outcome num pedido reservado — Flutter mostra «recusou» (accepted==false) mas a BD continua reservado",
+      "actor": "seller JWT",
+      "pre": "trigger só cruza BD se outcome=accepted|rejected; Flutter: accepted = outcome==accepted",
+      "repro": "POST FLEABER_JSON_V1 kind=reservation_request_outcome order_id=<reservado> (sem outcome)",
+      "expected": "recusa ou card alinhado ao status reservado",
+      "obtained": {
+        "http": 201,
+        "msg": "1045",
+        "order_status": "reservado",
+        "flutter": "O vendedor recusou o pedido de reserva."
+      },
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "AF1.RES.OUTCOME-EXPIRED",
+      "lens": "AF1",
+      "severity": "P1",
+      "title": "reservation_request_outcome outcome=expired em reservado — card «recusou», BD reservado",
+      "actor": "seller JWT",
+      "pre": "sem check para outcome∉{accepted,rejected}",
+      "repro": "POST outcome=expired order reservado",
+      "expected": "recusa",
+      "obtained": {
+        "http": 201,
+        "msg": "1046"
+      },
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "AF1.RES.ACCEPTED-PAID",
+      "lens": "AF1",
+      "severity": "P1",
+      "title": "reservation_accepted aceite num pedido já pago — card «Tens até … para pagar» sem cruzar status",
+      "actor": "seller JWT",
+      "pre": "assert só compara expires_at se reservation_expires_at ≠ null; não exige status reservado",
+      "repro": "POST kind=reservation_accepted order pago expires_at=BD",
+      "expected": "chat_system_card_status_mismatch",
+      "obtained": {
+        "http": 201,
+        "msg": "1047",
+        "status": "pago",
+        "paid_cents": 1234
+      },
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "AF1.CANCEL.DISPLAY",
+      "lens": "AF1",
+      "severity": "P1",
+      "title": "cancel_request_outcome.display livre — card mostra reembolso 4321 € com pedido ainda pago",
+      "actor": "seller JWT",
+      "pre": "trigger só valida outcome accepted/rejected; Flutter _buildCancelOutcomeFromPayload usa payload.display cru",
+      "repro": "POST kind=cancel_request_outcome outcome=updated display=«reembolso 4321 €» order pago",
+      "expected": "recusa ou display ignorado",
+      "obtained": {
+        "http": 201,
+        "msg": "1048",
+        "status": "pago",
+        "refund": null,
+        "flutter_line": "Cancelamento aceite — reembolso de 4321,00 € processado na hora."
+      },
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "AF1.SEGURO.LABEL-INT",
+      "lens": "AF1",
+      "severity": "P2",
+      "title": "seguro_fleaber_paid label «PIX 4321 €» (inteiro) aceite — regex do label exige decimal; Flutter concatena o label no card de pago",
+      "actor": "buyer JWT",
+      "pre": "label ~ '(Seguro|PIX|MB WAY|Compra paga).*\\d+[,.]\\d+\\s*€'",
+      "repro": "POST seguro_fleaber_paid total=12.34 label=«PIX 4321 €»",
+      "expected": "chat_system_card_label_mismatch",
+      "obtained": {
+        "http": 201,
+        "msg": "1049"
+      },
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "AF1.SEGURO.LABEL-EUR",
+      "lens": "AF1",
+      "severity": "P2",
+      "title": "seguro_fleaber_paid label «MB WAY 4321,00 EUR» aceite — regex só casa €, não EUR",
+      "actor": "buyer JWT",
+      "pre": "label mismatch só se o padrão com € casar",
+      "repro": "POST label=«MB WAY 4321,00 EUR» total correcto",
+      "expected": "chat_system_card_label_mismatch",
+      "obtained": {
+        "http": 201,
+        "msg": "1050"
+      },
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "AF1.MBWAY.NOTES",
+      "lens": "AF1",
+      "severity": "P2",
+      "title": "reservation_payment_submitted.notes livre — card mostra «Observações: Comprovativo MB WAY 4321 €» sem prova",
+      "actor": "buyer JWT",
+      "pre": "notes não validado; Flutter imprime Observações: $notes",
+      "repro": "POST kind=reservation_payment_submitted notes=«MB WAY 4321 €»",
+      "expected": "notes sanitizado ou recusado",
+      "obtained": {
+        "http": 201,
+        "msg": "1051"
+      },
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "AF1.OFFER.WITHDRAWN",
+      "lens": "AF1",
+      "severity": "P1",
+      "title": "price_offer_outcome outcome=withdrawn com oferta pending — Flutter mostra «Proposta recusada.» (accepted==false)",
+      "actor": "seller JWT",
+      "pre": "trigger só valida accepted/rejected; PriceOfferOutcomeChatCard: else → recusada",
+      "repro": "POST price_offer_outcome outcome=withdrawn offer pending amount=BD",
+      "expected": "chat_system_card_offer_status_mismatch",
+      "obtained": {
+        "http": 201,
+        "msg": "1054"
+      },
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "AF1.OFFER.OUTCOME-OMIT",
+      "lens": "AF1",
+      "severity": "P1",
+      "title": "price_offer_outcome sem outcome + oferta pending — card «Proposta recusada.»",
+      "actor": "seller JWT",
+      "pre": "mesmo buraco que withdrawn, variante omit",
+      "repro": "POST price_offer_outcome sem outcome",
+      "expected": "recusa",
+      "obtained": {
+        "http": 201,
+        "msg": "1055"
+      },
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "AF4.PROOF.fleaber_app_static",
+      "lens": "AF4",
+      "severity": "P1",
+      "title": "reservation_payment_submitted.proof_url=fleaber_app_static aceite — Flutter abre no Image.network/dialog",
+      "actor": "buyer JWT",
+      "pre": "allowlist fleaber.app / fleaber_private; nested https e public bloqueados",
+      "repro": "POST proof_url=https://fleaber.app/favicon.ico",
+      "expected": "chat_system_card_url_denied",
+      "obtained": {
+        "http": 201,
+        "msg": "1056",
+        "url": "https://fleaber.app/favicon.ico"
+      },
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "AF4.PROOF.fleaber_pt_static",
+      "lens": "AF4",
+      "severity": "P1",
+      "title": "reservation_payment_submitted.proof_url=fleaber_pt_static aceite — Flutter abre no Image.network/dialog",
+      "actor": "buyer JWT",
+      "pre": "allowlist fleaber.app / fleaber_private; nested https e public bloqueados",
+      "repro": "POST proof_url=https://www.fleaber.pt/robots.txt",
+      "expected": "chat_system_card_url_denied",
+      "obtained": {
+        "http": 201,
+        "msg": "1057",
+        "url": "https://www.fleaber.pt/robots.txt"
+      },
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "AF4.PROOF.crlf_embedded",
+      "lens": "AF4",
+      "severity": "P2",
+      "title": "reservation_payment_submitted.proof_url=crlf_embedded aceite — Flutter abre no Image.network/dialog",
+      "actor": "buyer JWT",
+      "pre": "allowlist fleaber.app / fleaber_private; nested https e public bloqueados",
+      "repro": "POST proof_url=https://fleaber.app/x%0d%0aLocation:%20https://evil.example/receipt.png",
+      "expected": "chat_system_card_url_denied",
+      "obtained": {
+        "http": 201,
+        "msg": "1058",
+        "url": "https://fleaber.app/x%0d%0aLocation:%20https://evil.example/receipt.png"
+      },
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "AF4.PROOF.query_proto_rel",
+      "lens": "AF4",
+      "severity": "P1",
+      "title": "reservation_payment_submitted.proof_url=query_proto_rel aceite — Flutter abre no Image.network/dialog",
+      "actor": "buyer JWT",
+      "pre": "allowlist fleaber.app / fleaber_private; nested https e public bloqueados",
+      "repro": "POST proof_url=https://fleaber.app/l?next=//evil.example/receipt.png",
+      "expected": "chat_system_card_url_denied",
+      "obtained": {
+        "http": 201,
+        "msg": "1059",
+        "url": "https://fleaber.app/l?next=//evil.example/receipt.png"
+      },
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "AF4.PROOF.query_bare_host",
+      "lens": "AF4",
+      "severity": "P1",
+      "title": "reservation_payment_submitted.proof_url=query_bare_host aceite — Flutter abre no Image.network/dialog",
+      "actor": "buyer JWT",
+      "pre": "allowlist fleaber.app / fleaber_private; nested https e public bloqueados",
+      "repro": "POST proof_url=https://fleaber.app/l?u=evil.example/receipt.png",
+      "expected": "chat_system_card_url_denied",
+      "obtained": {
+        "http": 201,
+        "msg": "1060",
+        "url": "https://fleaber.app/l?u=evil.example/receipt.png"
+      },
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "AF4.PROOF.fragment_at",
+      "lens": "AF4",
+      "severity": "P2",
+      "title": "reservation_payment_submitted.proof_url=fragment_at aceite — Flutter abre no Image.network/dialog",
+      "actor": "buyer JWT",
+      "pre": "allowlist fleaber.app / fleaber_private; nested https e public bloqueados",
+      "repro": "POST proof_url=https://fleaber.app/x#@evil.example/receipt.png",
+      "expected": "chat_system_card_url_denied",
+      "obtained": {
+        "http": 201,
+        "msg": "1061",
+        "url": "https://fleaber.app/x#@evil.example/receipt.png"
+      },
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "AF4.PROOF.private_traversal",
+      "lens": "AF4",
+      "severity": "P2",
+      "title": "reservation_payment_submitted.proof_url=private_traversal aceite — Flutter abre no Image.network/dialog",
+      "actor": "buyer JWT",
+      "pre": "allowlist fleaber.app / fleaber_private; nested https e public bloqueados",
+      "repro": "POST proof_url=https://fxdknzrqjenzqcvnwqqq.supabase.co/storage/v1/object/fleaber_private/../public/avatars/x.png",
+      "expected": "chat_system_card_url_denied",
+      "obtained": {
+        "http": 201,
+        "msg": "1062",
+        "url": "https://fxdknzrqjenzqcvnwqqq.supabase.co/storage/v1/object/fleaber_private/../public/avatars/x.png"
+      },
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "AF4.PROOF.private_pct_dots",
+      "lens": "AF4",
+      "severity": "P2",
+      "title": "reservation_payment_submitted.proof_url=private_pct_dots aceite — Flutter abre no Image.network/dialog",
+      "actor": "buyer JWT",
+      "pre": "allowlist fleaber.app / fleaber_private; nested https e public bloqueados",
+      "repro": "POST proof_url=https://fxdknzrqjenzqcvnwqqq.supabase.co/storage/v1/object/fleaber_private/%2e%2e/public/avatars/x.png",
+      "expected": "chat_system_card_url_denied",
+      "obtained": {
+        "http": 201,
+        "msg": "1063",
+        "url": "https://fxdknzrqjenzqcvnwqqq.supabase.co/storage/v1/object/fleaber_private/%2e%2e/public/avatars/x.png"
+      },
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "AF4.IMG.PUBLIC",
+      "lens": "AF4",
+      "severity": "P2",
+      "title": "chat_image.url em bucket public aceite — allowlist só casa supabase.co/storage/, sem negar /object/public/",
+      "actor": "buyer JWT",
+      "pre": "chat_image url check ≠ proof_url (sem denylist public)",
+      "repro": "POST chat_image path=chat_uploads/{me}/{chat}/x url=…/object/public/avatars/x.png",
+      "expected": "chat_system_card_url_denied",
+      "obtained": {
+        "http": 201,
+        "msg": "1068"
+      },
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "AF3.INBOX.BACKDATE-90S",
+      "lens": "AF3",
+      "severity": "P3",
+      "title": "last_message_time −90s sobrevive (janela de 2 minutos)",
+      "actor": "buyer JWT",
+      "pre": "clamp só se < now()-2min ou > now()+5min",
+      "repro": "POST chats last_message_time=now-90s",
+      "expected": "forçar now()",
+      "obtained": {
+        "http": 201,
+        "stored": "2026-09-01T18:22:57.566684+00:00"
+      },
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "AF5.INBOX.INSERT.mbway_nbsp",
+      "lens": "AF5",
+      "severity": "P2",
+      "title": "Inbox INSERT last_message «mbway_nbsp» aceite — preview falso na lista",
+      "actor": "buyer JWT",
+      "pre": "batata_chat_is_forged_inbox_preview = '(Seguro Fleaber|Compra paga|MB WAY|PIX).*(\\d+[,.]?\\d*\\s*€|€\\s*\\d+)'",
+      "repro": "POST chats last_message=MB WAY 4321,00 € confirmado",
+      "expected": "chat_inbox_preview_forbidden",
+      "obtained": {
+        "http": 201,
+        "id": "f006e599-8816-47b6-95ac-4f926010735a",
+        "stored": "MB WAY 4321,00 € confirmado"
+      },
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "AF5.INBOX.INSERT.mbway_concat",
+      "lens": "AF5",
+      "severity": "P2",
+      "title": "Inbox INSERT last_message «mbway_concat» aceite — preview falso na lista",
+      "actor": "buyer JWT",
+      "pre": "batata_chat_is_forged_inbox_preview = '(Seguro Fleaber|Compra paga|MB WAY|PIX).*(\\d+[,.]?\\d*\\s*€|€\\s*\\d+)'",
+      "repro": "POST chats last_message=MBWAY 4321,00 €",
+      "expected": "chat_inbox_preview_forbidden",
+      "obtained": {
+        "http": 201,
+        "id": "b037a8ef-5711-4150-ba20-920581c8eea7",
+        "stored": "MBWAY 4321,00 €"
+      },
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "AF5.INBOX.INSERT.transfer",
+      "lens": "AF5",
+      "severity": "P2",
+      "title": "Inbox INSERT last_message «transfer» aceite — preview falso na lista",
+      "actor": "buyer JWT",
+      "pre": "batata_chat_is_forged_inbox_preview = '(Seguro Fleaber|Compra paga|MB WAY|PIX).*(\\d+[,.]?\\d*\\s*€|€\\s*\\d+)'",
+      "repro": "POST chats last_message=Transferência confirmada 4321,00 €",
+      "expected": "chat_inbox_preview_forbidden",
+      "obtained": {
+        "http": 201,
+        "id": "3d1b428e-409a-4e27-a86b-17159eb18cd4",
+        "stored": "Transferência confirmada 4321,00 €"
+      },
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "AF5.INBOX.INSERT.pagamento_eur",
+      "lens": "AF5",
+      "severity": "P2",
+      "title": "Inbox INSERT last_message «pagamento_eur» aceite — preview falso na lista",
+      "actor": "buyer JWT",
+      "pre": "batata_chat_is_forged_inbox_preview = '(Seguro Fleaber|Compra paga|MB WAY|PIX).*(\\d+[,.]?\\d*\\s*€|€\\s*\\d+)'",
+      "repro": "POST chats last_message=Pagamento recebido 4321,00 EUR",
+      "expected": "chat_inbox_preview_forbidden",
+      "obtained": {
+        "http": 201,
+        "id": "90a9b582-1de5-4991-9018-50bd52e10547",
+        "stored": "Pagamento recebido 4321,00 EUR"
+      },
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "AF5.DEL.JSONV1",
+      "lens": "AF5",
+      "severity": "P1",
+      "title": "DELETE de card FLEABER_JSON_V1 permitido",
+      "actor": "buyer JWT",
+      "pre": "guard_delete",
+      "repro": "DELETE chat_messages FLEABER_JSON_V1",
+      "expected": "chat_system_card_immutable",
+      "obtained": "200 []",
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "AF7.PROOF.OTHER-UID-PATH",
+      "lens": "AF7",
+      "severity": "P2",
+      "title": "proof_url allowlist aceita path order_proofs/{outro_uid}/… — não amarra ao buyer/order",
+      "actor": "buyer JWT",
+      "pre": "allowlist prefixo fleaber_private sem checar uid/order",
+      "repro": "POST proof_url=…/order_proofs/{buyer2}/{order}/x.png",
+      "expected": "url denied ou path tem de ser deste pedido",
+      "obtained": {
+        "http": 201,
+        "msg": "1071"
+      },
+      "proven": true,
+      "evidence": {}
+    }
+  ],
+  "blocked": [
+    {
+      "id": "AF2.PRE.double_colon",
+      "lens": "AF2",
+      "title": "double_colon",
+      "ev": "23514 chat_system_card_invalid_json"
+    },
+    {
+      "id": "AF2.PRE.nbsp_in_prefix",
+      "lens": "AF2",
+      "title": "nbsp_in_prefix",
+      "ev": "23514 chat_system_card_bundle_id_required"
+    },
+    {
+      "id": "AF2.PRE.prefix_then_ff_json",
+      "lens": "AF2",
+      "title": "prefix_then_ff_json",
+      "ev": "23514 chat_system_card_invalid_json"
+    },
+    {
+      "id": "AF1.DISPUTE.REASON",
+      "lens": "AF1",
+      "title": "dispute sem row recusado",
+      "ev": "23514 chat_system_card_dispute_missing"
+    },
+    {
+      "id": "AF1.REVIEW.FORGE",
+      "lens": "AF1",
+      "title": "review sem row recusado",
+      "ev": "23514 chat_system_card_review_missing"
+    },
+    {
+      "id": "AF4.PROOF.vbscript",
+      "lens": "AF4",
+      "title": "vbscript",
+      "ev": "23514 chat_system_card_url_denied"
+    },
+    {
+      "id": "AF4.PROOF.blob",
+      "lens": "AF4",
+      "title": "blob",
+      "ev": "23514 chat_system_card_url_denied"
+    },
+    {
+      "id": "AF4.PROOF.file",
+      "lens": "AF4",
+      "title": "file",
+      "ev": "23514 chat_system_card_url_denied"
+    },
+    {
+      "id": "AF4.PROOF.backslash_host",
+      "lens": "AF4",
+      "title": "backslash_host",
+      "ev": "23514 chat_system_card_url_denied"
+    },
+    {
+      "id": "AF3.INBOX.FUTURE",
+      "lens": "AF3",
+      "title": "future clamped",
+      "ev": "2026-09-01T18:24:27.178983+00:00"
+    },
+    {
+      "id": "AF3.MSG.CREATED-AT",
+      "lens": "AF3",
+      "title": "created_at imutável",
+      "ev": "2026-09-01T18:24:27.274396+00:00"
+    },
+    {
+      "id": "AF5.INBOX.INSERT.mbway_nospace_euro",
+      "lens": "AF5",
+      "title": "mbway_nospace_euro",
+      "ev": "42501 chat_inbox_preview_forbidden"
+    },
+    {
+      "id": "AF5.INBOX.INSERT.compra_sem_seguro",
+      "lens": "AF5",
+      "title": "compra_sem_seguro",
+      "ev": "42501 chat_inbox_preview_forbidden"
+    },
+    {
+      "id": "AF5.INBOX.PATCH.NOSPACE",
+      "lens": "AF5",
+      "title": "patch nospaces recusado",
+      "ev": "42501 chat_inbox_preview_forbidden"
+    },
+    {
+      "id": "AF6.UPSERT",
+      "lens": "AF6",
+      "title": "upsert recusado",
+      "ev": "400 {\"statusCode\":\"403\",\"error\":\"Unauthorized\",\"message\":\"new row violates row-level security policy\",\"code\":\"AccessDenied\"}"
+    },
+    {
+      "id": "AF6.UPLOAD.OTHER-PREFIX",
+      "lens": "AF6",
+      "title": "upload pasta alheia recusado",
+      "ev": "400 {\"statusCode\":\"403\",\"error\":\"Unauthorized\",\"message\":\"new row violates row-level security policy\",\"code\":\"AccessDenied\"}"
+    },
+    {
+      "id": "AF6.SIGN.OTHER",
+      "lens": "AF6",
+      "title": "sign alheio recusado",
+      "ev": "400 {\"statusCode\":\"404\",\"error\":\"not_found\",\"message\":\"Object not found\",\"code\":\"NoSuchKey\"}"
+    },
+    {
+      "id": "AF7.B2.THREAD",
+      "lens": "AF7",
+      "title": "B2 fora da thread recusado",
+      "ev": "42501 chat_system_card_not_participant"
+    },
+    {
+      "id": "AF7.B2.READ",
+      "lens": "AF7",
+      "title": "B2 não lê thread alheia",
+      "ev": "200 n=0"
+    },
+    {
+      "id": "AF8.CHAT.PAID-UNPAID",
+      "lens": "AF8",
+      "title": "chat recusa pago em unpaid (Edge 400)",
+      "ev": "23514 chat_system_card_order_not_paid"
+    }
+  ],
+  "skipped": [],
+  "notes": [
+    {
+      "id": "fixture",
+      "title": "ids",
+      "ev": {
+        "product": "aada06ce-3c7a-40b4-a5c8-ddef9d67f300",
+        "chat": "b3188bdd-c957-46c1-8f0f-db55ba442605",
+        "reserved": "352251b6-9f17-4de8-94fb-194647151909",
+        "paid": "3b6fc32f-d413-4f2e-8d77-1ab3b4ff184a",
+        "unpaid": "6588c6e0-6345-4b7c-a515-d65f19572b54",
+        "offer": "37d3c35f-7846-429b-bd36-58e5b68c0038",
+        "buyer": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+        "seller": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+        "buyer2": "214dea53-5b2c-49ad-ae4d-d12e3f1315b6"
+      }
+    },
+    {
+      "id": "AF2.ENC.zwsp.insert",
+      "lens": "AF2",
+      "title": "inseriu mas Flutter trim não parseia",
+      "ev": {
+        "http": 201,
+        "id": "1032"
+      }
+    },
+    {
+      "id": "AF2.ENC.zwnj.insert",
+      "lens": "AF2",
+      "title": "inseriu mas Flutter trim não parseia",
+      "ev": {
+        "http": 201,
+        "id": "1033"
+      }
+    },
+    {
+      "id": "AF2.ENC.soft_hyphen.insert",
+      "lens": "AF2",
+      "title": "inseriu mas Flutter trim não parseia",
+      "ev": {
+        "http": 201,
+        "id": "1034"
+      }
+    },
+    {
+      "id": "AF2.ENC.word_joiner.insert",
+      "lens": "AF2",
+      "title": "inseriu mas Flutter trim não parseia",
+      "ev": {
+        "http": 201,
+        "id": "1035"
+      }
+    },
+    {
+      "id": "AF2.ENC.rtl.insert",
+      "lens": "AF2",
+      "title": "inseriu mas Flutter trim não parseia",
+      "ev": {
+        "http": 201,
+        "id": "1036"
+      }
+    },
+    {
+      "id": "AF2.ENC.fullwidth_brace.insert",
+      "lens": "AF2",
+      "title": "inseriu mas Flutter trim não parseia",
+      "ev": {
+        "http": 201,
+        "id": "1037"
+      }
+    },
+    {
+      "id": "AF2.ENC.json_array.insert",
+      "lens": "AF2",
+      "title": "inseriu mas Flutter trim não parseia",
+      "ev": {
+        "http": 201,
+        "id": "1038"
+      }
+    },
+    {
+      "id": "AF2.PRE.lower_prefix",
+      "lens": "AF2",
+      "title": "inseriu sem card Flutter",
+      "ev": "201 [{\"id\":1039,\"created_at\":\"2026-09-01T18:24:23.356286+00:00\",\"chat_id\":\"b3188bdd-c957-46c1-8f0f-db55ba442605\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"fleaber_json_v1:{\\\"kind\\\":\\\"bundle_proposal\\\",\\\"total_eur\\\":6543.21,\\\"se…"
+    },
+    {
+      "id": "AF2.PRE.mixed_prefix",
+      "lens": "AF2",
+      "title": "inseriu sem card Flutter",
+      "ev": "201 [{\"id\":1040,\"created_at\":\"2026-09-01T18:24:23.466882+00:00\",\"chat_id\":\"b3188bdd-c957-46c1-8f0f-db55ba442605\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"Fleaber_Json_V1:{\\\"kind\\\":\\\"bundle_proposal\\\",\\\"total_eur\\\":6543.21,\\\"se…"
+    },
+    {
+      "id": "AF2.PRE.zwsp_in_prefix",
+      "lens": "AF2",
+      "title": "inseriu sem card Flutter",
+      "ev": "201 [{\"id\":1042,\"created_at\":\"2026-09-01T18:24:23.675525+00:00\",\"chat_id\":\"b3188bdd-c957-46c1-8f0f-db55ba442605\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"FLEABER_JSON_V1​:{\\\"kind\\\":\\\"bundle_proposal\\\",\\\"total_eur\\\":6543.21,\\\"s…"
+    },
+    {
+      "id": "AF6.UP1",
+      "lens": "AF6",
+      "title": "upload 1",
+      "ev": "200 {\"Key\":\"fleaber_private/chat_uploads/bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96/b3188bdd-c957-46c1-8f0f-db55ba442605/RTAF-20260901T1915-a.png\",\"Id\":\"bf71c284-c679-49b7-8f29-ed6ff064ac2d\"}"
+    },
+    {
+      "id": "AF8.EDGE.PI",
+      "lens": "AF8",
+      "title": "create-payment-intent amount=1 vs order",
+      "ev": "400 {\"error\":\"Missing payment metadata.\"}"
+    }
+  ],
+  "actors": {
+    "buyer": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+    "seller": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+    "buyer2": "214dea53-5b2c-49ad-ae4d-d12e3f1315b6"
+  },
+  "created": {
+    "orders": [
+      "352251b6-9f17-4de8-94fb-194647151909",
+      "3b6fc32f-d413-4f2e-8d77-1ab3b4ff184a",
+      "6588c6e0-6345-4b7c-a515-d65f19572b54"
+    ],
+    "products": [
+      "aada06ce-3c7a-40b4-a5c8-ddef9d67f300"
+    ],
+    "chats": [
+      "b3188bdd-c957-46c1-8f0f-db55ba442605",
+      "9838b0fc-1de7-491d-8432-bd881c3803e2",
+      "f006e599-8816-47b6-95ac-4f926010735a",
+      "b037a8ef-5711-4150-ba20-920581c8eea7",
+      "3d1b428e-409a-4e27-a86b-17159eb18cd4",
+      "90a9b582-1de5-4991-9018-50bd52e10547"
+    ],
+    "msgs": [
+      "1027",
+      "1028",
+      "1029",
+      "1030",
+      "1031",
+      "1032",
+      "1033",
+      "1034",
+      "1035",
+      "1036",
+      "1037",
+      "1038",
+      "1039",
+      "1040",
+      "1042",
+      "1045",
+      "1046",
+      "1047",
+      "1048",
+      "1049",
+      "1050",
+      "1051",
+      "1054",
+      "1055",
+      "1056",
+      "1057",
+      "1058",
+      "1059",
+      "1060",
+      "1061",
+      "1062",
+      "1063",
+      "1068",
+      "1069",
+      "1071"
+    ],
+    "offers": [
+      "37d3c35f-7846-429b-bd36-58e5b68c0038"
+    ]
+  }
+}

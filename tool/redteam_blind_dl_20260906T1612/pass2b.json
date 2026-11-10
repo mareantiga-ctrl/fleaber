@@ -1,0 +1,132 @@
+{
+  "stamp": "20260906T1612",
+  "prefix": "RTDL-20260906T1612",
+  "auditor": "REDTEAM_BLIND_DL_EDGE_SETTLE_POS_DBDG_v1",
+  "lenses": [
+    "DL1"
+  ],
+  "probes": [
+    {
+      "probe_id": "A3",
+      "edge_rpc": "create-payment-intent POST",
+      "payload": "B2 POST checkout amount=1 total=50 server_amount_cents=50 vs SKU 12,00€",
+      "http": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1glkALqTh42crNqD2uPg2x3yNvOh0kW7UEn7ZWxG5OM600mXIfBO6H4pd#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21… loc=\"\"",
+      "stripe_bd": "{\"sid\":\"cs_test_a1glkALqTh42crNqD2uPg2x3yNvOh0kW7UEn7ZWxG5OM600mXIfBO6H4pd\",\"server_amount_cents\":1325,\"amount_total\":1325,\"price_total\":13.25}",
+      "result": "HOLD",
+      "lens": "DL1",
+      "count_finding": false
+    },
+    {
+      "probe_id": "A1",
+      "edge_rpc": "create-payment-intent GET settle",
+      "payload": "GET unpaid session cs_test_a1glkALqTh42crNqD2uPg2x3yNvOh0kW7UEn7ZWxG5OM600mXIfBO6H4pd",
+      "http": "402 Pagamento ainda não confirmado. Se já pagaste, aguarda alguns segundos e volta à app Fleaber. loc=\"\"",
+      "stripe_bd": "{\"status\":\"reserva_pendente\",\"amount_paid_cents\":\"\"}",
+      "result": "HOLD",
+      "lens": "DL1",
+      "count_finding": false
+    },
+    {
+      "probe_id": "A2",
+      "edge_rpc": "GET settle session_id alheio tip↔order",
+      "payload": "GET payment-intent?session_id=cs_tip; GET tip-checkout?session_id=cs_order",
+      "http": "{\"ckB\":\"200 {\\\"checkoutUrl\\\":\\\"https://checkout.stripe.com/c/pay/cs_test_a1XiyCygYjU8wqhMyi7mI2DghdC3mJaA6kU9PWyDznH6PzwIGictQZxb7P#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21… loc=\\\"\\\"\",\"tip\":\"200 {\\\"checkoutUrl\\\":\\\"https://checkout.stripe…",
+      "stripe_bd": "{\"sidA\":\"cs_test_a1glkALqTh42crNqD2uPg2x3yNvOh0kW7UEn7ZWxG5OM600mXIfBO6H4pd\",\"sidB\":\"cs_test_a1XiyCygYjU8wqhMyi7mI2DghdC3mJaA6kU9PWyDznH6PzwIGictQZxb7P\",\"tipSid\":\"cs_test_a1DMvxw7GqUKkOgohDavvkLlWd4m05zQ1iV7dY0uvIGhd8wMRHnOFCtS7X\",\"statusA\":\"reserva_pendente\",\"statusB\":\"reserva_p…",
+      "result": "HOLD",
+      "lens": "DL1",
+      "count_finding": false
+    },
+    {
+      "probe_id": "A4",
+      "edge_rpc": "create-payment-intent reuse + GET dead cs_",
+      "payload": "2.º POST mesma order; GET unpaid; GET cs_test_dead…",
+      "http": "{\"reuse\":\"200 {\\\"checkoutUrl\\\":\\\"https://checkout.stripe.com/c/pay/cs_test_a1glkALqTh42crNqD2uPg2x3yNvOh0kW7UEn7ZWxG5OM600mXIfBO6H4pd#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21… loc=\\\"\\\"\",\"getUnpaid\":\"402 Pagamento ainda não confirmado. Se…",
+      "stripe_bd": "{\"sidA\":\"cs_test_a1glkALqTh42crNqD2uPg2x3yNvOh0kW7UEn7ZWxG5OM600mXIfBO6H4pd\",\"sidReuse\":\"cs_test_a1glkALqTh42crNqD2uPg2x3yNvOh0kW7UEn7ZWxG5OM600mXIfBO6H4pd\",\"reusedSame\":true,\"status\":\"reserva_pendente\"}",
+      "result": "HOLD",
+      "lens": "DL1",
+      "count_finding": false
+    }
+  ],
+  "findings": [],
+  "blocked": [
+    {
+      "id": "A3.amount",
+      "lens": "DL1",
+      "title": "quote servidor, body.amount ignorado",
+      "ev": {
+        "quoted": 1325,
+        "amount_total": 1325
+      }
+    },
+    {
+      "id": "A1.unpaid",
+      "lens": "DL1",
+      "title": "GET settle unpaid não creditou",
+      "ev": {
+        "get": "402 Pagamento ainda não confirmado. Se já pagaste, aguarda alguns segundos e volta à app Fleaber. loc=\"\"",
+        "status": "reserva_pendente"
+      }
+    },
+    {
+      "id": "A2.alien",
+      "lens": "DL1",
+      "title": "session alheia não creditou",
+      "ev": {
+        "statusA": "reserva_pendente",
+        "statusB": "reserva_pendente",
+        "tip": "pending",
+        "tipOnOrder": "402 Pagamento ainda não confirmado. Se já pagaste, aguarda alguns segundos e volta à app Fleaber. loc=\"\"",
+        "orderOnTip": "200 Pagamento ainda não confirmado. Se já pagaste, aguarda alguns segundos e volta à app Fleaber. loc=\"\""
+      }
+    },
+    {
+      "id": "A4.reuse",
+      "lens": "DL1",
+      "title": "reuse mesmo sid; dead GET não liquida",
+      "ev": {
+        "reusedSame": true,
+        "dead": "400 Pagamento ainda não confirmado. Se já pagaste, aguarda alguns segundos e volta à app Fleaber. loc=\"\"",
+        "get": "402 Pagamento ainda não confirmado. Se já pagaste, aguarda alguns segundos e volta à app Fleaber. loc=\"\"",
+        "status": "reserva_pendente"
+      }
+    }
+  ],
+  "skipped": [],
+  "notes": [
+    {
+      "id": "b2.ckA",
+      "lens": "DL1",
+      "title": "B2 checkout amount=1",
+      "ev": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1glkALqTh42crNqD2uPg2x3yNvOh0kW7UEn7ZWxG5OM600mXIfBO6H4pd#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21… loc=\"\""
+    },
+    {
+      "id": "b2.ckB",
+      "lens": "DL1",
+      "title": "B2 checkout amount=99999",
+      "ev": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1XiyCygYjU8wqhMyi7mI2DghdC3mJaA6kU9PWyDznH6PzwIGictQZxb7P#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21… loc=\"\""
+    }
+  ],
+  "actors": {
+    "buyer": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+    "seller": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+    "buyer2": "f04349ea-ece7-4112-be45-0a8c05ee5216",
+    "seller2": null
+  },
+  "created": {
+    "orders": [
+      "b2eaff60-7d8d-4552-832e-c5ab8d39a4c8",
+      "d5c93937-9a4f-4d39-8ffa-a024e394bed0"
+    ],
+    "products": [
+      "e9f743cc-219a-4daf-b0b9-5edf8d1d1126",
+      "015b15d8-93c1-4049-8489-846aa29a52b9"
+    ],
+    "lives": [
+      "f14d1a25-baa6-4a3b-b4f5-94f8955af792"
+    ],
+    "tips": [
+      "d4c61054-d300-4fae-a83d-927c3f16be73"
+    ]
+  },
+  "has_sk_test": false
+}

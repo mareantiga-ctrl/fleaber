@@ -1,0 +1,57 @@
+{
+  "auditor": "REDTEAM_BLIND_CK_CHAT_POS_CDCI_v1",
+  "prefix": "RTCK-20260906T1316",
+  "production_touched": false,
+  "fase4": false,
+  "corrections_applied": false,
+  "contagem": {
+    "P0": 0,
+    "P1": 2,
+    "P2": 1,
+    "P3": 0,
+    "P4": 0,
+    "total_P0_P3": 3
+  },
+  "findings": [
+    {
+      "id": "P1-1",
+      "severity": "P1",
+      "lens": "CK1",
+      "title": "seguro_fleaber_paid aceita rails fora do denylist CDCI (PaysafeCash, PicPay)",
+      "class": "rail-lie-seguro",
+      "actor": "buyer JWT",
+      "pre": "CDCI notes/label list tem paysafecard/pix/apple/google/wechat — não PaysafeCash nem PicPay",
+      "repro": "POST chat_messages FLEABER_JSON_V1 kind=seguro_fleaber_paid label=PaysafeCash 12,00 € (e PicPay 12,00 €) order_id=e3740b45-1202-44e5-a1cf-90e08e96e74c",
+      "expected": "chat_system_card_label_mismatch",
+      "obtained": "201 id=1610 PaysafeCash; 201 id=1611 PicPay; orders.status=pago (já Stripe, sem Δ FSM)",
+      "proven": true
+    },
+    {
+      "id": "P1-2",
+      "severity": "P1",
+      "lens": "CK5",
+      "title": "PATCH chats.last_message aceita rails novos fora do inbox denylist CDCI",
+      "class": "rail-lie-inbox",
+      "actor": "buyer JWT",
+      "pre": "batata_chat_is_forged_inbox_preview CDCI",
+      "repro": "PATCH chats?id=eq.51b15008-7f9a-4bee-9e7b-6779d75aaba8 last_message=<rail>",
+      "expected": "chat_inbox_preview_forbidden",
+      "obtained": "200 stored=exact: PaysafeCash 12,00 €; tap to cash / NFC prova; Samsung Pay transfer; Vanilla gift card; bonifico istantaneo 12,00 €; Überweisung 12,00 €; rev0lut.me 12 €. WeChat exacto → 403 (controlo).",
+      "proven": true
+    },
+    {
+      "id": "P2-1",
+      "severity": "P2",
+      "lens": "CK4",
+      "title": "batata_storage_url_path_canonical rebenta 54000 (NUL no regex) — proof cards e path checks inalcançáveis",
+      "class": "canonicalizer-nul-crash",
+      "actor": "buyer JWT",
+      "pre": "CDCI canonicalizer inclui chr(0) na classe POSIX do regexp_replace",
+      "repro": "POST reservation_payment_submitted notes que NÃO batem no denylist (PaysafeCash, PicPay, tap to cash, CK-B proof_url, …)",
+      "expected": "201 (se rail permitido) ou url_denied (se path hostil)",
+      "obtained": "500 code=54000 message=null character not permitted; card NÃO persiste; CK-B %u002f/%255c/UTF-16LE/… nunca chegaram ao like '%..%'",
+      "proven": true,
+      "note": "Latente: se o 54000 for corrigido sem alargar o denylist, os rails 500 viram 201 no card de prova."
+    }
+  ]
+}

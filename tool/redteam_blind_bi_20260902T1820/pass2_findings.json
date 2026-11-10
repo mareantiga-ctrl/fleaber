@@ -1,0 +1,376 @@
+{
+  "stamp": "20260902T1820",
+  "prefix": "RTBI-20260902T1820",
+  "lenses": [
+    "BI1",
+    "BI2",
+    "BI6",
+    "BI7"
+  ],
+  "findings": [
+    {
+      "id": "P2-BI1/BI7-disc-sched-vod",
+      "lens": "BI7",
+      "severity": "P2",
+      "title": "Discovery publica VOD de scheduled; CDN Mux serve HLS; Edge 404 (hub_lives_public anula VOD)",
+      "actor": "anon",
+      "pre": "S2 hub_published=false; scheduled+active com mux_vod real",
+      "repro": "GET hub_lives_discovery_public?id=eq.798f9a02-993c-4da5-8a22-609ed5e5a512 ; GET https://stream.mux.com/8cje21NKdUUro21jGdEv2UlfmWLD7TAMIWi2W01H5Gb8.m3u8 ; POST resolve-mux-playback",
+      "expected": "VOD só em ended público; CDN não acessível a partir da grelha scheduled",
+      "obtained": {
+        "hub_public": "",
+        "discovery": {
+          "id": "798f9a02-993c-4da5-8a22-609ed5e5a512",
+          "status": "scheduled",
+          "is_active": true,
+          "mux_playback_id": "Cap7U300PcqvBmbZj01cL92AT01k401ntf97eCUWynvj9Pc",
+          "mux_vod_playback_id": "8cje21NKdUUro21jGdEv2UlfmWLD7TAMIWi2W01H5Gb8",
+          "seller_handle": "rtbi-20260902t1820-s2"
+        },
+        "pub_vod": "",
+        "cdn": "200 loc=- acao=- #EXTM3U\n#EXT-X-VERSION:5\n#EXT-X-INDEPENDENT-SEGMENTS\n\n#EXT-X-STREAM-INF:BANDWIDTH=2493700,AVERAGE-BANDWIDTH=2493700,CODECS=\"mp4a.40.2,avc1.640020\",RESOLUTION=1280x720,CLOSED-CAPTIONS=NONE\nhttps://mani…",
+        "cdn_extm3u": true,
+        "edge": "404 loc=- acao=* {\"error\":\"live_not_public\"}",
+        "s2_hub_profiles_public": ""
+      },
+      "proven": true,
+      "evidence": {
+        "live_id": "798f9a02-993c-4da5-8a22-609ed5e5a512",
+        "vod": "8cje21NKdUUro21jGdEv2UlfmWLD7TAMIWi2W01H5Gb8"
+      }
+    },
+    {
+      "id": "P2-BI7-disc-air-vod",
+      "lens": "BI7",
+      "severity": "P2",
+      "title": "Enquanto o directo está no ar, discovery expõe mux_vod_playback_id (gravação anterior) e o CDN serve sem Edge",
+      "actor": "anon",
+      "pre": "live+active com vod+playback preenchidos; hub_lives_public anula VOD",
+      "repro": "GET hub_lives_discovery_public live-air ; CDN vod id",
+      "expected": "VOD oculto até status=ended",
+      "obtained": {
+        "discovery": {
+          "id": "57cc69a3-650d-4340-bf28-bf1a9d004f56",
+          "status": "live",
+          "is_active": true,
+          "mux_playback_id": "Cap7U300PcqvBmbZj01cL92AT01k401ntf97eCUWynvj9Pc",
+          "mux_vod_playback_id": "8cje21NKdUUro21jGdEv2UlfmWLD7TAMIWi2W01H5Gb8",
+          "seller_handle": "rtbi-20260902t1820-s2"
+        },
+        "hub_public_vod": "",
+        "hub_public_pb": "",
+        "cdn_extm3u": true,
+        "cdn": "200 loc=- acao=- #EXTM3U\n#EXT-X-VERSION:5\n#EXT-X-INDEPENDENT-SEGMENTS\n\n#EXT-X-STREAM-INF:BANDWIDTH=2493700,AVERAGE-BANDWIDTH=2493700,CODECS=\"mp4a.40.2,avc1.640020\",RESOLUTION=1280x720,CLOSED-CAPTIONS=NONE\nhttps://mani…"
+      },
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "P2-BI2-connect-ip-canonical",
+      "lens": "BI2",
+      "severity": "P2",
+      "title": "sanitizeWebReturnOrigin aceita IPv4 decimal/octal/hex/127.1 e canonicaliza para 127.0.0.1 (allowlisted) — 303 /wallet",
+      "actor": "browser (sem JWT)",
+      "pre": "GET create-connect-account?web_return_origin=",
+      "repro": "web_return_origin=https://2130706433 | https://127.1 | https://0x7f000001 | https://0177.0.0.1",
+      "expected": "só hosts exactos fleaber.pt / localhost literal — não formas IP alternativas",
+      "obtained": {
+        "decimal": "https://127.0.0.1/wallet",
+        "127.1": "https://127.0.0.1/wallet",
+        "0x7f": "https://127.0.0.1/wallet",
+        "octal": "https://127.0.0.1/wallet",
+        "dword_alt": ""
+      },
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "P3-BI1-broadcasting-anon",
+      "lens": "BI1",
+      "severity": "P3",
+      "title": "anon executa batata_live_is_broadcasting (oráculo UUID)",
+      "actor": "anon",
+      "pre": "REVOKE no SQL historic; GRANT live?",
+      "repro": "POST rpc/batata_live_is_broadcasting",
+      "expected": "42501 anon",
+      "obtained": {
+        "air": true,
+        "rand": false
+      },
+      "proven": true,
+      "evidence": {}
+    }
+  ],
+  "blocked": [
+    {
+      "id": "p2.fomo.sched",
+      "lens": "BI1",
+      "title": "FOMO sched ainda live_not_public",
+      "ev": "200 loc=- acao=- {\"ok\": false, \"error\": \"live_not_public\"}"
+    },
+    {
+      "id": "p2.stor.objects",
+      "lens": "BI6",
+      "title": "prefixos visíveis mas objectos alheios não listados",
+      "ev": {
+        "root_n": 3,
+        "disputes": "200 loc=- acao=* [{\"name\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"id\":null,\"updated_at\":null,\"created_at\":null,\"last_accessed_at\":null,\"metadata\":null}]",
+        "disputesB2": "200 loc=- acao=* []",
+        "mediaOther": "200 loc=- acao=* []"
+      }
+    }
+  ],
+  "skipped": [],
+  "notes": [
+    {
+      "id": "p2.s2.raw",
+      "lens": "BI1",
+      "title": "S2 profile before patch",
+      "ev": {
+        "id": "d32f786a-a621-4fe7-9eb2-6d1f2d801e25",
+        "handle": "",
+        "handle_suggested": "",
+        "hub_published": false,
+        "full_name": "rtbi-20260902t1820-s2"
+      }
+    },
+    {
+      "id": "p2.s2.patch",
+      "lens": "BI1",
+      "title": "S2 publish patch",
+      "ev": {
+        "code": "P0001",
+        "details": "",
+        "hint": "Use batata_claim_handle, batata_change_handle ou batata_publish_hub.",
+        "message": "handle_immutable_use_rpc"
+      }
+    },
+    {
+      "id": "p2.s2.hub_public",
+      "lens": "BI1",
+      "title": "hub_profiles_public S2",
+      "ev": "200 loc=- acao=- []"
+    },
+    {
+      "id": "p2.s2.hub_disc",
+      "lens": "BI1",
+      "title": "hub_profiles_discovery S2",
+      "ev": "200 loc=- acao=- []"
+    },
+    {
+      "id": "p2.pub.air",
+      "lens": "BI1",
+      "title": "hub_lives_public air",
+      "ev": ""
+    },
+    {
+      "id": "p2.pub.sched",
+      "lens": "BI1",
+      "title": "hub_lives_public sched",
+      "ev": ""
+    },
+    {
+      "id": "p2.pub.ended",
+      "lens": "BI1",
+      "title": "hub_lives_public ended",
+      "ev": ""
+    },
+    {
+      "id": "p2.pub.draft",
+      "lens": "BI1",
+      "title": "hub_lives_public draft",
+      "ev": ""
+    },
+    {
+      "id": "p2.disc.air",
+      "lens": "BI7",
+      "title": "discovery air",
+      "ev": {
+        "id": "57cc69a3-650d-4340-bf28-bf1a9d004f56",
+        "status": "live",
+        "is_active": true,
+        "mux_playback_id": "Cap7U300PcqvBmbZj01cL92AT01k401ntf97eCUWynvj9Pc",
+        "mux_vod_playback_id": "8cje21NKdUUro21jGdEv2UlfmWLD7TAMIWi2W01H5Gb8",
+        "seller_handle": "rtbi-20260902t1820-s2"
+      }
+    },
+    {
+      "id": "p2.disc.sched",
+      "lens": "BI7",
+      "title": "discovery sched",
+      "ev": {
+        "id": "798f9a02-993c-4da5-8a22-609ed5e5a512",
+        "status": "scheduled",
+        "is_active": true,
+        "mux_playback_id": "Cap7U300PcqvBmbZj01cL92AT01k401ntf97eCUWynvj9Pc",
+        "mux_vod_playback_id": "8cje21NKdUUro21jGdEv2UlfmWLD7TAMIWi2W01H5Gb8",
+        "seller_handle": "rtbi-20260902t1820-s2"
+      }
+    },
+    {
+      "id": "p2.disc.ended",
+      "lens": "BI7",
+      "title": "discovery ended",
+      "ev": ""
+    },
+    {
+      "id": "p2.disc.draft",
+      "lens": "BI7",
+      "title": "discovery draft",
+      "ev": ""
+    },
+    {
+      "id": "p2.items.pub.sched",
+      "lens": "BI1",
+      "title": "items public sched",
+      "ev": "200 loc=- acao=- []"
+    },
+    {
+      "id": "p2.items.disc.sched",
+      "lens": "BI1",
+      "title": "items discovery sched",
+      "ev": "200 loc=- acao=- []"
+    },
+    {
+      "id": "p2.items.disc.air",
+      "lens": "BI1",
+      "title": "items discovery air",
+      "ev": "200 loc=- acao=- [{\"id\":\"34dd26fe-bb3c-4b7f-bed6-215e411b129e\",\"title\":\"RTBI-20260902T1820 item\",\"price\":7.0}]"
+    },
+    {
+      "id": "p2.fomo.sched",
+      "lens": "BI1",
+      "title": "FOMO sched após publish",
+      "ev": {
+        "ok": false,
+        "error": "live_not_public"
+      }
+    },
+    {
+      "id": "p2.fomo.air",
+      "lens": "BI1",
+      "title": "FOMO air após publish",
+      "ev": {
+        "ok": false,
+        "error": "live_not_public"
+      }
+    },
+    {
+      "id": "p2.fomo.ended",
+      "lens": "BI1",
+      "title": "FOMO ended após publish",
+      "ev": {
+        "ok": false,
+        "error": "live_not_public"
+      }
+    },
+    {
+      "id": "p2.stor.root",
+      "lens": "BI6",
+      "title": "private root",
+      "ev": "200 loc=- acao=* [{\"name\":\"chat_uploads\",\"id\":null,\"updated_at\":null,\"created_at\":null,\"last_accessed_at\":null,\"metadata\":null},{\"name\":\"order_disputes\",\"id\":null,\"updated_at\":null,\"created_at\":null,\"last_accessed_at\"…"
+    },
+    {
+      "id": "p2.stor.disputes",
+      "lens": "BI6",
+      "title": "private order_disputes/",
+      "ev": "200 loc=- acao=* [{\"name\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"id\":null,\"updated_at\":null,\"created_at\":null,\"last_accessed_at\":null,\"metadata\":null}]"
+    },
+    {
+      "id": "p2.stor.disputes.b2",
+      "lens": "BI6",
+      "title": "private disputes B2",
+      "ev": "200 loc=- acao=* []"
+    },
+    {
+      "id": "p2.stor.disputes.s1",
+      "lens": "BI6",
+      "title": "private disputes S1",
+      "ev": "200 loc=- acao=* []"
+    },
+    {
+      "id": "p2.stor.chat",
+      "lens": "BI6",
+      "title": "private chat_uploads/",
+      "ev": "200 loc=- acao=* [{\"name\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"id\":null,\"updated_at\":null,\"created_at\":null,\"last_accessed_at\":null,\"metadata\":null}]"
+    },
+    {
+      "id": "p2.stor.chat.b2",
+      "lens": "BI6",
+      "title": "private chat B2",
+      "ev": "200 loc=- acao=* []"
+    },
+    {
+      "id": "p2.stor.media.prod",
+      "lens": "BI6",
+      "title": "chat_media product_photos/",
+      "ev": "200 loc=- acao=* [{\"name\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"id\":null,\"updated_at\":null,\"created_at\":null,\"last_accessed_at\":null,\"metadata\":null}]"
+    },
+    {
+      "id": "p2.stor.media.other",
+      "lens": "BI6",
+      "title": "chat_media photos S1",
+      "ev": "200 loc=- acao=* []"
+    },
+    {
+      "id": "p2.ip.decimal",
+      "lens": "BI2",
+      "title": "https://2130706433 → https://127.0.0.1/wallet",
+      "ev": "303 loc=https://127.0.0.1/wallet acao=* "
+    },
+    {
+      "id": "p2.ip.127.1",
+      "lens": "BI2",
+      "title": "https://127.1 → https://127.0.0.1/wallet",
+      "ev": "303 loc=https://127.0.0.1/wallet acao=* "
+    },
+    {
+      "id": "p2.ip.0x7f",
+      "lens": "BI2",
+      "title": "https://0x7f000001 → https://127.0.0.1/wallet",
+      "ev": "303 loc=https://127.0.0.1/wallet acao=* "
+    },
+    {
+      "id": "p2.ip.octal",
+      "lens": "BI2",
+      "title": "https://0177.0.0.1 → https://127.0.0.1/wallet",
+      "ev": "303 loc=https://127.0.0.1/wallet acao=* "
+    },
+    {
+      "id": "p2.ip.dword_alt",
+      "lens": "BI2",
+      "title": "https://2130706433.fleaber.pt → null",
+      "ev": "200 loc=- acao=* <!DOCTYPE html><html lang=\"pt\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Fleaber</title><script>window.setTimeout(function(){ window.locati…"
+    },
+    {
+      "id": "p2.bc.anon",
+      "lens": "BI1",
+      "title": "broadcasting anon",
+      "ev": {
+        "air": true,
+        "rand": false
+      }
+    }
+  ],
+  "actors": {
+    "buyer": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+    "seller": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+    "buyer2": "8e708242-17c9-4f53-9047-460e0b0c7426",
+    "seller2": "d32f786a-a621-4fe7-9eb2-6d1f2d801e25",
+    "seller3": "a93d032e-dc83-460b-9928-e26b6ae84972"
+  },
+  "created": {
+    "lives": [
+      "57cc69a3-650d-4340-bf28-bf1a9d004f56",
+      "798f9a02-993c-4da5-8a22-609ed5e5a512",
+      "5d2d0386-9248-4a6e-890a-02dae2fe75d5",
+      "8a20a8ab-21d2-4b29-9663-a54f72b073d5"
+    ],
+    "items": [
+      "34dd26fe-bb3c-4b7f-bed6-215e411b129e",
+      "72503bae-388a-4b69-9090-2923ff64d605"
+    ],
+    "products": [],
+    "tips": []
+  }
+}

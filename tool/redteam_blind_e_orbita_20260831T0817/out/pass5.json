@@ -1,0 +1,83 @@
+{
+  "pass": 5,
+  "stamp": "20260831T0817",
+  "order": {
+    "id": "0da5b981-a8a1-421a-8110-563519238849",
+    "status": "reserva_pendente",
+    "amount_paid_cents": null,
+    "stripe_checkout_session_id": "cs_test_a1Vr38MEbjEzj9udPyZqbI4oABwyvC2rLLj3VoRNPvJiCpqf5PG2TxYWAU",
+    "stock_units_applied": null,
+    "price_total": 10.1
+  },
+  "product": {
+    "id": "fd9dd752-ebb4-42e6-b1bb-c80fe405280b",
+    "list_on_marketplace": false,
+    "is_sold": false,
+    "quantity": 2
+  },
+  "settle": {
+    "http": 402,
+    "loc": null,
+    "snip": "Pagamento ainda não confirmado. Se já pagaste, aguarda alguns segundos e volta à app Fleaber."
+  },
+  "reviews": {
+    "n": 8,
+    "snip": "[{\"id\":\"aa90960c-d519-455d-8d48-d3dd675ab67e\",\"author_display\":\"Maestro\",\"comment\":\"rtb collusion\",\"stars\":5,\"target_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\"}, \n {\"id\":\"933c3958-73e2-49ab-83a3-30591de5bee6\",\"author_display\":\"Maestro\",\"comment\":\"COMP_RACE_20260827_B_1787859300 a\",\"stars\":1,\"target_…"
+  },
+  "hub_locations": [
+    {
+      "id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+      "handle": "fleahub-demo-ux",
+      "full_name": "Maria Demo FleaHub",
+      "location": "Lisboa, Portugal"
+    },
+    {
+      "id": "69104e91-6a00-40d9-a7c9-b1571422ae43",
+      "handle": "joao84",
+      "full_name": "Joao84",
+      "location": "São João dos Montes"
+    }
+  ],
+  "findings": [
+    {
+      "id": "E7-STALE-SESSION-SETTLE-GET",
+      "lens": "E7",
+      "severity": "info",
+      "title": "GET checkout_return success em Session de produto já unlistado",
+      "pre": "session created then unlist; GET settle anon",
+      "repro": "GET create-payment-intent?checkout_return=success&session_id=",
+      "proven": false,
+      "evidence": {
+        "http": 402,
+        "loc": null,
+        "snip": "Pagamento ainda não confirmado. Se já pagaste, aguarda alguns segundos e volta à app Fleaber."
+      }
+    },
+    {
+      "id": "E10-STALE-SESSION-PAID",
+      "lens": "E10",
+      "severity": "info",
+      "title": "order liquidada após Session pré-unlist (produto unlistado)",
+      "pre": "observe order+product",
+      "repro": "GET orders+products service",
+      "proven": false,
+      "evidence": {
+        "order": {
+          "id": "0da5b981-a8a1-421a-8110-563519238849",
+          "status": "reserva_pendente",
+          "amount_paid_cents": null,
+          "stripe_checkout_session_id": "cs_test_a1Vr38MEbjEzj9udPyZqbI4oABwyvC2rLLj3VoRNPvJiCpqf5PG2TxYWAU",
+          "stock_units_applied": null,
+          "price_total": 10.1
+        },
+        "product": {
+          "id": "fd9dd752-ebb4-42e6-b1bb-c80fe405280b",
+          "list_on_marketplace": false,
+          "is_sold": false,
+          "quantity": 2
+        }
+      }
+    }
+  ],
+  "proven": []
+}

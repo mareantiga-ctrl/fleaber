@@ -1,0 +1,228 @@
+{
+  "findings": [
+    {
+      "id": "RTQ-Q1-live-item-foreign-product-accept",
+      "lens": "Q1",
+      "severity": "P1",
+      "title": "Live atacante reserva/aceita contra product_id do vendedor vítima",
+      "actor": "seller2 JWT + buyer",
+      "pre": "live_items RLS permite product_id alheio",
+      "repro": "PATCH live_items.product_id=SKU vítima; POST reserva; RPC accept",
+      "expected": "product_id tem de ser do dono da live",
+      "obtained": {
+        "item": {
+          "id": "39ba1cf7-04a6-4753-ab54-fe68ba92ca2f",
+          "live_id": "5930e05e-217d-4db1-9260-3c694b482da5",
+          "title": "RTQ-20260901T0735 itemA",
+          "quantity": null,
+          "status": "available",
+          "product_id": "26f9ce2f-d306-4303-a19f-41b6e3221382"
+        },
+        "res": {
+          "id": "b1de1706-437f-40be-a2a2-e5625f058d40",
+          "live_id": "5930e05e-217d-4db1-9260-3c694b482da5",
+          "live_item_id": "39ba1cf7-04a6-4753-ab54-fe68ba92ca2f",
+          "seller_id": "c5ef0dee-52bf-4aee-9b34-0e8015c536df",
+          "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+          "status": "accepted",
+          "requested_qty": 2,
+          "source": "fleaber_live"
+        },
+        "qty_victim": 5
+      },
+      "proven": true,
+      "evidence": {}
+    }
+  ],
+  "notes": [
+    {
+      "id": "p1.fixture",
+      "lens": "Q1",
+      "title": "lives+items",
+      "ev": {
+        "liveV": "4c92f20c-513f-4cd1-b5b0-50c50708f80b",
+        "liveA": "5930e05e-217d-4db1-9260-3c694b482da5",
+        "itemV": "8c6bdbc7-2a9f-4dc9-a52c-fd3beb02dab6",
+        "itemA": "39ba1cf7-04a6-4753-ab54-fe68ba92ca2f",
+        "prodVictim": "26f9ce2f-d306-4303-a19f-41b6e3221382",
+        "prodAttack": "e155b7ad-f9c9-4d2d-875b-c4a618e27d2b"
+      }
+    },
+    {
+      "id": "p1.q2.select.buyer",
+      "lens": "Q2",
+      "title": "buyer SELECT lives secret cols",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table lives\"}"
+    },
+    {
+      "id": "p1.q2.select.anon",
+      "lens": "Q2",
+      "title": "anon SELECT lives secret cols",
+      "ev": "401 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table lives\"}"
+    },
+    {
+      "id": "p1.q2.complete.jwt",
+      "lens": "Q2",
+      "title": "complete-mux-live alheia",
+      "ev": {
+        "buyer": "403 {\"error\":\"Sem permissão para esta live.\",\"step\":\"auth\"}",
+        "seller2": "403 {\"error\":\"Sem permissão para esta live.\",\"step\":\"auth\"}",
+        "anon": "401 {\"error\":\"invalid claim: missing sub claim\",\"step\":\"auth\"}"
+      }
+    },
+    {
+      "id": "p1.q2.livekit",
+      "lens": "Q2",
+      "title": "livekit-mux-publish alheia",
+      "ev": {
+        "stop_buyer": "403 {\"error\":\"Sem permissão para esta live.\",\"step\":\"auth\"}",
+        "egress_s2": "403 {\"error\":\"Sem permissão para esta live.\",\"step\":\"auth\"}",
+        "token_s2": "403 {\"error\":\"Sem permissão para esta live.\",\"step\":\"auth\"}"
+      }
+    },
+    {
+      "id": "p1.q2.live.after",
+      "lens": "Q2",
+      "title": "live vítima após tentativas stop",
+      "ev": {
+        "id": "4c92f20c-513f-4cd1-b5b0-50c50708f80b",
+        "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+        "vendedor_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+        "status": "live",
+        "is_active": true,
+        "mux_live_id": "MLQ_20260901T0735_V",
+        "mux_stream_key": "SKQ_20260901T0735_V",
+        "stream_key": "SKQ_20260901T0735_V",
+        "livekit_egress_id": "EGQ_20260901T0735_V",
+        "livekit_room_name": "fleaber_q_20260901T0735_v",
+        "mux_playback_id": "PBQ_20260901T0735_V"
+      }
+    },
+    {
+      "id": "p1.q2.patch.lives",
+      "lens": "Q2",
+      "title": "PATCH lives vítima",
+      "ev": {
+        "buyer": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table lives\"}",
+        "seller2": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table lives\"}"
+      }
+    },
+    {
+      "id": "p1.q2.clone.insert",
+      "lens": "Q2",
+      "title": "seller2 INSERT lives mux_live_id vítima",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table lives\"}"
+    },
+    {
+      "id": "p1.q1.spoof.seller_id",
+      "lens": "Q1",
+      "title": "buyer INSERT accepted seller_id=self",
+      "ev": "201 [{\"id\":\"053e690c-a32a-4ad5-a051-37504c5d96fa\",\"live_id\":\"4c92f20c-513f-4cd1-b5b0-50c50708f80b\",\"live_item_id\":\"8c6bdbc7-2a9f-4dc9-a52c-fd3beb02dab6\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"buyer_id\":\"bfcbeeee…"
+    },
+    {
+      "id": "p1.q1.cross.item",
+      "lens": "Q1",
+      "title": "live_item de live A em live V",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"live_item_live_mismatch\"}"
+    },
+    {
+      "id": "p1.q1.hijack.product",
+      "lens": "Q1",
+      "title": "seller2 aponta live_item ao SKU vítima",
+      "ev": "200 [{\"id\":\"39ba1cf7-04a6-4753-ab54-fe68ba92ca2f\",\"live_id\":\"5930e05e-217d-4db1-9260-3c694b482da5\",\"seller_id\":null,\"ref_code\":\"RTQ1788244767138128\",\"title\":\"RTQ-20260901T0735 itemA\",\"description\":null,\"price\":12.0,\"image_ur…"
+    },
+    {
+      "id": "p1.q1.hijack.accept",
+      "lens": "Q1",
+      "title": "accept sobre SKU vítima",
+      "ev": {
+        "insert": "201 [{\"id\":\"b1de1706-437f-40be-a2a2-e5625f058d40\",\"live_id\":\"5930e05e-217d-4db1-9260-3c694b482da5\",\"live_item_id\":\"39ba1cf7-04a6-4753-ab54-fe68ba92ca2f\",\"seller_id\":\"c5ef0dee-52bf-4aee-9b34-0e8015c536df\",\"buyer_id\":\"bfcbeeee…",
+        "accept": "200 {\"ok\": true, \"item_qty\": 5, \"request_id\": \"b1de1706-437f-40be-a2a2-e5625f058d40\", \"item_status\": \"reserved_partial\", \"reserved_qty\": 2}",
+        "res": {
+          "id": "b1de1706-437f-40be-a2a2-e5625f058d40",
+          "live_id": "5930e05e-217d-4db1-9260-3c694b482da5",
+          "live_item_id": "39ba1cf7-04a6-4753-ab54-fe68ba92ca2f",
+          "seller_id": "c5ef0dee-52bf-4aee-9b34-0e8015c536df",
+          "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+          "status": "accepted",
+          "requested_qty": 2,
+          "source": "fleaber_live"
+        },
+        "qty_victim": 5
+      }
+    },
+    {
+      "id": "p1.q7.s2.accept.victim",
+      "lens": "Q7",
+      "title": "seller2 INSERT accepted no live vítima",
+      "ev": "201 [{\"id\":\"55542b4a-dc01-4543-b3ae-2f9a68a3f1e8\",\"live_id\":\"4c92f20c-513f-4cd1-b5b0-50c50708f80b\",\"live_item_id\":\"8c6bdbc7-2a9f-4dc9-a52c-fd3beb02dab6\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"buyer_id\":\"c5ef0dee…"
+    },
+    {
+      "id": "p1.q7.rpc.foreign",
+      "lens": "Q7",
+      "title": "RPC accept/convert por 2.º actor",
+      "ev": {
+        "pend": "201 [{\"id\":\"33a3ec8f-e68a-43b3-a88f-e887afc824b1\",\"live_id\":\"4c92f20c-513f-4cd1-b5b0-50c50708f80b\",\"live_item_id\":\"8c6bdbc7-2a9f-4dc9-a52c-fd3beb02dab6\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"buyer_id\":\"bfcbeeee…",
+        "acc_b2": "200 {\"ok\": false, \"error\": \"not_allowed\"}",
+        "acc_s2": "200 {\"ok\": false, \"error\": \"not_allowed\"}",
+        "conv_b2": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_live_reservation_stripe_convert\"}"
+      }
+    },
+    {
+      "id": "p1.q1.fb.manual",
+      "lens": "Q1",
+      "title": "seller INSERT facebook_manual accepted",
+      "ev": "201 [{\"id\":\"9fbc43ea-88bc-4688-8af1-4bc32b911c23\",\"live_id\":\"4c92f20c-513f-4cd1-b5b0-50c50708f80b\",\"live_item_id\":\"8c6bdbc7-2a9f-4dc9-a52c-fd3beb02dab6\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"buyer_id\":\"bfcbeeee…"
+    },
+    {
+      "id": "p1.q1.buyer.patch.accept",
+      "lens": "Q1",
+      "title": "buyer PATCH accepted+qty",
+      "ev": {
+        "patch": "200 []",
+        "row": {
+          "id": "33a3ec8f-e68a-43b3-a88f-e887afc824b1",
+          "live_id": "4c92f20c-513f-4cd1-b5b0-50c50708f80b",
+          "live_item_id": "8c6bdbc7-2a9f-4dc9-a52c-fd3beb02dab6",
+          "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+          "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+          "status": "pending",
+          "requested_qty": 1,
+          "source": "fleaber_live"
+        }
+      }
+    },
+    {
+      "id": "p1.q4.race.accept.vs.b2insert",
+      "lens": "Q4",
+      "title": "accept ∥ buyer2 INSERT accepted",
+      "ev": {
+        "seller_accept": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"qty_exceeds_stock\"}",
+        "b2_insert": "201 [{\"id\":\"e536749d-ea42-4154-a494-9a02e21c79a1\",\"live_id\":\"4c92f20c-513f-4cd1-b5b0-50c50708f80b\",\"live_item_id\":\"8c6bdbc7-2a9f-4dc9-a52c-fd3beb02dab6\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"buyer_id\":\"03ea8a52…"
+      }
+    }
+  ],
+  "fb_row": {
+    "id": "9fbc43ea-88bc-4688-8af1-4bc32b911c23",
+    "live_id": "4c92f20c-513f-4cd1-b5b0-50c50708f80b",
+    "live_item_id": "8c6bdbc7-2a9f-4dc9-a52c-fd3beb02dab6",
+    "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+    "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+    "status": "pending",
+    "requested_qty": 1,
+    "source": "facebook_manual"
+  },
+  "live_after": {
+    "id": "4c92f20c-513f-4cd1-b5b0-50c50708f80b",
+    "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+    "vendedor_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+    "status": "live",
+    "is_active": true,
+    "mux_live_id": "MLQ_20260901T0735_V",
+    "mux_stream_key": "SKQ_20260901T0735_V",
+    "stream_key": "SKQ_20260901T0735_V",
+    "livekit_egress_id": "EGQ_20260901T0735_V",
+    "livekit_room_name": "fleaber_q_20260901T0735_v",
+    "mux_playback_id": "PBQ_20260901T0735_V"
+  }
+}

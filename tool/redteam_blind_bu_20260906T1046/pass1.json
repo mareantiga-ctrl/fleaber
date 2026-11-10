@@ -1,0 +1,1284 @@
+{
+  "auditor": "REDTEAM_BLIND_BU_HUB_EDGE_POS_BLBQ_v1",
+  "stamp": "20260906T1046",
+  "prefix": "RTBU-20260906T1046",
+  "lenses": [
+    "BU1",
+    "BU2",
+    "BU3",
+    "BU4",
+    "BU5",
+    "BU6"
+  ],
+  "findings_all": [
+    {
+      "id": "BU1-FOMO-sched-empty",
+      "lens": "BU1",
+      "severity": "P3",
+      "title": "FOMO aceita live is_active=false (sem items)",
+      "actor": "anon",
+      "pre": "live sched id=14184877-c110-45c8-bc0c-07229fef3829",
+      "repro": "RPC batata_hub_live_fomo_snapshot",
+      "expected": "live_not_public para inactiva",
+      "obtained": "200 {\"ok\": true, \"items\": [], \"live_id\": \"14184877-c110-45c8-bc0c-07229fef3829\", \"is_active\": false, \"live_status\": \"scheduled\", \"viewer_count\": 0}",
+      "proven": true,
+      "count_exact_closed": false,
+      "evidence": {}
+    },
+    {
+      "id": "BU1-DISC-UNPUB-SCHED",
+      "lens": "BU1",
+      "severity": "P2",
+      "title": "discovery lista scheduled de vendedor unpublished",
+      "actor": "anon",
+      "pre": "S2 hub_published=false scheduled live",
+      "repro": "GET hub_lives_discovery_public?id=eq.b070dff8-bf05-4009-a214-a56f7b7fdb3b",
+      "expected": "0 rows (só Hub publicado / sem montra)",
+      "obtained": "200 [{\"id\":\"b070dff8-bf05-4009-a214-a56f7b7fdb3b\",\"status\":\"scheduled\",\"is_active\":false,\"mux_playback_id\":null,\"mux_vod_playback_id\":null,\"seller_handle\":\"rtbu-20260906t1046-s2\",\"seller_id\":\"eedac4bd-7bbf-4f51-8da0-f86d4a0d…",
+      "proven": true,
+      "count_exact_closed": false,
+      "evidence": {}
+    },
+    {
+      "id": "BU1-UNPUB-AIR-PB",
+      "lens": "BU1",
+      "severity": "P1",
+      "title": "mux_playback_id de directo unpublished visível na view pública",
+      "actor": "anon",
+      "pre": "S2 hub_published=false status=live is_active=true",
+      "repro": "GET hub_lives_discovery_public / hub_lives_public",
+      "expected": "sem row ou mux_playback_id null",
+      "obtained": "pub=200 [] disc=200 [{\"id\":\"3d3804ba-6354-4df5-9c37-162f24aa0e88\",\"status\":\"live\",\"is_active\":true,\"mux_playback_id\":\"rtbuUnpubAirPb\",\"mux_vod_playback_id\":null,\"seller_handle\":\"rtbu-20260906t1046-s2\",\"seller_id\":\"eedac4bd-7bbf-4f51-8da0-f8…",
+      "proven": true,
+      "count_exact_closed": false,
+      "evidence": {}
+    },
+    {
+      "id": "BU6-PRIVATE-LIST",
+      "lens": "BU6",
+      "severity": "P1",
+      "title": "B1 lista objectos fleaber_private",
+      "actor": "B1",
+      "pre": "bucket private",
+      "repro": "POST /storage/v1/object/list/fleaber_private",
+      "expected": "[] / 400 / 403",
+      "obtained": "200 acao=* [{\"name\":\"chat_uploads\",\"id\":null,\"updated_at\":null,\"created_at\":null,\"last_accessed_at\":null,\"metadata\":null},{\"name\":\"order_disputes\",\"id\":null,\"updated_at\":null,\"created_at\":null,\"last_accessed_at\":null,\"metadata\":nul…",
+      "proven": true,
+      "count_exact_closed": false,
+      "evidence": {}
+    }
+  ],
+  "findings_countable": [
+    {
+      "id": "BU1-FOMO-sched-empty",
+      "lens": "BU1",
+      "severity": "P3",
+      "title": "FOMO aceita live is_active=false (sem items)",
+      "actor": "anon",
+      "pre": "live sched id=14184877-c110-45c8-bc0c-07229fef3829",
+      "repro": "RPC batata_hub_live_fomo_snapshot",
+      "expected": "live_not_public para inactiva",
+      "obtained": "200 {\"ok\": true, \"items\": [], \"live_id\": \"14184877-c110-45c8-bc0c-07229fef3829\", \"is_active\": false, \"live_status\": \"scheduled\", \"viewer_count\": 0}",
+      "proven": true,
+      "count_exact_closed": false,
+      "evidence": {}
+    },
+    {
+      "id": "BU1-DISC-UNPUB-SCHED",
+      "lens": "BU1",
+      "severity": "P2",
+      "title": "discovery lista scheduled de vendedor unpublished",
+      "actor": "anon",
+      "pre": "S2 hub_published=false scheduled live",
+      "repro": "GET hub_lives_discovery_public?id=eq.b070dff8-bf05-4009-a214-a56f7b7fdb3b",
+      "expected": "0 rows (só Hub publicado / sem montra)",
+      "obtained": "200 [{\"id\":\"b070dff8-bf05-4009-a214-a56f7b7fdb3b\",\"status\":\"scheduled\",\"is_active\":false,\"mux_playback_id\":null,\"mux_vod_playback_id\":null,\"seller_handle\":\"rtbu-20260906t1046-s2\",\"seller_id\":\"eedac4bd-7bbf-4f51-8da0-f86d4a0d…",
+      "proven": true,
+      "count_exact_closed": false,
+      "evidence": {}
+    },
+    {
+      "id": "BU1-UNPUB-AIR-PB",
+      "lens": "BU1",
+      "severity": "P1",
+      "title": "mux_playback_id de directo unpublished visível na view pública",
+      "actor": "anon",
+      "pre": "S2 hub_published=false status=live is_active=true",
+      "repro": "GET hub_lives_discovery_public / hub_lives_public",
+      "expected": "sem row ou mux_playback_id null",
+      "obtained": "pub=200 [] disc=200 [{\"id\":\"3d3804ba-6354-4df5-9c37-162f24aa0e88\",\"status\":\"live\",\"is_active\":true,\"mux_playback_id\":\"rtbuUnpubAirPb\",\"mux_vod_playback_id\":null,\"seller_handle\":\"rtbu-20260906t1046-s2\",\"seller_id\":\"eedac4bd-7bbf-4f51-8da0-f8…",
+      "proven": true,
+      "count_exact_closed": false,
+      "evidence": {}
+    },
+    {
+      "id": "BU6-PRIVATE-LIST",
+      "lens": "BU6",
+      "severity": "P1",
+      "title": "B1 lista objectos fleaber_private",
+      "actor": "B1",
+      "pre": "bucket private",
+      "repro": "POST /storage/v1/object/list/fleaber_private",
+      "expected": "[] / 400 / 403",
+      "obtained": "200 acao=* [{\"name\":\"chat_uploads\",\"id\":null,\"updated_at\":null,\"created_at\":null,\"last_accessed_at\":null,\"metadata\":null},{\"name\":\"order_disputes\",\"id\":null,\"updated_at\":null,\"created_at\":null,\"last_accessed_at\":null,\"metadata\":nul…",
+      "proven": true,
+      "count_exact_closed": false,
+      "evidence": {}
+    }
+  ],
+  "blocked": [
+    {
+      "id": "bu1.fomo.inactive",
+      "lens": "BU1",
+      "title": "FOMO inactive recusado/vazio",
+      "ev": "200 {\"ok\": false, \"error\": \"live_not_public\"}"
+    },
+    {
+      "id": "bu1.fomo.endedUnpub",
+      "lens": "BU1",
+      "title": "FOMO endedUnpub recusado/vazio",
+      "ev": "200 {\"ok\": false, \"error\": \"live_not_public\"}"
+    },
+    {
+      "id": "bu1.disc.pb.inactive",
+      "lens": "BU1",
+      "title": "discovery sem mux_playback inactiva",
+      "ev": "200 []"
+    },
+    {
+      "id": "bu1.inactive.hub",
+      "lens": "BU1",
+      "title": "views omitem live inactiva",
+      "ev": "200 []"
+    },
+    {
+      "id": "bu1.disc.pb.sched",
+      "lens": "BU1",
+      "title": "discovery sem mux_playback inactiva",
+      "ev": "200 [{\"id\":\"14184877-c110-45c8-bc0c-07229fef3829\",\"status\":\"scheduled\",\"is_active\":false,\"mux_playback_id\":null,\"mux_vod_playback_id\":null,\"seller_handle\":\"fleahub-demo-ux\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",…"
+    },
+    {
+      "id": "bu1.disc.pb.schedUnpub",
+      "lens": "BU1",
+      "title": "discovery sem mux_playback inactiva",
+      "ev": "200 [{\"id\":\"b070dff8-bf05-4009-a214-a56f7b7fdb3b\",\"status\":\"scheduled\",\"is_active\":false,\"mux_playback_id\":null,\"mux_vod_playback_id\":null,\"seller_handle\":\"rtbu-20260906t1046-s2\",\"seller_id\":\"eedac4bd-7bbf-4f51-8da0-f86d4a0d…"
+    },
+    {
+      "id": "bu1.items.inactive",
+      "lens": "BU1",
+      "title": "items Hub omitidos em live inactiva",
+      "ev": "200 []"
+    },
+    {
+      "id": "bu5.b1.pb.inactive",
+      "lens": "BU5",
+      "title": "B1 sem mux_playback inactiva",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table lives\"}"
+    },
+    {
+      "id": "bu5.b1.pb.sched",
+      "lens": "BU5",
+      "title": "B1 sem mux_playback inactiva",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table lives\"}"
+    },
+    {
+      "id": "bu5.b1.pb.schedUnpub",
+      "lens": "BU5",
+      "title": "B1 sem mux_playback inactiva",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table lives\"}"
+    },
+    {
+      "id": "bu5.resolve.inactive",
+      "lens": "BU5",
+      "title": "resolve recusa inactive",
+      "ev": "404 acao=* {\"error\":\"live_not_public\"}"
+    },
+    {
+      "id": "bu5.resolve.sched",
+      "lens": "BU5",
+      "title": "resolve recusa sched",
+      "ev": "404 acao=* {\"error\":\"live_not_public\"}"
+    },
+    {
+      "id": "bu5.resolve.endedUnpub",
+      "lens": "BU5",
+      "title": "resolve recusa endedUnpub",
+      "ev": "404 acao=* {\"error\":\"live_not_public\"}"
+    },
+    {
+      "id": "bu2.wr.ipv6mapped",
+      "lens": "BU2",
+      "title": "web_return recusado/seguro ipv6mapped",
+      "ev": "200 acao=* <!DOCTYPE html><html lang=\"pt\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Fleaber</title><script>window.setTimeout(function(){ window.location.href = \"fleaber:/…"
+    },
+    {
+      "id": "bu2.cors.ipv6mapped",
+      "lens": "BU2",
+      "title": "CORS não reflecte ipv6mapped",
+      "ev": "200 acao=https://fleaber.pt ok"
+    },
+    {
+      "id": "bu2.wr.ipv6mapped_http",
+      "lens": "BU2",
+      "title": "web_return recusado/seguro ipv6mapped_http",
+      "ev": "200 acao=* <!DOCTYPE html><html lang=\"pt\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Fleaber</title><script>window.setTimeout(function(){ window.location.href = \"fleaber:/…"
+    },
+    {
+      "id": "bu2.cors.ipv6mapped_http",
+      "lens": "BU2",
+      "title": "CORS não reflecte ipv6mapped_http",
+      "ev": "200 acao=https://fleaber.pt ok"
+    },
+    {
+      "id": "bu2.wr.ipv6loop",
+      "lens": "BU2",
+      "title": "web_return recusado/seguro ipv6loop",
+      "ev": "200 acao=* <!DOCTYPE html><html lang=\"pt\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Fleaber</title><script>window.setTimeout(function(){ window.location.href = \"fleaber:/…"
+    },
+    {
+      "id": "bu2.cors.ipv6loop",
+      "lens": "BU2",
+      "title": "CORS não reflecte ipv6loop",
+      "ev": "200 acao=https://fleaber.pt ok"
+    },
+    {
+      "id": "bu2.wr.nip",
+      "lens": "BU2",
+      "title": "web_return recusado/seguro nip",
+      "ev": "200 acao=* <!DOCTYPE html><html lang=\"pt\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Fleaber</title><script>window.setTimeout(function(){ window.location.href = \"fleaber:/…"
+    },
+    {
+      "id": "bu2.cors.nip",
+      "lens": "BU2",
+      "title": "CORS não reflecte nip",
+      "ev": "200 acao=https://fleaber.pt ok"
+    },
+    {
+      "id": "bu2.wr.nip_http",
+      "lens": "BU2",
+      "title": "web_return recusado/seguro nip_http",
+      "ev": "200 acao=* <!DOCTYPE html><html lang=\"pt\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Fleaber</title><script>window.setTimeout(function(){ window.location.href = \"fleaber:/…"
+    },
+    {
+      "id": "bu2.cors.nip_http",
+      "lens": "BU2",
+      "title": "CORS não reflecte nip_http",
+      "ev": "200 acao=https://fleaber.pt ok"
+    },
+    {
+      "id": "bu2.wr.sslip",
+      "lens": "BU2",
+      "title": "web_return recusado/seguro sslip",
+      "ev": "200 acao=* <!DOCTYPE html><html lang=\"pt\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Fleaber</title><script>window.setTimeout(function(){ window.location.href = \"fleaber:/…"
+    },
+    {
+      "id": "bu2.cors.sslip",
+      "lens": "BU2",
+      "title": "CORS não reflecte sslip",
+      "ev": "200 acao=https://fleaber.pt ok"
+    },
+    {
+      "id": "bu2.wr.localtest",
+      "lens": "BU2",
+      "title": "web_return recusado/seguro localtest",
+      "ev": "200 acao=* <!DOCTYPE html><html lang=\"pt\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Fleaber</title><script>window.setTimeout(function(){ window.location.href = \"fleaber:/…"
+    },
+    {
+      "id": "bu2.cors.localtest",
+      "lens": "BU2",
+      "title": "CORS não reflecte localtest",
+      "ev": "200 acao=https://fleaber.pt ok"
+    },
+    {
+      "id": "bu2.wr.lvh",
+      "lens": "BU2",
+      "title": "web_return recusado/seguro lvh",
+      "ev": "200 acao=* <!DOCTYPE html><html lang=\"pt\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Fleaber</title><script>window.setTimeout(function(){ window.location.href = \"fleaber:/…"
+    },
+    {
+      "id": "bu2.cors.lvh",
+      "lens": "BU2",
+      "title": "CORS não reflecte lvh",
+      "ev": "200 acao=https://fleaber.pt ok"
+    },
+    {
+      "id": "bu2.wr.decimal",
+      "lens": "BU2",
+      "title": "web_return recusado/seguro decimal",
+      "ev": "200 acao=* <!DOCTYPE html><html lang=\"pt\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Fleaber</title><script>window.setTimeout(function(){ window.location.href = \"fleaber:/…"
+    },
+    {
+      "id": "bu2.cors.decimal",
+      "lens": "BU2",
+      "title": "CORS não reflecte decimal",
+      "ev": "200 acao=https://fleaber.pt ok"
+    },
+    {
+      "id": "bu2.wr.evil",
+      "lens": "BU2",
+      "title": "web_return recusado/seguro evil",
+      "ev": "200 acao=* <!DOCTYPE html><html lang=\"pt\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Fleaber</title><script>window.setTimeout(function(){ window.location.href = \"fleaber:/…"
+    },
+    {
+      "id": "bu2.cors.evil",
+      "lens": "BU2",
+      "title": "CORS não reflecte evil",
+      "ev": "200 acao=https://fleaber.pt ok"
+    },
+    {
+      "id": "bu2.wr.sub",
+      "lens": "BU2",
+      "title": "web_return recusado/seguro sub",
+      "ev": "200 acao=* <!DOCTYPE html><html lang=\"pt\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Fleaber</title><script>window.setTimeout(function(){ window.location.href = \"fleaber:/…"
+    },
+    {
+      "id": "bu2.cors.sub",
+      "lens": "BU2",
+      "title": "CORS não reflecte sub",
+      "ev": "200 acao=https://fleaber.pt ok"
+    },
+    {
+      "id": "bu2.wr.userinfo",
+      "lens": "BU2",
+      "title": "web_return recusado/seguro userinfo",
+      "ev": "200 acao=* <!DOCTYPE html><html lang=\"pt\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Fleaber</title><script>window.setTimeout(function(){ window.location.href = \"fleaber:/…"
+    },
+    {
+      "id": "bu2.cors.userinfo",
+      "lens": "BU2",
+      "title": "CORS não reflecte userinfo",
+      "ev": "200 acao=https://fleaber.pt ok"
+    },
+    {
+      "id": "bu2.wr.localhost",
+      "lens": "BU2",
+      "title": "web_return recusado/seguro localhost",
+      "ev": "303 loc=http://localhost:5173/wallet acao=* "
+    },
+    {
+      "id": "bu2.cors.localhost",
+      "lens": "BU2",
+      "title": "CORS não reflecte localhost",
+      "ev": "200 acao=http://localhost:5173 ok"
+    },
+    {
+      "id": "bu2.wr.allowed",
+      "lens": "BU2",
+      "title": "web_return recusado/seguro allowed",
+      "ev": "303 loc=https://fleaber.pt/wallet acao=* "
+    },
+    {
+      "id": "bu2.cors.allowed",
+      "lens": "BU2",
+      "title": "CORS não reflecte allowed",
+      "ev": "200 acao=https://fleaber.pt ok"
+    },
+    {
+      "id": "bu4.complete.b2",
+      "lens": "BU4",
+      "title": "complete-mux cruzado recusado",
+      "ev": "403 acao=* {\"error\":\"Sem permissão para esta live.\",\"step\":\"auth\"}"
+    },
+    {
+      "id": "bu4.lk.b2",
+      "lens": "BU4",
+      "title": "livekit token cruzado recusado",
+      "ev": "403 acao=* {\"error\":\"Sem permissão para esta live.\",\"step\":\"auth\"}"
+    },
+    {
+      "id": "bu4.egress.b2",
+      "lens": "BU4",
+      "title": "egress cruzado recusado",
+      "ev": "403 acao=* {\"error\":\"Sem permissão para esta live.\",\"step\":\"auth\"}"
+    },
+    {
+      "id": "bu4.create.buyer",
+      "lens": "BU4",
+      "title": "buyer não cria Mux",
+      "ev": "403 acao=* {\"error\":\"Apenas contas de vendedor podem criar directos.\",\"step\":\"authz\"}"
+    },
+    {
+      "id": "bu4.cleanup",
+      "lens": "BU4",
+      "title": "cleanup sem segredo recusado",
+      "ev": "401 acao=https://fleaber.pt {\"error\":\"Unauthorized.\"}"
+    },
+    {
+      "id": "bu3.tip.tipid",
+      "lens": "BU3",
+      "title": "tip_id cliente recusado",
+      "ev": "400 acao=* {\"error\":\"Client tip_id is not allowed.\"}"
+    },
+    {
+      "id": "bu3.unpaid",
+      "lens": "BU3",
+      "title": "unpaid não settled Δwallet=0",
+      "ev": "status=pending Δs=0.0"
+    },
+    {
+      "id": "bu3.seller.swap",
+      "lens": "BU3",
+      "title": "seller swap recusado",
+      "ev": "400 acao=* {\"error\":\"Tip seller does not own this live.\"}"
+    },
+    {
+      "id": "bu3.tip.inactive",
+      "lens": "BU3",
+      "title": "tip inactiva recusado",
+      "ev": "400 acao=* {\"error\":\"Tips only allowed while the live is broadcasting.\"}"
+    },
+    {
+      "id": "bu6.private.public",
+      "lens": "BU6",
+      "title": "public URL não serve private",
+      "ev": "400 acao=* {\"statusCode\":\"404\",\"error\":\"Bucket not found\",\"message\":\"Bucket not found\",\"code\":\"NoSuchBucket\"}"
+    }
+  ],
+  "skipped": [],
+  "notes": [
+    {
+      "id": "fix.s1",
+      "lens": "BU1",
+      "title": "S1 profile",
+      "ev": {
+        "id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+        "handle": "fleahub-demo-ux",
+        "handle_suggested": "axinoquaa",
+        "hub_published": true,
+        "user_type": "vendedor",
+        "full_name": "Maria Demo FleaHub"
+      }
+    },
+    {
+      "id": "fix.s2",
+      "lens": "BU1",
+      "title": "S2 unpublished",
+      "ev": {
+        "id": "eedac4bd-7bbf-4f51-8da0-f86d4a0d98af",
+        "handle": null,
+        "handle_suggested": null,
+        "hub_published": false,
+        "user_type": "vendedor",
+        "full_name": "rtbu-20260906t1046-s2"
+      }
+    },
+    {
+      "id": "fix.ids",
+      "lens": "BU1",
+      "title": "fixtures",
+      "ev": {
+        "air": "9d4319c5-9f7a-41f7-8297-ac4087d44973",
+        "inactive": "b0c8ca33-0b15-417f-bbe9-15b215a97392",
+        "sched": "14184877-c110-45c8-bc0c-07229fef3829",
+        "endedPub": "5f03ce39-6d7a-41bb-b0df-f80d61588b5a",
+        "schedUnpub": "b070dff8-bf05-4009-a214-a56f7b7fdb3b",
+        "endedUnpub": "09daf1d2-d77e-4892-aa07-df65ba634112",
+        "airUnpub": "3d3804ba-6354-4df5-9c37-162f24aa0e88",
+        "itemInactive": "bc6184cd-b732-49ff-a15b-dfe6f5270647",
+        "itemAir": "14b31828-d02f-4a48-bf79-5a026a9e0541"
+      }
+    },
+    {
+      "id": "bu1.fomo.anon.air",
+      "lens": "BU1",
+      "title": "FOMO anon air",
+      "ev": "200 {\"ok\": true, \"items\": [{\"status\": \"available\", \"is_last_unit\": false, \"live_item_id\": \"14b31828-d02f-4a48-bf79-5a026a9e0541\", \"available_qty\": 3, \"pending_queue_count\": 0, \"display_reserved_qty\": 0}], \"live_id\": \"9d4319c…"
+    },
+    {
+      "id": "bu1.fomo.b1.air",
+      "lens": "BU1",
+      "title": "FOMO B1 air",
+      "ev": "200 {\"ok\": true, \"items\": [{\"status\": \"available\", \"is_last_unit\": false, \"live_item_id\": \"14b31828-d02f-4a48-bf79-5a026a9e0541\", \"available_qty\": 3, \"pending_queue_count\": 0, \"display_reserved_qty\": 0}], \"live_id\": \"9d4319c…"
+    },
+    {
+      "id": "bu1.fomo.anon.inactive",
+      "lens": "BU1",
+      "title": "FOMO anon inactive",
+      "ev": "200 {\"ok\": false, \"error\": \"live_not_public\"}"
+    },
+    {
+      "id": "bu1.fomo.b1.inactive",
+      "lens": "BU1",
+      "title": "FOMO B1 inactive",
+      "ev": "200 {\"ok\": false, \"error\": \"live_not_public\"}"
+    },
+    {
+      "id": "bu1.fomo.anon.sched",
+      "lens": "BU1",
+      "title": "FOMO anon sched",
+      "ev": "200 {\"ok\": true, \"items\": [], \"live_id\": \"14184877-c110-45c8-bc0c-07229fef3829\", \"is_active\": false, \"live_status\": \"scheduled\", \"viewer_count\": 0}"
+    },
+    {
+      "id": "bu1.fomo.b1.sched",
+      "lens": "BU1",
+      "title": "FOMO B1 sched",
+      "ev": "200 {\"ok\": true, \"items\": [], \"live_id\": \"14184877-c110-45c8-bc0c-07229fef3829\", \"is_active\": false, \"live_status\": \"scheduled\", \"viewer_count\": 0}"
+    },
+    {
+      "id": "bu1.fomo.anon.endedPub",
+      "lens": "BU1",
+      "title": "FOMO anon endedPub",
+      "ev": "200 {\"ok\": true, \"items\": [], \"live_id\": \"5f03ce39-6d7a-41bb-b0df-f80d61588b5a\", \"is_active\": false, \"live_status\": \"ended\", \"viewer_count\": 0}"
+    },
+    {
+      "id": "bu1.fomo.b1.endedPub",
+      "lens": "BU1",
+      "title": "FOMO B1 endedPub",
+      "ev": "200 {\"ok\": true, \"items\": [], \"live_id\": \"5f03ce39-6d7a-41bb-b0df-f80d61588b5a\", \"is_active\": false, \"live_status\": \"ended\", \"viewer_count\": 0}"
+    },
+    {
+      "id": "bu1.fomo.anon.endedUnpub",
+      "lens": "BU1",
+      "title": "FOMO anon endedUnpub",
+      "ev": "200 {\"ok\": false, \"error\": \"live_not_public\"}"
+    },
+    {
+      "id": "bu1.fomo.b1.endedUnpub",
+      "lens": "BU1",
+      "title": "FOMO B1 endedUnpub",
+      "ev": "200 {\"ok\": false, \"error\": \"live_not_public\"}"
+    },
+    {
+      "id": "bu1.fomo.anon.airUnpub",
+      "lens": "BU1",
+      "title": "FOMO anon airUnpub",
+      "ev": "200 {\"ok\": false, \"error\": \"live_not_public\"}"
+    },
+    {
+      "id": "bu1.fomo.b1.airUnpub",
+      "lens": "BU1",
+      "title": "FOMO B1 airUnpub",
+      "ev": "200 {\"ok\": false, \"error\": \"live_not_public\"}"
+    },
+    {
+      "id": "bu1.pub.air",
+      "lens": "BU1",
+      "title": "hub_lives_public air",
+      "ev": "200 [{\"id\":\"9d4319c5-9f7a-41f7-8297-ac4087d44973\",\"status\":\"live\",\"is_active\":true,\"mux_playback_id\":\"rtbuPbLive1046aaa\",\"mux_vod_playback_id\":null,\"seller_handle\":\"fleahub-demo-ux\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a…"
+    },
+    {
+      "id": "bu1.disc.air",
+      "lens": "BU1",
+      "title": "hub_lives_discovery_public air",
+      "ev": "200 [{\"id\":\"9d4319c5-9f7a-41f7-8297-ac4087d44973\",\"status\":\"live\",\"is_active\":true,\"mux_playback_id\":\"rtbuPbLive1046aaa\",\"mux_vod_playback_id\":null,\"seller_handle\":\"fleahub-demo-ux\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a…"
+    },
+    {
+      "id": "bu1.pub.inactive",
+      "lens": "BU1",
+      "title": "hub_lives_public inactive",
+      "ev": "200 []"
+    },
+    {
+      "id": "bu1.disc.inactive",
+      "lens": "BU1",
+      "title": "hub_lives_discovery_public inactive",
+      "ev": "200 []"
+    },
+    {
+      "id": "bu1.pub.sched",
+      "lens": "BU1",
+      "title": "hub_lives_public sched",
+      "ev": "200 [{\"id\":\"14184877-c110-45c8-bc0c-07229fef3829\",\"status\":\"scheduled\",\"is_active\":false,\"mux_playback_id\":null,\"mux_vod_playback_id\":null,\"seller_handle\":\"fleahub-demo-ux\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",…"
+    },
+    {
+      "id": "bu1.disc.sched",
+      "lens": "BU1",
+      "title": "hub_lives_discovery_public sched",
+      "ev": "200 [{\"id\":\"14184877-c110-45c8-bc0c-07229fef3829\",\"status\":\"scheduled\",\"is_active\":false,\"mux_playback_id\":null,\"mux_vod_playback_id\":null,\"seller_handle\":\"fleahub-demo-ux\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",…"
+    },
+    {
+      "id": "bu1.pub.endedPub",
+      "lens": "BU1",
+      "title": "hub_lives_public endedPub",
+      "ev": "200 [{\"id\":\"5f03ce39-6d7a-41bb-b0df-f80d61588b5a\",\"status\":\"ended\",\"is_active\":false,\"mux_playback_id\":null,\"mux_vod_playback_id\":\"rtbuPbVod1046bbbb\",\"seller_handle\":\"fleahub-demo-ux\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f…"
+    },
+    {
+      "id": "bu1.disc.endedPub",
+      "lens": "BU1",
+      "title": "hub_lives_discovery_public endedPub",
+      "ev": "200 [{\"id\":\"5f03ce39-6d7a-41bb-b0df-f80d61588b5a\",\"status\":\"ended\",\"is_active\":false,\"mux_playback_id\":null,\"mux_vod_playback_id\":\"rtbuPbVod1046bbbb\",\"seller_handle\":\"fleahub-demo-ux\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f…"
+    },
+    {
+      "id": "bu1.pub.schedUnpub",
+      "lens": "BU1",
+      "title": "hub_lives_public schedUnpub",
+      "ev": "200 []"
+    },
+    {
+      "id": "bu1.disc.schedUnpub",
+      "lens": "BU1",
+      "title": "hub_lives_discovery_public schedUnpub",
+      "ev": "200 [{\"id\":\"b070dff8-bf05-4009-a214-a56f7b7fdb3b\",\"status\":\"scheduled\",\"is_active\":false,\"mux_playback_id\":null,\"mux_vod_playback_id\":null,\"seller_handle\":\"rtbu-20260906t1046-s2\",\"seller_id\":\"eedac4bd-7bbf-4f51-8da0-f86d4a0d…"
+    },
+    {
+      "id": "bu1.pub.endedUnpub",
+      "lens": "BU1",
+      "title": "hub_lives_public endedUnpub",
+      "ev": "200 []"
+    },
+    {
+      "id": "bu1.disc.endedUnpub",
+      "lens": "BU1",
+      "title": "hub_lives_discovery_public endedUnpub",
+      "ev": "200 []"
+    },
+    {
+      "id": "bu1.pub.airUnpub",
+      "lens": "BU1",
+      "title": "hub_lives_public airUnpub",
+      "ev": "200 []"
+    },
+    {
+      "id": "bu1.disc.airUnpub",
+      "lens": "BU1",
+      "title": "hub_lives_discovery_public airUnpub",
+      "ev": "200 [{\"id\":\"3d3804ba-6354-4df5-9c37-162f24aa0e88\",\"status\":\"live\",\"is_active\":true,\"mux_playback_id\":\"rtbuUnpubAirPb\",\"mux_vod_playback_id\":null,\"seller_handle\":\"rtbu-20260906t1046-s2\",\"seller_id\":\"eedac4bd-7bbf-4f51-8da0-f8…"
+    },
+    {
+      "id": "bu1.items.inactive",
+      "lens": "BU1",
+      "title": "hub items inactive",
+      "ev": "200 []"
+    },
+    {
+      "id": "bu5.lives.anon.air",
+      "lens": "BU5",
+      "title": "GET lives anon air",
+      "ev": "401 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table profiles\"}"
+    },
+    {
+      "id": "bu5.lives.B1.air",
+      "lens": "BU5",
+      "title": "GET lives B1 air",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table lives\"}"
+    },
+    {
+      "id": "bu5.lives.B2.air",
+      "lens": "BU5",
+      "title": "GET lives B2 air",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table lives\"}"
+    },
+    {
+      "id": "bu5.lives.anon.inactive",
+      "lens": "BU5",
+      "title": "GET lives anon inactive",
+      "ev": "401 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table profiles\"}"
+    },
+    {
+      "id": "bu5.lives.B1.inactive",
+      "lens": "BU5",
+      "title": "GET lives B1 inactive",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table lives\"}"
+    },
+    {
+      "id": "bu5.lives.B2.inactive",
+      "lens": "BU5",
+      "title": "GET lives B2 inactive",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table lives\"}"
+    },
+    {
+      "id": "bu5.lives.anon.sched",
+      "lens": "BU5",
+      "title": "GET lives anon sched",
+      "ev": "401 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table profiles\"}"
+    },
+    {
+      "id": "bu5.lives.B1.sched",
+      "lens": "BU5",
+      "title": "GET lives B1 sched",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table lives\"}"
+    },
+    {
+      "id": "bu5.lives.B2.sched",
+      "lens": "BU5",
+      "title": "GET lives B2 sched",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table lives\"}"
+    },
+    {
+      "id": "bu5.lives.anon.endedPub",
+      "lens": "BU5",
+      "title": "GET lives anon endedPub",
+      "ev": "401 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table profiles\"}"
+    },
+    {
+      "id": "bu5.lives.B1.endedPub",
+      "lens": "BU5",
+      "title": "GET lives B1 endedPub",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table lives\"}"
+    },
+    {
+      "id": "bu5.lives.B2.endedPub",
+      "lens": "BU5",
+      "title": "GET lives B2 endedPub",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table lives\"}"
+    },
+    {
+      "id": "bu5.lives.anon.schedUnpub",
+      "lens": "BU5",
+      "title": "GET lives anon schedUnpub",
+      "ev": "401 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table profiles\"}"
+    },
+    {
+      "id": "bu5.lives.B1.schedUnpub",
+      "lens": "BU5",
+      "title": "GET lives B1 schedUnpub",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table lives\"}"
+    },
+    {
+      "id": "bu5.lives.B2.schedUnpub",
+      "lens": "BU5",
+      "title": "GET lives B2 schedUnpub",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table lives\"}"
+    },
+    {
+      "id": "bu5.lives.anon.endedUnpub",
+      "lens": "BU5",
+      "title": "GET lives anon endedUnpub",
+      "ev": "401 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table profiles\"}"
+    },
+    {
+      "id": "bu5.lives.B1.endedUnpub",
+      "lens": "BU5",
+      "title": "GET lives B1 endedUnpub",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table lives\"}"
+    },
+    {
+      "id": "bu5.lives.B2.endedUnpub",
+      "lens": "BU5",
+      "title": "GET lives B2 endedUnpub",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table lives\"}"
+    },
+    {
+      "id": "bu5.embed.anon.live_items",
+      "lens": "BU5",
+      "title": "embed lives(*) live_items anon",
+      "ev": "401 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table profiles\"}"
+    },
+    {
+      "id": "bu5.embed.b1.live_items",
+      "lens": "BU5",
+      "title": "embed lives(*) live_items B1",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table lives\"}"
+    },
+    {
+      "id": "bu5.embed.anon.live_tips",
+      "lens": "BU5",
+      "title": "embed lives(*) live_tips anon",
+      "ev": "401 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table profiles\"}"
+    },
+    {
+      "id": "bu5.embed.b1.live_tips",
+      "lens": "BU5",
+      "title": "embed lives(*) live_tips B1",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table lives\"}"
+    },
+    {
+      "id": "bu5.embed.anon.live_messages",
+      "lens": "BU5",
+      "title": "embed lives(*) live_messages anon",
+      "ev": "401 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table profiles\"}"
+    },
+    {
+      "id": "bu5.embed.b1.live_messages",
+      "lens": "BU5",
+      "title": "embed lives(*) live_messages B1",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table lives\"}"
+    },
+    {
+      "id": "bu5.embed.anon.live_reservation_requests",
+      "lens": "BU5",
+      "title": "embed lives(*) live_reservation_requests anon",
+      "ev": "401 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table profiles\"}"
+    },
+    {
+      "id": "bu5.embed.b1.live_reservation_requests",
+      "lens": "BU5",
+      "title": "embed lives(*) live_reservation_requests B1",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table lives\"}"
+    },
+    {
+      "id": "bu5.embed.anon.orders",
+      "lens": "BU5",
+      "title": "embed lives(*) orders anon",
+      "ev": "401 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table profiles\"}"
+    },
+    {
+      "id": "bu5.embed.b1.orders",
+      "lens": "BU5",
+      "title": "embed lives(*) orders B1",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table lives\"}"
+    },
+    {
+      "id": "bu5.embed.anon.live_raffles",
+      "lens": "BU5",
+      "title": "embed lives(*) live_raffles anon",
+      "ev": "401 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table profiles\"}"
+    },
+    {
+      "id": "bu5.embed.b1.live_raffles",
+      "lens": "BU5",
+      "title": "embed lives(*) live_raffles B1",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table lives\"}"
+    },
+    {
+      "id": "bu5.real.mux",
+      "lens": "BU5",
+      "title": "lives with mux ids (svc obs)",
+      "ev": "8"
+    },
+    {
+      "id": "bu5.real.b1.5dd5cfd2-63b1-4cd8-82b1-c888e9dc5234",
+      "lens": "BU5",
+      "title": "B1 real live",
+      "ev": "200 []"
+    },
+    {
+      "id": "bu5.real.b1.301713b2-49b0-409c-b758-4c2153b2ddd1",
+      "lens": "BU5",
+      "title": "B1 real live",
+      "ev": "200 []"
+    },
+    {
+      "id": "bu5.real.b1.ed8624e6-6920-4d12-8578-aa8599ebc6d0",
+      "lens": "BU5",
+      "title": "B1 real live",
+      "ev": "200 []"
+    },
+    {
+      "id": "bu5.real.b1.a60c1f73-e499-4c18-892f-08c3a33f3605",
+      "lens": "BU5",
+      "title": "B1 real live",
+      "ev": "200 []"
+    },
+    {
+      "id": "bu5.real.b1.fe0d8865-d6d1-4182-bea4-3c2cb0901d3b",
+      "lens": "BU5",
+      "title": "B1 real live",
+      "ev": "200 []"
+    },
+    {
+      "id": "bu5.resolve.inactive",
+      "lens": "BU5",
+      "title": "resolve-mux inactive",
+      "ev": "404 acao=* {\"error\":\"live_not_public\"}"
+    },
+    {
+      "id": "bu5.resolve.sched",
+      "lens": "BU5",
+      "title": "resolve-mux sched",
+      "ev": "404 acao=* {\"error\":\"live_not_public\"}"
+    },
+    {
+      "id": "bu5.resolve.air",
+      "lens": "BU5",
+      "title": "resolve-mux air",
+      "ev": "200 acao=* {\"playback_id\":\"rtbuPbLive1046aaa\",\"playback_url\":\"https://stream.mux.com/rtbuPbLive1046aaa.m3u8?reduced_latency=true\",\"source\":\"live_active\",\"is_live\":true}"
+    },
+    {
+      "id": "bu5.resolve.endedUnpub",
+      "lens": "BU5",
+      "title": "resolve-mux endedUnpub",
+      "ev": "404 acao=* {\"error\":\"live_not_public\"}"
+    },
+    {
+      "id": "bu5.resolve.endedPub",
+      "lens": "BU5",
+      "title": "resolve-mux endedPub",
+      "ev": "200 acao=* {\"playback_id\":\"rtbuPbVod1046bbbb\",\"playback_url\":\"https://stream.mux.com/rtbuPbVod1046bbbb.m3u8\",\"source\":\"cache\",\"is_live\":false}"
+    },
+    {
+      "id": "bu2.wr.get.ipv6mapped",
+      "lens": "BU2",
+      "title": "GET web_return https://[::ffff:127.0.0.1]",
+      "ev": "200 acao=* <!DOCTYPE html><html lang=\"pt\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Fleaber</title><script>window.setTimeout(function(){ window.location.href = \"fleaber:/…"
+    },
+    {
+      "id": "bu2.cors.opt.ipv6mapped",
+      "lens": "BU2",
+      "title": "OPTIONS Origin=https://[::ffff:127.0.0.1]",
+      "ev": "200 acao=https://fleaber.pt ok"
+    },
+    {
+      "id": "bu2.wr.get.ipv6mapped_http",
+      "lens": "BU2",
+      "title": "GET web_return http://[::ffff:127.0.0.1]",
+      "ev": "200 acao=* <!DOCTYPE html><html lang=\"pt\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Fleaber</title><script>window.setTimeout(function(){ window.location.href = \"fleaber:/…"
+    },
+    {
+      "id": "bu2.cors.opt.ipv6mapped_http",
+      "lens": "BU2",
+      "title": "OPTIONS Origin=http://[::ffff:127.0.0.1]",
+      "ev": "200 acao=https://fleaber.pt ok"
+    },
+    {
+      "id": "bu2.wr.get.ipv6loop",
+      "lens": "BU2",
+      "title": "GET web_return https://[::1]",
+      "ev": "200 acao=* <!DOCTYPE html><html lang=\"pt\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Fleaber</title><script>window.setTimeout(function(){ window.location.href = \"fleaber:/…"
+    },
+    {
+      "id": "bu2.cors.opt.ipv6loop",
+      "lens": "BU2",
+      "title": "OPTIONS Origin=https://[::1]",
+      "ev": "200 acao=https://fleaber.pt ok"
+    },
+    {
+      "id": "bu2.wr.get.nip",
+      "lens": "BU2",
+      "title": "GET web_return https://127.0.0.1.nip.io",
+      "ev": "200 acao=* <!DOCTYPE html><html lang=\"pt\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Fleaber</title><script>window.setTimeout(function(){ window.location.href = \"fleaber:/…"
+    },
+    {
+      "id": "bu2.cors.opt.nip",
+      "lens": "BU2",
+      "title": "OPTIONS Origin=https://127.0.0.1.nip.io",
+      "ev": "200 acao=https://fleaber.pt ok"
+    },
+    {
+      "id": "bu2.wr.get.nip_http",
+      "lens": "BU2",
+      "title": "GET web_return http://127.0.0.1.nip.io",
+      "ev": "200 acao=* <!DOCTYPE html><html lang=\"pt\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Fleaber</title><script>window.setTimeout(function(){ window.location.href = \"fleaber:/…"
+    },
+    {
+      "id": "bu2.cors.opt.nip_http",
+      "lens": "BU2",
+      "title": "OPTIONS Origin=http://127.0.0.1.nip.io",
+      "ev": "200 acao=https://fleaber.pt ok"
+    },
+    {
+      "id": "bu2.wr.get.sslip",
+      "lens": "BU2",
+      "title": "GET web_return https://127.0.0.1.sslip.io",
+      "ev": "200 acao=* <!DOCTYPE html><html lang=\"pt\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Fleaber</title><script>window.setTimeout(function(){ window.location.href = \"fleaber:/…"
+    },
+    {
+      "id": "bu2.cors.opt.sslip",
+      "lens": "BU2",
+      "title": "OPTIONS Origin=https://127.0.0.1.sslip.io",
+      "ev": "200 acao=https://fleaber.pt ok"
+    },
+    {
+      "id": "bu2.wr.get.localtest",
+      "lens": "BU2",
+      "title": "GET web_return https://localtest.me",
+      "ev": "200 acao=* <!DOCTYPE html><html lang=\"pt\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Fleaber</title><script>window.setTimeout(function(){ window.location.href = \"fleaber:/…"
+    },
+    {
+      "id": "bu2.cors.opt.localtest",
+      "lens": "BU2",
+      "title": "OPTIONS Origin=https://localtest.me",
+      "ev": "200 acao=https://fleaber.pt ok"
+    },
+    {
+      "id": "bu2.wr.get.lvh",
+      "lens": "BU2",
+      "title": "GET web_return https://lvh.me",
+      "ev": "200 acao=* <!DOCTYPE html><html lang=\"pt\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Fleaber</title><script>window.setTimeout(function(){ window.location.href = \"fleaber:/…"
+    },
+    {
+      "id": "bu2.cors.opt.lvh",
+      "lens": "BU2",
+      "title": "OPTIONS Origin=https://lvh.me",
+      "ev": "200 acao=https://fleaber.pt ok"
+    },
+    {
+      "id": "bu2.wr.get.decimal",
+      "lens": "BU2",
+      "title": "GET web_return https://2130706433",
+      "ev": "200 acao=* <!DOCTYPE html><html lang=\"pt\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Fleaber</title><script>window.setTimeout(function(){ window.location.href = \"fleaber:/…"
+    },
+    {
+      "id": "bu2.cors.opt.decimal",
+      "lens": "BU2",
+      "title": "OPTIONS Origin=https://2130706433",
+      "ev": "200 acao=https://fleaber.pt ok"
+    },
+    {
+      "id": "bu2.wr.get.evil",
+      "lens": "BU2",
+      "title": "GET web_return https://evil.example",
+      "ev": "200 acao=* <!DOCTYPE html><html lang=\"pt\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Fleaber</title><script>window.setTimeout(function(){ window.location.href = \"fleaber:/…"
+    },
+    {
+      "id": "bu2.cors.opt.evil",
+      "lens": "BU2",
+      "title": "OPTIONS Origin=https://evil.example",
+      "ev": "200 acao=https://fleaber.pt ok"
+    },
+    {
+      "id": "bu2.wr.get.sub",
+      "lens": "BU2",
+      "title": "GET web_return https://attacker.fleaber.pt",
+      "ev": "200 acao=* <!DOCTYPE html><html lang=\"pt\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Fleaber</title><script>window.setTimeout(function(){ window.location.href = \"fleaber:/…"
+    },
+    {
+      "id": "bu2.cors.opt.sub",
+      "lens": "BU2",
+      "title": "OPTIONS Origin=https://attacker.fleaber.pt",
+      "ev": "200 acao=https://fleaber.pt ok"
+    },
+    {
+      "id": "bu2.wr.get.userinfo",
+      "lens": "BU2",
+      "title": "GET web_return https://evil.com@fleaber.pt",
+      "ev": "200 acao=* <!DOCTYPE html><html lang=\"pt\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Fleaber</title><script>window.setTimeout(function(){ window.location.href = \"fleaber:/…"
+    },
+    {
+      "id": "bu2.cors.opt.userinfo",
+      "lens": "BU2",
+      "title": "OPTIONS Origin=https://evil.com@fleaber.pt",
+      "ev": "200 acao=https://fleaber.pt ok"
+    },
+    {
+      "id": "bu2.wr.get.localhost",
+      "lens": "BU2",
+      "title": "GET web_return http://localhost:5173",
+      "ev": "303 loc=http://localhost:5173/wallet acao=* "
+    },
+    {
+      "id": "bu2.cors.opt.localhost",
+      "lens": "BU2",
+      "title": "OPTIONS Origin=http://localhost:5173",
+      "ev": "200 acao=http://localhost:5173 ok"
+    },
+    {
+      "id": "bu2.wr.get.allowed",
+      "lens": "BU2",
+      "title": "GET web_return https://fleaber.pt",
+      "ev": "303 loc=https://fleaber.pt/wallet acao=* "
+    },
+    {
+      "id": "bu2.cors.opt.allowed",
+      "lens": "BU2",
+      "title": "OPTIONS Origin=https://fleaber.pt",
+      "ev": "200 acao=https://fleaber.pt ok"
+    },
+    {
+      "id": "bu2.wr.post.ipv6",
+      "lens": "BU2",
+      "title": "POST connect ipv6 mapped",
+      "ev": "200 acao=* {\"stripeAccountId\":\"acct_1U5mYbQeUNx8ar08\",\"url\":\"https://connect.stripe.com/setup/e/acct_1U5mYbQeUNx8ar08/wcuY0W6Od9Ry\"}"
+    },
+    {
+      "id": "bu4.complete.b2",
+      "lens": "BU4",
+      "title": "complete-mux B2 vs S1 live",
+      "ev": "403 acao=* {\"error\":\"Sem permissão para esta live.\",\"step\":\"auth\"}"
+    },
+    {
+      "id": "bu4.lk.b2",
+      "lens": "BU4",
+      "title": "livekit token B2 vs S1",
+      "ev": "403 acao=* {\"error\":\"Sem permissão para esta live.\",\"step\":\"auth\"}"
+    },
+    {
+      "id": "bu4.egress.b2",
+      "lens": "BU4",
+      "title": "egress cruzado",
+      "ev": "403 acao=* {\"error\":\"Sem permissão para esta live.\",\"step\":\"auth\"}"
+    },
+    {
+      "id": "bu4.create.buyer",
+      "lens": "BU4",
+      "title": "create-mux as buyer",
+      "ev": "403 acao=* {\"error\":\"Apenas contas de vendedor podem criar directos.\",\"step\":\"authz\"}"
+    },
+    {
+      "id": "bu4.cleanup",
+      "lens": "BU4",
+      "title": "egress-cleanup secret errado",
+      "ev": "401 acao=https://fleaber.pt {\"error\":\"Unauthorized.\"}"
+    },
+    {
+      "id": "bu3.tip.create.tipid",
+      "lens": "BU3",
+      "title": "tip com tip_id cliente",
+      "ev": "400 acao=* {\"error\":\"Client tip_id is not allowed.\"}"
+    },
+    {
+      "id": "bu3.tip.create",
+      "lens": "BU3",
+      "title": "tip checkout unpaid",
+      "ev": "200 acao=* {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1TB73bFx2rcuOpGTrMagTazviEVZcjqjtAZjJpVtOZ2BiVg5sT8uEQJtU#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDR…"
+    },
+    {
+      "id": "bu3.settle.b2",
+      "lens": "BU3",
+      "title": "GET settle unpaid B2",
+      "ev": "200 acao=* Pagamento ainda não confirmado. Se já pagaste, aguarda alguns segundos e volta à app Fleaber."
+    },
+    {
+      "id": "bu3.settle.anon",
+      "lens": "BU3",
+      "title": "GET settle unpaid anon",
+      "ev": "200 acao=* Pagamento ainda não confirmado. Se já pagaste, aguarda alguns segundos e volta à app Fleaber."
+    },
+    {
+      "id": "bu3.rpc.b2",
+      "lens": "BU3",
+      "title": "RPC settle B2 unpaid",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_settle_live_tip_from_stripe\"}"
+    },
+    {
+      "id": "bu3.rpc.b1",
+      "lens": "BU3",
+      "title": "RPC settle B1 unpaid",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_settle_live_tip_from_stripe\"}"
+    },
+    {
+      "id": "bu3.rpc.anon",
+      "lens": "BU3",
+      "title": "RPC settle anon",
+      "ev": "401 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_settle_live_tip_from_stripe\"}"
+    },
+    {
+      "id": "bu3.tip.row",
+      "lens": "BU3",
+      "title": "tip row após settle unpaid",
+      "ev": "200 [{\"id\":\"9ae17bc9-0775-429b-ad64-bfa6f886704f\",\"status\":\"pending\",\"amount\":2.00,\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"stripe_session_id\":\"cs_test_a1TB73bFx2r…"
+    },
+    {
+      "id": "bu3.wallet",
+      "lens": "BU3",
+      "title": "Δ wallets unpaid",
+      "ev": {
+        "seller_before": 80.33,
+        "seller_after": 80.33,
+        "buyer_before": 61.1,
+        "buyer_after": 61.1
+      }
+    },
+    {
+      "id": "bu3.tip.wrong-seller",
+      "lens": "BU3",
+      "title": "tip seller ≠ owner",
+      "ev": "400 acao=* {\"error\":\"Tip seller does not own this live.\"}"
+    },
+    {
+      "id": "bu3.tip.inactive",
+      "lens": "BU3",
+      "title": "tip em live inactiva",
+      "ev": "400 acao=* {\"error\":\"Tips only allowed while the live is broadcasting.\"}"
+    },
+    {
+      "id": "bu6.buckets.anon",
+      "lens": "BU6",
+      "title": "list buckets anon",
+      "ev": "200 acao=* []"
+    },
+    {
+      "id": "bu6.buckets.b1",
+      "lens": "BU6",
+      "title": "list buckets B1",
+      "ev": "200 acao=* []"
+    },
+    {
+      "id": "bu6.buckets.svc",
+      "lens": "BU6",
+      "title": "list buckets svc (obs)",
+      "ev": "2 buckets"
+    },
+    {
+      "id": "bu6.public.names",
+      "lens": "BU6",
+      "title": "buckets public=true",
+      "ev": [
+        "chat_media"
+      ]
+    },
+    {
+      "id": "bu6.list.fleaber_private",
+      "lens": "BU6",
+      "title": "list fleaber_private B1",
+      "ev": "200 acao=* [{\"name\":\"chat_uploads\",\"id\":null,\"updated_at\":null,\"created_at\":null,\"last_accessed_at\":null,\"metadata\":null},{\"name\":\"order_disputes\",\"id\":null,\"updated_at\":null,\"created_at\":null,\"last_accessed_at\":null,\"metadata\":nul…"
+    },
+    {
+      "id": "bu6.publicget.fleaber_private",
+      "lens": "BU6",
+      "title": "GET public fleaber_private missing",
+      "ev": "400 acao=* {\"statusCode\":\"404\",\"error\":\"Bucket not found\",\"message\":\"Bucket not found\",\"code\":\"NoSuchBucket\"}"
+    },
+    {
+      "id": "bu6.list.chat_media",
+      "lens": "BU6",
+      "title": "list chat_media B1",
+      "ev": "200 acao=* [{\"name\":\"product_photos\",\"id\":null,\"updated_at\":null,\"created_at\":null,\"last_accessed_at\":null,\"metadata\":null}]"
+    },
+    {
+      "id": "bu6.publicget.chat_media",
+      "lens": "BU6",
+      "title": "GET public chat_media missing",
+      "ev": "400 acao=* {\"statusCode\":\"404\",\"error\":\"not_found\",\"message\":\"Object not found\",\"code\":\"NoSuchKey\"}"
+    },
+    {
+      "id": "bu6.list.product_images",
+      "lens": "BU6",
+      "title": "list product_images B1",
+      "ev": "200 acao=* []"
+    },
+    {
+      "id": "bu6.publicget.product_images",
+      "lens": "BU6",
+      "title": "GET public product_images missing",
+      "ev": "400 acao=* {\"statusCode\":\"404\",\"error\":\"Bucket not found\",\"message\":\"Bucket not found\",\"code\":\"NoSuchBucket\"}"
+    },
+    {
+      "id": "bu6.list.avatars",
+      "lens": "BU6",
+      "title": "list avatars B1",
+      "ev": "200 acao=* []"
+    },
+    {
+      "id": "bu6.publicget.avatars",
+      "lens": "BU6",
+      "title": "GET public avatars missing",
+      "ev": "400 acao=* {\"statusCode\":\"404\",\"error\":\"Bucket not found\",\"message\":\"Bucket not found\",\"code\":\"NoSuchBucket\"}"
+    },
+    {
+      "id": "bu6.list.hub_media",
+      "lens": "BU6",
+      "title": "list hub_media B1",
+      "ev": "200 acao=* []"
+    },
+    {
+      "id": "bu6.publicget.hub_media",
+      "lens": "BU6",
+      "title": "GET public hub_media missing",
+      "ev": "400 acao=* {\"statusCode\":\"404\",\"error\":\"Bucket not found\",\"message\":\"Bucket not found\",\"code\":\"NoSuchBucket\"}"
+    },
+    {
+      "id": "bu6.list.chat_media",
+      "lens": "BU6",
+      "title": "list chat_media B1",
+      "ev": "200 acao=* [{\"name\":\"product_photos\",\"id\":null,\"updated_at\":null,\"created_at\":null,\"last_accessed_at\":null,\"metadata\":null}]"
+    },
+    {
+      "id": "bu6.publicget.chat_media",
+      "lens": "BU6",
+      "title": "GET public chat_media missing",
+      "ev": "400 acao=* {\"statusCode\":\"404\",\"error\":\"not_found\",\"message\":\"Object not found\",\"code\":\"NoSuchKey\"}"
+    },
+    {
+      "id": "bu6.upload.anon.chat_media",
+      "lens": "BU6",
+      "title": "anon upload chat_media",
+      "ev": "400 acao=* {\"statusCode\":\"403\",\"error\":\"Unauthorized\",\"message\":\"new row violates row-level security policy\",\"code\":\"AccessDenied\"}"
+    },
+    {
+      "id": "bu6.private.public-url",
+      "lens": "BU6",
+      "title": "public URL fleaber_private",
+      "ev": "400 acao=* {\"statusCode\":\"404\",\"error\":\"Bucket not found\",\"message\":\"Bucket not found\",\"code\":\"NoSuchBucket\"}"
+    }
+  ],
+  "created_lives": [
+    "9d4319c5-9f7a-41f7-8297-ac4087d44973",
+    "b0c8ca33-0b15-417f-bbe9-15b215a97392",
+    "14184877-c110-45c8-bc0c-07229fef3829",
+    "5f03ce39-6d7a-41bb-b0df-f80d61588b5a",
+    "b070dff8-bf05-4009-a214-a56f7b7fdb3b",
+    "09daf1d2-d77e-4892-aa07-df65ba634112",
+    "3d3804ba-6354-4df5-9c37-162f24aa0e88"
+  ]
+}

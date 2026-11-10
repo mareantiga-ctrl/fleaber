@@ -1,0 +1,194 @@
+{
+  "stamp": "20260906T1228",
+  "prefix": "RTCH-20260906T1228",
+  "auditor": "REDTEAM_BLIND_CH_PAYOUT_POS_BXCC_v1",
+  "lenses": [
+    "CH3",
+    "CH4",
+    "CH5",
+    "CH6",
+    "CH7"
+  ],
+  "findings": [
+    {
+      "id": "CH-P0-DELTA-MISMATCH",
+      "lens": "CH7",
+      "severity": "P0",
+      "title": "Δwallet ≠ −1€ × nº Transfers Stripe novos",
+      "actor": "seller JWT",
+      "pre": "cada Transfer 100c = 1,00 € no ledger",
+      "repro": "comparar wallet Δ com wallet_payout_ledger stripe_transfer_id novos",
+      "expected": "delta_eur == -1.00 * new_transfer_count",
+      "obtained": {
+        "delta": -1.0,
+        "new_count": 10,
+        "new_tids": [
+          "tr_1UCeQqH7FWYUN3jh0XowjyeS",
+          "tr_1UCdZWH7FWYUN3jho1WX0SaO",
+          "tr_1UCdZQH7FWYUN3jhCzLHHuFE",
+          "tr_1UCdZLH7FWYUN3jhQ6u9khvi",
+          "tr_1UCdZGH7FWYUN3jhlzW02WDN",
+          "tr_1UCdZDH7FWYUN3jhjqVq8nR2",
+          "tr_1UCdZAH7FWYUN3jhQl0UOkSg",
+          "tr_1UCdZ7H7FWYUN3jhdO3L1fg9",
+          "tr_1UCdZ2H7FWYUN3jhHmDDu5XB",
+          "tr_1UCdYxH7FWYUN3jhrZPOrVp6"
+        ]
+      },
+      "proven": true,
+      "count": true,
+      "evidence": {}
+    }
+  ],
+  "blocked": [
+    {
+      "id": "rls.buyer.wallet",
+      "lens": "CH5",
+      "title": "buyer balance ≠66666 — PATCH 200 [] foi 0 rows (falso positivo pass1)",
+      "ev": {
+        "id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+        "balance": 61.1,
+        "stripe_account_id": "acct_1U8gAFQglI7kZRfq",
+        "updated_at": "2026-09-01T08:06:18.505303+00:00"
+      }
+    },
+    {
+      "id": "crash.finish",
+      "lens": "CH4",
+      "title": "after_finish retry 1 Transfer",
+      "ev": {
+        "crash": "500 {\"success\":false,\"error\":\"crash_inject:after_finish_before_response\",\"code\":\"payout_pending_reconcile\",\"needs_reconcile\":true,\"transferId\":\"tr_1UCeQqH7FWYUN3jh0XowjyeS\",\"idempotency_key\":\"p_4e9f4b151b19363fc21c40b1a025de… loc=\"\"",
+        "retry": "429 {\"error\":\"Demasiados pedidos. Tenta daqui a pouco.\"} loc=\"\"",
+        "tids": [
+          "tr_1UCeQqH7FWYUN3jh0XowjyeS"
+        ]
+      }
+    },
+    {
+      "id": "refund.crash",
+      "lens": "CH3",
+      "title": "refund crash retry 1 re_",
+      "ev": {
+        "ids": [
+          "re_3UCeQtH7FWYUN3jh0HPFSUYr"
+        ],
+        "c1": "500 {\"ok\":false,\"error\":\"crash_inject:after_stripe_before_db\",\"refund_id\":\"re_3UCeQtH7FWYUN3jh0HPFSUYr\",\"payment_intent\":\"pi_3UCeQtH7FWYUN3jh09f90Aek\",\"code\":\"refund_pending_reconcile\",\"needs_reconcile\":true,\"crash_inject\":t… loc=\"\"",
+        "c2": "200 {\"ok\":true,\"already_refunded\":true,\"idempotent\":true,\"refund_id\":\"re_3UCeQtH7FWYUN3jh0HPFSUYr\",\"status\":\"cancelado\",\"stock_units_applied\":null,\"amount_cents\":590,\"payment_intent\":\"pi_3UCeQtH7FWYUN3jh09f90Aek\"} loc=\"\""
+      }
+    },
+    {
+      "id": "CH-P0-FINALIZE-JWT",
+      "lens": "CH6",
+      "title": "JWT executou batata_finalize_stripe_order_refund",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_finalize_stripe_order_refund\"} loc=\"\""
+    }
+  ],
+  "skipped": [],
+  "notes": [
+    {
+      "id": "rls.buyer.wallet",
+      "lens": "CH5",
+      "title": "buyer wallet após PATCH alheio pass1 (esperado ≠66666)",
+      "ev": {
+        "id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+        "balance": 61.1,
+        "stripe_account_id": "acct_1U8gAFQglI7kZRfq",
+        "updated_at": "2026-09-01T08:06:18.505303+00:00"
+      }
+    },
+    {
+      "id": "comp.start",
+      "lens": "CH7",
+      "title": "ledger+wallet início pass3",
+      "ev": {
+        "wallet": 46.33,
+        "tids": 40
+      }
+    },
+    {
+      "id": "crash.finish",
+      "lens": "CH4",
+      "title": "after_finish + retry",
+      "ev": {
+        "crash": "500 {\"success\":false,\"error\":\"crash_inject:after_finish_before_response\",\"code\":\"payout_pending_reconcile\",\"needs_reconcile\":true,\"transferId\":\"tr_1UCeQqH7FWYUN3jh0XowjyeS\",\"idempotency_key\":\"p_4e9f4b151b19363fc21c40b1a025de… loc=\"\"",
+        "retry": "429 {\"error\":\"Demasiados pedidos. Tenta daqui a pouco.\"} loc=\"\"",
+        "tids": [
+          "tr_1UCeQqH7FWYUN3jh0XowjyeS"
+        ]
+      }
+    },
+    {
+      "id": "comp.delta",
+      "lens": "CH7",
+      "title": "Δwallet vs novos Transfers desta sessão pass3",
+      "ev": {
+        "wallet0": 46.33,
+        "wallet1": 45.33,
+        "delta_eur": -1.0,
+        "new_tids": [
+          "tr_1UCeQqH7FWYUN3jh0XowjyeS",
+          "tr_1UCdZWH7FWYUN3jho1WX0SaO",
+          "tr_1UCdZQH7FWYUN3jhCzLHHuFE",
+          "tr_1UCdZLH7FWYUN3jhQ6u9khvi",
+          "tr_1UCdZGH7FWYUN3jhlzW02WDN",
+          "tr_1UCdZDH7FWYUN3jhjqVq8nR2",
+          "tr_1UCdZAH7FWYUN3jhQl0UOkSg",
+          "tr_1UCdZ7H7FWYUN3jhdO3L1fg9",
+          "tr_1UCdZ2H7FWYUN3jhHmDDu5XB",
+          "tr_1UCdYxH7FWYUN3jhrZPOrVp6"
+        ],
+        "new_count": 10,
+        "expected_delta_if_100c": -0.1
+      }
+    },
+    {
+      "id": "fixture.paid",
+      "lens": "CH3",
+      "title": "setup_paid_order Stripe TEST",
+      "ev": "200 {\n  \"ok\": true,\n  \"order_id\": \"0bee6491-c71b-4a8b-870d-f072e601e7dc\",\n  \"product_id\": \"3a06ae0d-adc9-4fbd-9b1a-7cf64620d093\",\n  \"payment_intent_id\": \"pi_3UCeQtH7FWYUN3jh09f90Aek\",\n  \"pi_status\": \"succeeded\",\n  \"pi_amount… loc=\"\""
+    },
+    {
+      "id": "refund.crash",
+      "lens": "CH3",
+      "title": "refund crash + retry",
+      "ev": {
+        "c1": "500 {\"ok\":false,\"error\":\"crash_inject:after_stripe_before_db\",\"refund_id\":\"re_3UCeQtH7FWYUN3jh0HPFSUYr\",\"payment_intent\":\"pi_3UCeQtH7FWYUN3jh09f90Aek\",\"code\":\"refund_pending_reconcile\",\"needs_reconcile\":true,\"crash_inject\":t… loc=\"\"",
+        "c2": "200 {\"ok\":true,\"already_refunded\":true,\"idempotent\":true,\"refund_id\":\"re_3UCeQtH7FWYUN3jh0HPFSUYr\",\"status\":\"cancelado\",\"stock_units_applied\":null,\"amount_cents\":590,\"payment_intent\":\"pi_3UCeQtH7FWYUN3jh09f90Aek\"} loc=\"\"",
+        "order": {
+          "id": "0bee6491-c71b-4a8b-870d-f072e601e7dc",
+          "status": "cancelado",
+          "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+          "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+          "product_id": "3a06ae0d-adc9-4fbd-9b1a-7cf64620d093",
+          "quantity": 1,
+          "price_total": 5.9,
+          "amount_paid_cents": 590,
+          "payment_method": "Pagamento na app",
+          "shipping_method": "",
+          "shipped_at": "",
+          "stripe_payment_intent_id": "pi_3UCeQtH7FWYUN3jh09f90Aek",
+          "stripe_checkout_session_id": "",
+          "stripe_refund_id": "re_3UCeQtH7FWYUN3jh0HPFSUYr",
+          "wallet_release_processed_at": "2026-09-06T11:40:28.345038+00:00",
+          "wallet_refund_processed_at": "2026-09-06T11:40:28.345038+00:00",
+          "stock_units_applied": "",
+          "completed_at": ""
+        }
+      }
+    }
+  ],
+  "actors": {
+    "buyer": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+    "seller": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+    "buyer2": "03ee8b80-fc44-4e42-8dc8-7378706d654b",
+    "seller2": null
+  },
+  "created": {
+    "orders": [
+      "0bee6491-c71b-4a8b-870d-f072e601e7dc"
+    ],
+    "products": [
+      "3a06ae0d-adc9-4fbd-9b1a-7cf64620d093"
+    ]
+  }
+}

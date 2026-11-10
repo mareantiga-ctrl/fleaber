@@ -1,0 +1,64 @@
+{
+  "stamp": "20260907T0928",
+  "prefix": "RTFB-20260907T0928",
+  "probes": [
+    {
+      "probe_id": "D2",
+      "poco": "FB-D",
+      "payload": "settle unpaid Session (anti-atrofia residual ≤1) pass2 fresco",
+      "http_rpc": {
+        "cpi": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1ShPOnCM39ymues2KGJCb2phsRn9c7k1TeP6Ot6N6bdPrhJZOIPTZD9yJ#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21oYWlsUnxrVkRhQUQyNlJjSWBCN3BXNXVvVT1haml…",
+        "settle": "402 Pagamento ainda não confirmado. Se já pagaste, aguarda alguns segundos e volta à app Fleaber."
+      },
+      "bd_stripe": {
+        "settle_status": 402,
+        "credited": false
+      },
+      "verdict": "FAIL",
+      "classe_nova": "NÃO",
+      "lens": "FB-D"
+    },
+    {
+      "probe_id": "C3-paid",
+      "poco": "FB-C",
+      "payload": "2× fase2Settle mesma PI paga leftover → 1 efeito",
+      "http_rpc": {
+        "s1": "401 {\"ok\":false,\"error\":\"service_role required\"}",
+        "s2": "401 {\"ok\":false,\"error\":\"service_role required\"}"
+      },
+      "bd_stripe": {
+        "dW": 0.0,
+        "q0": 1,
+        "q1": 1,
+        "st0": "concluido",
+        "st1": "concluido",
+        "applied0": 1,
+        "applied1": 1
+      },
+      "verdict": "FAIL",
+      "classe_nova": "SIM",
+      "lens": "FB-C"
+    },
+    {
+      "probe_id": "B3e2e",
+      "poco": "FB-B",
+      "payload": "setup_paid_bag 2 lines (apoio B3: captura 4-line sem sk_test_)",
+      "http_rpc": "200 {\n  \"ok\": true,\n  \"probe\": \"setup_paid_bag\",\n  \"payment_intent_id\": \"pi_3UCy2ZH7FWYUN3jh0kLv4Mf9\",\n  \"pi_amount_cents\": 1115,\n  \"total_cents_quote\": 1115,\n  \"items_cents\": 1000,\n  \"protection_cents\": 115,\n  \"share_a_cents\": 335,\n  \"share_b_cents\": 780,\n  \"expected_paid_a\": 335,\n …",
+      "bd_stripe": {
+        "stA": "pago",
+        "stB": "pago",
+        "both": true,
+        "half": false,
+        "pi": "pi_3UCy2ZH7FWYUN3jh0kLv4Mf9",
+        "pi_amt": 1115,
+        "paid_a": 335,
+        "paid_b": 780
+      },
+      "verdict": "FAIL",
+      "classe_nova": "NÃO",
+      "lens": "FB-B"
+    }
+  ],
+  "findings": [],
+  "n": 3
+}

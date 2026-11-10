@@ -1,0 +1,80 @@
+{
+  "pass": 3,
+  "probes": {
+    "p3.prev_fb": {
+      "id": "da64ec26-32fa-468b-9f58-57dd07f2ae63",
+      "status": "concluido",
+      "wallet_release_processed_at": null,
+      "auto_feedback_processed_at": "2020-01-01T00:00:00+00:00",
+      "completed_at": "2026-08-31T07:29:56.412005+00:00",
+      "amount_paid_cents": 590,
+      "stripe_refund_id": null,
+      "stock_units_applied": 1,
+      "product_id": "ba6b0897-e738-4cda-8749-34b0c8d7361c"
+    },
+    "setup.paid": {
+      "http": 200,
+      "snip": "{   \"ok\": true,   \"order_id\": \"671fd1c6-44d6-463b-ba63-2b464814c0ea\",   \"product_id\": \"29dfdaef-df01-4e87-bd51-cc5e03415c3c\",   \"payment_intent_id\": \"pi_3UAPgsH7FWYUN3jh1nbkFpKf\",   \"pi_status\": \"succeeded\",   \"pi_amount_received\": 590,   \"initial_qty\": 2,   \""
+    },
+    "p3.autofeedback_hold": {
+      "mark_http": 200,
+      "auto": "2026-08-31T07:31:36.971336+00:00",
+      "rel_seller": {
+        "http": 200,
+        "snip": "false"
+      },
+      "rel_b2": {
+        "http": 200,
+        "snip": "false"
+      },
+      "released": null,
+      "dS": 0.0
+    },
+    "p3.dispute_entregue_danificado": {
+      "status": "entregue",
+      "disp": {
+        "http": 201,
+        "snip": "[{\"id\":\"c12bad97-9581-4d7f-8f5e-0b21c01bb498\",\"order_id\":\"671fd1c6-44d6-463b-ba63-2b464814c0ea\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"reason\":\"danificado\",\"description\":\"RTD2 pass3 disputa depois de auto entregue sem o vendedor enviar o artigo.\",\""
+      }
+    },
+    "p3.forge_return_label": {
+      "http": 200,
+      "snip": "[{\"id\":\"c12bad97-9581-4d7f-8f5e-0b21c01bb498\",\"order_id\":\"671fd1c6-44d6-463b-ba63-2b464814c0ea\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"reason\":\"danificado\",\"description\":\"RTD2 pass3 disputa depois de auto entregue sem o vendedor enviar o artigo.\",\""
+    },
+    "p3.b2_patch_b1_order": {
+      "http": 200,
+      "snip": "[]"
+    },
+    "p3.clawback_jwt": {
+      "http": 403,
+      "snip": "{\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_clawback_seller_wallet_for_order\"}"
+    }
+  },
+  "findings": [
+    {
+      "id": "RTD2-0820-D2-5-03",
+      "title": "JWT grava auto_feedback_processed_at e seller não consegue libertar wallet",
+      "sev": "P1",
+      "actor": "B1 JWT",
+      "lens": "D2-5",
+      "after": {
+        "auto": "2026-08-31T07:31:36.971336+00:00",
+        "release": null,
+        "rel_seller": "false"
+      },
+      "impact": "Cron salta (processed_at not null). Seller RPC false. Payout fica à mercê do buyer chamar release.",
+      "repro": "concluido → PATCH auto_feedback_processed_at=now → seller RPC release false"
+    },
+    {
+      "id": "RTD2-0820-D2-1-06",
+      "title": "Disputa após pago→entregue (seller nunca enviou)",
+      "sev": "P1",
+      "lens": "D2-1",
+      "after": {
+        "status": "entregue",
+        "disp_http": 201
+      },
+      "impact": "Mesma classe D2-1-03: atalho entregue abre janela de disputa."
+    }
+  ]
+}

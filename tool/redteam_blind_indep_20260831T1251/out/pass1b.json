@@ -1,0 +1,168 @@
+{
+  "auditor": "REDTEAM_BLIND_INDEP_v4",
+  "stamp": "20260831T1251",
+  "project": "fxdknzrqjenzqcvnwqqq",
+  "production_touched": false,
+  "fase4": false,
+  "corrections_applied": false,
+  "fresh_id": "269de162-1eae-43c5-979a-fe036585d524",
+  "findings": [
+    {
+      "id": "P1-ZOMBIE-LIVE-UNLIST",
+      "title": "live ended+is_active permite hold/checkout de unlist",
+      "actor": "buyer JWT + live is_active leftover",
+      "sev": "P1",
+      "well": "1",
+      "pre": "unlist; live status=ended is_active=true",
+      "request": "POST orders live_id; create-payment-intent",
+      "before": {
+        "id": "f03bd1d5-fc77-4f3e-8584-a3e56bad632b",
+        "status": "ended",
+        "is_active": true
+      },
+      "after": {
+        "order": "201 [{\"id\":\"506d8302-1fd3-472f-84d5-0d3120de7c54\",\"created_at\":\"2026-08-31T12:02:55.925772+00:00\",\"product_id\":\"92271ce6-d72c-474f-b859-5830144411f0\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"price_total\":4.50,\"shipping_meth…",
+        "checkout": "{\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1dZWADiDbDN8H1jcAu9013nPQFlEI3CAM26TKTR7M7qgVOJs1w5GGhS9z#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21oYWlsUnxrVkRhQUQyNlJjSWBCN3BXNXVvVT1hamlcf3Fjd1dRMGJmREk9Yz09PH1CMzVTY0pBXD1kMU5HZl1da05gf0s1XGQ1NWA3bVFBNzNMJyknY3dqaFZgd3Ngdyc%2FcXdwYCknZ2RmbmJ3anBrYUZqaWp3Jz8nJmNjY2NjYycpJ2lkfGpwcVF8dWAnPyd2bGtiaWBabHFgaCcpJ2BrZGdpYFVpZGZgbWppYWB3dic%2FcXdwYHgl\",\"checkout…",
+        "session": true,
+        "seller_patch": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table lives\"}"
+      },
+      "impact": "Session Stripe para SKU morto via live-zombie",
+      "repro": "live ended is_active=true; POST orders unlist+live_id"
+    }
+  ],
+  "holds": [
+    {
+      "id": "p3.products.anon2",
+      "title": "anon sem SELECT products",
+      "well": "3",
+      "evidence": "401 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table products\"}"
+    },
+    {
+      "id": "p3.profiles.anon2",
+      "title": "anon sem SELECT profiles",
+      "well": "3",
+      "evidence": "401 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table profiles\"}"
+    },
+    {
+      "id": "p1.buyer.unlist.select2",
+      "title": "buyer não vê unlist",
+      "well": "1",
+      "evidence": "200 []"
+    },
+    {
+      "id": "p1.bundle.dead.order",
+      "title": "order do membro morto bloqueada",
+      "well": "1",
+      "evidence": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"order_hold_product_sold\"}"
+    },
+    {
+      "id": "p1.offer.order2",
+      "title": "hold após offer unlist bloqueado",
+      "well": "1",
+      "evidence": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"order_hold_product_not_listed\"}"
+    }
+  ],
+  "notes": [
+    {
+      "id": "p3.products.anon2",
+      "title": "products anon no cost_price",
+      "well": "3",
+      "detail": "401 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table products\"}"
+    },
+    {
+      "id": "p3.profiles.anon2",
+      "title": "profiles anon",
+      "well": "3",
+      "detail": "401 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table profiles\"}"
+    },
+    {
+      "id": "p1.buyer.unlist.select2",
+      "title": "buyer unlist",
+      "well": "1",
+      "detail": "200 []"
+    },
+    {
+      "id": "p1.live.svc",
+      "title": "service INSERT ended live",
+      "well": "1",
+      "detail": "201 [{\"id\":\"f03bd1d5-fc77-4f3e-8584-a3e56bad632b\",\"created_at\":\"2026-08-31T12:02:55.363563+00:00\",\"vendedor_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"mux_live_id\":null,\"stream_key\":null,\"playback_id\":null,\"is_active\":false,\"title\":\"RTI4-20260831T1251--ZOMBIE-SVC\",\"status\":\"ended\",\"…"
+    },
+    {
+      "id": "p1.zombie.seller.patch",
+      "title": "seller PATCH is_active",
+      "well": "1",
+      "detail": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table lives\"}"
+    },
+    {
+      "id": "p1.zombie.svc.patch",
+      "title": "service PATCH is_active (observe leftover)",
+      "well": "1",
+      "detail": "200 [{\"id\":\"f03bd1d5-fc77-4f3e-8584-a3e56bad632b\",\"created_at\":\"2026-08-31T12:02:55.363563+00:00\",\"vendedor_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"mux_live_id\":null,\"stream_key\":null,\"playback_id\":null,\"is_active\":true,\"title\":\"RTI4-20260831T1251--ZOMBIE-SVC\",\"status\":\"ended\",\"s…"
+    },
+    {
+      "id": "p1.zombie.order",
+      "title": "unlist+live_id",
+      "well": "1",
+      "detail": {
+        "zombieOn": true,
+        "live": {
+          "id": "f03bd1d5-fc77-4f3e-8584-a3e56bad632b",
+          "status": "ended",
+          "is_active": true
+        },
+        "order": "201 [{\"id\":\"506d8302-1fd3-472f-84d5-0d3120de7c54\",\"created_at\":\"2026-08-31T12:02:55.925772+00:00\",\"product_id\":\"92271ce6-d72c-474f-b859-5830144411f0\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"price_total\":4.50,\"shipping_meth…",
+        "sellerPatchHttp": 403
+      }
+    },
+    {
+      "id": "p1.li.svc",
+      "title": "live_item fixture",
+      "well": "3",
+      "detail": "400 {\"code\":\"23502\",\"details\":\"Failing row contains (5133af46-4be6-4e7d-96e7-ebd62cdc0975, f03bd1d5-fc77-4f3e-8584-a3e56bad632b, 980f4fa1-0004-42f9-abca-69f1a9c29588, null, RTI4-20260831T1251--LI, null, 4.5, null, null, null, t, 0, available, 2026-08-31 12:02:57.428481+00, null, live…"
+    },
+    {
+      "id": "p1.bundle.compose",
+      "title": "orders after accept+dead member",
+      "well": "1",
+      "detail": {
+        "bundle": {
+          "id": "27b693d9-3562-4eb0-8b68-ed45fe3d188e",
+          "status": "accepted",
+          "total_eur": 6.0,
+          "product_ids": [
+            "d27d298d-1fcd-4f77-91d4-36e7f7b49666",
+            "8aa0cc61-53eb-4c7e-8f95-6194200f2905"
+          ],
+          "subtotal_eur": 6.0
+        },
+        "oA": "201 [{\"id\":\"6607200a-5131-4e4b-8250-5da7c1188ddc\",\"created_at\":\"2026-08-31T12:02:58.423104+00:00\",\"product_id\":\"d27d298d-1fcd-4f77-91d4-36e7f7b49666\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"price_total\":6.00,\"shipping_meth…",
+        "oB": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"order_hold_product_sold\"}"
+      }
+    },
+    {
+      "id": "p1.bundle.live.member.checkout",
+      "title": "checkout membro vivo",
+      "well": "1",
+      "detail": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1f00QvjSeDKk3CSgzeg6Um7vkj9d8hBUyYDsR5LGGcGjeOqzYw4qblByZ#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21oYWlsUnxrVkRhQUQyNlJjSWBCN3BXNXVvVT1haml…"
+    },
+    {
+      "id": "p1.offer.order2",
+      "title": "order after accepted unlist offer",
+      "well": "1",
+      "detail": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"order_hold_product_not_listed\"}"
+    }
+  ],
+  "created_products": [
+    "92271ce6-d72c-474f-b859-5830144411f0",
+    "78682800-247c-4495-aebb-780bbe990a12",
+    "d27d298d-1fcd-4f77-91d4-36e7f7b49666",
+    "8aa0cc61-53eb-4c7e-8f95-6194200f2905"
+  ],
+  "created_orders": [
+    "506d8302-1fd3-472f-84d5-0d3120de7c54",
+    "6607200a-5131-4e4b-8250-5da7c1188ddc"
+  ],
+  "created_lives": [
+    "f03bd1d5-fc77-4f3e-8584-a3e56bad632b"
+  ]
+}

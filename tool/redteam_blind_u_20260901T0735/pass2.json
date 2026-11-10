@@ -1,0 +1,165 @@
+{
+  "auditor": "REDTEAM_BLIND_U_MARKETPLACE_CHECKOUT_v1",
+  "pass": 2,
+  "notes": [
+    {
+      "id": "p2.unlist.sku",
+      "lens": "U1",
+      "title": "SKU alvo do PATCH buyer",
+      "ev": {
+        "id": "e519379d-8726-437d-86a9-6cb8d0c73d43",
+        "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+        "title": "RTU-20260901T0735 unlist-other",
+        "price": 9.0,
+        "quantity": 2,
+        "is_sold": false,
+        "list_on_marketplace": true,
+        "available_for_live": false
+      }
+    },
+    {
+      "id": "p2.penny",
+      "lens": "U2",
+      "title": "hold 0.01€ unpayable",
+      "ev": {
+        "order": {
+          "status": "reserva_pendente",
+          "contract": 1,
+          "offer": "3546f532-9161-4d4b-9c73-74bfe6de0abb"
+        },
+        "product": {
+          "qty": 4,
+          "listed": true
+        }
+      }
+    },
+    {
+      "id": "p2.penny.ck",
+      "lens": "U2",
+      "title": "re-checkout penny",
+      "ev": "400 {\"error\":\"Checkout blocked: item without price.\"}"
+    },
+    {
+      "id": "p2.penny.cancel",
+      "lens": "U2",
+      "title": "buyer cancela hold unpayable",
+      "ev": {
+        "can": "200 [{\"id\":\"e522af37-d399-4f75-a0a3-4185cf9e39a9\",\"created_at\":\"2026-09-01T06:42:30.660087+00:00\",\"product_id\":\"1a82b315-33db-446b-b675-05e2fe8abbff\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-00…",
+        "status": "cancelado"
+      }
+    },
+    {
+      "id": "p2.bun.race",
+      "lens": "U2",
+      "title": "bundle aceite vs SKUs",
+      "ev": {
+        "bundle": {
+          "id": "a73c7113-e96c-4745-9584-6ffe9bb0e32d",
+          "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+          "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+          "chat_id": null,
+          "product_ids": [
+            "22860323-5e16-4ced-ac1a-ddacad302ca9",
+            "2ddabe86-7d57-486b-ac61-b1f67dfb31c7"
+          ],
+          "subtotal_eur": 28.0,
+          "discount_pct": 10.0,
+          "discount_eur": 2.8,
+          "total_eur": 25.2,
+          "status": "accepted",
+          "created_at": "2026-09-01T06:42:37.079636+00:00",
+          "responded_at": null
+        },
+        "a_listed": false,
+        "b_listed": true
+      }
+    },
+    {
+      "id": "order.fail",
+      "title": "insertOrder 400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"order_hold_product_not_listed\"}",
+      "ev": {
+        "product": "22860323-5e16-4ced-ac1a-ddacad302ca9",
+        "qty": 1,
+        "payment": "Pagamento na app"
+      }
+    },
+    {
+      "id": "p2.bun.holds",
+      "lens": "U2",
+      "title": "holds no bundle aceite+unlist",
+      "ev": {
+        "a": null,
+        "b": "54503b86-a98e-4664-b7ce-5cc2b84c2c36"
+      }
+    },
+    {
+      "id": "p2.bun.partial",
+      "lens": "U2",
+      "title": "só um hold no par unlistado",
+      "ev": {
+        "a": null,
+        "b": "54503b86-a98e-4664-b7ce-5cc2b84c2c36"
+      }
+    },
+    {
+      "id": "p2.ship.seller",
+      "lens": "U3",
+      "title": "S PATCH portes no hold do buyer",
+      "ev": {
+        "before": "entrega em mão",
+        "patch": "200 [{\"id\":\"83742d0d-853c-4a2e-a390-580714affd1d\",\"created_at\":\"2026-09-01T06:42:40.324228+00:00\",\"product_id\":\"1ad5774c-33da-4e40-b64c-9816720a696b\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-00…",
+        "after": "entrega em mão"
+      }
+    },
+    {
+      "id": "p2.dual.orders",
+      "lens": "U3",
+      "title": "orders do saco com 2 cs_",
+      "ev": [
+        {
+          "id": "526b39f2-4325-4a83-b4b0-937e5f8e24d5",
+          "status": "reserva_pendente",
+          "stripe_checkout_session_id": null,
+          "price_total": 21.33,
+          "contract_unit_cents": 2000
+        },
+        {
+          "id": "e39a9266-4bb9-45e7-9b7d-076d12459700",
+          "status": "reserva_pendente",
+          "stripe_checkout_session_id": null,
+          "price_total": 21.32,
+          "contract_unit_cents": 2000
+        }
+      ]
+    },
+    {
+      "id": "p2.hub.ghost",
+      "lens": "U7",
+      "title": "ghost ainda no Hub",
+      "ev": {
+        "id": "1b7cba91-0169-4216-8d4e-3bd3d7c99b14",
+        "price": 11.0,
+        "is_sold": false,
+        "title": "RTU-20260901T0735 hub-ghost"
+      }
+    }
+  ],
+  "blocked": [
+    {
+      "id": "RTU-U1-unlist-alheio",
+      "lens": "U1",
+      "title": "200 [] era no-op RLS; SKU continua listado",
+      "ev": {
+        "id": "e519379d-8726-437d-86a9-6cb8d0c73d43",
+        "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+        "title": "RTU-20260901T0735 unlist-other",
+        "price": 9.0,
+        "quantity": 2,
+        "is_sold": false,
+        "list_on_marketplace": true,
+        "available_for_live": false
+      }
+    }
+  ],
+  "findings": []
+}

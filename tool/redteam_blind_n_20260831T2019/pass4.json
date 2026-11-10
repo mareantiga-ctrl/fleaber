@@ -1,0 +1,271 @@
+{
+  "auditor": "REDTEAM_BLIND_N_LIVE_STREAM_v1",
+  "pass": 4,
+  "stamp": "20260831T2019",
+  "prev.s2.status": {
+    "id": "01677f6a-5e0a-4c7f-80af-df2880b9dd6e",
+    "status": "pending",
+    "buyer_id": "b5a2a77d-9389-487a-ae8f-11a5b0d05cb4",
+    "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+    "requested_qty": 1
+  },
+  "prev.tip": {
+    "id": "7e3899bf-19a5-4e57-a8e7-0b2289049ea6",
+    "status": "pending",
+    "amount": 99.0,
+    "stripe_session_id": null,
+    "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+    "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+    "payment_source": "stripe"
+  },
+  "prev.tipX": {
+    "id": "05c8b5e0-d1df-4ee2-940f-15cfd6ffd438",
+    "buyer_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+    "seller_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+    "amount": 1.0,
+    "status": "pending"
+  },
+  "tips.alien": {
+    "http": 200,
+    "n": 0
+  },
+  "wallet.before": {
+    "seller": 10.0,
+    "buyer": 46.35
+  },
+  "n5.spoof": {
+    "id": "bb15b97a-cd34-4be9-919f-224396f9679a",
+    "live_id": "4e436f88-767a-4a89-9e81-37e601491db5",
+    "live_item_id": "db432fdf-a9f3-4339-b65b-507c1cdc2767",
+    "seller_id": "b5a2a77d-9389-487a-ae8f-11a5b0d05cb4",
+    "buyer_id": "b5a2a77d-9389-487a-ae8f-11a5b0d05cb4",
+    "requested_qty": 1,
+    "queue_position": null,
+    "source": "fleaber_live",
+    "status": "accepted",
+    "notes": null,
+    "processed_by_user_id": null,
+    "expires_at": null,
+    "created_at": "2026-08-31T19:35:32.452055+00:00",
+    "updated_at": "2026-08-31T19:35:32.452055+00:00",
+    "effective_at": "2026-08-31T19:35:32.452055+00:00",
+    "detected_at": null,
+    "external_display_name": null,
+    "external_buyer_ref": null,
+    "chat_sequence": null,
+    "avatar_phash": null,
+    "ocr_raw_line": null,
+    "ingest_channel": null,
+    "ingest_confidence": null,
+    "ingest_status": null,
+    "idempotency_key": null,
+    "ocr_confidence": null,
+    "parser_confidence": null,
+    "item_match_confidence": null,
+    "identity_confidence": null,
+    "resolved_ref_slug": null,
+    "resolved_match_type": null,
+    "parser_intent": null,
+    "device_id": null
+  },
+  "n5.stock.after": {
+    "ok": true,
+    "price": 7,
+    "live_id": "4e436f88-767a-4a89-9e81-37e601491db5",
+    "ref_code": "RTN4A",
+    "item_kind": "live_only",
+    "total_qty": 1,
+    "product_id": null,
+    "blocked_qty": 0,
+    "live_status": "live",
+    "live_item_id": "db432fdf-a9f3-4339-b65b-507c1cdc2767",
+    "available_qty": 0,
+    "pending_bag_qty": 0,
+    "sold_converted_qty": 0,
+    "checkout_product_id": null,
+    "reserved_accepted_qty": 1
+  },
+  "n5.proc.s2": {
+    "ok": true,
+    "item_qty": 1,
+    "request_id": "bb15b97a-cd34-4be9-919f-224396f9679a",
+    "item_status": "reserved_full",
+    "reserved_qty": 1
+  },
+  "n7.settle": "400 {\"error\":\"No such checkout.session: cs_test_rtn3_forged_20260831T2019\"}",
+  "wallet.after": {
+    "seller": 10.0,
+    "buyer": 46.35
+  },
+  "n1.tok": {
+    "lab_n": 0,
+    "list_n": 3,
+    "seller_ids": [
+      "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96"
+    ]
+  },
+  "n5.qty": {
+    "quantity": 1
+  },
+  "findings": [
+    {
+      "id": "RTN-n5.spoof.seller_id",
+      "lens": "N5",
+      "severity": "P0",
+      "title": "S2 spoofa seller_id=próprio e INSERT reserva accepted no artigo da live A",
+      "actor": "seller2",
+      "pre": "live A do lab seller, item qty=1, body.seller_id=S2",
+      "repro": "POST live_reservation_requests seller_id=<self> status=accepted",
+      "expected": "pending ou 403 (seller_id tem de ser o dono da live)",
+      "obtained": "status=accepted seller_id=b5a2a77d-9389-487a-ae8f-11a5b0d05cb4",
+      "evidence": {
+        "row": {
+          "id": "bb15b97a-cd34-4be9-919f-224396f9679a",
+          "live_id": "4e436f88-767a-4a89-9e81-37e601491db5",
+          "live_item_id": "db432fdf-a9f3-4339-b65b-507c1cdc2767",
+          "seller_id": "b5a2a77d-9389-487a-ae8f-11a5b0d05cb4",
+          "buyer_id": "b5a2a77d-9389-487a-ae8f-11a5b0d05cb4",
+          "requested_qty": 1,
+          "queue_position": null,
+          "source": "fleaber_live",
+          "status": "accepted",
+          "notes": null,
+          "processed_by_user_id": null,
+          "expires_at": null,
+          "created_at": "2026-08-31T19:35:32.452055+00:00",
+          "updated_at": "2026-08-31T19:35:32.452055+00:00",
+          "effective_at": "2026-08-31T19:35:32.452055+00:00",
+          "detected_at": null,
+          "external_display_name": null,
+          "external_buyer_ref": null,
+          "chat_sequence": null,
+          "avatar_phash": null,
+          "ocr_raw_line": null,
+          "ingest_channel": null,
+          "ingest_confidence": null,
+          "ingest_status": null,
+          "idempotency_key": null,
+          "ocr_confidence": null,
+          "parser_confidence": null,
+          "item_match_confidence": null,
+          "identity_confidence": null,
+          "resolved_ref_slug": null,
+          "resolved_match_type": null,
+          "parser_intent": null,
+          "device_id": null
+        }
+      }
+    },
+    {
+      "id": "RTN-n5.proc.s2",
+      "lens": "N5",
+      "severity": "P1",
+      "title": "S2 processa reserva da live A",
+      "actor": "seller2",
+      "pre": "não é dono",
+      "repro": "rpc batata_process_live_reservation_request accept",
+      "expected": "not_allowed",
+      "obtained": "200 {\"ok\": true, \"item_qty\": 1, \"request_id\": \"bb15b97a-cd34-4be9-919f-224396f9679a\", \"item_status\": \"reserved_full\", \"reserved_qty\": 1}",
+      "evidence": {}
+    }
+  ],
+  "holds": [
+    {
+      "id": "n5.bag.s2.coerced",
+      "lens": "N5",
+      "title": "INSERT accepted de não-dono foi coerido (não P1)",
+      "actor": "seller2",
+      "obtained": "pending"
+    },
+    {
+      "id": "n7.tip.cs.null",
+      "lens": "N7",
+      "title": "create_live_tip_pending ignora session do cliente (null)",
+      "actor": "buyer",
+      "obtained": "pending"
+    },
+    {
+      "id": "n7.tips.cross.retract",
+      "lens": "N7",
+      "title": "tips.cross era gorjeta em que o JWT é o vendedor — RLS própria, retratado",
+      "actor": "buyer",
+      "obtained": {
+        "id": "05c8b5e0-d1df-4ee2-940f-15cfd6ffd438",
+        "buyer_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+        "seller_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+        "amount": 1.0,
+        "status": "pending"
+      }
+    },
+    {
+      "id": "n7.tips.parties_only",
+      "lens": "N7",
+      "title": "JWT não lê tips alheias (só onde é parte)",
+      "actor": "buyer",
+      "obtained": "200 []"
+    },
+    {
+      "id": "n7.wallet.delta0",
+      "lens": "N7",
+      "title": "sem Δwallet (pending ≠ captura)",
+      "actor": "buyer",
+      "obtained": "seller=10.0 buyer=46.35"
+    }
+  ],
+  "notes": [
+    {
+      "id": "p4.prev.s2res",
+      "lens": "N5",
+      "title": "pass3 s2 reservation status",
+      "ev": "200 [{\"id\":\"01677f6a-5e0a-4c7f-80af-df2880b9dd6e\",\"status\":\"pending\",\"buyer_id\":\"b5a2a77d-9389-487a-ae8f-11a5b0d05cb4\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"requested_qty…"
+    },
+    {
+      "id": "p4.prev.tip",
+      "lens": "N7",
+      "title": "pass3 tip pending",
+      "ev": "200 [{\"id\":\"7e3899bf-19a5-4e57-a8e7-0b2289049ea6\",\"status\":\"pending\",\"amount\":99.00,\"stripe_session_id\":null,\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-000…"
+    },
+    {
+      "id": "p4.tipx.role",
+      "lens": "N7",
+      "title": "tips.cross row: we are seller?",
+      "ev": true
+    },
+    {
+      "id": "p4.tips.alien",
+      "lens": "N7",
+      "title": "tips where we are neither party",
+      "ev": "200 []"
+    },
+    {
+      "id": "p4.n5.spoof.seller_id",
+      "lens": "N5",
+      "title": "S2 INSERT accepted seller_id=self on live A",
+      "ev": "201 [{\"id\":\"bb15b97a-cd34-4be9-919f-224396f9679a\",\"live_id\":\"4e436f88-767a-4a89-9e81-37e601491db5\",\"live_item_id\":\"db432fdf-a9f3-4339-b65b-507c1cdc2767\",\"seller_id\":\"b5a2a77d-9389-487a…"
+    },
+    {
+      "id": "p4.n5.stock",
+      "lens": "N5",
+      "title": "stock after spoof",
+      "ev": "200 {\"ok\": true, \"price\": 7, \"live_id\": \"4e436f88-767a-4a89-9e81-37e601491db5\", \"ref_code\": \"RTN4A\", \"item_kind\": \"live_only\", \"total_qty\": 1, \"product_id\": null, \"blocked_qty\": 0, \"li…"
+    },
+    {
+      "id": "p4.n5.proc.s2",
+      "lens": "N5",
+      "title": "S2 process accept",
+      "ev": "200 {\"ok\": true, \"item_qty\": 1, \"request_id\": \"bb15b97a-cd34-4be9-919f-224396f9679a\", \"item_status\": \"reserved_full\", \"reserved_qty\": 1}"
+    },
+    {
+      "id": "p4.n7.settle.forged",
+      "lens": "N7",
+      "title": "GET tip settle forged cs",
+      "ev": "400 {\"error\":\"No such checkout.session: cs_test_rtn3_forged_20260831T2019\"}"
+    },
+    {
+      "id": "p4.n1.tok",
+      "lens": "N1",
+      "title": "tokens lab vs list",
+      "ev": "lab.n=0 list.n=3 ids={bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96}"
+    }
+  ]
+}

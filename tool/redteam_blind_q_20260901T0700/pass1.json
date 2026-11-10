@@ -1,0 +1,112 @@
+{
+  "notes": [
+    {
+      "id": "p1.fixture",
+      "lens": "Q1",
+      "title": "lives+items",
+      "ev": {
+        "liveA": "d047ec64-8ea1-4fc8-973f-a88561ac6caf",
+        "liveB": "8915989f-9e14-40a1-a55a-d2a9e05e3634",
+        "itemA": "e89fa4bd-6554-45b8-9392-c0abcb3348a3",
+        "itemB": "94b106e2-7267-4e68-beec-398dafe0fe97",
+        "prodA": "30fdd742-1ce0-4706-bd82-22459cc13779",
+        "prodB": "ca5edc2c-d562-407a-a542-8159537e0c77"
+      }
+    },
+    {
+      "id": "p1.q1.s2.itemA.viaLiveB",
+      "lens": "Q1",
+      "title": "S2 accepted no item A via live B",
+      "ev": "201 [{\"id\":\"629a6263-ab9b-4c37-a88a-90e92dac3a69\",\"live_id\":\"8915989f-9e14-40a1-a55a-d2a9e05e3634\",\"live_item_id\":\"e89fa4bd-6554-45b8-9392-c0abcb3348a3\",\"seller_id\":\"acf14a9b-833e-4dfc-a80e-ea5b8362f928\",\"buyer_id\":\"9009f046…"
+    },
+    {
+      "id": "p1.q1.buyer.cross",
+      "lens": "Q1",
+      "title": "buyer pending item A na live B",
+      "ev": "201 [{\"id\":\"d6628a13-b9e6-4c39-8b00-f51d76c4f4f5\",\"live_id\":\"8915989f-9e14-40a1-a55a-d2a9e05e3634\",\"live_item_id\":\"e89fa4bd-6554-45b8-9392-c0abcb3348a3\",\"seller_id\":\"acf14a9b-833e-4dfc-a80e-ea5b8362f928\",\"buyer_id\":\"bfcbeeee…"
+    },
+    {
+      "id": "p1.q1.s2.accept.cross",
+      "lens": "Q1",
+      "title": "S2 RPC accept pedido cruzado",
+      "ev": "200 {\"ok\": true, \"item_qty\": 2, \"request_id\": \"d6628a13-b9e6-4c39-8b00-f51d76c4f4f5\", \"item_status\": \"available\", \"reserved_qty\": 1}"
+    },
+    {
+      "id": "p1.q1.buyer.pendingA",
+      "lens": "Q1",
+      "title": "buyer pending item A",
+      "ev": "201 [{\"id\":\"2db28afc-ef5b-4095-a4db-0eafe841c8f5\",\"live_id\":\"d047ec64-8ea1-4fc8-973f-a88561ac6caf\",\"live_item_id\":\"e89fa4bd-6554-45b8-9392-c0abcb3348a3\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"buyer_id\":\"bfcbeeee…"
+    },
+    {
+      "id": "p1.q1.buyer.retarget",
+      "lens": "Q1",
+      "title": "buyer PATCH live_item → B",
+      "ev": "200 []"
+    },
+    {
+      "id": "p1.q1.s2.patch.liveA",
+      "lens": "Q1",
+      "title": "S2 PATCH owner live A",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table lives\"}"
+    },
+    {
+      "id": "p1.q1.s1.donate",
+      "lens": "Q7",
+      "title": "S1 PATCH seller_id=S2",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table lives\"}"
+    },
+    {
+      "id": "p1.q7.helper.self",
+      "lens": "Q7",
+      "title": "S2 INSERT helper na loja S1",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"new row violates row-level security policy for table \\\"seller_helpers\\\"\"}"
+    },
+    {
+      "id": "p1.q1.confused.deputy",
+      "lens": "Q1",
+      "title": "S2 accept com p_processed_by=S1",
+      "ev": "200 {\"ok\": false, \"error\": \"not_allowed\"}"
+    },
+    {
+      "id": "p1.q1.classic.spoof",
+      "lens": "Q1",
+      "title": "S2 seller_id spoof na live A (fecho NOP)",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"reservation_buyer_mismatch\"}"
+    }
+  ],
+  "findings": [
+    {
+      "id": "RTQ-Q1-buyer-cross-live-s2-accept",
+      "lens": "Q1",
+      "severity": "P0",
+      "title": "S2 aceita reserva do comprador no artigo de S1 via live_id B",
+      "actor": "buyer JWT + seller2 JWT",
+      "pre": "pending com live_item de A e live_id de B",
+      "repro": "POST reserva live_id=B live_item=A; rpc process accept como S2",
+      "expected": "pending forçado a live A / accept recusado",
+      "obtained": {
+        "id": "d6628a13-b9e6-4c39-8b00-f51d76c4f4f5",
+        "live_id": "8915989f-9e14-40a1-a55a-d2a9e05e3634",
+        "live_item_id": "e89fa4bd-6554-45b8-9392-c0abcb3348a3",
+        "seller_id": "acf14a9b-833e-4dfc-a80e-ea5b8362f928",
+        "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+        "status": "accepted",
+        "requested_qty": 1,
+        "source": "fleaber_live"
+      },
+      "proven": true,
+      "evidence": {
+        "insert": "201 [{\"id\":\"d6628a13-b9e6-4c39-8b00-f51d76c4f4f5\",\"live_id\":\"8915989f-9e14-40a1-a55a-d2a9e05e3634\",\"live_item_id\":\"e89fa4bd-6554-45b8-9392-c0abcb3348a3\",\"seller_id\":\"acf14a9b-833e-4dfc-a80e-ea5b8362f928\",\"buyer_id\":\"bfcbeeee…",
+        "accept": "200 {\"ok\": true, \"item_qty\": 2, \"request_id\": \"d6628a13-b9e6-4c39-8b00-f51d76c4f4f5\", \"item_status\": \"available\", \"reserved_qty\": 1}"
+      }
+    }
+  ],
+  "lives": {
+    "A": "d047ec64-8ea1-4fc8-973f-a88561ac6caf",
+    "B": "8915989f-9e14-40a1-a55a-d2a9e05e3634"
+  },
+  "items": {
+    "A": "e89fa4bd-6554-45b8-9392-c0abcb3348a3",
+    "B": "94b106e2-7267-4e68-beec-398dafe0fe97"
+  }
+}

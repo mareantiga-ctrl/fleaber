@@ -1,0 +1,43 @@
+{
+  "stamp": "20260902T1822",
+  "prefix": "RTBJ-20260902T1822",
+  "auditor": "REDTEAM_BLIND_BJ_PAYOUT_POS_ATBE_v1",
+  "note": "dumpAll falhou no pass1 (Set no JSON); reconstruído a partir do stdout + observe.dart",
+  "lenses": ["BJ1", "BJ2", "BJ4", "BJ6", "BJ7"],
+  "findings": [
+    {
+      "id": "BJ4-01-nfc-nfd-dup-transfer",
+      "lens": "BJ4",
+      "severity": "P0",
+      "title": "idempotency_key NFC vs NFD gerou duas Transfers",
+      "actor": "seller JWT",
+      "pre": "hash SHA-256 sem Unicode normalize; Connect ready; saldo ≥2€",
+      "repro": "POST create-connect-account amount=100 key=café(U+00E9) depois café(e+U+0301)",
+      "expected": "2ª request idempotente / mesma Transfer",
+      "obtained": {
+        "nfc": "200 {\"success\":true,\"transferId\":\"tr_1UBHzdH7FWYUN3jhscTAilDd\",\"balance\":26}",
+        "nfd": "200 {\"success\":true,\"transferId\":\"tr_1UBHzfH7FWYUN3jhgDTGv5BY\",\"balance\":25}",
+        "ledger_nfc_key": "p_a9339d0b43360410a3ac8cb988936da7fbfdff208075cd45022d442b11f1da",
+        "ledger_nfd_key": "p_82d757cfdf980836d67dab643756c86f76bb2bb3a689daeabd92a9af6e5d2c"
+      },
+      "proven": true
+    }
+  ],
+  "blocked_highlights": [
+    "PUT/PATCH/DELETE 405",
+    "amount true/0x64/1e2 400",
+    "array/comma/object amount 400",
+    "user_id cross 400 Cannot create another user",
+    "JWT debit/finish 42501",
+    "GET evil.com sem Location hostil",
+    "crash_inject sem secret ignorado",
+    "crash after_debit retry 1 Transfer",
+    "crash after_stripe retry mesma tr_",
+    "race mesma key 1 Transfer",
+    "PATCH wallets stripe_account_id 200 [] mutated=false acct inalterado"
+  ],
+  "false_positives_not_counted": [
+    "BJ1-05 NBSP amount=100¢ correcto",
+    "BJ1-07 PATCH wallets 200 [] sem mutação"
+  ]
+}

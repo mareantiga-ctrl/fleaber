@@ -1,0 +1,74 @@
+{
+  "stamp": "20260906T1538",
+  "prefix": "RTDF-20260906T1538",
+  "auditor": "REDTEAM_BLIND_DF_PAYOUT_POS_CVDA_v1",
+  "lenses": [
+    "DF5"
+  ],
+  "probes": [
+    {
+      "id": "DF-C2-BUYER-REFUND",
+      "lens": "DF5",
+      "payload": "POST refund-order JWT comprador order=87f9640c-ce7f-44cb-ad63-7c4ce0b00441",
+      "http_bd": "403 {\"ok\":false,\"error\":\"Sem permissão.\"} loc=\"\" refund_id=null Δseller=0.0",
+      "result": "HOLD"
+    },
+    {
+      "id": "DF-C3-REL-REFUND-RACE",
+      "lens": "DF5",
+      "payload": "Future.wait refund-order + release em pago",
+      "http_bd": "refunded=true released=false Δ=0.0 hits=[200 {\"ok\":true,\"already_refunded\":true,\"idempotent\":true,\"refund_id\":\"re_3UChIvH7FWYUN3jh0H8EnjZE\",\"status\":\"cancelado\",\"stock_units_applied\":null,\"amount_cents\":590,\"payment_intent\":\"pi_3UChIvH7FWYUN3jh0RwmaM0H\",\"status_str… loc=\"\", 200 false loc=\"\", 200 false loc=\"\"]",
+      "result": "HOLD"
+    }
+  ],
+  "findings": [],
+  "blocked": [
+    {
+      "id": "refund.buyer",
+      "lens": "DF5",
+      "title": "buyer refund-order recusado (seller-only)",
+      "ev": "403 {\"ok\":false,\"error\":\"Sem permissão.\"} loc=\"\""
+    },
+    {
+      "id": "race.rel.refund",
+      "lens": "DF5",
+      "title": "race pago sem crédito+refund simultâneo",
+      "ev": {
+        "refunded": true,
+        "released": false,
+        "delta": 0.0
+      }
+    }
+  ],
+  "skipped": [],
+  "notes": [
+    {
+      "id": "fixture.paid",
+      "lens": "DF5",
+      "title": "setup_paid_order Stripe TEST",
+      "ev": "200 {\n  \"ok\": true,\n  \"order_id\": \"87f9640c-ce7f-44cb-ad63-7c4ce0b00441\",\n  \"product_id\": \"b6b73ee1-75c2-4875-af44-9684cec59486\",\n  \"payment_intent_id\": \"pi_3UChIrH7FWYUN3jh1ZKHAUzq\",\n  \"pi_status\": \"succeeded\",\n  \"pi_amount… loc=\"\""
+    },
+    {
+      "id": "fixture.paid",
+      "lens": "DF5",
+      "title": "setup_paid_order Stripe TEST",
+      "ev": "200 {\n  \"ok\": true,\n  \"order_id\": \"75085c2b-dc7b-4284-84bf-f3f8b8384d4f\",\n  \"product_id\": \"bcebb5a4-0228-4d5f-bd6e-eac8fbf1f14e\",\n  \"payment_intent_id\": \"pi_3UChIvH7FWYUN3jh0RwmaM0H\",\n  \"pi_status\": \"succeeded\",\n  \"pi_amount… loc=\"\""
+    }
+  ],
+  "actors": {
+    "buyer": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+    "seller": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+    "buyer2": null,
+    "seller2": "d279dfd2-2cd9-4743-9b6c-bc55da1971f6"
+  },
+  "created": {
+    "orders": [
+      "87f9640c-ce7f-44cb-ad63-7c4ce0b00441",
+      "75085c2b-dc7b-4284-84bf-f3f8b8384d4f"
+    ],
+    "products": [
+      "b6b73ee1-75c2-4875-af44-9684cec59486",
+      "bcebb5a4-0228-4d5f-bd6e-eac8fbf1f14e"
+    ]
+  }
+}

@@ -1,0 +1,1214 @@
+{
+  "stamp": "20260906T1739",
+  "prefix": "RTDT-20260906T1739",
+  "lenses": [
+    "DT1",
+    "DT2",
+    "DT3",
+    "DT4",
+    "DT5",
+    "DT6",
+    "DT7",
+    "DT8"
+  ],
+  "wells": [
+    "DT-A",
+    "DT-B",
+    "DT-C",
+    "DT-D"
+  ],
+  "findings": [
+    {
+      "id": "P2-A1",
+      "lens": "DT7",
+      "severity": "P2",
+      "title": "cs_ morta bloqueia reclaim (DoS checkout)",
+      "actor": "buyer JWT + buyer2",
+      "pre": "stripe_checkout_session_id=cs_test_dead…",
+      "repro": "CPI buyer2; CPI owner",
+      "expected": "buyer2 400; owner reclaim + nova cs_",
+      "obtained": {
+        "actor2": "400 {\"error\":\"Checkout blocked: order does not belong to buyer.\"}",
+        "retry": "429 {\"error\":\"Demasiados checkouts. Tenta daqui a pouco.\"}",
+        "stored": "cs_test_deaddeaddeaddeaddead12"
+      },
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "P2-A2",
+      "lens": "DT7",
+      "severity": "P2",
+      "title": "claiming futuro/malform prende o cadeado",
+      "actor": "buyer JWT (plant service_role observação)",
+      "pre": "claiming futuro malform",
+      "repro": "CPI após claiming futuro",
+      "expected": "futuro=órfão; reclaim + cs_ coerente; RPC JWT 403",
+      "obtained": {
+        "hit": "429 {\"error\":\"Demasiados checkouts. Tenta daqui a pouco.\"}",
+        "stored": "claiming:1820248960417:malformtok12ab",
+        "rpcJwt": 403
+      },
+      "proven": true,
+      "evidence": {}
+    }
+  ],
+  "blocked": [
+    {
+      "id": "A3-TIMEOUT100",
+      "lens": "DT4",
+      "title": "timeout 100ms∥complete∥retry ≤1 Session útil",
+      "ev": {
+        "sids": [],
+        "stored": [
+          "",
+          ""
+        ],
+        "payable": 0
+      }
+    },
+    {
+      "id": "A4-DISJOINT",
+      "lens": "DT2",
+      "title": "bags disjuntos: mutex serializou; JWT sem GRANT",
+      "ev": {
+        "sids": [],
+        "payable": 0,
+        "jwtMutex": 403,
+        "briefs": [
+          "429 {\"error\":\"Demasiados checkouts. Tenta daqui a pouco.\"}",
+          "429 {\"error\":\"Demasiados checkouts. Tenta daqui a pouco.\"}"
+        ]
+      }
+    },
+    {
+      "id": "A5-STEAL",
+      "lens": "DT7",
+      "title": "JWT write negado; claim alheio negado",
+      "ev": {
+        "jwtPatch": 403,
+        "stealRpc": 403,
+        "stealCpi": "400 {\"error\":\"Checkout blocked: order does not belong to buyer.\"}",
+        "owner": "429 {\"error\":\"Demasiados checkouts. Tenta daqui a pouco.\"}",
+        "stored": "claiming:1788712974076:stealclaim12ab"
+      }
+    },
+    {
+      "id": "B1-OVERLAP",
+      "lens": "DT3",
+      "title": "B1 ≤1 cs_ útil / 2.º contention",
+      "ev": {
+        "sids": [],
+        "payable": 0,
+        "stored": [
+          "",
+          "",
+          "",
+          "",
+          "",
+          ""
+        ],
+        "briefs": [
+          "429 {\"error\":\"Demasiados checkouts. Tenta daqui a pouco.\"}",
+          "429 {\"error\":\"Demasiados checkouts. Tenta daqui a pouco.\"}"
+        ]
+      }
+    },
+    {
+      "id": "B2-OVERLAP",
+      "lens": "DT3",
+      "title": "B2 ≤1 cs_ útil / 2.º contention",
+      "ev": {
+        "sids": [],
+        "payable": 0,
+        "stored": [
+          "",
+          "",
+          ""
+        ],
+        "briefs": [
+          "429 {\"error\":\"Demasiados checkouts. Tenta daqui a pouco.\"}",
+          "429 {\"error\":\"Demasiados checkouts. Tenta daqui a pouco.\"}",
+          "429 {\"error\":\"Demasiados checkouts. Tenta daqui a pouco.\"}"
+        ]
+      }
+    },
+    {
+      "id": "B3-OVERLAP",
+      "lens": "DT3",
+      "title": "B3 ≤1 cs_ útil / 2.º contention",
+      "ev": {
+        "sids": [],
+        "payable": 0,
+        "stored": [
+          "",
+          "",
+          "",
+          "",
+          ""
+        ],
+        "briefs": [
+          "429 {\"error\":\"Demasiados checkouts. Tenta daqui a pouco.\"}",
+          "429 {\"error\":\"Demasiados checkouts. Tenta daqui a pouco.\"}"
+        ]
+      }
+    },
+    {
+      "id": "B4-OVERLAP",
+      "lens": "DT3",
+      "title": "B4 ≤1 cs_ útil / 2.º contention",
+      "ev": {
+        "sids": [],
+        "payable": 0,
+        "stored": [
+          "",
+          "",
+          ""
+        ],
+        "briefs": [
+          "429 {\"error\":\"Demasiados checkouts. Tenta daqui a pouco.\"}",
+          "429 {\"error\":\"Demasiados checkouts. Tenta daqui a pouco.\"}"
+        ]
+      }
+    },
+    {
+      "id": "B5-OVERLAP",
+      "lens": "DT4",
+      "title": "B5 ≤1 cs_ útil / 2.º contention",
+      "ev": {
+        "sids": [],
+        "payable": 0,
+        "stored": [
+          "",
+          "",
+          ""
+        ],
+        "briefs": [
+          "429 {\"error\":\"Demasiados checkouts. Tenta daqui a pouco.\"}",
+          "429 {\"error\":\"Demasiados checkouts. Tenta daqui a pouco.\"}",
+          "429 {\"error\":\"Demasiados checkouts. Tenta daqui a pouco.\"}"
+        ]
+      }
+    },
+    {
+      "id": "B6-OVERLAP",
+      "lens": "DT4",
+      "title": "B6 ≤1 cs_ útil / 2.º contention",
+      "ev": {
+        "sids": [],
+        "payable": 0,
+        "stored": [
+          "",
+          "",
+          "",
+          ""
+        ],
+        "briefs": [
+          "429 {\"error\":\"Demasiados checkouts. Tenta daqui a pouco.\"}",
+          "429 {\"error\":\"Demasiados checkouts. Tenta daqui a pouco.\"}"
+        ]
+      }
+    },
+    {
+      "id": "B7-OVERLAP",
+      "lens": "DT4",
+      "title": "B7 ≤1 cs_ útil / 2.º contention",
+      "ev": {
+        "sids": [],
+        "payable": 0,
+        "stored": [
+          "",
+          "",
+          "",
+          ""
+        ],
+        "briefs": [
+          "429 {\"error\":\"Demasiados checkouts. Tenta daqui a pouco.\"}",
+          "429 {\"error\":\"Demasiados checkouts. Tenta daqui a pouco.\"}"
+        ]
+      }
+    },
+    {
+      "id": "C1-UNDERPAY",
+      "lens": "DT6",
+      "title": "total_eur/item_price ignorados; amount catálogo",
+      "ev": {
+        "amt": "",
+        "hit": "429 {\"error\":\"Demasiados checkouts. Tenta daqui a pouco.\"}"
+      }
+    },
+    {
+      "id": "C2-SHIP-COUPON",
+      "lens": "DT6",
+      "title": "Session open: shipping immutable na BD; coupon ignorado",
+      "ev": {
+        "openAmt": "",
+        "recpiAmt": "",
+        "couponAmt": "",
+        "patch": 200,
+        "shipAfter": "entrega em mão"
+      }
+    },
+    {
+      "id": "C3-LAST",
+      "lens": "DT5",
+      "title": "2.º insert/CPI bloqueado no last-unit",
+      "ev": {
+        "o1": "59ec0261-b18d-45de-9756-e057e6fa7184",
+        "o2": ""
+      }
+    },
+    {
+      "id": "C4-UNLIST",
+      "lens": "DT5",
+      "title": "unlist∥checkout sem Session+qty0 simultâneo",
+      "ev": {
+        "ck": "429 {\"error\":\"Demasiados checkouts. Tenta daqui a pouco.\"}",
+        "listed": false,
+        "qty": 0
+      }
+    },
+    {
+      "id": "C5-OFF-ARRAY",
+      "lens": "DT6",
+      "title": "array/notes off-platform fail-closed; sem cs_ no array",
+      "ev": {
+        "arrPm": "[\"MB WAY\"]",
+        "arr": "429 {\"error\":\"Demasiados checkouts. Tenta daqui a pouco.\"}",
+        "mismatch": "429 {\"error\":\"Demasiados checkouts. Tenta daqui a pouco.\"}"
+      }
+    },
+    {
+      "id": "D1-PAID",
+      "lens": "DT8",
+      "title": "Stripe TEST pago + caixa coerente",
+      "ev": {
+        "status": "pago",
+        "pi": "pi_3UCjAHH7FWYUN3jh00yzg3o6",
+        "cents": 590,
+        "applied": 1,
+        "qty": 1,
+        "wallets": {
+          "buyer": 61.1,
+          "seller": 1.0,
+          "buyer2": 0,
+          "seller2": 0
+        }
+      }
+    },
+    {
+      "id": "D2-CROSS",
+      "lens": "DT1",
+      "title": "bag cross-seller 400",
+      "ev": "429 {\"error\":\"Demasiados checkouts. Tenta daqui a pouco.\"}"
+    },
+    {
+      "id": "D3-QTY",
+      "lens": "DT5",
+      "title": "qty hostil ignorada; stock claim 1",
+      "ev": {
+        "jwtQty": 403,
+        "cpi": "429 {\"error\":\"Demasiados checkouts. Tenta daqui a pouco.\"}",
+        "amt": "",
+        "orderQty": 1
+      }
+    }
+  ],
+  "skipped": [],
+  "probes": [
+    {
+      "probe_id": "A1",
+      "poco": "DT-A",
+      "payload": "plant cs_test_dead; buyer2 CPI; owner retry",
+      "http_rpc": {
+        "actor2": "400 {\"error\":\"Checkout blocked: order does not belong to buyer.\"}",
+        "retry": "429 {\"error\":\"Demasiados checkouts. Tenta daqui a pouco.\"}"
+      },
+      "bd_stripe": "cs_test_deaddeaddeaddeaddead12",
+      "verdict": "HOLD",
+      "classe_nova": "NÃO",
+      "lens": "DT7"
+    },
+    {
+      "probe_id": "A2",
+      "poco": "DT-A",
+      "payload": "claiming:<now+1y>:malformtok12ab + CPI; RPC JWT",
+      "http_rpc": {
+        "rpcJwt": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_bag_checkout_claim\"}",
+        "cpi": "429 {\"error\":\"Demasiados checkouts. Tenta daqui a pouco.\"}"
+      },
+      "bd_stripe": "claiming:1820248960417:malformtok12ab",
+      "verdict": "HOLD",
+      "classe_nova": "NÃO",
+      "lens": "DT7"
+    },
+    {
+      "probe_id": "A3",
+      "poco": "DT-A",
+      "payload": "Future.wait bag timeout 100ms ∥ server complete ∥ retry +800ms",
+      "http_rpc": [
+        "598 client_timeout",
+        "429 {\"error\":\"Demasiados checkouts. Tenta daqui a pouco.\"}",
+        "429 {\"error\":\"Demasiados checkouts. Tenta daqui a pouco.\"}"
+      ],
+      "bd_stripe": {
+        "stored": [
+          "",
+          ""
+        ],
+        "payable": 0,
+        "sids": []
+      },
+      "verdict": "FAIL",
+      "classe_nova": "SIM",
+      "lens": "DT4"
+    },
+    {
+      "probe_id": "A4",
+      "poco": "DT-A",
+      "payload": "Future.wait 2 bags disjuntos mesmo buyer (2+2 SKUs)",
+      "http_rpc": {
+        "briefs": [
+          "429 {\"error\":\"Demasiados checkouts. Tenta daqui a pouco.\"}",
+          "429 {\"error\":\"Demasiados checkouts. Tenta daqui a pouco.\"}"
+        ],
+        "jwtMutex": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table batata_checkout_mutex\"}"
+      },
+      "bd_stripe": {
+        "sids": [],
+        "payable": 0,
+        "storedA": [
+          "",
+          ""
+        ],
+        "storedB": [
+          "",
+          ""
+        ],
+        "svcMutex": "200 []"
+      },
+      "verdict": "FAIL",
+      "classe_nova": "NÃO",
+      "lens": "DT2"
+    },
+    {
+      "probe_id": "A5",
+      "poco": "DT-A",
+      "payload": "JWT PATCH cs_ sem claim; buyer2 RPC claim token alheio + CPI",
+      "http_rpc": {
+        "jwtPatch": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"order_money_fields_immutable\"}",
+        "stealRpc": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_bag_checkout_claim\"}",
+        "stealCpi": "400 {\"error\":\"Checkout blocked: order does not belong to buyer.\"}",
+        "owner": "429 {\"error\":\"Demasiados checkouts. Tenta daqui a pouco.\"}"
+      },
+      "bd_stripe": "claiming:1788712974076:stealclaim12ab",
+      "verdict": "FAIL",
+      "classe_nova": "NÃO",
+      "lens": "DT7"
+    },
+    {
+      "probe_id": "B1",
+      "poco": "DT-B",
+      "payload": "Future.wait bag 6-line ∥ bag 4-line subset meio (BCDE)",
+      "http_rpc": [
+        "429 {\"error\":\"Demasiados checkouts. Tenta daqui a pouco.\"}",
+        "429 {\"error\":\"Demasiados checkouts. Tenta daqui a pouco.\"}"
+      ],
+      "bd_stripe": {
+        "sids": [],
+        "stored": [
+          "",
+          "",
+          "",
+          "",
+          "",
+          ""
+        ],
+        "payable": 0,
+        "reused": [
+          false,
+          false
+        ],
+        "contention": [
+          false,
+          false
+        ]
+      },
+      "verdict": "FAIL",
+      "classe_nova": "SIM",
+      "lens": "DT3"
+    },
+    {
+      "probe_id": "B2",
+      "poco": "DT-B",
+      "payload": "Future.wait bag AB ∥ bag BC ∥ bag CA (triângulo 3 CPI)",
+      "http_rpc": [
+        "429 {\"error\":\"Demasiados checkouts. Tenta daqui a pouco.\"}",
+        "429 {\"error\":\"Demasiados checkouts. Tenta daqui a pouco.\"}",
+        "429 {\"error\":\"Demasiados checkouts. Tenta daqui a pouco.\"}"
+      ],
+      "bd_stripe": {
+        "sids": [],
+        "stored": [
+          "",
+          "",
+          ""
+        ],
+        "payable": 0,
+        "reused": [
+          false,
+          false,
+          false
+        ],
+        "contention": [
+          false,
+          false,
+          false
+        ]
+      },
+      "verdict": "FAIL",
+      "classe_nova": "SIM",
+      "lens": "DT3"
+    },
+    {
+      "probe_id": "B3",
+      "poco": "DT-B",
+      "payload": "Future.wait bag ABCDE ∥ CPI single índice 2/5 (B, nem extrema nem meio)",
+      "http_rpc": [
+        "429 {\"error\":\"Demasiados checkouts. Tenta daqui a pouco.\"}",
+        "429 {\"error\":\"Demasiados checkouts. Tenta daqui a pouco.\"}"
+      ],
+      "bd_stripe": {
+        "sids": [],
+        "stored": [
+          "",
+          "",
+          "",
+          "",
+          ""
+        ],
+        "payable": 0,
+        "reused": [
+          false,
+          false
+        ],
+        "contention": [
+          false,
+          false
+        ]
+      },
+      "verdict": "FAIL",
+      "classe_nova": "SIM",
+      "lens": "DT3"
+    },
+    {
+      "probe_id": "B4",
+      "poco": "DT-B",
+      "payload": "Future.wait 2× bag idêntico ordem UUID invertida (delay 0)",
+      "http_rpc": [
+        "429 {\"error\":\"Demasiados checkouts. Tenta daqui a pouco.\"}",
+        "429 {\"error\":\"Demasiados checkouts. Tenta daqui a pouco.\"}"
+      ],
+      "bd_stripe": {
+        "sids": [],
+        "stored": [
+          "",
+          "",
+          ""
+        ],
+        "payable": 0,
+        "reused": [
+          false,
+          false
+        ],
+        "contention": [
+          false,
+          false
+        ]
+      },
+      "verdict": "FAIL",
+      "classe_nova": "SIM",
+      "lens": "DT3"
+    },
+    {
+      "probe_id": "B5",
+      "poco": "DT-B",
+      "payload": "Future.wait bag ∥ single +200ms ∥ bag (3 corrotinas mesmo set)",
+      "http_rpc": [
+        "429 {\"error\":\"Demasiados checkouts. Tenta daqui a pouco.\"}",
+        "429 {\"error\":\"Demasiados checkouts. Tenta daqui a pouco.\"}",
+        "429 {\"error\":\"Demasiados checkouts. Tenta daqui a pouco.\"}"
+      ],
+      "bd_stripe": {
+        "sids": [],
+        "stored": [
+          "",
+          "",
+          ""
+        ],
+        "payable": 0,
+        "reused": [
+          false,
+          false,
+          false
+        ],
+        "contention": [
+          false,
+          false,
+          false
+        ]
+      },
+      "verdict": "FAIL",
+      "classe_nova": "SIM",
+      "lens": "DT4"
+    },
+    {
+      "probe_id": "B6",
+      "poco": "DT-B",
+      "payload": "Future.wait bag full → sleep 50ms → subset 2-line",
+      "http_rpc": [
+        "429 {\"error\":\"Demasiados checkouts. Tenta daqui a pouco.\"}",
+        "429 {\"error\":\"Demasiados checkouts. Tenta daqui a pouco.\"}"
+      ],
+      "bd_stripe": {
+        "sids": [],
+        "stored": [
+          "",
+          "",
+          "",
+          ""
+        ],
+        "payable": 0,
+        "reused": [
+          false,
+          false
+        ],
+        "contention": [
+          false,
+          false
+        ]
+      },
+      "verdict": "FAIL",
+      "classe_nova": "SIM",
+      "lens": "DT4"
+    },
+    {
+      "probe_id": "B7",
+      "poco": "DT-B",
+      "payload": "Future.wait subset first → sleep 50ms → superset expand",
+      "http_rpc": [
+        "429 {\"error\":\"Demasiados checkouts. Tenta daqui a pouco.\"}",
+        "429 {\"error\":\"Demasiados checkouts. Tenta daqui a pouco.\"}"
+      ],
+      "bd_stripe": {
+        "sids": [],
+        "stored": [
+          "",
+          "",
+          "",
+          ""
+        ],
+        "payable": 0,
+        "reused": [
+          false,
+          false
+        ],
+        "contention": [
+          false,
+          false
+        ]
+      },
+      "verdict": "FAIL",
+      "classe_nova": "SIM",
+      "lens": "DT4"
+    },
+    {
+      "probe_id": "C1",
+      "poco": "DT-C",
+      "payload": "body total_eur=0 item_price=0.01 amount=0 (SKU 18€ CTT)",
+      "http_rpc": "429 {\"error\":\"Demasiados checkouts. Tenta daqui a pouco.\"}",
+      "bd_stripe": {
+        "amt": ""
+      },
+      "verdict": "FAIL",
+      "classe_nova": "NÃO",
+      "lens": "DT6"
+    },
+    {
+      "probe_id": "C2",
+      "poco": "DT-C",
+      "payload": "Session open → JWT PATCH shipping=ctt; re-CPI ctt; coupon SAVE90",
+      "http_rpc": {
+        "open": "429 {\"error\":\"Demasiados checkouts. Tenta daqui a pouco.\"}",
+        "patch": "200 [{\"id\":\"493b1bac-70ea-4329-bc69-6364b6227edb\",\"created_at\":\"2026-09-06T16:43:24.28558+00:00\",\"product_id\":\"5bfca751-762b-4472-aa61-90997b87ff01\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"price_total\":15.00,\"shipping_meth…",
+        "recpi": "429 {\"error\":\"Demasiados checkouts. Tenta daqui a pouco.\"}",
+        "coupon": "429 {\"error\":\"Demasiados checkouts. Tenta daqui a pouco.\"}"
+      },
+      "bd_stripe": {
+        "openAmt": "",
+        "recpiAmt": "",
+        "couponAmt": "",
+        "shipAfter": "entrega em mão",
+        "shipReallyChanged": false
+      },
+      "verdict": "FAIL",
+      "classe_nova": "NÃO",
+      "lens": "DT6"
+    },
+    {
+      "probe_id": "C3",
+      "poco": "DT-C",
+      "payload": "2 buyers qty=1 (insert 2.º)",
+      "http_rpc": {
+        "o1": "59ec0261-b18d-45de-9756-e057e6fa7184",
+        "o2": ""
+      },
+      "bd_stripe": {
+        "o1": "59ec0261-b18d-45de-9756-e057e6fa7184",
+        "o2": ""
+      },
+      "verdict": "FAIL",
+      "classe_nova": "NÃO",
+      "lens": "DT5"
+    },
+    {
+      "probe_id": "C4",
+      "poco": "DT-C",
+      "payload": "Future.wait CPI ∥ unlist+qty=0",
+      "http_rpc": {
+        "ck": "429 {\"error\":\"Demasiados checkouts. Tenta daqui a pouco.\"}",
+        "patch": "200 [{\"id\":\"25f5a960-3a6d-42e1-b031-39309e81e552\",\"created_at\":\"2026-09-06T16:43:28.568794+00:00\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"title\":\"RTDT-20260906T1739-c4-unlist-0\",\"price\":13.0,\"ref_code\":null,\"category\":null,\"clothing_size\":null,\"gender\":null,\"description\":…"
+      },
+      "bd_stripe": {
+        "id": "25f5a960-3a6d-42e1-b031-39309e81e552",
+        "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+        "title": "RTDT-20260906T1739-c4-unlist-0",
+        "price": 13.0,
+        "quantity": 0,
+        "is_sold": false,
+        "list_on_marketplace": false,
+        "available_for_live": true
+      },
+      "verdict": "FAIL",
+      "classe_nova": "NÃO",
+      "lens": "DT5"
+    },
+    {
+      "probe_id": "C5",
+      "poco": "DT-C",
+      "payload": "payment_method JSON array [\"MB WAY\"] + CPI body array/object notes mismatch",
+      "http_rpc": {
+        "arr": "429 {\"error\":\"Demasiados checkouts. Tenta daqui a pouco.\"}",
+        "mismatch": "429 {\"error\":\"Demasiados checkouts. Tenta daqui a pouco.\"}"
+      },
+      "bd_stripe": {
+        "arrPm": "[\"MB WAY\"]",
+        "arrSid": "",
+        "misSid": ""
+      },
+      "verdict": "FAIL",
+      "classe_nova": "SIM",
+      "lens": "DT6"
+    },
+    {
+      "probe_id": "D1",
+      "poco": "DT-D",
+      "payload": "setup_paid_order Stripe TEST 4242 + ledger stock/caixa",
+      "http_rpc": "pago fixture",
+      "bd_stripe": {
+        "oid": "4bbd093b-2b57-4556-9310-1988143149d6",
+        "pi": "pi_3UCjAHH7FWYUN3jh00yzg3o6",
+        "status": "pago",
+        "cents": 590,
+        "applied": 1,
+        "qty": 1
+      },
+      "verdict": "FAIL",
+      "classe_nova": "NÃO",
+      "lens": "DT8"
+    },
+    {
+      "probe_id": "D2",
+      "poco": "DT-D",
+      "payload": "bag 2 sellers (S1+S2) CPI",
+      "http_rpc": "429 {\"error\":\"Demasiados checkouts. Tenta daqui a pouco.\"}",
+      "bd_stripe": {
+        "s2pid": "6429d905-d881-44bd-8260-a3e828cb536e"
+      },
+      "verdict": "FAIL",
+      "classe_nova": "NÃO",
+      "lens": "DT1"
+    },
+    {
+      "probe_id": "D3",
+      "poco": "DT-D",
+      "payload": "JWT PATCH qty=99; CPI quantity=99 em stock=1",
+      "http_rpc": {
+        "jwtQty": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"order_money_fields_immutable\"}",
+        "cpi": "429 {\"error\":\"Demasiados checkouts. Tenta daqui a pouco.\"}"
+      },
+      "bd_stripe": {
+        "prodQty": 1,
+        "orderQty": 1,
+        "amt": ""
+      },
+      "verdict": "FAIL",
+      "classe_nova": "NÃO",
+      "lens": "DT5"
+    }
+  ],
+  "notes": [
+    {
+      "id": "actors",
+      "title": "ids",
+      "ev": {
+        "b": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+        "s": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+        "b2": "75298dca-d7e7-46d8-a37b-394891052976",
+        "s2": "1e4d220b-008e-438a-8050-61e63380e4d5"
+      }
+    },
+    {
+      "id": "DT8.wallet.pre",
+      "lens": "DT8",
+      "well": "DT-D",
+      "title": "baseline",
+      "ev": {
+        "buyer": 61.1,
+        "seller": 1.0,
+        "buyer2": 0,
+        "seller2": 0
+      }
+    },
+    {
+      "id": "A1.dead",
+      "lens": "DT7",
+      "well": "DT-A",
+      "title": "cs_ morta reclaim + actor2",
+      "ev": {
+        "first": "429 {\"error\":\"Demasiados checkouts. Tenta daqui a pouco.\"}",
+        "plant": "200 [{\"id\":\"819fceb0-68f5-4046-8e82-1f0111b8fc5b\",\"created_at\":\"2026-09-06T16:42:34.065942+00:00\",\"product_id\":\"396ae7ac-2cb4-47c6-ab2d-185ff1e0398e\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"price_total\":12.00,\"shipping_met…",
+        "actor2": "400 {\"error\":\"Checkout blocked: order does not belong to buyer.\"}",
+        "retry": "429 {\"error\":\"Demasiados checkouts. Tenta daqui a pouco.\"}",
+        "stored": "cs_test_deaddeaddeaddeaddead12"
+      }
+    },
+    {
+      "id": "A3.timeout100",
+      "lens": "DT4",
+      "well": "DT-A",
+      "title": "timeout 100ms ∥ complete ∥ retry 800ms",
+      "ev": {
+        "briefs": [
+          "598 client_timeout",
+          "429 {\"error\":\"Demasiados checkouts. Tenta daqui a pouco.\"}",
+          "429 {\"error\":\"Demasiados checkouts. Tenta daqui a pouco.\"}"
+        ],
+        "stored": [
+          "",
+          ""
+        ],
+        "payable": 0,
+        "sids": [],
+        "reused": [
+          false,
+          false,
+          false
+        ]
+      }
+    },
+    {
+      "id": "A4.disjoint",
+      "lens": "DT2",
+      "well": "DT-A",
+      "title": "2 bags disjuntos mesmo buyer ∥",
+      "ev": {
+        "briefs": [
+          "429 {\"error\":\"Demasiados checkouts. Tenta daqui a pouco.\"}",
+          "429 {\"error\":\"Demasiados checkouts. Tenta daqui a pouco.\"}"
+        ],
+        "sids": [],
+        "payable": 0,
+        "storedA": [
+          "",
+          ""
+        ],
+        "storedB": [
+          "",
+          ""
+        ],
+        "jwtMutex": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table batata_checkout_mutex\"}",
+        "svcMutex": "200 []"
+      }
+    },
+    {
+      "id": "B1.overlap",
+      "lens": "DT3",
+      "well": "DT-B",
+      "title": "Future.wait bag 6-line ∥ bag 4-line subset meio (BCDE)",
+      "ev": {
+        "sids": [],
+        "payable": 0,
+        "briefs": [
+          "429 {\"error\":\"Demasiados checkouts. Tenta daqui a pouco.\"}",
+          "429 {\"error\":\"Demasiados checkouts. Tenta daqui a pouco.\"}"
+        ],
+        "stored": [
+          "",
+          "",
+          "",
+          "",
+          "",
+          ""
+        ],
+        "reused": [
+          false,
+          false
+        ]
+      }
+    },
+    {
+      "id": "B2.overlap",
+      "lens": "DT3",
+      "well": "DT-B",
+      "title": "Future.wait bag AB ∥ bag BC ∥ bag CA (triângulo 3 CPI)",
+      "ev": {
+        "sids": [],
+        "payable": 0,
+        "briefs": [
+          "429 {\"error\":\"Demasiados checkouts. Tenta daqui a pouco.\"}",
+          "429 {\"error\":\"Demasiados checkouts. Tenta daqui a pouco.\"}",
+          "429 {\"error\":\"Demasiados checkouts. Tenta daqui a pouco.\"}"
+        ],
+        "stored": [
+          "",
+          "",
+          ""
+        ],
+        "reused": [
+          false,
+          false,
+          false
+        ]
+      }
+    },
+    {
+      "id": "B3.overlap",
+      "lens": "DT3",
+      "well": "DT-B",
+      "title": "Future.wait bag ABCDE ∥ CPI single índice 2/5 (B, nem extrema nem meio)",
+      "ev": {
+        "sids": [],
+        "payable": 0,
+        "briefs": [
+          "429 {\"error\":\"Demasiados checkouts. Tenta daqui a pouco.\"}",
+          "429 {\"error\":\"Demasiados checkouts. Tenta daqui a pouco.\"}"
+        ],
+        "stored": [
+          "",
+          "",
+          "",
+          "",
+          ""
+        ],
+        "reused": [
+          false,
+          false
+        ]
+      }
+    },
+    {
+      "id": "B4.overlap",
+      "lens": "DT3",
+      "well": "DT-B",
+      "title": "Future.wait 2× bag idêntico ordem UUID invertida (delay 0)",
+      "ev": {
+        "sids": [],
+        "payable": 0,
+        "briefs": [
+          "429 {\"error\":\"Demasiados checkouts. Tenta daqui a pouco.\"}",
+          "429 {\"error\":\"Demasiados checkouts. Tenta daqui a pouco.\"}"
+        ],
+        "stored": [
+          "",
+          "",
+          ""
+        ],
+        "reused": [
+          false,
+          false
+        ]
+      }
+    },
+    {
+      "id": "B5.overlap",
+      "lens": "DT4",
+      "well": "DT-B",
+      "title": "Future.wait bag ∥ single +200ms ∥ bag (3 corrotinas mesmo set)",
+      "ev": {
+        "sids": [],
+        "payable": 0,
+        "briefs": [
+          "429 {\"error\":\"Demasiados checkouts. Tenta daqui a pouco.\"}",
+          "429 {\"error\":\"Demasiados checkouts. Tenta daqui a pouco.\"}",
+          "429 {\"error\":\"Demasiados checkouts. Tenta daqui a pouco.\"}"
+        ],
+        "stored": [
+          "",
+          "",
+          ""
+        ],
+        "reused": [
+          false,
+          false,
+          false
+        ]
+      }
+    },
+    {
+      "id": "B6.overlap",
+      "lens": "DT4",
+      "well": "DT-B",
+      "title": "Future.wait bag full → sleep 50ms → subset 2-line",
+      "ev": {
+        "sids": [],
+        "payable": 0,
+        "briefs": [
+          "429 {\"error\":\"Demasiados checkouts. Tenta daqui a pouco.\"}",
+          "429 {\"error\":\"Demasiados checkouts. Tenta daqui a pouco.\"}"
+        ],
+        "stored": [
+          "",
+          "",
+          "",
+          ""
+        ],
+        "reused": [
+          false,
+          false
+        ]
+      }
+    },
+    {
+      "id": "B7.overlap",
+      "lens": "DT4",
+      "well": "DT-B",
+      "title": "Future.wait subset first → sleep 50ms → superset expand",
+      "ev": {
+        "sids": [],
+        "payable": 0,
+        "briefs": [
+          "429 {\"error\":\"Demasiados checkouts. Tenta daqui a pouco.\"}",
+          "429 {\"error\":\"Demasiados checkouts. Tenta daqui a pouco.\"}"
+        ],
+        "stored": [
+          "",
+          "",
+          "",
+          ""
+        ],
+        "reused": [
+          false,
+          false
+        ]
+      }
+    },
+    {
+      "id": "C2.session-open",
+      "lens": "DT6",
+      "well": "DT-C",
+      "title": "portes/coupon com Session open",
+      "ev": {
+        "open": "429 {\"error\":\"Demasiados checkouts. Tenta daqui a pouco.\"}",
+        "openAmt": "",
+        "patchShip": "200 [{\"id\":\"493b1bac-70ea-4329-bc69-6364b6227edb\",\"created_at\":\"2026-09-06T16:43:24.28558+00:00\",\"product_id\":\"5bfca751-762b-4472-aa61-90997b87ff01\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"price_total\":15.00,\"shipping_meth…",
+        "shipAfter": "entrega em mão",
+        "recpi": "429 {\"error\":\"Demasiados checkouts. Tenta daqui a pouco.\"}",
+        "recpiAmt": "",
+        "coupon": "429 {\"error\":\"Demasiados checkouts. Tenta daqui a pouco.\"}",
+        "couponAmt": ""
+      }
+    },
+    {
+      "id": "order.fail",
+      "title": "insertOrder",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"order_hold_exceeds_stock\"}"
+    },
+    {
+      "id": "C5.off-new",
+      "lens": "DT6",
+      "well": "DT-C",
+      "title": "método array + notes mismatch",
+      "ev": {
+        "arrPm": "[\"MB WAY\"]",
+        "arrHit": "429 {\"error\":\"Demasiados checkouts. Tenta daqui a pouco.\"}",
+        "mismatch": "429 {\"error\":\"Demasiados checkouts. Tenta daqui a pouco.\"}",
+        "arrayBypass": false
+      }
+    },
+    {
+      "id": "fixture.paid",
+      "lens": "DT8",
+      "title": "setup_paid_order Stripe TEST",
+      "ev": "200 {\n  \"ok\": true,\n  \"order_id\": \"4bbd093b-2b57-4556-9310-1988143149d6\",\n  \"product_id\": \"b747c76d-7af6-4b4c-8643-c007f9fc5f40\",\n  \"payment_intent_id\": \"pi_3UCjAHH7FWYUN3jh00yzg3o6\",\n  \"pi_status\": \"succeeded\",\n  \"pi_amount_received\": 590,\n  \"initial_qty\": 2,\n  \"settle_http\": 200,\n …"
+    },
+    {
+      "id": "D1.paid",
+      "lens": "DT8",
+      "well": "DT-D",
+      "title": "Stripe TEST pago + caixa",
+      "ev": {
+        "oid": "4bbd093b-2b57-4556-9310-1988143149d6",
+        "pid": "b747c76d-7af6-4b4c-8643-c007f9fc5f40",
+        "pi": "pi_3UCjAHH7FWYUN3jh00yzg3o6",
+        "status": "pago",
+        "cents": 590,
+        "applied": 1,
+        "qty": 1,
+        "wallets0": {
+          "buyer": 61.1,
+          "seller": 1.0,
+          "buyer2": 0,
+          "seller2": 0
+        },
+        "wallets1": {
+          "buyer": 61.1,
+          "seller": 1.0,
+          "buyer2": 0,
+          "seller2": 0
+        }
+      }
+    },
+    {
+      "id": "DT8.wallet.post",
+      "lens": "DT8",
+      "well": "DT-D",
+      "title": "após probes",
+      "ev": {
+        "pre": {
+          "buyer": 61.1,
+          "seller": 1.0,
+          "buyer2": 0,
+          "seller2": 0
+        },
+        "post": {
+          "buyer": 61.1,
+          "seller": 1.0,
+          "buyer2": 0,
+          "seller2": 0
+        }
+      }
+    }
+  ],
+  "actors": {
+    "buyer": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+    "seller": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+    "buyer2": "75298dca-d7e7-46d8-a37b-394891052976",
+    "seller2": "1e4d220b-008e-438a-8050-61e63380e4d5"
+  },
+  "created": {
+    "orders": [
+      "819fceb0-68f5-4046-8e82-1f0111b8fc5b",
+      "3b0d4f4e-1ca5-4784-865e-c1a2bf6ff4c6",
+      "9cd077a4-b54e-4dd2-b3a2-c1ea3d4a8881",
+      "a7d4f9f8-f3ae-4a27-a1e7-32b613f5a741",
+      "f156d69c-c526-49be-b619-bf4cdec92ba9",
+      "f2c6d12b-b875-43d4-90f0-8446bfd77f6c",
+      "6b172dac-7db0-404d-8e9d-2fc00d04269a",
+      "a6042804-7950-425e-963f-de19694b6621",
+      "d01b40ab-2eff-4bdd-aac4-8f4d434a2c65",
+      "c23ead63-421c-4fbb-bc36-c16954d12426",
+      "ec7557e8-8956-4c8c-b41e-e253258ae21b",
+      "07f0f191-7ac7-4ac5-bb0e-3da3c4440dbd",
+      "ef047084-cdfb-4bbf-9312-bd0da439ddd4",
+      "21031f7c-9342-4a12-b93d-211edb81f8b7",
+      "e60d3955-2de4-489c-b4b2-025f753ea730",
+      "f08b05b2-eaa1-469f-829c-dc274f4e34a5",
+      "e53c0f05-5b86-4d84-9274-5d8440a8fc0d",
+      "35c55d37-8824-4403-8722-0c4195c7c2a1",
+      "643ae958-7222-4b06-9d4d-25a89244a508",
+      "67e531d2-a8c1-4e5d-8e9f-daaa9a2cfd7a",
+      "5669b39a-5028-4c4c-83bf-b806325c17da",
+      "685878d8-f194-43d3-a791-aa03548c3138",
+      "1d08e688-3e6d-440f-98d2-71d6ccb8ee7a",
+      "78411816-e5a2-4fd2-b755-2bec91c310ed",
+      "c27ea74c-2e59-434f-814e-539f80b1d671",
+      "45e9a898-4df3-4cef-b167-720bc8cc2bd4",
+      "38fe6043-2976-4ecb-bc2f-05bd1caa36d4",
+      "0512c290-d4f0-4f3b-9d7d-d1026ab5d118",
+      "64131d61-fa0f-41d5-b292-4a288b3d9985",
+      "48524ba6-b0b3-4897-b007-b58db46819ab",
+      "84845b1e-0c97-4da0-ad75-ca25178953ba",
+      "bf67aa4d-3522-451e-95a9-7ab61d1fe614",
+      "ff8f5f74-f32d-4461-a884-13b5d333b2d8",
+      "4652b551-0e99-441b-b8cc-ec2ae4163294",
+      "d4e015cd-a7f8-4915-a22b-ebcc1e5ca142",
+      "2963e084-6b72-4cb1-b74e-70bf9e2850bb",
+      "7855c67b-2ebe-430c-9c9c-b4331fb0a985",
+      "15314896-965a-4016-b238-00d20166bc12",
+      "493b1bac-70ea-4329-bc69-6364b6227edb",
+      "a841bc4e-85d7-4336-b213-77222c7304fa",
+      "59ec0261-b18d-45de-9756-e057e6fa7184",
+      "d94c4f4a-f9e6-4a72-9c78-4b4b01f53d2c",
+      "3950907b-e7b1-461a-acc1-fc656f4e87bd",
+      "205e73ff-9bf1-485c-9d1a-0019ae924837",
+      "4bbd093b-2b57-4556-9310-1988143149d6",
+      "e3d2c340-5bf5-4ea6-a080-7f230f229388",
+      "e8c53ae3-6fe1-43ac-a0a9-70f485c47038",
+      "315b97cb-f8bf-49fa-93d5-ebe225f5238a"
+    ],
+    "products": [
+      "396ae7ac-2cb4-47c6-ab2d-185ff1e0398e",
+      "cebea64f-39bb-4dfe-a692-b1a6891c51be",
+      "9ef0ad48-0307-4f48-995f-8f244c4e7931",
+      "c7126298-9b3b-45d1-a84b-0604b07b1d9a",
+      "8c667d9a-2110-4fbf-b02c-649ab89a02c6",
+      "a1bbf0c2-f106-485b-adb3-b94f4a508a2a",
+      "6eef657e-db87-4e82-b2ef-4e15cda8358d",
+      "129e47a4-459d-4bac-b573-162d541a07b9",
+      "911350c9-478a-430b-aabe-51ef9a2c13fc",
+      "84b04dfe-82fe-43b7-a578-f6cb49099170",
+      "92e7799b-0020-4391-8d64-d48bbd191b66",
+      "3ea3bbbf-bb87-4ffd-b88b-edf49ffb7e6b",
+      "7385b6fd-f784-4ea3-9d29-bd1bb9352195",
+      "3c620f16-3cdd-4633-8a88-ff1fc94d11a9",
+      "b4bfa4bc-3d56-419f-ba40-388b50bb7e7d",
+      "d62a4d19-36d7-40de-b6e0-45bf85501e2d",
+      "eef40b49-5ae9-4933-82a6-7e2c4ccebfac",
+      "000a9882-6bcf-4178-860f-798e360ae432",
+      "16e34bbf-d18d-451b-b5d7-4b8c2036ca69",
+      "5beaf65a-7694-4c3e-a68d-eded8ac720ae",
+      "bec36eca-81ea-4036-8ce4-c8ed0520c223",
+      "cfa74b9a-a21a-4ac2-8a81-22f7e5427a71",
+      "105bb989-7e2e-412a-97a3-2ec4b9347a0f",
+      "fb5b15d1-0a52-4148-aadd-cb43a83c2d66",
+      "0fb390dd-bedf-49e5-be5c-b4809f516716",
+      "ef544b3e-deea-4c06-8df5-c5391d5075c9",
+      "71ff0d64-9ada-4659-bedf-140caa95c787",
+      "c3e219fb-e3d0-4664-8f0d-7913547f5eec",
+      "d58a4df4-2385-44c2-98d6-31a0b5867e5f",
+      "b1426d89-1d9c-40ab-80d6-619dfc2965e3",
+      "3116419b-bb2b-4295-9c5e-d52889122632",
+      "d5038b7a-78a0-44c3-a425-e5c636359e0c",
+      "1c8df904-c152-4274-9960-32932d045f8e",
+      "467f6468-1409-4562-960d-2677f7fd1447",
+      "0a946b77-ab9c-464a-bc14-50733f523b9b",
+      "ec718778-0a92-42bb-bcd1-8ff0133e4e7b",
+      "df4b21d5-6fc0-44e5-a5dc-9f1f379fcfef",
+      "078ddc2f-2a59-4cd0-8bcb-e1544b9393b6",
+      "5bfca751-762b-4472-aa61-90997b87ff01",
+      "7bb17262-f01f-49e4-9593-ef8659f65b05",
+      "bd1315c4-b83a-478d-b9b0-83f75b9d8951",
+      "25f5a960-3a6d-42e1-b031-39309e81e552",
+      "ee4e7463-fc41-470c-abd2-7ca94e9c90c0",
+      "293e2660-cae4-415e-9768-b77b93feb42e",
+      "b747c76d-7af6-4b4c-8643-c007f9fc5f40",
+      "6429d905-d881-44bd-8260-a3e828cb536e",
+      "4b25d643-10ea-4957-9d39-35ae811c9a16",
+      "f0107b13-cdcc-4f2d-be15-3b9773f844b1"
+    ],
+    "bundles": [],
+    "offers": [],
+    "sessions": []
+  }
+}

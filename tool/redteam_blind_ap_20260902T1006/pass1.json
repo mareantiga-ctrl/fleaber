@@ -1,0 +1,791 @@
+{
+  "stamp": "20260902T1006",
+  "prefix": "RTAP-20260902T1006",
+  "lenses": [
+    "AP1",
+    "AP2",
+    "AP3",
+    "AP4",
+    "AP5",
+    "AP6",
+    "AP7",
+    "AP8"
+  ],
+  "findings": [
+    {
+      "id": "AP1-11",
+      "lens": "AP1",
+      "severity": "P2",
+      "title": "Buyer chama purchase_broadcast directo",
+      "actor": "buyer JWT",
+      "pre": "sem convert pago",
+      "repro": "rpc batata_live_purchase_broadcast",
+      "expected": "revoke / not_allowed",
+      "obtained": "200 true",
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "AP3-06",
+      "lens": "AP3",
+      "severity": "P1",
+      "title": "Buyer reserva em live ended",
+      "actor": "buyer JWT",
+      "pre": "live ended",
+      "repro": "POST live_reservation_requests",
+      "expected": "live_ended",
+      "obtained": "201 [{\"id\":\"047f83e0-157e-4add-8491-f0199001b490\",\"live_id\":\"9dddd78a-8d51-46f1-b2cc-71e7e3e9cd13\",\"live_item_id\":\"b8abe083-8dd3-4a4f-bd85-9af1da8e8cc0\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0…",
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "AP8-01-seller",
+      "lens": "AP8",
+      "severity": "P0",
+      "title": "Wallet seller mudou sem pagamento Stripe TEST",
+      "actor": "probes JWT",
+      "pre": "t0={buyer: 61.1, seller: 26.97, buyer2: 0, seller2: 0} t1={buyer: 61.1, seller: 24.97, buyer2: 0, seller2: 0}",
+      "repro": "convert/mark_sold/hitch sem captura nova",
+      "expected": "Δ=0",
+      "obtained": {
+        "delta": -2.0,
+        "t0": 26.97,
+        "t1": 24.97
+      },
+      "proven": true,
+      "evidence": {}
+    }
+  ],
+  "blocked": [
+    {
+      "id": "AP1-01",
+      "lens": "AP1",
+      "title": "Buyer INSERT reservation status=converted",
+      "ev": "201 [{\"id\":\"288ce000-985f-46b3-a7fb-4a7725dae092\",\"live_id\":\"620a71de-1c4c-4ad3-b423-f8624f569a73\",\"live_item_id\":\"a9598a98-9635-4e59-aed9-7bcae4644777\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0…"
+    },
+    {
+      "id": "AP1-01b",
+      "lens": "AP1",
+      "title": "INSERT converted forçado a pending",
+      "ev": "201 [{\"id\":\"bcf286a5-d189-4bc4-b87c-b15a6709d277\",\"live_id\":\"620a71de-1c4c-4ad3-b423-f8624f569a73\",\"live_item_id\":\"a9598a98-9635-4e59-aed9-7bcae4644777\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0…"
+    },
+    {
+      "id": "AP1-02",
+      "lens": "AP1",
+      "title": "PATCH converted sem PI",
+      "ev": {
+        "hit": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"convert_requires_paid_order\"}",
+        "row": {
+          "id": "99b42ff7-a6b5-4201-8823-f15d836a4aea",
+          "status": "pending",
+          "requested_qty": 1,
+          "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+          "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+          "live_item_id": "a9598a98-9635-4e59-aed9-7bcae4644777",
+          "live_id": "620a71de-1c4c-4ad3-b423-f8624f569a73",
+          "source": "fleaber_live",
+          "processed_by_user_id": ""
+        }
+      }
+    },
+    {
+      "id": "AP1-03",
+      "lens": "AP1",
+      "title": "RPC convert sem PI",
+      "ev": {
+        "hit": "200 {\"ok\": false, \"error\": \"convert_requires_paid_order\"}",
+        "row": {
+          "id": "99b42ff7-a6b5-4201-8823-f15d836a4aea",
+          "status": "pending",
+          "requested_qty": 1,
+          "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+          "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+          "live_item_id": "a9598a98-9635-4e59-aed9-7bcae4644777",
+          "live_id": "620a71de-1c4c-4ad3-b423-f8624f569a73",
+          "source": "fleaber_live",
+          "processed_by_user_id": ""
+        }
+      }
+    },
+    {
+      "id": "AP1-04",
+      "lens": "AP1",
+      "title": "Buyer RPC convert na reserva própria",
+      "ev": "200 {\"ok\": false, \"error\": \"not_allowed\"}"
+    },
+    {
+      "id": "AP1-05",
+      "lens": "AP1",
+      "title": "hitch live_item_id em order paga",
+      "ev": {
+        "hit": "200 [{\"id\":\"872f5d2a-ee6e-4afa-bc88-3b45c2c7bb7c\",\"created_at\":\"2026-09-02T09:16:59.519528+00:00\",\"product_id\":\"3dbb150e-7cae-4662-a325-841c962e267e\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c…",
+        "order": {
+          "id": "872f5d2a-ee6e-4afa-bc88-3b45c2c7bb7c",
+          "status": "pago",
+          "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+          "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+          "product_id": "3dbb150e-7cae-4662-a325-841c962e267e",
+          "quantity": 1,
+          "price_total": 11.0,
+          "amount_paid_cents": 1100,
+          "stripe_payment_intent_id": "pi_rtap_mkt-PI206476",
+          "live_item_id": "",
+          "live_id": "",
+          "stock_units_applied": 1
+        }
+      }
+    },
+    {
+      "id": "AP1-07",
+      "lens": "AP1",
+      "title": "convert cross live_item",
+      "ev": {
+        "hit": "200 {\"ok\": false, \"error\": \"convert_requires_paid_order\"}",
+        "res": {
+          "id": "f40cbe80-3dea-490b-9d8b-12d91719d701",
+          "status": "pending",
+          "requested_qty": 1,
+          "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+          "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+          "live_item_id": "a9598a98-9635-4e59-aed9-7bcae4644777",
+          "live_id": "620a71de-1c4c-4ad3-b423-f8624f569a73",
+          "source": "fleaber_live",
+          "processed_by_user_id": ""
+        }
+      }
+    },
+    {
+      "id": "AP1-08",
+      "lens": "AP1",
+      "title": "PATCH buyer_id order paga",
+      "ev": {
+        "hit": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"order_money_fields_immutable\"}",
+        "order": {
+          "id": "872f5d2a-ee6e-4afa-bc88-3b45c2c7bb7c",
+          "status": "pago",
+          "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+          "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+          "product_id": "3dbb150e-7cae-4662-a325-841c962e267e",
+          "quantity": 1,
+          "price_total": 11.0,
+          "amount_paid_cents": 1100,
+          "stripe_payment_intent_id": "pi_rtap_mkt-PI206476",
+          "live_item_id": "",
+          "live_id": "",
+          "stock_units_applied": 1
+        }
+      }
+    },
+    {
+      "id": "AP1-09",
+      "lens": "AP1",
+      "title": "convert B2 sem PI B2",
+      "ev": {
+        "hit": "200 {\"ok\": false, \"error\": \"convert_requires_paid_order\"}",
+        "res": {
+          "id": "28add238-73a1-4ff8-8cf6-e2b105a423a4",
+          "status": "pending",
+          "requested_qty": 1,
+          "buyer_id": "53a79fb1-33c1-470d-ab00-244190ea3556",
+          "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+          "live_item_id": "79335e99-c073-4664-a0f0-2faab6416145",
+          "live_id": "620a71de-1c4c-4ad3-b423-f8624f569a73",
+          "source": "fleaber_live",
+          "processed_by_user_id": ""
+        }
+      }
+    },
+    {
+      "id": "AP1-10",
+      "lens": "AP1",
+      "title": "INSERT helper_manual converted → pending",
+      "ev": "201 [{\"id\":\"0923a6f0-d751-4e35-b1a8-dbb91e37b98f\",\"live_id\":\"620a71de-1c4c-4ad3-b423-f8624f569a73\",\"live_item_id\":\"a9598a98-9635-4e59-aed9-7bcae4644777\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0…"
+    },
+    {
+      "id": "AP2-01",
+      "lens": "AP2",
+      "title": "helper escalate permissions",
+      "ev": {
+        "hit": "200 [{\"id\":\"55d7b594-4590-4f79-b7f1-f14daf002aca\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"helper_user_id\":\"2191d58c-dec6-41e0-902f-5e3b819ab9d0\",\"display_name\":\"RTAP-20260902T1006 helper\",\"active\":true,\"permissions\":{\"can_mark_items…",
+        "row": {
+          "id": "55d7b594-4590-4f79-b7f1-f14daf002aca",
+          "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+          "helper_user_id": "2191d58c-dec6-41e0-902f-5e3b819ab9d0",
+          "invitation_status": "accepted",
+          "active": true,
+          "permissions": {
+            "can_mark_items_sold": false,
+            "can_change_current_item": true,
+            "can_manage_reservations": false,
+            "can_view_live_dashboard": true
+          }
+        }
+      }
+    },
+    {
+      "id": "AP2-02",
+      "lens": "AP2",
+      "title": "helper mark_sold sem can_mark",
+      "ev": {
+        "hit": "200 {\"ok\": false, \"error\": \"not_allowed\"}",
+        "item": {
+          "id": "a9598a98-9635-4e59-aed9-7bcae4644777",
+          "live_id": "620a71de-1c4c-4ad3-b423-f8624f569a73",
+          "status": "available",
+          "quantity": 2,
+          "is_active": true,
+          "item_kind": "live_only",
+          "product_id": "",
+          "checkout_product_id": "",
+          "price": 15.0,
+          "title": "RTAP-20260902T1006 live_only"
+        }
+      }
+    },
+    {
+      "id": "AP2-03",
+      "lens": "AP2",
+      "title": "Helper view-only RPC convert",
+      "ev": "200 {\"ok\": false, \"error\": \"not_allowed\"}"
+    },
+    {
+      "id": "AP2-04",
+      "lens": "AP2",
+      "title": "Helper INSERT seller_helpers na loja alheia",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"new row violates row-level security policy for table \\\"seller_helpers\\\"\"}"
+    },
+    {
+      "id": "AP2-05",
+      "lens": "AP2",
+      "title": "Helper convoca outro helper via RPC",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"not_allowed\"}"
+    },
+    {
+      "id": "AP4-01",
+      "lens": "AP4",
+      "title": "hitch product_id alheio",
+      "ev": {
+        "hit": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"live_item_product_seller_mismatch\"}",
+        "item": {
+          "id": "a9598a98-9635-4e59-aed9-7bcae4644777",
+          "live_id": "620a71de-1c4c-4ad3-b423-f8624f569a73",
+          "status": "available",
+          "quantity": 2,
+          "is_active": true,
+          "item_kind": "live_only",
+          "product_id": "",
+          "checkout_product_id": "",
+          "price": 15.0,
+          "title": "RTAP-20260902T1006 live_only"
+        }
+      }
+    },
+    {
+      "id": "AP4-02",
+      "lens": "AP4",
+      "title": "hitch checkout_product UPDATE alheio",
+      "ev": {
+        "hit": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"live_item_checkout_product_seller_mismatch\"}",
+        "item": {
+          "id": "a9598a98-9635-4e59-aed9-7bcae4644777",
+          "live_id": "620a71de-1c4c-4ad3-b423-f8624f569a73",
+          "status": "available",
+          "quantity": 2,
+          "is_active": true,
+          "item_kind": "live_only",
+          "product_id": "",
+          "checkout_product_id": "",
+          "price": 15.0,
+          "title": "RTAP-20260902T1006 live_only"
+        }
+      }
+    },
+    {
+      "id": "AP4-03",
+      "lens": "AP4",
+      "title": "mark_sold sem PI não deslista sku extra",
+      "ev": {
+        "hit": "200 {\"ok\": true, \"price\": 15.0, \"live_id\": \"620a71de-1c4c-4ad3-b423-f8624f569a73\", \"ref_code\": \"AP189251\", \"item_kind\": \"live_only\", \"total_qty\": 2, \"product_id\": null, \"blocked_qty\": 0, \"live_status\": \"live\", \"live_item_id\": \"a9598a98-9635-4e5…",
+        "extra": {
+          "id": "269298a8-063e-4f3a-8e6a-cd7657a504f9",
+          "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+          "title": "RTAP-20260902T1006 skuExtra",
+          "price": 33.0,
+          "quantity": 4,
+          "is_sold": false,
+          "list_on_marketplace": true
+        },
+        "item": {
+          "id": "a9598a98-9635-4e59-aed9-7bcae4644777",
+          "live_id": "620a71de-1c4c-4ad3-b423-f8624f569a73",
+          "status": "available",
+          "quantity": 2,
+          "is_active": true,
+          "item_kind": "live_only",
+          "product_id": "",
+          "checkout_product_id": "269298a8-063e-4f3a-8e6a-cd7657a504f9",
+          "price": 15.0,
+          "title": "RTAP-20260902T1006 live_only"
+        }
+      }
+    },
+    {
+      "id": "AP4-04",
+      "lens": "AP4",
+      "title": "PATCH status=SOLD",
+      "ev": {
+        "hit": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"live_item_status_sold_rpc_only\"}",
+        "item": {
+          "id": "79335e99-c073-4664-a0f0-2faab6416145",
+          "live_id": "620a71de-1c4c-4ad3-b423-f8624f569a73",
+          "status": "available",
+          "quantity": "",
+          "is_active": true,
+          "item_kind": "marketplace_product",
+          "product_id": "3dbb150e-7cae-4662-a325-841c962e267e",
+          "checkout_product_id": "",
+          "price": 11.0,
+          "title": "RTAP-20260902T1006 mkt"
+        }
+      }
+    },
+    {
+      "id": "AP4-05",
+      "lens": "AP4",
+      "title": "Seller2 mark_sold no item da live A",
+      "ev": "200 {\"ok\": false, \"error\": \"not_allowed\"}"
+    },
+    {
+      "id": "AP4-06",
+      "lens": "AP4",
+      "title": "INSERT live_item já status=sold",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"live_item_status_sold_rpc_only\"}"
+    },
+    {
+      "id": "AP5-01",
+      "lens": "AP5",
+      "title": "mover live_id alheio",
+      "ev": {
+        "hit": "200 []",
+        "item": {
+          "id": "b956e6b4-2601-4547-9b43-57d69038100d",
+          "live_id": "337cc662-da59-420e-8eb5-f99041fcf3f2",
+          "status": "available",
+          "quantity": 1,
+          "is_active": true,
+          "item_kind": "live_only",
+          "product_id": "",
+          "checkout_product_id": "",
+          "price": 19.0,
+          "title": "RTAP-20260902T1006 s2 item"
+        }
+      }
+    },
+    {
+      "id": "AP5-02",
+      "lens": "AP5",
+      "title": "qty increase live_only",
+      "ev": {
+        "hit": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"live_item_qty_increase_not_allowed\"}",
+        "item": {
+          "id": "a9598a98-9635-4e59-aed9-7bcae4644777",
+          "live_id": "620a71de-1c4c-4ad3-b423-f8624f569a73",
+          "status": "available",
+          "quantity": 2,
+          "is_active": true,
+          "item_kind": "live_only",
+          "product_id": "",
+          "checkout_product_id": "269298a8-063e-4f3a-8e6a-cd7657a504f9",
+          "price": 15.0,
+          "title": "RTAP-20260902T1006 live_only"
+        }
+      }
+    },
+    {
+      "id": "AP5-03",
+      "lens": "AP5",
+      "title": "cross-item same SKU accept",
+      "ev": {
+        "a1": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"qty_exceeds_stock\"}",
+        "a2": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"qty_exceeds_stock\"}",
+        "r1": {
+          "id": "fc69fdf8-8e43-4d31-9601-b474ae2b8c7b",
+          "status": "pending",
+          "requested_qty": 1,
+          "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+          "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+          "live_item_id": "222ee1f1-3201-4a72-9705-dc3acb84f30d",
+          "live_id": "620a71de-1c4c-4ad3-b423-f8624f569a73",
+          "source": "fleaber_live",
+          "processed_by_user_id": ""
+        },
+        "r2": {
+          "id": "8559db17-37c9-4972-a11a-c1590f90a0fa",
+          "status": "pending",
+          "requested_qty": 1,
+          "buyer_id": "53a79fb1-33c1-470d-ab00-244190ea3556",
+          "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+          "live_item_id": "b69aff76-443c-46bc-8160-8bf25495a846",
+          "live_id": "628fedac-a306-4422-a9da-837712b70fb2",
+          "source": "fleaber_live",
+          "processed_by_user_id": ""
+        }
+      }
+    },
+    {
+      "id": "AP5-04",
+      "lens": "AP5",
+      "title": "Seller2 INSERT item na live A",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"live_item_not_authorized\"}"
+    },
+    {
+      "id": "AP6-01",
+      "lens": "AP6",
+      "title": "race accept stock=1",
+      "ev": {
+        "h0": "200 {\"ok\": true, \"item_qty\": 1, \"request_id\": \"5bdecb17-26af-4933-93c1-0a584155f7cb\", \"item_status\": \"reserved_full\", \"reserved_qty\": 1}",
+        "h1": "200 {\"ok\": false, \"error\": \"qty_exceeds_stock\", \"requested\": 1, \"available_qty\": 0}",
+        "r0": {
+          "id": "5bdecb17-26af-4933-93c1-0a584155f7cb",
+          "status": "accepted",
+          "requested_qty": 1,
+          "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+          "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+          "live_item_id": "9ce7d5e9-0c36-423f-850d-7b04b4da9eca",
+          "live_id": "620a71de-1c4c-4ad3-b423-f8624f569a73",
+          "source": "fleaber_live",
+          "processed_by_user_id": "980f4fa1-0004-42f9-abca-69f1a9c29588"
+        },
+        "r1": {
+          "id": "1363019b-f0f7-4221-9ec3-1b4d0d01c044",
+          "status": "pending",
+          "requested_qty": 1,
+          "buyer_id": "53a79fb1-33c1-470d-ab00-244190ea3556",
+          "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+          "live_item_id": "9ce7d5e9-0c36-423f-850d-7b04b4da9eca",
+          "live_id": "620a71de-1c4c-4ad3-b423-f8624f569a73",
+          "source": "fleaber_live",
+          "processed_by_user_id": ""
+        }
+      }
+    },
+    {
+      "id": "AP3-01",
+      "lens": "AP3",
+      "title": "Hub esconde reserved_full/esgotado",
+      "ev": {
+        "status": "reserved_full",
+        "hub": "200 []",
+        "disc": "200 []"
+      }
+    },
+    {
+      "id": "AP3-02",
+      "lens": "AP3",
+      "title": "REST buyer reserved_full",
+      "ev": "200 []"
+    },
+    {
+      "id": "AP3-03",
+      "lens": "AP3",
+      "title": "stock rpc reserved_full",
+      "ev": "200 {\"ok\": true, \"price\": 9.0, \"live_id\": \"620a71de-1c4c-4ad3-b423-f8624f569a73\", \"ref_code\": \"AP2653810\", \"item_kind\": \"live_only\", \"total_qty\": 1, \"product_id\": null, \"blocked_qty\": 0, \"live_status\": \"live\", \"live_item_id\": \"e0e4de92-7693-473…"
+    },
+    {
+      "id": "AP3-04",
+      "lens": "AP3",
+      "title": "Hub ended item",
+      "ev": "200 []"
+    },
+    {
+      "id": "AP3-05",
+      "lens": "AP3",
+      "title": "REST ended item",
+      "ev": "200 []"
+    },
+    {
+      "id": "AP7-01",
+      "lens": "AP7",
+      "title": "PATCH live alheia",
+      "ev": {
+        "hit": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table lives\"}",
+        "live": {
+          "id": "620a71de-1c4c-4ad3-b423-f8624f569a73",
+          "status": "live",
+          "is_active": true,
+          "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588"
+        }
+      }
+    },
+    {
+      "id": "AP7-02",
+      "lens": "AP7",
+      "title": "Seller2 complete-mux-live na live A",
+      "ev": "403 {\"error\":\"Sem permissão para esta live.\",\"step\":\"auth\"}"
+    },
+    {
+      "id": "AP7-03",
+      "lens": "AP7",
+      "title": "Seller2 pede token LiveKit da live A",
+      "ev": "403 {\"error\":\"Sem permissão para esta live.\",\"step\":\"auth\"}"
+    },
+    {
+      "id": "AP7-04",
+      "lens": "AP7",
+      "title": "Seller2 INSERT live com seller_id da vítima",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table lives\"}"
+    },
+    {
+      "id": "AP7-05",
+      "lens": "AP7",
+      "title": "REST stream_key",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table lives\"}"
+    },
+    {
+      "id": "AP7-06",
+      "lens": "AP7",
+      "title": "Seller2 DELETE live A",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table lives\"}"
+    },
+    {
+      "id": "AP7-07",
+      "lens": "AP7",
+      "title": "Buyer ingest OCR na live alheia sem device token",
+      "ev": "401 {\"ok\":false,\"error\":\"missing_device_token\"}"
+    },
+    {
+      "id": "AP7-08",
+      "lens": "AP7",
+      "title": "Helper view-only termina a live REST",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table lives\"}"
+    },
+    {
+      "id": "AP8-01-buyer",
+      "lens": "AP8",
+      "title": "wallet buyer estável",
+      "ev": {
+        "t0": 61.1,
+        "t1": 61.1
+      }
+    },
+    {
+      "id": "AP8-01-buyer2",
+      "lens": "AP8",
+      "title": "wallet buyer2 estável",
+      "ev": {
+        "t0": 0,
+        "t1": 0
+      }
+    },
+    {
+      "id": "AP8-01-seller2",
+      "lens": "AP8",
+      "title": "wallet seller2 estável",
+      "ev": {
+        "t0": 0,
+        "t1": 0
+      }
+    }
+  ],
+  "skipped": [],
+  "notes": [
+    {
+      "id": "actors",
+      "title": "JWT B1/S1/B2/S2/H",
+      "ev": {
+        "b1": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+        "s1": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+        "b2": "53a79fb1-33c1-470d-ab00-244190ea3556",
+        "s2": "58076b08-ce3a-4a09-afc6-db4bfacc1948",
+        "h": "2191d58c-dec6-41e0-902f-5e3b819ab9d0"
+      }
+    },
+    {
+      "id": "wallets.t0",
+      "lens": "AP8",
+      "title": "saldos iniciais",
+      "ev": {
+        "buyer": 61.1,
+        "seller": 26.97,
+        "buyer2": 0,
+        "seller2": 0
+      }
+    },
+    {
+      "id": "fixture.items",
+      "lens": "AP1",
+      "title": "live items",
+      "ev": {
+        "only": "201 [{\"id\":\"a9598a98-9635-4e59-aed9-7bcae4644777\",\"live_id\":\"620a71de-1c4c-4ad3-b423-f8624f569a73\",\"seller_id\":null,\"ref_code\":\"AP189251\",\"title\":\"RTAP-20260902T1006 live_only\",\"description\":null,\"price\":15.0,\"image_url\":null,\"size\":null,\"color…",
+        "mkt": "201 [{\"id\":\"79335e99-c073-4664-a0f0-2faab6416145\",\"live_id\":\"620a71de-1c4c-4ad3-b423-f8624f569a73\",\"seller_id\":null,\"ref_code\":\"AP190592\",\"title\":\"RTAP-20260902T1006 mkt\",\"description\":null,\"price\":11.0,\"image_url\":null,\"size\":null,\"color\":null…",
+        "pool1": "201 [{\"id\":\"222ee1f1-3201-4a72-9705-dc3acb84f30d\",\"live_id\":\"620a71de-1c4c-4ad3-b423-f8624f569a73\",\"seller_id\":null,\"ref_code\":\"AP191653\",\"title\":\"RTAP-20260902T1006 pool1\",\"description\":null,\"price\":8.0,\"image_url\":null,\"size\":null,\"color\":nul…",
+        "pool2": "201 [{\"id\":\"b69aff76-443c-46bc-8160-8bf25495a846\",\"live_id\":\"628fedac-a306-4422-a9da-837712b70fb2\",\"seller_id\":null,\"ref_code\":\"AP192524\",\"title\":\"RTAP-20260902T1006 pool2\",\"description\":null,\"price\":8.0,\"image_url\":null,\"size\":null,\"color\":nul…",
+        "s2": "201 [{\"id\":\"b956e6b4-2601-4547-9b43-57d69038100d\",\"live_id\":\"337cc662-da59-420e-8eb5-f99041fcf3f2\",\"seller_id\":null,\"ref_code\":\"AP193495\",\"title\":\"RTAP-20260902T1006 s2 item\",\"description\":null,\"price\":19.0,\"image_url\":null,\"size\":null,\"color\":…"
+      }
+    },
+    {
+      "id": "AP1.fakePi.blind",
+      "lens": "AP1",
+      "title": "PATCH PI sem filtro",
+      "ev": "400 {\"code\":\"21000\",\"details\":null,\"hint\":null,\"message\":\"UPDATE requires a WHERE clause\"}"
+    },
+    {
+      "id": "AP2.helper.after",
+      "lens": "AP2",
+      "title": "estado helper",
+      "ev": {
+        "id": "55d7b594-4590-4f79-b7f1-f14daf002aca",
+        "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+        "helper_user_id": "2191d58c-dec6-41e0-902f-5e3b819ab9d0",
+        "invitation_status": "accepted",
+        "active": true,
+        "permissions": {
+          "can_mark_items_sold": false,
+          "can_change_current_item": true,
+          "can_manage_reservations": false,
+          "can_view_live_dashboard": true
+        }
+      }
+    },
+    {
+      "id": "AP4.hitchOwn",
+      "lens": "AP4",
+      "title": "hitch checkout SKU extra próprio",
+      "ev": {
+        "hit": "200 [{\"id\":\"a9598a98-9635-4e59-aed9-7bcae4644777\",\"live_id\":\"620a71de-1c4c-4ad3-b423-f8624f569a73\",\"seller_id\":null,\"ref_code\":\"AP189251\",\"title\":\"RTAP-20260902T1006 live_only\",\"description\":null,\"price\":15.0,\"image_url\":null,\"size\":null,\"color…",
+        "item": {
+          "id": "a9598a98-9635-4e59-aed9-7bcae4644777",
+          "live_id": "620a71de-1c4c-4ad3-b423-f8624f569a73",
+          "status": "available",
+          "quantity": 2,
+          "is_active": true,
+          "item_kind": "live_only",
+          "product_id": "",
+          "checkout_product_id": "269298a8-063e-4f3a-8e6a-cd7657a504f9",
+          "price": 15.0,
+          "title": "RTAP-20260902T1006 live_only"
+        }
+      }
+    },
+    {
+      "id": "AP3.profile",
+      "lens": "AP3",
+      "title": "hub flags seller",
+      "ev": {
+        "id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+        "hub_published": true,
+        "handle": "fleahub-demo-ux",
+        "is_live": false
+      }
+    },
+    {
+      "id": "AP3.ghost.item",
+      "lens": "AP3",
+      "title": "após accept qty=1",
+      "ev": {
+        "id": "e0e4de92-7693-473c-ac09-4c18271dfa7c",
+        "live_id": "620a71de-1c4c-4ad3-b423-f8624f569a73",
+        "status": "reserved_full",
+        "quantity": 1,
+        "is_active": true,
+        "item_kind": "live_only",
+        "product_id": "",
+        "checkout_product_id": "",
+        "price": 9.0,
+        "title": "RTAP-20260902T1006 ghost"
+      }
+    },
+    {
+      "id": "AP3.anon.rest",
+      "lens": "AP3",
+      "title": "anon live_items",
+      "ev": "401 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table live_items\"}"
+    },
+    {
+      "id": "AP3.anon.stock",
+      "lens": "AP3",
+      "title": "anon stock rpc",
+      "ev": "200 {\"ok\": true, \"price\": 9.0, \"live_id\": \"620a71de-1c4c-4ad3-b423-f8624f569a73\", \"ref_code\": \"AP2653810\", \"item_kind\": \"live_only\", \"total_qty\": 1, \"product_id\": null, \"blocked_qty\": 0, \"live_status\": \"live\", \"live_item_id\": \"e0e4de92-7693-473…"
+    },
+    {
+      "id": "AP3.ended.stock",
+      "lens": "AP3",
+      "title": "stock rpc ended",
+      "ev": "200 {\"ok\": true, \"price\": 9.0, \"live_id\": \"9dddd78a-8d51-46f1-b2cc-71e7e3e9cd13\", \"ref_code\": \"AP2747111\", \"item_kind\": \"live_only\", \"total_qty\": 1, \"product_id\": null, \"blocked_qty\": 0, \"live_status\": \"ended\", \"live_item_id\": \"b8abe083-8dd3-4a…"
+    },
+    {
+      "id": "wallets.t1",
+      "lens": "AP8",
+      "title": "saldos após probes",
+      "ev": {
+        "buyer": 61.1,
+        "seller": 24.97,
+        "buyer2": 0,
+        "seller2": 0
+      }
+    },
+    {
+      "id": "AP8.orders.prefix",
+      "lens": "AP8",
+      "title": "orders criadas no probe",
+      "ev": {
+        "created": [
+          "872f5d2a-ee6e-4afa-bc88-3b45c2c7bb7c"
+        ],
+        "query": "400 {\"code\":\"42703\",\"details\":null,\"hint\":null,\"message\":\"column orders.description does not exist\"}"
+      }
+    }
+  ],
+  "actors": {
+    "buyer": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+    "seller": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+    "buyer2": "53a79fb1-33c1-470d-ab00-244190ea3556",
+    "seller2": "58076b08-ce3a-4a09-afc6-db4bfacc1948",
+    "helper": "2191d58c-dec6-41e0-902f-5e3b819ab9d0"
+  },
+  "created": {
+    "lives": [
+      "620a71de-1c4c-4ad3-b423-f8624f569a73",
+      "628fedac-a306-4422-a9da-837712b70fb2",
+      "337cc662-da59-420e-8eb5-f99041fcf3f2",
+      "9dddd78a-8d51-46f1-b2cc-71e7e3e9cd13"
+    ],
+    "items": [
+      "a9598a98-9635-4e59-aed9-7bcae4644777",
+      "79335e99-c073-4664-a0f0-2faab6416145",
+      "222ee1f1-3201-4a72-9705-dc3acb84f30d",
+      "b69aff76-443c-46bc-8160-8bf25495a846",
+      "b956e6b4-2601-4547-9b43-57d69038100d",
+      "9ce7d5e9-0c36-423f-850d-7b04b4da9eca",
+      "e0e4de92-7693-473c-ac09-4c18271dfa7c",
+      "b8abe083-8dd3-4a4f-bd85-9af1da8e8cc0"
+    ],
+    "orders": [
+      "872f5d2a-ee6e-4afa-bc88-3b45c2c7bb7c"
+    ],
+    "products": [
+      "3dbb150e-7cae-4662-a325-841c962e267e",
+      "269298a8-063e-4f3a-8e6a-cd7657a504f9",
+      "961a6a3d-8338-4501-958d-cc1b13561b2e",
+      "cf9a1ed3-b857-4ef7-bab5-3706dd1f7c69"
+    ],
+    "reservations": [
+      "99b42ff7-a6b5-4201-8823-f15d836a4aea",
+      "288ce000-985f-46b3-a7fb-4a7725dae092",
+      "bcf286a5-d189-4bc4-b87c-b15a6709d277",
+      "8efee363-afc1-4990-a345-6455af642610",
+      "f40cbe80-3dea-490b-9d8b-12d91719d701",
+      "28add238-73a1-4ff8-8cf6-e2b105a423a4",
+      "0923a6f0-d751-4e35-b1a8-dbb91e37b98f",
+      "fc69fdf8-8e43-4d31-9601-b474ae2b8c7b",
+      "8559db17-37c9-4972-a11a-c1590f90a0fa",
+      "5bdecb17-26af-4933-93c1-0a584155f7cb",
+      "1363019b-f0f7-4221-9ec3-1b4d0d01c044",
+      "110373a2-ea25-42af-8563-662a1bc2a2cc",
+      "047f83e0-157e-4add-8491-f0199001b490"
+    ],
+    "helpers": [
+      "55d7b594-4590-4f79-b7f1-f14daf002aca"
+    ]
+  }
+}

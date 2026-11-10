@@ -1,0 +1,44 @@
+{
+  "auditor": "REDTEAM_BLIND_ER_BAG_SINGLE_RETEST_v1",
+  "frozen_at": "2026-09-07T07:51:06+01:00",
+  "production_touched": false,
+  "fase4": false,
+  "corrections_applied": false,
+  "prefix": "RTER-20260907T0744",
+  "staging": "fxdknzrqjenzqcvnwqqq",
+  "probes_na_tabela": 14,
+  "classes_novas": 5,
+  "races_bag_single": 6,
+  "stripe_test_pago": true,
+  "dual_cs_fresh_buyer": true,
+  "veredicto": "FAIL_P1",
+  "contagem": {
+    "P0": 0,
+    "P1": 1,
+    "P2": 0,
+    "P3": 0,
+    "P4": 0,
+    "TOTAL_P0_P3": 1
+  },
+  "resumo_numerico": "P0=0 P1=1 P2=0 P3=0 TOTAL=1",
+  "findings": [
+    {
+      "id": "P1-1",
+      "severity": "P1",
+      "title": "Saco e artigo avulso ao mesmo tempo: dois links",
+      "probes": ["A1", "A2", "A3", "A5", "confirm_fresh", "confirm_again"],
+      "gate": "dual cs_ HTTP 200 reused=false no saco de 5 (e saco de 3 t=0) ∥ avulso t=0/50ms; ledger aponta ao saco; órfã settle 402; stagger 200ms e saco de 2 unificam"
+    }
+  ],
+  "closed_regression": {
+    "B1_6x4": "400 overlapping + 200; 1 cs_",
+    "B2_expand": "200 + 400 overlapping; nunca 2.ª cs_",
+    "B3_identico": "1 cs_ reused",
+    "B4_shrink": "400 + 200; 1 cs_"
+  },
+  "closed_small_bag": {
+    "A4": "bag∥single@200∥bag 1 cs_ reused",
+    "A5": "bag ABC ∥ single B t=0 fresco 2 cs_ (HOLD P1-1; ronda anterior unificava)",
+    "A6": "bag de 2 first → 200ms → single 1 cs_"
+  }
+}

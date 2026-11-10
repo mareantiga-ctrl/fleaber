@@ -1,0 +1,57 @@
+{
+  "version": 3,
+  "description": "Matriz de cobertura stock lifecycle — inclui edge, hub, cross-pool UI. Stripe excluído.",
+  "article_stock_movements": {
+    "create_catalog_item": { "phase": "SL-A", "ux": true, "bd": true },
+    "add_stock": { "phase": "SL-A", "ux": true, "bd": true },
+    "quick_edit_qty": { "phase": "SL-A", "ux": true, "bd": true },
+    "mark_sold": { "phase": "SL-A", "ux": true, "bd": true },
+    "restock_after_sold_r32": { "phase": "SL-A", "ux": true, "bd": true },
+    "cross_pool_sale_live_gravado": { "phase": "SL-B+SL-G", "ux": "SL-G", "bd": "SL-B" },
+    "cross_pool_blocked_other_live": { "phase": "SL-B", "bd": true },
+    "cross_pool_cross_reserved": { "phase": "SL-B", "bd": true },
+    "gravado_product_id_sold": { "phase": "SL-B+SL-G", "ux": "SL-G gravado", "bd": true },
+    "marketplace_product_sold": { "phase": "SL-B+SL-G", "ux": "SL-G marketplace", "bd": true },
+    "sold_dedup_converted_order": { "phase": "SL-B", "bd": true },
+    "a3_r32_new_live_inherit": { "phase": "SL-B", "bd": true },
+    "waitlist_stock_zero": { "phase": "SL-E", "ux": true, "bd": true },
+    "partial_multi_qty_accept": { "phase": "SL-E", "bd": true },
+    "seller_reject_overstock": { "phase": "SL-E", "ux": true, "bd": true },
+    "overstock_qty_confirm": { "phase": "SL-E", "bd": true }
+  },
+  "reservation_states": {
+    "pending": { "phase": "SL-A,SL-E", "ux": true, "bd": true },
+    "accepted": { "phase": "SL-A,SL-E", "ux": true, "bd": true },
+    "rejected": { "phase": "SL-A,SL-E", "ux": true, "bd": true },
+    "converted": { "phase": "SL-B,SL-C", "bd": true },
+    "expired": { "phase": "SL-C reservation_state", "bd": true }
+  },
+  "hub": {
+    "publish_handle_vitrine": { "phase": "SL-F", "tool": "hub_publish_staging_functional.dart" }
+  },
+  "messages": {
+    "humanizer_M01_M19": { "phase": "SL-C", "tool": "message_battery_humanizer_test.dart" },
+    "emitters_M20_M23": { "phase": "SL-C", "tool": "message_battery --area emitters" },
+    "reservation_order_dm_sweeps": { "phase": "SL-C", "tool": "message_battery areas" },
+    "live_session_audit": { "phase": "SL-C", "tool": "stock_lifecycle_live_messages.dart" },
+    "ui_prints_heuristics": { "phase": "SL-D", "tool": "stock_lifecycle_deep_audit.dart" }
+  },
+  "audit_layers": [
+    "bd_stock_rpc",
+    "ui_hierarchy_qty_labels",
+    "visual_heuristics_technical_redundant_contradictory",
+    "seller_buyer_number_align",
+    "message_humanization",
+    "hub_publish_functional"
+  ],
+  "ux_path_minimal": {
+    "phases": 7,
+    "maestro_invocations_SL-A": 6,
+    "maestro_invocations_SL-E": 2,
+    "maestro_invocations_SL-G": 3,
+    "note": "SL-B/C/F sem Maestro; SL-D audit final"
+  },
+  "excluded_by_design": {
+    "stripe_checkout_doc7": "Browser/USB real — única exclusão intencional"
+  }
+}

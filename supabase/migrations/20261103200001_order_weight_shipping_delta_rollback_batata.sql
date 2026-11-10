@@ -1,0 +1,17 @@
+-- ROLLBACK ZIP 140 (correr manualmente se necessário — não aplica sozinho)
+-- ATENÇÃO: apaga adjustments e colunas auxiliares. Não correr em PROD com dados vivos sem backup.
+
+-- drop trigger if exists trg_orders_on_paid_shipping_clocks on public.orders;
+-- drop function if exists public.batata_orders_on_paid_shipping_clocks();
+-- drop function if exists public.batata_seller_confirm_shipping_weight(uuid, numeric, text, text);
+-- drop function if exists public.batata_mark_shipping_adjustment_paid(uuid, text, text);
+-- drop function if exists public.batata_expire_shipping_deltas_and_deadlines(timestamptz, integer);
+-- drop function if exists public.batata_order_blocks_dpd_create(uuid);
+-- drop function if exists public.batata_ship_clock_pause(uuid);
+-- drop function if exists public.batata_ship_clock_resume(uuid);
+-- drop function if exists public.batata_add_business_days(timestamptz, integer);
+-- drop function if exists public.batata_is_pt_business_day(date);
+-- drop function if exists public.batata_flag_enabled(text);
+-- drop table if exists public.order_shipping_adjustments;
+-- -- flags: update fleaber_feature_flags set enabled=false where key like 'order_%';
+-- select 'rollback_zip140_documented_only' as note;

@@ -1,0 +1,493 @@
+{
+  "FROZEN_AT": "2026-08-30T15:17:56.480457Z",
+  "pass": "2+3",
+  "project": "fxdknzrqjenzqcvnwqqq",
+  "stamp": "20260830T1605",
+  "production_touched": false,
+  "fase4_started": false,
+  "b2_uid": "233d0170-c74c-45f7-bfba-19235d41152c",
+  "product_id": "531065af-f217-4210-840b-7fd39f9c475e",
+  "race_pid": "2c709406-c1ea-4b44-b7bd-a1a99455bd67",
+  "openapi_tables": 0,
+  "openapi_rpcs": 0,
+  "findings": [],
+  "matrix": [
+    {
+      "surface": "OFFERS",
+      "attack": "INSERT offer status=accepted amount=0.50",
+      "identity": "buyer",
+      "result": "http=201 [{\"id\":\"65c6e28c-e42b-43dd-b481-2872f6da77f0\",\"product_id\":\"531065af-f217-4210-840b-7fd39f9c475e\",\"chat_id\":null,\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f…",
+      "impact": "persistiu",
+      "severity": "info",
+      "evidence": "[{\"id\":\"65c6e28c-e42b-43dd-b481-2872f6da77f0\",\"product_id\":\"531065af-f217-4210-840b-7fd39f9c475e\",\"chat_id\":null,\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"amoun…"
+    },
+    {
+      "surface": "PRICE / CONTRACT",
+      "attack": "order com offer hostil",
+      "identity": "buyer",
+      "result": "http=201 final={id: 6b75da47-b941-4806-b28a-2623f19866a5, contract_unit_cents: 2500, price_total: 25.0, product_offer_id: null, status: pendente}",
+      "impact": "não selou 0.50",
+      "severity": "info",
+      "evidence": {
+        "id": "6b75da47-b941-4806-b28a-2623f19866a5",
+        "contract_unit_cents": 2500,
+        "price_total": 25.0,
+        "product_offer_id": null,
+        "status": "pendente"
+      }
+    },
+    {
+      "surface": "CHECKOUT",
+      "attack": "PATCH shipping carrier→hand",
+      "identity": "buyer",
+      "result": "http=200 ship=carrier",
+      "impact": "selo manteve",
+      "severity": "info",
+      "evidence": [
+        {
+          "id": "38d45ad9-730c-4be4-9c0d-e41b5ac2d9f1",
+          "shipping_method": "carrier",
+          "contract_unit_cents": 2500
+        }
+      ]
+    },
+    {
+      "surface": "CHECKOUT",
+      "attack": "full JSON amount=50 vs server",
+      "identity": "buyer",
+      "result": "http=400 {\"error\":\"Checkout blocked: order status 'pendente' cannot start payment.\"}",
+      "impact": "autoridade servidor",
+      "severity": "info",
+      "evidence": {
+        "error": "Checkout blocked: order status 'pendente' cannot start payment."
+      }
+    },
+    {
+      "surface": "CHECKOUT",
+      "attack": "INSERT shipping=gratis_hostile",
+      "identity": "buyer",
+      "result": "http=201 id=a04ada76-4eb5-441b-b6a2-a45067d92827 [{\"id\":\"a04ada76-4eb5-441b-b6a2-a45067d92827\",\"created_at\":\"2026-08-30T15:17:39.540333+00:00\",\"product_id\":\"531065af-f21…",
+      "impact": "selo inválido",
+      "severity": "info",
+      "evidence": null
+    },
+    {
+      "surface": "CHECKOUT",
+      "attack": "checkout order portes lixo + body hand",
+      "identity": "buyer",
+      "result": "http=400 {\"error\":\"Checkout blocked: order status 'pendente' cannot start payment.\"}",
+      "impact": "body manda portes?",
+      "severity": "info",
+      "evidence": "{\"error\":\"Checkout blocked: order status 'pendente' cannot start payment.\"}"
+    },
+    {
+      "surface": "AUTH / PROFILES",
+      "attack": "buyer INSERT helper na loja alheia",
+      "identity": "buyer",
+      "result": "http=403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"new row violates row-level security policy for table \\\"seller_helpers\\\"\"}",
+      "impact": "bloqueado",
+      "severity": "info",
+      "evidence": null
+    },
+    {
+      "surface": "AUTH / PROFILES",
+      "attack": "seller invite helper pending",
+      "identity": "seller",
+      "result": "http=201 id=dbf0e8bc-730f-4220-a86a-438ad8eccb5e",
+      "impact": "fixture",
+      "severity": "info",
+      "evidence": null
+    },
+    {
+      "surface": "AUTH / PROFILES",
+      "attack": "helper PATCH permissions payouts=true",
+      "identity": "buyer",
+      "result": "http=200 [{\"id\":\"dbf0e8bc-730f-4220-a86a-438ad8eccb5e\",\"invitation_status\":\"accepted\",\"permissions\":{\"can_manage_payouts\":false,\"can_manage_reservations\":true},\"active\":true}]",
+      "impact": "escalada perms",
+      "severity": "info",
+      "evidence": [
+        {
+          "id": "dbf0e8bc-730f-4220-a86a-438ad8eccb5e",
+          "invitation_status": "accepted",
+          "permissions": {
+            "can_manage_payouts": false,
+            "can_manage_reservations": true
+          },
+          "active": true
+        }
+      ]
+    },
+    {
+      "surface": "STORAGE",
+      "attack": "list fleaber_private order_disputes/",
+      "identity": "buyer",
+      "result": "http=200 n=1 [{\"name\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"id\":null,\"updated_at\":null,\"created_at\":null,\"last_accessed_at\":null,\"metadata\":null}]",
+      "impact": "object names",
+      "severity": "info",
+      "evidence": "[{\"name\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"id\":null,\"updated_at\":null,\"created_at\":null,\"last_accessed_at\":null,\"metadata\":null}]"
+    },
+    {
+      "surface": "STORAGE",
+      "attack": "list fleaber_private order_proofs/",
+      "identity": "buyer",
+      "result": "http=200 n=1 [{\"name\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"id\":null,\"updated_at\":null,\"created_at\":null,\"last_accessed_at\":null,\"metadata\":null}]",
+      "impact": "object names",
+      "severity": "info",
+      "evidence": "[{\"name\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"id\":null,\"updated_at\":null,\"created_at\":null,\"last_accessed_at\":null,\"metadata\":null}]"
+    },
+    {
+      "surface": "STORAGE",
+      "attack": "list fleaber_private chat_uploads/",
+      "identity": "buyer",
+      "result": "http=200 n=1 [{\"name\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"id\":null,\"updated_at\":null,\"created_at\":null,\"last_accessed_at\":null,\"metadata\":null}]",
+      "impact": "object names",
+      "severity": "info",
+      "evidence": "[{\"name\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"id\":null,\"updated_at\":null,\"created_at\":null,\"last_accessed_at\":null,\"metadata\":null}]"
+    },
+    {
+      "surface": "STORAGE",
+      "attack": "list fleaber_private order_disputes/980f4fa1-0004-42f9-abca-69f1a9c29588/",
+      "identity": "buyer",
+      "result": "http=200 n=0 []",
+      "impact": "vazio/negado",
+      "severity": "info",
+      "evidence": "[]"
+    },
+    {
+      "surface": "STORAGE",
+      "attack": "list fleaber_private order_proofs/bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96/",
+      "identity": "buyer",
+      "result": "http=200 n=20 [{\"name\":\"0ed33415-11ad-4cde-80cc-9420866aae4c\",\"id\":null,\"updated_at\":null,\"created_at\":null,\"last_accessed_at\":null,\"metadata\":null},{\"nam…",
+      "impact": "object names",
+      "severity": "info",
+      "evidence": "[{\"name\":\"0ed33415-11ad-4cde-80cc-9420866aae4c\",\"id\":null,\"updated_at\":null,\"created_at\":null,\"last_accessed_at\":null,\"metadata\":null},{\"name\":\"35547c82-6842-4df3-a96c-e68a9a067cca…"
+    },
+    {
+      "surface": "STORAGE",
+      "attack": "B2 lista order_disputes do seller lab",
+      "identity": "buyer2",
+      "result": "http=200 []",
+      "impact": "cross-user storage",
+      "severity": "info",
+      "evidence": "[]"
+    },
+    {
+      "surface": "stripe_checkout_events",
+      "attack": "SELECT",
+      "identity": "buyer",
+      "result": "http=200 [{\"id\":\"1acee782-49d0-4ecd-a101-eb26816de64e\",\"created_at\":\"2026-08-26T11:51:41.621115+00:00\",\"session_id\":null,\"order_i…",
+      "impact": "leitura",
+      "severity": "info",
+      "evidence": null
+    },
+    {
+      "surface": "stripe_checkout_events",
+      "attack": "SELECT",
+      "identity": "anon",
+      "result": "http=200 []",
+      "impact": "leitura",
+      "severity": "info",
+      "evidence": null
+    },
+    {
+      "surface": "notifications",
+      "attack": "SELECT",
+      "identity": "buyer",
+      "result": "http=404 {\"code\":\"PGRST205\",\"details\":null,\"hint\":\"Perhaps you meant the table 'public.user_notifications'\",\"message\":\"Could not …",
+      "impact": "leitura",
+      "severity": "info",
+      "evidence": null
+    },
+    {
+      "surface": "notifications",
+      "attack": "SELECT",
+      "identity": "anon",
+      "result": "http=404 {\"code\":\"PGRST205\",\"details\":null,\"hint\":\"Perhaps you meant the table 'public.user_notifications'\",\"…",
+      "impact": "leitura",
+      "severity": "info",
+      "evidence": null
+    },
+    {
+      "surface": "device_tokens",
+      "attack": "SELECT",
+      "identity": "buyer",
+      "result": "http=404 {\"code\":\"PGRST205\",\"details\":null,\"hint\":\"Perhaps you meant the table 'public.seller_device_tokens'\",\"message\":\"Could no…",
+      "impact": "leitura",
+      "severity": "info",
+      "evidence": null
+    },
+    {
+      "surface": "device_tokens",
+      "attack": "SELECT",
+      "identity": "anon",
+      "result": "http=404 {\"code\":\"PGRST205\",\"details\":null,\"hint\":\"Perhaps you meant the table 'public.seller_device_tokens'\"…",
+      "impact": "leitura",
+      "severity": "info",
+      "evidence": null
+    },
+    {
+      "surface": "ps_pairing_sessions",
+      "attack": "SELECT",
+      "identity": "buyer",
+      "result": "http=200 []",
+      "impact": "leitura",
+      "severity": "info",
+      "evidence": null
+    },
+    {
+      "surface": "ps_pairing_sessions",
+      "attack": "SELECT",
+      "identity": "anon",
+      "result": "http=200 []",
+      "impact": "leitura",
+      "severity": "info",
+      "evidence": null
+    },
+    {
+      "surface": "ps_ingest_audit",
+      "attack": "SELECT",
+      "identity": "buyer",
+      "result": "http=200 []",
+      "impact": "leitura",
+      "severity": "info",
+      "evidence": null
+    },
+    {
+      "surface": "ps_ingest_audit",
+      "attack": "SELECT",
+      "identity": "anon",
+      "result": "http=200 []",
+      "impact": "leitura",
+      "severity": "info",
+      "evidence": null
+    },
+    {
+      "surface": "live_tips",
+      "attack": "SELECT",
+      "identity": "buyer",
+      "result": "http=200 [{\"id\":\"6f279c54-3327-4eec-a7c8-18e605e15a44\",\"live_id\":null,\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_i…",
+      "impact": "leitura",
+      "severity": "info",
+      "evidence": null
+    },
+    {
+      "surface": "live_tips",
+      "attack": "SELECT",
+      "identity": "anon",
+      "result": "http=200 []",
+      "impact": "leitura",
+      "severity": "info",
+      "evidence": null
+    },
+    {
+      "surface": "reviews_public_ratings",
+      "attack": "SELECT",
+      "identity": "buyer",
+      "result": "http=200 [{\"id\":\"21ea0f91-a1cb-49a1-baf2-a1a577d72bc3\",\"created_at\":\"2026-08-29T08:05:00.347312+00:00\",\"target_id\":\"bfcbeeee-7dc1…",
+      "impact": "leitura",
+      "severity": "info",
+      "evidence": null
+    },
+    {
+      "surface": "reviews_public_ratings",
+      "attack": "SELECT",
+      "identity": "anon",
+      "result": "http=200 [{\"id\":\"21ea0f91-a1cb-49a1-baf2-a1a577d72bc3\",\"created_at\":\"2026-08-29T08:05:00.347312+00:00\",\"targe…",
+      "impact": "leitura",
+      "severity": "info",
+      "evidence": null
+    },
+    {
+      "surface": "LIVE",
+      "attack": "SELECT lives sem stream_key",
+      "identity": "buyer",
+      "result": "http=200 [{\"id\":\"5dd5cfd2-63b1-4cd8-82b1-c888e9dc5234\",\"status\":\"ended\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"mux_playback_id\":\"00ErJWBwqaXL00hlMxr015H4o00…",
+      "impact": "catalogo",
+      "severity": "info",
+      "evidence": null
+    },
+    {
+      "surface": "ORDERS",
+      "attack": "B2 SELECT orders",
+      "identity": "buyer2",
+      "result": "http=200 rows=0 foreign=0",
+      "impact": "vazio/scoped",
+      "severity": "info",
+      "evidence": null
+    },
+    {
+      "surface": "DISPUTES",
+      "attack": "B2 SELECT disputes",
+      "identity": "buyer2",
+      "result": "http=200 foreign=0 []",
+      "impact": "vazio",
+      "severity": "info",
+      "evidence": null
+    },
+    {
+      "surface": "CHAT",
+      "attack": "B2 SELECT chat_messages",
+      "identity": "buyer2",
+      "result": "http=200 n=0",
+      "impact": "chat alheio?",
+      "severity": "info",
+      "evidence": "[]"
+    },
+    {
+      "surface": "BAG / CART",
+      "attack": "bag 2 orders amount=50 dup line",
+      "identity": "buyer",
+      "result": "http=400 {\"error\":\"Checkout blocked: order status 'pendente' cannot start payment.\"}",
+      "impact": "saco autoridade",
+      "severity": "info",
+      "evidence": {
+        "error": "Checkout blocked: order status 'pendente' cannot start payment."
+      }
+    },
+    {
+      "surface": "WEBHOOK",
+      "attack": "GET create-payment-intent fake session settle",
+      "identity": "anon",
+      "result": "http=400 Pagamento ainda não confirmado. Se já pagaste, aguarda alguns segundos e volta à app Fleaber.",
+      "impact": "return path",
+      "severity": "info",
+      "evidence": null
+    },
+    {
+      "surface": "TIPS",
+      "attack": "GET tip checkout fake session",
+      "identity": "anon",
+      "result": "http=400 {\"error\":\"No such checkout.session: cs_test_fake\"}",
+      "impact": "settle fake",
+      "severity": "info",
+      "evidence": null
+    },
+    {
+      "surface": "TIPS",
+      "attack": "send_live_tip_from_wallet",
+      "identity": "buyer",
+      "result": "http=404 {\"code\":\"PGRST202\",\"details\":\"Searched for the function public.batata_send_live_tip_from_wallet with parameters p_amount, p_live_id or with a single unnamed jso…",
+      "impact": "tip wallet",
+      "severity": "info",
+      "evidence": null
+    },
+    {
+      "surface": "PAYOUT",
+      "attack": "seller payout 1 cent unique key",
+      "identity": "seller",
+      "result": "http=200 {\"success\":true,\"transferId\":\"tr_1UAAUTH7FWYUN3jh8ONsWDOG\",\"balance\":30.28}",
+      "impact": "payout",
+      "severity": "info",
+      "evidence": null
+    },
+    {
+      "surface": "PAYOUT",
+      "attack": "two different keys concurrent 1c",
+      "identity": "seller",
+      "result": "a=200 {\"success\":true,\"transferId\":\"tr_1UAAUVH7FWYUN3jhXvq4c5Q7\",\"balance\":30.27} b=200 {\"success\":true,\"transferId\":\"tr_1UAAUVH7FWYUN3jhg3jWx06L\",\"balance\":30.26}",
+      "impact": "dup transfer?",
+      "severity": "info",
+      "evidence": null
+    },
+    {
+      "surface": "STOCK",
+      "attack": "2 INSERT concurrent qty=1 stock=1",
+      "identity": "buyer+b2",
+      "result": "a=201 idA=42bc2dfa-c51c-4e24-91e3-35fdf5f7720f b=400 idB=null prod=[{\"id\":\"2c709406-c1ea-4b44-b7bd-a1a99455bd67\",\"quantity\":1,\"is_sold\":false}] holds=[{\"id\":\"42bc2dfa-c51c-4e24-91e3-35fdf5f7720f\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"status\":\"pendente\",\"quantity\":1,\"stock_units_applied\":null}]",
+      "impact": "oversell?",
+      "severity": "info",
+      "evidence": {
+        "a": "[{\"id\":\"42bc2dfa-c51c-4e24-91e3-35fdf5f7720f\",\"created_at\":\"2026-08-30T15:17:52.419963+00:00\",\"product_id\":\"2c709406-c1e…",
+        "b": "{\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"order_hold_exceeds_stock\"}",
+        "product": [
+          {
+            "id": "2c709406-c1ea-4b44-b7bd-a1a99455bd67",
+            "quantity": 1,
+            "is_sold": false
+          }
+        ],
+        "orders": [
+          {
+            "id": "42bc2dfa-c51c-4e24-91e3-35fdf5f7720f",
+            "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+            "status": "pendente",
+            "quantity": 1,
+            "stock_units_applied": null
+          }
+        ]
+      }
+    },
+    {
+      "surface": "STOCK",
+      "attack": "10x INSERT same buyer stock=1",
+      "identity": "buyer",
+      "result": "created=0 prod=[{\"id\":\"d8664c24-d38e-4574-b841-677e6afbceba\",\"quantity\":1,\"is_sold\":false}]",
+      "impact": "1 hold",
+      "severity": "info",
+      "evidence": {
+        "ids": [],
+        "https": [
+          "400:{\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"order_…",
+          "400:{\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"order_…",
+          "400:{\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"order_…",
+          "400:{\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"order_…",
+          "400:{\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"order_…",
+          "400:{\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"order_…",
+          "400:{\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"order_…",
+          "400:{\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"order_…",
+          "201:[{\"id\":\"8d52dc42-74dd-4d8c-ae24-cf4b33708cee\",\"created_at\":\"…",
+          "400:{\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"order_…"
+        ],
+        "product": [
+          {
+            "id": "d8664c24-d38e-4574-b841-677e6afbceba",
+            "quantity": 1,
+            "is_sold": false
+          }
+        ]
+      }
+    },
+    {
+      "surface": "LIVE ITEMS",
+      "attack": "SELECT live_items seller",
+      "identity": "seller",
+      "result": "http=400 {\"code\":\"42703\",\"details\":null,\"hint\":null,\"message\":\"column live_items.is_sold does not exist\"}",
+      "impact": "catalogo live",
+      "severity": "info",
+      "evidence": null
+    },
+    {
+      "surface": "REFUNDS",
+      "attack": "2 refund concurrent",
+      "identity": "seller",
+      "result": "a=422 {\"ok\":false,\"error\":\"Sem PaymentIntent Stripe nesta encomenda. Contacte suporte … b=422 {\"ok\":false,\"error\":\"Sem PaymentIntent Stripe nesta encomenda. Contacte suporte …",
+      "impact": "dup refund",
+      "severity": "info",
+      "evidence": null
+    },
+    {
+      "surface": "AUTH / PROFILES",
+      "attack": "buyer SELECT seller profile *",
+      "identity": "buyer",
+      "result": "http=200 keys=200",
+      "impact": "PII",
+      "severity": "info",
+      "evidence": "[]"
+    },
+    {
+      "surface": "STRIPE SESSION",
+      "attack": "observe events service",
+      "identity": "service_observe",
+      "result": "http=200 [{\"session_id\":null,\"order_id\":null,\"event\":\"tip_checkout_error\",\"detail\":{\"error\": \"No such checkout.session: cs_test_fake\"}}, \n {\"session_id\":null,\"order_id\":null,\"event\":\"checkout_error\",\"detail\":{\"error\": \"Checkout b…",
+      "impact": "evidência amount",
+      "severity": "info",
+      "evidence": null
+    }
+  ],
+  "notes": [
+    "OpenAPI svc tables=0 rpcs=0",
+    "privileged rpc buyer 200: []",
+    "p2=531065af-f217-4210-840b-7fd39f9c475e race=2c709406-c1ea-4b44-b7bd-a1a99455bd67",
+    "checkout server_amount_cents=null body_keys=[error]"
+  ]
+}

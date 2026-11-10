@@ -1,0 +1,60 @@
+{
+  "auditor": "REDTEAM_BLIND_DV_STORAGE_POS_DNDS_v1",
+  "frozen_at": "2026-09-06T17:47:00+01:00",
+  "prefix": "RTDV-20260906T1737",
+  "staging": "fxdknzrqjenzqcvnwqqq",
+  "production_touched": false,
+  "fase4": false,
+  "corrections_applied": false,
+  "veredicto": "FAIL_P1",
+  "contagem": {
+    "P0": 0,
+    "P1": 1,
+    "P2": 1,
+    "P3": 0,
+    "P4": 0,
+    "TOTAL_P0_P3": 2
+  },
+  "probes_na_tabela": 27,
+  "classes_novas": 13,
+  "lentes": ["DV1", "DV2", "DV3", "DV4", "DV5", "DV6", "DV7"],
+  "stripe_test_pago": true,
+  "findings": [
+    {
+      "id": "RTDV-A7-revoke-table-direct-insert",
+      "severity": "P1",
+      "lens": "DV2",
+      "title": "JWT INSERT+SELECT em batata_private_object_revoked (path alheio, sem RLS)",
+      "actor": "buyer JWT",
+      "loot": false,
+      "cross_user": true,
+      "evidence": "pass1.json DV-A7 201; confirm.json a7_select_b1 n=3 paths include B2; a7_insert_proofs_b2 201; RPC alien 42501"
+    },
+    {
+      "id": "RTDV-A4-proof-ok-ignores-revoke",
+      "severity": "P2",
+      "lens": "DV2",
+      "title": "proof_ok true e disputa 201 após DELETE+revoke",
+      "actor": "buyer JWT",
+      "loot": false,
+      "evidence": "confirm_a4_persist.json proof_ok=true dispute=201 eb442db3 auth=404 rev=true oid=8a8ff4ca"
+    }
+  ],
+  "residual_not_counted": [
+    "label %252f deny",
+    "// após host deny",
+    "dispute window 403 enviado/release",
+    "signed CDN 200 pós-DELETE pass1 only; confirm 404"
+  ],
+  "actors": {
+    "buyer": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+    "seller": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+    "buyer2": "211d7842-51dc-446b-83b1-bee42cc3ec2b"
+  },
+  "happy": {
+    "order_id": "a2a4618c-7417-43d0-87da-036c912adfab",
+    "pi": "pi_3UCj9JH7FWYUN3jh1JMHTq74",
+    "dispute_id": "1296b2ca-1cba-4026-a054-cd332c068926",
+    "amount_paid_cents": 590
+  }
+}

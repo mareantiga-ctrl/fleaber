@@ -1,0 +1,208 @@
+{
+  "probes": [
+    {
+      "probe_id": "A1",
+      "poco": "CY-A",
+      "payload": "B1 POST follows following_id=S1 published",
+      "http": "403 208ms {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"new row violates row-level security policy for table \\\"follows\\\"\"}",
+      "bd": "{\"s1_hub\":true,\"follow_id\":null}",
+      "result": "FAIL",
+      "lens": "CY1",
+      "residual": false,
+      "count_finding": false
+    },
+    {
+      "probe_id": "A2",
+      "poco": "CY-A",
+      "payload": "B1 POST follows following_id=S2 unpublished (controlo clássico)",
+      "http": "403 174ms {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"new row violates row-level security policy for table \\\"follows\\\"\"}",
+      "bd": "{\"tickets\":0,\"raffle\":\"86fa9057-069d-490c-ac8a-8aaae6d30453\"}",
+      "result": "HOLD",
+      "lens": "CY1",
+      "residual": true,
+      "count_finding": false
+    },
+    {
+      "probe_id": "A3",
+      "poco": "CY-A",
+      "payload": "B1 POST favorites product S1 published listável",
+      "http": "403 393ms {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"new row violates row-level security policy for table \\\"favorites\\\"\"}",
+      "bd": "{\"product\":\"2dcf78fc-f38f-4776-bf83-b6e0c9991ede\"}",
+      "result": "FAIL",
+      "lens": "CY2",
+      "residual": false,
+      "count_finding": false
+    },
+    {
+      "probe_id": "A4",
+      "poco": "CY-A",
+      "payload": "B1 POST favorites SKU loja unpublished",
+      "http": "403 452ms {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"new row violates row-level security policy for table \\\"favorites\\\"\"}",
+      "bd": "{\"product\":\"8e1f6bb8-6bac-481e-896c-d62b7971a12f\"}",
+      "result": "HOLD",
+      "lens": "CY2",
+      "residual": true,
+      "count_finding": false
+    },
+    {
+      "probe_id": "A5",
+      "poco": "CY-A",
+      "payload": "follow ghost UUID / self / follower_id=B2 spoof / following=B2",
+      "http": "{\"ghost\":\"403 333ms {\\\"code\\\":\\\"42501\\\",\\\"details\\\":null,\\\"hint\\\":null,\\\"message\\\":\\\"new row violates row-level security policy for table \\\\\\\"follows\\\\\\\"\\\"}\",\"self\":\"403 249ms {\\\"code\\\":\\\"42501\\\",\\\"details\\\":null,\\\"hint\\\":null,\\\"message\\\":\\\"new row violates row-level security pol…",
+      "bd": "",
+      "result": "HOLD",
+      "lens": "CY1",
+      "residual": false,
+      "count_finding": false
+    },
+    {
+      "probe_id": "A6",
+      "poco": "CY-A",
+      "payload": "race PATCH hub_published=false ∥ POST follow S2",
+      "http": "{\"unpub\":\"200 191ms [{\\\"created_at\\\":\\\"2026-09-06T13:53:50.601152+00:00\\\",\\\"full_name\\\":\\\"rtcy-20260906t1450-s2\\\",\\\"user_type\\\":\\\"vendedor\\\",\\\"phone\\\":null,\\\"id\\\":\\\"6efb23e4-c04b-49ae-b7c9-346c5817ccf0\\\",\\\"photo_url\\\":null,\\\"is_live\\\":true,\\\"next_live\\\":null,\\\"last…\",\"follow\":\"40…",
+      "bd": "{\"hub_after\":false,\"tickets\":0,\"follow_id\":null}",
+      "result": "HOLD",
+      "lens": "CY6",
+      "residual": false,
+      "count_finding": false
+    },
+    {
+      "probe_id": "A7",
+      "poco": "CY-A",
+      "payload": "B1 favorite SKU is_sold=true loja published",
+      "http": "403 339ms {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"new row violates row-level security policy for table \\\"favorites\\\"\"}",
+      "bd": "{\"product\":\"8904c6b2-eedb-4c47-b439-2e924b2de990\"}",
+      "result": "HOLD",
+      "lens": "CY2",
+      "residual": false,
+      "count_finding": false
+    },
+    {
+      "probe_id": "A8",
+      "poco": "CY-A",
+      "payload": "B1 favorite SKU quantity=0 loja published",
+      "http": "403 385ms {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"new row violates row-level security policy for table \\\"favorites\\\"\"}",
+      "bd": "{\"product\":\"7c5b1845-0f94-4496-bb13-a3c2e99f1d5e\"}",
+      "result": "HOLD",
+      "lens": "CY2",
+      "residual": false,
+      "count_finding": false
+    },
+    {
+      "probe_id": "A9",
+      "poco": "CY-A",
+      "payload": "B1 favorite SKU list_on_marketplace=false loja published",
+      "http": "403 388ms {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"new row violates row-level security policy for table \\\"favorites\\\"\"}",
+      "bd": "{\"product\":\"a315c5de-6ed1-42ec-8b3c-5683abd6ef45\"}",
+      "result": "HOLD",
+      "lens": "CY2",
+      "residual": false,
+      "count_finding": false
+    },
+    {
+      "probe_id": "A10",
+      "poco": "CY-A",
+      "payload": "PATCH follow published→unpublished + POST upsert unpublished",
+      "http": "{\"patch\":null,\"upsert\":\"403 216ms {\\\"code\\\":\\\"42501\\\",\\\"details\\\":null,\\\"hint\\\":null,\\\"message\\\":\\\"new row violates row-level security policy for table \\\\\\\"follows\\\\\\\"\\\"}\"}",
+      "bd": "",
+      "result": "HOLD",
+      "lens": "CY7",
+      "residual": false,
+      "count_finding": false
+    }
+  ],
+  "findings": [
+    {
+      "id": "CY-A1-FOLLOW-PUB-REGRESSION",
+      "lens": "CY1",
+      "severity": "P2",
+      "title": "follow published recusado (happy path partido)",
+      "actor": "B1",
+      "pre": "S1 hub_published=true",
+      "repro": "POST /rest/v1/follows follower=B1 following=S1",
+      "expected": "201",
+      "obtained": "403 208ms {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"new row violates row-level security policy for table \\\"follows\\\"\"}",
+      "proven": true,
+      "count_exact_closed": false,
+      "evidence": {}
+    },
+    {
+      "id": "CY-A3-FAV-PUB-REGRESSION",
+      "lens": "CY2",
+      "severity": "P2",
+      "title": "favorite published recusado (happy path partido)",
+      "actor": "B1",
+      "pre": "S1 published; SKU list_on_marketplace qty>0",
+      "repro": "POST /rest/v1/favorites",
+      "expected": "201",
+      "obtained": "403 393ms {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"new row violates row-level security policy for table \\\"favorites\\\"\"}",
+      "proven": true,
+      "count_exact_closed": false,
+      "evidence": {}
+    }
+  ],
+  "notes": [
+    {
+      "id": "fix.s1",
+      "lens": "CY1",
+      "title": "S1 published",
+      "ev": {
+        "id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+        "handle": "fleahub-demo-ux",
+        "handle_suggested": "axinoquaa",
+        "hub_published": true,
+        "user_type": "vendedor",
+        "full_name": "Maria Demo FleaHub",
+        "is_live": false,
+        "photo_url": "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=800&auto=format&fit=crop"
+      }
+    },
+    {
+      "id": "fix.s2",
+      "lens": "CY1",
+      "title": "S2 unpublished vendedor",
+      "ev": {
+        "id": "6efb23e4-c04b-49ae-b7c9-346c5817ccf0",
+        "handle": null,
+        "handle_suggested": null,
+        "hub_published": false,
+        "user_type": "vendedor",
+        "full_name": "rtcy-20260906t1450-s2",
+        "is_live": true,
+        "photo_url": null
+      }
+    },
+    {
+      "id": "fix.b2",
+      "lens": "CY1",
+      "title": "B2 comprador",
+      "ev": {
+        "id": "15fae79a-9ff2-4b08-9d9a-caf52fac7b48",
+        "handle": null,
+        "handle_suggested": null,
+        "hub_published": false,
+        "user_type": "comprador",
+        "full_name": "rtcy-20260906t1450-b2",
+        "is_live": false,
+        "photo_url": null
+      }
+    },
+    {
+      "id": "fix.raffle",
+      "lens": "CY7",
+      "title": "raffle S2 unpublished",
+      "ev": "201 187ms [{\"id\":\"86fa9057-069d-490c-ac8a-8aaae6d30453\",\"live_id\":\"cca08b5d-415e-4127-a83a-a51dfe0411c1\",\"seller_id\":\"6efb23e4-c04b-49ae-b7c9-346c5817ccf0\",\"title\":\"RTCY-20260906T1450 raffle unpub\",\"description\":null,\"photo_url\":n…"
+    }
+  ],
+  "skipped": [],
+  "lenses": [
+    "CY1",
+    "CY2",
+    "CY6",
+    "CY7"
+  ],
+  "lives": [
+    "0135447d-1cce-4555-b433-4db80d0b32f1",
+    "cca08b5d-415e-4127-a83a-a51dfe0411c1"
+  ]
+}

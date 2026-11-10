@@ -1,0 +1,368 @@
+{
+  "auditor": "REDTEAM_BLIND_DR_TIP_RAFFLE_POS_DHDM_v1",
+  "prefix": "RTDR-20260906T1708",
+  "staging": "fxdknzrqjenzqcvnwqqq",
+  "production_touched": false,
+  "fase4": false,
+  "corrections_applied": false,
+  "probes_na_tabela": 14,
+  "classes_novas": 7,
+  "races": 4,
+  "lentes": [
+    "DR1",
+    "DR2",
+    "DR3",
+    "DR4",
+    "DR5",
+    "DR6",
+    "DR7"
+  ],
+  "P0": 0,
+  "P1": 0,
+  "P2": 0,
+  "P3": 0,
+  "TOTAL": 0,
+  "probes": [
+    {
+      "probe_id": "A1.tip.amount.hostil",
+      "poco": "DR-A",
+      "payload": "amount 0/-1/0.5/501/\"1e2\"/[2]/amount_cents=1",
+      "http": "zero:400 {\"error\":\"Invalid tip amount.\"} | neg:400 {\"error\":\"Invalid tip amount.\"} | half:400 {\"error\":\"Invalid tip amount.\"} | over:400 {\"error\":\"Tip amount too high.\"} | sci:200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1bhgMG9Hm45erjqKSaniJQMixOLcuVPdvNus1Rn7j…",
+      "bd": "{\"created_sessions_or_tips\":6,\"dWallet\":0.0}",
+      "result": "HOLD",
+      "lens": "DR1",
+      "residual": false,
+      "classe_nova": true,
+      "race": false,
+      "count_finding": false
+    },
+    {
+      "probe_id": "A2.tip_id.live_alheio",
+      "poco": "DR-A",
+      "payload": "tip_id UUID cliente + live S2 seller_id S1",
+      "http": "400 {\"error\":\"Tip seller does not own this live.\"} | 400 {\"error\":\"Tip seller does not own this live.\"}",
+      "bd": "{\"tipId\":null,\"liveTipId\":null}",
+      "result": "HOLD",
+      "lens": "DR1",
+      "residual": false,
+      "classe_nova": false,
+      "race": false,
+      "count_finding": false
+    },
+    {
+      "probe_id": "A3.tip.end_live.race",
+      "poco": "DR-A",
+      "payload": "POST tip ∥ end_live + hub unpublish",
+      "http": "400 {\"error\":\"Tips only allowed while the live is broadcasting.\"}",
+      "bd": "{\"status\":\"\",\"dWallet\":0.0,\"hub_restored\":true}",
+      "result": "HOLD",
+      "lens": "DR4",
+      "residual": false,
+      "classe_nova": true,
+      "race": true,
+      "count_finding": false
+    },
+    {
+      "probe_id": "A4.tip.seller_ne_owner",
+      "poco": "DR-A",
+      "payload": "seller_id S2 na live S1",
+      "http": "400 {\"error\":\"Tip seller does not own this live.\"}",
+      "bd": "{\"tipId\":null}",
+      "result": "HOLD",
+      "lens": "DR1",
+      "residual": false,
+      "classe_nova": false,
+      "race": false,
+      "count_finding": false
+    },
+    {
+      "probe_id": "B1.share.sem.rifa",
+      "poco": "DR-B",
+      "payload": "claim_share + join raffle_id inexistente; live sem rifa",
+      "http": "200 {\"ok\": false, \"error\": \"raffle_not_found\"} | 200 {\"ok\": false, \"error\": \"raffle_not_found\"}",
+      "bd": "{\"tickets\":0,\"winners\":0,\"live\":\"5ded6180-16c6-4c59-97fd-8c0df6204597\"}",
+      "result": "HOLD",
+      "lens": "DR2",
+      "residual": false,
+      "classe_nova": true,
+      "race": false,
+      "count_finding": false
+    },
+    {
+      "probe_id": "B2.share.com.rifa",
+      "poco": "DR-B",
+      "payload": "join + claim_share rifa active",
+      "http": "200 {\"ok\": true, \"joined\": true, \"duplicate\": false, \"ticket_balance\": 1} | 200 {\"ok\": true, \"duplicate\": false, \"ticket_balance\": 2}",
+      "bd": "{\"raffle\":\"f58289f4-aa39-47f0-a793-36ae7380fae3\",\"tJoin\":1,\"tShare\":2}",
+      "result": "HOLD",
+      "lens": "DR2",
+      "residual": false,
+      "classe_nova": false,
+      "race": false,
+      "count_finding": false
+    },
+    {
+      "probe_id": "B3.winner.forge.double",
+      "poco": "DR-B",
+      "payload": "draw JWT buyer+S2; POST winners; draw seller×2",
+      "http": "400 {\"code\":\"P0001\",\"details\":null,\"hint\":null,\"message\":\"not_allowed\"} | 403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"new row violates row-level security policy for table \\\"live_raffle_winners\\\"\"} | 200 {\"ok\": true, \"status\": \"drawn\", \"winners\": [{\"rank\": 1, \"user_i…",
+      "bd": "{\"nWinForge\":0,\"nWinDouble\":1,\"close\":\"200 {\\\"ok\\\": true, \\\"status\\\": \\\"closed\\\"}\",\"join\":\"200 {\\\"ok\\\": true, \\\"joined\\\": true, \\\"duplicate\\\": false, \\\"ticket_balance\\\": 1}\"}",
+      "result": "HOLD",
+      "lens": "DR2",
+      "residual": false,
+      "classe_nova": true,
+      "race": false,
+      "count_finding": false
+    },
+    {
+      "probe_id": "C1.convert.pending",
+      "poco": "DR-C",
+      "payload": "convert RPC + CPI em reservation pending",
+      "http": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_live_reservation_stripe_convert\"} | 200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1NG4jFnkKhY6Ygb4pndCjiefGM7hZkbtZASTLWJGZxQVfmK7dZZccBqPT#fidnandhYHdWcXxpYCc%2FJ2FgY…",
+      "bd": "{\"res\":{\"code\":\"42703\",\"details\":null,\"hint\":null,\"message\":\"column live_reservation_requests.converted_order_id does not exist\"},\"ord\":\"reserva_pendente\"}",
+      "result": "HOLD",
+      "lens": "DR3",
+      "residual": false,
+      "classe_nova": true,
+      "race": false,
+      "count_finding": false
+    },
+    {
+      "probe_id": "C2.convert.parallel",
+      "poco": "DR-C",
+      "payload": "CPI B1 ∥ CPI B2(res B1) ∥ convert RPC B1 ∥ convert RPC B2",
+      "http": "0 no-oid-a | 0 no-oid-b | 403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_live_reservation_stripe_convert\"} | 403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_live_reservation_stripe_co…",
+      "bd": "{\"resA\":{\"code\":\"42703\",\"details\":null,\"hint\":null,\"message\":\"column live_reservation_requests.converted_order_id does not exist\"},\"resB\":{\"code\":\"42703\",\"details\":null,\"hint\":null,\"message\":\"column live_reservation_requests.converted_order_id does not exist\"},\"ordA\":null,\"ordB\":null,\"nConv\":0}",
+      "result": "HOLD",
+      "lens": "DR4",
+      "residual": false,
+      "classe_nova": true,
+      "race": true,
+      "count_finding": false
+    },
+    {
+      "probe_id": "C3.accept.cpi.race",
+      "poco": "DR-C",
+      "payload": "accept live_only ∥ marketplace CPI mesmo SKU qty=1",
+      "http": "200 [{\"id\":\"1394cab8-8a60-49a4-ba4b-81f0334c12dd\",\"live_id\":\"9d641e0c-e5ec-4a99-b458-ad7592743e09\",\"live_item_id\":\"a8f264ea-d5e1-42fe-b3a0-d21b118f0f81\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0… | 400 {\"error\":\"Checkout blocked: …",
+      "bd": "{\"res\":{\"code\":\"42703\",\"details\":null,\"hint\":null,\"message\":\"column live_reservation_requests.converted_order_id does not exist\"},\"ord\":\"reserva_pendente\",\"prod\":{\"id\":\"ba5586b4-1f6c-4e08-a0e0-a1c19b4a1599\",\"quantity\":1,\"is_sold\":false},\"bothSold\":false}",
+      "result": "HOLD",
+      "lens": "DR4",
+      "residual": false,
+      "classe_nova": true,
+      "race": true,
+      "count_finding": false
+    },
+    {
+      "probe_id": "C4.convert.after.ended",
+      "poco": "DR-C",
+      "payload": "end_live depois accepted; RPC+PATCH+CPI convert",
+      "http": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_live_reservation_stripe_convert\"} | 403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"convert_requires_paid_order\"} | n/a",
+      "bd": "{\"code\":\"42703\",\"details\":null,\"hint\":null,\"message\":\"column live_reservation_requests.converted_order_id does not exist\"}",
+      "result": "HOLD",
+      "lens": "DR6",
+      "residual": false,
+      "classe_nova": false,
+      "race": false,
+      "count_finding": false
+    },
+    {
+      "probe_id": "C5.capacity.vs.stock",
+      "poco": "DR-C",
+      "payload": "accepted qty=1; convert unpaid; 2º buyer reserve",
+      "http": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_live_reservation_stripe_convert\"} | acc=200 [{\"id\":\"5922f776-cd02-4a44-884a-b9ec3259eb1c\",\"live_id\":\"8b1acacd-c331-48f8-91af-1a66a93155ce\",\"live_item_id\":\"2efa18a0-8691-4b6c-a0a5-c88dd…",
+      "bd": "{\"a\":{\"code\":\"42703\",\"details\":null,\"hint\":null,\"message\":\"column live_reservation_requests.converted_order_id does not exist\"},\"b\":{\"code\":\"42703\",\"details\":null,\"hint\":null,\"message\":\"column live_reservation_requests.converted_order_id does not exist\"},\"stock0\":{\"ok\":true,\"price\":9.0,\"live_id\":\"8b1acacd-c331-48f8-91a…",
+      "result": "HOLD",
+      "lens": "DR5",
+      "residual": false,
+      "classe_nova": false,
+      "race": false,
+      "count_finding": false
+    },
+    {
+      "probe_id": "D1.tip.session.test",
+      "poco": "DR-D",
+      "payload": "POST tip Session TEST ∥ hub unpublish; GET settle unpaid",
+      "http": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a18wSGEArNwatA6me3SVSJchgPQiMk6BGYIkNbeEX62CUYpJ8WZMClvEtY#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21… | 200 Pagamento ainda não confirma…",
+      "bd": "{\"tip\":{\"id\":\"7ce47904-5027-4c5d-977b-ea7fa460cb7c\",\"status\":\"pending\",\"amount\":2.0,\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"live_id\":\"2db50b6e-7783-4e08-9fe5-7ab8b1d27acd\",\"stripe_session_id\":\"cs_test_a18wSGEArNwatA6me3SVSJchgPQiMk6BGYIkNbeEX62CUYpJ8WZMClvEt…",
+      "result": "HOLD",
+      "lens": "DR7",
+      "residual": false,
+      "classe_nova": false,
+      "race": true,
+      "count_finding": false
+    },
+    {
+      "probe_id": "D2.convert.feliz.ledger",
+      "poco": "DR-D",
+      "payload": "accepted → CPI live reservation → order ledger; settle unpaid",
+      "http": "200 [{\"id\":\"bfa1e680-fe5c-4f7b-8868-5b65eab18a12\",\"live_id\":\"76521456-fe80-4f19-8b3e-99099cf86680\",\"live_item_id\":\"47840238-3629-4ca7-b211-e86ef6bd35da\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0… | 200 {\"checkoutUrl\":\"https://chec…",
+      "bd": "{\"res\":{\"code\":\"42703\",\"details\":null,\"hint\":null,\"message\":\"column live_reservation_requests.converted_order_id does not exist\"},\"ord\":{\"id\":\"7ef2d016-163d-438d-bf9f-889b8df87aa2\",\"status\":\"reserva_pendente\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"product_i…",
+      "result": "HOLD",
+      "lens": "DR3",
+      "residual": false,
+      "classe_nova": false,
+      "race": false,
+      "count_finding": false
+    }
+  ],
+  "findings": [],
+  "blocked": [
+    {
+      "id": "A1.tip.amount.hostil",
+      "lens": "DR1",
+      "title": "amounts hostis sem crédito",
+      "ev": {
+        "zero": "400 {\"error\":\"Invalid tip amount.\"}",
+        "neg": "400 {\"error\":\"Invalid tip amount.\"}",
+        "half": "400 {\"error\":\"Invalid tip amount.\"}",
+        "over": "400 {\"error\":\"Tip amount too high.\"}",
+        "sci": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1bhgMG9Hm45erjqKSaniJQMixOLcuVPdvNus1Rn7jbdhDX5HygwtYDZCd#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21…",
+        "arr": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1qcPhMxauYgHTVEANSCHVaKKn1LxXXeRWOCFnBih8bxNu6E7asRPctFO2#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21…",
+        "cents_field": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1FOI3n4pTm9nrJArX3XwunmW52yNZUYY6QcTSzcgCLPx9Y39l6aA30sRK#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21…"
+      }
+    },
+    {
+      "id": "A2.tip_id.live_alheio",
+      "lens": "DR1",
+      "title": "tip_id/live alheio recusado",
+      "ev": {
+        "tip_id": "400 {\"error\":\"Tip seller does not own this live.\"}",
+        "live": "400 {\"error\":\"Tip seller does not own this live.\"}"
+      }
+    },
+    {
+      "id": "A3.tip.end_live.race",
+      "lens": "DR4",
+      "title": "race tip∥end sem crédito",
+      "ev": {
+        "http": "400 {\"error\":\"Tips only allowed while the live is broadcasting.\"}",
+        "status": "",
+        "dWallet": 0.0
+      }
+    },
+    {
+      "id": "A4.tip.seller_ne_owner",
+      "lens": "DR1",
+      "title": "seller≠owner recusado",
+      "ev": "400 {\"error\":\"Tip seller does not own this live.\"}"
+    },
+    {
+      "id": "B1.share.sem.rifa",
+      "lens": "DR2",
+      "title": "sem rifa = sem prémio",
+      "ev": {
+        "share": "200 {\"ok\": false, \"error\": \"raffle_not_found\"}",
+        "join": "200 {\"ok\": false, \"error\": \"raffle_not_found\"}"
+      }
+    },
+    {
+      "id": "B2.share.com.rifa",
+      "lens": "DR2",
+      "title": "share com rifa elegível",
+      "ev": {
+        "ticketsJoin": 1,
+        "ticketsShare": 2,
+        "share": "200 {\"ok\": true, \"duplicate\": false, \"ticket_balance\": 2}"
+      }
+    },
+    {
+      "id": "B3.winner.forge.double",
+      "lens": "DR2",
+      "title": "forge/double recusado",
+      "ev": {
+        "buyer": "400 {\"code\":\"P0001\",\"details\":null,\"hint\":null,\"message\":\"not_allowed\"}",
+        "ins": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"new row violates row-level security policy for table \\\"live_raffle_winners\\\"\"}",
+        "nWin": 1
+      }
+    },
+    {
+      "id": "C1.convert.pending",
+      "lens": "DR3",
+      "title": "pending não converteu",
+      "ev": {
+        "rpc": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_live_reservation_stripe_convert\"}",
+        "cpi": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1NG4jFnkKhY6Ygb4pndCjiefGM7hZkbtZASTLWJGZxQVfmK7dZZccBqPT#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21…",
+        "status": null
+      }
+    },
+    {
+      "id": "C2.convert.parallel",
+      "lens": "DR4",
+      "title": "race convert sem double",
+      "ev": {
+        "resA": null,
+        "resB": null,
+        "nConv": 0
+      }
+    },
+    {
+      "id": "C3.accept.cpi.race",
+      "lens": "DR4",
+      "title": "accept∥CPI sem oversell pago",
+      "ev": {
+        "res": null,
+        "ord": "reserva_pendente",
+        "cpiOk": false
+      }
+    },
+    {
+      "id": "C4.convert.after.ended",
+      "lens": "DR6",
+      "title": "convert pós-ended recusado",
+      "ev": {
+        "rpc": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_live_reservation_stripe_convert\"}",
+        "patch": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"convert_requires_paid_order\"}",
+        "status": null
+      }
+    },
+    {
+      "id": "C5.capacity.vs.stock",
+      "lens": "DR5",
+      "title": "capacity coerente sem convert unpaid",
+      "ev": {
+        "a": null,
+        "b": null,
+        "acc": "200 [{\"id\":\"5922f776-cd02-4a44-884a-b9ec3259eb1c\",\"live_id\":\"8b1acacd-c331-48f8-91af-1a66a93155ce\",\"live_item_id\":\"2efa18a0-8691-4b6c-a0a5-c88dd2343102\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0…"
+      }
+    },
+    {
+      "id": "D1.tip.session.test",
+      "lens": "DR7",
+      "title": "Session TEST pending Δ=0",
+      "ev": {
+        "create": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a18wSGEArNwatA6me3SVSJchgPQiMk6BGYIkNbeEX62CUYpJ8WZMClvEtY#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21…",
+        "settle": "200 Pagamento ainda não confirmado. Se já pagaste, aguarda alguns segundos e volta à app Fleaber.",
+        "status": "pending",
+        "dWallet": 0.0
+      }
+    },
+    {
+      "id": "D2.convert.feliz.ledger",
+      "lens": "DR3",
+      "title": "order ledger unpaid; ≠converted",
+      "ev": {
+        "ord": "reserva_pendente",
+        "res": null,
+        "sid": "cs_test_a1usngQsIQJwQjfzjkYDLVvL7Ica4efHamFGIj18DMu7pFTiLpjMDeyMi4"
+      }
+    }
+  ],
+  "notes": [
+    {
+      "id": "order.fail",
+      "title": "insertOrder",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"order_live_item_exhausted\"}"
+    },
+    {
+      "id": "order.fail",
+      "title": "insertOrder",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"order_live_item_exhausted\"}"
+    },
+    {
+      "id": "order.fail",
+      "title": "insertOrder",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"order_live_item_exhausted\"}"
+    }
+  ]
+}

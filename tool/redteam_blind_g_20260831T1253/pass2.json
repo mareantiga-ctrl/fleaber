@@ -1,0 +1,302 @@
+{
+  "pass": 2,
+  "prefix": "RTG-20260831T1253",
+  "wallets_before": {
+    "buyer": 22.75,
+    "seller": 234.6,
+    "buyer2": 0,
+    "seller2": 0
+  },
+  "findings": [
+    {
+      "id": "RTG-G6-003",
+      "lens": "G6",
+      "severity": "P1",
+      "title": "Checkout cobra o preço selado 8,50€ depois do SKU ir a 99€",
+      "actor": "buyer Edge após seller PATCH price",
+      "pre": "order price_total=8.50; product.price=99",
+      "repro": "POST create-payment-intent",
+      "expected": "requote 99€ ou recusa",
+      "obtained": {
+        "server_amount_cents": 958,
+        "body": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1Pbwax8VWHcgSaVnGLzccp3UdciXHegJFdkQRr0u6mS8B8TNufcex0Ykq#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZ…"
+      },
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "RTG-G2-003",
+      "lens": "G2",
+      "severity": "P1",
+      "title": "Hold criado em corrida com unlist+sold do último SKU",
+      "actor": "buyer POST ∥ seller PATCH",
+      "pre": "qty=1 listed",
+      "repro": "Future.wait POST orders ∥ PATCH is_sold+unlist",
+      "expected": "hold recusado ou produto não sold com hold",
+      "obtained": {
+        "order": {
+          "id": "3390f39c-9c9f-43c6-9c8e-8b55850b56b7",
+          "status": "reserva_pendente",
+          "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+          "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+          "product_id": "2f081282-f2cf-45c3-ba24-a1c4b9234643",
+          "quantity": 1,
+          "price_total": 8.5,
+          "amount_paid_cents": null,
+          "payment_method": "Pagamento na app",
+          "shipping_method": "entrega em mão",
+          "stripe_payment_intent_id": null,
+          "stripe_checkout_session_id": null,
+          "stripe_refund_id": null,
+          "wallet_release_processed_at": null,
+          "wallet_refund_processed_at": null,
+          "stock_units_applied": null,
+          "completed_at": null,
+          "auto_feedback_processed_at": null,
+          "bundle_id": null
+        },
+        "product": {
+          "id": "2f081282-f2cf-45c3-ba24-a1c4b9234643",
+          "title": "RTG-20260831T1253 hold-unlist",
+          "price": 8.5,
+          "quantity": 1,
+          "is_sold": true,
+          "list_on_marketplace": false,
+          "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588"
+        }
+      },
+      "proven": true,
+      "evidence": {}
+    }
+  ],
+  "notes": [
+    {
+      "id": "p2.observe.stale_order",
+      "lens": "G6",
+      "title": "order after pass1 PATCH storm",
+      "ev": {
+        "id": "5c513bab-f308-47d8-8047-93b1356cd386",
+        "status": "reserva_pendente",
+        "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+        "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+        "product_id": "bd96d730-85ba-4a53-8aaf-7dfccecdcb48",
+        "quantity": 1,
+        "price_total": 8.5,
+        "amount_paid_cents": null,
+        "payment_method": "Pagamento na app",
+        "shipping_method": "entrega em mão",
+        "stripe_payment_intent_id": null,
+        "stripe_checkout_session_id": null,
+        "stripe_refund_id": null,
+        "wallet_release_processed_at": null,
+        "wallet_refund_processed_at": null,
+        "stock_units_applied": null,
+        "completed_at": "2026-08-31T12:02:42.432705+00:00",
+        "auto_feedback_processed_at": null,
+        "bundle_id": null
+      }
+    },
+    {
+      "id": "p2.observe.stale_status",
+      "lens": "G6",
+      "title": "status actual",
+      "ev": "reserva_pendente"
+    },
+    {
+      "id": "p2.g1.pay_parallel",
+      "lens": "G1",
+      "title": "2× create-payment-intent",
+      "ev": {
+        "a": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1mldjZj9hxGNqEEhZd9ufeITtW1p601Ke8s10JK31otg4OuvmWjHrzn2x#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZ…",
+        "b": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1mldjZj9hxGNqEEhZd9ufeITtW1p601Ke8s10JK31otg4OuvmWjHrzn2x#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZ…"
+      }
+    },
+    {
+      "id": "p2.g1.pay_cents",
+      "lens": "G1",
+      "title": "session urls/cents",
+      "ev": {
+        "urls": 1,
+        "cents": [
+          958,
+          958
+        ]
+      }
+    },
+    {
+      "id": "p2.g2.last_unit",
+      "lens": "G2",
+      "title": "2 buyers qty=1",
+      "ev": {
+        "b1": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"order_hold_exceeds_stock\"}",
+        "b2": "201 [{\"id\":\"e6c51507-1fb3-4a29-9e2e-d509f5ef9952\",\"created_at\":\"2026-08-31T12:05:21.97534+00:00\",\"product_id\":\"e687cecd-e2dd-4789-b319-6505ca56d75b\",\"buyer_id\":\"af9c7e0f-9767-4107-b5fc…",
+        "active_holds": 1
+      }
+    },
+    {
+      "id": "p2.g2.checkout_unlist",
+      "lens": "G2",
+      "title": "pay ∥ unlist",
+      "ev": {
+        "pay": "400 {\"error\":\"Checkout blocked: product is not listed.\"}",
+        "unlist": "200 [{\"id\":\"1faec269-dd92-4c98-ae20-eb0afc1881f3\",\"created_at\":\"2026-08-31T12:05:22.423957+00:00\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"title\":\"RTG-20260831T1253 unlist-r…",
+        "product": {
+          "id": "1faec269-dd92-4c98-ae20-eb0afc1881f3",
+          "title": "RTG-20260831T1253 unlist-race",
+          "price": 8.5,
+          "quantity": 1,
+          "is_sold": false,
+          "list_on_marketplace": false,
+          "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588"
+        }
+      }
+    },
+    {
+      "id": "p2.g6.stale_price",
+      "lens": "G6",
+      "title": "checkout after 8.5→99",
+      "ev": {
+        "http": 200,
+        "cents": 958,
+        "snip": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1Pbwax8VWHcgSaVnGLzccp3UdciXHegJFdkQRr0u6mS8B8TNufcex0Ykq#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZ…"
+      }
+    },
+    {
+      "id": "p2.g2.hold_unlist",
+      "lens": "G2",
+      "title": "hold INSERT ∥ sold+unlist",
+      "ev": {
+        "hold": "201 [{\"id\":\"3390f39c-9c9f-43c6-9c8e-8b55850b56b7\",\"created_at\":\"2026-08-31T12:05:26.445575+00:00\",\"product_id\":\"2f081282-f2cf-45c3-ba24-a1c4b9234643\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a…",
+        "unlist": "200 [{\"id\":\"2f081282-f2cf-45c3-ba24-a1c4b9234643\",\"created_at\":\"2026-08-31T12:05:26.250598+00:00\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"title\":\"RTG-20260831T1253 hold-unl…",
+        "product": {
+          "id": "2f081282-f2cf-45c3-ba24-a1c4b9234643",
+          "title": "RTG-20260831T1253 hold-unlist",
+          "price": 8.5,
+          "quantity": 1,
+          "is_sold": true,
+          "list_on_marketplace": false,
+          "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588"
+        },
+        "order": {
+          "id": "3390f39c-9c9f-43c6-9c8e-8b55850b56b7",
+          "status": "reserva_pendente",
+          "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+          "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+          "product_id": "2f081282-f2cf-45c3-ba24-a1c4b9234643",
+          "quantity": 1,
+          "price_total": 8.5,
+          "amount_paid_cents": null,
+          "payment_method": "Pagamento na app",
+          "shipping_method": "entrega em mão",
+          "stripe_payment_intent_id": null,
+          "stripe_checkout_session_id": null,
+          "stripe_refund_id": null,
+          "wallet_release_processed_at": null,
+          "wallet_refund_processed_at": null,
+          "stock_units_applied": null,
+          "completed_at": null,
+          "auto_feedback_processed_at": null,
+          "bundle_id": null
+        }
+      }
+    },
+    {
+      "id": "p2.g1.offer_acc",
+      "lens": "G1",
+      "title": "2× accept offer",
+      "ev": {
+        "a": "200 [{\"id\":\"ea623764-b176-4ba9-b8f2-bebaa6ecddef\",\"product_id\":\"8958bb14-a427-4555-9d9e-54e4edc4b1b9\",\"chat_id\":null,\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f…",
+        "b": "200 [{\"id\":\"ea623764-b176-4ba9-b8f2-bebaa6ecddef\",\"product_id\":\"8958bb14-a427-4555-9d9e-54e4edc4b1b9\",\"chat_id\":null,\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f…"
+      }
+    },
+    {
+      "id": "p2.g1.tip_wallet",
+      "lens": "G1",
+      "title": "2× tip wallet paralelo",
+      "ev": {
+        "a": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"not_allowed\"}",
+        "b": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"not_allowed\"}",
+        "wallets": {
+          "buyer": 22.75,
+          "seller": 234.6,
+          "buyer2": 0,
+          "seller2": 0
+        }
+      }
+    },
+    {
+      "id": "p2.g2.offer_expire",
+      "lens": "G2",
+      "title": "accept ∥ expire cron",
+      "ev": {
+        "accept": "200 [{\"id\":\"354c0b68-e8ba-4249-afe9-342d7bc5a567\",\"product_id\":\"356b6cb4-6ed8-4b9c-b88f-2fcc6e253deb\",\"chat_id\":null,\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f…",
+        "expire": "200 2",
+        "row": {
+          "id": "354c0b68-e8ba-4249-afe9-342d7bc5a567",
+          "status": "expired",
+          "expires_at": "2026-08-31T12:05:27.843939+00:00",
+          "responded_at": "2026-08-31T12:05:30.175201+00:00"
+        }
+      }
+    },
+    {
+      "id": "p2.g1.payout_same",
+      "lens": "G1",
+      "title": "payout same idempotency_key ∥",
+      "ev": {
+        "a": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_wallet_payout_debit\"}",
+        "b": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_wallet_payout_debit\"}"
+      }
+    },
+    {
+      "id": "p2.g1.payout_diff",
+      "lens": "G1",
+      "title": "payout 2 keys distintas ∥",
+      "ev": {
+        "a": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_wallet_payout_debit\"}",
+        "b": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_wallet_payout_debit\"}",
+        "wallets": {
+          "buyer": 22.75,
+          "seller": 234.6,
+          "buyer2": 0,
+          "seller2": 0
+        }
+      }
+    },
+    {
+      "id": "p2.g5.live_item_fail",
+      "lens": "G5",
+      "title": "live_items insert",
+      "ev": "400 {\"code\":\"23514\",\"details\":\"Failing row contains (a61037fc-8955-4672-bf6b-e2259e99547f, e7dd11a1-1138-49ae-9f0c-831e14f10563, 980f4fa1-0004-42f9-abca-69f1a9c29588, RTG-1253, rtg ite…"
+    }
+  ],
+  "wallets_after": {
+    "buyer": 22.75,
+    "seller": 234.6,
+    "buyer2": 0,
+    "seller2": 0
+  },
+  "created": {
+    "products": [
+      "ded5b67c-8b15-49e6-a52e-b01bfbd47d28",
+      "e687cecd-e2dd-4789-b319-6505ca56d75b",
+      "1faec269-dd92-4c98-ae20-eb0afc1881f3",
+      "ce140c58-7eec-42d8-989e-68b5f7623526",
+      "2f081282-f2cf-45c3-ba24-a1c4b9234643",
+      "8958bb14-a427-4555-9d9e-54e4edc4b1b9",
+      "356b6cb4-6ed8-4b9c-b88f-2fcc6e253deb",
+      "678c4eaa-c34e-4766-b2b8-615139805c1d"
+    ],
+    "orders": [
+      "7c1baf96-ba90-4908-a077-9bdc1d51f011",
+      "e6c51507-1fb3-4a29-9e2e-d509f5ef9952",
+      "a74d5679-bd1a-46dd-9315-001a0dfb354c",
+      "7876a4db-8025-4de9-ab10-8d67f780bce4",
+      "3390f39c-9c9f-43c6-9c8e-8b55850b56b7"
+    ],
+    "lives": [
+      "1e9b75ff-eb2a-4bde-9b31-f03e92fa693a",
+      "e7dd11a1-1138-49ae-9f0c-831e14f10563"
+    ]
+  }
+}

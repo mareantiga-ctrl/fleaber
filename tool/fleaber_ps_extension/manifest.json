@@ -1,0 +1,55 @@
+{
+  "manifest_version": 3,
+  "name": "Fleaber Seller Studio — Facebook Live",
+  "version": "1.7.29",
+  "description": "Seller Studio Fleaber (Produção) — quero obrigatório; quero obrigatório; Chat MVP só reservas.",
+  "permissions": ["storage", "scripting", "tabs", "windows"],
+  "host_permissions": [
+    "https://www.facebook.com/*",
+    "https://web.facebook.com/*",
+    "https://m.facebook.com/*",
+    "https://business.facebook.com/*",
+    "https://bpmpkzwnrbmuqnhgdscf.supabase.co/*",
+    "https://fxdknzrqjenzqcvnwqqq.supabase.co/*",
+    "https://*.mux.com/*",
+    "http://127.0.0.1:11434/*",
+    "http://localhost:11434/*",
+    "http://127.0.0.1:8765/*",
+    "http://localhost:8765/*"
+  ],
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://www.facebook.com/*",
+        "https://web.facebook.com/*",
+        "https://m.facebook.com/*",
+        "https://business.facebook.com/*",
+        "http://127.0.0.1:8765/*",
+        "http://localhost:8765/*"
+      ],
+      "js": ["content_loader.js"],
+      "run_at": "document_idle",
+      "all_frames": false
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["content.js", "parser.js", "panel.js"],
+      "matches": [
+        "https://www.facebook.com/*",
+        "https://web.facebook.com/*",
+        "https://m.facebook.com/*",
+        "https://business.facebook.com/*",
+        "http://127.0.0.1:8765/*",
+        "http://localhost:8765/*"
+      ]
+    }
+  ],
+  "action": {
+    "default_title": "Fleaber Seller Studio"
+  }
+}

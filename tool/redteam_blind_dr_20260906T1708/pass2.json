@@ -1,0 +1,149 @@
+{
+  "auditor": "REDTEAM_BLIND_DR_TIP_RAFFLE_POS_DHDM_v1",
+  "pass": 2,
+  "prefix": "RTDR-20260906T1708",
+  "probes": [
+    {
+      "probe_id": "A2.tip_id.live_alheio",
+      "poco": "DR-A",
+      "payload": "tip_id UUID cliente em live S1 seller S1 (pass2)",
+      "http": "400 {\"error\":\"Client tip_id is not allowed.\"}",
+      "bd": "{\"tipId\":null,\"sid\":null}",
+      "result": "HOLD",
+      "lens": "DR1",
+      "residual": false,
+      "classe_nova": true,
+      "race": false,
+      "count_finding": false
+    },
+    {
+      "probe_id": "A1.tip.amount.hostil",
+      "poco": "DR-A",
+      "payload": "pass2 confirm sci 1e2 + arr [2] Session; unpaid",
+      "http": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1zKvfJlGpDVB65jr4JqcWW6yMsOx3ge1W7qf1QC81beDWxg19TBNIoA44#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21… | 200 {\"checkoutUrl\":\"https://chec…",
+      "bd": "{\"sci\":{\"id\":\"2e8e9861-eb58-4fbc-bb51-c18c3039271c\",\"status\":\"pending\",\"amount\":100.0,\"buyer_id\":\"9872df1e-93d8-4353-b097-d0f99dc70599\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"live_id\":\"3ff93618-f607-4357-a7e0-3ab53ccb95e7\",\"stripe_session_id\":\"cs_test_a1zKvfJlGpDVB65jr4JqcWW6yMsOx3ge1W7qf1QC81beDWxg19TBNIo…",
+      "result": "HOLD",
+      "lens": "DR1",
+      "residual": false,
+      "classe_nova": true,
+      "race": false,
+      "count_finding": false
+    },
+    {
+      "probe_id": "C1.convert.pending",
+      "poco": "DR-C",
+      "payload": "pass2 pending convert RPC+CPI (order sem live_item insert)",
+      "http": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_live_reservation_stripe_convert\"} | 400 {\"error\":\"Checkout blocked: live item does not match order.\"}",
+      "bd": "{\"res\":{\"id\":\"ff9bc2b8-9ec1-40b6-b654-2d1f5051e83d\",\"status\":\"pending\",\"requested_qty\":1,\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"live_id\":\"bac08389-74d6-4587-996d-3e22e617e6b6\",\"live_item_id\":\"8f90843a-09c8-47a3-a502-26cf37856d40\"},\"ord\":\"reserva_pendente\"}",
+      "result": "HOLD",
+      "lens": "DR3",
+      "residual": false,
+      "classe_nova": true,
+      "race": false,
+      "count_finding": false
+    },
+    {
+      "probe_id": "C2.convert.parallel",
+      "poco": "DR-C",
+      "payload": "pass2 CPI B1∥B2(res B1) + RPC×2",
+      "http": "0 no-a | 0 no-b | 403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_live_reservation_stripe_convert\"} | 403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_live_reservation_stripe_convert\"}",
+      "bd": "{\"resA\":{\"id\":\"37a65732-7fbc-44e3-9130-872260fc870d\",\"status\":\"accepted\",\"requested_qty\":1,\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"live_id\":\"bb5164d6-dd02-4e77-a213-8b52174971f1\",\"live_item_id\":\"f5425c06-44f7-463c-b7e4-8c3c4aae4d2c\"},\"resB\":{\"id\":\"0ca3e309-1bae-43ee-87d3-c70dec56a1aa\",\"status\":\"pending\",\"req…",
+      "result": "HOLD",
+      "lens": "DR4",
+      "residual": false,
+      "classe_nova": true,
+      "race": true,
+      "count_finding": false
+    },
+    {
+      "probe_id": "C3.accept.cpi.race",
+      "poco": "DR-C",
+      "payload": "pass2 accept∥marketplace CPI qty=1",
+      "http": "200 [{\"id\":\"f16ced37-c225-45c8-8b2a-2cc935cb82d3\",\"live_id\":\"34c40544-2615-4262-807c-47b2568cb6f0\",\"live_item_id\":\"74fa5bad-45c4-41a7-84b1-3623f6ea3796\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0… | 400 {\"error\":\"Checkout blocked: …",
+      "bd": "{\"res\":{\"id\":\"f16ced37-c225-45c8-8b2a-2cc935cb82d3\",\"status\":\"accepted\",\"requested_qty\":1,\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"live_id\":\"34c40544-2615-4262-807c-47b2568cb6f0\",\"live_item_id\":\"74fa5bad-45c4-41a7-84b1-3623f6ea3796\"},\"ord\":\"reserva_pendente\",\"prod\":{\"id\":\"08cc39a3-2563-4a5c-9e94-5facc754a2ab\"…",
+      "result": "HOLD",
+      "lens": "DR4",
+      "residual": false,
+      "classe_nova": true,
+      "race": true,
+      "count_finding": false
+    },
+    {
+      "probe_id": "C4.convert.after.ended",
+      "poco": "DR-C",
+      "payload": "pass2 convert após ended",
+      "http": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_live_reservation_stripe_convert\"} | 403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"convert_requires_paid_order\"}",
+      "bd": "{\"id\":\"6933b24d-aa50-41ce-96aa-f1e2c2eeb516\",\"status\":\"accepted\",\"requested_qty\":1,\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"live_id\":\"c1808eb5-c3b3-42f6-84d2-ad38db4b03ef\",\"live_item_id\":\"08948ae4-dec4-4085-85f2-9cb74a8e084a\"}",
+      "result": "HOLD",
+      "lens": "DR6",
+      "residual": false,
+      "classe_nova": false,
+      "race": false,
+      "count_finding": false
+    },
+    {
+      "probe_id": "C5.capacity.vs.stock",
+      "poco": "DR-C",
+      "payload": "pass2 accepted qty=1; convert unpaid; 2º accept",
+      "http": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_live_reservation_stripe_convert\"} | acc2=400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"qty_exceeds_stock\"}",
+      "bd": "{\"a\":{\"id\":\"768b2c63-cee7-4f0a-b129-c9bc5b74b03c\",\"status\":\"accepted\",\"requested_qty\":1,\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"live_id\":\"adc0d275-90b7-487e-8805-39da4cc76a1b\",\"live_item_id\":\"fd1ad8d2-aed1-4510-a90c-7b64f8d074d3\"},\"b\":{\"id\":\"cd21ed0d-494f-4226-8c66-cc8e7677ccbb\",\"status\":\"pending\",\"requested…",
+      "result": "HOLD",
+      "lens": "DR5",
+      "residual": false,
+      "classe_nova": false,
+      "race": false,
+      "count_finding": false
+    },
+    {
+      "probe_id": "D2.convert.feliz.ledger",
+      "poco": "DR-D",
+      "payload": "pass2 accepted CPI ledger + settle unpaid",
+      "http": "400 {\"error\":\"Checkout blocked: live item does not match order.\"} | n/a",
+      "bd": "{\"res\":{\"id\":\"50191174-dec3-452f-bb4d-90308c44248f\",\"status\":\"accepted\",\"requested_qty\":1,\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"live_id\":\"0ff33d25-526d-4f15-bb86-48fe201bfc30\",\"live_item_id\":\"de7087bf-bfcd-44f0-9986-bf7e69f5f25b\"},\"ord\":{\"id\":\"ad34d2b1-7737-496a-bdb6-2b6409a2d79a\",\"status\":\"reserva_pendent…",
+      "result": "HOLD",
+      "lens": "DR3",
+      "residual": false,
+      "classe_nova": false,
+      "race": false,
+      "count_finding": false
+    }
+  ],
+  "findings": [],
+  "blocked": [
+    {
+      "id": "A2.tip_id.client",
+      "lens": "DR1",
+      "title": "tip_id cliente recusado",
+      "ev": "400 {\"error\":\"Client tip_id is not allowed.\"}"
+    },
+    {
+      "id": "C2.convert.parallel",
+      "lens": "DR4",
+      "title": "pass2 race sem double",
+      "ev": {
+        "a": "accepted",
+        "b": "pending",
+        "oa": null,
+        "ob": null,
+        "c2a": "0 no-a",
+        "c2b": "0 no-b"
+      }
+    }
+  ],
+  "notes": [
+    {
+      "id": "order.fail",
+      "title": "insertOrder",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"order_hold_exceeds_stock\"}"
+    },
+    {
+      "id": "order.fail",
+      "title": "insertOrder",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"order_hold_exceeds_stock\"}"
+    }
+  ],
+  "P0": 0,
+  "P1": 0,
+  "P2": 0,
+  "P3": 0
+}

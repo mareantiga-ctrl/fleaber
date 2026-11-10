@@ -1,0 +1,265 @@
+{
+  "stamp": "20260906T1225",
+  "prefix": "RTCD-20260906T1225",
+  "lenses": [
+    "CD2",
+    "CD6"
+  ],
+  "wells": [
+    "CD-A",
+    "CD-C"
+  ],
+  "findings": [
+    {
+      "id": "P2-2",
+      "lens": "CD2",
+      "severity": "P2",
+      "title": "Overlap 5∥3: Edge devolveu 2 cs_ distintas (HTML 1 pagável ou expirada)",
+      "actor": "buyer JWT",
+      "pre": "bag ABCDE ∥ DEF",
+      "repro": "Future.wait 2× bag_checkout; GET HTML",
+      "expected": "1 cs_",
+      "obtained": {
+        "cpi_sids": [
+          "cs_test_a16NFwMLU4Tq6h3rrzJqbg7QQbtSV4CvXBH6h3t28T7hrYPpTXmdz0Lg5n",
+          "cs_test_a1f211Nn90dWmDRqRJnxXgn0EqmtmFik3GsUElohs4q7GjVrYeWDTx6wOd"
+        ],
+        "htmlPay": 0,
+        "pages": [
+          {
+            "sid": "cs_test_a16NFwMLU4Tq6h3rrzJqbg7QQbtSV4CvXBH6h3t28T7hrYPpTXmdz0Lg5n",
+            "status": 200,
+            "len": 564069,
+            "expired_hint": true,
+            "pay_hint": false,
+            "snip": "<!doctype html><html lang=\"en\" translate=\"no\" class=\"App--classic\" data-checkout-variant=\"classic\"><head><link rel=\"dns-prefetch\" href=\"https://api.stripe.com\"/><link rel=\"dns-prefetch\" href=\"https://merchant-ui-api.stri…"
+          },
+          {
+            "sid": "cs_test_a1f211Nn90dWmDRqRJnxXgn0EqmtmFik3GsUElohs4q7GjVrYeWDTx6wOd",
+            "status": 200,
+            "len": 564069,
+            "expired_hint": true,
+            "pay_hint": false,
+            "snip": "<!doctype html><html lang=\"en\" translate=\"no\" class=\"App--classic\" data-checkout-variant=\"classic\"><head><link rel=\"dns-prefetch\" href=\"https://api.stripe.com\"/><link rel=\"dns-prefetch\" href=\"https://merchant-ui-api.stri…"
+          }
+        ],
+        "stored_cs_n": 1
+      },
+      "proven": true,
+      "evidence": {}
+    }
+  ],
+  "blocked": [
+    {
+      "id": "A4-HTML-PASS1",
+      "lens": "CD2",
+      "title": "HTML overlap pass1 não prova 2 pagáveis",
+      "ev": {
+        "p1": {
+          "sid": "cs_test_a1rbmIQFMEkywNJfhVt1ezHfbbGa7ZOnukWoDuQrET31uwGo7tBD2PMx7D",
+          "status": 200,
+          "len": 564069,
+          "expired_hint": true,
+          "pay_hint": false,
+          "snip": "<!doctype html><html lang=\"en\" translate=\"no\" class=\"App--classic\" data-checkout-variant=\"classic\"><head><link rel=\"dns-prefetch\" href=\"https://api.stripe.com\"/><link rel=\"dns-prefetch\" href=\"https://merchant-ui-api.stri…"
+        },
+        "p2": {
+          "sid": "cs_test_a13YQjZnFlOR46OGQuZZGyNjYZYlxoQj8TGoUJzZcd6HhBBjVbHbdp7lAD",
+          "status": 200,
+          "len": 564069,
+          "expired_hint": true,
+          "pay_hint": false,
+          "snip": "<!doctype html><html lang=\"en\" translate=\"no\" class=\"App--classic\" data-checkout-variant=\"classic\"><head><link rel=\"dns-prefetch\" href=\"https://api.stripe.com\"/><link rel=\"dns-prefetch\" href=\"https://merchant-ui-api.stri…"
+        }
+      }
+    },
+    {
+      "id": "P2-1-CONFIRM",
+      "lens": "CD2",
+      "title": "P2-1 confirmado: claiming órfão persiste após 5s e 2 CPI",
+      "ev": {
+        "h1": "400 {\"error\":\"Checkout blocked: order claim contention.\"}",
+        "h2": "400 {\"error\":\"Checkout blocked: order claim contention.\"}",
+        "stored": "claiming:orphanedtoken12"
+      }
+    },
+    {
+      "id": "C1-LAST-UNIT",
+      "lens": "CD6",
+      "title": "race última unidade ≤1 Session",
+      "ev": {
+        "ok": 0,
+        "briefs": [
+          "400 {\"error\":\"Checkout blocked: quantity 1 exceeds available stock 0.\"}",
+          "400 {\"error\":\"Checkout blocked: quantity 1 exceeds available stock 0.\"}"
+        ]
+      }
+    },
+    {
+      "id": "C2-UNLIST-RACE2",
+      "lens": "CD6",
+      "title": "2.ª race unlist∥checkout executada",
+      "ev": {
+        "ck": 400,
+        "ul": 200
+      }
+    }
+  ],
+  "skipped": [],
+  "notes": [
+    {
+      "id": "P2.A4.html",
+      "lens": "CD2",
+      "well": "CD-A",
+      "title": "GET HTML Sessions overlap pass1",
+      "ev": {
+        "p1": {
+          "sid": "cs_test_a1rbmIQFMEkywNJfhVt1ezHfbbGa7ZOnukWoDuQrET31uwGo7tBD2PMx7D",
+          "status": 200,
+          "len": 564069,
+          "expired_hint": true,
+          "pay_hint": false,
+          "snip": "<!doctype html><html lang=\"en\" translate=\"no\" class=\"App--classic\" data-checkout-variant=\"classic\"><head><link rel=\"dns-prefetch\" href=\"https://api.stripe.com\"/><link rel=\"dns-prefetch\" href=\"https://merchant-ui-api.stri…"
+        },
+        "p2": {
+          "sid": "cs_test_a13YQjZnFlOR46OGQuZZGyNjYZYlxoQj8TGoUJzZcd6HhBBjVbHbdp7lAD",
+          "status": 200,
+          "len": 564069,
+          "expired_hint": true,
+          "pay_hint": false,
+          "snip": "<!doctype html><html lang=\"en\" translate=\"no\" class=\"App--classic\" data-checkout-variant=\"classic\"><head><link rel=\"dns-prefetch\" href=\"https://api.stripe.com\"/><link rel=\"dns-prefetch\" href=\"https://merchant-ui-api.stri…"
+        }
+      }
+    },
+    {
+      "id": "P2.A4.rerun",
+      "lens": "CD2",
+      "well": "CD-A",
+      "title": "overlap 5∥3 + HTML + BD",
+      "ev": {
+        "cpi_sids": [
+          "cs_test_a16NFwMLU4Tq6h3rrzJqbg7QQbtSV4CvXBH6h3t28T7hrYPpTXmdz0Lg5n",
+          "cs_test_a1f211Nn90dWmDRqRJnxXgn0EqmtmFik3GsUElohs4q7GjVrYeWDTx6wOd"
+        ],
+        "pages": [
+          {
+            "sid": "cs_test_a16NFwMLU4Tq6h3rrzJqbg7QQbtSV4CvXBH6h3t28T7hrYPpTXmdz0Lg5n",
+            "status": 200,
+            "len": 564069,
+            "expired_hint": true,
+            "pay_hint": false,
+            "snip": "<!doctype html><html lang=\"en\" translate=\"no\" class=\"App--classic\" data-checkout-variant=\"classic\"><head><link rel=\"dns-prefetch\" href=\"https://api.stripe.com\"/><link rel=\"dns-prefetch\" href=\"https://merchant-ui-api.stri…"
+          },
+          {
+            "sid": "cs_test_a1f211Nn90dWmDRqRJnxXgn0EqmtmFik3GsUElohs4q7GjVrYeWDTx6wOd",
+            "status": 200,
+            "len": 564069,
+            "expired_hint": true,
+            "pay_hint": false,
+            "snip": "<!doctype html><html lang=\"en\" translate=\"no\" class=\"App--classic\" data-checkout-variant=\"classic\"><head><link rel=\"dns-prefetch\" href=\"https://api.stripe.com\"/><link rel=\"dns-prefetch\" href=\"https://merchant-ui-api.stri…"
+          }
+        ],
+        "stored": [
+          {
+            "oid": "ab8152f9-e392-4152-a782-0ce380dbef95",
+            "sid": "cs_test_a16NFwMLU4Tq6h3rrzJqbg7QQbtSV4CvXBH6h3t28T7hrYPpTXmdz0Lg5n"
+          },
+          {
+            "oid": "0209634b-ee5b-4864-83f1-5218d47bc0f3",
+            "sid": "cs_test_a16NFwMLU4Tq6h3rrzJqbg7QQbtSV4CvXBH6h3t28T7hrYPpTXmdz0Lg5n"
+          },
+          {
+            "oid": "25ea1032-8bb1-4b7c-9771-e476858c40b6",
+            "sid": "cs_test_a16NFwMLU4Tq6h3rrzJqbg7QQbtSV4CvXBH6h3t28T7hrYPpTXmdz0Lg5n"
+          },
+          {
+            "oid": "6c9a8b73-bf6d-451f-8994-9bedf74edeb2",
+            "sid": "cs_test_a16NFwMLU4Tq6h3rrzJqbg7QQbtSV4CvXBH6h3t28T7hrYPpTXmdz0Lg5n"
+          },
+          {
+            "oid": "eb4041e4-5368-4005-80e1-ecbd4f4ff187",
+            "sid": "cs_test_a16NFwMLU4Tq6h3rrzJqbg7QQbtSV4CvXBH6h3t28T7hrYPpTXmdz0Lg5n"
+          },
+          {
+            "oid": "6c1fda27-1088-48ac-bb4e-27d9f4c72f0f",
+            "sid": ""
+          }
+        ],
+        "stored_cs_n": 1,
+        "briefs": [
+          "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a16NFwMLU4Tq6h3rrzJqbg7QQbtSV4CvXBH6h3t28T7hrYPpTXmdz0Lg5n#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21oYWlsUnxrVkRhQUQyNlJjSWBCN3BXNXVvVT1haml…",
+          "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1f211Nn90dWmDRqRJnxXgn0EqmtmFik3GsUElohs4q7GjVrYeWDTx6wOd#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21oYWlsUnxrVkRhQUQyNlJjSWBCN3BXNXVvVT1haml…"
+        ]
+      }
+    },
+    {
+      "id": "P2.A3.persist",
+      "lens": "CD2",
+      "well": "CD-A",
+      "title": "claiming: órfão persistente (2 CPI + 5s)",
+      "ev": {
+        "h1": "400 {\"error\":\"Checkout blocked: order claim contention.\"}",
+        "h2": "400 {\"error\":\"Checkout blocked: order claim contention.\"}",
+        "stored": "claiming:orphanedtoken12"
+      }
+    },
+    {
+      "id": "P2.C1.last",
+      "lens": "CD6",
+      "well": "CD-C",
+      "title": "2 buyers stock=1 após 2 holds",
+      "ev": {
+        "briefs": [
+          "400 {\"error\":\"Checkout blocked: quantity 1 exceeds available stock 0.\"}",
+          "400 {\"error\":\"Checkout blocked: quantity 1 exceeds available stock 0.\"}"
+        ],
+        "ok": 0,
+        "pages": []
+      }
+    },
+    {
+      "id": "P2.C2.unlist-race",
+      "lens": "CD6",
+      "well": "CD-C",
+      "title": "checkout ∥ unlist (2.ª race)",
+      "ev": {
+        "ck": "400 {\"error\":\"Checkout blocked: product is not listed.\"}",
+        "ul": "200 [{\"id\":\"882db188-2abb-4241-9429-e009acacaf5a\",\"created_at\":\"2026-09-06T11:36:29.262966+00:00\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"title\":\"RTCD-20260906T1225-p2-unlist\",\"price\":13.0,\"ref_code\":null,\"category\":null,\"clothing_size\":null,\"gender\":null,\"description\":\"R…"
+      }
+    }
+  ],
+  "actors": {
+    "buyer": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+    "seller": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+    "buyer2": "f0c1e826-cbe2-4aa5-a7a9-b5a748dc9c7d",
+    "seller2": null
+  },
+  "created": {
+    "orders": [
+      "ab8152f9-e392-4152-a782-0ce380dbef95",
+      "0209634b-ee5b-4864-83f1-5218d47bc0f3",
+      "25ea1032-8bb1-4b7c-9771-e476858c40b6",
+      "6c9a8b73-bf6d-451f-8994-9bedf74edeb2",
+      "eb4041e4-5368-4005-80e1-ecbd4f4ff187",
+      "6c1fda27-1088-48ac-bb4e-27d9f4c72f0f",
+      "daefb3f8-bdb3-4e7a-b2c4-cf93774858ff",
+      "ef15040a-459c-4f96-96d6-05f91a0fe22f",
+      "25f8bab4-64a0-4298-a004-c9077d96e2f1",
+      "eead13ba-f9ab-41b8-9f5d-c52104dc1d1b"
+    ],
+    "products": [
+      "d9688d77-47ae-4409-bad8-b2221bb24405",
+      "d56a6631-a28b-44f6-8c6f-bf66d4f7b956",
+      "4b9209f6-06ce-46fe-b561-d43f1f8b1b22",
+      "606cc046-6e6f-484f-8fb9-87551aea4306",
+      "8dc2f0de-a2be-4f08-801a-9c618c7fd2f4",
+      "ca5cda43-bd43-4955-852f-98099a7c9730",
+      "38cce77a-51ec-45f7-a3e7-ab47c3367aa8",
+      "690f69c8-1952-46d3-9ca8-d8bed17e9e29",
+      "882db188-2abb-4241-9429-e009acacaf5a"
+    ],
+    "bundles": [],
+    "offers": [],
+    "sessions": []
+  }
+}

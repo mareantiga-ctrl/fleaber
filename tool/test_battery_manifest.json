@@ -1,0 +1,251 @@
+{
+  "version": 1,
+  "title": "Fleaber UX+BD Battery",
+  "liveMarkdown": "tool/TEST_BATTERY_LIVE.md",
+  "registryJson": "tool/test_battery_registry.json",
+  "tests": [
+    {
+      "id": "T01",
+      "phase": "1",
+      "layer": "BD",
+      "name": "flutter_test_core",
+      "title": "Unit tests Flutter (raffle, chat, lineage)",
+      "expected": "Todos os testes unitarios PASS no servidor local",
+      "runner": "run_full_automated_battery.ps1"
+    },
+    {
+      "id": "T02",
+      "phase": "1",
+      "layer": "BD",
+      "name": "live_ops_staging_check",
+      "title": "Live ops staging V0 (RPC/BD)",
+      "expected": "Checks Doc #3/#4/#6/#7 na BD staging PASS",
+      "runner": "run_full_automated_battery.ps1"
+    },
+    {
+      "id": "T03",
+      "phase": "1",
+      "layer": "BD",
+      "name": "integration_stock",
+      "title": "Integracao stock A3",
+      "expected": "Qty/stock coerente na BD apos cenario stock",
+      "runner": "run_full_automated_battery.ps1"
+    },
+    {
+      "id": "T04",
+      "phase": "1",
+      "layer": "BD",
+      "name": "integration_a3_r32_qty",
+      "title": "Integracao A3/R32 qty",
+      "expected": "Alinhamento qty reservas/vendido na BD",
+      "runner": "run_full_automated_battery.ps1"
+    },
+    {
+      "id": "T05",
+      "phase": "1",
+      "layer": "BD",
+      "name": "integration_cross_pool",
+      "title": "Integracao cross-pool A340",
+      "expected": "Cross-pool RR1 PASS na BD",
+      "runner": "run_full_automated_battery.ps1"
+    },
+    {
+      "id": "T06",
+      "phase": "1",
+      "layer": "BD",
+      "name": "integration_lineage",
+      "title": "Integracao linhagem A005",
+      "expected": "logical_item_lineage PASS na BD",
+      "runner": "run_full_automated_battery.ps1"
+    },
+    {
+      "id": "T07a",
+      "phase": "1",
+      "layer": "UX",
+      "name": "maestro_seller_harness",
+      "title": "Seller harness: Aceitar reserva pending",
+      "expected": "emulator-5554: login + studio + Aceitar visivel; prints cs01 seller",
+      "runner": "run_maestro_automation.ps1"
+    },
+    {
+      "id": "T07b",
+      "phase": "1",
+      "layer": "UX",
+      "name": "maestro_seller_stock",
+      "title": "Seller +Stock no harness",
+      "expected": "emulator-5554: doc_03 stock sem red screen; catalogo actualizado",
+      "runner": "run_maestro_automation.ps1"
+    },
+    {
+      "id": "T07c",
+      "phase": "1",
+      "layer": "UX",
+      "name": "maestro_buyer_raffle_bag",
+      "title": "Buyer player + rifa + saco",
+      "expected": "emulator-5556: login, player, saco; prints cs10 buyer",
+      "runner": "run_maestro_automation.ps1"
+    },
+    {
+      "id": "T08a",
+      "phase": "1",
+      "layer": "BD",
+      "name": "doc_apk_v0_bd",
+      "title": "Doc APK V0 BD",
+      "expected": "live_ops_staging_check dentro de doc_apk PASS",
+      "runner": "run_doc_apk_tests.ps1"
+    },
+    {
+      "id": "T08b",
+      "phase": "1",
+      "layer": "UX",
+      "name": "doc_apk_cancel_bag",
+      "title": "Doc #4 APK cancelar saco",
+      "expected": "emulator-5556: saco -> Gerir reservas -> Cancelar; prints cs05",
+      "runner": "run_doc_apk_tests.ps1"
+    },
+    {
+      "id": "T08c",
+      "phase": "1",
+      "layer": "UX",
+      "name": "doc_apk_bag_pagar",
+      "title": "Doc #6 APK saco Pagar",
+      "expected": "emulator-5556: saco mostra botao Pagar; print cs09",
+      "runner": "run_doc_apk_tests.ps1"
+    },
+    {
+      "id": "T08d",
+      "phase": "1",
+      "layer": "UX",
+      "name": "doc_apk_seller_stock",
+      "title": "Doc #3 APK adicionar stock",
+      "expected": "emulator-5554: +Stock no catalogo harness; prints cs02",
+      "runner": "run_doc_apk_tests.ps1"
+    },
+    {
+      "id": "T08e",
+      "phase": "1",
+      "layer": "UX",
+      "name": "doc_apk_stripe",
+      "title": "Doc #7 Stripe EUR",
+      "expected": "SKIP manual (browser real)",
+      "runner": "run_doc_apk_tests.ps1"
+    },
+    {
+      "id": "T09",
+      "phase": "1",
+      "layer": "UX",
+      "name": "seller_stock_ui_maestro",
+      "title": "Seller stock UI (bateria isolada)",
+      "expected": "emulator-5554: doc_03 apos open studio PASS",
+      "runner": "run_full_automated_battery.ps1"
+    },
+    {
+      "id": "T10",
+      "phase": "1",
+      "layer": "UX",
+      "name": "pull_maestro_logs",
+      "title": "Pull logs maestro_studio",
+      "expected": "Log pull do seller sem erro",
+      "runner": "run_full_automated_battery.ps1"
+    },
+    {
+      "id": "T11",
+      "phase": "2",
+      "layer": "UX+BD",
+      "name": "CS01",
+      "title": "Reserva pending -> Aceitar",
+      "expected": "Seller Aceitar + buyer player; BD verify_accepted; UX ambos PASS",
+      "runner": "run_cross_surface_ux_battery.ps1"
+    },
+    {
+      "id": "T12",
+      "phase": "2",
+      "layer": "UX+BD",
+      "name": "CS02",
+      "title": "Adicionar stock (+1)",
+      "expected": "Seller +Stock; BD stock; print catalogo",
+      "runner": "run_cross_surface_ux_battery.ps1"
+    },
+    {
+      "id": "T13",
+      "phase": "2",
+      "layer": "UX+BD",
+      "name": "CS03",
+      "title": "A3 quick edit qty",
+      "expected": "Seller+buyer carrossel; BD a3_r32_qty_alignment",
+      "runner": "run_cross_surface_ux_battery.ps1"
+    },
+    {
+      "id": "T14",
+      "phase": "2",
+      "layer": "UX+BD",
+      "name": "CS04",
+      "title": "R32 repor stock",
+      "expected": "Vendido + restock; seller+buyer prints",
+      "runner": "run_cross_surface_ux_battery.ps1"
+    },
+    {
+      "id": "T15",
+      "phase": "2",
+      "layer": "UX+BD",
+      "name": "CS05",
+      "title": "Cancelar saco",
+      "expected": "Buyer cancela; seller cancelados; BD cancel",
+      "runner": "run_cross_surface_ux_battery.ps1"
+    },
+    {
+      "id": "T16",
+      "phase": "2",
+      "layer": "UX+BD",
+      "name": "CS06",
+      "title": "Marcar vendido",
+      "expected": "Seller vendido + buyer card; BD stock",
+      "runner": "run_cross_surface_ux_battery.ps1"
+    },
+    {
+      "id": "T17",
+      "phase": "2",
+      "layer": "BD",
+      "name": "CS07",
+      "title": "Cross-pool",
+      "expected": "SKIP UX (bd_only); BD cross_pool_rr1",
+      "runner": "run_cross_surface_ux_battery.ps1"
+    },
+    {
+      "id": "T18",
+      "phase": "2",
+      "layer": "UX+BD",
+      "name": "CS08",
+      "title": "Linhagem prep -> live",
+      "expected": "Home->Novo Direto->Artigos do directo; BD lineage",
+      "runner": "run_cross_surface_ux_battery.ps1"
+    },
+    {
+      "id": "T19",
+      "phase": "2",
+      "layer": "UX+BD",
+      "name": "CS09",
+      "title": "Saco Pagar",
+      "expected": "Buyer saco Pagar visivel; BD bag_edge",
+      "runner": "run_cross_surface_ux_battery.ps1"
+    },
+    {
+      "id": "T20",
+      "phase": "2",
+      "layer": "UX+BD",
+      "name": "CS10",
+      "title": "Rifa + saco",
+      "expected": "Buyer rifa+saco; BD verify_raffle_join",
+      "runner": "run_cross_surface_ux_battery.ps1"
+    },
+    {
+      "id": "T21",
+      "phase": "2",
+      "layer": "UX",
+      "name": "CS11",
+      "title": "Stripe Doc #7",
+      "expected": "SKIP manual",
+      "runner": "run_cross_surface_ux_battery.ps1"
+    }
+  ]
+}

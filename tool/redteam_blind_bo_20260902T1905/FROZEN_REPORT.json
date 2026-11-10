@@ -1,0 +1,63 @@
+{
+  "auditor": "REDTEAM_BLIND_BO_HUB_EDGE_POS_BFBK_v1",
+  "frozen_at": "2026-09-02T18:15:00Z",
+  "production_touched": false,
+  "fase4": false,
+  "corrections_applied": false,
+  "veredicto": "FAIL_P2",
+  "prefix": "RTBO-20260902T1905",
+  "staging": "fxdknzrqjenzqcvnwqqq",
+  "lentes": ["BO1", "BO2", "BO3", "BO4", "BO5", "BO6", "BO7"],
+  "contagem": {
+    "P0_aberto": false,
+    "P0_quantos": 0,
+    "P1_aberto": false,
+    "P1_quantos": 0,
+    "P2_aberto": true,
+    "P2_quantos": 2,
+    "P3_aberto": true,
+    "P3_quantos": 2,
+    "P4_aberto": false,
+    "P4_quantos": 0,
+    "total_P0_P3": 4
+  },
+  "findings_open": [
+    {
+      "id": "BO-P2-01",
+      "severity": "P2",
+      "lens": "BO7",
+      "title": "tabela lives (anon) vaza mux_vod_playback_id que Hub anula; CDN HLS",
+      "count": true,
+      "proof": ["pass2.json", "pass3.json"]
+    },
+    {
+      "id": "BO-P2-02",
+      "severity": "P2",
+      "lens": "BO1",
+      "title": "hub_live_items_public/_discovery 401 anon após revoke broadcasting",
+      "count": true,
+      "proof": ["pass2.json"]
+    },
+    {
+      "id": "BO-P3-01",
+      "severity": "P3",
+      "lens": "BO1",
+      "title": "batata_resolve_handle handle_suggested unpublished",
+      "count": true,
+      "proof": ["pass1.json"]
+    },
+    {
+      "id": "BO-P3-02",
+      "severity": "P3",
+      "lens": "BO1",
+      "title": "FOMO/hub_lives_public live+is_active=false",
+      "count": true,
+      "proof": ["pass1.json"]
+    }
+  ],
+  "hold_exact_bibc": [
+    "discovery scheduled VOD null",
+    "web_return 2130706433 still 303 loopback — not counted",
+    "tip No such checkout replaced by generic message"
+  ]
+}

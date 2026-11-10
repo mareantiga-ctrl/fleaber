@@ -1,0 +1,1641 @@
+{
+  "stamp": "20260902T1905",
+  "prefix": "RTBO-20260902T1905",
+  "auditor": "REDTEAM_BLIND_BO_HUB_EDGE_POS_BFBK_v1",
+  "lenses": [
+    "BO1",
+    "BO2",
+    "BO3",
+    "BO4",
+    "BO5",
+    "BO6",
+    "BO7"
+  ],
+  "findings": [
+    {
+      "id": "bo1.handle.sug.unpub",
+      "lens": "BO1",
+      "severity": "P3",
+      "title": "batata_resolve_handle enumera UUID de loja desligada via handle_suggested",
+      "actor": "anon",
+      "pre": "S2 hub_published=false handle=null handle_suggested=rtbo1905s2sug",
+      "repro": "POST rpc/batata_resolve_handle p_handle=rtbo1905s2sug",
+      "expected": "not_found (vitrine e discovery vazias)",
+      "obtained": "200 {\"found\": true, \"handle\": \"rtbo1905s2sug\", \"profile_id\": \"d15e351f-b4f2-4719-a645-575711f47f22\", \"http_status\": 200, \"redirect_to\": null, \"hub_published\": false} loc=\"\" acao=null vitrine=200 [] loc=\"\" acao=null",
+      "proven": true,
+      "count": true,
+      "evidence": {}
+    },
+    {
+      "id": "bo1.fomo.live_inactive",
+      "lens": "BO1",
+      "severity": "P3",
+      "title": "FOMO snapshot em estado live_inactive",
+      "actor": "anon",
+      "pre": "live live_inactive",
+      "repro": "rpc batata_hub_live_fomo_snapshot",
+      "expected": "denied",
+      "obtained": "200 {\"ok\": true, \"items\": [], \"live_id\": \"5862bc23-c707-4f57-ad4c-80eafcb2272f\", \"is_active\": false, \"live_status\": \"live\", \"viewer_count\": 0} loc=\"\" acao=null",
+      "proven": true,
+      "count": true,
+      "evidence": {}
+    },
+    {
+      "id": "bo7.vod.bypass.edge",
+      "lens": "BO7",
+      "severity": "P2",
+      "title": "assisto VOD scheduled via tabela lives+CDN sem passar no Edge/Hub view",
+      "actor": "buyer JWT + CDN Mux",
+      "pre": "scheduled com vod plantado; Edge resolve-mux recusa",
+      "repro": "GET lives mux_vod_playback_id; GET https://stream.mux.com/{id}.m3u8",
+      "expected": "sem ID VOD fora de ended público",
+      "obtained": "jwt=200 [{\"mux_vod_playback_id\":\"8cje21NKdUUro21jGdEv2UlfmWLD7TAMIWi2W01H5Gb8\",\"status\":\"scheduled\"}] loc=\"\" acao=null cdn=200 edge=404 {\"error\":\"live_not_public\"} loc=\"\" acao=*",
+      "proven": true,
+      "count": true,
+      "evidence": {}
+    }
+  ],
+  "blocked": [
+    {
+      "id": "bo1.lives.anon.sched",
+      "lens": "BO1",
+      "title": "anon lives sched",
+      "ev": "401 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table lives\"} loc=\"\" acao=null"
+    },
+    {
+      "id": "bo1.lives.anon.draft",
+      "lens": "BO1",
+      "title": "anon lives draft",
+      "ev": "401 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table lives\"} loc=\"\" acao=null"
+    },
+    {
+      "id": "bo1.lives.anon.paused",
+      "lens": "BO1",
+      "title": "anon lives paused",
+      "ev": "400 {\"code\":\"22P02\",\"details\":null,\"hint\":null,\"message\":\"invalid input syntax for type uuid: \\\"null\\\"\"} loc=\"\" acao=null"
+    },
+    {
+      "id": "bo1.lives.anon.live_inactive",
+      "lens": "BO1",
+      "title": "anon lives live_inactive",
+      "ev": "401 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table lives\"} loc=\"\" acao=null"
+    },
+    {
+      "id": "bo1.lives.anon.ended_unpub",
+      "lens": "BO1",
+      "title": "anon lives ended_unpub",
+      "ev": "401 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table lives\"} loc=\"\" acao=null"
+    },
+    {
+      "id": "bo1.lives.anon.sched_unpub",
+      "lens": "BO1",
+      "title": "anon lives sched_unpub",
+      "ev": "401 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table lives\"} loc=\"\" acao=null"
+    },
+    {
+      "id": "bo1.handle.empty",
+      "lens": "BO1",
+      "title": "handle vazio",
+      "ev": "200 {\"error\": \"not_found\", \"found\": false, \"http_status\": 404} loc=\"\" acao=null"
+    },
+    {
+      "id": "bo1.fomo.air",
+      "lens": "BO1",
+      "title": "FOMO snapshot em estado air",
+      "ev": "200 {\"ok\": true, \"items\": [{\"status\": \"available\", \"is_last_unit\": false, \"live_item_id\": \"e63a0f60-32d5-47f0-b9bb-ac52a04ed007\", \"available_qty\": 3, \"pending_queue_count\": 0, \"display_reserved_qty\": 0}], \"live_id\": \"5150803c-11bb-4f58-900a-765… loc=\"\" acao=null"
+    },
+    {
+      "id": "bo1.fomo.sched",
+      "lens": "BO1",
+      "title": "FOMO snapshot em estado sched",
+      "ev": "200 {\"ok\": true, \"items\": [], \"live_id\": \"091b954c-9744-44e3-bd1c-51fd037cba7f\", \"is_active\": false, \"live_status\": \"scheduled\", \"viewer_count\": 0} loc=\"\" acao=null"
+    },
+    {
+      "id": "bo1.fomo.draft",
+      "lens": "BO1",
+      "title": "FOMO snapshot em estado draft",
+      "ev": "200 {\"ok\": false, \"error\": \"live_not_public\"} loc=\"\" acao=null"
+    },
+    {
+      "id": "bo1.fomo.ended_pub",
+      "lens": "BO1",
+      "title": "FOMO snapshot em estado ended_pub",
+      "ev": "200 {\"ok\": true, \"items\": [], \"live_id\": \"22f91ffc-032d-4188-b297-3d8120b75ed3\", \"is_active\": false, \"live_status\": \"ended\", \"viewer_count\": 0} loc=\"\" acao=null"
+    },
+    {
+      "id": "bo1.fomo.paused",
+      "lens": "BO1",
+      "title": "FOMO snapshot em estado paused",
+      "ev": "200 {\"ok\": false, \"error\": \"missing_live_id\"} loc=\"\" acao=null"
+    },
+    {
+      "id": "bo1.fomo.ended_unpub",
+      "lens": "BO1",
+      "title": "FOMO snapshot em estado ended_unpub",
+      "ev": "200 {\"ok\": false, \"error\": \"live_not_public\"} loc=\"\" acao=null"
+    },
+    {
+      "id": "bo1.fomo.air_unpub",
+      "lens": "BO1",
+      "title": "FOMO snapshot em estado air_unpub",
+      "ev": "200 {\"ok\": false, \"error\": \"live_not_public\"} loc=\"\" acao=null"
+    },
+    {
+      "id": "bo1.fomo.sched_unpub",
+      "lens": "BO1",
+      "title": "FOMO snapshot em estado sched_unpub",
+      "ev": "200 {\"ok\": false, \"error\": \"live_not_public\"} loc=\"\" acao=null"
+    },
+    {
+      "id": "bo1.fomo.ghost",
+      "lens": "BO1",
+      "title": "FOMO UUID inexistente",
+      "ev": "200 {\"ok\": false, \"error\": \"live_not_public\"} loc=\"\" acao=null"
+    },
+    {
+      "id": "bo1.bcast.anon",
+      "lens": "BO1",
+      "title": "anon broadcasting recusado",
+      "ev": "401 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_live_is_broadcasting\"} loc=\"\" acao=null"
+    },
+    {
+      "id": "bo2.cors.https://evil.com",
+      "lens": "BO2",
+      "title": "CORS não reflecte https://evil.com",
+      "ev": "opt=https://fleaber.pt post=https://fleaber.pt"
+    },
+    {
+      "id": "bo2.cors.http://evil.com",
+      "lens": "BO2",
+      "title": "CORS não reflecte http://evil.com",
+      "ev": "opt=https://fleaber.pt post=https://fleaber.pt"
+    },
+    {
+      "id": "bo2.cors.https://fleaber.pt.evil.com",
+      "lens": "BO2",
+      "title": "CORS não reflecte https://fleaber.pt.evil.com",
+      "ev": "opt=https://fleaber.pt post=https://fleaber.pt"
+    },
+    {
+      "id": "bo2.cors.https://evil.fleaber.pt",
+      "lens": "BO2",
+      "title": "CORS não reflecte https://evil.fleaber.pt",
+      "ev": "opt=https://fleaber.pt post=https://fleaber.pt"
+    },
+    {
+      "id": "bo2.cors.https://attacker.fleaber.pt",
+      "lens": "BO2",
+      "title": "CORS não reflecte https://attacker.fleaber.pt",
+      "ev": "opt=https://fleaber.pt post=https://fleaber.pt"
+    },
+    {
+      "id": "bo2.cors.http://[::1]:3000",
+      "lens": "BO2",
+      "title": "CORS não reflecte http://[::1]:3000",
+      "ev": "opt=https://fleaber.pt post=https://fleaber.pt"
+    },
+    {
+      "id": "bo2.cors.http://[::ffff:127.0.0.1]:8080",
+      "lens": "BO2",
+      "title": "CORS não reflecte http://[::ffff:127.0.0.1]:8080",
+      "ev": "opt=https://fleaber.pt post=https://fleaber.pt"
+    },
+    {
+      "id": "bo2.cors.https://[::ffff:127.0.0.1]",
+      "lens": "BO2",
+      "title": "CORS não reflecte https://[::ffff:127.0.0.1]",
+      "ev": "opt=https://fleaber.pt post=https://fleaber.pt"
+    },
+    {
+      "id": "bo2.cors.null",
+      "lens": "BO2",
+      "title": "CORS não reflecte null",
+      "ev": "opt=https://fleaber.pt post=https://fleaber.pt"
+    },
+    {
+      "id": "bo2.cors.chrome-extension://abcdef",
+      "lens": "BO2",
+      "title": "CORS não reflecte chrome-extension://abcdef",
+      "ev": "opt=https://fleaber.pt post=https://fleaber.pt"
+    },
+    {
+      "id": "bo2.cors.https://localtest.me",
+      "lens": "BO2",
+      "title": "CORS não reflecte https://localtest.me",
+      "ev": "opt=https://fleaber.pt post=https://fleaber.pt"
+    },
+    {
+      "id": "bo2.cors.https://lvh.me",
+      "lens": "BO2",
+      "title": "CORS não reflecte https://lvh.me",
+      "ev": "opt=https://fleaber.pt post=https://fleaber.pt"
+    },
+    {
+      "id": "bo2.wr.https://[::1]/wallet",
+      "lens": "BO2",
+      "title": "web_return recusado https://[::1]/wallet",
+      "ev": "200 <!DOCTYPE html><html lang=\"pt\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Fleaber</title><script>window.setTimeout(function(){ window.location.href = \"fleaber://fleaber.com/wallet\"… loc=\"\" acao=*"
+    },
+    {
+      "id": "bo2.wr.https://[::ffff:127.0.0.1]/x",
+      "lens": "BO2",
+      "title": "web_return recusado https://[::ffff:127.0.0.1]/x",
+      "ev": "403 <!DOCTYPE html>\n<!--[if lt IE 7]> <html class=\"no-js ie6 oldie\" lang=\"en-US\"> <![endif]-->\n<!--[if IE 7]>    <html class=\"no-js ie7 oldie\" lang=\"en-US\"> <![endif]-->\n<!--[if IE 8]>    <html class=\"no-js ie8 oldie\" lang=\"en-US\"> <![endif]-->… loc=\"\" acao=null"
+    },
+    {
+      "id": "bo2.wr.http://[::ffff:127.0.0.1]/x",
+      "lens": "BO2",
+      "title": "web_return recusado http://[::ffff:127.0.0.1]/x",
+      "ev": "403 <!DOCTYPE html>\n<!--[if lt IE 7]> <html class=\"no-js ie6 oldie\" lang=\"en-US\"> <![endif]-->\n<!--[if IE 7]>    <html class=\"no-js ie7 oldie\" lang=\"en-US\"> <![endif]-->\n<!--[if IE 8]>    <html class=\"no-js ie8 oldie\" lang=\"en-US\"> <![endif]-->… loc=\"\" acao=null"
+    },
+    {
+      "id": "bo2.wr.https://[::ffff:7f00:1]/",
+      "lens": "BO2",
+      "title": "web_return recusado https://[::ffff:7f00:1]/",
+      "ev": "403 <!DOCTYPE html>\n<!--[if lt IE 7]> <html class=\"no-js ie6 oldie\" lang=\"en-US\"> <![endif]-->\n<!--[if IE 7]>    <html class=\"no-js ie7 oldie\" lang=\"en-US\"> <![endif]-->\n<!--[if IE 8]>    <html class=\"no-js ie8 oldie\" lang=\"en-US\"> <![endif]-->… loc=\"\" acao=null"
+    },
+    {
+      "id": "bo2.wr.http://[::1]",
+      "lens": "BO2",
+      "title": "web_return recusado http://[::1]",
+      "ev": "200 <!DOCTYPE html><html lang=\"pt\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Fleaber</title><script>window.setTimeout(function(){ window.location.href = \"fleaber://fleaber.com/wallet\"… loc=\"\" acao=*"
+    },
+    {
+      "id": "bo2.wr.https://localtest.me",
+      "lens": "BO2",
+      "title": "web_return recusado https://localtest.me",
+      "ev": "200 <!DOCTYPE html><html lang=\"pt\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Fleaber</title><script>window.setTimeout(function(){ window.location.href = \"fleaber://fleaber.com/wallet\"… loc=\"\" acao=*"
+    },
+    {
+      "id": "bo2.wr.https://lvh.me",
+      "lens": "BO2",
+      "title": "web_return recusado https://lvh.me",
+      "ev": "200 <!DOCTYPE html><html lang=\"pt\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Fleaber</title><script>window.setTimeout(function(){ window.location.href = \"fleaber://fleaber.com/wallet\"… loc=\"\" acao=*"
+    },
+    {
+      "id": "bo2.wr.https://127.0.0.1.nip.io",
+      "lens": "BO2",
+      "title": "web_return recusado https://127.0.0.1.nip.io",
+      "ev": "200 <!DOCTYPE html><html lang=\"pt\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Fleaber</title><script>window.setTimeout(function(){ window.location.href = \"fleaber://fleaber.com/wallet\"… loc=\"\" acao=*"
+    },
+    {
+      "id": "bo2.wr.https://spoofed.localhost",
+      "lens": "BO2",
+      "title": "web_return recusado https://spoofed.localhost",
+      "ev": "200 <!DOCTYPE html><html lang=\"pt\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Fleaber</title><script>window.setTimeout(function(){ window.location.href = \"fleaber://fleaber.com/wallet\"… loc=\"\" acao=*"
+    },
+    {
+      "id": "bo2.wr.https://fleaber.pt.evil.com",
+      "lens": "BO2",
+      "title": "web_return recusado https://fleaber.pt.evil.com",
+      "ev": "200 <!DOCTYPE html><html lang=\"pt\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Fleaber</title><script>window.setTimeout(function(){ window.location.href = \"fleaber://fleaber.com/wallet\"… loc=\"\" acao=*"
+    },
+    {
+      "id": "bo2.wr.https://evil.fleaber.pt",
+      "lens": "BO2",
+      "title": "web_return recusado https://evil.fleaber.pt",
+      "ev": "200 <!DOCTYPE html><html lang=\"pt\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Fleaber</title><script>window.setTimeout(function(){ window.location.href = \"fleaber://fleaber.com/wallet\"… loc=\"\" acao=*"
+    },
+    {
+      "id": "bo2.wr.https://localhost.evil.com",
+      "lens": "BO2",
+      "title": "web_return recusado https://localhost.evil.com",
+      "ev": "200 <!DOCTYPE html><html lang=\"pt\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Fleaber</title><script>window.setTimeout(function(){ window.location.href = \"fleaber://fleaber.com/wallet\"… loc=\"\" acao=*"
+    },
+    {
+      "id": "bo2.wr.https://fleaber.pt",
+      "lens": "BO2",
+      "title": "web_return recusado https://fleaber.pt",
+      "ev": "303  loc=https://fleaber.pt/wallet acao=*"
+    },
+    {
+      "id": "bo2.wr.http://localhost",
+      "lens": "BO2",
+      "title": "web_return recusado http://localhost",
+      "ev": "303  loc=http://localhost/wallet acao=*"
+    },
+    {
+      "id": "bo2.wr.http://127.0.0.1",
+      "lens": "BO2",
+      "title": "web_return recusado http://127.0.0.1",
+      "ev": "303  loc=http://127.0.0.1/wallet acao=*"
+    },
+    {
+      "id": "bo2.wr.exact",
+      "lens": "BO2",
+      "title": "exacto BC https://2130706433 recusado",
+      "ev": "303  loc=https://127.0.0.1/wallet acao=*"
+    },
+    {
+      "id": "bo2.wr.exact",
+      "lens": "BO2",
+      "title": "exacto BC https://127.1 recusado",
+      "ev": "303  loc=https://127.0.0.1/wallet acao=*"
+    },
+    {
+      "id": "bo2.wr.exact",
+      "lens": "BO2",
+      "title": "exacto BC https://0x7f000001 recusado",
+      "ev": "303  loc=https://127.0.0.1/wallet acao=*"
+    },
+    {
+      "id": "bo2.wr.https://0177.0.0.1",
+      "lens": "BO2",
+      "title": "web_return recusado https://0177.0.0.1",
+      "ev": "303  loc=https://127.0.0.1/wallet acao=*"
+    },
+    {
+      "id": "bo2.wr.https://0.0.0.0",
+      "lens": "BO2",
+      "title": "web_return recusado https://0.0.0.0",
+      "ev": "200 <!DOCTYPE html><html lang=\"pt\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Fleaber</title><script>window.setTimeout(function(){ window.location.href = \"fleaber://fleaber.com/wallet\"… loc=\"\" acao=*"
+    },
+    {
+      "id": "bo2.wr.https://fleaber.pt@evil.com",
+      "lens": "BO2",
+      "title": "web_return recusado https://fleaber.pt@evil.com",
+      "ev": "200 <!DOCTYPE html><html lang=\"pt\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Fleaber</title><script>window.setTimeout(function(){ window.location.href = \"fleaber://fleaber.com/wallet\"… loc=\"\" acao=*"
+    },
+    {
+      "id": "bo2.wr.https://fleaber.pt%00.evil.com",
+      "lens": "BO2",
+      "title": "web_return recusado https://fleaber.pt%00.evil.com",
+      "ev": "200 <!DOCTYPE html><html lang=\"pt\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Fleaber</title><script>window.setTimeout(function(){ window.location.href = \"fleaber://fleaber.com/wallet\"… loc=\"\" acao=*"
+    },
+    {
+      "id": "bo2.wr.javascript:alert(1)",
+      "lens": "BO2",
+      "title": "web_return recusado javascript:alert(1)",
+      "ev": "403 <!DOCTYPE html>\n<!--[if lt IE 7]> <html class=\"no-js ie6 oldie\" lang=\"en-US\"> <![endif]-->\n<!--[if IE 7]>    <html class=\"no-js ie7 oldie\" lang=\"en-US\"> <![endif]-->\n<!--[if IE 8]>    <html class=\"no-js ie8 oldie\" lang=\"en-US\"> <![endif]-->… loc=\"\" acao=null"
+    },
+    {
+      "id": "bo2.wr.https://127.0.0.1.xip.io",
+      "lens": "BO2",
+      "title": "web_return recusado https://127.0.0.1.xip.io",
+      "ev": "200 <!DOCTYPE html><html lang=\"pt\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Fleaber</title><script>window.setTimeout(function(){ window.location.href = \"fleaber://fleaber.com/wallet\"… loc=\"\" acao=*"
+    },
+    {
+      "id": "bo2.wr.https://[::ffff:8.8.8.8]/",
+      "lens": "BO2",
+      "title": "web_return recusado https://[::ffff:8.8.8.8]/",
+      "ev": "403 <!DOCTYPE html>\n<!--[if lt IE 7]> <html class=\"no-js ie6 oldie\" lang=\"en-US\"> <![endif]-->\n<!--[if IE 7]>    <html class=\"no-js ie7 oldie\" lang=\"en-US\"> <![endif]-->\n<!--[if IE 8]>    <html class=\"no-js ie8 oldie\" lang=\"en-US\"> <![endif]-->… loc=\"\" acao=null"
+    },
+    {
+      "id": "bo3.tip.unpaid.b2",
+      "lens": "BO3",
+      "title": "B2 unpaid não credita",
+      "ev": {
+        "status": "pending",
+        "http": "200 Pagamento ainda não confirmado. Se já pagaste, aguarda alguns segundos e volta à app Fleaber. loc=\"\" acao=*"
+      }
+    },
+    {
+      "id": "bo4.tip_id.client",
+      "lens": "BO4",
+      "title": "B2 POST com tip_id do cliente (B1)",
+      "ev": "400 {\"error\":\"Client tip_id is not allowed.\"} loc=\"\" acao=*"
+    },
+    {
+      "id": "bo3.tip.forged",
+      "lens": "BO3",
+      "title": "forged sem oráculo Stripe",
+      "ev": "400 Pagamento ainda não confirmado. Se já pagaste, aguarda alguns segundos e volta à app Fleaber. loc=\"\" acao=*"
+    },
+    {
+      "id": "bo4.tip.rpc.jwt",
+      "lens": "BO4",
+      "title": "JWT chama batata_settle_live_tip_from_stripe",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_settle_live_tip_from_stripe\"} loc=\"\" acao=null"
+    },
+    {
+      "id": "bo3.tip.sched",
+      "lens": "BO3",
+      "title": "tip checkout em scheduled",
+      "ev": "400 {\"error\":\"Tips only allowed while the live is broadcasting.\"} loc=\"\" acao=*"
+    },
+    {
+      "id": "bo3.tip.ended",
+      "lens": "BO3",
+      "title": "tip checkout em ended",
+      "ev": "400 {\"error\":\"Tips only allowed while the live is broadcasting.\"} loc=\"\" acao=*"
+    },
+    {
+      "id": "bo4.tip.seller.mismatch",
+      "lens": "BO4",
+      "title": "tip seller_id alheio vs live",
+      "ev": "400 {\"error\":\"Tip seller does not own this live.\"} loc=\"\" acao=*"
+    },
+    {
+      "id": "bo4.tip.buyer_id",
+      "lens": "BO4",
+      "title": "buyer_id JWT ganha",
+      "ev": {
+        "id": "05b69ea4-0638-4241-86d1-8b899a520939",
+        "status": "pending",
+        "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+        "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+        "amount": 1.0,
+        "stripe_session_id": "cs_test_a1MHzBxsBAyxOfq98Q9LxJpF7zQiEr4jy72mTTYRRY3JSMQ6ZxJnime8xH",
+        "live_id": "5150803c-11bb-4f58-900a-765d5354f2ea"
+      }
+    },
+    {
+      "id": "bo5.resolve.air.ok",
+      "lens": "BO5",
+      "title": "resolve-mux air esperado público",
+      "ev": "200 {\"playback_id\":\"play-air-20260902T1905\",\"playback_url\":\"https://stream.mux.com/play-air-20260902T1905.m3u8?reduced_latency=true\",\"source\":\"live_active\",\"is_live\":true} loc=\"\" acao=*"
+    },
+    {
+      "id": "bo5.resolve.sched",
+      "lens": "BO5",
+      "title": "resolve-mux sched recusado",
+      "ev": "404 {\"error\":\"live_not_public\"} loc=\"\" acao=*"
+    },
+    {
+      "id": "bo5.resolve.draft",
+      "lens": "BO5",
+      "title": "resolve-mux draft recusado",
+      "ev": "404 {\"error\":\"live_not_public\"} loc=\"\" acao=*"
+    },
+    {
+      "id": "bo5.resolve.ended_pub.ok",
+      "lens": "BO5",
+      "title": "resolve-mux ended_pub esperado público",
+      "ev": "200 {\"playback_id\":\"8cje21NKdUUro21jGdEv2UlfmWLD7TAMIWi2W01H5Gb8\",\"playback_url\":\"https://stream.mux.com/8cje21NKdUUro21jGdEv2UlfmWLD7TAMIWi2W01H5Gb8.m3u8\",\"source\":\"cache\",\"is_live\":false} loc=\"\" acao=*"
+    },
+    {
+      "id": "bo5.resolve.paused",
+      "lens": "BO5",
+      "title": "resolve-mux paused recusado",
+      "ev": "400 {\"error\":\"live_id obrigatório.\"} loc=\"\" acao=*"
+    },
+    {
+      "id": "bo5.resolve.live_inactive",
+      "lens": "BO5",
+      "title": "resolve-mux live_inactive recusado",
+      "ev": "404 {\"error\":\"live_not_public\"} loc=\"\" acao=*"
+    },
+    {
+      "id": "bo5.resolve.ended_unpub",
+      "lens": "BO5",
+      "title": "resolve-mux ended_unpub recusado",
+      "ev": "404 {\"error\":\"live_not_public\"} loc=\"\" acao=*"
+    },
+    {
+      "id": "bo5.resolve.air_unpub.ok",
+      "lens": "BO5",
+      "title": "resolve-mux air_unpub esperado público",
+      "ev": "200 {\"playback_id\":\"play-unpub-air-20260902T1905\",\"playback_url\":\"https://stream.mux.com/play-unpub-air-20260902T1905.m3u8?reduced_latency=true\",\"source\":\"live_active\",\"is_live\":true} loc=\"\" acao=*"
+    },
+    {
+      "id": "bo5.resolve.sched_unpub",
+      "lens": "BO5",
+      "title": "resolve-mux sched_unpub recusado",
+      "ev": "404 {\"error\":\"live_not_public\"} loc=\"\" acao=*"
+    },
+    {
+      "id": "bo5.complete.s2",
+      "lens": "BO5",
+      "title": "Seller2 complete-mux-live da live A",
+      "ev": "403 {\"error\":\"Sem permissão para esta live.\",\"step\":\"auth\"} loc=\"\" acao=*"
+    },
+    {
+      "id": "bo5.livekit.s2",
+      "lens": "BO5",
+      "title": "Seller2 livekit token da live A",
+      "ev": "403 {\"error\":\"Sem permissão para esta live.\",\"step\":\"auth\"} loc=\"\" acao=*"
+    },
+    {
+      "id": "bo5.complete.buyer",
+      "lens": "BO5",
+      "title": "Buyer complete-mux-live",
+      "ev": "403 {\"error\":\"Sem permissão para esta live.\",\"step\":\"auth\"} loc=\"\" acao=*"
+    },
+    {
+      "id": "bo5.complete.anon",
+      "lens": "BO5",
+      "title": "Anon complete-mux-live",
+      "ev": "401 {\"error\":\"invalid claim: missing sub claim\",\"step\":\"auth\"} loc=\"\" acao=*"
+    },
+    {
+      "id": "bo5.create.buyer",
+      "lens": "BO5",
+      "title": "Buyer create-mux-live",
+      "ev": "403 {\"error\":\"Apenas contas de vendedor podem criar directos.\",\"step\":\"authz\"} loc=\"\" acao=*"
+    },
+    {
+      "id": "bo6.buckets.anon",
+      "lens": "BO6",
+      "title": "list buckets",
+      "ev": "200 [] loc=\"\" acao=*"
+    },
+    {
+      "id": "bo6.get.fleaber_private/980f4fa1-0004-42f9-abca-69f1a9c29588/stream_key.txt",
+      "lens": "BO6",
+      "title": "object recusado",
+      "ev": "400 {\"statusCode\":\"404\",\"error\":\"not_found\",\"message\":\"Object not found\",\"code\":\"NoSuchKey\"} loc=\"\" acao=*"
+    },
+    {
+      "id": "bo6.get.fleaber_private/980f4fa1-0004-42f9-abca-69f1a9c29588/id",
+      "lens": "BO6",
+      "title": "object recusado",
+      "ev": "400 {\"statusCode\":\"404\",\"error\":\"not_found\",\"message\":\"Object not found\",\"code\":\"NoSuchKey\"} loc=\"\" acao=*"
+    },
+    {
+      "id": "bo6.get.chat_media/980f4fa1-0004-42f9-abca-69f1a9c29588/x.jpg",
+      "lens": "BO6",
+      "title": "object recusado",
+      "ev": "400 {\"statusCode\":\"404\",\"error\":\"not_found\",\"message\":\"Object not found\",\"code\":\"NoSuchKey\"} loc=\"\" acao=*"
+    },
+    {
+      "id": "bo6.get.mux/5150803c-11bb-4f58-900a-765d5354f2ea/stream",
+      "lens": "BO6",
+      "title": "object recusado",
+      "ev": "400 {\"statusCode\":\"404\",\"error\":\"Bucket not found\",\"message\":\"Bucket not found\",\"code\":\"NoSuchBucket\"} loc=\"\" acao=*"
+    },
+    {
+      "id": "bo6.upload.private",
+      "lens": "BO6",
+      "title": "anon upload fleaber_private",
+      "ev": "400 {\"statusCode\":\"415\",\"error\":\"invalid_mime_type\",\"message\":\"mime type text/plain is not supported\",\"code\":\"InvalidMimeType\"} loc=\"\" acao=*"
+    }
+  ],
+  "skipped": [],
+  "notes": [
+    {
+      "id": "plant.vod",
+      "lens": "BO1",
+      "title": "playback plantado",
+      "ev": "8cje21NKdUUro21jGdEv2UlfmWLD7TAMIWi2W01H5Gb8"
+    },
+    {
+      "id": "live.fail",
+      "title": "insertLive paused",
+      "ev": "400 {\"code\":\"23514\",\"details\":\"Failing row contains (3c972e3b-7dd2-4552-926f-5c66f5e54404, 2026-09-02 18:08:29.171642+00, 980f4fa1-0004-42f9-abca-69f1a9c29588, muxlive-paused-20260902T1905, sk-paused-20260902T1905, play-paused-20260902T1905, t,… loc=\"\" acao=null"
+    },
+    {
+      "id": "bo1.hub_lives_public.air",
+      "lens": "BO1",
+      "title": "hub_lives_public air",
+      "ev": "200 [{\"id\":\"5150803c-11bb-4f58-900a-765d5354f2ea\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"seller_handle\":\"fleahub-demo-ux\",\"title\":\"RTBO-20260902T1905-air\",\"status\":\"live\",\"is_active\":true,\"mux_playback_id\":\"play-air-20260902T1905\",… loc=\"\" acao=null"
+    },
+    {
+      "id": "bo1.hub_lives_discovery_public.air",
+      "lens": "BO1",
+      "title": "hub_lives_discovery_public air",
+      "ev": "200 [{\"id\":\"5150803c-11bb-4f58-900a-765d5354f2ea\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"seller_handle\":\"fleahub-demo-ux\",\"seller_name\":\"Maria Demo FleaHub\",\"seller_photo_url\":\"https://images.unsplash.com/photo-1494790108377-be9c29… loc=\"\" acao=null"
+    },
+    {
+      "id": "bo1.hub_live_items_public.air",
+      "lens": "BO1",
+      "title": "hub_live_items_public air",
+      "ev": "401 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_live_is_broadcasting\"} loc=\"\" acao=null"
+    },
+    {
+      "id": "bo1.hub_live_items_discovery_public.air",
+      "lens": "BO1",
+      "title": "hub_live_items_discovery_public air",
+      "ev": "401 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_live_is_broadcasting\"} loc=\"\" acao=null"
+    },
+    {
+      "id": "bo1.hub_lives_public.sched",
+      "lens": "BO1",
+      "title": "hub_lives_public sched",
+      "ev": "200 [{\"id\":\"091b954c-9744-44e3-bd1c-51fd037cba7f\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"seller_handle\":\"fleahub-demo-ux\",\"title\":\"RTBO-20260902T1905-sched\",\"status\":\"scheduled\",\"is_active\":false,\"mux_playback_id\":null,\"mux_vod_pla… loc=\"\" acao=null"
+    },
+    {
+      "id": "bo1.hub_lives_discovery_public.sched",
+      "lens": "BO1",
+      "title": "hub_lives_discovery_public sched",
+      "ev": "200 [{\"id\":\"091b954c-9744-44e3-bd1c-51fd037cba7f\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"seller_handle\":\"fleahub-demo-ux\",\"seller_name\":\"Maria Demo FleaHub\",\"seller_photo_url\":\"https://images.unsplash.com/photo-1494790108377-be9c29… loc=\"\" acao=null"
+    },
+    {
+      "id": "bo1.hub_live_items_public.sched",
+      "lens": "BO1",
+      "title": "hub_live_items_public sched",
+      "ev": "401 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_live_is_broadcasting\"} loc=\"\" acao=null"
+    },
+    {
+      "id": "bo1.hub_live_items_discovery_public.sched",
+      "lens": "BO1",
+      "title": "hub_live_items_discovery_public sched",
+      "ev": "401 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_live_is_broadcasting\"} loc=\"\" acao=null"
+    },
+    {
+      "id": "bo1.hub_lives_public.draft",
+      "lens": "BO1",
+      "title": "hub_lives_public draft",
+      "ev": "200 [] loc=\"\" acao=null"
+    },
+    {
+      "id": "bo1.hub_lives_discovery_public.draft",
+      "lens": "BO1",
+      "title": "hub_lives_discovery_public draft",
+      "ev": "200 [] loc=\"\" acao=null"
+    },
+    {
+      "id": "bo1.hub_live_items_public.draft",
+      "lens": "BO1",
+      "title": "hub_live_items_public draft",
+      "ev": "401 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_live_is_broadcasting\"} loc=\"\" acao=null"
+    },
+    {
+      "id": "bo1.hub_live_items_discovery_public.draft",
+      "lens": "BO1",
+      "title": "hub_live_items_discovery_public draft",
+      "ev": "401 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_live_is_broadcasting\"} loc=\"\" acao=null"
+    },
+    {
+      "id": "bo1.hub_lives_public.ended_pub",
+      "lens": "BO1",
+      "title": "hub_lives_public ended_pub",
+      "ev": "200 [{\"id\":\"22f91ffc-032d-4188-b297-3d8120b75ed3\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"seller_handle\":\"fleahub-demo-ux\",\"title\":\"RTBO-20260902T1905-ended-pub\",\"status\":\"ended\",\"is_active\":false,\"mux_playback_id\":null,\"mux_vod_pla… loc=\"\" acao=null"
+    },
+    {
+      "id": "bo1.hub_lives_discovery_public.ended_pub",
+      "lens": "BO1",
+      "title": "hub_lives_discovery_public ended_pub",
+      "ev": "200 [{\"id\":\"22f91ffc-032d-4188-b297-3d8120b75ed3\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"seller_handle\":\"fleahub-demo-ux\",\"seller_name\":\"Maria Demo FleaHub\",\"seller_photo_url\":\"https://images.unsplash.com/photo-1494790108377-be9c29… loc=\"\" acao=null"
+    },
+    {
+      "id": "bo1.hub_live_items_public.ended_pub",
+      "lens": "BO1",
+      "title": "hub_live_items_public ended_pub",
+      "ev": "401 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_live_is_broadcasting\"} loc=\"\" acao=null"
+    },
+    {
+      "id": "bo1.hub_live_items_discovery_public.ended_pub",
+      "lens": "BO1",
+      "title": "hub_live_items_discovery_public ended_pub",
+      "ev": "401 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_live_is_broadcasting\"} loc=\"\" acao=null"
+    },
+    {
+      "id": "bo1.hub_lives_public.paused",
+      "lens": "BO1",
+      "title": "hub_lives_public paused",
+      "ev": "0 no-id loc=\"\" acao=null"
+    },
+    {
+      "id": "bo1.hub_lives_discovery_public.paused",
+      "lens": "BO1",
+      "title": "hub_lives_discovery_public paused",
+      "ev": "0 no-id loc=\"\" acao=null"
+    },
+    {
+      "id": "bo1.hub_live_items_public.paused",
+      "lens": "BO1",
+      "title": "hub_live_items_public paused",
+      "ev": "0 no-id loc=\"\" acao=null"
+    },
+    {
+      "id": "bo1.hub_live_items_discovery_public.paused",
+      "lens": "BO1",
+      "title": "hub_live_items_discovery_public paused",
+      "ev": "0 no-id loc=\"\" acao=null"
+    },
+    {
+      "id": "bo1.hub_lives_public.live_inactive",
+      "lens": "BO1",
+      "title": "hub_lives_public live_inactive",
+      "ev": "200 [{\"id\":\"5862bc23-c707-4f57-ad4c-80eafcb2272f\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"seller_handle\":\"fleahub-demo-ux\",\"title\":\"RTBO-20260902T1905-live-inactive\",\"status\":\"live\",\"is_active\":false,\"mux_playback_id\":null,\"mux_vod_… loc=\"\" acao=null"
+    },
+    {
+      "id": "bo1.hub_lives_discovery_public.live_inactive",
+      "lens": "BO1",
+      "title": "hub_lives_discovery_public live_inactive",
+      "ev": "200 [] loc=\"\" acao=null"
+    },
+    {
+      "id": "bo1.hub_live_items_public.live_inactive",
+      "lens": "BO1",
+      "title": "hub_live_items_public live_inactive",
+      "ev": "401 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_live_is_broadcasting\"} loc=\"\" acao=null"
+    },
+    {
+      "id": "bo1.hub_live_items_discovery_public.live_inactive",
+      "lens": "BO1",
+      "title": "hub_live_items_discovery_public live_inactive",
+      "ev": "401 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_live_is_broadcasting\"} loc=\"\" acao=null"
+    },
+    {
+      "id": "bo1.hub_lives_public.ended_unpub",
+      "lens": "BO1",
+      "title": "hub_lives_public ended_unpub",
+      "ev": "200 [] loc=\"\" acao=null"
+    },
+    {
+      "id": "bo1.hub_lives_discovery_public.ended_unpub",
+      "lens": "BO1",
+      "title": "hub_lives_discovery_public ended_unpub",
+      "ev": "200 [] loc=\"\" acao=null"
+    },
+    {
+      "id": "bo1.hub_live_items_public.ended_unpub",
+      "lens": "BO1",
+      "title": "hub_live_items_public ended_unpub",
+      "ev": "401 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_live_is_broadcasting\"} loc=\"\" acao=null"
+    },
+    {
+      "id": "bo1.hub_live_items_discovery_public.ended_unpub",
+      "lens": "BO1",
+      "title": "hub_live_items_discovery_public ended_unpub",
+      "ev": "401 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_live_is_broadcasting\"} loc=\"\" acao=null"
+    },
+    {
+      "id": "bo1.hub_lives_public.air_unpub",
+      "lens": "BO1",
+      "title": "hub_lives_public air_unpub",
+      "ev": "200 [] loc=\"\" acao=null"
+    },
+    {
+      "id": "bo1.hub_lives_discovery_public.air_unpub",
+      "lens": "BO1",
+      "title": "hub_lives_discovery_public air_unpub",
+      "ev": "200 [{\"id\":\"629ca023-0d38-4aba-9ae8-ac4250e1878b\",\"seller_id\":\"d15e351f-b4f2-4719-a645-575711f47f22\",\"seller_handle\":\"rtbo1905s2sug\",\"seller_name\":\"Rtbo S2 Hidden\",\"seller_photo_url\":null,\"title\":\"RTBO-20260902T1905-air-unpub\",\"status\":\"live\",\"… loc=\"\" acao=null"
+    },
+    {
+      "id": "bo1.hub_live_items_public.air_unpub",
+      "lens": "BO1",
+      "title": "hub_live_items_public air_unpub",
+      "ev": "401 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_live_is_broadcasting\"} loc=\"\" acao=null"
+    },
+    {
+      "id": "bo1.hub_live_items_discovery_public.air_unpub",
+      "lens": "BO1",
+      "title": "hub_live_items_discovery_public air_unpub",
+      "ev": "401 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_live_is_broadcasting\"} loc=\"\" acao=null"
+    },
+    {
+      "id": "bo1.hub_lives_public.sched_unpub",
+      "lens": "BO1",
+      "title": "hub_lives_public sched_unpub",
+      "ev": "200 [] loc=\"\" acao=null"
+    },
+    {
+      "id": "bo1.hub_lives_discovery_public.sched_unpub",
+      "lens": "BO1",
+      "title": "hub_lives_discovery_public sched_unpub",
+      "ev": "200 [{\"id\":\"f973326a-7561-439a-b328-3f51d6fc8867\",\"seller_id\":\"d15e351f-b4f2-4719-a645-575711f47f22\",\"seller_handle\":\"rtbo1905s2sug\",\"seller_name\":\"Rtbo S2 Hidden\",\"seller_photo_url\":null,\"title\":\"RTBO-20260902T1905-sched-unpub\",\"status\":\"sched… loc=\"\" acao=null"
+    },
+    {
+      "id": "bo1.hub_live_items_public.sched_unpub",
+      "lens": "BO1",
+      "title": "hub_live_items_public sched_unpub",
+      "ev": "401 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_live_is_broadcasting\"} loc=\"\" acao=null"
+    },
+    {
+      "id": "bo1.hub_live_items_discovery_public.sched_unpub",
+      "lens": "BO1",
+      "title": "hub_live_items_discovery_public sched_unpub",
+      "ev": "401 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_live_is_broadcasting\"} loc=\"\" acao=null"
+    },
+    {
+      "id": "bo1.lives.jwt.sched",
+      "lens": "BO1",
+      "title": "buyer GET lives sched",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table lives\"} loc=\"\" acao=null"
+    },
+    {
+      "id": "bo1.lives.anon.sched",
+      "lens": "BO1",
+      "title": "anon GET lives",
+      "ev": "401 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table lives\"} loc=\"\" acao=null"
+    },
+    {
+      "id": "bo1.lives.jwt.draft",
+      "lens": "BO1",
+      "title": "buyer GET lives draft",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table lives\"} loc=\"\" acao=null"
+    },
+    {
+      "id": "bo1.lives.anon.draft",
+      "lens": "BO1",
+      "title": "anon GET lives",
+      "ev": "401 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table lives\"} loc=\"\" acao=null"
+    },
+    {
+      "id": "bo1.lives.jwt.paused",
+      "lens": "BO1",
+      "title": "buyer GET lives paused",
+      "ev": "400 {\"code\":\"22P02\",\"details\":null,\"hint\":null,\"message\":\"invalid input syntax for type uuid: \\\"null\\\"\"} loc=\"\" acao=null"
+    },
+    {
+      "id": "bo1.lives.anon.paused",
+      "lens": "BO1",
+      "title": "anon GET lives",
+      "ev": "400 {\"code\":\"22P02\",\"details\":null,\"hint\":null,\"message\":\"invalid input syntax for type uuid: \\\"null\\\"\"} loc=\"\" acao=null"
+    },
+    {
+      "id": "bo1.lives.jwt.live_inactive",
+      "lens": "BO1",
+      "title": "buyer GET lives live_inactive",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table lives\"} loc=\"\" acao=null"
+    },
+    {
+      "id": "bo1.lives.anon.live_inactive",
+      "lens": "BO1",
+      "title": "anon GET lives",
+      "ev": "401 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table lives\"} loc=\"\" acao=null"
+    },
+    {
+      "id": "bo1.lives.jwt.ended_unpub",
+      "lens": "BO1",
+      "title": "buyer GET lives ended_unpub",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table lives\"} loc=\"\" acao=null"
+    },
+    {
+      "id": "bo1.lives.anon.ended_unpub",
+      "lens": "BO1",
+      "title": "anon GET lives",
+      "ev": "401 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table lives\"} loc=\"\" acao=null"
+    },
+    {
+      "id": "bo1.lives.jwt.sched_unpub",
+      "lens": "BO1",
+      "title": "buyer GET lives sched_unpub",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table lives\"} loc=\"\" acao=null"
+    },
+    {
+      "id": "bo1.lives.anon.sched_unpub",
+      "lens": "BO1",
+      "title": "anon GET lives",
+      "ev": "401 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table lives\"} loc=\"\" acao=null"
+    },
+    {
+      "id": "bo1.handle.sug",
+      "lens": "BO1",
+      "title": "resolve handle_suggested unpublished",
+      "ev": "200 {\"found\": true, \"handle\": \"rtbo1905s2sug\", \"profile_id\": \"d15e351f-b4f2-4719-a645-575711f47f22\", \"http_status\": 200, \"redirect_to\": null, \"hub_published\": false} loc=\"\" acao=null"
+    },
+    {
+      "id": "bo1.fomo.anon.air",
+      "lens": "BO1",
+      "title": "FOMO anon air",
+      "ev": "200 {\"ok\": true, \"items\": [{\"status\": \"available\", \"is_last_unit\": false, \"live_item_id\": \"e63a0f60-32d5-47f0-b9bb-ac52a04ed007\", \"available_qty\": 3, \"pending_queue_count\": 0, \"display_reserved_qty\": 0}], \"live_id\": \"5150803c-11bb-4f58-900a-765… loc=\"\" acao=null"
+    },
+    {
+      "id": "bo1.fomo.buyer.air",
+      "lens": "BO1",
+      "title": "FOMO buyer air",
+      "ev": "200 {\"ok\": true, \"items\": [{\"status\": \"available\", \"is_last_unit\": false, \"live_item_id\": \"e63a0f60-32d5-47f0-b9bb-ac52a04ed007\", \"available_qty\": 3, \"pending_queue_count\": 0, \"display_reserved_qty\": 0}], \"live_id\": \"5150803c-11bb-4f58-900a-765… loc=\"\" acao=null"
+    },
+    {
+      "id": "bo1.fomo.anon.sched",
+      "lens": "BO1",
+      "title": "FOMO anon sched",
+      "ev": "200 {\"ok\": true, \"items\": [], \"live_id\": \"091b954c-9744-44e3-bd1c-51fd037cba7f\", \"is_active\": false, \"live_status\": \"scheduled\", \"viewer_count\": 0} loc=\"\" acao=null"
+    },
+    {
+      "id": "bo1.fomo.buyer.sched",
+      "lens": "BO1",
+      "title": "FOMO buyer sched",
+      "ev": "200 {\"ok\": true, \"items\": [], \"live_id\": \"091b954c-9744-44e3-bd1c-51fd037cba7f\", \"is_active\": false, \"live_status\": \"scheduled\", \"viewer_count\": 0} loc=\"\" acao=null"
+    },
+    {
+      "id": "bo1.fomo.anon.draft",
+      "lens": "BO1",
+      "title": "FOMO anon draft",
+      "ev": "200 {\"ok\": false, \"error\": \"live_not_public\"} loc=\"\" acao=null"
+    },
+    {
+      "id": "bo1.fomo.buyer.draft",
+      "lens": "BO1",
+      "title": "FOMO buyer draft",
+      "ev": "200 {\"ok\": false, \"error\": \"live_not_public\"} loc=\"\" acao=null"
+    },
+    {
+      "id": "bo1.fomo.anon.ended_pub",
+      "lens": "BO1",
+      "title": "FOMO anon ended_pub",
+      "ev": "200 {\"ok\": true, \"items\": [], \"live_id\": \"22f91ffc-032d-4188-b297-3d8120b75ed3\", \"is_active\": false, \"live_status\": \"ended\", \"viewer_count\": 0} loc=\"\" acao=null"
+    },
+    {
+      "id": "bo1.fomo.buyer.ended_pub",
+      "lens": "BO1",
+      "title": "FOMO buyer ended_pub",
+      "ev": "200 {\"ok\": true, \"items\": [], \"live_id\": \"22f91ffc-032d-4188-b297-3d8120b75ed3\", \"is_active\": false, \"live_status\": \"ended\", \"viewer_count\": 0} loc=\"\" acao=null"
+    },
+    {
+      "id": "bo1.fomo.anon.paused",
+      "lens": "BO1",
+      "title": "FOMO anon paused",
+      "ev": "200 {\"ok\": false, \"error\": \"missing_live_id\"} loc=\"\" acao=null"
+    },
+    {
+      "id": "bo1.fomo.buyer.paused",
+      "lens": "BO1",
+      "title": "FOMO buyer paused",
+      "ev": "200 {\"ok\": false, \"error\": \"missing_live_id\"} loc=\"\" acao=null"
+    },
+    {
+      "id": "bo1.fomo.anon.live_inactive",
+      "lens": "BO1",
+      "title": "FOMO anon live_inactive",
+      "ev": "200 {\"ok\": true, \"items\": [], \"live_id\": \"5862bc23-c707-4f57-ad4c-80eafcb2272f\", \"is_active\": false, \"live_status\": \"live\", \"viewer_count\": 0} loc=\"\" acao=null"
+    },
+    {
+      "id": "bo1.fomo.buyer.live_inactive",
+      "lens": "BO1",
+      "title": "FOMO buyer live_inactive",
+      "ev": "200 {\"ok\": true, \"items\": [], \"live_id\": \"5862bc23-c707-4f57-ad4c-80eafcb2272f\", \"is_active\": false, \"live_status\": \"live\", \"viewer_count\": 0} loc=\"\" acao=null"
+    },
+    {
+      "id": "bo1.fomo.anon.ended_unpub",
+      "lens": "BO1",
+      "title": "FOMO anon ended_unpub",
+      "ev": "200 {\"ok\": false, \"error\": \"live_not_public\"} loc=\"\" acao=null"
+    },
+    {
+      "id": "bo1.fomo.buyer.ended_unpub",
+      "lens": "BO1",
+      "title": "FOMO buyer ended_unpub",
+      "ev": "200 {\"ok\": false, \"error\": \"live_not_public\"} loc=\"\" acao=null"
+    },
+    {
+      "id": "bo1.fomo.anon.air_unpub",
+      "lens": "BO1",
+      "title": "FOMO anon air_unpub",
+      "ev": "200 {\"ok\": false, \"error\": \"live_not_public\"} loc=\"\" acao=null"
+    },
+    {
+      "id": "bo1.fomo.buyer.air_unpub",
+      "lens": "BO1",
+      "title": "FOMO buyer air_unpub",
+      "ev": "200 {\"ok\": false, \"error\": \"live_not_public\"} loc=\"\" acao=null"
+    },
+    {
+      "id": "bo1.fomo.anon.sched_unpub",
+      "lens": "BO1",
+      "title": "FOMO anon sched_unpub",
+      "ev": "200 {\"ok\": false, \"error\": \"live_not_public\"} loc=\"\" acao=null"
+    },
+    {
+      "id": "bo1.fomo.buyer.sched_unpub",
+      "lens": "BO1",
+      "title": "FOMO buyer sched_unpub",
+      "ev": "200 {\"ok\": false, \"error\": \"live_not_public\"} loc=\"\" acao=null"
+    },
+    {
+      "id": "bo1.bcast.anon",
+      "lens": "BO1",
+      "title": "anon batata_live_is_broadcasting",
+      "ev": "401 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_live_is_broadcasting\"} loc=\"\" acao=null"
+    },
+    {
+      "id": "bo2.cors.https://evil.com",
+      "lens": "BO2",
+      "title": "CORS Origin=https://evil.com",
+      "ev": {
+        "opt": "200 ok loc=\"\" acao=https://fleaber.pt",
+        "post": "404 {\"error\":\"live_not_public\"} loc=\"\" acao=https://fleaber.pt",
+        "opt_acao": "https://fleaber.pt",
+        "post_acao": "https://fleaber.pt",
+        "acah": "authorization, x-client-info, apikey, content-type, x-device-token, x-cleanup-secret, x-webhook-secret"
+      }
+    },
+    {
+      "id": "bo2.cors.http://evil.com",
+      "lens": "BO2",
+      "title": "CORS Origin=http://evil.com",
+      "ev": {
+        "opt": "200 ok loc=\"\" acao=https://fleaber.pt",
+        "post": "404 {\"error\":\"live_not_public\"} loc=\"\" acao=https://fleaber.pt",
+        "opt_acao": "https://fleaber.pt",
+        "post_acao": "https://fleaber.pt",
+        "acah": "authorization, x-client-info, apikey, content-type, x-device-token, x-cleanup-secret, x-webhook-secret"
+      }
+    },
+    {
+      "id": "bo2.cors.https://fleaber.pt.evil.com",
+      "lens": "BO2",
+      "title": "CORS Origin=https://fleaber.pt.evil.com",
+      "ev": {
+        "opt": "200 ok loc=\"\" acao=https://fleaber.pt",
+        "post": "404 {\"error\":\"live_not_public\"} loc=\"\" acao=https://fleaber.pt",
+        "opt_acao": "https://fleaber.pt",
+        "post_acao": "https://fleaber.pt",
+        "acah": "authorization, x-client-info, apikey, content-type, x-device-token, x-cleanup-secret, x-webhook-secret"
+      }
+    },
+    {
+      "id": "bo2.cors.https://evil.fleaber.pt",
+      "lens": "BO2",
+      "title": "CORS Origin=https://evil.fleaber.pt",
+      "ev": {
+        "opt": "200 ok loc=\"\" acao=https://fleaber.pt",
+        "post": "404 {\"error\":\"live_not_public\"} loc=\"\" acao=https://fleaber.pt",
+        "opt_acao": "https://fleaber.pt",
+        "post_acao": "https://fleaber.pt",
+        "acah": "authorization, x-client-info, apikey, content-type, x-device-token, x-cleanup-secret, x-webhook-secret"
+      }
+    },
+    {
+      "id": "bo2.cors.https://attacker.fleaber.pt",
+      "lens": "BO2",
+      "title": "CORS Origin=https://attacker.fleaber.pt",
+      "ev": {
+        "opt": "200 ok loc=\"\" acao=https://fleaber.pt",
+        "post": "404 {\"error\":\"live_not_public\"} loc=\"\" acao=https://fleaber.pt",
+        "opt_acao": "https://fleaber.pt",
+        "post_acao": "https://fleaber.pt",
+        "acah": "authorization, x-client-info, apikey, content-type, x-device-token, x-cleanup-secret, x-webhook-secret"
+      }
+    },
+    {
+      "id": "bo2.cors.http://[::1]:3000",
+      "lens": "BO2",
+      "title": "CORS Origin=http://[::1]:3000",
+      "ev": {
+        "opt": "200 ok loc=\"\" acao=https://fleaber.pt",
+        "post": "404 {\"error\":\"live_not_public\"} loc=\"\" acao=https://fleaber.pt",
+        "opt_acao": "https://fleaber.pt",
+        "post_acao": "https://fleaber.pt",
+        "acah": "authorization, x-client-info, apikey, content-type, x-device-token, x-cleanup-secret, x-webhook-secret"
+      }
+    },
+    {
+      "id": "bo2.cors.http://[::ffff:127.0.0.1]:8080",
+      "lens": "BO2",
+      "title": "CORS Origin=http://[::ffff:127.0.0.1]:8080",
+      "ev": {
+        "opt": "200 ok loc=\"\" acao=https://fleaber.pt",
+        "post": "404 {\"error\":\"live_not_public\"} loc=\"\" acao=https://fleaber.pt",
+        "opt_acao": "https://fleaber.pt",
+        "post_acao": "https://fleaber.pt",
+        "acah": "authorization, x-client-info, apikey, content-type, x-device-token, x-cleanup-secret, x-webhook-secret"
+      }
+    },
+    {
+      "id": "bo2.cors.https://[::ffff:127.0.0.1]",
+      "lens": "BO2",
+      "title": "CORS Origin=https://[::ffff:127.0.0.1]",
+      "ev": {
+        "opt": "200 ok loc=\"\" acao=https://fleaber.pt",
+        "post": "404 {\"error\":\"live_not_public\"} loc=\"\" acao=https://fleaber.pt",
+        "opt_acao": "https://fleaber.pt",
+        "post_acao": "https://fleaber.pt",
+        "acah": "authorization, x-client-info, apikey, content-type, x-device-token, x-cleanup-secret, x-webhook-secret"
+      }
+    },
+    {
+      "id": "bo2.cors.null",
+      "lens": "BO2",
+      "title": "CORS Origin=null",
+      "ev": {
+        "opt": "200 ok loc=\"\" acao=https://fleaber.pt",
+        "post": "404 {\"error\":\"live_not_public\"} loc=\"\" acao=https://fleaber.pt",
+        "opt_acao": "https://fleaber.pt",
+        "post_acao": "https://fleaber.pt",
+        "acah": "authorization, x-client-info, apikey, content-type, x-device-token, x-cleanup-secret, x-webhook-secret"
+      }
+    },
+    {
+      "id": "bo2.cors.https://fleaber.pt",
+      "lens": "BO2",
+      "title": "CORS Origin=https://fleaber.pt",
+      "ev": {
+        "opt": "200 ok loc=\"\" acao=https://fleaber.pt",
+        "post": "404 {\"error\":\"live_not_public\"} loc=\"\" acao=https://fleaber.pt",
+        "opt_acao": "https://fleaber.pt",
+        "post_acao": "https://fleaber.pt",
+        "acah": "authorization, x-client-info, apikey, content-type, x-device-token, x-cleanup-secret, x-webhook-secret"
+      }
+    },
+    {
+      "id": "bo2.cors.http://localhost:5173",
+      "lens": "BO2",
+      "title": "CORS Origin=http://localhost:5173",
+      "ev": {
+        "opt": "200 ok loc=\"\" acao=http://localhost:5173",
+        "post": "404 {\"error\":\"live_not_public\"} loc=\"\" acao=http://localhost:5173",
+        "opt_acao": "http://localhost:5173",
+        "post_acao": "http://localhost:5173",
+        "acah": "authorization, x-client-info, apikey, content-type, x-device-token, x-cleanup-secret, x-webhook-secret"
+      }
+    },
+    {
+      "id": "bo2.cors.http://127.0.0.1:4173",
+      "lens": "BO2",
+      "title": "CORS Origin=http://127.0.0.1:4173",
+      "ev": {
+        "opt": "200 ok loc=\"\" acao=http://127.0.0.1:4173",
+        "post": "404 {\"error\":\"live_not_public\"} loc=\"\" acao=http://127.0.0.1:4173",
+        "opt_acao": "http://127.0.0.1:4173",
+        "post_acao": "http://127.0.0.1:4173",
+        "acah": "authorization, x-client-info, apikey, content-type, x-device-token, x-cleanup-secret, x-webhook-secret"
+      }
+    },
+    {
+      "id": "bo2.cors.chrome-extension://abcdef",
+      "lens": "BO2",
+      "title": "CORS Origin=chrome-extension://abcdef",
+      "ev": {
+        "opt": "200 ok loc=\"\" acao=https://fleaber.pt",
+        "post": "404 {\"error\":\"live_not_public\"} loc=\"\" acao=https://fleaber.pt",
+        "opt_acao": "https://fleaber.pt",
+        "post_acao": "https://fleaber.pt",
+        "acah": "authorization, x-client-info, apikey, content-type, x-device-token, x-cleanup-secret, x-webhook-secret"
+      }
+    },
+    {
+      "id": "bo2.cors.https://localtest.me",
+      "lens": "BO2",
+      "title": "CORS Origin=https://localtest.me",
+      "ev": {
+        "opt": "200 ok loc=\"\" acao=https://fleaber.pt",
+        "post": "404 {\"error\":\"live_not_public\"} loc=\"\" acao=https://fleaber.pt",
+        "opt_acao": "https://fleaber.pt",
+        "post_acao": "https://fleaber.pt",
+        "acah": "authorization, x-client-info, apikey, content-type, x-device-token, x-cleanup-secret, x-webhook-secret"
+      }
+    },
+    {
+      "id": "bo2.cors.https://lvh.me",
+      "lens": "BO2",
+      "title": "CORS Origin=https://lvh.me",
+      "ev": {
+        "opt": "200 ok loc=\"\" acao=https://fleaber.pt",
+        "post": "404 {\"error\":\"live_not_public\"} loc=\"\" acao=https://fleaber.pt",
+        "opt_acao": "https://fleaber.pt",
+        "post_acao": "https://fleaber.pt",
+        "acah": "authorization, x-client-info, apikey, content-type, x-device-token, x-cleanup-secret, x-webhook-secret"
+      }
+    },
+    {
+      "id": "bo2.wr.get",
+      "lens": "BO2",
+      "title": "GET web_return_origin=https://[::1]/wallet",
+      "ev": "200 <!DOCTYPE html><html lang=\"pt\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Fleaber</title><script>window.setTimeout(function(){ window.location.href = \"fleaber://fleaber.com/wallet\"… loc=\"\" acao=*"
+    },
+    {
+      "id": "bo2.wr.post",
+      "lens": "BO2",
+      "title": "POST onboarding origin=https://[::1]/wallet",
+      "ev": "200 {\"stripeAccountId\":\"acct_1U5mYbQeUNx8ar08\",\"url\":\"https://connect.stripe.com/setup/e/acct_1U5mYbQeUNx8ar08/rN1COVJgcPqG\"} loc=\"\" acao=*"
+    },
+    {
+      "id": "bo2.wr.get",
+      "lens": "BO2",
+      "title": "GET web_return_origin=https://[::ffff:127.0.0.1]/x",
+      "ev": "403 <!DOCTYPE html>\n<!--[if lt IE 7]> <html class=\"no-js ie6 oldie\" lang=\"en-US\"> <![endif]-->\n<!--[if IE 7]>    <html class=\"no-js ie7 oldie\" lang=\"en-US\"> <![endif]-->\n<!--[if IE 8]>    <html class=\"no-js ie8 oldie\" lang=\"en-US\"> <![endif]-->… loc=\"\" acao=null"
+    },
+    {
+      "id": "bo2.wr.post",
+      "lens": "BO2",
+      "title": "POST onboarding origin=https://[::ffff:127.0.0.1]/x",
+      "ev": "200 {\"stripeAccountId\":\"acct_1U5mYbQeUNx8ar08\",\"url\":\"https://connect.stripe.com/setup/e/acct_1U5mYbQeUNx8ar08/LDreAqGNURDL\"} loc=\"\" acao=*"
+    },
+    {
+      "id": "bo2.wr.get",
+      "lens": "BO2",
+      "title": "GET web_return_origin=http://[::ffff:127.0.0.1]/x",
+      "ev": "403 <!DOCTYPE html>\n<!--[if lt IE 7]> <html class=\"no-js ie6 oldie\" lang=\"en-US\"> <![endif]-->\n<!--[if IE 7]>    <html class=\"no-js ie7 oldie\" lang=\"en-US\"> <![endif]-->\n<!--[if IE 8]>    <html class=\"no-js ie8 oldie\" lang=\"en-US\"> <![endif]-->… loc=\"\" acao=null"
+    },
+    {
+      "id": "bo2.wr.post",
+      "lens": "BO2",
+      "title": "POST onboarding origin=http://[::ffff:127.0.0.1]/x",
+      "ev": "200 {\"stripeAccountId\":\"acct_1U5mYbQeUNx8ar08\",\"url\":\"https://connect.stripe.com/setup/e/acct_1U5mYbQeUNx8ar08/HfvQHJJDtOYC\"} loc=\"\" acao=*"
+    },
+    {
+      "id": "bo2.wr.get",
+      "lens": "BO2",
+      "title": "GET web_return_origin=https://[::ffff:7f00:1]/",
+      "ev": "403 <!DOCTYPE html>\n<!--[if lt IE 7]> <html class=\"no-js ie6 oldie\" lang=\"en-US\"> <![endif]-->\n<!--[if IE 7]>    <html class=\"no-js ie7 oldie\" lang=\"en-US\"> <![endif]-->\n<!--[if IE 8]>    <html class=\"no-js ie8 oldie\" lang=\"en-US\"> <![endif]-->… loc=\"\" acao=null"
+    },
+    {
+      "id": "bo2.wr.post",
+      "lens": "BO2",
+      "title": "POST onboarding origin=https://[::ffff:7f00:1]/",
+      "ev": "200 {\"stripeAccountId\":\"acct_1U5mYbQeUNx8ar08\",\"url\":\"https://connect.stripe.com/setup/e/acct_1U5mYbQeUNx8ar08/bz2ySeuI7cxI\"} loc=\"\" acao=*"
+    },
+    {
+      "id": "bo2.wr.get",
+      "lens": "BO2",
+      "title": "GET web_return_origin=http://[::1]",
+      "ev": "200 <!DOCTYPE html><html lang=\"pt\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Fleaber</title><script>window.setTimeout(function(){ window.location.href = \"fleaber://fleaber.com/wallet\"… loc=\"\" acao=*"
+    },
+    {
+      "id": "bo2.wr.post",
+      "lens": "BO2",
+      "title": "POST onboarding origin=http://[::1]",
+      "ev": "200 {\"stripeAccountId\":\"acct_1U5mYbQeUNx8ar08\",\"url\":\"https://connect.stripe.com/setup/e/acct_1U5mYbQeUNx8ar08/2uxHPwtt3bj3\"} loc=\"\" acao=*"
+    },
+    {
+      "id": "bo2.wr.get",
+      "lens": "BO2",
+      "title": "GET web_return_origin=https://localtest.me",
+      "ev": "200 <!DOCTYPE html><html lang=\"pt\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Fleaber</title><script>window.setTimeout(function(){ window.location.href = \"fleaber://fleaber.com/wallet\"… loc=\"\" acao=*"
+    },
+    {
+      "id": "bo2.wr.post",
+      "lens": "BO2",
+      "title": "POST onboarding origin=https://localtest.me",
+      "ev": "200 {\"stripeAccountId\":\"acct_1U5mYbQeUNx8ar08\",\"url\":\"https://connect.stripe.com/setup/e/acct_1U5mYbQeUNx8ar08/mSGk8bKm1Okq\"} loc=\"\" acao=*"
+    },
+    {
+      "id": "bo2.wr.get",
+      "lens": "BO2",
+      "title": "GET web_return_origin=https://lvh.me",
+      "ev": "200 <!DOCTYPE html><html lang=\"pt\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Fleaber</title><script>window.setTimeout(function(){ window.location.href = \"fleaber://fleaber.com/wallet\"… loc=\"\" acao=*"
+    },
+    {
+      "id": "bo2.wr.post",
+      "lens": "BO2",
+      "title": "POST onboarding origin=https://lvh.me",
+      "ev": "200 {\"stripeAccountId\":\"acct_1U5mYbQeUNx8ar08\",\"url\":\"https://connect.stripe.com/setup/e/acct_1U5mYbQeUNx8ar08/vN4ZIvgrExR0\"} loc=\"\" acao=*"
+    },
+    {
+      "id": "bo2.wr.get",
+      "lens": "BO2",
+      "title": "GET web_return_origin=https://127.0.0.1.nip.io",
+      "ev": "200 <!DOCTYPE html><html lang=\"pt\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Fleaber</title><script>window.setTimeout(function(){ window.location.href = \"fleaber://fleaber.com/wallet\"… loc=\"\" acao=*"
+    },
+    {
+      "id": "bo2.wr.post",
+      "lens": "BO2",
+      "title": "POST onboarding origin=https://127.0.0.1.nip.io",
+      "ev": "200 {\"stripeAccountId\":\"acct_1U5mYbQeUNx8ar08\",\"url\":\"https://connect.stripe.com/setup/e/acct_1U5mYbQeUNx8ar08/3nyduITs1Mu0\"} loc=\"\" acao=*"
+    },
+    {
+      "id": "bo2.wr.get",
+      "lens": "BO2",
+      "title": "GET web_return_origin=https://spoofed.localhost",
+      "ev": "200 <!DOCTYPE html><html lang=\"pt\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Fleaber</title><script>window.setTimeout(function(){ window.location.href = \"fleaber://fleaber.com/wallet\"… loc=\"\" acao=*"
+    },
+    {
+      "id": "bo2.wr.post",
+      "lens": "BO2",
+      "title": "POST onboarding origin=https://spoofed.localhost",
+      "ev": "200 {\"stripeAccountId\":\"acct_1U5mYbQeUNx8ar08\",\"url\":\"https://connect.stripe.com/setup/e/acct_1U5mYbQeUNx8ar08/mZzP7kIdZdIT\"} loc=\"\" acao=*"
+    },
+    {
+      "id": "bo2.wr.get",
+      "lens": "BO2",
+      "title": "GET web_return_origin=https://fleaber.pt.evil.com",
+      "ev": "200 <!DOCTYPE html><html lang=\"pt\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Fleaber</title><script>window.setTimeout(function(){ window.location.href = \"fleaber://fleaber.com/wallet\"… loc=\"\" acao=*"
+    },
+    {
+      "id": "bo2.wr.post",
+      "lens": "BO2",
+      "title": "POST onboarding origin=https://fleaber.pt.evil.com",
+      "ev": "200 {\"stripeAccountId\":\"acct_1U5mYbQeUNx8ar08\",\"url\":\"https://connect.stripe.com/setup/e/acct_1U5mYbQeUNx8ar08/Yr16XZwruC9Y\"} loc=\"\" acao=*"
+    },
+    {
+      "id": "bo2.wr.get",
+      "lens": "BO2",
+      "title": "GET web_return_origin=https://evil.fleaber.pt",
+      "ev": "200 <!DOCTYPE html><html lang=\"pt\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Fleaber</title><script>window.setTimeout(function(){ window.location.href = \"fleaber://fleaber.com/wallet\"… loc=\"\" acao=*"
+    },
+    {
+      "id": "bo2.wr.post",
+      "lens": "BO2",
+      "title": "POST onboarding origin=https://evil.fleaber.pt",
+      "ev": "200 {\"stripeAccountId\":\"acct_1U5mYbQeUNx8ar08\",\"url\":\"https://connect.stripe.com/setup/e/acct_1U5mYbQeUNx8ar08/EmNPPOMCseOi\"} loc=\"\" acao=*"
+    },
+    {
+      "id": "bo2.wr.get",
+      "lens": "BO2",
+      "title": "GET web_return_origin=https://localhost.evil.com",
+      "ev": "200 <!DOCTYPE html><html lang=\"pt\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Fleaber</title><script>window.setTimeout(function(){ window.location.href = \"fleaber://fleaber.com/wallet\"… loc=\"\" acao=*"
+    },
+    {
+      "id": "bo2.wr.post",
+      "lens": "BO2",
+      "title": "POST onboarding origin=https://localhost.evil.com",
+      "ev": "200 {\"stripeAccountId\":\"acct_1U5mYbQeUNx8ar08\",\"url\":\"https://connect.stripe.com/setup/e/acct_1U5mYbQeUNx8ar08/H65rWnFhm81g\"} loc=\"\" acao=*"
+    },
+    {
+      "id": "bo2.wr.get",
+      "lens": "BO2",
+      "title": "GET web_return_origin=https://fleaber.pt",
+      "ev": "303  loc=https://fleaber.pt/wallet acao=*"
+    },
+    {
+      "id": "bo2.wr.post",
+      "lens": "BO2",
+      "title": "POST onboarding origin=https://fleaber.pt",
+      "ev": "200 {\"stripeAccountId\":\"acct_1U5mYbQeUNx8ar08\",\"url\":\"https://connect.stripe.com/setup/e/acct_1U5mYbQeUNx8ar08/JERWu09jTqsW\"} loc=\"\" acao=*"
+    },
+    {
+      "id": "bo2.wr.get",
+      "lens": "BO2",
+      "title": "GET web_return_origin=http://localhost",
+      "ev": "303  loc=http://localhost/wallet acao=*"
+    },
+    {
+      "id": "bo2.wr.post",
+      "lens": "BO2",
+      "title": "POST onboarding origin=http://localhost",
+      "ev": "200 {\"stripeAccountId\":\"acct_1U5mYbQeUNx8ar08\",\"url\":\"https://connect.stripe.com/setup/e/acct_1U5mYbQeUNx8ar08/hnTwSZr0fTt4\"} loc=\"\" acao=*"
+    },
+    {
+      "id": "bo2.wr.get",
+      "lens": "BO2",
+      "title": "GET web_return_origin=http://127.0.0.1",
+      "ev": "303  loc=http://127.0.0.1/wallet acao=*"
+    },
+    {
+      "id": "bo2.wr.post",
+      "lens": "BO2",
+      "title": "POST onboarding origin=http://127.0.0.1",
+      "ev": "200 {\"stripeAccountId\":\"acct_1U5mYbQeUNx8ar08\",\"url\":\"https://connect.stripe.com/setup/e/acct_1U5mYbQeUNx8ar08/6BjGjekpo3VB\"} loc=\"\" acao=*"
+    },
+    {
+      "id": "bo2.wr.get",
+      "lens": "BO2",
+      "title": "GET web_return_origin=https://2130706433",
+      "ev": "303  loc=https://127.0.0.1/wallet acao=*"
+    },
+    {
+      "id": "bo2.wr.post",
+      "lens": "BO2",
+      "title": "POST onboarding origin=https://2130706433",
+      "ev": "200 {\"stripeAccountId\":\"acct_1U5mYbQeUNx8ar08\",\"url\":\"https://connect.stripe.com/setup/e/acct_1U5mYbQeUNx8ar08/R5tRhwK9CSn4\"} loc=\"\" acao=*"
+    },
+    {
+      "id": "bo2.wr.get",
+      "lens": "BO2",
+      "title": "GET web_return_origin=https://127.1",
+      "ev": "303  loc=https://127.0.0.1/wallet acao=*"
+    },
+    {
+      "id": "bo2.wr.post",
+      "lens": "BO2",
+      "title": "POST onboarding origin=https://127.1",
+      "ev": "200 {\"stripeAccountId\":\"acct_1U5mYbQeUNx8ar08\",\"url\":\"https://connect.stripe.com/setup/e/acct_1U5mYbQeUNx8ar08/XTx9gphhwaxd\"} loc=\"\" acao=*"
+    },
+    {
+      "id": "bo2.wr.get",
+      "lens": "BO2",
+      "title": "GET web_return_origin=https://0x7f000001",
+      "ev": "303  loc=https://127.0.0.1/wallet acao=*"
+    },
+    {
+      "id": "bo2.wr.post",
+      "lens": "BO2",
+      "title": "POST onboarding origin=https://0x7f000001",
+      "ev": "200 {\"stripeAccountId\":\"acct_1U5mYbQeUNx8ar08\",\"url\":\"https://connect.stripe.com/setup/e/acct_1U5mYbQeUNx8ar08/GyxI1qMf6GeU\"} loc=\"\" acao=*"
+    },
+    {
+      "id": "bo2.wr.get",
+      "lens": "BO2",
+      "title": "GET web_return_origin=https://0177.0.0.1",
+      "ev": "303  loc=https://127.0.0.1/wallet acao=*"
+    },
+    {
+      "id": "bo2.wr.post",
+      "lens": "BO2",
+      "title": "POST onboarding origin=https://0177.0.0.1",
+      "ev": "200 {\"stripeAccountId\":\"acct_1U5mYbQeUNx8ar08\",\"url\":\"https://connect.stripe.com/setup/e/acct_1U5mYbQeUNx8ar08/eY3CB0pKST0q\"} loc=\"\" acao=*"
+    },
+    {
+      "id": "bo2.wr.get",
+      "lens": "BO2",
+      "title": "GET web_return_origin=https://0.0.0.0",
+      "ev": "200 <!DOCTYPE html><html lang=\"pt\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Fleaber</title><script>window.setTimeout(function(){ window.location.href = \"fleaber://fleaber.com/wallet\"… loc=\"\" acao=*"
+    },
+    {
+      "id": "bo2.wr.post",
+      "lens": "BO2",
+      "title": "POST onboarding origin=https://0.0.0.0",
+      "ev": "200 {\"stripeAccountId\":\"acct_1U5mYbQeUNx8ar08\",\"url\":\"https://connect.stripe.com/setup/e/acct_1U5mYbQeUNx8ar08/1jLrfoERGm2N\"} loc=\"\" acao=*"
+    },
+    {
+      "id": "bo2.wr.get",
+      "lens": "BO2",
+      "title": "GET web_return_origin=https://fleaber.pt@evil.com",
+      "ev": "200 <!DOCTYPE html><html lang=\"pt\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Fleaber</title><script>window.setTimeout(function(){ window.location.href = \"fleaber://fleaber.com/wallet\"… loc=\"\" acao=*"
+    },
+    {
+      "id": "bo2.wr.post",
+      "lens": "BO2",
+      "title": "POST onboarding origin=https://fleaber.pt@evil.com",
+      "ev": "200 {\"stripeAccountId\":\"acct_1U5mYbQeUNx8ar08\",\"url\":\"https://connect.stripe.com/setup/e/acct_1U5mYbQeUNx8ar08/1rfSdQGOQqOH\"} loc=\"\" acao=*"
+    },
+    {
+      "id": "bo2.wr.get",
+      "lens": "BO2",
+      "title": "GET web_return_origin=https://fleaber.pt%00.evil.com",
+      "ev": "200 <!DOCTYPE html><html lang=\"pt\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Fleaber</title><script>window.setTimeout(function(){ window.location.href = \"fleaber://fleaber.com/wallet\"… loc=\"\" acao=*"
+    },
+    {
+      "id": "bo2.wr.post",
+      "lens": "BO2",
+      "title": "POST onboarding origin=https://fleaber.pt%00.evil.com",
+      "ev": "200 {\"stripeAccountId\":\"acct_1U5mYbQeUNx8ar08\",\"url\":\"https://connect.stripe.com/setup/e/acct_1U5mYbQeUNx8ar08/N0hroZB4p0NP\"} loc=\"\" acao=*"
+    },
+    {
+      "id": "bo2.wr.get",
+      "lens": "BO2",
+      "title": "GET web_return_origin=javascript:alert(1)",
+      "ev": "403 <!DOCTYPE html>\n<!--[if lt IE 7]> <html class=\"no-js ie6 oldie\" lang=\"en-US\"> <![endif]-->\n<!--[if IE 7]>    <html class=\"no-js ie7 oldie\" lang=\"en-US\"> <![endif]-->\n<!--[if IE 8]>    <html class=\"no-js ie8 oldie\" lang=\"en-US\"> <![endif]-->… loc=\"\" acao=null"
+    },
+    {
+      "id": "bo2.wr.post",
+      "lens": "BO2",
+      "title": "POST onboarding origin=javascript:alert(1)",
+      "ev": "200 {\"stripeAccountId\":\"acct_1U5mYbQeUNx8ar08\",\"url\":\"https://connect.stripe.com/setup/e/acct_1U5mYbQeUNx8ar08/KA4H2GdN9gyw\"} loc=\"\" acao=*"
+    },
+    {
+      "id": "bo2.wr.get",
+      "lens": "BO2",
+      "title": "GET web_return_origin=https://127.0.0.1.xip.io",
+      "ev": "200 <!DOCTYPE html><html lang=\"pt\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Fleaber</title><script>window.setTimeout(function(){ window.location.href = \"fleaber://fleaber.com/wallet\"… loc=\"\" acao=*"
+    },
+    {
+      "id": "bo2.wr.post",
+      "lens": "BO2",
+      "title": "POST onboarding origin=https://127.0.0.1.xip.io",
+      "ev": "200 {\"stripeAccountId\":\"acct_1U5mYbQeUNx8ar08\",\"url\":\"https://connect.stripe.com/setup/e/acct_1U5mYbQeUNx8ar08/nBcprSJrnpmk\"} loc=\"\" acao=*"
+    },
+    {
+      "id": "bo2.wr.get",
+      "lens": "BO2",
+      "title": "GET web_return_origin=https://[::ffff:8.8.8.8]/",
+      "ev": "403 <!DOCTYPE html>\n<!--[if lt IE 7]> <html class=\"no-js ie6 oldie\" lang=\"en-US\"> <![endif]-->\n<!--[if IE 7]>    <html class=\"no-js ie7 oldie\" lang=\"en-US\"> <![endif]-->\n<!--[if IE 8]>    <html class=\"no-js ie8 oldie\" lang=\"en-US\"> <![endif]-->… loc=\"\" acao=null"
+    },
+    {
+      "id": "bo2.wr.post",
+      "lens": "BO2",
+      "title": "POST onboarding origin=https://[::ffff:8.8.8.8]/",
+      "ev": "200 {\"stripeAccountId\":\"acct_1U5mYbQeUNx8ar08\",\"url\":\"https://connect.stripe.com/setup/e/acct_1U5mYbQeUNx8ar08/42rsrK2nGnyy\"} loc=\"\" acao=*"
+    },
+    {
+      "id": "bo3.tip.create",
+      "lens": "BO3",
+      "title": "buyer tip checkout live air",
+      "ev": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1apdsHVTLl51Q4zYJB3RA0hsifaUlGCeLfeyLcFYsyfLjxSBWTiFoj7uH#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21… loc=\"\" acao=*"
+    },
+    {
+      "id": "bo3.tip.b2settle",
+      "lens": "BO3",
+      "title": "B2 GET settle unpaid session",
+      "ev": "200 Pagamento ainda não confirmado. Se já pagaste, aguarda alguns segundos e volta à app Fleaber. loc=\"\" acao=*"
+    },
+    {
+      "id": "bo3.tip.row",
+      "lens": "BO3",
+      "title": "tip após B2 settle unpaid",
+      "ev": {
+        "row": {
+          "id": "2fc01666-9358-41e8-a34b-578c162c17f8",
+          "status": "pending",
+          "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+          "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+          "amount": 1.5,
+          "stripe_session_id": "cs_test_a1apdsHVTLl51Q4zYJB3RA0hsifaUlGCeLfeyLcFYsyfLjxSBWTiFoj7uH",
+          "live_id": "5150803c-11bb-4f58-900a-765d5354f2ea"
+        },
+        "seller_wallet": 16.0,
+        "http": "200 Pagamento ainda não confirmado. Se já pagaste, aguarda alguns segundos e volta à app Fleaber. loc=\"\" acao=*"
+      }
+    },
+    {
+      "id": "bo3.tip.forged",
+      "lens": "BO3",
+      "title": "GET session forjada",
+      "ev": "400 Pagamento ainda não confirmado. Se já pagaste, aguarda alguns segundos e volta à app Fleaber. loc=\"\" acao=*"
+    },
+    {
+      "id": "bo4.tip.buyer_id",
+      "lens": "BO4",
+      "title": "body buyer_id spoof",
+      "ev": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1MHzBxsBAyxOfq98Q9LxJpF7zQiEr4jy72mTTYRRY3JSMQ6ZxJnime8xH#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21… loc=\"\" acao=*"
+    },
+    {
+      "id": "bo5.resolve.air",
+      "lens": "BO5",
+      "title": "resolve-mux air",
+      "ev": "200 {\"playback_id\":\"play-air-20260902T1905\",\"playback_url\":\"https://stream.mux.com/play-air-20260902T1905.m3u8?reduced_latency=true\",\"source\":\"live_active\",\"is_live\":true} loc=\"\" acao=*"
+    },
+    {
+      "id": "bo5.resolve.sched",
+      "lens": "BO5",
+      "title": "resolve-mux sched",
+      "ev": "404 {\"error\":\"live_not_public\"} loc=\"\" acao=*"
+    },
+    {
+      "id": "bo5.resolve.draft",
+      "lens": "BO5",
+      "title": "resolve-mux draft",
+      "ev": "404 {\"error\":\"live_not_public\"} loc=\"\" acao=*"
+    },
+    {
+      "id": "bo5.resolve.ended_pub",
+      "lens": "BO5",
+      "title": "resolve-mux ended_pub",
+      "ev": "200 {\"playback_id\":\"8cje21NKdUUro21jGdEv2UlfmWLD7TAMIWi2W01H5Gb8\",\"playback_url\":\"https://stream.mux.com/8cje21NKdUUro21jGdEv2UlfmWLD7TAMIWi2W01H5Gb8.m3u8\",\"source\":\"cache\",\"is_live\":false} loc=\"\" acao=*"
+    },
+    {
+      "id": "bo5.resolve.paused",
+      "lens": "BO5",
+      "title": "resolve-mux paused",
+      "ev": "400 {\"error\":\"live_id obrigatório.\"} loc=\"\" acao=*"
+    },
+    {
+      "id": "bo5.resolve.live_inactive",
+      "lens": "BO5",
+      "title": "resolve-mux live_inactive",
+      "ev": "404 {\"error\":\"live_not_public\"} loc=\"\" acao=*"
+    },
+    {
+      "id": "bo5.resolve.ended_unpub",
+      "lens": "BO5",
+      "title": "resolve-mux ended_unpub",
+      "ev": "404 {\"error\":\"live_not_public\"} loc=\"\" acao=*"
+    },
+    {
+      "id": "bo5.resolve.air_unpub",
+      "lens": "BO5",
+      "title": "resolve-mux air_unpub",
+      "ev": "200 {\"playback_id\":\"play-unpub-air-20260902T1905\",\"playback_url\":\"https://stream.mux.com/play-unpub-air-20260902T1905.m3u8?reduced_latency=true\",\"source\":\"live_active\",\"is_live\":true} loc=\"\" acao=*"
+    },
+    {
+      "id": "bo5.resolve.sched_unpub",
+      "lens": "BO5",
+      "title": "resolve-mux sched_unpub",
+      "ev": "404 {\"error\":\"live_not_public\"} loc=\"\" acao=*"
+    },
+    {
+      "id": "bo5.embed.disc",
+      "lens": "BO5",
+      "title": "discovery sched raw",
+      "ev": "200 [{\"id\":\"091b954c-9744-44e3-bd1c-51fd037cba7f\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"seller_handle\":\"fleahub-demo-ux\",\"seller_name\":\"Maria Demo FleaHub\",\"seller_photo_url\":\"https://images.unsplash.com/photo-1494790108377-be9c29… loc=\"\" acao=null"
+    },
+    {
+      "id": "bo5.embed.pub",
+      "lens": "BO5",
+      "title": "hub_lives_public sched raw",
+      "ev": "200 [{\"id\":\"091b954c-9744-44e3-bd1c-51fd037cba7f\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"seller_handle\":\"fleahub-demo-ux\",\"title\":\"RTBO-20260902T1905-sched\",\"status\":\"scheduled\",\"is_active\":false,\"mux_playback_id\":null,\"mux_vod_pla… loc=\"\" acao=null"
+    },
+    {
+      "id": "bo6.buckets.anon",
+      "lens": "BO6",
+      "title": "list buckets anon",
+      "ev": "200 [] loc=\"\" acao=*"
+    },
+    {
+      "id": "bo6.get.fleaber_private/980f4fa1-0004-42f9-abca-69f1a9c29588/stream_key.txt",
+      "lens": "BO6",
+      "title": "GET object",
+      "ev": "400 {\"statusCode\":\"404\",\"error\":\"not_found\",\"message\":\"Object not found\",\"code\":\"NoSuchKey\"} loc=\"\" acao=*"
+    },
+    {
+      "id": "bo6.get.fleaber_private/980f4fa1-0004-42f9-abca-69f1a9c29588/id",
+      "lens": "BO6",
+      "title": "GET object",
+      "ev": "400 {\"statusCode\":\"404\",\"error\":\"not_found\",\"message\":\"Object not found\",\"code\":\"NoSuchKey\"} loc=\"\" acao=*"
+    },
+    {
+      "id": "bo6.get.chat_media/980f4fa1-0004-42f9-abca-69f1a9c29588/x.jpg",
+      "lens": "BO6",
+      "title": "GET object",
+      "ev": "400 {\"statusCode\":\"404\",\"error\":\"not_found\",\"message\":\"Object not found\",\"code\":\"NoSuchKey\"} loc=\"\" acao=*"
+    },
+    {
+      "id": "bo6.get.mux/5150803c-11bb-4f58-900a-765d5354f2ea/stream",
+      "lens": "BO6",
+      "title": "GET object",
+      "ev": "400 {\"statusCode\":\"404\",\"error\":\"Bucket not found\",\"message\":\"Bucket not found\",\"code\":\"NoSuchBucket\"} loc=\"\" acao=*"
+    },
+    {
+      "id": "bo7.comp.sched",
+      "lens": "BO7",
+      "title": "JWT+CDN+embed+edge scheduled",
+      "ev": {
+        "jwt": "200 [{\"mux_vod_playback_id\":\"8cje21NKdUUro21jGdEv2UlfmWLD7TAMIWi2W01H5Gb8\",\"status\":\"scheduled\"}] loc=\"\" acao=null",
+        "cdn": "200 #EXTM3U\n#EXT-X-VERSION:5\n#EXT-X-INDEPENDENT-SEGMENTS\n\n#EXT-X-STREAM-INF:BANDWIDTH=2493700,AVERAGE-BANDWIDTH=2493700,CODECS=\"mp4a.40.2,avc1.640020\",RESOLUTION=1280x720,CLOSED-CAPTIONS=NONE\nhttps://manifest-oci-us-ashburn-1-vop1.fastly.mux.co… loc=\"\" acao=*",
+        "embed": "200",
+        "edge": "404 {\"error\":\"live_not_public\"} loc=\"\" acao=*"
+      }
+    }
+  ],
+  "actors": {
+    "buyer": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+    "seller": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+    "buyer2": "4bf7a472-4aca-48db-ad14-addb35453d99",
+    "seller2": "d15e351f-b4f2-4719-a645-575711f47f22"
+  },
+  "created": {
+    "lives": [
+      "5150803c-11bb-4f58-900a-765d5354f2ea",
+      "091b954c-9744-44e3-bd1c-51fd037cba7f",
+      "140126a9-168c-4b49-ba96-9abf1ea87b04",
+      "22f91ffc-032d-4188-b297-3d8120b75ed3",
+      "5862bc23-c707-4f57-ad4c-80eafcb2272f",
+      "6cdc3ad0-60e5-48c3-b22a-30cb5d7a8841",
+      "629ca023-0d38-4aba-9ae8-ac4250e1878b",
+      "f973326a-7561-439a-b328-3f51d6fc8867"
+    ],
+    "items": [
+      "e63a0f60-32d5-47f0-b9bb-ac52a04ed007"
+    ],
+    "tips": [
+      "2fc01666-9358-41e8-a34b-578c162c17f8",
+      "05b69ea4-0638-4241-86d1-8b899a520939"
+    ],
+    "products": []
+  },
+  "plantedPlaybackId": "8cje21NKdUUro21jGdEv2UlfmWLD7TAMIWi2W01H5Gb8"
+}

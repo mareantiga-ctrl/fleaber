@@ -1,0 +1,40 @@
+{
+  "auditor": "REDTEAM_BLIND_CQ_CHAT_POS_ALLOW_v1",
+  "prefix": "RTCQ-20260906T1412",
+  "findings": [
+    {
+      "id": "P1-1",
+      "severity": "P1",
+      "title": "Allowlist notes/inbox aceita montante e moeda fora de [€$£¥]/EUR (ramo 3 denylist-shaped)",
+      "surfaces": [
+        "reservation_payment_submitted.notes",
+        "chats.last_message"
+      ],
+      "root": "batata_chat_client_notes_allowed third OR: len<=120 AND NOT [€$£¥] AND NOT amount-regex AND NOT payment_lie_text",
+      "persisted_examples": [
+        "12,00",
+        "12,50",
+        "doze euros",
+        "enviado 12 💶",
+        "obrigado ￥ 12",
+        "12,00 ϵ",
+        "12 ₠",
+        "paguei &#8364; 12",
+        "12 &euro;",
+        "[\"12,00\"]",
+        "{\"paid\":12.00}",
+        "JSON number 12.00",
+        "long text with 12,00 mid",
+        "pago 12 usd"
+      ],
+      "held_counterexamples": [
+        "obrigado € → notes_forbidden",
+        "12.00 EUR → notes_forbidden",
+        "１２．００ ＥＵＲ NFKC → notes_forbidden",
+        "PaysafeCash 12,00 € residual → notes_forbidden"
+      ],
+      "not_p0": "PATCH pago 403; wallet Δ=0; storage RLS 403; OCR 401",
+      "msg_ids": [1644, 1645, 1646, 1648, 1651, 1652, 1654, 1655, 1656, 1657, 1658, 1659, 1664, 1665, 1666]
+    }
+  ]
+}

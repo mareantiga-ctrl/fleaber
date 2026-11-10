@@ -1,0 +1,52 @@
+{
+  "auditor": "REDTEAM_BLIND_BQ_DISPUTA_POS_BFBK_v1",
+  "frozen_at": "2026-09-02T18:22:00Z",
+  "prefix": "RTBQ-20260902T1905",
+  "folder": "tool/redteam_blind_bq_20260902T1905/",
+  "production_touched": false,
+  "fase4": false,
+  "corrections_applied": false,
+  "lentes_cobertas": ["BQ1", "BQ2", "BQ3", "BQ4", "BQ5", "BQ6", "BQ7", "BQ8"],
+  "VEREDICTO": "FAIL_P1",
+  "contagem": {
+    "P0_aberto": false,
+    "P0_quantos": 0,
+    "P1_aberto": true,
+    "P1_quantos": 1,
+    "P2_aberto": true,
+    "P2_quantos": 2,
+    "P3_aberto": false,
+    "P3_quantos": 0,
+    "P4_aberto": false,
+    "P4_quantos": 0,
+    "TOTAL_P0_P3_abertos": 3
+  },
+  "findings": [
+    {
+      "id": "BQ3-01",
+      "severity": "P1",
+      "lenses": ["BQ3", "BQ7", "BQ8"],
+      "title": "order_dispute_replies proof needle no URL inteiro (query + fragment); signed URL B2 servida a B1/S1/anon"
+    },
+    {
+      "id": "BQ3-02",
+      "severity": "P2",
+      "lenses": ["BQ3"],
+      "title": "order_disputes proof_photos aceita ../ e %2e%2e sem loot storage"
+    },
+    {
+      "id": "BQ3-03",
+      "severity": "P2",
+      "lenses": ["BQ3"],
+      "title": "INSERT reply aceita https://fleaber.pt/… com needle"
+    }
+  ],
+  "not_counted_exactos": [
+    "seller pago→pedido_devolucao → order_seller_cannot_mark_pedido_devolucao",
+    "order_disputes proof query-string wrap → dispute_proof_url_denied"
+  ],
+  "false_positives_retracted": [
+    "pass1 BQ4-05 refund open dispute: order ainda pago sem disputa (RLS INSERT só concluido/entregue)",
+    "pass1 BQ3-03 P1 traversal: GET não entrega PNG; downgrade classe BQ3-02 P2"
+  ]
+}

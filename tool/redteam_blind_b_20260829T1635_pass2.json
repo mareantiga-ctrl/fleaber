@@ -1,0 +1,580 @@
+{
+  "pass": 2,
+  "findings": [
+    {
+      "id": "RTB-B-REP-03",
+      "title": "Review possível em venda forçada pelo seller",
+      "severity": "P1",
+      "actor": "vítima (ou seller a controlar o fluxo)",
+      "preconditions": "order fantasma paga off-platform",
+      "request": "POST reviews na order forçada",
+      "before": {},
+      "result": "[{\"id\":\"09cc3416-3e62-4614-b214-90e07069794b\",\"created_at\":\"2026-08-29T15:42:47.916034+00:00\",\"target_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"buyer_id\":\"78129954-383e-4b69-8dad-f81ae5c692d8\",\"stars\":5,\"comment\":\"forced-sale-review\",\"is_automatic\":false,\"target_type\":\"seller\",\"author_role\":\"compr…",
+      "after": {},
+      "impact": "Reputação colada a uma compra que a vítima não iniciou.",
+      "reproduction": "Seller cria order+pago; JWT da vítima (ou auto-feedback) cria review."
+    },
+    {
+      "id": "RTB-B-ID-02",
+      "title": "Venda forçada até concluido sobre conta que nunca encomendou",
+      "severity": "P1",
+      "actor": "seller JWT",
+      "preconditions": "UUID de qualquer buyer; produto próprio; payment_method=mbway",
+      "request": "POST orders {buyer_id:vítima} + PATCH pago [+ enviado/concluido]",
+      "before": {
+        "victim": "78129954-383e-4b69-8dad-f81ae5c692d8",
+        "product": "7f1bf68e-24a5-471f-8413-930e057385e9"
+      },
+      "result": {
+        "status": "concluido",
+        "stock_units_applied": 1
+      },
+      "after": {
+        "order": [
+          {
+            "id": "59f1272e-6e50-430c-b574-6698a693b54f",
+            "created_at": "2026-08-29T15:42:46.955595+00:00",
+            "product_id": "7f1bf68e-24a5-471f-8413-930e057385e9",
+            "buyer_id": "78129954-383e-4b69-8dad-f81ae5c692d8",
+            "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+            "price_total": 7.5,
+            "shipping_method": null,
+            "payment_method": "mbway",
+            "proof_url": null,
+            "status": "concluido",
+            "reservation_expires_at": null,
+            "is_reservation": false,
+            "completed_at": "2026-08-29T15:42:47.337129+00:00",
+            "auto_feedback_processed_at": null,
+            "returned_at": null,
+            "wallet_release_processed_at": null,
+            "wallet_refund_processed_at": null,
+            "bundle_id": null,
+            "quantity": 1,
+            "live_id": null,
+            "live_item_id": null,
+            "live_raffle_id": null,
+            "stripe_checkout_session_id": null,
+            "stripe_payment_intent_id": null,
+            "stripe_refund_id": null,
+            "stripe_refunded_at": null,
+            "stock_units_applied": 1,
+            "amount_paid_cents": null,
+            "contract_unit_cents": 750,
+            "contract_qty": 1,
+            "product_offer_id": null
+          }
+        ],
+        "product": [
+          {
+            "id": "7f1bf68e-24a5-471f-8413-930e057385e9",
+            "created_at": "2026-08-29T15:42:46.840635+00:00",
+            "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+            "title": "RTB-B p2 20260829T1635",
+            "price": 7.5,
+            "ref_code": null,
+            "category": null,
+            "clothing_size": null,
+            "gender": null,
+            "description": null,
+            "state": null,
+            "image_urls": null,
+            "list_on_marketplace": false,
+            "available_for_live": false,
+            "is_sold": true,
+            "favorites_count": 0,
+            "quantity": 0
+          }
+        ]
+      },
+      "impact": "Stock consumido e máquina logística/reputação avança sem consentimento do comprador e sem captura Stripe.",
+      "reproduction": "JWT seller INSERT order com buyer_id alheio, mbway, PATCH pago e estados seguintes."
+    }
+  ],
+  "probes": [
+    {
+      "id": "rpc.buyer.batata_is_admin",
+      "title": "buyer batata_is_admin",
+      "status": 200,
+      "body": "false"
+    },
+    {
+      "id": "rpc.buyer.batata_admin_list_profiles",
+      "title": "buyer batata_admin_list_profiles",
+      "status": 400,
+      "body": "{\"code\":\"P0001\",\"details\":null,\"hint\":null,\"message\":\"Acesso negado.\"}"
+    },
+    {
+      "id": "rpc.buyer.batata_admin_resolve_dispute",
+      "title": "buyer batata_admin_resolve_dispute",
+      "status": 400,
+      "body": "{\"code\":\"P0001\",\"details\":null,\"hint\":null,\"message\":\"Apenas administradores podem resolver disputas.\"}"
+    },
+    {
+      "id": "rpc.buyer.batata_credit_wallet_once",
+      "title": "buyer batata_credit_wallet_once",
+      "status": 403,
+      "body": "{\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_credit_wallet_once\"}"
+    },
+    {
+      "id": "rpc.buyer.batata_debit_wallet_once",
+      "title": "buyer batata_debit_wallet_once",
+      "status": 403,
+      "body": "{\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_debit_wallet_once\"}"
+    },
+    {
+      "id": "rpc.buyer.batata_clawback_seller_wallet_for_order",
+      "title": "buyer batata_clawback_seller_wallet_for_order",
+      "status": 403,
+      "body": "{\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_clawback_seller_wallet_for_order\"}"
+    },
+    {
+      "id": "rpc.buyer.batata_finalize_stripe_order_refund",
+      "title": "buyer batata_finalize_stripe_order_refund",
+      "status": 404,
+      "body": "{\"code\":\"PGRST202\",\"details\":\"Searched for the function public.batata_finalize_stripe_order_refund with parameter p_order_id or with a single unnamed json/jsonb parameter, but no matches were found in the schema cache.\",\"hint\":null,\"message\":\"Could not find the function public.batata_finalize_stripe_order_refund(p_order_id) in the schema cache\"}"
+    },
+    {
+      "id": "rpc.buyer.batata_lab_clear_all_fm_pending",
+      "title": "buyer batata_lab_clear_all_fm_pending",
+      "status": 403,
+      "body": "{\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_lab_clear_all_fm_pending\"}"
+    },
+    {
+      "id": "rpc.buyer.batata_create_seller_device_token",
+      "title": "buyer batata_create_seller_device_token",
+      "status": 200,
+      "body": "{\"ok\": true, \"label\": \"x\", \"token\": \"1ecab73d3ae504d58827628fc74442a85aa5e8646dd07237c8bb68bd808c5d01\", \"device_id\": \"rtb-b-buyer\"}"
+    },
+    {
+      "id": "rpc.buyer.batata_claim_external_reservations",
+      "title": "buyer batata_claim_external_reservations",
+      "status": 200,
+      "body": "{\"ok\": false, \"error\": \"live_id_required\"}"
+    },
+    {
+      "id": "rpc.buyer.batata_mark_live_item_sold",
+      "title": "buyer batata_mark_live_item_sold",
+      "status": 200,
+      "body": "{\"ok\": false, \"error\": \"live_item_not_found\"}"
+    },
+    {
+      "id": "rpc.buyer.batata_draw_live_raffle_winners",
+      "title": "buyer batata_draw_live_raffle_winners",
+      "status": 400,
+      "body": "{\"code\":\"P0001\",\"details\":null,\"hint\":null,\"message\":\"raffle_not_found\"}"
+    },
+    {
+      "id": "rpc.buyer.batata_activate_live_raffle",
+      "title": "buyer batata_activate_live_raffle",
+      "status": 400,
+      "body": "{\"code\":\"P0001\",\"details\":null,\"hint\":null,\"message\":\"raffle_not_found\"}"
+    },
+    {
+      "id": "rpc.buyer.batata_live_reconcile_stripe_order",
+      "title": "buyer batata_live_reconcile_stripe_order",
+      "status": 200,
+      "body": "{\"ok\": false, \"error\": \"order_not_found\"}"
+    },
+    {
+      "id": "rpc.buyer.batata_live_system_message",
+      "title": "buyer batata_live_system_message",
+      "status": 200,
+      "body": "{\"ok\": false, \"error\": \"live_not_found\"}"
+    },
+    {
+      "id": "rpc.buyer.batata_ingest_ocr_reservation",
+      "title": "buyer batata_ingest_ocr_reservation",
+      "status": 200,
+      "body": "{\"ok\": false, \"error\": \"invalid_token\"}"
+    },
+    {
+      "id": "rpc.buyer.batata_get_my_payout_details",
+      "title": "buyer batata_get_my_payout_details",
+      "status": 200,
+      "body": "[{\"mb_way\":null,\"iban\":null,\"external_payments_enabled\":false}]"
+    },
+    {
+      "id": "rpc.buyer.batata_ps_create_pairing",
+      "title": "buyer batata_ps_create_pairing",
+      "status": 404,
+      "body": "{\"code\":\"PGRST202\",\"details\":\"Searched for the function public.batata_ps_create_pairing with parameter p_device_hint or with a single unnamed json/jsonb parameter, but no matches were found in the schema cache.\",\"hint\":\"Perhaps you meant to call the function public.batata_ps_create_pairing(p_device_id_hint, p_live_id)\",\"message\":\"Could not find the…"
+    },
+    {
+      "id": "rpc.seller.batata_is_admin",
+      "title": "seller batata_is_admin",
+      "status": 200,
+      "body": "false"
+    },
+    {
+      "id": "rpc.seller.batata_admin_list_profiles",
+      "title": "seller batata_admin_list_profiles",
+      "status": 400,
+      "body": "{\"code\":\"P0001\",\"details\":null,\"hint\":null,\"message\":\"Acesso negado.\"}"
+    },
+    {
+      "id": "rpc.seller.batata_admin_resolve_dispute",
+      "title": "seller batata_admin_resolve_dispute",
+      "status": 400,
+      "body": "{\"code\":\"P0001\",\"details\":null,\"hint\":null,\"message\":\"Apenas administradores podem resolver disputas.\"}"
+    },
+    {
+      "id": "rpc.seller.batata_credit_wallet_once",
+      "title": "seller batata_credit_wallet_once",
+      "status": 403,
+      "body": "{\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_credit_wallet_once\"}"
+    },
+    {
+      "id": "rpc.seller.batata_debit_wallet_once",
+      "title": "seller batata_debit_wallet_once",
+      "status": 403,
+      "body": "{\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_debit_wallet_once\"}"
+    },
+    {
+      "id": "rpc.seller.batata_clawback_seller_wallet_for_order",
+      "title": "seller batata_clawback_seller_wallet_for_order",
+      "status": 403,
+      "body": "{\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_clawback_seller_wallet_for_order\"}"
+    },
+    {
+      "id": "rpc.seller.batata_finalize_stripe_order_refund",
+      "title": "seller batata_finalize_stripe_order_refund",
+      "status": 404,
+      "body": "{\"code\":\"PGRST202\",\"details\":\"Searched for the function public.batata_finalize_stripe_order_refund with parameter p_order_id or with a single unnamed json/jsonb parameter, but no matches were found in the schema cache.\",\"hint\":null,\"message\":\"Could not find the function public.batata_finalize_stripe_order_refund(p_order_id) in the schema cache\"}"
+    },
+    {
+      "id": "rpc.seller.batata_lab_clear_all_fm_pending",
+      "title": "seller batata_lab_clear_all_fm_pending",
+      "status": 403,
+      "body": "{\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_lab_clear_all_fm_pending\"}"
+    },
+    {
+      "id": "rpc.seller.batata_create_seller_device_token",
+      "title": "seller batata_create_seller_device_token",
+      "status": 200,
+      "body": "{\"ok\": true, \"label\": \"x\", \"token\": \"dbfb9ae8ceceb132eb6ccf007bf52eda7b5841788018b15191f7fa6b6505a423\", \"device_id\": \"rtb-b-buyer\"}"
+    },
+    {
+      "id": "rpc.seller.batata_claim_external_reservations",
+      "title": "seller batata_claim_external_reservations",
+      "status": 200,
+      "body": "{\"ok\": false, \"error\": \"live_id_required\"}"
+    },
+    {
+      "id": "rpc.seller.batata_mark_live_item_sold",
+      "title": "seller batata_mark_live_item_sold",
+      "status": 200,
+      "body": "{\"ok\": false, \"error\": \"live_item_not_found\"}"
+    },
+    {
+      "id": "rpc.seller.batata_draw_live_raffle_winners",
+      "title": "seller batata_draw_live_raffle_winners",
+      "status": 400,
+      "body": "{\"code\":\"P0001\",\"details\":null,\"hint\":null,\"message\":\"raffle_not_found\"}"
+    },
+    {
+      "id": "rpc.seller.batata_activate_live_raffle",
+      "title": "seller batata_activate_live_raffle",
+      "status": 400,
+      "body": "{\"code\":\"P0001\",\"details\":null,\"hint\":null,\"message\":\"raffle_not_found\"}"
+    },
+    {
+      "id": "rpc.seller.batata_live_reconcile_stripe_order",
+      "title": "seller batata_live_reconcile_stripe_order",
+      "status": 200,
+      "body": "{\"ok\": false, \"error\": \"order_not_found\"}"
+    },
+    {
+      "id": "rpc.seller.batata_live_system_message",
+      "title": "seller batata_live_system_message",
+      "status": 200,
+      "body": "{\"ok\": false, \"error\": \"live_not_found\"}"
+    },
+    {
+      "id": "rpc.seller.batata_ingest_ocr_reservation",
+      "title": "seller batata_ingest_ocr_reservation",
+      "status": 200,
+      "body": "{\"ok\": false, \"error\": \"invalid_token\"}"
+    },
+    {
+      "id": "rpc.seller.batata_get_my_payout_details",
+      "title": "seller batata_get_my_payout_details",
+      "status": 200,
+      "body": "[{\"mb_way\":\"910000000\",\"iban\":\"PT50000201231234567890154\",\"external_payments_enabled\":true}]"
+    },
+    {
+      "id": "rpc.seller.batata_ps_create_pairing",
+      "title": "seller batata_ps_create_pairing",
+      "status": 404,
+      "body": "{\"code\":\"PGRST202\",\"details\":\"Searched for the function public.batata_ps_create_pairing with parameter p_device_hint or with a single unnamed json/jsonb parameter, but no matches were found in the schema cache.\",\"hint\":\"Perhaps you meant to call the function public.batata_ps_create_pairing(p_device_id_hint, p_live_id)\",\"message\":\"Could not find the…"
+    },
+    {
+      "id": "p2.ghost.insert",
+      "title": "seller INSERT order buyer=vítima fresca",
+      "status": 201,
+      "body": "[{\"id\":\"59f1272e-6e50-430c-b574-6698a693b54f\",\"created_at\":\"2026-08-29T15:42:46.955595+00:00\",\"product_id\":\"7f1bf68e-24a5-471f-8413-930e057385e9\",\"buyer_id\":\"78129954-383e-4b69-8dad-f81ae5c692d8\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"price_total\":7.5,\"shipping_method\":null,\"payment_method\":\"mbway\",\"proof_url\":null,\"status\":\"pendente\",\"reservation_expires_at\":null,\"is_reservation\":false,\"completed_at\":null,\"auto_feedback_processed_at\":null,\"returned_at\":null,\"wallet_release_processe…"
+    },
+    {
+      "id": "p2.ghost.truth",
+      "title": "estado final order fantasma vítima",
+      "order": [
+        {
+          "id": "59f1272e-6e50-430c-b574-6698a693b54f",
+          "created_at": "2026-08-29T15:42:46.955595+00:00",
+          "product_id": "7f1bf68e-24a5-471f-8413-930e057385e9",
+          "buyer_id": "78129954-383e-4b69-8dad-f81ae5c692d8",
+          "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+          "price_total": 7.5,
+          "shipping_method": null,
+          "payment_method": "mbway",
+          "proof_url": null,
+          "status": "concluido",
+          "reservation_expires_at": null,
+          "is_reservation": false,
+          "completed_at": "2026-08-29T15:42:47.337129+00:00",
+          "auto_feedback_processed_at": null,
+          "returned_at": null,
+          "wallet_release_processed_at": null,
+          "wallet_refund_processed_at": null,
+          "bundle_id": null,
+          "quantity": 1,
+          "live_id": null,
+          "live_item_id": null,
+          "live_raffle_id": null,
+          "stripe_checkout_session_id": null,
+          "stripe_payment_intent_id": null,
+          "stripe_refund_id": null,
+          "stripe_refunded_at": null,
+          "stock_units_applied": 1,
+          "amount_paid_cents": null,
+          "contract_unit_cents": 750,
+          "contract_qty": 1,
+          "product_offer_id": null
+        }
+      ],
+      "product": [
+        {
+          "id": "7f1bf68e-24a5-471f-8413-930e057385e9",
+          "created_at": "2026-08-29T15:42:46.840635+00:00",
+          "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+          "title": "RTB-B p2 20260829T1635",
+          "price": 7.5,
+          "ref_code": null,
+          "category": null,
+          "clothing_size": null,
+          "gender": null,
+          "description": null,
+          "state": null,
+          "image_urls": null,
+          "list_on_marketplace": false,
+          "available_for_live": false,
+          "is_sold": true,
+          "favorites_count": 0,
+          "quantity": 0
+        }
+      ]
+    },
+    {
+      "id": "p2.ghost.victim_sees",
+      "title": "vítima vê a order",
+      "status": 200,
+      "body": "[{\"id\":\"59f1272e-6e50-430c-b574-6698a693b54f\",\"status\":\"concluido\",\"buyer_id\":\"78129954-383e-4b69-8dad-f81ae5c692d8\",\"stock_units_applied\":1,\"amount_paid_cents\":null}]"
+    },
+    {
+      "id": "p2.ghost.review.victim",
+      "title": "vítima review na venda forçada",
+      "status": 201,
+      "body": "[{\"id\":\"09cc3416-3e62-4614-b214-90e07069794b\",\"created_at\":\"2026-08-29T15:42:47.916034+00:00\",\"target_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"buyer_id\":\"78129954-383e-4b69-8dad-f81ae5c692d8\",\"stars\":5,\"comment\":\"forced-sale-review\",\"is_automatic\":false,\"target_type\":\"seller\",\"author_role\":\"compr…"
+    },
+    {
+      "id": "p2.stripe_events",
+      "title": "buyer lista stripe_checkout_events",
+      "status": 200,
+      "body": "[{\"id\":\"1acee782-49d0-4ecd-a101-eb26816de64e\",\"session_id\":null,\"order_id\":\"dce8ec48-c70c-488d-9e6b-ec61e2305a2d\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"event\":\"checkout_request\",\"detail\":{\"amount\": 3583, \"live_id\": null, \"buyer_id\": \"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\", \"order_id\": \"dce8ec48-c70c-488d-9e6b-ec61e2305a2d\", \"product_id\": \"0c71ab09-ae7a-4116-a279-ab2cd8dc81c7\", \"bag_checkout\": true, \"prize_shipping\": false, \"has_web_return_origin\": false}}, \n {\"id\":\"72773ccd-5606-4d06-8e21-0840372d6d94\",\"session_id\":\"cs_test_a1tfykIgkmKntJhy7Xf6cXxAh9OP0plkbH73UChNQtNGU2FbftL1wc33Xq…"
+    },
+    {
+      "id": "p2.stripe_events.others",
+      "title": "eventos com buyer_id alheio",
+      "count": 0,
+      "sample": []
+    },
+    {
+      "id": "p2.claim.namesquat",
+      "title": "claim reservas FB pelo nome da vítima",
+      "status": 200,
+      "body": "{\"ok\": false, \"error\": \"live_id_required\"}"
+    },
+    {
+      "id": "p2.dev.buyer",
+      "title": "buyer cria device token OCR",
+      "status": 200,
+      "body": "{\"ok\": true, \"label\": \"x\", \"token\": \"920808162ba4466c25768ab6c55ab97cb3649191d096a2549ffd1ed3e0b1b776\", \"device_id\": \"rtb-b-buyer-dev\"}"
+    },
+    {
+      "id": "p2.dev.seller",
+      "title": "seller cria device token",
+      "status": 200,
+      "body": "{\"ok\": true, \"label\": \"x\", \"token\": \"98b3912e7faf5f59ea3c900337ee210013f0b007b7701862925c41fa52ec6fa7\", \"device_id\": \"rtb-b-seller-dev\"}"
+    },
+    {
+      "id": "p2.orders.shipcols",
+      "title": "colunas de morada/telefone em orders",
+      "status": 400,
+      "body": "{\"code\":\"42703\",\"details\":null,\"hint\":null,\"message\":\"column orders.shipping_address does not exist\"}"
+    },
+    {
+      "id": "p2.dispute.foreign",
+      "title": "INSERT dispute em order inexistente/alheia",
+      "status": 403,
+      "body": "{\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"new row violates row-level security policy for table \\\"order_disputes\\\"\"}"
+    },
+    {
+      "id": "p2.live.item",
+      "title": "live_item amostra",
+      "item": {
+        "id": "a4e89203-f0d6-4df2-a76a-e01435065b5f",
+        "live_id": "5dd5cfd2-63b1-4cd8-82b1-c888e9dc5234",
+        "seller_id": null,
+        "ref_code": "REGTEST-1781725253233",
+        "title": "Regression product",
+        "description": null,
+        "price": 5.0,
+        "image_url": null,
+        "size": null,
+        "color": null,
+        "is_active": true,
+        "order_index": 0,
+        "status": "reserved_full",
+        "created_at": "2026-06-18T04:30:11.010572+00:00",
+        "photo_url": null,
+        "item_kind": "marketplace_product",
+        "product_id": "ff993983-c627-461f-bcfb-cacac80404ed",
+        "checkout_product_id": null,
+        "quantity": null,
+        "clothing_size": null,
+        "gender": null,
+        "updated_at": "2026-08-29T09:01:44.621016+00:00",
+        "logical_item_id": null,
+        "public_slot": null
+      }
+    },
+    {
+      "id": "p2.dual.order",
+      "title": "order marketplace+live_item",
+      "status": 201,
+      "body": "[{\"id\":\"0d37f7c9-3127-4bc4-b6bd-1bc56233004f\",\"created_at\":\"2026-08-29T15:42:49.072208+00:00\",\"product_id\":\"ff993983-c627-461f-bcfb-cacac80404ed\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"price_total\":4.2,\"shipping_method\":null,\"payment_method\":\"mbway\",\"proof_url\":null,\"status\":\"pendente\",\"reservation_expires_at\":null,\"is_reservation\":fal…"
+    },
+    {
+      "id": "p2.verify.becb6e38-c695-480b-a06d-c151ae78a033",
+      "title": "estado real pass1",
+      "row": {
+        "id": "becb6e38-c695-480b-a06d-c151ae78a033",
+        "created_at": "2026-08-29T15:38:51.125519+00:00",
+        "product_id": "e34738b3-1099-4645-9d1e-1eef556ba405",
+        "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+        "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+        "price_total": 4.2,
+        "shipping_method": null,
+        "payment_method": "mbway",
+        "proof_url": null,
+        "status": "pago",
+        "reservation_expires_at": null,
+        "is_reservation": false,
+        "completed_at": null,
+        "auto_feedback_processed_at": null,
+        "returned_at": null,
+        "wallet_release_processed_at": null,
+        "wallet_refund_processed_at": null,
+        "bundle_id": null,
+        "quantity": 1,
+        "live_id": null,
+        "live_item_id": null,
+        "live_raffle_id": null,
+        "stripe_checkout_session_id": null,
+        "stripe_payment_intent_id": null,
+        "stripe_refund_id": null,
+        "stripe_refunded_at": null,
+        "stock_units_applied": 1,
+        "amount_paid_cents": null,
+        "contract_unit_cents": 420,
+        "contract_qty": 1,
+        "product_offer_id": null
+      }
+    },
+    {
+      "id": "p2.verify.e46fef45-b2d2-43b6-89fe-36633d531da5",
+      "title": "estado real pass1",
+      "row": {
+        "id": "e46fef45-b2d2-43b6-89fe-36633d531da5",
+        "created_at": "2026-08-29T15:38:54.376234+00:00",
+        "product_id": "b6efa3e9-915a-411d-9728-6cbe5847b187",
+        "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+        "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+        "price_total": 99.0,
+        "shipping_method": null,
+        "payment_method": "mbway",
+        "proof_url": null,
+        "status": "pago",
+        "reservation_expires_at": null,
+        "is_reservation": false,
+        "completed_at": "2026-08-29T15:38:54.760387+00:00",
+        "auto_feedback_processed_at": null,
+        "returned_at": null,
+        "wallet_release_processed_at": null,
+        "wallet_refund_processed_at": null,
+        "bundle_id": null,
+        "quantity": 1,
+        "live_id": null,
+        "live_item_id": null,
+        "live_raffle_id": null,
+        "stripe_checkout_session_id": null,
+        "stripe_payment_intent_id": null,
+        "stripe_refund_id": null,
+        "stripe_refunded_at": null,
+        "stock_units_applied": 1,
+        "amount_paid_cents": null,
+        "contract_unit_cents": 420,
+        "contract_qty": 1,
+        "product_offer_id": null
+      }
+    },
+    {
+      "id": "p2.verify.2b7fd1ed-3238-4f13-9470-044f9d50a221",
+      "title": "estado real pass1",
+      "row": {
+        "id": "2b7fd1ed-3238-4f13-9470-044f9d50a221",
+        "created_at": "2026-08-29T15:38:52.504676+00:00",
+        "product_id": "be201289-3ec3-47ec-9dc1-e8fabd0b4fcd",
+        "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+        "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+        "price_total": 4.2,
+        "shipping_method": null,
+        "payment_method": "stripe",
+        "proof_url": null,
+        "status": "pendente",
+        "reservation_expires_at": null,
+        "is_reservation": false,
+        "completed_at": "2026-08-29T15:38:52.833248+00:00",
+        "auto_feedback_processed_at": null,
+        "returned_at": null,
+        "wallet_release_processed_at": null,
+        "wallet_refund_processed_at": null,
+        "bundle_id": null,
+        "quantity": 1,
+        "live_id": null,
+        "live_item_id": null,
+        "live_raffle_id": null,
+        "stripe_checkout_session_id": null,
+        "stripe_payment_intent_id": null,
+        "stripe_refund_id": null,
+        "stripe_refunded_at": null,
+        "stock_units_applied": null,
+        "amount_paid_cents": null,
+        "contract_unit_cents": 420,
+        "contract_qty": 1,
+        "product_offer_id": null
+      }
+    }
+  ],
+  "gaps": []
+}

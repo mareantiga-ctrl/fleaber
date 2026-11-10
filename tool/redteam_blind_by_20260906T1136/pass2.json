@@ -1,0 +1,170 @@
+{
+  "auditor": "REDTEAM_BLIND_BY_CHAT_POS_BRBW_v1",
+  "pass": 2,
+  "findings": [
+    {
+      "id": "P2.c19c-no-ascii-dots",
+      "lens": "BY4",
+      "severity": "P2",
+      "title": "proof_url %c1%9c%c1%9c sem ASCII ..",
+      "actor": "buyer JWT",
+      "pre": "pass2",
+      "repro": "POST {\"kind\":\"reservation_payment_submitted\",\"order_id\":\"52db2fa8-47d3-481c-85b5-de3b93380b63\",\"notes\":\"ok\",\"proof_url\":\"https://fxdknzrqjenzqcvnwqqq.supabase.co/storage/v1/object/fleaber_private/order_proofs/bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96/52db2fa8-47d3-481c-85b5-de3b93380b63/%c1%9c%c1%9c/%c1%9c%c1%9c/order_proofs/bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96/c548838a-e478-4d67-9774-7e534926ceb8/rtby_b.png\"}",
+      "expected": "denied",
+      "obtained": "201 [{\"id\":1505,\"created_at\":\"2026-09-06T10:44:00.411464+00:00\",\"chat_id\":\"edb67d60-6e7f-4fee-8b69-44e9b69721a7\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"reservation_payment_subm…",
+      "proven": true,
+      "evidence": {
+        "id": "1505",
+        "payload": {
+          "kind": "reservation_payment_submitted",
+          "order_id": "52db2fa8-47d3-481c-85b5-de3b93380b63",
+          "notes": "ok",
+          "proof_url": "https://fxdknzrqjenzqcvnwqqq.supabase.co/storage/v1/object/fleaber_private/order_proofs/bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96/52db2fa8-47d3-481c-85b5-de3b93380b63/%c1%9c%c1%9c/%c1%9c%c1%9c/order_proofs/bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96/c548838a-e478-4d67-9774-7e534926ceb8/rtby_b.png"
+        }
+      }
+    },
+    {
+      "id": "P2.c19c-plus-e080ae",
+      "lens": "BY4",
+      "severity": "P2",
+      "title": "proof_url %c1%9c + %e0%80%ae (backslash + overlong dots)",
+      "actor": "buyer JWT",
+      "pre": "pass2",
+      "repro": "POST {\"kind\":\"reservation_payment_submitted\",\"order_id\":\"52db2fa8-47d3-481c-85b5-de3b93380b63\",\"notes\":\"ok\",\"proof_url\":\"https://fxdknzrqjenzqcvnwqqq.supabase.co/storage/v1/object/fleaber_private/order_proofs/bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96/52db2fa8-47d3-481c-85b5-de3b93380b63/%c1%9c%e0%80%ae%e0%80%ae/%c1%9c%e0%80%ae%e0%80%ae/order_proofs/bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96/c548838a-e478-4d67-9774-7e534926ceb8/rtby_b.png\"}",
+      "expected": "denied",
+      "obtained": "201 [{\"id\":1506,\"created_at\":\"2026-09-06T10:44:00.779425+00:00\",\"chat_id\":\"edb67d60-6e7f-4fee-8b69-44e9b69721a7\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"reservation_payment_subm…",
+      "proven": true,
+      "evidence": {
+        "id": "1506",
+        "payload": {
+          "kind": "reservation_payment_submitted",
+          "order_id": "52db2fa8-47d3-481c-85b5-de3b93380b63",
+          "notes": "ok",
+          "proof_url": "https://fxdknzrqjenzqcvnwqqq.supabase.co/storage/v1/object/fleaber_private/order_proofs/bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96/52db2fa8-47d3-481c-85b5-de3b93380b63/%c1%9c%e0%80%ae%e0%80%ae/%c1%9c%e0%80%ae%e0%80%ae/order_proofs/bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96/c548838a-e478-4d67-9774-7e534926ceb8/rtby_b.png"
+        }
+      }
+    },
+    {
+      "id": "P2.notes-perfectmoney",
+      "lens": "BY1",
+      "severity": "P1",
+      "title": "notes Perfect Money (mesma classe off-denylist)",
+      "actor": "buyer JWT",
+      "pre": "pass2",
+      "repro": "POST {\"kind\":\"reservation_payment_submitted\",\"order_id\":\"52db2fa8-47d3-481c-85b5-de3b93380b63\",\"notes\":\"Perfect Money 12,00 €\"}",
+      "expected": "denied",
+      "obtained": "201 [{\"id\":1507,\"created_at\":\"2026-09-06T10:44:03.527349+00:00\",\"chat_id\":\"edb67d60-6e7f-4fee-8b69-44e9b69721a7\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"reservation_payment_subm…",
+      "proven": true,
+      "evidence": {
+        "id": "1507",
+        "payload": {
+          "kind": "reservation_payment_submitted",
+          "order_id": "52db2fa8-47d3-481c-85b5-de3b93380b63",
+          "notes": "Perfect Money 12,00 €"
+        }
+      }
+    }
+  ],
+  "blocked": [
+    {
+      "id": "P2.upload-cross-user",
+      "lens": "BY6",
+      "title": "upload B2 recusado",
+      "ev": "400 {\"statusCode\":\"403\",\"error\":\"Unauthorized\",\"message\":\"new row violates row-level security policy\",\"code\":\"AccessDenied\"}"
+    },
+    {
+      "id": "P2.get-cross-user",
+      "lens": "BY6",
+      "title": "GET B2 recusado",
+      "ev": "400 {\"statusCode\":\"404\",\"error\":\"not_found\",\"message\":\"Object not found\",\"code\":\"NoSuchKey\"}"
+    }
+  ],
+  "notes": [
+    {
+      "id": "P2.seller-skrill-notes",
+      "lens": "BY1",
+      "title": "seller GET 1461",
+      "ev": "200 [{\"id\":1461,\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"reservation_payment_submitted\\\",\\\"order_id\\\":\\\"52db2fa8-47d3-481c-85b5-de3b93380b63\\\",\\\"notes\\\":\\\"Skrill 12,00 €\\\"}\"}]"
+    },
+    {
+      "id": "P2.seller-isss-clearpay",
+      "lens": "BY1",
+      "title": "seller GET 1485",
+      "ev": "200 [{\"id\":1485,\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"reservation_payment_submitted\\\",\\\"order_id\\\":\\\"52db2fa8-47d3-481c-85b5-de3b93380b63\\\",\\\"notes\\\":\\\"Clea⁪rpay 12,00 €\\\"}\"}]"
+    },
+    {
+      "id": "P2.seller-cgj-clearpay",
+      "lens": "BY1",
+      "title": "seller GET 1486",
+      "ev": "200 [{\"id\":1486,\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"reservation_payment_submitted\\\",\\\"order_id\\\":\\\"52db2fa8-47d3-481c-85b5-de3b93380b63\\\",\\\"notes\\\":\\\"Clea͏rpay 12,00 €\\\"}\"}]"
+    },
+    {
+      "id": "P2.seller-seguro-skrill",
+      "lens": "BY1",
+      "title": "seller GET 1471",
+      "ev": "200 [{\"id\":1471,\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"seguro_fleaber_paid\\\",\\\"order_id\\\":\\\"193a6333-89a5-43a1-8df2-b7b49413a2a2\\\",\\\"total\\\":\\\"5.90\\\",\\\"label\\\":\\\"Skrill 12,00 €\\\"}\"}]"
+    },
+    {
+      "id": "P2.seller-double-enc-url",
+      "lens": "BY1",
+      "title": "seller GET 1497",
+      "ev": "200 [{\"id\":1497,\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"reservation_payment_submitted\\\",\\\"order_id\\\":\\\"52db2fa8-47d3-481c-85b5-de3b93380b63\\\",\\\"notes\\\":\\\"ok\\\",\\\"proof_url\\\":\\\"https://fxdknzrqjenzqcvnwqqq.supabase.co/storage/v1/o…"
+    },
+    {
+      "id": "P2.seller-e080ae-url",
+      "lens": "BY1",
+      "title": "seller GET 1498",
+      "ev": "200 [{\"id\":1498,\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"reservation_payment_submitted\\\",\\\"order_id\\\":\\\"52db2fa8-47d3-481c-85b5-de3b93380b63\\\",\\\"notes\\\":\\\"ok\\\",\\\"proof_url\\\":\\\"https://fxdknzrqjenzqcvnwqqq.supabase.co/storage/v1/o…"
+    },
+    {
+      "id": "P2.inbox-now",
+      "lens": "BY5",
+      "title": "last_message actual",
+      "ev": "GCash 12,00 €"
+    },
+    {
+      "id": "P2.loot-double",
+      "lens": "BY4",
+      "title": "GET",
+      "ev": "400 len=285 {\"statusCode\":\"400\",\"error\":\"InvalidKey\",\"message\":\"Invalid key: order_proofs/bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96/52db2fa8-47d3-481c-85b5-de3b93380b63/%2e%2e/%2e%2e/order_proofs/bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96/c548838a-e478-4d67-9774-7e534926ceb8/rtby_b.png\",\"code\":\"InvalidKey\"}"
+    },
+    {
+      "id": "P2.loot-e080ae",
+      "lens": "BY4",
+      "title": "GET",
+      "ev": "400 len=369 {\"error\":\"Bad Request\",\"code\":\"FST_ERR_BAD_URL\",\"message\":\"'/object/authenticated/fleaber_private/order_proofs/bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96/52db2fa8-47d3-481c-85b5-de3b93380b63/%E0%80%AE%E0%80%AE/%E0%80%AE%E0%80%AE/order_proofs/bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96/c548838a-e478-4d67-9774-7e534926ceb8/rtby_b.png' is not a valid url component\",\"statusC…"
+    },
+    {
+      "id": "P2.loot-c19c",
+      "lens": "BY4",
+      "title": "GET",
+      "ev": "400 len=357 {\"error\":\"Bad Request\",\"code\":\"FST_ERR_BAD_URL\",\"message\":\"'/object/authenticated/fleaber_private/order_proofs/bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96/52db2fa8-47d3-481c-85b5-de3b93380b63/%C1%9C%C1%9C/%C1%9C%C1%9C/order_proofs/bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96/c548838a-e478-4d67-9774-7e534926ceb8/rtby_b.png' is not a valid url component\",\"statusCode\":400}"
+    },
+    {
+      "id": "P2.loot-c19c-e080ae",
+      "lens": "BY4",
+      "title": "GET",
+      "ev": "400 len=381 {\"error\":\"Bad Request\",\"code\":\"FST_ERR_BAD_URL\",\"message\":\"'/object/authenticated/fleaber_private/order_proofs/bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96/52db2fa8-47d3-481c-85b5-de3b93380b63/%C1%9C%E0%80%AE%E0%80%AE/%C1%9C%E0%80%AE%E0%80%AE/order_proofs/bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96/c548838a-e478-4d67-9774-7e534926ceb8/rtby_b.png' is not a valid url compone…"
+    },
+    {
+      "id": "P2.honest-b",
+      "lens": "BY6",
+      "title": "GET prova B",
+      "ev": "200 len=10"
+    },
+    {
+      "id": "P2.live-ended",
+      "lens": "BY8",
+      "title": "live já ended",
+      "ev": "200 [{\"id\":\"9e5dccf3-28fd-4807-9091-decc31ebecb5\",\"status\":\"ended\",\"is_active\":false}]"
+    }
+  ],
+  "lenses": [
+    "BY1",
+    "BY4",
+    "BY5",
+    "BY6",
+    "BY8"
+  ],
+  "paid_chat": "bf654459-f8b5-4899-8bec-38c0eaafd820"
+}

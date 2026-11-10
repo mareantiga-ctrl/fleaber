@@ -1,0 +1,909 @@
+{
+  "auditor": "REDTEAM_BLIND_CK_CHAT_POS_CDCI_v1",
+  "prefix": "RTCK-20260906T1316",
+  "probes": [
+    {
+      "id": "CKA.notes-paysafecash",
+      "family": "CK-A rails",
+      "payload": "card notes=PaysafeCash 12,00 €",
+      "http": "500 {\"code\":\"54000\",\"details\":null,\"hint\":null,\"message\":\"null character not permitted\"}",
+      "bd": "orders.status=reserva_pendente",
+      "verdict": "HOLD"
+    },
+    {
+      "id": "CKA.notes-paysafe-cash-loja",
+      "family": "CK-A rails",
+      "payload": "card notes=PaySafe cash código loja",
+      "http": "500 {\"code\":\"54000\",\"details\":null,\"hint\":null,\"message\":\"null character not permitted\"}",
+      "bd": "orders.status=reserva_pendente",
+      "verdict": "HOLD"
+    },
+    {
+      "id": "CKA.notes-pix-emv",
+      "family": "CK-A rails",
+      "payload": "card notes=Pix Copia e Cola 00020126580014BR.GOV.BCB.PIX0136a1b2c3d4",
+      "http": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_notes_forbidden\"}",
+      "bd": "orders.status=reserva_pendente",
+      "verdict": "HOLD"
+    },
+    {
+      "id": "CKA.notes-pix-cpf",
+      "family": "CK-A rails",
+      "payload": "card notes=chave pix aleatória CPF 123.456.789-00",
+      "http": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_notes_forbidden\"}",
+      "bd": "orders.status=reserva_pendente",
+      "verdict": "HOLD"
+    },
+    {
+      "id": "CKA.notes-picpay",
+      "family": "CK-A rails",
+      "payload": "card notes=PicPay 12,00 €",
+      "http": "500 {\"code\":\"54000\",\"details\":null,\"hint\":null,\"message\":\"null character not permitted\"}",
+      "bd": "orders.status=reserva_pendente",
+      "verdict": "HOLD"
+    },
+    {
+      "id": "CKA.notes-mbway-qr",
+      "family": "CK-A rails",
+      "payload": "card notes=MB WAY QR / lê este QR MBWay",
+      "http": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_notes_forbidden\"}",
+      "bd": "orders.status=reserva_pendente",
+      "verdict": "HOLD"
+    },
+    {
+      "id": "CKA.notes-sepa-inst",
+      "family": "CK-A rails",
+      "payload": "card notes=SEPA Instant / SCT Inst",
+      "http": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_notes_forbidden\"}",
+      "bd": "orders.status=reserva_pendente",
+      "verdict": "HOLD"
+    },
+    {
+      "id": "CKA.notes-iban-instant",
+      "family": "CK-A rails",
+      "payload": "card notes=IBAN + enviado instantâneo 12 €",
+      "http": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_notes_forbidden\"}",
+      "bd": "orders.status=reserva_pendente",
+      "verdict": "HOLD"
+    },
+    {
+      "id": "CKA.notes-revolut-dot-me",
+      "family": "CK-A rails",
+      "payload": "card notes=Revolut . Me 12,00 €",
+      "http": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_notes_forbidden\"}",
+      "bd": "orders.status=reserva_pendente",
+      "verdict": "HOLD"
+    },
+    {
+      "id": "CKA.notes-revolut-u2024",
+      "family": "CK-A rails",
+      "payload": "card notes=revolut․me 12,00 €",
+      "http": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_notes_forbidden\"}",
+      "bd": "orders.status=reserva_pendente",
+      "verdict": "HOLD"
+    },
+    {
+      "id": "CKA.notes-rev0lut",
+      "family": "CK-A rails",
+      "payload": "card notes=rev0lut.me 12 €",
+      "http": "500 {\"code\":\"54000\",\"details\":null,\"hint\":null,\"message\":\"null character not permitted\"}",
+      "bd": "orders.status=reserva_pendente",
+      "verdict": "HOLD"
+    },
+    {
+      "id": "CKA.notes-apple-cash",
+      "family": "CK-A rails",
+      "payload": "card notes=Apple Cash 12,00 €",
+      "http": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_notes_forbidden\"}",
+      "bd": "orders.status=reserva_pendente",
+      "verdict": "HOLD"
+    },
+    {
+      "id": "CKA.notes-apple-pay-cash",
+      "family": "CK-A rails",
+      "payload": "card notes=Apple Pay Cash",
+      "http": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_notes_forbidden\"}",
+      "bd": "orders.status=reserva_pendente",
+      "verdict": "HOLD"
+    },
+    {
+      "id": "CKA.notes-tap-nfc",
+      "family": "CK-A rails",
+      "payload": "card notes=tap to cash / NFC prova",
+      "http": "500 {\"code\":\"54000\",\"details\":null,\"hint\":null,\"message\":\"null character not permitted\"}",
+      "bd": "orders.status=reserva_pendente",
+      "verdict": "HOLD"
+    },
+    {
+      "id": "CKA.notes-gpay-send",
+      "family": "CK-A rails",
+      "payload": "card notes=Google Pay send money",
+      "http": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_notes_forbidden\"}",
+      "bd": "orders.status=reserva_pendente",
+      "verdict": "HOLD"
+    },
+    {
+      "id": "CKA.notes-samsung-pay",
+      "family": "CK-A rails",
+      "payload": "card notes=Samsung Pay transfer",
+      "http": "500 {\"code\":\"54000\",\"details\":null,\"hint\":null,\"message\":\"null character not permitted\"}",
+      "bd": "orders.status=reserva_pendente",
+      "verdict": "HOLD"
+    },
+    {
+      "id": "CKA.notes-money-order",
+      "family": "CK-A rails",
+      "payload": "card notes=money order / cashier check",
+      "http": "500 {\"code\":\"54000\",\"details\":null,\"hint\":null,\"message\":\"null character not permitted\"}",
+      "bd": "orders.status=reserva_pendente",
+      "verdict": "HOLD"
+    },
+    {
+      "id": "CKA.notes-vanilla",
+      "family": "CK-A rails",
+      "payload": "card notes=Vanilla gift card",
+      "http": "500 {\"code\":\"54000\",\"details\":null,\"hint\":null,\"message\":\"null character not permitted\"}",
+      "bd": "orders.status=reserva_pendente",
+      "verdict": "HOLD"
+    },
+    {
+      "id": "CKA.notes-paysafe-pin",
+      "family": "CK-A rails",
+      "payload": "card notes=PaySafe card PIN",
+      "http": "500 {\"code\":\"54000\",\"details\":null,\"hint\":null,\"message\":\"null character not permitted\"}",
+      "bd": "orders.status=reserva_pendente",
+      "verdict": "HOLD"
+    },
+    {
+      "id": "CKA.notes-comprovativo-mbway-qr",
+      "family": "CK-A rails",
+      "payload": "card notes=comprovativo MB WAY QR",
+      "http": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_notes_forbidden\"}",
+      "bd": "orders.status=reserva_pendente",
+      "verdict": "HOLD"
+    },
+    {
+      "id": "CKA.notes-transf-sepa",
+      "family": "CK-A rails",
+      "payload": "card notes=transferência imediata SEPA",
+      "http": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_notes_forbidden\"}",
+      "bd": "orders.status=reserva_pendente",
+      "verdict": "HOLD"
+    },
+    {
+      "id": "CKA.notes-revolutme",
+      "family": "CK-A rails",
+      "payload": "card notes=enviei por RevolutMe",
+      "http": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_notes_forbidden\"}",
+      "bd": "orders.status=reserva_pendente",
+      "verdict": "HOLD"
+    },
+    {
+      "id": "CKA.notes-cashapp-spaced",
+      "family": "CK-A rails",
+      "payload": "card notes=$Cash App Pay",
+      "http": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_notes_forbidden\"}",
+      "bd": "orders.status=reserva_pendente",
+      "verdict": "HOLD"
+    },
+    {
+      "id": "CKA.notes-wise-tag",
+      "family": "CK-A rails",
+      "payload": "card notes=Wise tag @user / pay.wise",
+      "http": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_notes_forbidden\"}",
+      "bd": "orders.status=reserva_pendente",
+      "verdict": "HOLD"
+    },
+    {
+      "id": "CKA.notes-it-bonifico",
+      "family": "CK-A rails",
+      "payload": "card notes=bonifico istantaneo 12,00 €",
+      "http": "500 {\"code\":\"54000\",\"details\":null,\"hint\":null,\"message\":\"null character not permitted\"}",
+      "bd": "orders.status=reserva_pendente",
+      "verdict": "HOLD"
+    },
+    {
+      "id": "CKA.notes-de-ueberweisung",
+      "family": "CK-A rails",
+      "payload": "card notes=Überweisung 12,00 €",
+      "http": "500 {\"code\":\"54000\",\"details\":null,\"hint\":null,\"message\":\"null character not permitted\"}",
+      "bd": "orders.status=reserva_pendente",
+      "verdict": "HOLD"
+    },
+    {
+      "id": "CKA.ctrl-skrill",
+      "family": "CK-A residual",
+      "payload": "card notes=Skrill 12,00 €",
+      "http": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_notes_forbidden\"}",
+      "bd": "orders.status=reserva_pendente",
+      "verdict": "HOLD"
+    },
+    {
+      "id": "CKA.ctrl-wechat",
+      "family": "CK-A residual",
+      "payload": "card notes=WeChat Pay 12,00 €",
+      "http": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_notes_forbidden\"}",
+      "bd": "orders.status=reserva_pendente",
+      "verdict": "HOLD"
+    },
+    {
+      "id": "CKA.seguro-paysafecash",
+      "family": "CK-A seguro",
+      "payload": "seguro_fleaber_paid label=PaysafeCash 12,00 €",
+      "http": "201 id=1610",
+      "bd": "orders.status=pago",
+      "verdict": "FAIL"
+    },
+    {
+      "id": "CKA.seguro-picpay",
+      "family": "CK-A seguro",
+      "payload": "seguro_fleaber_paid label=PicPay 12,00 €",
+      "http": "201 id=1611",
+      "bd": "orders.status=pago",
+      "verdict": "FAIL"
+    },
+    {
+      "id": "CKA.seguro-apple-cash",
+      "family": "CK-A seguro",
+      "payload": "seguro_fleaber_paid label=Apple Cash 12,00 €",
+      "http": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_label_mismatch\"}",
+      "bd": "orders.status=pago",
+      "verdict": "HOLD"
+    },
+    {
+      "id": "CKA.seguro-samsung-pay",
+      "family": "CK-A seguro",
+      "payload": "seguro_fleaber_paid label=Samsung Pay transfer",
+      "http": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_label_mismatch\"}",
+      "bd": "orders.status=pago",
+      "verdict": "HOLD"
+    },
+    {
+      "id": "CKB.proof-u002f",
+      "family": "CK-B path",
+      "payload": "proof_url u002f",
+      "http": "500 {\"code\":\"54000\",\"details\":null,\"hint\":null,\"message\":\"null character not permitted\"}",
+      "bd": "orders.status=pago",
+      "verdict": "HOLD"
+    },
+    {
+      "id": "CKB.proof-pct255c",
+      "family": "CK-B path",
+      "payload": "proof_url pct255c",
+      "http": "500 {\"code\":\"54000\",\"details\":null,\"hint\":null,\"message\":\"null character not permitted\"}",
+      "bd": "orders.status=pago",
+      "verdict": "HOLD"
+    },
+    {
+      "id": "CKB.proof-utf16le",
+      "family": "CK-B path",
+      "payload": "proof_url utf16le",
+      "http": "500 {\"code\":\"54000\",\"details\":null,\"hint\":null,\"message\":\"null character not permitted\"}",
+      "bd": "orders.status=pago",
+      "verdict": "HOLD"
+    },
+    {
+      "id": "CKB.proof-mixed-252f-255c",
+      "family": "CK-B path",
+      "payload": "proof_url mixed-252f-255c",
+      "http": "500 {\"code\":\"54000\",\"details\":null,\"hint\":null,\"message\":\"null character not permitted\"}",
+      "bd": "orders.status=pago",
+      "verdict": "HOLD"
+    },
+    {
+      "id": "CKB.proof-two-dot-leader",
+      "family": "CK-B path",
+      "payload": "proof_url two-dot-leader",
+      "http": "500 {\"code\":\"54000\",\"details\":null,\"hint\":null,\"message\":\"null character not permitted\"}",
+      "bd": "orders.status=pago",
+      "verdict": "HOLD"
+    },
+    {
+      "id": "CKB.proof-c1-9c",
+      "family": "CK-B path",
+      "payload": "proof_url c1-9c",
+      "http": "500 {\"code\":\"54000\",\"details\":null,\"hint\":null,\"message\":\"null character not permitted\"}",
+      "bd": "orders.status=pago",
+      "verdict": "HOLD"
+    },
+    {
+      "id": "CKB.proof-null-00",
+      "family": "CK-B path",
+      "payload": "proof_url null-00",
+      "http": "500 {\"code\":\"54000\",\"details\":null,\"hint\":null,\"message\":\"null character not permitted\"}",
+      "bd": "orders.status=pago",
+      "verdict": "HOLD"
+    },
+    {
+      "id": "CKB.proof-shy-dots",
+      "family": "CK-B path",
+      "payload": "proof_url shy-dots",
+      "http": "500 {\"code\":\"54000\",\"details\":null,\"hint\":null,\"message\":\"null character not permitted\"}",
+      "bd": "orders.status=pago",
+      "verdict": "HOLD"
+    },
+    {
+      "id": "CKC.inbox-paysafecash",
+      "family": "CK-C inbox",
+      "payload": "PATCH last_message=PaysafeCash 12,00 €",
+      "http": "200",
+      "bd": "chats.last_message=PaysafeCash 12,00 €",
+      "verdict": "FAIL"
+    },
+    {
+      "id": "CKC.inbox-tap-nfc",
+      "family": "CK-C inbox",
+      "payload": "PATCH last_message=tap to cash / NFC prova",
+      "http": "200",
+      "bd": "chats.last_message=tap to cash / NFC prova",
+      "verdict": "FAIL"
+    },
+    {
+      "id": "CKC.inbox-samsung",
+      "family": "CK-C inbox",
+      "payload": "PATCH last_message=Samsung Pay transfer",
+      "http": "200",
+      "bd": "chats.last_message=Samsung Pay transfer",
+      "verdict": "FAIL"
+    },
+    {
+      "id": "CKC.inbox-vanilla",
+      "family": "CK-C inbox",
+      "payload": "PATCH last_message=Vanilla gift card",
+      "http": "200",
+      "bd": "chats.last_message=Vanilla gift card",
+      "verdict": "FAIL"
+    },
+    {
+      "id": "CKC.inbox-bonifico",
+      "family": "CK-C inbox",
+      "payload": "PATCH last_message=bonifico istantaneo 12,00 €",
+      "http": "200",
+      "bd": "chats.last_message=bonifico istantaneo 12,00 €",
+      "verdict": "FAIL"
+    },
+    {
+      "id": "CKC.inbox-ueberweisung",
+      "family": "CK-C inbox",
+      "payload": "PATCH last_message=Überweisung 12,00 €",
+      "http": "200",
+      "bd": "chats.last_message=Überweisung 12,00 €",
+      "verdict": "FAIL"
+    },
+    {
+      "id": "CKC.inbox-rev0lut",
+      "family": "CK-C inbox",
+      "payload": "PATCH last_message=rev0lut.me 12 €",
+      "http": "200",
+      "bd": "chats.last_message=rev0lut.me 12 €",
+      "verdict": "FAIL"
+    },
+    {
+      "id": "CKC.ctrl-wechat",
+      "family": "CK-C inbox",
+      "payload": "PATCH last_message=WeChat Pay 12,00 €",
+      "http": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"chat_inbox_preview_forbidden\"}",
+      "bd": "chats.last_message=rev0lut.me 12 €",
+      "verdict": "HOLD"
+    },
+    {
+      "id": "CKC.list-alien",
+      "family": "CK-C storage",
+      "payload": "B1 LIST prefix order_proofs/{b2}/",
+      "http": "200 []",
+      "bd": "lista vazia/4xx",
+      "verdict": "HOLD"
+    },
+    {
+      "id": "CKC.upload-alien",
+      "family": "CK-C storage",
+      "payload": "B1 UPLOAD path B2",
+      "http": "400 {\"statusCode\":\"403\",\"error\":\"Unauthorized\",\"message\":\"new row violates row-level security policy\",\"code\":\"AccessDenied\"}",
+      "bd": "sem objecto",
+      "verdict": "HOLD"
+    },
+    {
+      "id": "CKC.get-cross",
+      "family": "CK-C storage",
+      "payload": "B2 GET prova B1",
+      "http": "400 {\"statusCode\":\"404\",\"error\":\"not_found\",\"message\":\"Object not found\",\"code\":\"NoSuchKey\"}",
+      "bd": "sem corpo",
+      "verdict": "HOLD"
+    },
+    {
+      "id": "CKD.chrono-insert",
+      "family": "CK-D chrono",
+      "payload": "INSERT created_at=2026-09-06T09:21:59.008244Z",
+      "http": "201 [{\"id\":1622,\"created_at\":\"2026-09-06T12:21:58.032817+00:00\",\"chat_id\":\"51b15008-7f9a-4bee-9e7b-6779d75aaba8\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"RTCK card no meio da timeline\",\"is_reservation\":fals…",
+      "bd": "created_at=2026-09-06T12:21:58.032817+00:00",
+      "verdict": "HOLD"
+    },
+    {
+      "id": "CKD.inject-b2",
+      "family": "CK-D cross-user",
+      "payload": "B2 INSERT chat A-B",
+      "http": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"new row violates row-level security policy for table \\\"chat_messages\\\"\"}",
+      "bd": "0 rows",
+      "verdict": "HOLD"
+    },
+    {
+      "id": "CK8.ocr-notoken",
+      "family": "CK8 Edge",
+      "payload": "OCR sem x-device-token",
+      "http": "401 {\"ok\":false,\"error\":\"missing_device_token\"}",
+      "bd": "sem ingest",
+      "verdict": "HOLD"
+    },
+    {
+      "id": "CKD.compose-pago",
+      "family": "CK-D composição",
+      "payload": "card PaysafeCash 12,00 € + PATCH status=pago",
+      "http": "card=500 {\"code\":\"54000\",\"details\":null,\"hint\":null,\"message\":\"null character not permitted\"} patch=403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"order_buyer_cannot_mark_pago\"}",
+      "bd": "status reserva_pendente → reserva_pendente wallet 54.33 → 54.33",
+      "verdict": "HOLD"
+    }
+  ],
+  "findings": [
+    {
+      "id": "CKA.seguro-paysafecash",
+      "lens": "CK1",
+      "severity": "P1",
+      "title": "seguro_fleaber_paid label=PaysafeCash 12,00 €",
+      "actor": "buyer JWT",
+      "pre": "denylist/canonical CDCI sem este rail/encoding/URL",
+      "repro": "POST chat_messages FLEABER_JSON_V1:{\"kind\":\"seguro_fleaber_paid\",\"order_id\":\"e3740b45-1202-44e5-a1cf-90e08e96e74c\",\"total\":\"5.90\",\"label\":\"PaysafeCash 12,00 €\"}",
+      "expected": "notes_forbidden / url_denied / label_mismatch",
+      "obtained": "201 [{\"id\":1610,\"created_at\":\"2026-09-06T12:21:48.463298+00:00\",\"chat_id\":\"860b015a-b8d2-4f3e-89b8-72d5e528f010\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"seguro_fleaber_paid\\\",\\\"…",
+      "proven": true,
+      "evidence": {
+        "id": "1610",
+        "kind": "seguro_fleaber_paid",
+        "payload": {
+          "kind": "seguro_fleaber_paid",
+          "order_id": "e3740b45-1202-44e5-a1cf-90e08e96e74c",
+          "total": "5.90",
+          "label": "PaysafeCash 12,00 €"
+        },
+        "order_status": "pago"
+      }
+    },
+    {
+      "id": "CKA.seguro-picpay",
+      "lens": "CK1",
+      "severity": "P1",
+      "title": "seguro_fleaber_paid label=PicPay 12,00 €",
+      "actor": "buyer JWT",
+      "pre": "denylist/canonical CDCI sem este rail/encoding/URL",
+      "repro": "POST chat_messages FLEABER_JSON_V1:{\"kind\":\"seguro_fleaber_paid\",\"order_id\":\"e3740b45-1202-44e5-a1cf-90e08e96e74c\",\"total\":\"5.90\",\"label\":\"PicPay 12,00 €\"}",
+      "expected": "notes_forbidden / url_denied / label_mismatch",
+      "obtained": "201 [{\"id\":1611,\"created_at\":\"2026-09-06T12:21:48.865993+00:00\",\"chat_id\":\"860b015a-b8d2-4f3e-89b8-72d5e528f010\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"seguro_fleaber_paid\\\",\\\"…",
+      "proven": true,
+      "evidence": {
+        "id": "1611",
+        "kind": "seguro_fleaber_paid",
+        "payload": {
+          "kind": "seguro_fleaber_paid",
+          "order_id": "e3740b45-1202-44e5-a1cf-90e08e96e74c",
+          "total": "5.90",
+          "label": "PicPay 12,00 €"
+        },
+        "order_status": "pago"
+      }
+    },
+    {
+      "id": "CKC.inbox-paysafecash",
+      "lens": "CK5",
+      "severity": "P1",
+      "title": "inbox last_message forjado: PaysafeCash 12,00 €",
+      "actor": "buyer JWT",
+      "pre": "batata_chat_is_forged_inbox_preview CDCI",
+      "repro": "PATCH chats.last_message=PaysafeCash 12,00 €",
+      "expected": "chat_inbox_preview_forbidden",
+      "obtained": "PaysafeCash 12,00 €",
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "CKC.inbox-tap-nfc",
+      "lens": "CK5",
+      "severity": "P1",
+      "title": "inbox last_message forjado: tap to cash / NFC prova",
+      "actor": "buyer JWT",
+      "pre": "batata_chat_is_forged_inbox_preview CDCI",
+      "repro": "PATCH chats.last_message=tap to cash / NFC prova",
+      "expected": "chat_inbox_preview_forbidden",
+      "obtained": "tap to cash / NFC prova",
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "CKC.inbox-samsung",
+      "lens": "CK5",
+      "severity": "P1",
+      "title": "inbox last_message forjado: Samsung Pay transfer",
+      "actor": "buyer JWT",
+      "pre": "batata_chat_is_forged_inbox_preview CDCI",
+      "repro": "PATCH chats.last_message=Samsung Pay transfer",
+      "expected": "chat_inbox_preview_forbidden",
+      "obtained": "Samsung Pay transfer",
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "CKC.inbox-vanilla",
+      "lens": "CK5",
+      "severity": "P1",
+      "title": "inbox last_message forjado: Vanilla gift card",
+      "actor": "buyer JWT",
+      "pre": "batata_chat_is_forged_inbox_preview CDCI",
+      "repro": "PATCH chats.last_message=Vanilla gift card",
+      "expected": "chat_inbox_preview_forbidden",
+      "obtained": "Vanilla gift card",
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "CKC.inbox-bonifico",
+      "lens": "CK5",
+      "severity": "P1",
+      "title": "inbox last_message forjado: bonifico istantaneo 12,00 €",
+      "actor": "buyer JWT",
+      "pre": "batata_chat_is_forged_inbox_preview CDCI",
+      "repro": "PATCH chats.last_message=bonifico istantaneo 12,00 €",
+      "expected": "chat_inbox_preview_forbidden",
+      "obtained": "bonifico istantaneo 12,00 €",
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "CKC.inbox-ueberweisung",
+      "lens": "CK5",
+      "severity": "P1",
+      "title": "inbox last_message forjado: Überweisung 12,00 €",
+      "actor": "buyer JWT",
+      "pre": "batata_chat_is_forged_inbox_preview CDCI",
+      "repro": "PATCH chats.last_message=Überweisung 12,00 €",
+      "expected": "chat_inbox_preview_forbidden",
+      "obtained": "Überweisung 12,00 €",
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "CKC.inbox-rev0lut",
+      "lens": "CK5",
+      "severity": "P1",
+      "title": "inbox last_message forjado: rev0lut.me 12 €",
+      "actor": "buyer JWT",
+      "pre": "batata_chat_is_forged_inbox_preview CDCI",
+      "repro": "PATCH chats.last_message=rev0lut.me 12 €",
+      "expected": "chat_inbox_preview_forbidden",
+      "obtained": "rev0lut.me 12 €",
+      "proven": true,
+      "evidence": {}
+    }
+  ],
+  "blocked": [
+    {
+      "id": "CKA.notes-paysafecash",
+      "lens": "CK1",
+      "title": "recusado",
+      "ev": "500 {\"code\":\"54000\",\"details\":null,\"hint\":null,\"message\":\"null character not permitted\"}"
+    },
+    {
+      "id": "CKA.notes-paysafe-cash-loja",
+      "lens": "CK1",
+      "title": "recusado",
+      "ev": "500 {\"code\":\"54000\",\"details\":null,\"hint\":null,\"message\":\"null character not permitted\"}"
+    },
+    {
+      "id": "CKA.notes-pix-emv",
+      "lens": "CK1",
+      "title": "recusado",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_notes_forbidden\"}"
+    },
+    {
+      "id": "CKA.notes-pix-cpf",
+      "lens": "CK1",
+      "title": "recusado",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_notes_forbidden\"}"
+    },
+    {
+      "id": "CKA.notes-picpay",
+      "lens": "CK1",
+      "title": "recusado",
+      "ev": "500 {\"code\":\"54000\",\"details\":null,\"hint\":null,\"message\":\"null character not permitted\"}"
+    },
+    {
+      "id": "CKA.notes-mbway-qr",
+      "lens": "CK1",
+      "title": "recusado",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_notes_forbidden\"}"
+    },
+    {
+      "id": "CKA.notes-sepa-inst",
+      "lens": "CK1",
+      "title": "recusado",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_notes_forbidden\"}"
+    },
+    {
+      "id": "CKA.notes-iban-instant",
+      "lens": "CK1",
+      "title": "recusado",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_notes_forbidden\"}"
+    },
+    {
+      "id": "CKA.notes-revolut-dot-me",
+      "lens": "CK1",
+      "title": "recusado",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_notes_forbidden\"}"
+    },
+    {
+      "id": "CKA.notes-revolut-u2024",
+      "lens": "CK1",
+      "title": "recusado",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_notes_forbidden\"}"
+    },
+    {
+      "id": "CKA.notes-rev0lut",
+      "lens": "CK1",
+      "title": "recusado",
+      "ev": "500 {\"code\":\"54000\",\"details\":null,\"hint\":null,\"message\":\"null character not permitted\"}"
+    },
+    {
+      "id": "CKA.notes-apple-cash",
+      "lens": "CK1",
+      "title": "recusado",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_notes_forbidden\"}"
+    },
+    {
+      "id": "CKA.notes-apple-pay-cash",
+      "lens": "CK1",
+      "title": "recusado",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_notes_forbidden\"}"
+    },
+    {
+      "id": "CKA.notes-tap-nfc",
+      "lens": "CK1",
+      "title": "recusado",
+      "ev": "500 {\"code\":\"54000\",\"details\":null,\"hint\":null,\"message\":\"null character not permitted\"}"
+    },
+    {
+      "id": "CKA.notes-gpay-send",
+      "lens": "CK1",
+      "title": "recusado",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_notes_forbidden\"}"
+    },
+    {
+      "id": "CKA.notes-samsung-pay",
+      "lens": "CK1",
+      "title": "recusado",
+      "ev": "500 {\"code\":\"54000\",\"details\":null,\"hint\":null,\"message\":\"null character not permitted\"}"
+    },
+    {
+      "id": "CKA.notes-money-order",
+      "lens": "CK1",
+      "title": "recusado",
+      "ev": "500 {\"code\":\"54000\",\"details\":null,\"hint\":null,\"message\":\"null character not permitted\"}"
+    },
+    {
+      "id": "CKA.notes-vanilla",
+      "lens": "CK1",
+      "title": "recusado",
+      "ev": "500 {\"code\":\"54000\",\"details\":null,\"hint\":null,\"message\":\"null character not permitted\"}"
+    },
+    {
+      "id": "CKA.notes-paysafe-pin",
+      "lens": "CK1",
+      "title": "recusado",
+      "ev": "500 {\"code\":\"54000\",\"details\":null,\"hint\":null,\"message\":\"null character not permitted\"}"
+    },
+    {
+      "id": "CKA.notes-comprovativo-mbway-qr",
+      "lens": "CK1",
+      "title": "recusado",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_notes_forbidden\"}"
+    },
+    {
+      "id": "CKA.notes-transf-sepa",
+      "lens": "CK1",
+      "title": "recusado",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_notes_forbidden\"}"
+    },
+    {
+      "id": "CKA.notes-revolutme",
+      "lens": "CK1",
+      "title": "recusado",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_notes_forbidden\"}"
+    },
+    {
+      "id": "CKA.notes-cashapp-spaced",
+      "lens": "CK1",
+      "title": "recusado",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_notes_forbidden\"}"
+    },
+    {
+      "id": "CKA.notes-wise-tag",
+      "lens": "CK1",
+      "title": "recusado",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_notes_forbidden\"}"
+    },
+    {
+      "id": "CKA.notes-it-bonifico",
+      "lens": "CK1",
+      "title": "recusado",
+      "ev": "500 {\"code\":\"54000\",\"details\":null,\"hint\":null,\"message\":\"null character not permitted\"}"
+    },
+    {
+      "id": "CKA.notes-de-ueberweisung",
+      "lens": "CK1",
+      "title": "recusado",
+      "ev": "500 {\"code\":\"54000\",\"details\":null,\"hint\":null,\"message\":\"null character not permitted\"}"
+    },
+    {
+      "id": "CKA.ctrl-skrill",
+      "lens": "CK1",
+      "title": "recusado",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_notes_forbidden\"}"
+    },
+    {
+      "id": "CKA.ctrl-wechat",
+      "lens": "CK1",
+      "title": "recusado",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_notes_forbidden\"}"
+    },
+    {
+      "id": "CKA.seguro-apple-cash",
+      "lens": "CK1",
+      "title": "recusado",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_label_mismatch\"}"
+    },
+    {
+      "id": "CKA.seguro-samsung-pay",
+      "lens": "CK1",
+      "title": "recusado",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_label_mismatch\"}"
+    },
+    {
+      "id": "CKB.proof-u002f",
+      "lens": "CK2",
+      "title": "recusado",
+      "ev": "500 {\"code\":\"54000\",\"details\":null,\"hint\":null,\"message\":\"null character not permitted\"}"
+    },
+    {
+      "id": "CKB.proof-pct255c",
+      "lens": "CK2",
+      "title": "recusado",
+      "ev": "500 {\"code\":\"54000\",\"details\":null,\"hint\":null,\"message\":\"null character not permitted\"}"
+    },
+    {
+      "id": "CKB.proof-utf16le",
+      "lens": "CK2",
+      "title": "recusado",
+      "ev": "500 {\"code\":\"54000\",\"details\":null,\"hint\":null,\"message\":\"null character not permitted\"}"
+    },
+    {
+      "id": "CKB.proof-mixed-252f-255c",
+      "lens": "CK2",
+      "title": "recusado",
+      "ev": "500 {\"code\":\"54000\",\"details\":null,\"hint\":null,\"message\":\"null character not permitted\"}"
+    },
+    {
+      "id": "CKB.proof-two-dot-leader",
+      "lens": "CK2",
+      "title": "recusado",
+      "ev": "500 {\"code\":\"54000\",\"details\":null,\"hint\":null,\"message\":\"null character not permitted\"}"
+    },
+    {
+      "id": "CKB.proof-c1-9c",
+      "lens": "CK2",
+      "title": "recusado",
+      "ev": "500 {\"code\":\"54000\",\"details\":null,\"hint\":null,\"message\":\"null character not permitted\"}"
+    },
+    {
+      "id": "CKB.proof-null-00",
+      "lens": "CK2",
+      "title": "recusado",
+      "ev": "500 {\"code\":\"54000\",\"details\":null,\"hint\":null,\"message\":\"null character not permitted\"}"
+    },
+    {
+      "id": "CKB.proof-shy-dots",
+      "lens": "CK2",
+      "title": "recusado",
+      "ev": "500 {\"code\":\"54000\",\"details\":null,\"hint\":null,\"message\":\"null character not permitted\"}"
+    },
+    {
+      "id": "CKC.ctrl-wechat",
+      "lens": "CK5",
+      "title": "inbox recusado",
+      "ev": {
+        "http": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"chat_inbox_preview_forbidden\"}",
+        "stored": "rev0lut.me 12 €"
+      }
+    },
+    {
+      "id": "CKC.list-alien",
+      "lens": "CK6",
+      "title": "list B2 recusado/vazio",
+      "ev": "200 []"
+    },
+    {
+      "id": "CKC.upload-alien",
+      "lens": "CK6",
+      "title": "upload path B2 recusado",
+      "ev": "400 {\"statusCode\":\"403\",\"error\":\"Unauthorized\",\"message\":\"new row violates row-level security policy\",\"code\":\"AccessDenied\"}"
+    },
+    {
+      "id": "CKC.get-cross",
+      "lens": "CK6",
+      "title": "GET prova alheia recusado",
+      "ev": "400 {\"statusCode\":\"404\",\"error\":\"not_found\",\"message\":\"Object not found\",\"code\":\"NoSuchKey\"}"
+    },
+    {
+      "id": "CKD.chrono-insert",
+      "lens": "CK3",
+      "title": "created_at forçado para now",
+      "ev": {
+        "http": "201 [{\"id\":1622,\"created_at\":\"2026-09-06T12:21:58.032817+00:00\",\"chat_id\":\"51b15008-7f9a-4bee-9e7b-6779d75aaba8\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"RTCK card no meio da timeline\",\"is_reservation\":fals…",
+        "stored": "2026-09-06T12:21:58.032817+00:00"
+      }
+    },
+    {
+      "id": "CKD.inject-b2",
+      "lens": "CK7",
+      "title": "inject B2 recusado",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"new row violates row-level security policy for table \\\"chat_messages\\\"\"}"
+    },
+    {
+      "id": "CK8.ocr-notoken",
+      "lens": "CK8",
+      "title": "OCR sem token recusado",
+      "ev": "401 {\"ok\":false,\"error\":\"missing_device_token\"}"
+    },
+    {
+      "id": "CKD.compose-pago",
+      "lens": "CK1",
+      "title": "FSM pago sem Stripe recusado",
+      "ev": {
+        "card": "500 {\"code\":\"54000\",\"details\":null,\"hint\":null,\"message\":\"null character not permitted\"}",
+        "before": "reserva_pendente",
+        "after": "reserva_pendente",
+        "http": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"order_buyer_cannot_mark_pago\"}",
+        "wallet_delta": 0.0
+      }
+    }
+  ],
+  "notes": [
+    {
+      "id": "fixture.paid",
+      "lens": "CK1",
+      "title": "setup_paid_order Stripe TEST",
+      "ev": "200 {\n  \"ok\": true,\n  \"order_id\": \"e3740b45-1202-44e5-a1cf-90e08e96e74c\",\n  \"product_id\": \"c0a84558-3865-4a2a-99e4-6f2970470fae\",\n  \"payment_intent_id\": \"pi_3UCf4gH7FWYUN3jh1cR0ePjH\",\n  \"pi_status\": \"succeeded\",\n  \"pi_amount…"
+    },
+    {
+      "id": "fixture.paid",
+      "lens": "CK1",
+      "title": "setup_paid_order Stripe TEST",
+      "ev": "200 {\n  \"ok\": true,\n  \"order_id\": \"1ebc4758-2a72-447a-bfea-530b6224e928\",\n  \"product_id\": \"5924046a-cdf8-4949-ba32-1875e6f4ce70\",\n  \"payment_intent_id\": \"pi_3UCf4kH7FWYUN3jh1LLDAY95\",\n  \"pi_status\": \"succeeded\",\n  \"pi_amount…"
+    },
+    {
+      "id": "CKC.upload-a",
+      "lens": "CK6",
+      "title": "upload prova própria A",
+      "ev": "200 {\"Key\":\"fleaber_private/order_proofs/bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96/e3740b45-1202-44e5-a1cf-90e08e96e74c/rtck_a.png\",\"Id\":\"5e17254d-a911-463e-b967-79cba764c8cb\"}"
+    }
+  ],
+  "lenses": [
+    "CK1",
+    "CK2",
+    "CK3",
+    "CK5",
+    "CK6",
+    "CK7",
+    "CK8"
+  ],
+  "chat_id": "51b15008-7f9a-4bee-9e7b-6779d75aaba8",
+  "order_pending": "f76f527f-b95e-4008-859a-96b6cdf15f36",
+  "order_paid_a": "e3740b45-1202-44e5-a1cf-90e08e96e74c",
+  "order_paid_b": "1ebc4758-2a72-447a-bfea-530b6224e928",
+  "unused_abs": "https://fxdknzrqjenzqcvnwqqq.supabase.co/storage/v1/object/fleaber_private/order_proofs/bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96/e3740b45-1202-44e5-a1cf-90e08e96e74c/rtck_a.png"
+}

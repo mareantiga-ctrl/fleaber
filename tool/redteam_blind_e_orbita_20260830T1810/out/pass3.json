@@ -1,0 +1,121 @@
+{
+  "auditor": "REDTEAM_BLIND_E_ORBITA_v1",
+  "pass": 3,
+  "production_touched": false,
+  "fase4": false,
+  "corrections_applied": false,
+  "matrix": [
+    {
+      "lens": "E6",
+      "surface": "products",
+      "attack": "fixture_RTE-20260830T1810-qty0",
+      "identity": "service_role_setup",
+      "result": "201 [{\"id\":\"aa0a009d-eeaa-45c8-ac39-e4525eb2c2b7\",\"created_at\":\"2026-08-30T17:15:36.391543+00:00\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29…",
+      "impact": "",
+      "severity": "",
+      "evidence": null
+    },
+    {
+      "lens": "E6",
+      "surface": "orders",
+      "attack": "hold_qty0_sold",
+      "identity": "buyer",
+      "result": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"order_hold_exceeds_stock\"}",
+      "impact": "",
+      "severity": "",
+      "evidence": null
+    },
+    {
+      "lens": "E6",
+      "surface": "products",
+      "attack": "fixture_RTE-20260830T1810-duel",
+      "identity": "service_role_setup",
+      "result": "201 [{\"id\":\"1de15d2b-90d6-4bec-852e-663afbf39d69\",\"created_at\":\"2026-08-30T17:15:37.032514+00:00\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29…",
+      "impact": "",
+      "severity": "",
+      "evidence": null
+    },
+    {
+      "lens": "E6",
+      "surface": "orders",
+      "attack": "dual_buyer_qty1_sold",
+      "identity": "buyer||buyer2",
+      "result": "A=201 [{\"id\":\"0ad908b1-abc5-4dfd-904d-5d7086c24908\",\"created_at\":\"2026-08-30T17:15:37.197561+00:00\",\"product_id\":\"1de15d2b-90d6-4bec-852e-663afbf39d69\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a… B=400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"order_hold_exceeds_stock\"}",
+      "impact": "",
+      "severity": "",
+      "evidence": null
+    },
+    {
+      "lens": "E6",
+      "surface": "products",
+      "attack": "fixture_RTE-20260830T1810-sess-cancel",
+      "identity": "service_role_setup",
+      "result": "201 [{\"id\":\"3c1cae4e-f364-4e83-ad8d-11680427423a\",\"created_at\":\"2026-08-30T17:15:37.693894+00:00\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29…",
+      "impact": "",
+      "severity": "",
+      "evidence": null
+    },
+    {
+      "lens": "E6",
+      "surface": "create-payment-intent",
+      "attack": "session_before_cancel",
+      "identity": "buyer",
+      "result": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a12L1fgyP5ROvSE6Ac03id3VveHqeXY3SvpCW9SH9eh6k5IONPaV3xk0sY#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21oYWlsUnxrVkRhQUQyNlJjSWBCN3BXNXVvVT1hamlcf3Fjd1dRMGJmREk9Yz09PH1CMzVTY0pBXD1kMU5HZl1da05gf0s1XGQ1NWA3bVFBNzNMJ…",
+      "impact": "",
+      "severity": "",
+      "evidence": null
+    },
+    {
+      "lens": "E6",
+      "surface": "orders",
+      "attack": "status_after_cancel_with_open_session",
+      "identity": "service_role_observe",
+      "result": "200 [{\"id\":\"56040f44-5b55-4a57-85a8-347726c5f75f\",\"status\":\"cancelado\",\"stripe_checkout_session_id\":\"cs_test_a12L1fgyP5ROvSE6Ac03id3VveHqeXY3SvpCW9SH9eh6k5IONPaV3xk0sY\",\"price_total\":8}]",
+      "impact": "",
+      "severity": "",
+      "evidence": null
+    },
+    {
+      "lens": "E7",
+      "surface": "create-payment-intent",
+      "attack": "return_unpaid_after_cancel",
+      "identity": "anon",
+      "result": "200 200 Pagamento ainda não confirmado. Se já pagaste, aguarda alguns segundos e volta à app Fleaber. loc=",
+      "impact": "",
+      "severity": "",
+      "evidence": null
+    },
+    {
+      "lens": "E10",
+      "surface": "orders",
+      "attack": "observe_pass2_a1852f3f-6497-442c-8430-405a71268a88",
+      "identity": "service_role_observe",
+      "result": "200 [{\"id\":\"a1852f3f-6497-442c-8430-405a71268a88\",\"status\":\"cancelado\",\"price_total\":9.05,\"product_id\":\"47ca5092-438b-4764-8eed-8830be0b1c33\",\"bundle_id\":null,\"stripe_checkout_session_id\":\"cs_test_a1PWLSC6dqrrubH7neu0Kzattl7cv8XyBEv1nYfOzbyFry7Wn6Sos3PfRU\"}]",
+      "impact": "",
+      "severity": "",
+      "evidence": null
+    },
+    {
+      "lens": "E10",
+      "surface": "orders",
+      "attack": "observe_pass2_95385f51-94f5-486b-9417-a0831fb82cde",
+      "identity": "service_role_observe",
+      "result": "200 [{\"id\":\"95385f51-94f5-486b-9417-a0831fb82cde\",\"status\":\"cancelado\",\"price_total\":10.69,\"product_id\":\"b860cd49-4f14-4aef-bc14-8f2a03baaf20\",\"bundle_id\":\"c019eaff-7325-445a-941d-60e0c19f01d6\",\"stripe_checkout_session_id\":null}]",
+      "impact": "",
+      "severity": "",
+      "evidence": null
+    },
+    {
+      "lens": "E10",
+      "surface": "orders",
+      "attack": "observe_pass2_b8b32b59-0f9d-49c5-9e0e-3bb22806223e",
+      "identity": "service_role_observe",
+      "result": "200 [{\"id\":\"b8b32b59-0f9d-49c5-9e0e-3bb22806223e\",\"status\":\"cancelado\",\"price_total\":12.64,\"product_id\":\"7bea4060-e99e-4c92-93cc-23879e920302\",\"bundle_id\":\"c019eaff-7325-445a-941d-60e0c19f01d6\",\"stripe_checkout_session_id\":null}]",
+      "impact": "",
+      "severity": "",
+      "evidence": null
+    }
+  ],
+  "findings": [],
+  "gaps": []
+}

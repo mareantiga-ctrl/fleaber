@@ -1,0 +1,274 @@
+{
+  "auditor": "REDTEAM_BLIND_F_POLITICAS_FINAS_v1",
+  "stamp": "20260831T0735",
+  "pass": 2,
+  "map": {
+    "OBS-pago-insert": {
+      "http": 200,
+      "n": 1,
+      "id": "f2a8b690-a5fc-479e-8dd1-60778bc8d33c",
+      "snip": "[{\"id\":\"f2a8b690-a5fc-479e-8dd1-60778bc8d33c\",\"status\":\"reserva_pendente\",\"stripe_payment_intent_id\":null,\"stripe_checkout_session_id\":null,\"amount_paid_cents\":null,\"contract_unit_cents\":1250,\"price_total\":12.50,\"quantity\":1,\"product_offer_id\":null}]",
+      "identity": "svc"
+    },
+    "pago_parsed": {
+      "status": "reserva_pendente",
+      "pi": null,
+      "paid": null
+    },
+    "OBS-offer-order": {
+      "http": 200,
+      "n": 1,
+      "id": "f9741e1e-9572-4538-938b-f8c87d684749",
+      "snip": "[{\"id\":\"f9741e1e-9572-4538-938b-f8c87d684749\",\"status\":\"reserva_pendente\",\"price_total\":13.77,\"contract_unit_cents\":1250,\"contract_qty\":1,\"product_offer_id\":null,\"stripe_checkout_session_id\":\"cs_test_a1da7TQ4REXUInpYmyOzays9UopKxs6lkMIL7heI6RvnlnGR31xuEbOVQv\",\"amount_paid_cents\":null}]",
+      "identity": "svc"
+    },
+    "OBS-offer": {
+      "http": 200,
+      "n": 1,
+      "id": "18d08a85-a477-4289-b686-b0fd13b8aabd",
+      "snip": "[{\"id\":\"18d08a85-a477-4289-b686-b0fd13b8aabd\",\"status\":\"accepted\",\"amount\":8.00,\"expires_at\":\"2026-08-31T04:42:37.887089+00:00\",\"responded_at\":\"2026-08-31T06:42:38.048313+00:00\"}]",
+      "identity": "svc"
+    },
+    "offer_contract": {
+      "unit_cents": 1250,
+      "product_offer_id": null,
+      "price_total": 13.77,
+      "session": "cs_test_a1da7TQ4REXUInpYmyOzays9UopKxs6lkMIL7heI6RvnlnGR31xuEbOVQv",
+      "offer_status": "accepted",
+      "offer_amount": 8.0,
+      "offer_expires": "2026-08-31T04:42:37.887089+00:00"
+    },
+    "OBS-ghost": {
+      "http": 200,
+      "n": 1,
+      "id": "66ee144e-8f2a-45bf-8e3e-34349826d293",
+      "snip": "[{\"id\":\"66ee144e-8f2a-45bf-8e3e-34349826d293\",\"status\":\"cancelado\",\"product_id\":\"38a7d055-94bb-4a2d-bb80-5063c2b0ba45\",\"amount_paid_cents\":null,\"contract_unit_cents\":1250}]",
+      "identity": "svc"
+    },
+    "F8-edge-ghost-cancelado": {
+      "http": 400,
+      "n": 0,
+      "id": null,
+      "snip": "{\"error\":\"Checkout blocked: order status 'cancelado' cannot start payment.\"}",
+      "identity": "buyer"
+    },
+    "F4-edge-pago-insert": {
+      "http": 200,
+      "n": 0,
+      "id": null,
+      "snip": "{\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1iEjD1ZycRg4UtdSg7besAAuUQbRQzkgYlftymmgz5xQtWi9GcLDfxK3p#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21oYWlsUnxrVkRhQUQyNlJjSWBCN3BXNXVvVT1hamlcf3Fjd1dRMGJmREk9Yz09PH1CMzVTY0pBXD1kMU5…",
+      "identity": "buyer"
+    },
+    "F1-profiles-b2": {
+      "http": 200,
+      "n": 0,
+      "id": null,
+      "snip": "[]",
+      "identity": "buyer2"
+    },
+    "F2-directory": {
+      "http": 200,
+      "n": 1,
+      "id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+      "snip": "[{\"id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"full_name\":\"Maria Demo FleaHub\",\"handle\":\"fleahub-demo-ux\",\"location\":\"Lisboa, Portugal\",\"user_type\":\"vendedor\"}]",
+      "identity": "buyer2"
+    },
+    "F2-directory-limit": {
+      "http": 200,
+      "n": 8,
+      "id": "3b5e8c23-9b88-4f66-962b-cea3d9327ae1",
+      "snip": "[{\"id\":\"3b5e8c23-9b88-4f66-962b-cea3d9327ae1\",\"full_name\":\"RT2120 buyer2\",\"handle\":null}, \n {\"id\":\"4581528c-3897-496f-b14f-dc9c7e1973b8\",\"full_name\":\"rtb.b.1245p2.3340613026\",\"handle\":null}, \n {\"id\":\"a4d4733b-8ce3-4cfc-b5c8-00e35a0e6fe1\",\"full_name\":\"RTB3-20260830T1250 helper\",\"handle\":null}, \n {\"id\":\"7c0e2202-2f11-4c0…",
+      "identity": "buyer2"
+    },
+    "FIX-draft-item": {
+      "http": 400,
+      "n": 0,
+      "id": null,
+      "snip": "{\"code\":\"23514\",\"details\":\"Failing row contains (1dae0829-d643-4856-aa6a-02b60c8ab7a2, bdd782c8-f2c4-49c4-9579-d197b2d479c9, 980f4fa1-0004-42f9-abca-69f1a9c29588, RTF-D2, RTF-20260831T0735 draft-secret-only, null, 77.0, null, null, null, f, 0, draft, 2026-08-31 06:45:57.271551+00, null, live_only, null, null, 4, null, …",
+      "identity": "svc"
+    },
+    "F6-hold-s1": {
+      "http": 201,
+      "n": 1,
+      "id": "859c6ce4-7fc6-4b8e-9f3e-189cb2b590c2",
+      "snip": "[{\"id\":\"859c6ce4-7fc6-4b8e-9f3e-189cb2b590c2\",\"created_at\":\"2026-08-31T06:45:57.586652+00:00\",\"product_id\":\"65a0bce6-0e77-4f9a-b986-b9c81c710ae0\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"price_total\":11.00,\"shipping_method\":\"carrier\",\"payment_method\":\"pagamen…",
+      "identity": "buyer"
+    },
+    "F6-hold-s2": {
+      "http": 201,
+      "n": 1,
+      "id": "c9ab8c25-cf44-481f-b3ee-212ed7419e74",
+      "snip": "[{\"id\":\"c9ab8c25-cf44-481f-b3ee-212ed7419e74\",\"created_at\":\"2026-08-31T06:45:57.697159+00:00\",\"product_id\":\"e64d77fd-82e3-4e55-bc22-6dd8935e72a2\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"263c825c-f866-4d09-bb43-57e174ec262d\",\"price_total\":9.00,\"shipping_method\":\"carrier\",\"payment_method\":\"pagament…",
+      "identity": "buyer"
+    },
+    "F6-bag-two-sellers": {
+      "http": 400,
+      "n": 0,
+      "id": null,
+      "snip": "{\"error\":\"Checkout blocked: bag lines must share one seller. Pay each seller separately.\"}",
+      "identity": "buyer"
+    },
+    "F6-bag-omit-seller": {
+      "http": 400,
+      "n": 0,
+      "id": null,
+      "snip": "{\"error\":\"Checkout blocked: bag lines must share one seller. Pay each seller separately.\"}",
+      "identity": "buyer"
+    },
+    "F5-ps-create-ended": {
+      "http": 200,
+      "n": 0,
+      "id": null,
+      "snip": "{\"ok\": true, \"code\": \"571034\", \"live_id\": \"a61fd280-edd1-4efa-b203-c79bffeb6b1b\", \"device_id\": \"ps-reader-pc\", \"expires_at\": \"2026-08-31T06:47:59.403227+00:00\", \"live_title\": \"RTF-20260831T0735 ended-live\", \"ttl_seconds\": 120, \"created_by_helper\": false}",
+      "identity": "seller"
+    },
+    "pairing_code_present": true,
+    "expire-ps_pairing_sessions": {
+      "http": 200,
+      "snip": "[{\"id\":\"b60c3e2a-3763-4d28-9df9-f8ff076e1ce1\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"live_id\":\"a61fd280-edd1-4efa-b203-c79bffeb6b1b\",\"code\":\"571034\",\"device_token_plain\":\"7a6211035fc12d73838a01b721bad7e6f0775b53f76d85e9a5eda97f79513cd2\",\"device_id_hint\":\"ps-reader-pc\",\"expires_at\":\"2026-08-31T06:42:59.5832…"
+    },
+    "expire-helper_pairing_sessions": {
+      "http": 404,
+      "snip": "{\"code\":\"PGRST205\",\"details\":null,\"hint\":\"Perhaps you meant the table 'public.ps_pairing_sessions'\",\"message\":\"Could not find the table 'public.helper_pairing_sessions' in the schema cache\"}"
+    },
+    "expire-seller_device_pairing": {
+      "http": 404,
+      "snip": "{\"code\":\"PGRST205\",\"details\":null,\"hint\":\"Perhaps you meant the table 'public.seller_device_tokens'\",\"message\":\"Could not find the table 'public.seller_device_pairing' in the schema cache\"}"
+    },
+    "expire-live_pairing_codes": {
+      "http": 404,
+      "snip": "{\"code\":\"PGRST205\",\"details\":null,\"hint\":\"Perhaps you meant the table 'public.live_private_messages'\",\"message\":\"Could not find the table 'public.live_pairing_codes' in the schema cache\"}"
+    },
+    "F5-ps-claim-expired": {
+      "http": 404,
+      "n": 0,
+      "id": null,
+      "snip": "{\"code\":\"PGRST202\",\"details\":\"Searched for the function public.batata_ps_claim_pairing with parameters p_code, p_device_id, p_display_name or with a single unnamed json/jsonb parameter, but no matches were found in the schema cache.\",\"hint\":\"Perhaps you meant to call the function public.batata_ps_claim_pairing(p_app_ve…",
+      "identity": "buyer2"
+    },
+    "F7-helper-create-pairing": {
+      "http": 200,
+      "n": 0,
+      "id": null,
+      "snip": "{\"ok\": false, \"error\": \"not_allowed\"}",
+      "identity": "helper-chat"
+    },
+    "F2-wallets-star": {
+      "http": 200,
+      "n": 0,
+      "id": null,
+      "snip": "[]",
+      "identity": "buyer2"
+    },
+    "F2-wallet-tx": {
+      "http": 400,
+      "n": 0,
+      "id": null,
+      "snip": "{\"code\":\"42703\",\"details\":null,\"hint\":\"Perhaps you meant to reference the column \\\"wallet_transactions.order_id\\\".\",\"message\":\"column wallet_transactions.user_id does not exist\"}",
+      "identity": "buyer2"
+    },
+    "F2-staff-logs": {
+      "http": 200,
+      "n": 0,
+      "id": null,
+      "snip": "[]",
+      "identity": "buyer2"
+    },
+    "F2-live-messages": {
+      "http": 200,
+      "n": 5,
+      "id": "2d33567c-af8a-4ce5-bda8-a25ed547e012",
+      "snip": "[{\"id\":\"2d33567c-af8a-4ce5-bda8-a25ed547e012\",\"live_id\":\"13b142fc-83f2-44c5-bfe4-6e79b18f124c\",\"user_id\":\"69104e91-6a00-40d9-a7c9-b1571422ae43\",\"body\":\"🔥 Ultima unidade — Camisola Nike Azul L\",\"kind\":\"system\"}, \n {\"id\":\"818ad780-68c3-4e19-98b1-5b192dac605d\",\"live_id\":\"be3041db-2069-4b0a-80b9-1a4cb2fcf492\",\"user_id\":\"e…",
+      "identity": "buyer2"
+    },
+    "F2-chats": {
+      "http": 400,
+      "n": 0,
+      "id": null,
+      "snip": "{\"code\":\"42703\",\"details\":null,\"hint\":null,\"message\":\"column chats.buyer_id does not exist\"}",
+      "identity": "buyer2"
+    },
+    "table-device_tokens": {
+      "http": 404,
+      "snip": "{\"code\":\"PGRST205\",\"details\":null,\"hint\":\"Perhaps you meant the table 'public.seller_device_tokens'\",\"message\":\"Could not find the table 'public.device_tokens' in the schema cache\"}"
+    },
+    "table-user_device_tokens": {
+      "http": 404,
+      "snip": "{\"code\":\"PGRST205\",\"details\":null,\"hint\":\"Perhaps you meant the table 'public.seller_device_tokens'\",\"message\":\"Could not find the table 'public.user_device_tokens' in the schema cache\"}"
+    },
+    "table-fcm_tokens": {
+      "http": 404,
+      "snip": "{\"code\":\"PGRST205\",\"details\":null,\"hint\":\"Perhaps you meant the table 'public.seller_device_tokens'\",\"message\":\"Could not find the table 'public.fcm_tokens' in the schema cache\"}"
+    },
+    "table-push_tokens": {
+      "http": 404,
+      "snip": "{\"code\":\"PGRST205\",\"details\":null,\"hint\":\"Perhaps you meant the table 'public.seller_device_tokens'\",\"message\":\"Could not find the table 'public.push_tokens' in the schema cache\"}"
+    },
+    "openapi_svc": 200,
+    "rpc_n": 182,
+    "rpc_policy": [
+      "batata_admin_list_profiles",
+      "batata_admin_resolve_dispute",
+      "batata_assert_wallet_rpc_grants",
+      "batata_clawback_seller_wallet_for_order",
+      "batata_credit_wallet_once",
+      "batata_debit_wallet_once",
+      "batata_ensure_wallet",
+      "batata_expire_product_offers",
+      "batata_generate_auto_feedback",
+      "batata_get_my_payout_details",
+      "batata_is_admin",
+      "batata_order_wallet_base_eur",
+      "batata_order_wallet_net_disbursed_eur",
+      "batata_order_wallet_reembolso_cents",
+      "batata_order_wallet_remaining_eur",
+      "batata_ps_claim_pairing",
+      "batata_ps_create_pairing",
+      "batata_refund_buyer_wallet_for_order",
+      "batata_release_seller_wallet_for_order",
+      "batata_send_live_tip_from_wallet",
+      "batata_staff_has_permission",
+      "batata_staff_invite_helper_by_email",
+      "batata_staff_ping_active",
+      "batata_wallet_apply_tip_once",
+      "batata_wallet_payout_debit",
+      "batata_wallet_payout_finish"
+    ]
+  },
+  "findings": [
+    {
+      "id": "RTF0735-F2-DIRECTORY-ALL-101",
+      "lens": "F2",
+      "severity": "P2",
+      "title": "profiles_directory_public lista vários perfis (não só o próprio)",
+      "pre": "view grant authenticated",
+      "repro": "GET profiles_directory_public?limit=8 as buyer2",
+      "proven": true,
+      "evidence": {
+        "n": 8,
+        "snip": "[{\"id\":\"3b5e8c23-9b88-4f66-962b-cea3d9327ae1\",\"full_name\":\"RT2120 buyer2\",\"handle\":null}, \n {\"id\":\"4581528c-3897-496f-b14f-dc9c7e1973b8\",\"full_name\":\"rtb.b.1245p2.3340613026\",\"handle\":null}, \n {\"id\":\"a4d4733b-8ce3-4cfc-b5c8-00e35a0e6fe1\",\"full_name\":\"RTB3-20260830T1250 helper\",\"handle\":null}, \n {\"id\":\"7c0e2202-2f11-4c0…"
+      }
+    },
+    {
+      "id": "RTF0735-F2-LIVE-MSG-USER-102",
+      "lens": "F2",
+      "severity": "P2",
+      "title": "JWT lê live_messages.user_id de outros (Hub omite)",
+      "pre": "hub_live_messages_public sem user_id",
+      "repro": "GET live_messages as buyer2",
+      "proven": true,
+      "evidence": {
+        "snip": "[{\"id\":\"2d33567c-af8a-4ce5-bda8-a25ed547e012\",\"live_id\":\"13b142fc-83f2-44c5-bfe4-6e79b18f124c\",\"user_id\":\"69104e91-6a00-40d9-a7c9-b1571422ae43\",\"body\":\"🔥 Ultima unidade — Camisola Nike Azul L\",\"kind\":\"system\"}, \n {\"id\":\"818ad780-68c3-4e19-98b1-5b192dac605d\",\"live_id\":\"be3041db-2069-4b0a-80b9-1a4cb2fcf492\",\"user_id\":\"e…"
+      }
+    }
+  ],
+  "proven_n": 2,
+  "ghost": {
+    "id": "66ee144e-8f2a-45bf-8e3e-34349826d293",
+    "status": "cancelado",
+    "product_id": "38a7d055-94bb-4a2d-bb80-5063c2b0ba45",
+    "amount_paid_cents": null,
+    "contract_unit_cents": 1250
+  },
+  "dir_http": 200
+}

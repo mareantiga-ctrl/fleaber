@@ -1,0 +1,210 @@
+{
+  "findings": [
+    {
+      "id": "RTI4-P1-UNLIST-LIVE-REPEAT",
+      "severity": "P1",
+      "title": "Mesma classe: 2.º SKU unlist + live ended → Session",
+      "actor": "buyer JWT + Edge",
+      "pre": "outro produto unlist; mesmo live ended",
+      "repro": "hold live_id ended → checkout",
+      "impact": "classe repetível (SESSION; 1 captura já feita no 1.º SKU)",
+      "estado": "ABERTO",
+      "evidence": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1o3owIYMYl06aSqTfpCaDfK53qN4yFkCa11x0gcf9NeTfJJyatwwGZlej#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21oYWlsUnxrVkRhQUQyNlJjSWBCN3BXNXVvVT1hamlcf3Fjd1dRMGJmREk9Yz09PH1CMzVTY0pBXD1kMU5HZl1da05gf0s1XGQ1NWA3bVFBNzNMJyknY3dqaFZgd3Ngdyc%2FcXdwYCknZ2RmbmJ3anBrYUZqaWp3Jz8nJmNjY2NjYycpJ2lkfGpwcVF8dWAnPyd2bGtiaWBabHFgaCcpJ2BrZGdpYFVpZGZgbWppYWB3dic%2FcXdwYHgl\",\"checkoutSessionId\":\"cs_test_a1o3owIYMYl06aSqTfpCaDfK53qN4yFkCa11x0gcf9NeTfJJyatwwGZlej\",\"paidChatId\":null,\"s…"
+    },
+    {
+      "id": "RTI4-P1-RAFFLE-STRIP-FREEZE",
+      "severity": "P1",
+      "title": "live_raffle_id forjado bypassa unlist no hold e depois é anulado — stock fica preso",
+      "actor": "buyer JWT",
+      "pre": "qty=1 unlist; live_raffle_id UUID inexistente",
+      "repro": "POST orders live_raffle_id fake → coluna null → seller lista → available=0",
+      "impact": "DoS de stock sem live real e sem checkout",
+      "estado": "ABERTO",
+      "evidence": {
+        "hold": "201 [{\"id\":\"bf809940-c3e0-4058-951e-0b9a516977f9\",\"created_at\":\"2026-08-30T18:33:01.469106+00:00\",\"product_id\":\"88a02e2c-7264-4e26-9a27-eba2c6c241ca\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"price_total\":6.00,\"shipping_method\":\"carrier\",\"payment_method\":\"pagamento na app\",\"proof_url\":null,\"status\":\"reserva_pendente\",\"reservation_expires_at\":null,\"is_reservation\":false,\"completed_at\":null,\"auto_feedback_processed_at\":null,\"returned_at\":null,\"wallet_release_processed_at\":null,\"wallet_refund_processed_at\":null,\"bundle_id\":null,\"quantity\":1,…",
+        "row": {
+          "id": "bf809940-c3e0-4058-951e-0b9a516977f9",
+          "status": "reserva_pendente",
+          "live_raffle_id": null,
+          "live_id": null,
+          "product_id": "88a02e2c-7264-4e26-9a27-eba2c6c241ca"
+        },
+        "avail": {
+          "ok": false,
+          "held": 1,
+          "need": 1,
+          "stock": 1,
+          "available": 0
+        }
+      }
+    }
+  ],
+  "matrix": [
+    {
+      "surface": "base",
+      "attack": "wallet+order start pass3",
+      "identity": "observe",
+      "result": "w={id: 980f4fa1-0004-42f9-abca-69f1a9c29588, balance: 66.34} o={id: edbabf9f-eabf-43b2-9582-fbe7269c8c85, status: pago, amount_paid_cents: 1430, stripe_payment_intent_id: pi_3UADUhH7FWYUN3jh0HuS8iga, stripe_refund_id: null, wallet_release_processed_at: null, wallet_refund_processed_at: null, stock_units_applied: 1, live_id: dc7a0dd9-6bb1-43ee-9899-d4b5bf93960d, product_id: 8cc95520-3bff-4093-92b9-c556fe99dba7} avail={ok: false, held: 1, need: 1, stock: 1, available: 0}",
+      "impact": "",
+      "severity": "",
+      "evidence": null
+    },
+    {
+      "surface": "settle",
+      "attack": "dual GET settle paid session",
+      "identity": "anon",
+      "result": "200 <!DOCTYPE html><html lang=\"pt\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Fleaber</title><script>window.setTimeout(function(){ window.location.href = \"fleaber://fleaber.com/stripe-success?session_id=cs_test_a1g5rjxfzkHH912tV3dQehcK9CiPsKUa57m8aB3qtrAnx1UKsh2YawNXdN&product_id=8cc95520-3bff-4093-92b9-c556fe99dba7&order_id=edbabf9f-eabf-43b2-9582-fbe7269c8c85&liveId=dc7a0dd9-6bb1-43ee-9899-d4b5bf93960d&live_id=dc7a0dd9-6bb1-43ee-9899-d4b5bf93960d&sellerId=980f4fa1-0004-42f9-abca-69f1a9c29588\"; }, 250);</script></head><body style=\"margin… || 200 <!DOCTYPE html><html lang=\"pt\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Fleaber</title><script>window.setTimeout(function(){ window.location.href = \"fleaber://fleaber.com/stripe-success?session_id=cs_test_a1g5rjxfzkHH912tV3dQehcK9CiPsKUa57m8aB3qtrAnx1UKsh2YawNXdN&product_id=8cc95520-3bff-4093-92b9-c556fe99dba7&order_id=edbabf9f-eabf-43b2-9582-fbe7269c8c85&liveId=dc7a0dd9-6bb1-43ee-9899-d4b5bf93960d&live_id=dc7a0dd9-6bb1-43ee-9899-d4b5bf93960d&sellerId=980f4fa1-0004-42f9-abca-69f1a9c29588\"; }, 250);</script></head><body style=\"margin…",
+      "impact": "",
+      "severity": "",
+      "evidence": null
+    },
+    {
+      "surface": "settle",
+      "attack": "order after dual settle",
+      "identity": "observe",
+      "result": "{\"id\":\"edbabf9f-eabf-43b2-9582-fbe7269c8c85\",\"status\":\"pago\",\"amount_paid_cents\":1430,\"stock_units_applied\":1}",
+      "impact": "",
+      "severity": "",
+      "evidence": null
+    },
+    {
+      "surface": "repeat",
+      "attack": "2º SKU unlist + same ended live hold",
+      "identity": "buyer",
+      "result": "201 [{\"id\":\"d72eec6c-9071-4bd1-bbbc-c7a9b038b9e4\",\"created_at\":\"2026-08-30T18:32:53.791065+00:00\",\"product_id\":\"ba339a49-769f-4a57-9864-904bdf3d5e42\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"price_total\":7.50,\"shipping_method\":\"carrier\",\"payment_method\":\"pagamento na app\",\"proof_url\":null,\"status\":\"reserva_pendente\",\"reservation_expires_at\":null,\"is_reservation\":false,\"completed_at\":null,\"auto_feedback_processed_at\":null,\"returned_at\":null,\"wallet_release_processed_at\":null,\"wallet_refund_processed_at\":null,\"bundle_id\":null,\"quantity\":1,…",
+      "impact": "",
+      "severity": "",
+      "evidence": null
+    },
+    {
+      "surface": "repeat",
+      "attack": "2º SKU Session",
+      "identity": "buyer",
+      "result": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1o3owIYMYl06aSqTfpCaDfK53qN4yFkCa11x0gcf9NeTfJJyatwwGZlej#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21oYWlsUnxrVkRhQUQyNlJjSWBCN3BXNXVvVT1hamlcf3Fjd1dRMGJmREk9Yz09PH1CMzVTY0pBXD1kMU5HZl1da05gf0s1XGQ1NWA3bVFBNzNMJyknY3dqaFZgd3Ngdyc%2FcXdwYCknZ2RmbmJ3anBrYUZqaWp3Jz8nJmNjY2NjYycpJ2lkfGpwcVF8dWAnPyd2bGtiaWBabHFgaCcpJ2BrZGdpYFVpZGZgbWppYWB3dic%2FcXdwYHgl\",\"checkoutSessionId\":\"cs_test_a1o3owIYMYl06aSqTfpCaDfK53qN4yFkCa11x0gcf9NeTfJJyatwwGZlej\",\"paidChatId\":null,\"s…",
+      "impact": "",
+      "severity": "",
+      "evidence": null
+    },
+    {
+      "surface": "freeze",
+      "attack": "ghost raffle hold after capture",
+      "identity": "observe",
+      "result": "{\"id\":\"8450a8c0-5021-4ed3-9dfa-a0e6bd0db119\",\"status\":\"reserva_pendente\",\"live_raffle_id\":null,\"live_id\":null,\"quantity\":1,\"amount_paid_cents\":null}",
+      "impact": "",
+      "severity": "",
+      "evidence": null
+    },
+    {
+      "surface": "freeze",
+      "attack": "avail after capture+ghost hold",
+      "identity": "observe",
+      "result": "{ok: false, held: 1, need: 1, stock: 1, available: 0}",
+      "impact": "",
+      "severity": "",
+      "evidence": null
+    },
+    {
+      "surface": "pos",
+      "attack": "seller enviado after real capture",
+      "identity": "seller",
+      "result": "200 [{\"id\":\"edbabf9f-eabf-43b2-9582-fbe7269c8c85\",\"created_at\":\"2026-08-30T18:23:39.630904+00:00\",\"product_id\":\"8cc95520-3bff-4093-92b9-c556fe99dba7\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"price_total\":14.3,\"shipping_method\":\"carrier\",\"payment_method\":\"pagamento na app\",\"proof_url\":null,\"status\":\"enviado\",\"reservation_expires_at\":null,\"is_reservation\":false,\"completed_at\":null,\"auto_feedback_processed_at\":null,\"returned_at\":null,\"wallet_release_processed_at\":null,\"wallet_refund_processed_at\":null,\"bundle_id\":null,\"quantity\":1,\"live_id\"…",
+      "impact": "",
+      "severity": "",
+      "evidence": null
+    },
+    {
+      "surface": "pos",
+      "attack": "status after ship",
+      "identity": "observe",
+      "result": "{\"id\":\"edbabf9f-eabf-43b2-9582-fbe7269c8c85\",\"status\":\"enviado\"}",
+      "impact": "",
+      "severity": "",
+      "evidence": null
+    },
+    {
+      "surface": "pos",
+      "attack": "buyer concluido after shipped",
+      "identity": "buyer",
+      "result": "200 [{\"id\":\"edbabf9f-eabf-43b2-9582-fbe7269c8c85\",\"created_at\":\"2026-08-30T18:23:39.630904+00:00\",\"product_id\":\"8cc95520-3bff-4093-92b9-c556fe99dba7\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"price_total\":14.3,\"shipping_method\":\"carrier\",\"payment_method\":\"pagamento na app\",\"proof_url\":null,\"status\":\"concluido\",\"reservation_expires_at\":null,\"is_reservation\":false,\"completed_at\":\"2026-08-30T18:32:56.21531+00:00\",\"auto_feedback_processed_at\":null,\"returned_at\":null,\"wallet_release_processed_at\":null,\"wallet_refund_processed_at\":null,\"bundle_…",
+      "impact": "",
+      "severity": "",
+      "evidence": null
+    },
+    {
+      "surface": "pos",
+      "attack": "status after concluido",
+      "identity": "observe",
+      "result": "{\"id\":\"edbabf9f-eabf-43b2-9582-fbe7269c8c85\",\"status\":\"concluido\",\"wallet_release_processed_at\":null,\"completed_at\":\"2026-08-30T18:32:56.21531+00:00\"}",
+      "impact": "",
+      "severity": "",
+      "evidence": null
+    },
+    {
+      "surface": "race",
+      "attack": "release∥refund after concluido",
+      "identity": "buyer+seller",
+      "result": "rel=200 true ref=200 {\"ok\":true,\"already_refunded\":true,\"idempotent\":true,\"refund_id\":\"re_3UADUhH7FWYUN3jh0D4z7hhW\",\"status\":\"cancelado\",\"stock_units_applied\":null,\"amount_cents\":1430,\"payment_intent\":\"pi_3UADUhH7FWYUN3jh0HuS8iga\",\"status_stripe\":\"succeeded\"}",
+      "impact": "",
+      "severity": "",
+      "evidence": null
+    },
+    {
+      "surface": "acct",
+      "attack": "wallet Δ + order final",
+      "identity": "observe",
+      "result": "w0={id: 980f4fa1-0004-42f9-abca-69f1a9c29588, balance: 66.34} w1={id: 980f4fa1-0004-42f9-abca-69f1a9c29588, balance: 66.34} w2={id: 980f4fa1-0004-42f9-abca-69f1a9c29588, balance: 66.34} order={id: edbabf9f-eabf-43b2-9582-fbe7269c8c85, status: cancelado, amount_paid_cents: 1430, stripe_refund_id: re_3UADUhH7FWYUN3jh0D4z7hhW, wallet_release_processed_at: 2026-08-30T18:32:56.569238+00:00, wallet_refund_processed_at: 2026-08-30T18:32:58.478113+00:00, stripe_payment_intent_id: pi_3UADUhH7FWYUN3jh0HuS8iga}",
+      "impact": "",
+      "severity": "",
+      "evidence": null
+    },
+    {
+      "surface": "acct",
+      "attack": "net wallet seller",
+      "identity": "observe",
+      "result": "Δ=0.0 (captura 14.30; refund se stripe_refund_id)",
+      "impact": "",
+      "severity": "",
+      "evidence": null
+    },
+    {
+      "surface": "connect",
+      "attack": "evil origin + idempotency",
+      "identity": "seller",
+      "result": "200 {\"success\":true,\"transferId\":\"tr_1UADXMH7FWYUN3jhMpuIOM4Y\",\"balance\":65.34}",
+      "impact": "",
+      "severity": "",
+      "evidence": null
+    },
+    {
+      "surface": "raffle",
+      "attack": "qty=1 unlist fake raffle hold",
+      "identity": "buyer",
+      "result": "201 [{\"id\":\"bf809940-c3e0-4058-951e-0b9a516977f9\",\"created_at\":\"2026-08-30T18:33:01.469106+00:00\",\"product_id\":\"88a02e2c-7264-4e26-9a27-eba2c6c241ca\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"price_total\":6.00,\"shipping_method\":\"carrier\",\"payment_method\":\"pagamento na app\",\"proof_url\":null,\"status\":\"reserva_pendente\",\"reservation_expires_at\":null,\"is_reservation\":false,\"completed_at\":null,\"auto_feedback_processed_at\":null,\"returned_at\":null,\"wallet_release_processed_at\":null,\"wallet_refund_processed_at\":null,\"bundle_id\":null,\"quantity\":1,…",
+      "impact": "",
+      "severity": "",
+      "evidence": null
+    },
+    {
+      "surface": "raffle",
+      "attack": "persisted raffle cols",
+      "identity": "observe",
+      "result": "{\"id\":\"bf809940-c3e0-4058-951e-0b9a516977f9\",\"status\":\"reserva_pendente\",\"live_raffle_id\":null,\"live_id\":null,\"product_id\":\"88a02e2c-7264-4e26-9a27-eba2c6c241ca\"}",
+      "impact": "",
+      "severity": "",
+      "evidence": null
+    },
+    {
+      "surface": "raffle",
+      "attack": "avail after raffle-only hold + re-list",
+      "identity": "observe",
+      "result": "200 {\"ok\": false, \"held\": 1, \"need\": 1, \"stock\": 1, \"available\": 0}",
+      "impact": "",
+      "severity": "",
+      "evidence": null
+    }
+  ],
+  "gaps": [],
+  "production_touched": false,
+  "fase4": false,
+  "corrections_applied": false
+}

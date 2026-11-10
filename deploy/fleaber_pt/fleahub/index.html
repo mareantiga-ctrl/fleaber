@@ -1,0 +1,93 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+  <!--
+    If you are serving your web app in a path other than the root, change the
+    href value below to reflect the base path you are serving from.
+
+    The path provided below has to start and end with a slash "/" in order for
+    it to work correctly.
+
+    Alternatively, build your application passing the --base-href parameter
+    specifying the new root path of your web app.
+
+    Fore more details:
+    * https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base
+  -->
+  <base href="/fleahub/">
+
+  <meta charset="UTF-8">
+  <meta content="IE=Edge" http-equiv="X-UA-Compatible">
+
+  <!-- iOS meta tags & icons -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-title" content="Fleaber">
+
+  <!-- App shell default: noindex (rotas autenticadas). Hub bootstrap + Dart HubSeoService sobrescrevem em rotas publicadas fleaber.pt -->
+  <meta name="robots" content="noindex,nofollow" />
+
+  <!-- Favicon -->
+  <link rel="icon" href="Gemini_Generated_Image_tkp4qitkp4qitkp4(2).png" sizes="any"/>
+
+  <!-- Open Graph & SEO defaults (Hub bootstrap + lib/hub/seo actualizam por rota) -->
+  <meta property="og:title" content="Fleaber" />
+  <meta property="og:description" content="Live shopping e marketplace em Portugal." />
+  <meta property="og:image" content="https://storage.googleapis.com/flutterflow-prod-hosting/og_splash_gradient.png" />
+  <meta property="og:site_name" content="Fleaber" />
+  <meta name="twitter:title" content="Fleaber" />
+  <meta name="twitter:description" content="Live shopping e marketplace em Portugal." />
+  <meta name="twitter:image" content="https://storage.googleapis.com/flutterflow-prod-hosting/og_splash_gradient.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+
+  <title>Fleaber</title>
+  <meta name="description" content="Live shopping e marketplace em Portugal." />
+  <link rel="canonical" href="https://fleaber.pt" />
+
+  <!-- Hub SEO early bootstrap (crawlers FB/Google/WhatsApp — ver docs/live-hub-master-plan.md §2.28) -->
+  <script src="hub_seo_bootstrap.js" defer></script>
+
+  <!-- Status Bar color in Safari browser (iOS) and PWA -->
+  <meta name="theme-color" media="(prefers-color-scheme: light)" content="#f1f4f8">
+  <meta name="theme-color" media="(prefers-color-scheme: dark)"  content="#1d2428">
+
+  <link rel="manifest" href="manifest.json">
+  <!-- E85.3: prova de versão no HTML servido (actualizado no deploy). -->
+  <meta name="fleaber-build" content="161.1-hub-utf8-encoding-20261105">
+<!-- 189-pre-redteam-20261109-2000 --></head>
+<body>
+  <script>
+    // E85.3 — limpar SW/Cache Storage ANTES do bootstrap Flutter.
+    // O unregister assíncrono (E85.2) deixava o loader a servir main.dart.js antigo.
+    (async function () {
+      try {
+        // Sessões Stripe antigas: /fleahub/index.html#/stripe-success → /fleahub/#/…
+        var path = location.pathname || '';
+        var hash = location.hash || '';
+        if (/\/fleahub\/index\.html$/i.test(path) && hash.indexOf('stripe-success') >= 0) {
+          var q = location.search || '';
+          location.replace(location.origin + '/fleahub/' + q + hash);
+          return;
+        }
+      } catch (e0) {}
+      try {
+        if ('serviceWorker' in navigator) {
+          var regs = await navigator.serviceWorker.getRegistrations();
+          await Promise.all(regs.map(function (r) { return r.unregister(); }));
+        }
+        if (window.caches && caches.keys) {
+          var keys = await caches.keys();
+          await Promise.all(keys.map(function (k) { return caches.delete(k); }));
+        }
+      } catch (e) {
+        console.warn('fleaber cache clear', e);
+      }
+      var s = document.createElement('script');
+      // Cache-bust bootstrap (evita builds:[{},{}] + CDN canvaskit antigo).
+      s.src = 'flutter_bootstrap.js?v=161.1';
+      s.async = false;
+      document.body.appendChild(s);
+    })();
+  </script>
+</body>
+</html>

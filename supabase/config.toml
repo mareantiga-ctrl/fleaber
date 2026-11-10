@@ -1,0 +1,71 @@
+# JWT: false só onde o browser Stripe return URL faz GET sem sessão app.
+# POST de checkout/tip/connect valida sempre auth.getUser() no código (SEC-018 aceite residual).
+[functions.create-payment-intent]
+verify_jwt = false
+
+[functions.create-connect-account]
+verify_jwt = false
+
+[functions.stripe-webhook]
+verify_jwt = false
+
+[functions.refund-order]
+verify_jwt = true
+
+[functions.create-live-tip-checkout]
+verify_jwt = false
+
+[functions.meta-data-deletion]
+verify_jwt = false
+
+# Via isolada: comentários de post normal → ingest (service_role no código).
+[functions.meta-graph-post-ingest]
+verify_jwt = false
+
+# Webhook Meta Page feed (assinatura HMAC; sem JWT browser).
+[functions.meta-webhook]
+verify_jwt = false
+
+# Poll Graph Live Video comments (Bearer service / invoke secret).
+[functions.meta-graph-poll]
+verify_jwt = false
+
+[functions.livekit-mux-publish]
+verify_jwt = true
+
+[functions.create-mux-live]
+verify_jwt = true
+
+[functions.complete-mux-live]
+verify_jwt = true
+
+[functions.livekit-egress-cleanup]
+verify_jwt = false
+
+[functions.ops-health]
+verify_jwt = false
+
+# ZIP 174 — auditoria ambientes (auth própria via OPS_HEALTH_SECRET / service_role)
+[functions.ops-env-audit]
+verify_jwt = false
+
+# STAGING-ONLY destructive harnesses — NUNCA deploy para Prod (bpmpkz…).
+# Usar tool/deploy_edge_functions_safe.ps1. Requer FLEABER_ALLOW_DESTRUCTIVE_HARNESS=true.
+[functions.delete-test-account]
+verify_jwt = true
+
+[functions.sec-fase2-e2e-oversell]
+verify_jwt = false
+
+[functions.ingest-ocr-reservation]
+verify_jwt = false
+
+[functions.ps-pairing-claim]
+verify_jwt = false
+
+[functions.ps-heartbeat]
+verify_jwt = false
+
+# Moloni OAuth callback = GET sem JWT; POST valida auth.getUser() no código.
+[functions.moloni-api]
+verify_jwt = false

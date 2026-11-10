@@ -1,0 +1,67 @@
+{
+  "auditor": "REDTEAM_BLIND_BI_HUB_EDGE_POS_ATBE_v1",
+  "frozen_at": "2026-09-02T18:35:00+01:00",
+  "production_touched": false,
+  "fase4": false,
+  "corrections_applied": false,
+  "prefix": "RTBI-20260902T1820-",
+  "staging": "fxdknzrqjenzqcvnwqqq",
+  "lenses": ["BI1", "BI2", "BI3", "BI4", "BI5", "BI6", "BI7"],
+  "contagem": {
+    "P0": 0,
+    "P1": 0,
+    "P2": 2,
+    "P3": 1,
+    "P4": 0,
+    "total_p0_p3": 3
+  },
+  "veredicto": "FAIL_P2",
+  "findings": [
+    {
+      "id": "P2-BI7",
+      "severity": "P2",
+      "lenses": ["BI7", "BI1", "BI5"],
+      "title": "hub_lives_discovery_public publica mux_vod cru; CDN HLS; Edge 404",
+      "repro": "GET hub_lives_discovery_public scheduled/live; GET stream.mux.com/{vod}.m3u8; POST resolve-mux-playback",
+      "evidence": {
+        "scheduled_s1": "6bdfa1e2-6845-4aa3-a056-e65d9937dd8b",
+        "live_s1": "094f3276-b82f-4286-87a9-0f2b7fd5ad17",
+        "vod": "8cje21NKdUUro21jGdEv2UlfmWLD7TAMIWi2W01H5Gb8",
+        "cdn_status": 200,
+        "cdn_extm3u": true,
+        "edge_scheduled": "404 live_not_public",
+        "hub_lives_public_scheduled_vod": null
+      }
+    },
+    {
+      "id": "P2-BI2",
+      "severity": "P2",
+      "lenses": ["BI2"],
+      "title": "web_return_origin IP decimal/127.1/hex/octal → 303 https://127.0.0.1/wallet",
+      "repro": "GET create-connect-account?web_return_origin=https://2130706433 (e 127.1, 0x7f000001, 0177.0.0.1)",
+      "evidence": {
+        "decimal": "https://127.0.0.1/wallet",
+        "127.1": "https://127.0.0.1/wallet",
+        "0x7f": "https://127.0.0.1/wallet",
+        "octal": "https://127.0.0.1/wallet",
+        "evil.com": "html_no_location"
+      }
+    },
+    {
+      "id": "P3-BI1",
+      "severity": "P3",
+      "lenses": ["BI1"],
+      "title": "anon executa batata_live_is_broadcasting",
+      "repro": "POST rpc/batata_live_is_broadcasting",
+      "evidence": {"air": true, "rand": false}
+    }
+  ],
+  "not_counted_exactos": {
+    "hub_lives_public_scheduled_vod": "null_on_published_s1",
+    "draft_in_grid": "n=0",
+    "tip_stripe_oracle": "generic_400",
+    "total_qty_anon": "42501"
+  },
+  "gaps": ["tip_paid_settle_location_decimal_no_sk_test"],
+  "tip_session_unpaid": "cs_test_a1DGIaMQC4mPqOMIyLuJObv9yw8gQPyOg1peFQ5BLnLUEjj5N47ZLs3zCs"
+}

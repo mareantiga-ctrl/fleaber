@@ -1,0 +1,1 @@
+﻿select column_name from information_schema.columns where table_schema='public' and table_name='orders' and column_name ilike '%offer%' or (table_schema='public' and table_name='orders' and column_name in ('bundle_id','live_raffle_id','contract_unit_cents','contract_qty','product_offer_id','offer_id')) order by 1;

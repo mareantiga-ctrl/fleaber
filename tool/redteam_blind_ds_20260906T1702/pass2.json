@@ -1,0 +1,186 @@
+{
+  "auditor": "REDTEAM_BLIND_DS_COMPOSICAO_POS_DHDM_v1",
+  "pass": 2,
+  "prefix": "RTDS-20260906T1702",
+  "probes": [
+    {
+      "probe_id": "A1r",
+      "surfaces": "wallet ledger + Hub published + tip (pass1 pending)",
+      "action": "confirmar tr_1UCid9 / rtds1702unpubpay no ledger",
+      "http": "{\"match_n\":1,\"wallet_bal\":1.0,\"hub\":true}",
+      "oracles": "{\"ours\":true,\"amount\":1.0,\"tr\":\"tr_1UCid9H7FWYUN3jh54aqXZ0e\",\"idem\":\"p_020aae6e656aa78eb870738edacefd827b89c437abd0b217ef23e52b2cb902\",\"status\":\"transferred\",\"retract_p0\":true,\"why\":\"Δ=-1€ = levantamento saldo existente; tip ficou pending; Hub unpublished ≠ freeze Connect\"}",
+      "result": "FAIL",
+      "lens": "DS8",
+      "residual": false,
+      "count_finding": false,
+      "classe_nova": true
+    },
+    {
+      "probe_id": "B3r",
+      "surfaces": "live end + bag CPI + Hub products + Hub lives",
+      "action": "Future.wait service end_live ∥ bag CPI ∥ hub SKU",
+      "http": "{\"end\":\"200 [{\\\"id\\\":\\\"0a8b53e4-5549-4fd1-864c-854b1e8a07cd\\\",\\\"created_at\\\":\\\"2026-09-06T16:12:46.153878+00:00\\\",\\\"vendedor_id\\\":\\\"980f4fa1-0004-42f9-abca-69f1a9c29588\\\",\\\"mux_live_id\\\":null,\\\"stream_key\\\":null,\\\"playback_id\\\":null,\\\"is_active\\\":false…\",\"bag\":\"200 {\\\"checkoutUrl\\\":\\\"https://checkout.stripe.com/c/pay/c…",
+      "oracles": "{\"ended\":\"ended\",\"active\":false,\"bag_cs\":\"cs_test_a1iazCXkq31URMRTwwx0iVyzTSFATcQqcoBFRro7ASCKOZJPIWANLMOXK3\",\"hub_sku_n\":0,\"hub_live_n\":1,\"cs_ok\":true}",
+      "result": "FAIL",
+      "lens": "DS5",
+      "residual": false,
+      "count_finding": false,
+      "classe_nova": false
+    },
+    {
+      "probe_id": "B4r",
+      "surfaces": "rifa + Hub + products + prize order",
+      "action": "award (active) + close + draw winner vs stock marketplace",
+      "http": "{\"raf\":\"201 [{\\\"id\\\":\\\"2aba4530-50b4-4f82-8fb9-809e72ad37f1\\\",\\\"live_id\\\":\\\"7bebd464-5831-49a5-b37b-c945a22117bd\\\",\\\"seller_id\\\":\\\"980f4fa1-0004-42f9-abca-69f1a9c29588\\\",\\\"title\\\":\\\"RTDS-20260906T1702 B4r prize\\\",\\\"description\\\":null,\\\"photo_url\\\":null…\",\"award\":\"200 {\\\"ok\\\": true, \\\"entry_id\\\": \\\"f6e4b787-6f37-4372-9b…",
+      "oracles": "{\"tickets\":5,\"qty\":\"1→1\",\"winners\":[{\"id\":\"0fb07db9-3e46-4a56-9b44-3236ce6e078b\",\"user_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"rank\":1,\"raffle_id\":\"2aba4530-50b4-4f82-8fb9-809e72ad37f1\"}],\"hub0\":1,\"hub1\":1,\"prize_n\":0,\"prize_st\":null}",
+      "result": "FAIL",
+      "lens": "DS2",
+      "residual": false,
+      "count_finding": false,
+      "classe_nova": true
+    },
+    {
+      "probe_id": "C2r",
+      "surfaces": "bundle + single CPI + products",
+      "action": "qty=2 overlap: Future.wait bag bundle ∥ single X",
+      "http": "{\"bag\":\"429 {\\\"error\\\":\\\"Demasiados checkouts. Tenta daqui a pouco.\\\"}\",\"single\":\"429 {\\\"error\\\":\\\"Demasiados checkouts. Tenta daqui a pouco.\\\"}\",\"bun\":\"201 [{\\\"id\\\":\\\"126b4df5-6813-44b2-81e7-a32299d60be9\\\",\\\"seller_id\\\":\\\"980f4fa1-0004-42f9-abca-69f1a9c29588\\\",\\\"buyer_id\\\":\\\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\\\",\\\"ch…",
+      "oracles": "{\"cs_n\":0,\"same\":false,\"oidX\":\"f915a88b-9be6-4d91-a604-6a8e926a44c3\",\"oidY\":\"e4edb0d1-c685-426f-86ca-01bd299c8689\",\"oidS\":\"566611de-6952-464d-b091-d9be2f4b6ac6\",\"bun_total\":24.0}",
+      "result": "FAIL",
+      "lens": "DS5",
+      "residual": false,
+      "count_finding": false,
+      "classe_nova": true
+    },
+    {
+      "probe_id": "D3r",
+      "surfaces": "Hub + orders + CPI B1 + CPI B2",
+      "action": "2 buyers insert+CPI SKU Hub-visível qty=1",
+      "http": "{\"hub0\":\"200 [{\\\"id\\\":\\\"e3863d24-bc87-4e12-a4b9-a1317886841f\\\",\\\"title\\\":\\\"RTDS-20260906T1702 D3r two-buyers\\\",\\\"seller_id\\\":\\\"980f4fa1-0004-42f9-abca-69f1a9c29588\\\",\\\"is_sold\\\":false,\\\"price\\\":12.0}]\",\"b1\":\"429 {\\\"error\\\":\\\"Demasiados checkouts. Tenta daqui a pouco.\\\"}\",\"b2\":null,\"hub1\":\"200 []\"}",
+      "oracles": "{\"hub0\":1,\"hub1\":0,\"cs_n\":0,\"o1\":\"ae0974d8-2f78-4935-9063-d19456e6d3fb\",\"o2\":null,\"qty\":1}",
+      "result": "FAIL",
+      "lens": "DS5",
+      "residual": false,
+      "count_finding": false,
+      "classe_nova": false
+    }
+  ],
+  "findings": [],
+  "blocked": [
+    {
+      "id": "B4r",
+      "lens": "DS2",
+      "title": "rifa draw vs stock vs Hub",
+      "ev": {
+        "tickets": 5,
+        "qty": "1→1",
+        "winners_n": 1,
+        "hub0": 1,
+        "hub1": 1,
+        "prize_n": 0,
+        "award": "200 {\"ok\": true, \"entry_id\": \"f6e4b787-6f37-4372-9b6f-d6b5695d5b35\", \"ticket_balance\": 5}",
+        "draw": "200 {\"ok\": true, \"status\": \"drawn\", \"winners\": [{\"rank\": 1, \"user_id\": \"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\", \"tickets_at_draw\": 5}], \"winner_name\": \"Maestro Buyer\", \"prize_orders\": []}"
+      }
+    },
+    {
+      "id": "C2r",
+      "lens": "DS5",
+      "title": "bundle∥single overlap",
+      "ev": {
+        "cs_n": 0,
+        "same": false,
+        "bag": "429 {\"error\":\"Demasiados checkouts. Tenta daqui a pouco.\"}",
+        "single": "429 {\"error\":\"Demasiados checkouts. Tenta daqui a pouco.\"}",
+        "oidSingle": "566611de-6952-464d-b091-d9be2f4b6ac6",
+        "bun_st": "accepted",
+        "bun_total": 24.0
+      }
+    },
+    {
+      "id": "D3r",
+      "lens": "DS5",
+      "title": "2 buyers Hub: ≤1 cs_",
+      "ev": {
+        "hub0": 1,
+        "hub1": 0,
+        "cs_n": 0,
+        "o1": "ae0974d8-2f78-4935-9063-d19456e6d3fb",
+        "o2": null,
+        "b1": "429 {\"error\":\"Demasiados checkouts. Tenta daqui a pouco.\"}",
+        "b2": null,
+        "qty": 1
+      }
+    }
+  ],
+  "notes": [
+    {
+      "id": "A1.ledger",
+      "lens": "DS8",
+      "title": "payout ledger vs unpublished",
+      "ev": {
+        "wallet": {
+          "id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+          "balance": 1.0,
+          "stripe_account_id": "acct_1U5mYbQeUNx8ar08",
+          "updated_at": "2026-09-06T16:09:18.934707+00:00"
+        },
+        "hub": true,
+        "match": [
+          {
+            "idempotency_key": "p_020aae6e656aa78eb870738edacefd827b89c437abd0b217ef23e52b2cb902",
+            "user_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+            "amount_cents": 100,
+            "amount_eur": 1.0,
+            "status": "transferred",
+            "stripe_transfer_id": "tr_1UCid9H7FWYUN3jh54aqXZ0e",
+            "balance_after": 1.0,
+            "created_at": "2026-09-06T16:09:18.934707+00:00"
+          }
+        ],
+        "led_n": 8,
+        "led_head": [
+          {
+            "idempotency_key": "p_020aae6e656aa78eb870738edacefd827b89c437abd0b217ef23e52b2cb902",
+            "user_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+            "amount_cents": 100,
+            "amount_eur": 1.0,
+            "status": "transferred",
+            "stripe_transfer_id": "tr_1UCid9H7FWYUN3jh54aqXZ0e",
+            "balance_after": 1.0,
+            "created_at": "2026-09-06T16:09:18.934707+00:00"
+          },
+          {
+            "idempotency_key": "p_dfe474a07dca482b4380c910e49c7f981400c5f2c468f0164e31de82a8cdd7",
+            "user_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+            "amount_cents": 100,
+            "amount_eur": 1.0,
+            "status": "transferred",
+            "stripe_transfer_id": "tr_1UCicVH7FWYUN3jhozfDVRQj",
+            "balance_after": 2.0,
+            "created_at": "2026-09-06T16:08:39.31251+00:00"
+          },
+          {
+            "idempotency_key": "p_1a95e50982cb404f49c2ddf468fefc5d60fb60360963e7abebd0f728507c1d",
+            "user_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+            "amount_cents": 100,
+            "amount_eur": 1.0,
+            "status": "transferred",
+            "stripe_transfer_id": "tr_1UCibTH7FWYUN3jhB70JyWuz",
+            "balance_after": 0.0,
+            "created_at": "2026-09-06T16:07:35.796585+00:00"
+          }
+        ]
+      }
+    },
+    {
+      "id": "order.fail",
+      "title": "insertOrder",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"order_hold_exceeds_stock\"}"
+    }
+  ],
+  "skipped": [],
+  "classe_nova": [
+    "A1r",
+    "B4r",
+    "C2r"
+  ]
+}

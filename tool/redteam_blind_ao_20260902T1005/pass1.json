@@ -1,0 +1,860 @@
+{
+  "stamp": "20260902T1005",
+  "prefix": "RTAO-20260902T1005",
+  "auditor": "REDTEAM_BLIND_AO_CHAT_POS_AHAM_v1",
+  "lenses": [
+    "AO1",
+    "AO2",
+    "AO3",
+    "AO4",
+    "AO5",
+    "AO6",
+    "AO7",
+    "AO8"
+  ],
+  "findings": [
+    {
+      "id": "AO1.display-refund-eur",
+      "lens": "AO1",
+      "severity": "P2",
+      "title": "cancel display mentiroso keyword nova (refund-eur)",
+      "actor": "seller JWT",
+      "pre": "order pago, outcome=rejected (BD não cancelado)",
+      "repro": "POST cancel_request_outcome display=Refund 50 EUR processed",
+      "expected": "4xx",
+      "obtained": "201 [{\"id\":1200,\"created_at\":\"2026-09-02T09:14:20.314767+00:00\",\"chat_id\":\"ac2902d3-a3ca-4f82-b7de-2532db9cafba\",\"sender_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"cancel_request_outcome\\\",\\\"order_id\\\":\\\"2a97…",
+      "proven": true,
+      "evidence": {
+        "id": "1200",
+        "text": "Refund 50 EUR processed"
+      }
+    },
+    {
+      "id": "AO1.display-estorno",
+      "lens": "AO1",
+      "severity": "P2",
+      "title": "cancel display mentiroso keyword nova (estorno)",
+      "actor": "seller JWT",
+      "pre": "order pago, outcome=rejected (BD não cancelado)",
+      "repro": "POST cancel_request_outcome display=Estorno 50€ feito",
+      "expected": "4xx",
+      "obtained": "201 [{\"id\":1201,\"created_at\":\"2026-09-02T09:14:20.417544+00:00\",\"chat_id\":\"ac2902d3-a3ca-4f82-b7de-2532db9cafba\",\"sender_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"cancel_request_outcome\\\",\\\"order_id\\\":\\\"2a97…",
+      "proven": true,
+      "evidence": {
+        "id": "1201",
+        "text": "Estorno 50€ feito"
+      }
+    },
+    {
+      "id": "AO1.display-devolucao",
+      "lens": "AO1",
+      "severity": "P2",
+      "title": "cancel display mentiroso keyword nova (devolucao)",
+      "actor": "seller JWT",
+      "pre": "order pago, outcome=rejected (BD não cancelado)",
+      "repro": "POST cancel_request_outcome display=Devolução 50,00 € na conta",
+      "expected": "4xx",
+      "obtained": "201 [{\"id\":1202,\"created_at\":\"2026-09-02T09:14:20.509487+00:00\",\"chat_id\":\"ac2902d3-a3ca-4f82-b7de-2532db9cafba\",\"sender_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"cancel_request_outcome\\\",\\\"order_id\\\":\\\"2a97…",
+      "proven": true,
+      "evidence": {
+        "id": "1202",
+        "text": "Devolução 50,00 € na conta"
+      }
+    },
+    {
+      "id": "AO1.display-remboursement",
+      "lens": "AO1",
+      "severity": "P2",
+      "title": "cancel display mentiroso keyword nova (remboursement)",
+      "actor": "seller JWT",
+      "pre": "order pago, outcome=rejected (BD não cancelado)",
+      "repro": "POST cancel_request_outcome display=Remboursement 50 €",
+      "expected": "4xx",
+      "obtained": "201 [{\"id\":1203,\"created_at\":\"2026-09-02T09:14:20.600669+00:00\",\"chat_id\":\"ac2902d3-a3ca-4f82-b7de-2532db9cafba\",\"sender_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"cancel_request_outcome\\\",\\\"order_id\\\":\\\"2a97…",
+      "proven": true,
+      "evidence": {
+        "id": "1203",
+        "text": "Remboursement 50 €"
+      }
+    },
+    {
+      "id": "AO1.display-chargeback",
+      "lens": "AO1",
+      "severity": "P2",
+      "title": "cancel display mentiroso keyword nova (chargeback)",
+      "actor": "seller JWT",
+      "pre": "order pago, outcome=rejected (BD não cancelado)",
+      "repro": "POST cancel_request_outcome display=Chargeback 50 EUR",
+      "expected": "4xx",
+      "obtained": "201 [{\"id\":1204,\"created_at\":\"2026-09-02T09:14:20.698043+00:00\",\"chat_id\":\"ac2902d3-a3ca-4f82-b7de-2532db9cafba\",\"sender_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"cancel_request_outcome\\\",\\\"order_id\\\":\\\"2a97…",
+      "proven": true,
+      "evidence": {
+        "id": "1204",
+        "text": "Chargeback 50 EUR"
+      }
+    },
+    {
+      "id": "AO1.display-homoglyph-reembolso",
+      "lens": "AO1",
+      "severity": "P2",
+      "title": "cancel display mentiroso keyword nova (homoglyph-reembolso)",
+      "actor": "seller JWT",
+      "pre": "order pago, outcome=rejected (BD não cancelado)",
+      "repro": "POST cancel_request_outcome display=Rеembolso 50 EUR processado",
+      "expected": "4xx",
+      "obtained": "201 [{\"id\":1205,\"created_at\":\"2026-09-02T09:14:20.801225+00:00\",\"chat_id\":\"ac2902d3-a3ca-4f82-b7de-2532db9cafba\",\"sender_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"cancel_request_outcome\\\",\\\"order_id\\\":\\\"2a97…",
+      "proven": true,
+      "evidence": {
+        "id": "1205",
+        "text": "Rеembolso 50 EUR processado"
+      }
+    },
+    {
+      "id": "AO1.notes-wise",
+      "lens": "AO1",
+      "severity": "P2",
+      "title": "notes comprovativo keyword nova (wise)",
+      "actor": "buyer JWT",
+      "pre": "order pago",
+      "repro": "POST reservation_payment_submitted notes=Wise 50€ já caiu",
+      "expected": "4xx",
+      "obtained": "201 [{\"id\":1206,\"created_at\":\"2026-09-02T09:14:20.895852+00:00\",\"chat_id\":\"ac2902d3-a3ca-4f82-b7de-2532db9cafba\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"reservation_payment_submitted\\\",\\\"order_id\\\"…",
+      "proven": true,
+      "evidence": {
+        "id": "1206",
+        "text": "Wise 50€ já caiu"
+      }
+    },
+    {
+      "id": "AO1.notes-revolut",
+      "lens": "AO1",
+      "severity": "P2",
+      "title": "notes comprovativo keyword nova (revolut)",
+      "actor": "buyer JWT",
+      "pre": "order pago",
+      "repro": "POST reservation_payment_submitted notes=Revolut 12,00 € confirmado",
+      "expected": "4xx",
+      "obtained": "201 [{\"id\":1207,\"created_at\":\"2026-09-02T09:14:20.989283+00:00\",\"chat_id\":\"ac2902d3-a3ca-4f82-b7de-2532db9cafba\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"reservation_payment_submitted\\\",\\\"order_id\\\"…",
+      "proven": true,
+      "evidence": {
+        "id": "1207",
+        "text": "Revolut 12,00 € confirmado"
+      }
+    },
+    {
+      "id": "AO1.notes-applepay",
+      "lens": "AO1",
+      "severity": "P2",
+      "title": "notes comprovativo keyword nova (applepay)",
+      "actor": "buyer JWT",
+      "pre": "order pago",
+      "repro": "POST reservation_payment_submitted notes=Apple Pay 20€",
+      "expected": "4xx",
+      "obtained": "201 [{\"id\":1209,\"created_at\":\"2026-09-02T09:14:21.176516+00:00\",\"chat_id\":\"ac2902d3-a3ca-4f82-b7de-2532db9cafba\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"reservation_payment_submitted\\\",\\\"order_id\\\"…",
+      "proven": true,
+      "evidence": {
+        "id": "1209",
+        "text": "Apple Pay 20€"
+      }
+    },
+    {
+      "id": "AO1.notes-homoglyph-mbway",
+      "lens": "AO1",
+      "severity": "P2",
+      "title": "notes comprovativo keyword nova (homoglyph-mbway)",
+      "actor": "buyer JWT",
+      "pre": "order pago",
+      "repro": "POST reservation_payment_submitted notes=MВ WAY 50€ confirmado",
+      "expected": "4xx",
+      "obtained": "201 [{\"id\":1210,\"created_at\":\"2026-09-02T09:14:21.300479+00:00\",\"chat_id\":\"ac2902d3-a3ca-4f82-b7de-2532db9cafba\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"reservation_payment_submitted\\\",\\\"order_id\\\"…",
+      "proven": true,
+      "evidence": {
+        "id": "1210",
+        "text": "MВ WAY 50€ confirmado"
+      }
+    },
+    {
+      "id": "AO1.notes-via-caption",
+      "lens": "AO1",
+      "severity": "P3",
+      "title": "lie em caption (não notes) no comprovativo",
+      "actor": "buyer JWT",
+      "pre": "order pago; Flutter só mostra notes",
+      "repro": "POST reservation_payment_submitted caption=MB WAY 50€ notes=ok",
+      "expected": "4xx",
+      "obtained": "201 [{\"id\":1211,\"created_at\":\"2026-09-02T09:14:21.403798+00:00\",\"chat_id\":\"ac2902d3-a3ca-4f82-b7de-2532db9cafba\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"reservation_payment_submitted\\\",\\\"order_id\\\"…",
+      "proven": true,
+      "evidence": {
+        "id": "1211",
+        "text": ""
+      }
+    },
+    {
+      "id": "AO1.seguro-label-wise",
+      "lens": "AO1",
+      "severity": "P2",
+      "title": "seguro_fleaber_paid label Wise sem dígitos",
+      "actor": "buyer JWT",
+      "pre": "order pago, total=5.90",
+      "repro": "POST seguro_fleaber_paid label=Wise total=BD",
+      "expected": "4xx",
+      "obtained": "201 [{\"id\":1212,\"created_at\":\"2026-09-02T09:14:21.503967+00:00\",\"chat_id\":\"ac2902d3-a3ca-4f82-b7de-2532db9cafba\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"seguro_fleaber_paid\\\",\\\"order_id\\\":\\\"2a97565…",
+      "proven": true,
+      "evidence": {
+        "id": "1212",
+        "text": ""
+      }
+    },
+    {
+      "id": "AO1.seguro-label-pago",
+      "lens": "AO1",
+      "severity": "P2",
+      "title": "seguro_fleaber_paid label Pago no MB",
+      "actor": "buyer JWT",
+      "pre": "order pago",
+      "repro": "POST seguro_fleaber_paid label=Pago no MB",
+      "expected": "4xx",
+      "obtained": "201 [{\"id\":1213,\"created_at\":\"2026-09-02T09:14:21.597094+00:00\",\"chat_id\":\"ac2902d3-a3ca-4f82-b7de-2532db9cafba\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"seguro_fleaber_paid\\\",\\\"order_id\\\":\\\"2a97565…",
+      "proven": true,
+      "evidence": {
+        "id": "1213",
+        "text": ""
+      }
+    },
+    {
+      "id": "AO2.prefix-nbsp-prefix",
+      "lens": "AO2",
+      "severity": "P3",
+      "title": "prefixo variante nbsp-prefix gravou bolha JSON crua",
+      "actor": "seller JWT",
+      "pre": "strip Cf/BOM; cliente só startsWith(FLEABER_JSON_V1:)",
+      "repro": "POST text=nbsp-prefix",
+      "expected": "4xx ou texto não-card",
+      "obtained": "201 [{\"id\":1219,\"created_at\":\"2026-09-02T09:14:22.17621+00:00\",\"chat_id\":\"ac2902d3-a3ca-4f82-b7de-2532db9cafba\",\"sender_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"text\":\" FLEABER_JSON_V1:{\\\"kind\\\":\\\"cancel_request_outcome\\\",\\\"order_id\\\":\\\"2a97…",
+      "proven": true,
+      "evidence": {
+        "stored_starts_prefix": false,
+        "stored_len": 151
+      }
+    },
+    {
+      "id": "AO2.prefix-emspace-prefix",
+      "lens": "AO2",
+      "severity": "P3",
+      "title": "prefixo variante emspace-prefix gravou bolha JSON crua",
+      "actor": "seller JWT",
+      "pre": "strip Cf/BOM; cliente só startsWith(FLEABER_JSON_V1:)",
+      "repro": "POST text=emspace-prefix",
+      "expected": "4xx ou texto não-card",
+      "obtained": "201 [{\"id\":1220,\"created_at\":\"2026-09-02T09:14:22.2683+00:00\",\"chat_id\":\"ac2902d3-a3ca-4f82-b7de-2532db9cafba\",\"sender_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"text\":\" FLEABER_JSON_V1:{\\\"kind\\\":\\\"cancel_request_outcome\\\",\\\"order_id\\\":\\\"2a975…",
+      "proven": true,
+      "evidence": {
+        "stored_starts_prefix": false,
+        "stored_len": 151
+      }
+    },
+    {
+      "id": "AO2.prefix-tab-prefix",
+      "lens": "AO2",
+      "severity": "P3",
+      "title": "prefixo variante tab-prefix gravou bolha JSON crua",
+      "actor": "seller JWT",
+      "pre": "strip Cf/BOM; cliente só startsWith(FLEABER_JSON_V1:)",
+      "repro": "POST text=tab-prefix",
+      "expected": "4xx ou texto não-card",
+      "obtained": "201 [{\"id\":1221,\"created_at\":\"2026-09-02T09:14:22.363522+00:00\",\"chat_id\":\"ac2902d3-a3ca-4f82-b7de-2532db9cafba\",\"sender_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"text\":\"\\tFLEABER_JSON_V1:{\\\"kind\\\":\\\"cancel_request_outcome\\\",\\\"order_id\\\":\\\"2a…",
+      "proven": true,
+      "evidence": {
+        "stored_starts_prefix": false,
+        "stored_len": 151
+      }
+    },
+    {
+      "id": "AO2.prefix-fullwidth-colon",
+      "lens": "AO2",
+      "severity": "P3",
+      "title": "prefixo variante fullwidth-colon gravou bolha JSON crua",
+      "actor": "seller JWT",
+      "pre": "strip Cf/BOM; cliente só startsWith(FLEABER_JSON_V1:)",
+      "repro": "POST text=fullwidth-colon",
+      "expected": "4xx ou texto não-card",
+      "obtained": "201 [{\"id\":1222,\"created_at\":\"2026-09-02T09:14:22.460774+00:00\",\"chat_id\":\"ac2902d3-a3ca-4f82-b7de-2532db9cafba\",\"sender_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"text\":\"FLEABER_JSON_V1：{\\\"kind\\\":\\\"cancel_request_outcome\\\",\\\"order_id\\\":\\\"2a97…",
+      "proven": true,
+      "evidence": {
+        "stored_starts_prefix": false,
+        "stored_len": 150
+      }
+    },
+    {
+      "id": "AO2.prefix-lower-prefix",
+      "lens": "AO2",
+      "severity": "P3",
+      "title": "prefixo variante lower-prefix gravou bolha JSON crua",
+      "actor": "seller JWT",
+      "pre": "strip Cf/BOM; cliente só startsWith(FLEABER_JSON_V1:)",
+      "repro": "POST text=lower-prefix",
+      "expected": "4xx ou texto não-card",
+      "obtained": "201 [{\"id\":1223,\"created_at\":\"2026-09-02T09:14:22.551149+00:00\",\"chat_id\":\"ac2902d3-a3ca-4f82-b7de-2532db9cafba\",\"sender_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"text\":\"fleaber_json_v1:{\\\"kind\\\":\\\"cancel_request_outcome\\\",\\\"order_id\\\":\\\"2a97…",
+      "proven": true,
+      "evidence": {
+        "stored_starts_prefix": false,
+        "stored_len": 150
+      }
+    },
+    {
+      "id": "AO2.prefix-newline-after",
+      "lens": "AO2",
+      "severity": "P2",
+      "title": "prefixo variante newline-after gravou card parseável",
+      "actor": "seller JWT",
+      "pre": "strip Cf/BOM; cliente só startsWith(FLEABER_JSON_V1:)",
+      "repro": "POST text=newline-after",
+      "expected": "4xx ou texto não-card",
+      "obtained": "201 [{\"id\":1224,\"created_at\":\"2026-09-02T09:14:22.637812+00:00\",\"chat_id\":\"ac2902d3-a3ca-4f82-b7de-2532db9cafba\",\"sender_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"text\":\"FLEABER_JSON_V1:\\n{\\\"kind\\\":\\\"cancel_request_outcome\\\",\\\"order_id\\\":\\\"2a…",
+      "proven": true,
+      "evidence": {
+        "stored_starts_prefix": true,
+        "stored_len": 151
+      }
+    },
+    {
+      "id": "AO2.prefix-bom-after-prefix",
+      "lens": "AO2",
+      "severity": "P2",
+      "title": "prefixo variante bom-after-prefix gravou card parseável",
+      "actor": "seller JWT",
+      "pre": "strip Cf/BOM; cliente só startsWith(FLEABER_JSON_V1:)",
+      "repro": "POST text=bom-after-prefix",
+      "expected": "4xx ou texto não-card",
+      "obtained": "201 [{\"id\":1226,\"created_at\":\"2026-09-02T09:14:22.814969+00:00\",\"chat_id\":\"ac2902d3-a3ca-4f82-b7de-2532db9cafba\",\"sender_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"cancel_request_outcome\\\",\\\"order_id\\\":\\\"2a97…",
+      "proven": true,
+      "evidence": {
+        "stored_starts_prefix": true,
+        "stored_len": 150
+      }
+    },
+    {
+      "id": "AO2.kind-unicode-escape-server",
+      "lens": "AO2",
+      "severity": "P2",
+      "title": "kind \\u0073eguro_fleaber_paid via escape",
+      "actor": "buyer JWT",
+      "pre": "jsonb unescapes kind",
+      "repro": "POST kind=\\u0073eguro_fleaber_paid",
+      "expected": "4xx",
+      "obtained": "201 [{\"id\":1227,\"created_at\":\"2026-09-02T09:14:22.907473+00:00\",\"chat_id\":\"ac2902d3-a3ca-4f82-b7de-2532db9cafba\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"\\\\u0073eguro_fleaber_paid\\\",\\\"order_id\\\":\\\"2…",
+      "proven": true,
+      "evidence": {
+        "id": "1227",
+        "text": ""
+      }
+    },
+    {
+      "id": "AO3.patch-created-at",
+      "lens": "AO3",
+      "severity": "P2",
+      "title": "PATCH created_at de mensagem própria para 2020",
+      "actor": "buyer JWT",
+      "pre": "mensagem própria",
+      "repro": "PATCH chat_messages created_at=2020",
+      "expected": "4xx",
+      "obtained": "200 [{\"id\":1229,\"created_at\":\"2026-09-02T09:14:23.090058+00:00\",\"chat_id\":\"ac2902d3-a3ca-4f82-b7de-2532db9cafba\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"RTAO ping cronologia\",\"is_reservation\":false,\"is_read\":false,\"receiver_i…",
+      "proven": true,
+      "evidence": {
+        "id": "1229",
+        "text": ""
+      }
+    },
+    {
+      "id": "AO4.chat-image-public-url",
+      "lens": "AO4",
+      "severity": "P2",
+      "title": "chat_image path próprio + url object/public",
+      "actor": "buyer JWT",
+      "pre": "chat_image url só precisa supabase.co/storage/%",
+      "repro": "POST chat_image url=.../object/public/avatars/x.png",
+      "expected": "4xx",
+      "obtained": "201 [{\"id\":1238,\"created_at\":\"2026-09-02T09:14:24.095521+00:00\",\"chat_id\":\"ac2902d3-a3ca-4f82-b7de-2532db9cafba\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"chat_image\\\",\\\"path\\\":\\\"chat_uploads/bfcbeee…",
+      "proven": true,
+      "evidence": {
+        "id": "1238",
+        "text": ""
+      }
+    },
+    {
+      "id": "AO4.notes-html",
+      "lens": "AO4",
+      "severity": "P3",
+      "title": "notes HTML/img em comprovativo",
+      "actor": "buyer JWT",
+      "pre": "Flutter Text() não executa HTML; gravar = P3",
+      "repro": "POST notes=<img onerror>",
+      "expected": "4xx",
+      "obtained": "201 [{\"id\":1241,\"created_at\":\"2026-09-02T09:14:24.367582+00:00\",\"chat_id\":\"ac2902d3-a3ca-4f82-b7de-2532db9cafba\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"reservation_payment_submitted\\\",\\\"order_id\\\"…",
+      "proven": true,
+      "evidence": {
+        "id": "1241",
+        "text": ""
+      }
+    },
+    {
+      "id": "AO5.inbox-wise",
+      "lens": "AO5",
+      "severity": "P2",
+      "title": "inbox last_message \"Wise 50€\"",
+      "actor": "buyer JWT",
+      "pre": "forged_inbox_preview = payment_lie_text",
+      "repro": "PATCH chats last_message=Wise 50€",
+      "expected": "4xx",
+      "obtained": "200 [{\"id\":\"ac2902d3-a3ca-4f82-b7de-2532db9cafba\",\"created_at\":\"2026-08-27T06:37:32.277448+00:00\",\"user_a\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"user_b\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"last_message\":\"Wise 50€\",\"last_message_time\":\"202…",
+      "proven": true,
+      "evidence": {
+        "id": "ac2902d3-a3ca-4f82-b7de-2532db9cafba",
+        "text": ""
+      }
+    },
+    {
+      "id": "AO5.inbox-revolut",
+      "lens": "AO5",
+      "severity": "P2",
+      "title": "inbox last_message \"Revolut 12€ confirmado\"",
+      "actor": "buyer JWT",
+      "pre": "forged_inbox_preview = payment_lie_text",
+      "repro": "PATCH chats last_message=Revolut 12€ confirmado",
+      "expected": "4xx",
+      "obtained": "200 [{\"id\":\"ac2902d3-a3ca-4f82-b7de-2532db9cafba\",\"created_at\":\"2026-08-27T06:37:32.277448+00:00\",\"user_a\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"user_b\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"last_message\":\"Revolut 12€ confirmado\",\"last_mess…",
+      "proven": true,
+      "evidence": {
+        "id": "ac2902d3-a3ca-4f82-b7de-2532db9cafba",
+        "text": ""
+      }
+    },
+    {
+      "id": "AO5.inbox-mbway-aprovado",
+      "lens": "AO5",
+      "severity": "P2",
+      "title": "inbox last_message \"MB WAY aprovado\"",
+      "actor": "buyer JWT",
+      "pre": "forged_inbox_preview = payment_lie_text",
+      "repro": "PATCH chats last_message=MB WAY aprovado",
+      "expected": "4xx",
+      "obtained": "200 [{\"id\":\"ac2902d3-a3ca-4f82-b7de-2532db9cafba\",\"created_at\":\"2026-08-27T06:37:32.277448+00:00\",\"user_a\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"user_b\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"last_message\":\"MB WAY aprovado\",\"last_message_tim…",
+      "proven": true,
+      "evidence": {
+        "id": "ac2902d3-a3ca-4f82-b7de-2532db9cafba",
+        "text": ""
+      }
+    },
+    {
+      "id": "AO5.inbox-pagamento-recebido",
+      "lens": "AO5",
+      "severity": "P2",
+      "title": "inbox last_message \"Pagamento recebido\"",
+      "actor": "buyer JWT",
+      "pre": "forged_inbox_preview = payment_lie_text",
+      "repro": "PATCH chats last_message=Pagamento recebido",
+      "expected": "4xx",
+      "obtained": "200 [{\"id\":\"ac2902d3-a3ca-4f82-b7de-2532db9cafba\",\"created_at\":\"2026-08-27T06:37:32.277448+00:00\",\"user_a\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"user_b\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"last_message\":\"Pagamento recebido\",\"last_message_…",
+      "proven": true,
+      "evidence": {
+        "id": "ac2902d3-a3ca-4f82-b7de-2532db9cafba",
+        "text": ""
+      }
+    },
+    {
+      "id": "AO5.inbox-transf-confirmada",
+      "lens": "AO5",
+      "severity": "P2",
+      "title": "inbox last_message \"Transferência confirmada\"",
+      "actor": "buyer JWT",
+      "pre": "forged_inbox_preview = payment_lie_text",
+      "repro": "PATCH chats last_message=Transferência confirmada",
+      "expected": "4xx",
+      "obtained": "200 [{\"id\":\"ac2902d3-a3ca-4f82-b7de-2532db9cafba\",\"created_at\":\"2026-08-27T06:37:32.277448+00:00\",\"user_a\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"user_b\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"last_message\":\"Transferência confirmada\",\"last_me…",
+      "proven": true,
+      "evidence": {
+        "id": "ac2902d3-a3ca-4f82-b7de-2532db9cafba",
+        "text": ""
+      }
+    },
+    {
+      "id": "AO5.inbox-recebi-wise",
+      "lens": "AO5",
+      "severity": "P2",
+      "title": "inbox last_message \"Recebi no Wise\"",
+      "actor": "buyer JWT",
+      "pre": "forged_inbox_preview = payment_lie_text",
+      "repro": "PATCH chats last_message=Recebi no Wise",
+      "expected": "4xx",
+      "obtained": "200 [{\"id\":\"ac2902d3-a3ca-4f82-b7de-2532db9cafba\",\"created_at\":\"2026-08-27T06:37:32.277448+00:00\",\"user_a\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"user_b\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"last_message\":\"Recebi no Wise\",\"last_message_time…",
+      "proven": true,
+      "evidence": {
+        "id": "ac2902d3-a3ca-4f82-b7de-2532db9cafba",
+        "text": ""
+      }
+    },
+    {
+      "id": "AO7.b2-patch-inbox",
+      "lens": "AO7",
+      "severity": "P2",
+      "title": "B2 PATCH last_message do chat alheio",
+      "actor": "buyer2 JWT",
+      "pre": "chat B1-S1",
+      "repro": "PATCH chats last_message",
+      "expected": "4xx",
+      "obtained": "200 []",
+      "proven": true,
+      "evidence": {
+        "id": "",
+        "text": ""
+      }
+    }
+  ],
+  "blocked": [
+    {
+      "id": "CTRL.display-reembolso",
+      "lens": "AO1",
+      "title": "controlo exact AI P2-01 display Reembolso",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_display_forbidden\"}"
+    },
+    {
+      "id": "CTRL.notes-reembolso",
+      "lens": "AO1",
+      "title": "controlo exact AI P2-03 notes Reembolso",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_notes_forbidden\"}"
+    },
+    {
+      "id": "CTRL.inbox-paypal",
+      "lens": "AO5",
+      "title": "controlo exact AI P2-07 inbox PayPal 50€",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"chat_inbox_preview_forbidden\"}"
+    },
+    {
+      "id": "AO1.notes-multibanco",
+      "lens": "AO1",
+      "title": "notes comprovativo keyword nova (multibanco)",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_notes_forbidden\"}"
+    },
+    {
+      "id": "AO1.legacy-pad-nbsp",
+      "lens": "AO1",
+      "title": "plain Seguro card via pad Unicode nbsp (SQL ^\\s* vs Dart trim)",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"chat_seguro_legacy_plain_forbidden\"}"
+    },
+    {
+      "id": "AO1.legacy-pad-emspace",
+      "lens": "AO1",
+      "title": "plain Seguro card via pad Unicode emspace (SQL ^\\s* vs Dart trim)",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"chat_seguro_legacy_plain_forbidden\"}"
+    },
+    {
+      "id": "AO1.legacy-pad-ideographic",
+      "lens": "AO1",
+      "title": "plain Seguro card via pad Unicode ideographic (SQL ^\\s* vs Dart trim)",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"chat_seguro_legacy_plain_forbidden\"}"
+    },
+    {
+      "id": "AO1.legacy-pad-nnbsp",
+      "lens": "AO1",
+      "title": "plain Seguro card via pad Unicode nnbsp (SQL ^\\s* vs Dart trim)",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"chat_seguro_legacy_plain_forbidden\"}"
+    },
+    {
+      "id": "AO1.legacy-pad-thin",
+      "lens": "AO1",
+      "title": "plain Seguro card via pad Unicode thin (SQL ^\\s* vs Dart trim)",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"chat_seguro_legacy_plain_forbidden\"}"
+    },
+    {
+      "id": "AO2.prefix-double-prefix",
+      "lens": "AO2",
+      "title": "prefixo double-prefix",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_invalid_json\"}"
+    },
+    {
+      "id": "AO2.kind-unknown",
+      "lens": "AO2",
+      "title": "kind payment_confirmed fora da allowlist",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_kind_denied\"}"
+    },
+    {
+      "id": "AO3.created-at-backdate",
+      "lens": "AO3",
+      "title": "created_at forçado now()",
+      "ev": "201 [{\"id\":1229,\"created_at\":\"2026-09-02T09:14:23.090058+00:00\",\"chat_id\":\"ac2902d3-a3ca-4f82-b7de-2532db9cafba\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"RTAO ping cronologia\",\"is_reservation\":false,\"is_read\":false,\"receiver_i…"
+    },
+    {
+      "id": "AO3.inbox-time-backdate",
+      "lens": "AO3",
+      "title": "time clamped",
+      "ev": "200 [{\"id\":\"ac2902d3-a3ca-4f82-b7de-2532db9cafba\",\"created_at\":\"2026-08-27T06:37:32.277448+00:00\",\"user_a\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"user_b\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"last_message\":\"ola rtao\",\"last_message_time\":\"202…"
+    },
+    {
+      "id": "AO4.proof-data",
+      "lens": "AO4",
+      "title": "proof_url data",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_url_denied\"}"
+    },
+    {
+      "id": "AO4.proof-js",
+      "lens": "AO4",
+      "title": "proof_url js",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_url_denied\"}"
+    },
+    {
+      "id": "AO4.proof-vbscript",
+      "lens": "AO4",
+      "title": "proof_url vbscript",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_url_denied\"}"
+    },
+    {
+      "id": "AO4.proof-protocol-rel",
+      "lens": "AO4",
+      "title": "proof_url protocol-rel",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_url_denied\"}"
+    },
+    {
+      "id": "AO4.proof-public-bucket",
+      "lens": "AO4",
+      "title": "proof_url public-bucket",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_url_denied\"}"
+    },
+    {
+      "id": "AO4.proof-render",
+      "lens": "AO4",
+      "title": "proof_url render",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_url_denied\"}"
+    },
+    {
+      "id": "AO4.proof-userinfo",
+      "lens": "AO4",
+      "title": "proof_url userinfo",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_url_denied\"}"
+    },
+    {
+      "id": "AO4.proof-nl-inject",
+      "lens": "AO4",
+      "title": "proof_url nl-inject",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_url_denied\"}"
+    },
+    {
+      "id": "AO4.chat-image-js",
+      "lens": "AO4",
+      "title": "chat_image url javascript:",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_url_denied\"}"
+    },
+    {
+      "id": "AO4.chat-image-path-traversal",
+      "lens": "AO4",
+      "title": "chat_image path traversal",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_path_denied\"}"
+    },
+    {
+      "id": "AO1.notes-benign",
+      "lens": "AO1",
+      "title": "notes benignas aceites",
+      "ev": "201 [{\"id\":1242,\"created_at\":\"2026-09-02T09:14:25.024018+00:00\",\"chat_id\":\"ac2902d3-a3ca-4f82-b7de-2532db9cafba\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"reservation_payment_submitted\\\",\\\"order_id\\\"…"
+    },
+    {
+      "id": "AO5.delete-json-card",
+      "lens": "AO5",
+      "title": "DELETE card FLEABER_JSON_V1",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_immutable\"}"
+    },
+    {
+      "id": "AO5.patch-json-card",
+      "lens": "AO5",
+      "title": "PATCH text de card FLEABER_JSON_V1",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_immutable\"}"
+    },
+    {
+      "id": "AO6.upload-own",
+      "lens": "AO6",
+      "title": "upload order_proofs próprio",
+      "ev": "200 {\"Key\":\"fleaber_private/order_proofs/bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96/2a975658-318c-4482-9ea5-25e37e37f42a/RTAO-20260902T1005-own.png\",\"Id\":\"aff765d0-8c25-4828-ae72-77c11d6e2ecd\"}"
+    },
+    {
+      "id": "AO6.sign-own",
+      "lens": "AO6",
+      "title": "sign próprio",
+      "ev": "200 {\"signedURL\":\"/object/sign/fleaber_private/order_proofs/bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96/2a975658-318c-4482-9ea5-25e37e37f42a/RTAO-20260902T1005-own.png?token=eyJraWQiOiI3YmY5ZTQ0Ni1mOTg4LTRlNWEtYjM0Mi0zYTQ1ZTE5NTgzYzkiLCJhbGciOiJIUzI1N…"
+    },
+    {
+      "id": "AO6.upsert-own",
+      "lens": "AO6",
+      "title": "upsert overwrite prova própria",
+      "ev": "400 {\"statusCode\":\"403\",\"error\":\"Unauthorized\",\"message\":\"new row violates row-level security policy\",\"code\":\"AccessDenied\"}"
+    },
+    {
+      "id": "AO6.upload-b2-path",
+      "lens": "AO6",
+      "title": "buyer1 faz upload em order_proofs/buyer2/order",
+      "ev": "400 {\"statusCode\":\"403\",\"error\":\"Unauthorized\",\"message\":\"new row violates row-level security policy\",\"code\":\"AccessDenied\"}"
+    },
+    {
+      "id": "AO6.sign-b2-path",
+      "lens": "AO6",
+      "title": "buyer1 pede signed URL de path buyer2",
+      "ev": "400 {\"statusCode\":\"404\",\"error\":\"not_found\",\"message\":\"Object not found\",\"code\":\"NoSuchKey\"}"
+    },
+    {
+      "id": "AO6.b2-sign-b1-proof",
+      "lens": "AO6",
+      "title": "buyer2 signed URL da prova do buyer1",
+      "ev": "400 {\"statusCode\":\"404\",\"error\":\"not_found\",\"message\":\"Object not found\",\"code\":\"NoSuchKey\"}"
+    },
+    {
+      "id": "AO7.b2-insert-thread",
+      "lens": "AO7",
+      "title": "B2 insere mensagem no chat B1-S1",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"new row violates row-level security policy for table \\\"chat_messages\\\"\"}"
+    },
+    {
+      "id": "AO7.b2-read-thread",
+      "lens": "AO7",
+      "title": "B2 GET vazio/403",
+      "ev": "200 []"
+    },
+    {
+      "id": "AO7.seller-buyer-only-kind",
+      "lens": "AO7",
+      "title": "seller injecta kind buyer-only seguro_fleaber_paid",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_buyer_only\"}"
+    },
+    {
+      "id": "AO7.buyer-seller-only-kind",
+      "lens": "AO7",
+      "title": "buyer injecta cancel_request_outcome (seller-only)",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_seller_only\"}"
+    },
+    {
+      "id": "AO7.notify-other",
+      "lens": "AO7",
+      "title": "buyer INSERT notificação no seller",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"new row violates row-level security policy for table \\\"user_notifications\\\"\"}"
+    },
+    {
+      "id": "AO8.books-held",
+      "lens": "AO8",
+      "title": "wallets/status/paid intactos",
+      "ev": {
+        "wallets": {
+          "buyer": "",
+          "seller": "",
+          "buyer2": ""
+        },
+        "status": "pago",
+        "paid": 590
+      }
+    }
+  ],
+  "skipped": [],
+  "notes": [
+    {
+      "id": "actors",
+      "title": "JWT B1/S1/B2",
+      "ev": {
+        "b1": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+        "s1": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+        "b2": "8280a8cd-7e71-48f6-9f3d-58946ffe917f"
+      }
+    },
+    {
+      "id": "fixture.paid",
+      "lens": "AO8",
+      "title": "setup_paid_order Stripe TEST",
+      "ev": "200 {\n  \"ok\": true,\n  \"order_id\": \"2a975658-318c-4482-9ea5-25e37e37f42a\",\n  \"product_id\": \"591ffd83-52e6-4488-8608-c6a3bd488c8a\",\n  \"payment_intent_id\": \"pi_3UBAFJH7FWYUN3jh0yafuU3k\",\n  \"pi_status\": \"succeeded\",\n  \"pi_amount_received\": 590,\n  \"…"
+    },
+    {
+      "id": "fixture.books",
+      "lens": "AO8",
+      "title": "pago Stripe TEST",
+      "ev": {
+        "order": {
+          "id": "2a975658-318c-4482-9ea5-25e37e37f42a",
+          "status": "pago",
+          "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+          "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+          "product_id": "591ffd83-52e6-4488-8608-c6a3bd488c8a",
+          "quantity": 1,
+          "price_total": 5.9,
+          "amount_paid_cents": 590,
+          "payment_method": "Pagamento na app",
+          "shipping_method": "",
+          "stripe_payment_intent_id": "pi_3UBAFJH7FWYUN3jh0yafuU3k",
+          "stripe_refund_id": "",
+          "reservation_expires_at": "",
+          "proof_url": "",
+          "is_reservation": false
+        },
+        "wallets": {
+          "buyer": "",
+          "seller": "",
+          "buyer2": ""
+        },
+        "totalEur": "5.90"
+      }
+    },
+    {
+      "id": "fixture.chat",
+      "lens": "AO1",
+      "title": "chat B1-S1",
+      "ev": "ac2902d3-a3ca-4f82-b7de-2532db9cafba"
+    },
+    {
+      "id": "AO4.signed-own",
+      "lens": "AO4",
+      "title": "signed próprio recusado?",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_url_denied\"}"
+    },
+    {
+      "id": "AO8.edge-chat-text",
+      "lens": "AO8",
+      "title": "body chat_text no checkout",
+      "ev": "400 {\"error\":\"Checkout blocked: order status 'pago' cannot start payment.\"}"
+    }
+  ],
+  "actors": {
+    "buyer": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+    "seller": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+    "buyer2": "8280a8cd-7e71-48f6-9f3d-58946ffe917f"
+  },
+  "created": {
+    "orders": [
+      "2a975658-318c-4482-9ea5-25e37e37f42a"
+    ],
+    "products": [
+      "591ffd83-52e6-4488-8608-c6a3bd488c8a"
+    ],
+    "chats": [
+      "ac2902d3-a3ca-4f82-b7de-2532db9cafba"
+    ],
+    "messages": [
+      "1200",
+      "1201",
+      "1202",
+      "1203",
+      "1204",
+      "1205",
+      "1206",
+      "1207",
+      "1209",
+      "1210",
+      "1211",
+      "1212",
+      "1213",
+      "1219",
+      "1220",
+      "1221",
+      "1222",
+      "1223",
+      "1224",
+      "1226",
+      "1227",
+      "1229",
+      "1238",
+      "1241",
+      "1242"
+    ]
+  }
+}

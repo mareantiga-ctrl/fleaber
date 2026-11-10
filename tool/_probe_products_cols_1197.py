@@ -1,0 +1,5 @@
+﻿import subprocess, psycopg2
+from pathlib import Path
+PS = Path(r"c:\Users\Casa\Desktop\Fleaber\fleaber\tool\apply_seller_professional_119_7_prod.py").read_text(encoding="utf-8")
+# reuse CredMan from that file by importing main's approach
+exec(compile(Path(r"c:\Users\Casa\Desktop\Fleaber\fleaber\tool\apply_seller_professional_119_7_prod.py").read_text(encoding="utf-8").split("def main")[0] + "\npw = subprocess.check_output(['powershell','-NoProfile','-Command', PS_GET_PW], text=True).strip()\nprint('pw_len', len(pw))\nconn=psycopg2.connect(host='aws-1-eu-west-1.pooler.supabase.com',port=5432,dbname='postgres',user='postgres.bpmpkzwnrbmuqnhgdscf',password=pw,sslmode='require')\ncur=conn.cursor()\ncur.execute(\"select column_name from information_schema.columns where table_name='products' and table_schema='public' and column_name ilike '%active%' or (table_name='products' and table_schema='public' and column_name in ('seller_id','status','marketplace','is_marketplace','published')) order by 1\")\nprint(cur.fetchall())\nconn.close()\n", "<probe>", "exec"))

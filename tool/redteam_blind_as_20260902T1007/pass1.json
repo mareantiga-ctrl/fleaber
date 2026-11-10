@@ -1,0 +1,826 @@
+{
+  "stamp": "20260902T1007",
+  "prefix": "RTAS-20260902T1007",
+  "lenses": [
+    "AS1",
+    "AS2",
+    "AS3",
+    "AS4",
+    "AS5",
+    "AS6",
+    "AS7",
+    "AS8"
+  ],
+  "findings": [
+    {
+      "id": "AS2.seller_pago_to_entregue",
+      "lens": "AS2",
+      "severity": "P1",
+      "title": "Seller marca entregue a partir de pago sem enviado",
+      "actor": "seller JWT",
+      "pre": "order.status=pago capturado",
+      "repro": "PATCH status=entregue",
+      "expected": "42501 (só enviado após pago; entregue é do comprador)",
+      "obtained": {
+        "hit": "200 [{\"id\":\"fa6f6531-7027-438a-b901-9a1e1c46065b\",\"created_at\":\"2026-09-02T09:14:38.299567+00:00\",\"product_id\":\"42f49857-ead3-426a-b4ef-0ca32e1c6365\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c…",
+        "status": "entregue",
+        "shipped_at": ""
+      },
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "AS1.buyer_self_recusada",
+      "lens": "AS1",
+      "severity": "P2",
+      "title": "Buyer PATCH disputa → recusada (fecha o slot sem admin)",
+      "actor": "buyer JWT",
+      "pre": "disputa aberta em entregue",
+      "repro": "PATCH order_disputes status=recusada",
+      "expected": "terminal só via decisão/admin; recusada não é self-serve",
+      "obtained": {
+        "hit": "200 [{\"id\":\"dfc6edc0-770a-461c-bdfe-feceb3ae6364\",\"order_id\":\"fa6f6531-7027-438a-b901-9a1e1c46065b\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"reason\":\"danificado\",\"description\":\"RTAS prova disputa artigo danificado no envio.\",\"proof_ph…",
+        "row": {
+          "id": "dfc6edc0-770a-461c-bdfe-feceb3ae6364",
+          "status": "recusada",
+          "current_turn": "administracao",
+          "buyer_decision": ""
+        }
+      },
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "AS5.seller_fake_return_delivered",
+      "lens": "AS5",
+      "severity": "P2",
+      "title": "Seller grava return_delivered_at sem prova de receção",
+      "actor": "seller JWT",
+      "pre": "disputa aberta, sem etiqueta/scan",
+      "repro": "PATCH return_delivered_at=now()",
+      "expected": "campo só via carrier/admin",
+      "obtained": {
+        "hit": "200 [{\"id\":\"dfc6edc0-770a-461c-bdfe-feceb3ae6364\",\"order_id\":\"fa6f6531-7027-438a-b901-9a1e1c46065b\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"reason\":\"danificado\",\"description\":\"RTAS prova disputa artigo danificado no envio.\",\"proof_ph…",
+        "row": {
+          "id": "dfc6edc0-770a-461c-bdfe-feceb3ae6364",
+          "return_delivered_at": "2026-09-02T09:14:47.253031+00:00"
+        }
+      },
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "AS7.proof_public_bucket",
+      "lens": "AS7",
+      "severity": "P2",
+      "title": "proof_photos aceita object/public/chat_media (não fleaber_private)",
+      "actor": "buyer JWT",
+      "pre": "disputa existente",
+      "repro": "PATCH proof_photos=[public chat_media URL]",
+      "expected": "só fleaber_private/order_disputes/{uid}/{order_id}",
+      "obtained": "200 [{\"id\":\"dfc6edc0-770a-461c-bdfe-feceb3ae6364\",\"order_id\":\"fa6f6531-7027-438a-b901-9a1e1c46065b\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"reason\":\"danificado\",\"description\":\"RTAS prova disputa artigo danificado no envio.\",\"proof_ph…",
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "AS7.s1_reads_shallow_order_proofs",
+      "lens": "AS7",
+      "severity": "P1",
+      "title": "S1 lê order_proofs/{B1}/ficheiro raso (policy sem order_id, 1 nível)",
+      "actor": "seller JWT S1",
+      "pre": "B1–S1 têm histórico; ficheiro order_proofs/{B1}/rtas-shallow.png",
+      "repro": "GET storage order_proofs/{B1}/rtas-shallow.png JWT=S1",
+      "expected": "403 — path raso não é da encomenda S1",
+      "obtained": "200 binary:70b",
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "AS3.skip_return_hops",
+      "lens": "AS3",
+      "severity": "P2",
+      "title": "Seller salto pedido_devolucao → disputa_devolucao_vendedor → devolvida (sem em_devolucao nem receção)",
+      "actor": "seller JWT",
+      "pre": "pedido_devolucao após disputa",
+      "repro": "PATCH disputa_devolucao_vendedor; PATCH devolvida",
+      "expected": "cadeia em_devolucao → devolucao_entregue obrigatória",
+      "obtained": {
+        "shortcut": "200 [{\"id\":\"e67739cc-71e2-4e03-a2b5-bc8677f3488a\",\"created_at\":\"2026-09-02T09:14:52.337553+00:00\",\"product_id\":\"f09e0ba2-5b8c-40cb-8ad0-c0e08d86a939\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c…",
+        "devolvida": "200 [{\"id\":\"e67739cc-71e2-4e03-a2b5-bc8677f3488a\",\"created_at\":\"2026-09-02T09:14:52.337553+00:00\",\"product_id\":\"f09e0ba2-5b8c-40cb-8ad0-c0e08d86a939\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c…",
+        "status": "devolvida"
+      },
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "AS4.finalize_devolvida_to_cancelado",
+      "lens": "AS4",
+      "severity": "P2",
+      "title": "refund-order em devolvida passa status para cancelado (apaga o terminal de devolução)",
+      "actor": "Edge refund-order / finalize",
+      "pre": "status=devolvida, refund Stripe TEST",
+      "repro": "POST refund-order",
+      "expected": "permanece devolvida (ou refunded) — não reescrever como cancelado",
+      "obtained": {
+        "hit": "200 {\"ok\":true,\"already_refunded\":true,\"idempotent\":true,\"refund_id\":\"re_3UBAFsH7FWYUN3jh1FYGz1x4\",\"status\":\"cancelado\",\"stock_units_applied\":null,\"amount_cents\":590,\"payment_intent\":\"pi_3UBAFsH7FWYUN3jh1dZwAeM9\",\"status_stripe\":\"succeeded\"}",
+        "status": "cancelado",
+        "stripe_refund_id": "re_3UBAFsH7FWYUN3jh1FYGz1x4"
+      },
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "AS5.seller_enviado_to_concluido",
+      "lens": "AS5",
+      "severity": "P1",
+      "title": "Seller marca concluido a partir de enviado (sem o comprador)",
+      "actor": "seller JWT",
+      "pre": "enviado capturado",
+      "repro": "PATCH status=concluido",
+      "expected": "só o comprador confirma receção",
+      "obtained": {
+        "hit": "200 [{\"id\":\"ae918e05-07f6-4fcc-9107-e94b6cf2ac2b\",\"created_at\":\"2026-09-02T09:15:12.365618+00:00\",\"product_id\":\"0882f10f-8330-4f8a-87df-ab1b7b29a796\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c…",
+        "status": "concluido"
+      },
+      "proven": true,
+      "evidence": {}
+    }
+  ],
+  "blocked": [
+    {
+      "id": "AS1.alien_insert",
+      "lens": "AS1",
+      "title": "B2 abre disputa em encomenda B1 (verify)",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"new row violates row-level security policy for table \\\"order_disputes\\\"\"}"
+    },
+    {
+      "id": "AS1.dispute_on_pago",
+      "lens": "AS1",
+      "title": "Buyer abre disputa em pago",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"new row violates row-level security policy for table \\\"order_disputes\\\"\"}"
+    },
+    {
+      "id": "AS1.seller_insert",
+      "lens": "AS1",
+      "title": "Seller insere disputa",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"new row violates row-level security policy for table \\\"order_disputes\\\"\"}"
+    },
+    {
+      "id": "AS1.insert_resolvida",
+      "lens": "AS1",
+      "title": "INSERT resolvida recusado (pago)",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"new row violates row-level security policy for table \\\"order_disputes\\\"\"}"
+    },
+    {
+      "id": "AS1.admin_rpc",
+      "lens": "AS1",
+      "title": "admin resolve recusado",
+      "ev": "400 {\"code\":\"P0001\",\"details\":null,\"hint\":null,\"message\":\"Apenas administradores podem resolver disputas.\"}"
+    },
+    {
+      "id": "AS1.dispute_on_enviado",
+      "lens": "AS1",
+      "title": "Buyer abre disputa em enviado (RLS só entregue/concluido)",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"new row violates row-level security policy for table \\\"order_disputes\\\"\"}"
+    },
+    {
+      "id": "AS1.second_dispute",
+      "lens": "AS1",
+      "title": "2.ª disputa bloqueada",
+      "ev": "409 {\"code\":\"23505\",\"details\":null,\"hint\":null,\"message\":\"dispute_already_exists_for_order\"}"
+    },
+    {
+      "id": "AS1.buyer_resolvida_fake_decision",
+      "lens": "AS1",
+      "title": "buyer resolvida+decision",
+      "ev": {
+        "hit": "200 [{\"id\":\"dfc6edc0-770a-461c-bdfe-feceb3ae6364\",\"order_id\":\"fa6f6531-7027-438a-b901-9a1e1c46065b\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"reason\":\"danificado\",\"description\":\"RTAS prova disputa artigo danificado no envio.\",\"proof_ph…",
+        "row": {
+          "id": "dfc6edc0-770a-461c-bdfe-feceb3ae6364",
+          "status": "recusada",
+          "buyer_decision": "",
+          "current_turn": "administracao"
+        }
+      }
+    },
+    {
+      "id": "AS1.seller_turn_admin",
+      "lens": "AS1",
+      "title": "seller turn admin",
+      "ev": {
+        "hit": "200 [{\"id\":\"dfc6edc0-770a-461c-bdfe-feceb3ae6364\",\"order_id\":\"fa6f6531-7027-438a-b901-9a1e1c46065b\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"reason\":\"danificado\",\"description\":\"RTAS prova disputa artigo danificado no envio.\",\"proof_ph…",
+        "row": {
+          "id": "dfc6edc0-770a-461c-bdfe-feceb3ae6364",
+          "current_turn": "administracao",
+          "status": "recusada"
+        }
+      }
+    },
+    {
+      "id": "AS4.refund_percent_over_100",
+      "lens": "AS4",
+      "title": "percent>100",
+      "ev": {
+        "hit": "200 [{\"id\":\"dfc6edc0-770a-461c-bdfe-feceb3ae6364\",\"order_id\":\"fa6f6531-7027-438a-b901-9a1e1c46065b\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"reason\":\"danificado\",\"description\":\"RTAS prova disputa artigo danificado no envio.\",\"proof_ph…",
+        "row": {
+          "id": "dfc6edc0-770a-461c-bdfe-feceb3ae6364",
+          "seller_refund_percent": "",
+          "seller_offer_type": ""
+        }
+      }
+    },
+    {
+      "id": "AS6.label_public_bucket",
+      "lens": "AS6",
+      "title": "label public bucket",
+      "ev": {
+        "hit": "200 [{\"id\":\"dfc6edc0-770a-461c-bdfe-feceb3ae6364\",\"order_id\":\"fa6f6531-7027-438a-b901-9a1e1c46065b\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"reason\":\"danificado\",\"description\":\"RTAS prova disputa artigo danificado no envio.\",\"proof_ph…",
+        "url": ""
+      }
+    },
+    {
+      "id": "AS7.proof_xss_prefix",
+      "lens": "AS7",
+      "title": "XSS prefix denied",
+      "ev": "409 {\"code\":\"23505\",\"details\":null,\"hint\":null,\"message\":\"dispute_already_exists_for_order\"}"
+    },
+    {
+      "id": "AS7.s1_reads_s2_order_proofs",
+      "lens": "AS7",
+      "title": "S1 não lê prova profunda S2",
+      "ev": "400 {\"statusCode\":\"404\",\"error\":\"not_found\",\"message\":\"Object not found\",\"code\":\"NoSuchKey\"}"
+    },
+    {
+      "id": "AS7.am7_verify_closed",
+      "lens": "AS7",
+      "title": "AHAM AM7 continua fechado",
+      "ev": {
+        "s1": "400 {\"statusCode\":\"404\",\"error\":\"not_found\",\"message\":\"Object not found\",\"code\":\"NoSuchKey\"}",
+        "s2": "200 binary:70b"
+      }
+    },
+    {
+      "id": "AS3.am3_verify_no_restore",
+      "lens": "AS3",
+      "title": "AHAM: stock NÃO restaura em devolvida sem refund",
+      "ev": {
+        "qty": 0,
+        "applied": 1,
+        "shortcut_ok": true
+      }
+    },
+    {
+      "id": "AS4.fake_stripe_refund_id",
+      "lens": "AS4",
+      "title": "fake refund id",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"order_money_fields_immutable\"}"
+    },
+    {
+      "id": "AS4.clear_capture_fields",
+      "lens": "AS4",
+      "title": "clear capture",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"order_money_fields_immutable\"}"
+    },
+    {
+      "id": "AS4.am4_verify_refund_allowed",
+      "lens": "AS4",
+      "title": "AHAM: refund-order em devolvida permitido",
+      "ev": "200 {\"ok\":true,\"already_refunded\":true,\"idempotent\":true,\"refund_id\":\"re_3UBAFsH7FWYUN3jh1FYGz1x4\",\"status\":\"cancelado\",\"stock_units_applied\":null,\"amount_cents\":590,\"payment_intent\":\"pi_3UBAFsH7FWYUN3jh1dZwAeM9\",\"status_stripe\":\"succeeded\"}"
+    },
+    {
+      "id": "AS4.buyer_refund_order",
+      "lens": "AS4",
+      "title": "buyer refund-order",
+      "ev": "403 {\"ok\":false,\"error\":\"Sem permissão.\"}"
+    },
+    {
+      "id": "AS4.partial_seller_rpc",
+      "lens": "AS4",
+      "title": "partial seller",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"not_allowed\"}"
+    },
+    {
+      "id": "AS5.release_with_open_dispute",
+      "lens": "AS5",
+      "title": "release recusado com disputa",
+      "ev": "200 false"
+    },
+    {
+      "id": "AS5.seller_marks_entregue",
+      "lens": "AS5",
+      "title": "seller entregue",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"order_concluido_immutable_for_seller\"}"
+    },
+    {
+      "id": "AS6.enviado_without_capture",
+      "lens": "AS6",
+      "title": "enviado sem captura",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"order_status_requires_capture\"}"
+    },
+    {
+      "id": "AS6.shipping_frozen",
+      "lens": "AS6",
+      "title": "shipping freeze",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"order_shipping_frozen_after_payment\"}"
+    },
+    {
+      "id": "AS3.cancel_post_pay",
+      "lens": "AS3",
+      "title": "cancel pós-pago",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"order_cancel_denied_post_pay\"}"
+    },
+    {
+      "id": "AS7.reply_javascript",
+      "lens": "AS7",
+      "title": "reply js denied",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"dispute_proof_url_denied\"}"
+    }
+  ],
+  "skipped": [],
+  "notes": [
+    {
+      "id": "actors",
+      "title": "JWT B1/S1/B2/S2",
+      "ev": {
+        "b1": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+        "s1": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+        "b2": "81c86431-a612-431d-bb68-63374d4dca75",
+        "s2": "04a56bbe-8222-44fd-93db-ff33b4937085"
+      }
+    },
+    {
+      "id": "fixture.paid",
+      "lens": "AS1",
+      "title": "setup_paid_order Stripe TEST",
+      "ev": "200 {\n  \"ok\": true,\n  \"order_id\": \"fa6f6531-7027-438a-b901-9a1e1c46065b\",\n  \"product_id\": \"42f49857-ead3-426a-b4ef-0ca32e1c6365\",\n  \"payment_intent_id\": \"pi_3UBAFeH7FWYUN3jh1QprBPns\",\n  \"pi_status\": \"succeeded\",\n  \"pi_amount_received\": 590,\n  \"…"
+    },
+    {
+      "id": "AS1.fixture",
+      "lens": "AS1",
+      "title": "pago Stripe TEST",
+      "ev": {
+        "oid": "fa6f6531-7027-438a-b901-9a1e1c46065b",
+        "pid": "42f49857-ead3-426a-b4ef-0ca32e1c6365",
+        "status": "pago",
+        "paid": 590,
+        "pi": "pi_3UBAFeH7FWYUN3jh1QprBPns"
+      }
+    },
+    {
+      "id": "AS2.enviado",
+      "lens": "AS2",
+      "title": "seller → enviado",
+      "ev": {
+        "hit": "200 [{\"id\":\"fa6f6531-7027-438a-b901-9a1e1c46065b\",\"created_at\":\"2026-09-02T09:14:38.299567+00:00\",\"product_id\":\"42f49857-ead3-426a-b4ef-0ca32e1c6365\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c…",
+        "status": "enviado",
+        "shipped_at": "2026-09-02T09:14:41.488105+00:00"
+      }
+    },
+    {
+      "id": "fixture.paid",
+      "lens": "AS2",
+      "title": "setup_paid_order Stripe TEST",
+      "ev": "200 {\n  \"ok\": true,\n  \"order_id\": \"3081e29a-3957-4759-823f-831bf4e51a8f\",\n  \"product_id\": \"2b7c1d2b-5e12-456e-819c-01459bd69fb8\",\n  \"payment_intent_id\": \"pi_3UBAFiH7FWYUN3jh1JoVTQSd\",\n  \"pi_status\": \"succeeded\",\n  \"pi_amount_received\": 590,\n  \"…"
+    },
+    {
+      "id": "AS2.race_entregue_dispute",
+      "lens": "AS2",
+      "title": "Future.wait entregue∥POST disputa",
+      "ev": {
+        "entregue": "200 [{\"id\":\"3081e29a-3957-4759-823f-831bf4e51a8f\",\"created_at\":\"2026-09-02T09:14:42.603208+00:00\",\"product_id\":\"2b7c1d2b-5e12-456e-819c-01459bd69fb8\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c…",
+        "dispute": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"new row violates row-level security policy for table \\\"order_disputes\\\"\"}",
+        "order": {
+          "id": "3081e29a-3957-4759-823f-831bf4e51a8f",
+          "status": "entregue",
+          "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+          "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+          "product_id": "2b7c1d2b-5e12-456e-819c-01459bd69fb8",
+          "quantity": 1,
+          "price_total": 5.9,
+          "amount_paid_cents": 590,
+          "payment_method": "Pagamento na app",
+          "shipping_method": "",
+          "stripe_payment_intent_id": "pi_3UBAFiH7FWYUN3jh1JoVTQSd",
+          "stripe_checkout_session_id": "",
+          "stripe_refund_id": "",
+          "live_item_id": "",
+          "live_id": "",
+          "stock_units_applied": 1,
+          "contract_unit_cents": 590,
+          "contract_qty": 1,
+          "bundle_id": "",
+          "product_offer_id": "",
+          "shipped_at": "2026-09-02T09:14:44.834555+00:00",
+          "wallet_release_processed_at": "",
+          "wallet_refund_processed_at": "",
+          "completed_at": "",
+          "returned_at": "",
+          "proof_url": ""
+        },
+        "disputes": "[]"
+      }
+    },
+    {
+      "id": "AS1.dispute_entregue",
+      "lens": "AS1",
+      "title": "disputa em entregue",
+      "ev": "201 [{\"id\":\"dfc6edc0-770a-461c-bdfe-feceb3ae6364\",\"order_id\":\"fa6f6531-7027-438a-b901-9a1e1c46065b\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"reason\":\"danificado\",\"description\":\"RTAS prova disputa artigo danificado no envio.\",\"proof_ph…"
+    },
+    {
+      "id": "AS7.upload_shallow",
+      "lens": "AS7",
+      "title": "upload order_proofs raso",
+      "ev": "200 {\"Key\":\"fleaber_private/order_proofs/bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96/rtas-shallow.png\",\"Id\":\"0117d3a4-80a5-425a-8527-8bb2b194eb59\"}"
+    },
+    {
+      "id": "AS7.s2_paid",
+      "lens": "AS7",
+      "title": "B1–S2 pago",
+      "ev": "200 {\n  \"ok\": true,\n  \"order_id\": \"e7a9af2e-e01d-4e54-94b7-2e43a8edcac5\",\n  \"product_id\": \"402f06b6-bdf2-4098-bbde-40402bc40a6d\",\n  \"payment_intent_id\": \"pi_3UBAFnH7FWYUN3jh0RYgWSdD\",\n  \"pi_status\": \"succeeded\",\n  \"pi_amount_received\": 590,\n  \"…"
+    },
+    {
+      "id": "AS7.upload_s2_proof",
+      "lens": "AS7",
+      "title": "B1 upload prova S2",
+      "ev": "200 {\"Key\":\"fleaber_private/order_proofs/bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96/e7a9af2e-e01d-4e54-94b7-2e43a8edcac5/rtas-s2-secret.png\",\"Id\":\"73b33958-cf79-4c0c-bcae-cad28c59a183\"}"
+    },
+    {
+      "id": "AS7.am7_verify",
+      "lens": "AS7",
+      "title": "S1 vs S2 lê disputa B1–S2 (AHAM path order_id)",
+      "ev": {
+        "upload": "200 {\"Key\":\"fleaber_private/order_disputes/bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96/e7a9af2e-e01d-4e54-94b7-2e43a8edcac5/rtas-disp.png\",\"Id\":\"dc7236ec-677d-41c2-8ac3-6f7baa31dc79\"}",
+        "s1": "400 {\"statusCode\":\"404\",\"error\":\"not_found\",\"message\":\"Object not found\",\"code\":\"NoSuchKey\"}",
+        "s2": "200 binary:70b",
+        "dispute": "201 [{\"id\":\"f0a1179f-dc26-45a8-a7e2-d5a683db5aa7\",\"order_id\":\"e7a9af2e-e01d-4e54-94b7-2e43a8edcac5\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"reason\":\"danificado\",\"description\":\"RTAS prova disputa artigo danificado no envio.\",\"proof_ph…"
+      }
+    },
+    {
+      "id": "fixture.paid",
+      "lens": "AS3",
+      "title": "setup_paid_order Stripe TEST",
+      "ev": "200 {\n  \"ok\": true,\n  \"order_id\": \"e67739cc-71e2-4e03-a2b5-bc8677f3488a\",\n  \"product_id\": \"f09e0ba2-5b8c-40cb-8ad0-c0e08d86a939\",\n  \"payment_intent_id\": \"pi_3UBAFsH7FWYUN3jh1dZwAeM9\",\n  \"pi_status\": \"succeeded\",\n  \"pi_amount_received\": 590,\n  \"…"
+    },
+    {
+      "id": "AS3.pedido",
+      "lens": "AS3",
+      "title": "após pedido_devolucao",
+      "ev": {
+        "hit": "200 [{\"id\":\"e67739cc-71e2-4e03-a2b5-bc8677f3488a\",\"created_at\":\"2026-09-02T09:14:52.337553+00:00\",\"product_id\":\"f09e0ba2-5b8c-40cb-8ad0-c0e08d86a939\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c…",
+        "books": {
+          "order": {
+            "id": "e67739cc-71e2-4e03-a2b5-bc8677f3488a",
+            "status": "pedido_devolucao",
+            "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+            "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+            "product_id": "f09e0ba2-5b8c-40cb-8ad0-c0e08d86a939",
+            "quantity": 1,
+            "price_total": 5.9,
+            "amount_paid_cents": 590,
+            "payment_method": "Pagamento na app",
+            "shipping_method": "",
+            "stripe_payment_intent_id": "pi_3UBAFsH7FWYUN3jh1dZwAeM9",
+            "stripe_checkout_session_id": "",
+            "stripe_refund_id": "",
+            "live_item_id": "",
+            "live_id": "",
+            "stock_units_applied": 1,
+            "contract_unit_cents": 590,
+            "contract_qty": 1,
+            "bundle_id": "",
+            "product_offer_id": "",
+            "shipped_at": "2026-09-02T09:14:55.251023+00:00",
+            "wallet_release_processed_at": "",
+            "wallet_refund_processed_at": "",
+            "completed_at": "",
+            "returned_at": "",
+            "proof_url": ""
+          },
+          "product": {
+            "id": "f09e0ba2-5b8c-40cb-8ad0-c0e08d86a939",
+            "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+            "title": "Refund crash E2E 1788340492083",
+            "price": 5.9,
+            "quantity": 0,
+            "is_sold": true,
+            "list_on_marketplace": false
+          },
+          "wallets": {
+            "buyer": 61.1,
+            "seller": 26.97,
+            "buyer2": 0,
+            "seller2": 0
+          },
+          "stock": {
+            "code": "PGRST202",
+            "details": "Searched for the function public.batata_product_checkout_available with parameters p_need_qty, p_product_id or with a single unnamed json/jsonb parameter, but no matches were found in the schema cache.",
+            "hint": "Perhaps you meant to call the function public.batata_product_checkout_available(p_exclude_order_id, p_exclude_order_ids, p_need_qty, p_product_id)",
+            "message": "Could not find the function public.batata_product_checkout_available(p_need_qty, p_product_id) in the schema cache"
+          }
+        }
+      }
+    },
+    {
+      "id": "AS3.second_hold_pedido",
+      "lens": "AS3",
+      "title": "B2 hold no mesmo SKU em pedido_devolucao",
+      "ev": {
+        "avail": "404 {\"code\":\"PGRST202\",\"details\":\"Searched for the function public.batata_product_checkout_available with parameters p_need_qty, p_product_id or with a single unnamed json/jsonb parameter, but no matches were found in the schema cache.\",\"hint\":…",
+        "order": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"order_hold_exceeds_stock\"}",
+        "qty": 0
+      }
+    },
+    {
+      "id": "AS3.shortcut",
+      "lens": "AS3",
+      "title": "salta em_devolucao/devolucao_entregue",
+      "ev": {
+        "to_disputa_dev": "200 [{\"id\":\"e67739cc-71e2-4e03-a2b5-bc8677f3488a\",\"created_at\":\"2026-09-02T09:14:52.337553+00:00\",\"product_id\":\"f09e0ba2-5b8c-40cb-8ad0-c0e08d86a939\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c…",
+        "to_devolvida": "200 [{\"id\":\"e67739cc-71e2-4e03-a2b5-bc8677f3488a\",\"created_at\":\"2026-09-02T09:14:52.337553+00:00\",\"product_id\":\"f09e0ba2-5b8c-40cb-8ad0-c0e08d86a939\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c…",
+        "books": {
+          "order": {
+            "id": "e67739cc-71e2-4e03-a2b5-bc8677f3488a",
+            "status": "devolvida",
+            "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+            "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+            "product_id": "f09e0ba2-5b8c-40cb-8ad0-c0e08d86a939",
+            "quantity": 1,
+            "price_total": 5.9,
+            "amount_paid_cents": 590,
+            "payment_method": "Pagamento na app",
+            "shipping_method": "",
+            "stripe_payment_intent_id": "pi_3UBAFsH7FWYUN3jh1dZwAeM9",
+            "stripe_checkout_session_id": "",
+            "stripe_refund_id": "",
+            "live_item_id": "",
+            "live_id": "",
+            "stock_units_applied": 1,
+            "contract_unit_cents": 590,
+            "contract_qty": 1,
+            "bundle_id": "",
+            "product_offer_id": "",
+            "shipped_at": "2026-09-02T09:14:55.251023+00:00",
+            "wallet_release_processed_at": "2026-09-02T09:14:56.529475+00:00",
+            "wallet_refund_processed_at": "2026-09-02T09:14:56.529475+00:00",
+            "completed_at": "",
+            "returned_at": "",
+            "proof_url": ""
+          },
+          "product": {
+            "id": "f09e0ba2-5b8c-40cb-8ad0-c0e08d86a939",
+            "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+            "title": "Refund crash E2E 1788340492083",
+            "price": 5.9,
+            "quantity": 0,
+            "is_sold": true,
+            "list_on_marketplace": false
+          },
+          "wallets": {
+            "buyer": 61.1,
+            "seller": 26.97,
+            "buyer2": 0,
+            "seller2": 0
+          },
+          "stock": {
+            "code": "PGRST202",
+            "details": "Searched for the function public.batata_product_checkout_available with parameters p_need_qty, p_product_id or with a single unnamed json/jsonb parameter, but no matches were found in the schema cache.",
+            "hint": "Perhaps you meant to call the function public.batata_product_checkout_available(p_exclude_order_id, p_exclude_order_ids, p_need_qty, p_product_id)",
+            "message": "Could not find the function public.batata_product_checkout_available(p_need_qty, p_product_id) in the schema cache"
+          }
+        }
+      }
+    },
+    {
+      "id": "AS4.refund_devolvida",
+      "lens": "AS4",
+      "title": "refund-order pós-devolvida (AHAM gate)",
+      "ev": {
+        "hit": "200 {\"ok\":true,\"already_refunded\":true,\"idempotent\":true,\"refund_id\":\"re_3UBAFsH7FWYUN3jh1FYGz1x4\",\"status\":\"cancelado\",\"stock_units_applied\":null,\"amount_cents\":590,\"payment_intent\":\"pi_3UBAFsH7FWYUN3jh1dZwAeM9\",\"status_stripe\":\"succeeded\"}",
+        "before": {
+          "order": {
+            "id": "e67739cc-71e2-4e03-a2b5-bc8677f3488a",
+            "status": "devolvida",
+            "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+            "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+            "product_id": "f09e0ba2-5b8c-40cb-8ad0-c0e08d86a939",
+            "quantity": 1,
+            "price_total": 5.9,
+            "amount_paid_cents": 590,
+            "payment_method": "Pagamento na app",
+            "shipping_method": "",
+            "stripe_payment_intent_id": "pi_3UBAFsH7FWYUN3jh1dZwAeM9",
+            "stripe_checkout_session_id": "",
+            "stripe_refund_id": "",
+            "live_item_id": "",
+            "live_id": "",
+            "stock_units_applied": 1,
+            "contract_unit_cents": 590,
+            "contract_qty": 1,
+            "bundle_id": "",
+            "product_offer_id": "",
+            "shipped_at": "2026-09-02T09:14:55.251023+00:00",
+            "wallet_release_processed_at": "2026-09-02T09:14:56.529475+00:00",
+            "wallet_refund_processed_at": "2026-09-02T09:14:56.529475+00:00",
+            "completed_at": "",
+            "returned_at": "",
+            "proof_url": ""
+          },
+          "product": {
+            "id": "f09e0ba2-5b8c-40cb-8ad0-c0e08d86a939",
+            "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+            "title": "Refund crash E2E 1788340492083",
+            "price": 5.9,
+            "quantity": 0,
+            "is_sold": true,
+            "list_on_marketplace": false
+          },
+          "wallets": {
+            "buyer": 61.1,
+            "seller": 26.97,
+            "buyer2": 0,
+            "seller2": 0
+          },
+          "stock": {
+            "code": "PGRST202",
+            "details": "Searched for the function public.batata_product_checkout_available with parameters p_need_qty, p_product_id or with a single unnamed json/jsonb parameter, but no matches were found in the schema cache.",
+            "hint": "Perhaps you meant to call the function public.batata_product_checkout_available(p_exclude_order_id, p_exclude_order_ids, p_need_qty, p_product_id)",
+            "message": "Could not find the function public.batata_product_checkout_available(p_need_qty, p_product_id) in the schema cache"
+          }
+        },
+        "after": {
+          "order": {
+            "id": "e67739cc-71e2-4e03-a2b5-bc8677f3488a",
+            "status": "cancelado",
+            "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+            "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+            "product_id": "f09e0ba2-5b8c-40cb-8ad0-c0e08d86a939",
+            "quantity": 1,
+            "price_total": 5.9,
+            "amount_paid_cents": 590,
+            "payment_method": "Pagamento na app",
+            "shipping_method": "",
+            "stripe_payment_intent_id": "pi_3UBAFsH7FWYUN3jh1dZwAeM9",
+            "stripe_checkout_session_id": "",
+            "stripe_refund_id": "re_3UBAFsH7FWYUN3jh1FYGz1x4",
+            "live_item_id": "",
+            "live_id": "",
+            "stock_units_applied": "",
+            "contract_unit_cents": 590,
+            "contract_qty": 1,
+            "bundle_id": "",
+            "product_offer_id": "",
+            "shipped_at": "2026-09-02T09:14:55.251023+00:00",
+            "wallet_release_processed_at": "2026-09-02T09:14:56.529475+00:00",
+            "wallet_refund_processed_at": "2026-09-02T09:14:56.529475+00:00",
+            "completed_at": "",
+            "returned_at": "",
+            "proof_url": ""
+          },
+          "product": {
+            "id": "f09e0ba2-5b8c-40cb-8ad0-c0e08d86a939",
+            "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+            "title": "Refund crash E2E 1788340492083",
+            "price": 5.9,
+            "quantity": 1,
+            "is_sold": false,
+            "list_on_marketplace": true
+          },
+          "wallets": {
+            "buyer": 61.1,
+            "seller": 26.97,
+            "buyer2": 0,
+            "seller2": 0
+          },
+          "stock": {
+            "code": "PGRST202",
+            "details": "Searched for the function public.batata_product_checkout_available with parameters p_need_qty, p_product_id or with a single unnamed json/jsonb parameter, but no matches were found in the schema cache.",
+            "hint": "Perhaps you meant to call the function public.batata_product_checkout_available(p_exclude_order_id, p_exclude_order_ids, p_need_qty, p_product_id)",
+            "message": "Could not find the function public.batata_product_checkout_available(p_need_qty, p_product_id) in the schema cache"
+          }
+        }
+      }
+    },
+    {
+      "id": "AS8.second_checkout",
+      "lens": "AS8",
+      "title": "B2 create-payment-intent no SKU",
+      "ev": {
+        "avail": "404 {\"code\":\"PGRST202\",\"details\":\"Searched for the function public.batata_product_checkout_available with parameters p_need_qty, p_product_id or with a single unnamed json/jsonb parameter, but no matches were found in the schema cache.\",\"hint\":…",
+        "checkout": "400 {\"error\":\"Checkout blocked: order does not belong to buyer.\"}",
+        "qty": 1,
+        "applied": "",
+        "refund_id": "re_3UBAFsH7FWYUN3jh1FYGz1x4"
+      }
+    },
+    {
+      "id": "fixture.paid",
+      "lens": "AS4",
+      "title": "setup_paid_order Stripe TEST",
+      "ev": "200 {\n  \"ok\": true,\n  \"order_id\": \"f3139720-45b9-4c7b-8d68-f1d45f3b11a1\",\n  \"product_id\": \"dd9db595-72b1-4521-92d3-5a7c2c2b6c94\",\n  \"payment_intent_id\": \"pi_3UBAG4H7FWYUN3jh1E8SZTkS\",\n  \"pi_status\": \"succeeded\",\n  \"pi_amount_received\": 590,\n  \"…"
+    },
+    {
+      "id": "fixture.paid",
+      "lens": "AS5",
+      "title": "setup_paid_order Stripe TEST",
+      "ev": "200 {\n  \"ok\": true,\n  \"order_id\": \"48ddb732-17c3-4632-9197-fedc4efb509b\",\n  \"product_id\": \"663a44ae-4d74-4cb0-87d1-d35bf36d1dea\",\n  \"payment_intent_id\": \"pi_3UBAG8H7FWYUN3jh18yxhHjf\",\n  \"pi_status\": \"succeeded\",\n  \"pi_amount_received\": 590,\n  \"…"
+    },
+    {
+      "id": "AS5.pedido_to_concluido",
+      "lens": "AS5",
+      "title": "buyer aborta devolução → concluido",
+      "ev": {
+        "hit": "200 [{\"id\":\"48ddb732-17c3-4632-9197-fedc4efb509b\",\"created_at\":\"2026-09-02T09:15:08.050106+00:00\",\"product_id\":\"663a44ae-4d74-4cb0-87d1-d35bf36d1dea\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c…",
+        "order": {
+          "id": "48ddb732-17c3-4632-9197-fedc4efb509b",
+          "status": "concluido",
+          "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+          "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+          "product_id": "663a44ae-4d74-4cb0-87d1-d35bf36d1dea",
+          "quantity": 1,
+          "price_total": 5.9,
+          "amount_paid_cents": 590,
+          "payment_method": "Pagamento na app",
+          "shipping_method": "",
+          "stripe_payment_intent_id": "pi_3UBAG8H7FWYUN3jh18yxhHjf",
+          "stripe_checkout_session_id": "",
+          "stripe_refund_id": "",
+          "live_item_id": "",
+          "live_id": "",
+          "stock_units_applied": 1,
+          "contract_unit_cents": 590,
+          "contract_qty": 1,
+          "bundle_id": "",
+          "product_offer_id": "",
+          "shipped_at": "2026-09-02T09:15:10.666115+00:00",
+          "wallet_release_processed_at": "",
+          "wallet_refund_processed_at": "",
+          "completed_at": "2026-09-02T09:15:11.048439+00:00",
+          "returned_at": "",
+          "proof_url": ""
+        },
+        "dispute": "201 [{\"id\":\"88b852c1-9e20-4ded-afea-850f975b07f6\",\"order_id\":\"48ddb732-17c3-4632-9197-fedc4efb509b\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"reason\":\"danificado\",\"description\":\"RTAS prova disputa artigo danificado no envio.\",\"proof_ph…"
+      }
+    },
+    {
+      "id": "AS5.release_after_abort",
+      "lens": "AS5",
+      "title": "release wallet com disputa?",
+      "ev": {
+        "rpc": "200 false",
+        "wallets": {
+          "buyer": 61.1,
+          "seller": 26.97,
+          "buyer2": 0,
+          "seller2": 0
+        },
+        "w0_seller_delta_hint": {
+          "buyer": 61.1,
+          "seller": 26.97,
+          "buyer2": 0,
+          "seller2": 0
+        },
+        "dispute": {
+          "id": "88b852c1-9e20-4ded-afea-850f975b07f6",
+          "status": "aberta"
+        }
+      }
+    },
+    {
+      "id": "fixture.paid",
+      "lens": "AS5",
+      "title": "setup_paid_order Stripe TEST",
+      "ev": "200 {\n  \"ok\": true,\n  \"order_id\": \"ae918e05-07f6-4fcc-9107-e94b6cf2ac2b\",\n  \"product_id\": \"0882f10f-8330-4f8a-87df-ab1b7b29a796\",\n  \"payment_intent_id\": \"pi_3UBAGCH7FWYUN3jh06tGWLdK\",\n  \"pi_status\": \"succeeded\",\n  \"pi_amount_received\": 590,\n  \"…"
+    }
+  ],
+  "actors": {
+    "buyer": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+    "seller": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+    "buyer2": "81c86431-a612-431d-bb68-63374d4dca75",
+    "seller2": "04a56bbe-8222-44fd-93db-ff33b4937085"
+  },
+  "created": {
+    "lives": [],
+    "items": [],
+    "orders": [
+      "fa6f6531-7027-438a-b901-9a1e1c46065b",
+      "3081e29a-3957-4759-823f-831bf4e51a8f",
+      "e7a9af2e-e01d-4e54-94b7-2e43a8edcac5",
+      "e67739cc-71e2-4e03-a2b5-bc8677f3488a",
+      "f3139720-45b9-4c7b-8d68-f1d45f3b11a1",
+      "48ddb732-17c3-4632-9197-fedc4efb509b",
+      "ae918e05-07f6-4fcc-9107-e94b6cf2ac2b",
+      "a6ff9a51-7133-4641-a796-99b52a8de38d"
+    ],
+    "products": [
+      "42f49857-ead3-426a-b4ef-0ca32e1c6365",
+      "2b7c1d2b-5e12-456e-819c-01459bd69fb8",
+      "402f06b6-bdf2-4098-bbde-40402bc40a6d",
+      "f09e0ba2-5b8c-40cb-8ad0-c0e08d86a939",
+      "dd9db595-72b1-4521-92d3-5a7c2c2b6c94",
+      "663a44ae-4d74-4cb0-87d1-d35bf36d1dea",
+      "0882f10f-8330-4f8a-87df-ab1b7b29a796",
+      "da076a12-ba56-4e8c-b2bd-14d71d0135d6"
+    ],
+    "bundles": []
+  }
+}

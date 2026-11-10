@@ -1,0 +1,465 @@
+{
+  "auditor": "REDTEAM_BLIND_DM_CROSS_SURFACE_POS_DBDG_v1",
+  "prefix": "RTDM-20260906T1610",
+  "staging": "fxdknzrqjenzqcvnwqqq",
+  "probes": [
+    {
+      "probe_id": "A1",
+      "surfaces": "Hub + checkout CPI + tip + follows",
+      "action": "unpublish mid-CPI + mid-tip + follow",
+      "http": "{\"cpiBefore\":\"200 {\\\"checkoutUrl\\\":\\\"https://checkout.stripe.com/c/pay/cs_test_a1sRwl7EfFq83Jr9errmT8XklTwclHAm5g2vweVbAJkJw2EERjJrxkv2n2#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDR…\",\"unpub\":\"200 {\\\"ok\\\": true, \\\"handle\\\": \\\"fleahub-demo-ux\\\", \\\"profile_id\\\":…",
+      "oracles": "{\"hub_mid\":false,\"hubAnon_n\":0,\"hubJwt_n\":0,\"tipStatus\":\"pending\",\"tipCredited\":false,\"hub_after\":true,\"cpi_cs_after_unpub\":true}",
+      "result": "FAIL",
+      "lens": "DM6",
+      "residual": false,
+      "count_finding": false
+    },
+    {
+      "probe_id": "A2",
+      "surfaces": "Hub vitrine + follows + favorites + profiles",
+      "action": "follow+favorite published vs hub_products_public após unpublish",
+      "http": "{\"hubBefore\":\"200 [{\\\"id\\\":\\\"4f4a037c-2c9f-420c-ad88-82e6d3b0ab1a\\\",\\\"title\\\":\\\"RTDM-20260906T1610 A2 vitrine\\\",\\\"seller_id\\\":\\\"980f4fa1-0004-42f9-abca-69f1a9c29588\\\",\\\"is_sold\\\":false,\\\"price\\\":12.0}]\",\"favPub\":\"201 [{\\\"id\\\":\\\"a8056fba-8956-4f86-a9a1-35c6333e6239\\\",\\\"user_id\\\":\\\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\\\",…",
+      "oracles": "{\"vitrinePub\":true,\"vitrineGone\":true,\"favHappy\":true,\"favDeniedUnpub\":true}",
+      "result": "FAIL",
+      "lens": "DM1",
+      "residual": true,
+      "count_finding": false
+    },
+    {
+      "probe_id": "A3",
+      "surfaces": "Hub + products + CPI",
+      "action": "is_sold=true → vitrine vs checkout",
+      "http": "{\"hubJwt\":\"200 []\",\"hubAnon\":\"200 []\",\"cpi\":null,\"order\":null}",
+      "oracles": "{\"prod\":{\"id\":\"beffc1a2-f5c4-4520-92ed-3435bae6e2d2\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"title\":\"RTDM-20260906T1610 A3 sold\",\"price\":12.0,\"quantity\":1,\"is_sold\":true,\"list_on_marketplace\":true,\"available_for_live\":true},\"hubHidesSold\":true,\"cpiBlocked\":true,\"cs_\":false}",
+      "result": "FAIL",
+      "lens": "DM1",
+      "residual": false,
+      "count_finding": false
+    },
+    {
+      "probe_id": "B1",
+      "surfaces": "live hitch + bag marketplace + products",
+      "action": "Future.wait bag CPI ∥ live accept mesmo SKU qty=1",
+      "http": "{\"bag\":\"400 {\\\"error\\\":\\\"Checkout blocked: quantity 1 exceeds available stock 0.\\\"}\",\"accept\":\"200 [{\\\"id\\\":\\\"48230d14-b663-400f-86c6-2074cb70035e\\\",\\\"live_id\\\":\\\"7ed37fa8-142f-48c0-ad98-43e38109ae01\\\",\\\"live_item_id\\\":\\\"31a1a5d4-19d5-4e19-a7b3-52539fa67238\\\",\\\"seller_id\\\":\\\"980f4fa1-0004-42f9-abca-69f1a9c29588\\\",\\\"buy…",
+      "oracles": "{\"bagCs\":false,\"liveAcc\":true,\"prod\":{\"id\":\"a89de08c-05d8-483d-a6e5-638e0c915c0b\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"title\":\"RTDM-20260906T1610 B1 hitch-bag\",\"price\":12.0,\"quantity\":1,\"is_sold\":false,\"list_on_marketplace\":true,\"available_for_live\":true},\"res\":{\"id\":\"48230d14-b663-400f-86c6-2074cb70035e\",\"status\":\"accepted\",\"requested_qty\":1,…",
+      "result": "FAIL",
+      "lens": "DM2",
+      "residual": false,
+      "count_finding": false
+    },
+    {
+      "probe_id": "B2",
+      "surfaces": "live_item + products + Hub + CPI",
+      "action": "qty=0 live sold vs list_on_marketplace",
+      "http": "{\"hubJwt\":\"200 []\",\"hubAnon\":\"200 []\",\"cpi\":null}",
+      "oracles": "{\"prod\":{\"id\":\"1d97f585-8a18-4c17-be7b-10a22abb434e\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"title\":\"RTDM-20260906T1610 B2 qty0\",\"price\":12.0,\"quantity\":0,\"is_sold\":false,\"list_on_marketplace\":true,\"available_for_live\":true},\"live_item\":null,\"hubShowsQty0\":false,\"cpiQty0Cs\":false,\"liveZero\":true}",
+      "result": "FAIL",
+      "lens": "DM2",
+      "residual": false,
+      "count_finding": false
+    },
+    {
+      "probe_id": "B3",
+      "surfaces": "order + product + live_item hitch",
+      "action": "refund-order após pago Stripe + hitch",
+      "http": "200 {\"ok\":true,\"already_refunded\":true,\"idempotent\":true,\"refund_id\":\"re_3UChpRH7FWYUN3jh1c4wOCPG\",\"status\":\"cancelado\",\"stock_units_applied\":null,\"amount_cents\":590,\"payment_intent\":\"pi_3UChpRH7FWYUN3jh1tMJTzbb\",\"status_str…",
+      "oracles": "{\"qty\":\"1→2\",\"order_status\":\"cancelado\",\"pi\":\"pi_3UChpRH7FWYUN3jh1tMJTzbb\",\"li_before\":{\"id\":\"c5a75b01-7f4c-4c87-857e-8b5c589da628\",\"live_id\":\"a0a83d33-cb9a-415a-b98c-83e897e66c2c\",\"product_id\":\"c3e4b167-bbe4-4cd5-b4e8-23ad0272f04d\",\"checkout_product_id\":\"c3e4b167-bbe4-4cd5-b4e8-23ad0272f04d\",\"quantity\":null,\"status\":\"available\",\"is_active\":true,\"item_kind\":…",
+      "result": "FAIL",
+      "lens": "DM7",
+      "residual": false,
+      "count_finding": false
+    },
+    {
+      "probe_id": "C1",
+      "surfaces": "orders + chat + wallets + Hub + products",
+      "action": "setup_paid_order Stripe TEST 4242 → oráculos multi-sítio",
+      "http": "200 {\n  \"ok\": true,\n  \"order_id\": \"8b711264-24bb-4231-acb1-0f6a1ad70f1f\",\n  \"product_id\": \"e8f0b8f8-b50e-4d38-bdba-528c8a293a7d\",\n  \"payment_intent_id\": \"pi_3UChpZH7FWYUN3jh0ctfBDVw\",\n  \"pi_status\": \"succeeded\",\n  \"pi_amount…",
+      "oracles": "{\"status\":\"pago\",\"qty\":1,\"is_sold\":false,\"amount_paid_cents\":590,\"pi\":\"pi_3UChpZH7FWYUN3jh0ctfBDVw\",\"dSeller\":0.0,\"dBuyer\":0.0,\"chatHasOrder\":false,\"chats_n\":0,\"msgs_n\":0,\"hub_n\":0,\"wallet_release_note\":\"Δwallet pode ser 0 até release — não é P0 se status=pago\"}",
+      "result": "FAIL",
+      "lens": "DM5",
+      "residual": false,
+      "count_finding": false
+    },
+    {
+      "probe_id": "C2",
+      "surfaces": "orders + CPI + RPC seller confirm",
+      "action": "MB WAY exact → sem Session; seller tenta confirmar",
+      "http": "{\"cpi\":\"400 {\\\"error\\\":\\\"Checkout blocked: order is off-platform payment (no Stripe Session).\\\"}\",\"rpc\":\"404 {\\\"code\\\":\\\"PGRST202\\\",\\\"details\\\":\\\"Searched for the function public.batata_seller_confirm_direct_payment with parameters order_id, p_order_id or with a single unnamed json/jsonb parameter, but no matches were …",
+      "oracles": "{\"status\":\"reserva_pendente\",\"cs\":null,\"amount_paid\":null,\"stillUnpaid\":true}",
+      "result": "FAIL",
+      "lens": "DM3",
+      "residual": true,
+      "count_finding": false
+    },
+    {
+      "probe_id": "C3",
+      "surfaces": "order_disputes + refund-order + products + Stripe",
+      "action": "disputa aberta + refund sem double stock",
+      "http": "{\"disp\":\"403 {\\\"code\\\":\\\"42501\\\",\\\"details\\\":null,\\\"hint\\\":null,\\\"message\\\":\\\"new row violates row-level security policy for table \\\\\\\"order_disputes\\\\\\\"\\\"}\",\"rf\":\"200 {\\\"ok\\\":true,\\\"already_refunded\\\":true,\\\"idempotent\\\":true,\\\"refund_id\\\":\\\"re_3UChpgH7FWYUN3jh1iKt2Vbt\\\",\\\"status\\\":\\\"cancelado\\\",\\\"stock_units_applied\\…",
+      "oracles": "{\"qty\":\"1→2\",\"status\":\"cancelado\",\"stripeN\":null,\"stripeSum\":null,\"paidCents\":590}",
+      "result": "FAIL",
+      "lens": "DM7",
+      "residual": false,
+      "count_finding": false
+    },
+    {
+      "probe_id": "D1",
+      "surfaces": "CPI bag + live_reservation + products",
+      "action": "Future.wait CPI ∥ live accept qty=1",
+      "http": "{\"cpi\":\"400 {\\\"error\\\":\\\"Checkout blocked: quantity 1 exceeds available stock 0.\\\"}\",\"accept\":\"200 [{\\\"id\\\":\\\"d13b965b-3ec0-4007-a861-5d94e39dc764\\\",\\\"live_id\\\":\\\"e5db4cd9-0089-4d3a-a9d7-cdea440c3ac8\\\",\\\"live_item_id\\\":\\\"81e5caf5-8439-4451-88d7-fbb043d52b49\\\",\\\"seller_id\\\":\\\"980f4fa1-0004-42f9-abca-69f1a9c29588\\\",\\\"buy…",
+      "oracles": "{\"cs\":false,\"accepted\":true,\"prod\":{\"id\":\"34399a66-568c-46e5-97df-6a165bfaeef0\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"title\":\"RTDM-20260906T1610 D1 race\",\"price\":12.0,\"quantity\":1,\"is_sold\":false,\"list_on_marketplace\":true,\"available_for_live\":true},\"res\":{\"id\":\"d13b965b-3ec0-4007-a861-5d94e39dc764\",\"status\":\"accepted\",\"requested_qty\":1,\"live_i…",
+      "result": "FAIL",
+      "lens": "DM4",
+      "residual": false,
+      "count_finding": false
+    },
+    {
+      "probe_id": "D2",
+      "surfaces": "lives + Hub lives + CPI + orders",
+      "action": "Future.wait end_live ∥ CPI mesmo SKU hitch",
+      "http": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1mrYcw5pnM3S2WLi9oRT4M3bkRzdIXy1MO77akgSOpsxovHtP4m02uYlY#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDR…",
+      "oracles": "{\"liveAfter\":{\"id\":\"604fd231-b297-4a39-b63d-0cc513cf4db9\",\"status\":\"ended\",\"is_active\":false},\"cpiOk\":true,\"liveEnded\":true,\"order\":\"reserva_pendente\"}",
+      "result": "FAIL",
+      "lens": "DM4",
+      "residual": false,
+      "count_finding": false
+    },
+    {
+      "probe_id": "D3",
+      "surfaces": "refund-order + CPI + products + orders",
+      "action": "Future.wait refund ∥ CPI nova compra mesma unidade",
+      "http": "{\"rf\":null,\"cpi\":null}",
+      "oracles": "{\"qtyMid\":0,\"qtyEnd\":-1,\"old_status\":null,\"new_status\":null,\"newCs\":false,\"refunded\":false}",
+      "result": "HOLD",
+      "lens": "DM4",
+      "residual": false,
+      "count_finding": true
+    }
+  ],
+  "findings": [
+    {
+      "id": "P1-D3-REFUND-RACE",
+      "lens": "DM4",
+      "severity": "P1",
+      "title": "Refund ∥ nova CPI deixou stock incoerente",
+      "actor": "S1 refund ∥ B2 CPI",
+      "pre": "pago qty inicial 1 (após pay ~0)",
+      "repro": "Future.wait refund-order ∥ CPI",
+      "expected": "qty 0 ou 1 coerente com claims",
+      "obtained": {
+        "qtyMid": 0,
+        "qtyEnd": -1,
+        "rf": null,
+        "cpi": null,
+        "old": null,
+        "new": null
+      },
+      "proven": true,
+      "count_exact_closed": false,
+      "evidence": {}
+    }
+  ],
+  "blocked": [
+    {
+      "id": "A1",
+      "lens": "DM6",
+      "title": "unpublish: Hub vazio + follow deny + tip unpaid",
+      "ev": {
+        "hubGone": true,
+        "followDenied": true,
+        "cpiStill": true,
+        "unpaidTip": true
+      }
+    },
+    {
+      "id": "A2",
+      "lens": "DM1",
+      "title": "vitrine+fav published OK; unpublished Hub+fav deny",
+      "ev": {
+        "hubBefore_n": 1,
+        "favPub": 201,
+        "hubAfter_n": 0,
+        "favUnpub": 403
+      }
+    },
+    {
+      "id": "A3",
+      "lens": "DM1",
+      "title": "Hub esconde sold + CPI recusa Session",
+      "ev": {
+        "hub_n": 0,
+        "cpi": null
+      }
+    },
+    {
+      "id": "B1",
+      "lens": "DM2",
+      "title": "hitch+bag: um só claim ou ambos recusados",
+      "ev": {
+        "bagCs": false,
+        "liveAcc": true,
+        "bag": "400 {\"error\":\"Checkout blocked: quantity 1 exceeds available stock 0.\"}",
+        "acc": "200 [{\"id\":\"48230d14-b663-400f-86c6-2074cb70035e\",\"live_id\":\"7ed37fa8-142f-48c0-ad98-43e38109ae01\",\"live_item_id\":\"31a1a5d4-19d5-4e19-a7b3-52539fa67238\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"buyer_id\":\"3c85bc07…",
+        "res": {
+          "id": "48230d14-b663-400f-86c6-2074cb70035e",
+          "status": "accepted",
+          "requested_qty": 1,
+          "live_item_id": "31a1a5d4-19d5-4e19-a7b3-52539fa67238",
+          "buyer_id": "3c85bc07-abd5-4a6c-9b0b-b7814911ed7a"
+        },
+        "prod": {
+          "id": "a89de08c-05d8-483d-a6e5-638e0c915c0b",
+          "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+          "title": "RTDM-20260906T1610 B1 hitch-bag",
+          "price": 12.0,
+          "quantity": 1,
+          "is_sold": false,
+          "list_on_marketplace": true,
+          "available_for_live": true
+        }
+      }
+    },
+    {
+      "id": "B2",
+      "lens": "DM2",
+      "title": "qty0: Hub esconde + CPI deny",
+      "ev": {
+        "hub_n": 0,
+        "cpi": null,
+        "li": null
+      }
+    },
+    {
+      "id": "B3",
+      "lens": "DM7",
+      "title": "refund restore ≤1 + order terminal",
+      "ev": {
+        "qty": "1→2",
+        "order": "cancelado",
+        "rf": "200 {\"ok\":true,\"already_refunded\":true,\"idempotent\":true,\"refund_id\":\"re_3UChpRH7FWYUN3jh1c4wOCPG\",\"status\":\"cancelado\",\"stock_units_applied\":null,\"amount_cents\":590,\"payment_intent\":\"pi_3UChpRH7FWYUN3jh1tMJTzbb\",\"status_str…",
+        "li_before": "available",
+        "li_after": "available",
+        "orderRestored": true
+      }
+    },
+    {
+      "id": "C1",
+      "lens": "DM3",
+      "title": "pago Stripe: order+stock OK; chat/wallet observados",
+      "ev": {
+        "status": "pago",
+        "qty": 1,
+        "dSeller": 0.0,
+        "dBuyer": 0.0,
+        "chatHasOrder": false,
+        "chats_n": 0,
+        "msgs_n": 0,
+        "hub_n": 0,
+        "hubCoherent": false,
+        "pi": "pi_3UChpZH7FWYUN3jh0ctfBDVw"
+      }
+    },
+    {
+      "id": "C2",
+      "lens": "DM3",
+      "title": "MB WAY: CPI 400 + seller não marca pago",
+      "ev": {
+        "cpi": "400 {\"error\":\"Checkout blocked: order is off-platform payment (no Stripe Session).\"}",
+        "rpc": "404 {\"code\":\"PGRST202\",\"details\":\"Searched for the function public.batata_seller_confirm_direct_payment with parameters order_id, p_order_id or with a single unnamed json/jsonb parameter, but no matches were found in the sch…",
+        "patch": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"order_money_fields_immutable\"}",
+        "status": "reserva_pendente",
+        "sql": "200 true"
+      }
+    },
+    {
+      "id": "C3",
+      "lens": "DM7",
+      "title": "disputa+refund stock ≤1 e refund ≤ captura",
+      "ev": {
+        "qty": "1→2",
+        "stripeN": null,
+        "stripeSum": null,
+        "disp": 403,
+        "rf": "200 {\"ok\":true,\"already_refunded\":true,\"idempotent\":true,\"refund_id\":\"re_3UChpgH7FWYUN3jh1iKt2Vbt\",\"status\":\"cancelado\",\"stock_units_applied\":null,\"amount_cents\":590,\"payment_intent\":\"pi_3UChpgH7FWYUN3jh1HoxH2Kh\",\"status_str…",
+        "status": "cancelado"
+      }
+    },
+    {
+      "id": "D1",
+      "lens": "DM4",
+      "title": "race bag∥accept: ≤1 claim",
+      "ev": {
+        "d1Cs": false,
+        "d1Acc": true,
+        "cpi": "400 {\"error\":\"Checkout blocked: quantity 1 exceeds available stock 0.\"}",
+        "acc": "200 [{\"id\":\"d13b965b-3ec0-4007-a861-5d94e39dc764\",\"live_id\":\"e5db4cd9-0089-4d3a-a9d7-cdea440c3ac8\",\"live_item_id\":\"81e5caf5-8439-4451-88d7-fbb043d52b49\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"buyer_id\":\"3c85bc07…",
+        "res": {
+          "id": "d13b965b-3ec0-4007-a861-5d94e39dc764",
+          "status": "accepted",
+          "requested_qty": 1,
+          "live_item_id": "81e5caf5-8439-4451-88d7-fbb043d52b49",
+          "buyer_id": "3c85bc07-abd5-4a6c-9b0b-b7814911ed7a"
+        }
+      }
+    },
+    {
+      "id": "D2",
+      "lens": "DM4",
+      "title": "end_live∥CPI: live ended; CPI marketplace documentado",
+      "ev": {
+        "liveEnded": true,
+        "cpiOk": true,
+        "hubLive_n": 0,
+        "order": "reserva_pendente"
+      }
+    }
+  ],
+  "skipped": [],
+  "notes": [
+    {
+      "id": "fix.s1",
+      "lens": "DM1",
+      "title": "S1 published",
+      "ev": {
+        "id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+        "handle": "fleahub-demo-ux",
+        "hub_published": true,
+        "user_type": "vendedor",
+        "full_name": "Maria Demo FleaHub",
+        "is_live": false
+      }
+    },
+    {
+      "id": "fix.s2",
+      "lens": "DM1",
+      "title": "S2 unpublished",
+      "ev": {
+        "id": "d79418b4-3bf9-4c2b-92b4-72067f594923",
+        "handle": null,
+        "hub_published": false,
+        "user_type": "vendedor",
+        "full_name": "rtdm-20260906t1610-s2",
+        "is_live": false
+      }
+    },
+    {
+      "id": "order.fail",
+      "title": "insertOrder",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"order_hold_exceeds_stock\"}"
+    },
+    {
+      "id": "item.fail",
+      "title": "createLiveItem live_only",
+      "ev": "400 {\"code\":\"23514\",\"details\":\"Failing row contains (a80eb27d-83ef-4efb-b2d9-e7e051965fc2, e5e182e8-501f-4811-830b-087096440164, null, RTDM-1788707876562, RTDM-20260906T1610 B2 li, null, 12.0, null, null, null, t, 0, sold, 2…"
+    },
+    {
+      "id": "order.fail",
+      "title": "insertOrder",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"order_hold_exceeds_stock\"}"
+    },
+    {
+      "id": "fixture.paid",
+      "lens": "DM7",
+      "title": "setup_paid_order Stripe TEST",
+      "ev": "200 {\n  \"ok\": true,\n  \"order_id\": \"bff36c0d-99f0-403a-9d00-dddc345e004b\",\n  \"product_id\": \"c3e4b167-bbe4-4cd5-b4e8-23ad0272f04d\",\n  \"payment_intent_id\": \"pi_3UChpRH7FWYUN3jh1tMJTzbb\",\n  \"pi_status\": \"succeeded\",\n  \"pi_amount…"
+    },
+    {
+      "id": "fixture.paid",
+      "lens": "DM3",
+      "title": "setup_paid_order Stripe TEST",
+      "ev": "200 {\n  \"ok\": true,\n  \"order_id\": \"8b711264-24bb-4231-acb1-0f6a1ad70f1f\",\n  \"product_id\": \"e8f0b8f8-b50e-4d38-bdba-528c8a293a7d\",\n  \"payment_intent_id\": \"pi_3UChpZH7FWYUN3jh0ctfBDVw\",\n  \"pi_status\": \"succeeded\",\n  \"pi_amount…"
+    },
+    {
+      "id": "fixture.paid",
+      "lens": "DM7",
+      "title": "setup_paid_order Stripe TEST",
+      "ev": "200 {\n  \"ok\": true,\n  \"order_id\": \"52d3aabf-b58d-46b1-a7fc-97793ebf4d81\",\n  \"product_id\": \"40831b22-1582-47b1-9748-a4066949a63b\",\n  \"payment_intent_id\": \"pi_3UChpgH7FWYUN3jh1HoxH2Kh\",\n  \"pi_status\": \"succeeded\",\n  \"pi_amount…"
+    },
+    {
+      "id": "C3.qty_at_dispute",
+      "lens": "DM7",
+      "title": "qty após abrir disputa",
+      "ev": 1
+    },
+    {
+      "id": "fixture.paid",
+      "lens": "DM4",
+      "title": "setup_paid_order Stripe TEST",
+      "ev": "200 {\n  \"ok\": true,\n  \"order_id\": \"504f74d1-2643-4421-b2c2-5d03d24bc24c\",\n  \"product_id\": \"044f6366-9f20-4ccf-b196-240466ca629a\",\n  \"payment_intent_id\": \"pi_3UChprH7FWYUN3jh1czmLzoH\",\n  \"pi_status\": \"succeeded\",\n  \"pi_amount…"
+    },
+    {
+      "id": "order.fail",
+      "title": "insertOrder",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"order_hold_exceeds_stock\"}"
+    },
+    {
+      "id": "restore.s1",
+      "lens": "DM1",
+      "title": "S1 hub_published after",
+      "ev": false
+    }
+  ],
+  "lenses": [
+    "DM1",
+    "DM2",
+    "DM3",
+    "DM4",
+    "DM5",
+    "DM6",
+    "DM7"
+  ],
+  "actors": {
+    "b1": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+    "s1": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+    "b2": "3c85bc07-abd5-4a6c-9b0b-b7814911ed7a",
+    "s2": "d79418b4-3bf9-4c2b-92b4-72067f594923"
+  },
+  "created": {
+    "products": [
+      "bd897195-e1bc-4d10-b441-83ea85aec1ab",
+      "4f4a037c-2c9f-420c-ad88-82e6d3b0ab1a",
+      "beffc1a2-f5c4-4520-92ed-3435bae6e2d2",
+      "a89de08c-05d8-483d-a6e5-638e0c915c0b",
+      "1d97f585-8a18-4c17-be7b-10a22abb434e",
+      "c3e4b167-bbe4-4cd5-b4e8-23ad0272f04d",
+      "e8f0b8f8-b50e-4d38-bdba-528c8a293a7d",
+      "91dc7213-7a5d-4e06-ad40-66d10df6f44b",
+      "40831b22-1582-47b1-9748-a4066949a63b",
+      "34399a66-568c-46e5-97df-6a165bfaeef0",
+      "312bd2f2-6518-47db-96ac-565a0882b355",
+      "044f6366-9f20-4ccf-b196-240466ca629a"
+    ],
+    "orders": [
+      "d7915068-ae76-4538-9704-129607db5252",
+      "1007c737-72bf-4446-aeb0-164c366034ff",
+      "bff36c0d-99f0-403a-9d00-dddc345e004b",
+      "8b711264-24bb-4231-acb1-0f6a1ad70f1f",
+      "28f108df-a956-40f8-97bb-c31159bb3f13",
+      "52d3aabf-b58d-46b1-a7fc-97793ebf4d81",
+      "6319e862-a80e-4397-b223-1bb7ce0822bd",
+      "895e10c0-647f-49c9-80db-c1599e3b28ba",
+      "504f74d1-2643-4421-b2c2-5d03d24bc24c"
+    ],
+    "lives": [
+      "7cb5699c-a4c3-4e0b-a0fd-f74a78a1bbf2",
+      "7ed37fa8-142f-48c0-ad98-43e38109ae01",
+      "e5e182e8-501f-4811-830b-087096440164",
+      "a0a83d33-cb9a-415a-b98c-83e897e66c2c",
+      "e5db4cd9-0089-4d3a-a9d7-cdea440c3ac8",
+      "604fd231-b297-4a39-b63d-0cc513cf4db9"
+    ],
+    "items": [
+      "31a1a5d4-19d5-4e19-a7b3-52539fa67238",
+      "c5a75b01-7f4c-4c87-857e-8b5c589da628",
+      "81e5caf5-8439-4451-88d7-fbb043d52b49",
+      "99b9bb88-c7bd-48b0-a4c8-c9b36a6b6ada"
+    ],
+    "res": [
+      "48230d14-b663-400f-86c6-2074cb70035e",
+      "d13b965b-3ec0-4007-a861-5d94e39dc764"
+    ],
+    "tips": [
+      "58d922a8-644b-446e-8872-4558ab1dcace"
+    ]
+  }
+}

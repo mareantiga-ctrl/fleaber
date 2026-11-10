@@ -1,0 +1,233 @@
+{
+  "pass": 1,
+  "prefix": "RTI-20260831T1706",
+  "actors": {
+    "buyer": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+    "seller": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+    "buyer2": "24605196-54f7-4ae4-9286-8b7344836fa1",
+    "seller2": "4449ca94-ea14-4a8e-949a-b20ef6a1f44e"
+  },
+  "rpc_money_out": [
+    "batata_clawback_seller_wallet_for_order",
+    "batata_credit_wallet_once",
+    "batata_debit_wallet_once",
+    "batata_finalize_stripe_order_refund",
+    "batata_get_my_payout_details",
+    "batata_order_allows_seller_stripe_refund",
+    "batata_process_partial_refund_dispute",
+    "batata_record_buyer_refund_ledger",
+    "batata_refund_buyer_wallet_for_order",
+    "batata_release_seller_wallet_for_order",
+    "batata_wallet_payout_debit",
+    "batata_wallet_payout_finish"
+  ],
+  "wallets_start": {
+    "buyer": 22.75,
+    "seller": 244.6,
+    "buyer2": 0,
+    "seller2": 0
+  },
+  "seller_connect": "acct_1U5mYbQeUNx8ar08",
+  "i2_get_redirects": {
+    "https://evil.com": {
+      "status": 200,
+      "location": null,
+      "body": "<!DOCTYPE html><html lang=\"pt\"><head><meta charset=\"utf-8\"><meta name=\"viewport\"…"
+    },
+    "https://fleaber.pt.evil.com": {
+      "status": 200,
+      "location": null,
+      "body": "<!DOCTYPE html><html lang=\"pt\"><head><meta charset=\"utf-8\"><meta name=\"viewport\"…"
+    },
+    "https://evil.com/fleaber.pt": {
+      "status": 200,
+      "location": null,
+      "body": "<!DOCTYPE html><html lang=\"pt\"><head><meta charset=\"utf-8\"><meta name=\"viewport\"…"
+    },
+    "javascript:alert(1)": {
+      "status": 403,
+      "location": null,
+      "body": "<!DOCTYPE html>\n<!--[if lt IE 7]> <html class=\"no-js ie6 oldie\" lang=\"en-US\"> <!…"
+    },
+    "https://fleaber.pt/wallet?next=https://evil.com": {
+      "status": 303,
+      "location": "https://fleaber.pt/wallet",
+      "body": ""
+    },
+    "https://attacker@fleaber.pt": {
+      "status": 200,
+      "location": null,
+      "body": "<!DOCTYPE html><html lang=\"pt\"><head><meta charset=\"utf-8\"><meta name=\"viewport\"…"
+    },
+    "http://fleaber.pt": {
+      "status": 200,
+      "location": null,
+      "body": "<!DOCTYPE html><html lang=\"pt\"><head><meta charset=\"utf-8\"><meta name=\"viewport\"…"
+    },
+    "https://127.0.0.1": {
+      "status": 303,
+      "location": "https://127.0.0.1/wallet",
+      "body": ""
+    },
+    "//evil.com": {
+      "status": 200,
+      "location": null,
+      "body": "<!DOCTYPE html><html lang=\"pt\"><head><meta charset=\"utf-8\"><meta name=\"viewport\"…"
+    },
+    "https://fleaber.app.evil.com": {
+      "status": 200,
+      "location": null,
+      "body": "<!DOCTYPE html><html lang=\"pt\"><head><meta charset=\"utf-8\"><meta name=\"viewport\"…"
+    }
+  },
+  "findings": [],
+  "notes": [
+    {
+      "id": "p1.rpcs",
+      "lens": "I1",
+      "title": "RPCs saída/dinheiro",
+      "ev": 12
+    },
+    {
+      "id": "p1.wallets",
+      "lens": "I7",
+      "title": "saldos iniciais",
+      "ev": {
+        "buyer": 22.75,
+        "seller": 244.6,
+        "buyer2": 0,
+        "seller2": 0
+      }
+    },
+    {
+      "id": "p1.i1.debit_jwt",
+      "lens": "I1",
+      "title": "buyer JWT payout_debit seller",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_wallet_payout_debit\"}"
+    },
+    {
+      "id": "p1.i1.debit_self",
+      "lens": "I1",
+      "title": "buyer JWT debit self",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_wallet_payout_debit\"}"
+    },
+    {
+      "id": "p1.i1.finish_jwt",
+      "lens": "I1",
+      "title": "seller JWT payout_finish",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_wallet_payout_finish\"}"
+    },
+    {
+      "id": "p1.i1.claw_jwt",
+      "lens": "I1",
+      "title": "buyer JWT clawback",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_clawback_seller_wallet_for_order\"}"
+    },
+    {
+      "id": "p1.i2.user_id_cross",
+      "lens": "I2",
+      "title": "buyer JWT user_id=seller + amount",
+      "ev": "400 {\"error\":\"Cannot create another user Stripe account.\",\"code\":\"payout_failed\"}"
+    },
+    {
+      "id": "p1.i1.neg_amount",
+      "lens": "I1",
+      "title": "seller amount=-500",
+      "ev": "400 {\"error\":\"Valor de levantamento inválido.\",\"code\":\"payout_failed\"}"
+    },
+    {
+      "id": "p1.i1.float_amount",
+      "lens": "I1",
+      "title": "amount=5.90 (euros vs cêntimos)",
+      "ev": "400 {\"error\":\"O valor do levantamento tem de ser em cêntimos.\",\"code\":\"payout_failed\"}"
+    },
+    {
+      "id": "p1.i1.huge",
+      "lens": "I1",
+      "title": "amount=999999999¢",
+      "ev": "400 {\"error\":\"Saldo disponível insuficiente para este levantamento.\",\"code\":\"payout_failed\"}"
+    },
+    {
+      "id": "p1.i1.nokey",
+      "lens": "I1",
+      "title": "amount sem idempotency_key",
+      "ev": "400 {\"error\":\"idempotency_key em falta. Reinicia o levantamento na app.\",\"code\":\"payout_failed\"}"
+    },
+    {
+      "id": "p1.i2.post_origin",
+      "lens": "I2",
+      "title": "POST web_return_origin=evil.com",
+      "ev": {
+        "brief": "200 {\"stripeAccountId\":\"acct_1U5mYbQeUNx8ar08\",\"url\":\"https://connect.stripe.com/setup/e/acct_1U5mYbQeUNx8ar08/H4Vbt3gp4cYl\"}",
+        "url": "https://connect.stripe.com/setup/e/acct_1U5mYbQeUNx8ar08/H4Vbt3gp4cYl",
+        "account": "acct_1U5mYbQeUNx8ar08"
+      }
+    },
+    {
+      "id": "p1.i2.patch_own_acct",
+      "lens": "I2",
+      "title": "seller PATCH own stripe_account_id",
+      "ev": "200 []"
+    },
+    {
+      "id": "p1.i2.patch_victim",
+      "lens": "I2",
+      "title": "buyer PATCH seller wallet",
+      "ev": "200 []"
+    },
+    {
+      "id": "p1.i1.patch_balance",
+      "lens": "I1",
+      "title": "buyer PATCH own balance",
+      "ev": "200 []"
+    },
+    {
+      "id": "p1.i1.insert_ledger",
+      "lens": "I1",
+      "title": "JWT INSERT payout_ledger",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"new row violates row-level security policy for table \\\"wallet_payout_ledger\\\"\"}"
+    },
+    {
+      "id": "p1.i6.refund_b2",
+      "lens": "I6",
+      "title": "buyer2 refund-order hold alheia",
+      "ev": "403 {\"ok\":false,\"error\":\"Sem permissão.\"}"
+    },
+    {
+      "id": "p1.i6.refund_buyer",
+      "lens": "I6",
+      "title": "buyer1 refund-order própria (não seller)",
+      "ev": "403 {\"ok\":false,\"error\":\"Sem permissão.\"}"
+    },
+    {
+      "id": "p1.i6.refund_s2",
+      "lens": "I6",
+      "title": "seller2 refund-order de seller1",
+      "ev": "403 {\"ok\":false,\"error\":\"Sem permissão.\"}"
+    },
+    {
+      "id": "p1.i6.rpc_refund_b2",
+      "lens": "I6",
+      "title": "buyer2 RPC refund_buyer_wallet",
+      "ev": "200 false"
+    },
+    {
+      "id": "p1.i6.partial_b2",
+      "lens": "I6",
+      "title": "buyer2 partial_refund alheio",
+      "ev": "404 {\"code\":\"PGRST202\",\"details\":\"Searched for the function public.batata_process_partial_refund_dispute with parameters p_order_id, p_percent or with a single unnamed json/jsonb param…"
+    },
+    {
+      "id": "p1.i3.release_unpaid",
+      "lens": "I3",
+      "title": "release em reserva_pendente",
+      "ev": "200 false"
+    }
+  ],
+  "wallets_end": {
+    "buyer": 22.75,
+    "seller": 244.6,
+    "buyer2": 0,
+    "seller2": 0
+  }
+}

@@ -1,0 +1,307 @@
+{
+  "lenses": [
+    "CM1",
+    "CM3",
+    "CM5",
+    "CM7"
+  ],
+  "probes": [
+    {
+      "probe_id": "A1",
+      "poco": "CM-A",
+      "payload": "GET hub_lives_public unpublished live fae4dd16-74cf-457c-b1b7-c05d52af5ec2",
+      "http": "200 218ms []",
+      "bd": "",
+      "result": "HOLD",
+      "lens": "CM1",
+      "residual": false,
+      "count_finding": false
+    },
+    {
+      "probe_id": "A2",
+      "poco": "CM-A",
+      "payload": "GET hub_lives_discovery_public unpublished",
+      "http": "200 212ms []",
+      "bd": "",
+      "result": "HOLD",
+      "lens": "CM1",
+      "residual": false,
+      "count_finding": false
+    },
+    {
+      "probe_id": "A3",
+      "poco": "CM-A",
+      "payload": "GET hub_live_items_public + discovery unpublished item",
+      "http": "{\"pub\":\"400 189ms {\\\"code\\\":\\\"42703\\\",\\\"details\\\":null,\\\"hint\\\":null,\\\"message\\\":\\\"column hub_live_items_public.quantity does not exist\\\"}\",\"disc\":\"200 244ms []\"}",
+      "bd": "",
+      "result": "HOLD",
+      "lens": "CM1",
+      "residual": false,
+      "count_finding": false
+    },
+    {
+      "probe_id": "A4",
+      "poco": "CM-A",
+      "payload": "GET hub_products_public unpublished SKU",
+      "http": "400 203ms {\"code\":\"42703\",\"details\":null,\"hint\":null,\"message\":\"column hub_products_public.quantity does not exist\"}",
+      "bd": "",
+      "result": "HOLD",
+      "lens": "CM1",
+      "residual": false,
+      "count_finding": false
+    },
+    {
+      "probe_id": "A5",
+      "poco": "CM-A",
+      "payload": "B1 GET lives live+active unpublished + feed",
+      "http": "{\"byId\":\"200 197ms []\",\"inFeed\":false,\"feedN\":0}",
+      "bd": "{\"live\":\"fae4dd16-74cf-457c-b1b7-c05d52af5ec2\",\"hub_published\":false}",
+      "result": "HOLD",
+      "lens": "CM1",
+      "residual": false,
+      "count_finding": false
+    },
+    {
+      "probe_id": "A6",
+      "poco": "CM-A",
+      "payload": "B1 GET lives scheduled unpublished",
+      "http": "200 217ms []",
+      "bd": "",
+      "result": "HOLD",
+      "lens": "CM1",
+      "residual": false,
+      "count_finding": false
+    },
+    {
+      "probe_id": "A7",
+      "poco": "CM-A",
+      "payload": "GET live_items unpublished anon+B1",
+      "http": "{\"anon\":\"401 176ms {\\\"code\\\":\\\"42501\\\",\\\"details\\\":null,\\\"hint\\\":null,\\\"message\\\":\\\"permission denied for table profiles\\\"}\",\"b1\":\"200 209ms []\"}",
+      "bd": "",
+      "result": "HOLD",
+      "lens": "CM1",
+      "residual": false,
+      "count_finding": false
+    },
+    {
+      "probe_id": "A8",
+      "poco": "CM-A",
+      "payload": "RPC batata_live_item_stock unpublished anon+B1",
+      "http": "{\"anon\":\"200 181ms {\\\"ok\\\": false, \\\"error\\\": \\\"live_item_not_found\\\"}\",\"b1\":\"200 227ms {\\\"ok\\\": false, \\\"error\\\": \\\"live_item_not_found\\\"}\"}",
+      "bd": "",
+      "result": "HOLD",
+      "lens": "CM1",
+      "residual": false,
+      "count_finding": false
+    },
+    {
+      "probe_id": "A9",
+      "poco": "CM-A",
+      "payload": "B1 POST follows following_id=S2 unpublished UUID",
+      "http": "201 276ms [{\"id\":\"973db7f7-42b4-4508-a9c1-a20f8e9c554a\",\"follower_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"following_id\":\"9e6cd535-3b19-4e59-a9ee-2f35fb23c749\",\"created_at\":\"2026-09-06T12:26:06.442686+00:00\"}]",
+      "bd": "{\"tickets\":1,\"raffle\":\"6841b07b-8cd2-4402-8731-27eaab5f95a6\"}",
+      "result": "FAIL",
+      "lens": "CM1",
+      "residual": false,
+      "count_finding": true
+    },
+    {
+      "probe_id": "A10",
+      "poco": "CM-A",
+      "payload": "B1 POST follows S1 published (controlo)",
+      "http": "201 189ms [{\"id\":\"798bdd78-b723-467a-ac4e-c7bc95cf211b\",\"follower_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"following_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"created_at\":\"2026-09-06T12:26:07.121478+00:00\"}]",
+      "bd": "",
+      "result": "HOLD",
+      "lens": "CM1",
+      "residual": false,
+      "count_finding": false
+    },
+    {
+      "probe_id": "A11",
+      "poco": "CM-A",
+      "payload": "B2 follow unpublished vs ghost UUID timing/status",
+      "http": "{\"unpub\":\"201 195ms [{\\\"id\\\":\\\"e640dfcd-3d75-4819-bd4c-59b69d2cd256\\\",\\\"follower_id\\\":\\\"29a701c1-a9fc-47ff-8d6c-051a023c7b64\\\",\\\"following_id\\\":\\\"9e6cd535-3b19-4e59-a9ee-2f35fb23c749\\\",\\\"created_at\\\":\\\"2026-09-06T12:26:07.503175+00:00\\\"}]\",\"ghost\":\"201 227ms [{\\\"id\\\":\\\"cb1db287-0…",
+      "bd": "",
+      "result": "HOLD",
+      "lens": "CM1",
+      "residual": false,
+      "count_finding": false
+    },
+    {
+      "probe_id": "A12",
+      "poco": "CM-A",
+      "payload": "anon POST follows unpublished",
+      "http": "401 213ms {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table follows\"}",
+      "bd": "",
+      "result": "HOLD",
+      "lens": "CM1",
+      "residual": false,
+      "count_finding": false
+    },
+    {
+      "probe_id": "A13",
+      "poco": "CM-A",
+      "payload": "B1 POST favorites product unpublished UUID",
+      "http": "{\"insert\":\"201 223ms [{\\\"id\\\":\\\"9cc52811-94c0-4955-bac5-01fc317f4b6c\\\",\\\"user_id\\\":\\\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\\\",\\\"product_id\\\":\\\"da955394-7946-466a-aeb8-324c2bd3e9c8\\\",\\\"created_at\\\":\\\"2026-09-06T12:26:08.380067+00:00\\\"}]\",\"get\":\"200 230ms [{\\\"id\\\":\\\"9cc52811-94c0-495…",
+      "bd": "",
+      "result": "FAIL",
+      "lens": "CM1",
+      "residual": false,
+      "count_finding": true
+    },
+    {
+      "probe_id": "A14",
+      "poco": "CM-A",
+      "payload": "GET hub_reviews_public + reviews_gerais unpublished shop",
+      "http": "{\"hub\":\"200 201ms []\",\"rg\":\"200 195ms [{\\\"id\\\":\\\"12f2cfe4-e9b5-4efc-a603-d383de76a2f3\\\",\\\"stars\\\":5,\\\"comment\\\":\\\"RTCM-20260906T1318 review unpublished shop\\\",\\\"buyer_id\\\":\\\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\\\"}]\",\"anon\":\"401 176ms {\\\"code\\\":\\\"42501\\\",\\\"details\\\":null,\\\"hint\\\":…",
+      "bd": "",
+      "result": "HOLD",
+      "lens": "CM1",
+      "residual": false,
+      "count_finding": false
+    },
+    {
+      "probe_id": "A15",
+      "poco": "CM-A",
+      "payload": "RPC resolve handle/slug/redirect + discovery ilike + profiles eq",
+      "http": "{\"direct\":\"200 695ms {\\\"error\\\": \\\"not_found\\\", \\\"found\\\": false, \\\"http_status\\\": 404}\",\"slug\":\"200 208ms {\\\"error\\\": \\\"not_found\\\", \\\"found\\\": false, \\\"http_status\\\": 404}\",\"redir\":\"200 219ms {\\\"error\\\": \\\"not_found\\\", \\\"found\\\": false, \\\"http_status\\\": 404}\",\"ilike\":\"200 253ms…",
+      "bd": "",
+      "result": "HOLD",
+      "lens": "CM1",
+      "residual": false,
+      "count_finding": false
+    },
+    {
+      "probe_id": "A16",
+      "poco": "CM-A",
+      "payload": "B1 GET products unpublished + qty=0 + enum marketplace",
+      "http": "{\"unpub\":\"200 382ms []\",\"qty0\":\"200 383ms []\",\"enumHasUnpub\":false,\"enumHasQty0\":false}",
+      "bd": "",
+      "result": "HOLD",
+      "lens": "CM1",
+      "residual": false,
+      "count_finding": false
+    },
+    {
+      "probe_id": "R1",
+      "poco": "CDCI-residual",
+      "payload": "resolve_handle handle unpublished clássico",
+      "http": "200 352ms {\"error\": \"not_found\", \"found\": false, \"http_status\": 404}",
+      "bd": "",
+      "result": "HOLD",
+      "lens": "CM1",
+      "residual": true,
+      "count_finding": false
+    },
+    {
+      "probe_id": "R2",
+      "poco": "CDCI-residual",
+      "payload": "tip unpublished clássico (checkout com loja já off)",
+      "http": "400 acao=* 1520ms {\"error\":\"Tips only allowed for published hub sellers.\"}",
+      "bd": "",
+      "result": "HOLD",
+      "lens": "CM3",
+      "residual": true,
+      "count_finding": false
+    },
+    {
+      "probe_id": "R3",
+      "poco": "CDCI-residual",
+      "payload": "SELECT mux_playback_id JWT B1 vs dono unpublished",
+      "http": "{\"b1\":\"403 207ms {\\\"code\\\":\\\"42501\\\",\\\"details\\\":null,\\\"hint\\\":null,\\\"message\\\":\\\"permission denied for table lives\\\"}\",\"owner\":\"403 210ms {\\\"code\\\":\\\"42501\\\",\\\"details\\\":null,\\\"hint\\\":null,\\\"message\\\":\\\"permission denied for table lives\\\"}\"}",
+      "bd": "",
+      "result": "HOLD",
+      "lens": "CM5",
+      "residual": true,
+      "count_finding": false
+    }
+  ],
+  "findings": [
+    {
+      "id": "CM-A9-FOLLOW-UUID-UNPUB",
+      "lens": "CM1",
+      "severity": "P1",
+      "title": "follow UUID unpublished cria aresta e atribui rifa",
+      "actor": "B1",
+      "pre": "S2 hub off; UUID conhecido; raffle active=6841b07b-8cd2-4402-8731-27eaab5f95a6",
+      "repro": "POST follows following_id=S2",
+      "expected": "403/404 loja não publicada",
+      "obtained": {
+        "insert": "201 276ms [{\"id\":\"973db7f7-42b4-4508-a9c1-a20f8e9c554a\",\"follower_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"following_id\":\"9e6cd535-3b19-4e59-a9ee-2f35fb23c749\",\"created_at\":\"2026-09-06T12:26:06.442686+00:00\"}]",
+        "tickets": 1
+      },
+      "proven": true,
+      "count_exact_closed": false,
+      "evidence": {}
+    },
+    {
+      "id": "CM-A13-FAV-UNPUB",
+      "lens": "CM1",
+      "severity": "P2",
+      "title": "favorite SKU unpublished aceite (UUID oracle)",
+      "actor": "B1",
+      "pre": "da955394-7946-466a-aeb8-324c2bd3e9c8",
+      "repro": "POST favorites product_id unpublished",
+      "expected": "403/FK se SKU não visível",
+      "obtained": {
+        "insert": "201 223ms [{\"id\":\"9cc52811-94c0-4955-bac5-01fc317f4b6c\",\"user_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"product_id\":\"da955394-7946-466a-aeb8-324c2bd3e9c8\",\"created_at\":\"2026-09-06T12:26:08.380067+00:00\"}]",
+        "get": "200 230ms [{\"id\":\"9cc52811-94c0-4955-bac5-01fc317f4b6c\",\"product_id\":\"da955394-7946-466a-aeb8-324c2bd3e9c8\"}]"
+      },
+      "proven": true,
+      "count_exact_closed": false,
+      "evidence": {}
+    }
+  ],
+  "blocked": [],
+  "notes": [
+    {
+      "id": "fix.s1",
+      "lens": "CM1",
+      "title": "S1 profile",
+      "ev": {
+        "id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+        "handle": "fleahub-demo-ux",
+        "handle_suggested": "axinoquaa",
+        "hub_published": true,
+        "user_type": "vendedor",
+        "full_name": "Maria Demo FleaHub",
+        "is_live": false,
+        "photo_url": "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=800&auto=format&fit=crop"
+      }
+    },
+    {
+      "id": "fix.s2",
+      "lens": "CM1",
+      "title": "S2 unpublished",
+      "ev": {
+        "id": "9e6cd535-3b19-4e59-a9ee-2f35fb23c749",
+        "handle": null,
+        "handle_suggested": null,
+        "hub_published": false,
+        "user_type": "vendedor",
+        "full_name": "rtcm-20260906t1318-s2",
+        "is_live": false,
+        "photo_url": null
+      }
+    },
+    {
+      "id": "fix.review",
+      "lens": "CM1",
+      "title": "review S2",
+      "ev": "201 232ms [{\"id\":\"12f2cfe4-e9b5-4efc-a603-d383de76a2f3\",\"created_at\":\"2026-09-06T12:26:03.273238+00:00\",\"target_id\":\"9e6cd535-3b19-4e59-a9ee-2f35fb23c749\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"stars\":5,\"comment\":\"RTCM…"
+    },
+    {
+      "id": "fix.raffle",
+      "lens": "CM1",
+      "title": "raffle S2 unpublished",
+      "ev": "201 227ms [{\"id\":\"6841b07b-8cd2-4402-8731-27eaab5f95a6\",\"live_id\":\"fae4dd16-74cf-457c-b1b7-c05d52af5ec2\",\"seller_id\":\"9e6cd535-3b19-4e59-a9ee-2f35fb23c749\",\"title\":\"RTCM-20260906T1318 raffle unpub\",\"description\":null,\"photo_url\":n…"
+    },
+    {
+      "id": "a9.raffle.tickets",
+      "lens": "CM7",
+      "title": "tickets after follow unpub",
+      "ev": "200 198ms [{\"id\":\"c1ae37b8-5da7-47c5-aa1b-f55db7c973c6\",\"ticket_balance\":1}]"
+    }
+  ],
+  "skipped": []
+}

@@ -1,0 +1,172 @@
+{
+  "at": "2026-08-31T06:49:59.712Z",
+  "mode": "stripe_test",
+  "note": "Pagamentos via PaymentIntent Test (pm_card_visa). Refund via create-payment-intent refundOversoldStripeOrder.",
+  "seller_wallet_before": 72.41,
+  "product_id": "21cb7460-1786-4565-a2c6-4170f0a34aee",
+  "order_a_id": "e0f45171-ba98-4d62-855f-abcf8a32243b",
+  "order_b_id": "bb2f7143-4c6a-401a-8080-c3cca227e8a7",
+  "winner_pi": {
+    "id": "pi_3UAP2bH7FWYUN3jh01thwrZZ",
+    "status": "succeeded",
+    "amount": 590,
+    "amount_received": 590,
+    "currency": "eur"
+  },
+  "loser_pi": {
+    "id": "pi_3UAP2cH7FWYUN3jh0VUrZN7p",
+    "status": "succeeded",
+    "amount": 590,
+    "amount_received": 590,
+    "currency": "eur"
+  },
+  "stock_before_settle": 1,
+  "settle_a": {
+    "http": 200,
+    "body": {
+      "ok": true,
+      "settleResult": "paid",
+      "order": {
+        "id": "e0f45171-ba98-4d62-855f-abcf8a32243b",
+        "status": "pago",
+        "stock_units_applied": 1,
+        "stripe_refund_id": null,
+        "stripe_payment_intent_id": "pi_3UAP2bH7FWYUN3jh01thwrZZ",
+        "price_total": 5.9,
+        "amount_paid_cents": 590
+      },
+      "payment_intent": {
+        "id": "pi_3UAP2bH7FWYUN3jh01thwrZZ",
+        "status": "succeeded",
+        "amount": 590,
+        "amount_received": 590,
+        "currency": "eur"
+      }
+    }
+  },
+  "order_a_after": {
+    "id": "e0f45171-ba98-4d62-855f-abcf8a32243b",
+    "status": "pago",
+    "stock_units_applied": 1,
+    "stripe_refund_id": null,
+    "stripe_payment_intent_id": "pi_3UAP2bH7FWYUN3jh01thwrZZ",
+    "price_total": 5.9
+  },
+  "stock_after_winner": {
+    "quantity": 0,
+    "is_sold": true
+  },
+  "settle_b": {
+    "http": 200,
+    "body": {
+      "ok": true,
+      "settleResult": "oversell_refunded",
+      "order": {
+        "id": "bb2f7143-4c6a-401a-8080-c3cca227e8a7",
+        "status": "cancelado",
+        "stock_units_applied": null,
+        "stripe_refund_id": "re_3UAP2cH7FWYUN3jh0sDlxCj0",
+        "stripe_payment_intent_id": "pi_3UAP2cH7FWYUN3jh0VUrZN7p",
+        "price_total": 5.9,
+        "amount_paid_cents": 590
+      },
+      "payment_intent": {
+        "id": "pi_3UAP2cH7FWYUN3jh0VUrZN7p",
+        "status": "succeeded",
+        "amount": 590,
+        "amount_received": 590,
+        "currency": "eur"
+      }
+    }
+  },
+  "order_b_after": {
+    "id": "bb2f7143-4c6a-401a-8080-c3cca227e8a7",
+    "status": "cancelado",
+    "stock_units_applied": null,
+    "stripe_refund_id": "re_3UAP2cH7FWYUN3jh0sDlxCj0",
+    "stripe_refunded_at": "2026-08-31T06:50:06.362+00:00",
+    "stripe_payment_intent_id": "pi_3UAP2cH7FWYUN3jh0VUrZN7p",
+    "price_total": 5.9
+  },
+  "refund": {
+    "id": "re_3UAP2cH7FWYUN3jh0sDlxCj0",
+    "status": "succeeded",
+    "amount": 590,
+    "currency": "eur",
+    "payment_intent": "pi_3UAP2cH7FWYUN3jh0VUrZN7p",
+    "metadata": {
+      "fleaber_order_id": "bb2f7143-4c6a-401a-8080-c3cca227e8a7",
+      "fleaber_reason": "oversell_stock_insufficient"
+    }
+  },
+  "settle_b_retry": {
+    "http": 200,
+    "body": {
+      "ok": true,
+      "settleResult": "skipped",
+      "order": {
+        "id": "bb2f7143-4c6a-401a-8080-c3cca227e8a7",
+        "status": "cancelado",
+        "stock_units_applied": null,
+        "stripe_refund_id": "re_3UAP2cH7FWYUN3jh0sDlxCj0",
+        "stripe_payment_intent_id": "pi_3UAP2cH7FWYUN3jh0VUrZN7p",
+        "price_total": 5.9,
+        "amount_paid_cents": 590
+      },
+      "payment_intent": {
+        "id": "pi_3UAP2cH7FWYUN3jh0VUrZN7p",
+        "status": "succeeded",
+        "amount": 590,
+        "amount_received": 590,
+        "currency": "eur"
+      }
+    }
+  },
+  "order_b_after_retry": {
+    "status": "cancelado",
+    "stripe_refund_id": "re_3UAP2cH7FWYUN3jh0sDlxCj0",
+    "stock_units_applied": null
+  },
+  "refunds_on_pi": [
+    {
+      "id": "re_3UAP2cH7FWYUN3jh0sDlxCj0",
+      "amount": 590,
+      "status": "succeeded"
+    }
+  ],
+  "stock_final": {
+    "quantity": 0,
+    "is_sold": true
+  },
+  "seller_wallet_after": 72.41,
+  "order_b_events": [
+    {
+      "event": "sec_fase2_oversell_refund",
+      "created_at": "2026-08-31T06:50:06.445885+00:00"
+    }
+  ],
+  "checks": {
+    "both_pi_paid_before_settle": true,
+    "stock_was_1_before_settle": true,
+    "winner_order_pago": true,
+    "winner_stock_consumed": true,
+    "loser_not_pago": true,
+    "loser_cancelado": true,
+    "refund_created": true,
+    "refund_status_ok": true,
+    "refund_amount_ok": true,
+    "refund_pi_matches": true,
+    "refund_id_on_order": true,
+    "stock_final_zero": true,
+    "loser_no_claim": true,
+    "seller_wallet_unchanged": true,
+    "retry_same_refund": true,
+    "single_refund_on_pi": true,
+    "settle_b_oversell": true,
+    "idempotency_key": "fleaber_oversell_refund_bb2f7143-4c6a-401a-8080-c3cca227e8a7"
+  },
+  "failed_checks": [],
+  "ok": true,
+  "server_amount_cents": 590,
+  "cleaned": true
+}

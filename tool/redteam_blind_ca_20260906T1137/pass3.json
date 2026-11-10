@@ -1,0 +1,288 @@
+{
+  "lenses": [
+    "CA1",
+    "CA5",
+    "CA6",
+    "CA7"
+  ],
+  "findings": [
+    {
+      "id": "CA1-RESOLVE-HANDLE-UNPUB-ENDED",
+      "lens": "CA1",
+      "severity": "P2",
+      "title": "resolve_handle encontra unpublished só com scheduled/ended",
+      "actor": "anon",
+      "pre": "S2 hub_published=false; air ended",
+      "repro": "POST batata_resolve_handle slug S2",
+      "expected": "not_found (loja desligada sem directo no ar)",
+      "obtained": "200 {\"found\": true, \"handle\": \"rtca-20260906t1137-s2\", \"profile_id\": \"86819413-eae8-4b59-8319-3c904890bcea\", \"http_status\": 200, \"redirect_to\": null, \"hub_published\": false}",
+      "proven": true,
+      "count_exact_closed": false,
+      "evidence": {}
+    }
+  ],
+  "blocked": [
+    {
+      "id": "ca1.prof.after",
+      "lens": "CA1",
+      "title": "profiles discovery some sem air",
+      "ev": "200 []"
+    },
+    {
+      "id": "ca1.disc.after",
+      "lens": "CA1",
+      "title": "lives discovery vazia S2",
+      "ev": "200 []"
+    },
+    {
+      "id": "ca6.get.cross",
+      "lens": "CA6",
+      "title": "GET cruzado recusado",
+      "ev": {
+        "b2": 400,
+        "anon": 400,
+        "public": 400
+      }
+    },
+    {
+      "id": "ca6.list.cross",
+      "lens": "CA6",
+      "title": "list prefix alheio vazio/negado",
+      "ev": "200 acao=* []"
+    },
+    {
+      "id": "ca7.ut.patch",
+      "lens": "CA7",
+      "title": "user_type não escalável por JWT",
+      "ev": "400 {\"code\":\"P0001\",\"details\":null,\"hint\":\"Use batata_claim_handle, batata_change_handle ou batata_publish_hub.\",\"message\":\"handle_immutable_use_rpc\"}"
+    }
+  ],
+  "notes": [
+    {
+      "id": "ca1.prof.after-air",
+      "lens": "CA1",
+      "title": "profiles discovery após end air",
+      "ev": "200 []"
+    },
+    {
+      "id": "ca1.disc.after-air",
+      "lens": "CA1",
+      "title": "lives discovery S2 após end",
+      "ev": "200 []"
+    },
+    {
+      "id": "ca1.rh.after-air",
+      "lens": "CA1",
+      "title": "resolve_handle após end air",
+      "ev": "200 {\"found\": true, \"handle\": \"rtca-20260906t1137-s2\", \"profile_id\": \"86819413-eae8-4b59-8319-3c904890bcea\", \"http_status\": 200, \"redirect_to\": null, \"hub_published\": false}"
+    },
+    {
+      "id": "ca5.openapi",
+      "lens": "CA5",
+      "title": "openapi",
+      "ev": {
+        "status": 401,
+        "has_lives": false,
+        "has_mux": false,
+        "len": 101
+      }
+    },
+    {
+      "id": "ca6.buckets.anon",
+      "lens": "CA6",
+      "title": "list buckets anon",
+      "ev": "200 acao=* []"
+    },
+    {
+      "id": "ca6.buckets.b1",
+      "lens": "CA6",
+      "title": "list buckets B1",
+      "ev": "200 acao=* []"
+    },
+    {
+      "id": "ca6.list.anon.fleaber_private",
+      "lens": "CA6",
+      "title": "list anon",
+      "ev": {
+        "status": 200,
+        "n": 0,
+        "snip": "[]"
+      }
+    },
+    {
+      "id": "ca6.list.b1.fleaber_private",
+      "lens": "CA6",
+      "title": "list B1",
+      "ev": {
+        "status": 200,
+        "n": 3,
+        "snip": "[{\"name\":\"chat_uploads\",\"id\":null,\"updated_at\":null,\"created_at\":null,\"last_accessed_at\":null,\"metadata\":null},{\"name\":\"order_disputes\",\"id\":null,\"updated_at\":n…"
+      }
+    },
+    {
+      "id": "ca6.list.anon.chat_media",
+      "lens": "CA6",
+      "title": "list anon",
+      "ev": {
+        "status": 200,
+        "n": 0,
+        "snip": "[]"
+      }
+    },
+    {
+      "id": "ca6.list.b1.chat_media",
+      "lens": "CA6",
+      "title": "list B1",
+      "ev": {
+        "status": 200,
+        "n": 1,
+        "snip": "[{\"name\":\"product_photos\",\"id\":null,\"updated_at\":null,\"created_at\":null,\"last_accessed_at\":null,\"metadata\":null}]"
+      }
+    },
+    {
+      "id": "ca6.list.anon.product_photos",
+      "lens": "CA6",
+      "title": "list anon",
+      "ev": {
+        "status": 200,
+        "n": 0,
+        "snip": "[]"
+      }
+    },
+    {
+      "id": "ca6.list.b1.product_photos",
+      "lens": "CA6",
+      "title": "list B1",
+      "ev": {
+        "status": 200,
+        "n": 0,
+        "snip": "[]"
+      }
+    },
+    {
+      "id": "ca6.list.anon.avatars",
+      "lens": "CA6",
+      "title": "list anon",
+      "ev": {
+        "status": 200,
+        "n": 0,
+        "snip": "[]"
+      }
+    },
+    {
+      "id": "ca6.list.b1.avatars",
+      "lens": "CA6",
+      "title": "list B1",
+      "ev": {
+        "status": 200,
+        "n": 0,
+        "snip": "[]"
+      }
+    },
+    {
+      "id": "ca6.list.anon.mux",
+      "lens": "CA6",
+      "title": "list anon",
+      "ev": {
+        "status": 200,
+        "n": 0,
+        "snip": "[]"
+      }
+    },
+    {
+      "id": "ca6.list.b1.mux",
+      "lens": "CA6",
+      "title": "list B1",
+      "ev": {
+        "status": 200,
+        "n": 0,
+        "snip": "[]"
+      }
+    },
+    {
+      "id": "ca6.list.anon.recordings",
+      "lens": "CA6",
+      "title": "list anon",
+      "ev": {
+        "status": 200,
+        "n": 0,
+        "snip": "[]"
+      }
+    },
+    {
+      "id": "ca6.list.b1.recordings",
+      "lens": "CA6",
+      "title": "list B1",
+      "ev": {
+        "status": 200,
+        "n": 0,
+        "snip": "[]"
+      }
+    },
+    {
+      "id": "ca6.list.anon.lives",
+      "lens": "CA6",
+      "title": "list anon",
+      "ev": {
+        "status": 200,
+        "n": 0,
+        "snip": "[]"
+      }
+    },
+    {
+      "id": "ca6.list.b1.lives",
+      "lens": "CA6",
+      "title": "list B1",
+      "ev": {
+        "status": 200,
+        "n": 0,
+        "snip": "[]"
+      }
+    },
+    {
+      "id": "ca6.list.cross",
+      "lens": "CA6",
+      "title": "B1 lista prefix B2",
+      "ev": {
+        "status": 200,
+        "n": 0,
+        "brief": "200 acao=* []"
+      }
+    },
+    {
+      "id": "ca6.up.b1",
+      "lens": "CA6",
+      "title": "upload B1 private",
+      "ev": "400 acao=* {\"statusCode\":\"415\",\"error\":\"invalid_mime_type\",\"message\":\"mime type text/plain is not supported\",\"code\":\"InvalidMimeType\"}"
+    },
+    {
+      "id": "ca6.get.cross",
+      "lens": "CA6",
+      "title": "GET object cruzado",
+      "ev": {
+        "b2": 400,
+        "anon": 400,
+        "public_url": 400
+      }
+    },
+    {
+      "id": "ca6.bucket.chat",
+      "lens": "CA6",
+      "title": "chat_media meta",
+      "ev": "400 acao=* {\"statusCode\":\"404\",\"error\":\"Bucket not found\",\"message\":\"Bucket not found\",\"code\":\"NoSuchBucket\"}"
+    },
+    {
+      "id": "ca7.ut.patch",
+      "lens": "CA7",
+      "title": "B1 PATCH user_type",
+      "ev": "400 {\"code\":\"P0001\",\"details\":null,\"hint\":\"Use batata_claim_handle, batata_change_handle ou batata_publish_hub.\",\"message\":\"handle_immutable_use_rpc\"}"
+    },
+    {
+      "id": "ca5.hub.ended.unpub",
+      "lens": "CA5",
+      "title": "hub public ended unpublished",
+      "ev": "200 []"
+    }
+  ],
+  "skipped": []
+}

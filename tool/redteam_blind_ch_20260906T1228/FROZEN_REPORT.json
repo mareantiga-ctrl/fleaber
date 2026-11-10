@@ -1,0 +1,58 @@
+{
+  "auditor": "REDTEAM_BLIND_CH_PAYOUT_POS_BXCC_v1",
+  "frozen_at": "2026-09-06T11:42:00Z",
+  "prefix": "RTCH-20260906T1228",
+  "staging": "fxdknzrqjenzqcvnwqqq",
+  "production_touched": false,
+  "fase4": false,
+  "corrections_applied": false,
+  "veredicto": "FAIL_P2",
+  "lentes_cobertas": ["CH1", "CH2", "CH3", "CH4", "CH5", "CH6", "CH7"],
+  "contagem": {
+    "P0_aberto": false,
+    "P0_quantos": 0,
+    "P1_aberto": false,
+    "P1_quantos": 0,
+    "P2_aberto": true,
+    "P2_quantos": 2,
+    "P3_aberto": false,
+    "P3_quantos": 0,
+    "P4_aberto": false,
+    "P4_quantos": 0,
+    "TOTAL_P0_P3": 2
+  },
+  "findings_abertos": [
+    {
+      "id": "CH-P2-01",
+      "severity": "P2",
+      "count": 1,
+      "title": "homóglifo fora do fold grego/cirílico → 2 Transfers",
+      "lens": "CH1",
+      "payloads": ["armenian_oh", "georgian_on", "combining_acute", "turkish_I", "greek_upsilon", "race_armenian"],
+      "example_tids": [
+        "tr_1UCeO6H7FWYUN3jh708yyQsT",
+        "tr_1UCeO8H7FWYUN3jhNR7Xkiwh"
+      ],
+      "delta_eur": -2.0,
+      "source": "pass1.json"
+    },
+    {
+      "id": "CH-P2-02",
+      "severity": "P2",
+      "count": 1,
+      "title": "casefold I vs i → 2 Transfers",
+      "lens": "CH1",
+      "tids": [
+        "tr_1UCeOuH7FWYUN3jhM461YZGk",
+        "tr_1UCeOwH7FWYUN3jhxnGYEoBn"
+      ],
+      "delta_eur": -2.0,
+      "source": "pass1.json"
+    }
+  ],
+  "falsos_positivos_descartados": [
+    "CH-P0-WALLET-PATCH-OTHER",
+    "CH-P0-DELTA-MISMATCH",
+    "CH-P2-STRIP-EMPTY"
+  ]
+}

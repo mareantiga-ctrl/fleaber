@@ -1,0 +1,326 @@
+{
+  "stamp": "20260902T1612",
+  "prefix": "RTAX-20260902T1612",
+  "lentes": [
+    "AX1",
+    "AX2",
+    "AX4",
+    "AX7"
+  ],
+  "findings": [
+    {
+      "id": "AX1-method-PUT-payout",
+      "lens": "AX1",
+      "severity": "P2",
+      "title": "PUT create-connect-account criou Transfer",
+      "actor": "seller JWT",
+      "pre": "method PUT",
+      "repro": "PUT functions/v1/create-connect-account",
+      "expected": "405",
+      "obtained": "200 {\"success\":true,\"transferId\":\"tr_1UBFvmH7FWYUN3jhp2SAPnYq\",\"balance\":17}",
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "AX1-method-PATCH-payout",
+      "lens": "AX1",
+      "severity": "P2",
+      "title": "PATCH create-connect-account criou Transfer",
+      "actor": "seller JWT",
+      "pre": "method PATCH",
+      "repro": "PATCH functions/v1/create-connect-account",
+      "expected": "405",
+      "obtained": "200 {\"success\":true,\"transferId\":\"tr_1UBFvpH7FWYUN3jhrdHln3DQ\",\"balance\":16}",
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "AX1-method-DELETE-payout",
+      "lens": "AX1",
+      "severity": "P2",
+      "title": "DELETE create-connect-account criou Transfer",
+      "actor": "seller JWT",
+      "pre": "method DELETE",
+      "repro": "DELETE functions/v1/create-connect-account",
+      "expected": "405",
+      "obtained": "200 {\"success\":true,\"transferId\":\"tr_1UBFvrH7FWYUN3jhHMKn4IJE\",\"balance\":15}",
+      "proven": true,
+      "evidence": {}
+    }
+  ],
+  "blocked": [
+    {
+      "id": "AX4.wh-transfer.created",
+      "lens": "AX4",
+      "title": "webhook transfer.created",
+      "ev": {
+        "nosig": 400,
+        "junk": 400
+      }
+    },
+    {
+      "id": "AX4.wh-transfer.reversed",
+      "lens": "AX4",
+      "title": "webhook transfer.reversed",
+      "ev": {
+        "nosig": 400,
+        "junk": 400
+      }
+    },
+    {
+      "id": "AX4.wh-payout.paid",
+      "lens": "AX4",
+      "title": "webhook payout.paid",
+      "ev": {
+        "nosig": 400,
+        "junk": 400
+      }
+    },
+    {
+      "id": "AX4.wh-payout.failed",
+      "lens": "AX4",
+      "title": "webhook payout.failed",
+      "ev": {
+        "nosig": 400,
+        "junk": 400
+      }
+    },
+    {
+      "id": "AX4.wh-charge.refunded",
+      "lens": "AX4",
+      "title": "webhook charge.refunded",
+      "ev": {
+        "nosig": 400,
+        "junk": 400
+      }
+    },
+    {
+      "id": "AX4.wh-charge.dispute.created",
+      "lens": "AX4",
+      "title": "webhook charge.dispute.created",
+      "ev": {
+        "nosig": 400,
+        "junk": 400
+      }
+    },
+    {
+      "id": "AX4.wh-account.updated",
+      "lens": "AX4",
+      "title": "webhook account.updated",
+      "ev": {
+        "nosig": 400,
+        "junk": 400
+      }
+    },
+    {
+      "id": "AX4.wh-checkout.session.completed",
+      "lens": "AX4",
+      "title": "webhook checkout.session.completed",
+      "ev": {
+        "nosig": 400,
+        "junk": 400
+      }
+    },
+    {
+      "id": "AX1.crash-retry",
+      "lens": "AX1",
+      "title": "crash retry mesma Transfer",
+      "ev": {
+        "crash": "tr_1UBFvdH7FWYUN3jhdxNjQYLo",
+        "retry": "tr_1UBFvdH7FWYUN3jhdxNjQYLo"
+      }
+    },
+    {
+      "id": "AX1.grow",
+      "lens": "AX1",
+      "title": "amount maior idempotente",
+      "ev": "200 {\"success\":true,\"transferId\":\"tr_1UBFviH7FWYUN3jhRkMcx2Bd\",\"balance\":18,\"idempotent\":true}"
+    },
+    {
+      "id": "AX2.s2-userid",
+      "lens": "AX2",
+      "title": "user_id cruzado",
+      "ev": "400 {\"error\":\"Cannot create another user Stripe account.\",\"code\":\"payout_failed\"}"
+    },
+    {
+      "id": "AX2.patch-acct",
+      "lens": "AX2",
+      "title": "Connect id imutável JWT",
+      "ev": "200 []"
+    }
+  ],
+  "skipped": [],
+  "notes": [
+    {
+      "id": "fixture.balance",
+      "lens": "AX1",
+      "title": "service_role top-up seller ≥20€",
+      "ev": "200 [{\"id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"stripe_account_id\":\"acct_1U5mYbQeUNx8ar08\",\"balance\":20.00,\"updated_at\":\"2026-09-02T15:18:15.053578+00:00\"}]"
+    },
+    {
+      "id": "p2.snap",
+      "lens": "AX7",
+      "title": "saldos",
+      "ev": {
+        "buyer": 61.1,
+        "seller": 20.0,
+        "buyer2": 0,
+        "seller2": 0.0
+      }
+    },
+    {
+      "id": "ax4.wh.transfer.created",
+      "lens": "AX4",
+      "title": "webhook transfer.created",
+      "ev": {
+        "nosig": "400 {\"ok\":false,\"error\":\"missing_signature\"}",
+        "junk": "400 {\"ok\":false,\"error\":\"invalid_signature\"}"
+      }
+    },
+    {
+      "id": "ax4.wh.transfer.reversed",
+      "lens": "AX4",
+      "title": "webhook transfer.reversed",
+      "ev": {
+        "nosig": "400 {\"ok\":false,\"error\":\"missing_signature\"}",
+        "junk": "400 {\"ok\":false,\"error\":\"invalid_signature\"}"
+      }
+    },
+    {
+      "id": "ax4.wh.payout.paid",
+      "lens": "AX4",
+      "title": "webhook payout.paid",
+      "ev": {
+        "nosig": "400 {\"ok\":false,\"error\":\"missing_signature\"}",
+        "junk": "400 {\"ok\":false,\"error\":\"invalid_signature\"}"
+      }
+    },
+    {
+      "id": "ax4.wh.payout.failed",
+      "lens": "AX4",
+      "title": "webhook payout.failed",
+      "ev": {
+        "nosig": "400 {\"ok\":false,\"error\":\"missing_signature\"}",
+        "junk": "400 {\"ok\":false,\"error\":\"invalid_signature\"}"
+      }
+    },
+    {
+      "id": "ax4.wh.charge.refunded",
+      "lens": "AX4",
+      "title": "webhook charge.refunded",
+      "ev": {
+        "nosig": "400 {\"ok\":false,\"error\":\"missing_signature\"}",
+        "junk": "400 {\"ok\":false,\"error\":\"invalid_signature\"}"
+      }
+    },
+    {
+      "id": "ax4.wh.charge.dispute.created",
+      "lens": "AX4",
+      "title": "webhook charge.dispute.created",
+      "ev": {
+        "nosig": "400 {\"ok\":false,\"error\":\"missing_signature\"}",
+        "junk": "400 {\"ok\":false,\"error\":\"invalid_signature\"}"
+      }
+    },
+    {
+      "id": "ax4.wh.account.updated",
+      "lens": "AX4",
+      "title": "webhook account.updated",
+      "ev": {
+        "nosig": "400 {\"ok\":false,\"error\":\"missing_signature\"}",
+        "junk": "400 {\"ok\":false,\"error\":\"invalid_signature\"}"
+      }
+    },
+    {
+      "id": "ax4.wh.checkout.session.completed",
+      "lens": "AX4",
+      "title": "webhook checkout.session.completed",
+      "ev": {
+        "nosig": "400 {\"ok\":false,\"error\":\"missing_signature\"}",
+        "junk": "400 {\"ok\":false,\"error\":\"invalid_signature\"}"
+      }
+    },
+    {
+      "id": "ax1.crash",
+      "lens": "AX1",
+      "title": "crash after_stripe",
+      "ev": "500 {\"success\":false,\"error\":\"crash_inject:after_stripe_before_finish\",\"code\":\"payout_pending_reconcile\",\"needs_reconcile\":true,\"transferId\":\"tr_1UBFvdH7FWYUN3jhdxNjQYLo\",\"idempotency_key\":\"p_36603e7c9f0fed57d5fb439dd0e92d37912a981ca7e6f73bef49…"
+    },
+    {
+      "id": "ax1.crash.retry",
+      "lens": "AX1",
+      "title": "retry mesma key",
+      "ev": "200 {\"success\":true,\"transferId\":\"tr_1UBFvdH7FWYUN3jhdxNjQYLo\",\"balance\":19}"
+    },
+    {
+      "id": "ax1.grow-amount",
+      "lens": "AX1",
+      "title": "mesma key 100 depois 500",
+      "ev": {
+        "g1": "200 {\"success\":true,\"transferId\":\"tr_1UBFviH7FWYUN3jhRkMcx2Bd\",\"balance\":18}",
+        "g2": "200 {\"success\":true,\"transferId\":\"tr_1UBFviH7FWYUN3jhRkMcx2Bd\",\"balance\":18,\"idempotent\":true}",
+        "same": true
+      }
+    },
+    {
+      "id": "ax1.method.PUT",
+      "lens": "AX1",
+      "title": "PUT payout",
+      "ev": "200 {\"success\":true,\"transferId\":\"tr_1UBFvmH7FWYUN3jhp2SAPnYq\",\"balance\":17}"
+    },
+    {
+      "id": "ax1.method.PATCH",
+      "lens": "AX1",
+      "title": "PATCH payout",
+      "ev": "200 {\"success\":true,\"transferId\":\"tr_1UBFvpH7FWYUN3jhrdHln3DQ\",\"balance\":16}"
+    },
+    {
+      "id": "ax1.method.DELETE",
+      "lens": "AX1",
+      "title": "DELETE payout",
+      "ev": "200 {\"success\":true,\"transferId\":\"tr_1UBFvrH7FWYUN3jhHMKn4IJE\",\"balance\":15}"
+    },
+    {
+      "id": "ax2.s2.userid",
+      "lens": "AX2",
+      "title": "S2 user_id=S1",
+      "ev": "400 {\"error\":\"Cannot create another user Stripe account.\",\"code\":\"payout_failed\"}"
+    },
+    {
+      "id": "ax2.patch.acct",
+      "lens": "AX2",
+      "title": "PATCH stripe_account_id",
+      "ev": "200 []"
+    },
+    {
+      "id": "p2.wallets.end",
+      "lens": "AX7",
+      "title": "saldos",
+      "ev": {
+        "w0": {
+          "buyer": 61.1,
+          "seller": 20.0,
+          "buyer2": 0,
+          "seller2": 0.0
+        },
+        "w1": {
+          "buyer": 61.1,
+          "seller": 15.0,
+          "buyer2": 0,
+          "seller2": 0.0
+        },
+        "dSeller": -5.0
+      }
+    }
+  ],
+  "actors": {
+    "buyer": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+    "seller": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+    "buyer2": "92535f34-6edd-43ee-87e5-78e8a8ff3c0e",
+    "seller2": "d5e59f63-ba22-4a82-b136-ed44985e3bef"
+  },
+  "created": {
+    "orders": [],
+    "products": []
+  }
+}

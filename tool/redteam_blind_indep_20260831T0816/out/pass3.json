@@ -1,0 +1,266 @@
+{
+  "auditor": "REDTEAM_BLIND_INDEP_v4",
+  "stamp": "20260831T0816",
+  "project": "fxdknzrqjenzqcvnwqqq",
+  "production_touched": false,
+  "fase4": false,
+  "corrections_applied": false,
+  "fresh_id": "9edfd07a-a55c-4a42-86a6-e2f6c6815350",
+  "findings": [
+    {
+      "id": "RTI4-P1-EDGE-UNLIST-LIVE",
+      "title": "Edge cria Checkout Session de SKU unlistado via live_id activo (sem live_item)",
+      "actor": "buyer JWT + Edge",
+      "sev": "P1",
+      "well": "1",
+      "pre": "list_on_marketplace=false, Hub vazio, product NÃO está em live_items desta live",
+      "request": "create-payment-intent order+buyer_id+live_id",
+      "before": {
+        "product": {
+          "id": "bf6c5e1d-f59f-471c-be48-f12d5f36d044",
+          "title": "RTI4-20260831T0816-UA",
+          "is_sold": false,
+          "list_on_marketplace": false,
+          "quantity": 2,
+          "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588"
+        },
+        "live_items": []
+      },
+      "after": {
+        "checkoutSessionId": "cs_test_a1R6XIqqgsW4CTDjkdvFXUM7999EtuKgwuTtNXBIylvARxBJtkj4Zgxq1v",
+        "hasUrl": true,
+        "http": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1R6XIqqgsW4CTDjkdvFXUM7999EtuKgwuTtNXBIylvARxBJtkj4Zgxq1v#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21oYWlsUnxrVkRhQUQyNlJjSWBCN3BXNXVvVT1haml…"
+      },
+      "impact": "SESSION CRIADA sobre montra morta. Qualquer live activo do seller reabre catálogo unlistado a quem tenha o UUID. Captura ≠ session — pass2/browser.",
+      "repro": "seller unlist + POST orders live_id=live activa (sem live_item) + create-payment-intent"
+    },
+    {
+      "id": "RTI4-P1-FRESH-DEAD-LIVE",
+      "title": "buyer fresco hold de unlist alheio via live_id",
+      "actor": "fresh",
+      "sev": "P1",
+      "well": "1",
+      "pre": "signup; UUID conhecido; live activa seller",
+      "request": "POST orders",
+      "before": "bf6c5e1d-f59f-471c-be48-f12d5f36d044",
+      "after": "201 [{\"id\":\"247cbc6c-a28f-4de7-a493-5b9afe726cfd\",\"created_at\":\"2026-08-31T07:31:04.282499+00:00\",\"product_id\":\"bf6c5e1d-f59f-471c-be48-f12d5f36d044\",\"buyer_id\":\"9edfd07a-a55c-4a42-86a6-e2f6c6815350\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"price_total\":4.50,\"shipping_meth…",
+      "impact": "UUID + live activa = catálogo morto reaberto a qualquer conta.",
+      "repro": "signup + POST orders live_id"
+    },
+    {
+      "id": "RTI4-P1-OFFER-UNLIST",
+      "title": "JWT cria product_offer em SKU unlistado (Hub vazio)",
+      "actor": "buyer",
+      "sev": "P2",
+      "well": "1",
+      "pre": "list_on_marketplace=false; REST buyer SELECT vazio antes do offer?",
+      "request": "POST product_offers",
+      "before": "bf6c5e1d-f59f-471c-be48-f12d5f36d044",
+      "after": {
+        "id": "38d0d5a4-907a-4d70-ace1-79434f3b6fd8",
+        "status": "pending",
+        "amount": 1.0,
+        "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+        "product_id": "bf6c5e1d-f59f-471c-be48-f12d5f36d044"
+      },
+      "impact": "Canal de negociação em catálogo morto se o UUID for conhecido.",
+      "repro": "POST product_offers product_id unlist"
+    }
+  ],
+  "holds": [
+    {
+      "id": "p1b.sold.live",
+      "title": "is_sold continua bloqueado com live",
+      "well": "1",
+      "evidence": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"order_hold_product_sold\"}"
+    },
+    {
+      "id": "p1b.offer.self",
+      "title": "self-accept recusado ou revertido",
+      "well": "1",
+      "evidence": {
+        "id": "38d0d5a4-907a-4d70-ace1-79434f3b6fd8",
+        "status": "pending",
+        "amount": 1.0
+      }
+    },
+    {
+      "id": "p3.wallets.scope",
+      "title": "wallets buyer scoped",
+      "well": "3",
+      "evidence": "200 [{\"id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"balance\":22.75}]"
+    }
+  ],
+  "notes": [
+    {
+      "id": "p1b.context",
+      "title": "unlist+live context",
+      "well": "1",
+      "detail": {
+        "product": {
+          "id": "bf6c5e1d-f59f-471c-be48-f12d5f36d044",
+          "title": "RTI4-20260831T0816-UA",
+          "is_sold": false,
+          "list_on_marketplace": false,
+          "quantity": 2,
+          "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588"
+        },
+        "live": {
+          "id": "4d2efb5a-d520-4478-8d8d-1a2a0a92cc5c",
+          "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+          "vendedor_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+          "status": "live",
+          "is_active": true,
+          "title": "P001R raffle 1787818836352734"
+        },
+        "live_items_for_sku": []
+      }
+    },
+    {
+      "id": "p1b.edge.unlist.live",
+      "title": "edge checkout unlist+live",
+      "well": "1",
+      "detail": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1R6XIqqgsW4CTDjkdvFXUM7999EtuKgwuTtNXBIylvARxBJtkj4Zgxq1v#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21oYWlsUnxrVkRhQUQyNlJjSWBCN3BXNXVvVT1haml…"
+    },
+    {
+      "id": "p1b.settle.unpaid",
+      "title": "GET settle session unlist-live",
+      "well": "1",
+      "detail": {
+        "http": "402 Pagamento ainda não confirmado. Se já pagaste, aguarda alguns segundos e volta à app Fleaber.",
+        "order": {
+          "id": "73be7fe0-4f15-409b-9eb4-93fec9f5fb5b",
+          "status": "reserva_pendente",
+          "amount_paid_cents": null,
+          "stripe_checkout_session_id": "cs_test_a1R6XIqqgsW4CTDjkdvFXUM7999EtuKgwuTtNXBIylvARxBJtkj4Zgxq1v"
+        }
+      }
+    },
+    {
+      "id": "p1b.sold.live",
+      "title": "is_sold + live_id activo",
+      "well": "1",
+      "detail": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"order_hold_product_sold\"}"
+    },
+    {
+      "id": "p1b.fresh.unlist.live",
+      "title": "fresh hold unlist+live",
+      "well": "1",
+      "detail": "201 [{\"id\":\"247cbc6c-a28f-4de7-a493-5b9afe726cfd\",\"created_at\":\"2026-08-31T07:31:04.282499+00:00\",\"product_id\":\"bf6c5e1d-f59f-471c-be48-f12d5f36d044\",\"buyer_id\":\"9edfd07a-a55c-4a42-86a6-e2f6c6815350\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"price_total\":4.50,\"shipping_meth…"
+    },
+    {
+      "id": "p1b.offers",
+      "title": "offers on unlist",
+      "well": "1",
+      "detail": "200 [{\"id\":\"38d0d5a4-907a-4d70-ace1-79434f3b6fd8\",\"status\":\"pending\",\"amount\":1.00,\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"product_id\":\"bf6c5e1d-f59f-471c-be48-f12d5f36d044\"}]"
+    },
+    {
+      "id": "p1b.offer.self.accept",
+      "title": "buyer accept own offer unlist",
+      "well": "1",
+      "detail": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"offer_accept_not_authorized\"} after=pending"
+    },
+    {
+      "id": "p3.bundle.cols",
+      "title": "bundle sample",
+      "well": "3",
+      "detail": "200 [{\"id\":\"52a81196-a882-448f-92e0-292d673cf1bd\",\"seller_id\":\"69104e91-6a00-40d9-a7c9-b1571422ae43\",\"buyer_id\":\"e621595b-80f2-49e7-a7c8-01c8d5268c78\",\"chat_id\":\"8e5e1090-aec5-4ba0-81c4-c3265017a1e6\",\"product_ids\":[\"bf16dbf0-f826-4b9d-b50a-0c7a347a3bd7\"],\"subtotal_eur\":31.00,\"discoun…"
+    },
+    {
+      "id": "p1b.bundle.accept",
+      "title": "buyer bundle accepted",
+      "well": "1",
+      "detail": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"bundle_products_required\"}"
+    },
+    {
+      "id": "p3.wallets.anon",
+      "title": "wallets anon",
+      "well": "3",
+      "detail": "200 []"
+    },
+    {
+      "id": "p3.wallets.buyer",
+      "title": "wallets buyer",
+      "well": "3",
+      "detail": "200 [{\"id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"balance\":22.75}]"
+    },
+    {
+      "id": "p4.cron2.batata_expire_product_offers.anon",
+      "title": "batata_expire_product_offers",
+      "well": "4",
+      "detail": "401 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_expire_product_offers\"}"
+    },
+    {
+      "id": "p4.cron2.batata_expire_product_offers.buyer",
+      "title": "batata_expire_product_offers",
+      "well": "4",
+      "detail": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_expire_product_offers\"}"
+    },
+    {
+      "id": "p4.cron2.batata_process_auto_feedback.anon",
+      "title": "batata_process_auto_feedback",
+      "well": "4",
+      "detail": "404 {\"code\":\"PGRST202\",\"details\":\"Searched for the function public.batata_process_auto_feedback without parameters or with a single unnamed json/jsonb parameter, but no matches were found in the schema cache.\",\"hint\":\"Perhaps you meant to call the function public.batata_generate_auto…"
+    },
+    {
+      "id": "p4.cron2.batata_process_auto_feedback.buyer",
+      "title": "batata_process_auto_feedback",
+      "well": "4",
+      "detail": "404 {\"code\":\"PGRST202\",\"details\":\"Searched for the function public.batata_process_auto_feedback without parameters or with a single unnamed json/jsonb parameter, but no matches were found in the schema cache.\",\"hint\":\"Perhaps you meant to call the function public.batata_generate_auto…"
+    },
+    {
+      "id": "p4.cron2.batata_wallet_payout_finalize.anon",
+      "title": "batata_wallet_payout_finalize",
+      "well": "4",
+      "detail": "404 {\"code\":\"PGRST202\",\"details\":\"Searched for the function public.batata_wallet_payout_finalize without parameters or with a single unnamed json/jsonb parameter, but no matches were found in the schema cache.\",\"hint\":\"Perhaps you meant to call the function public.batata_wallet_payou…"
+    },
+    {
+      "id": "p4.cron2.batata_wallet_payout_finalize.buyer",
+      "title": "batata_wallet_payout_finalize",
+      "well": "4",
+      "detail": "404 {\"code\":\"PGRST202\",\"details\":\"Searched for the function public.batata_wallet_payout_finalize without parameters or with a single unnamed json/jsonb parameter, but no matches were found in the schema cache.\",\"hint\":\"Perhaps you meant to call the function public.batata_wallet_payou…"
+    },
+    {
+      "id": "p4.cron2.batata_invoke_livekit_egress_cleanup.anon",
+      "title": "batata_invoke_livekit_egress_cleanup",
+      "well": "4",
+      "detail": "401 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_invoke_livekit_egress_cleanup\"}"
+    },
+    {
+      "id": "p4.cron2.batata_invoke_livekit_egress_cleanup.buyer",
+      "title": "batata_invoke_livekit_egress_cleanup",
+      "well": "4",
+      "detail": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_invoke_livekit_egress_cleanup\"}"
+    },
+    {
+      "id": "p4.cron2.batata_claim_expired_reservations.anon",
+      "title": "batata_claim_expired_reservations",
+      "well": "4",
+      "detail": "404 {\"code\":\"PGRST202\",\"details\":\"Searched for the function public.batata_claim_expired_reservations without parameters or with a single unnamed json/jsonb parameter, but no matches were found in the schema cache.\",\"hint\":\"Perhaps you meant to call the function public.batata_claim_ex…"
+    },
+    {
+      "id": "p4.cron2.batata_claim_expired_reservations.buyer",
+      "title": "batata_claim_expired_reservations",
+      "well": "4",
+      "detail": "404 {\"code\":\"PGRST202\",\"details\":\"Searched for the function public.batata_claim_expired_reservations without parameters or with a single unnamed json/jsonb parameter, but no matches were found in the schema cache.\",\"hint\":\"Perhaps you meant to call the function public.batata_claim_ex…"
+    },
+    {
+      "id": "p3.oa.svc",
+      "title": "openapi svc",
+      "well": "3",
+      "detail": "200 len=479929"
+    },
+    {
+      "id": "p4.notif.view",
+      "title": "notifications_view",
+      "well": "4",
+      "detail": "200 []"
+    },
+    {
+      "id": "p3.fomo.anon",
+      "title": "fomo anon",
+      "well": "3",
+      "detail": "200 {\"ok\": true, \"items\": [{\"status\": \"available\", \"is_last_unit\": false, \"live_item_id\": \"ad87380e-c18e-4ce6-8ffa-4f2d3bd34b23\", \"available_qty\": 5, \"pending_queue_count\": 0, \"display_reserved_qty\": 0}], \"live_id\": \"4d2efb5a-d520-4478-8d8d-1a2a0a92cc5c\", \"is_active\": true, \"live_sta…"
+    }
+  ]
+}

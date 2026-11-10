@@ -1,0 +1,552 @@
+{
+  "stamp": "20260902T1908",
+  "prefix": "RTBP-20260902T1908",
+  "lenses": [
+    "BP1",
+    "BP2",
+    "BP4",
+    "BP6",
+    "BP7"
+  ],
+  "findings": [
+    {
+      "id": "P2-BP2-ip-decimal-regression",
+      "lens": "BP2",
+      "severity": "P2",
+      "title": "web_return IP decimal ainda 303 loopback (regressão do fecho claimed)",
+      "actor": "browser",
+      "pre": "isSuspiciousHostname no sanitizer",
+      "repro": "GET web_return_origin=https://2130706433",
+      "expected": "sem Location 127.0.0.1",
+      "obtained": "303 loc=https://127.0.0.1/wallet acao=* ",
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "P1-BP4-nfkc-two-transfers",
+      "lens": "BP4",
+      "severity": "P1",
+      "title": "idempotency NFKC (ﬁ vs fi) gerou duas Transfers Stripe",
+      "actor": "seller JWT",
+      "pre": "normalize só NFC; app gera wd_{uuid}_{cents}_{ms} (sem ligaduras)",
+      "repro": "duas POST amount=100 keys NFKC-equivalentes",
+      "expected": "1 Transfer / 2ª idempotente",
+      "obtained": {
+        "ta": "tr_1UBIdZH7FWYUN3jhcYUleECR",
+        "tb": "tr_1UBIdcH7FWYUN3jhp2DDkdsz",
+        "a": "200 loc=- acao=* {\"success\":true,\"transferId\":\"tr_1UBIdZH7FWYUN3jhcYUleECR\",\"balance\":13}",
+        "b": "200 loc=- acao=* {\"success\":true,\"transferId\":\"tr_1UBIdcH7FWYUN3jhp2DDkdsz\",\"balance\":12}"
+      },
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "P2-BP4-zwj-two-transfers",
+      "lens": "BP4",
+      "severity": "P2",
+      "title": "ZWJ no meio da key = 2 Transfers (hostile; app não gera ZWJ)",
+      "actor": "seller JWT hostil",
+      "pre": "normalize NFC sem strip Cf",
+      "repro": "key vs key com U+200D",
+      "expected": "defesa-em-profundidade: strip ignoráveis",
+      "obtained": {
+        "t1": "tr_1UBIdkH7FWYUN3jhTigmFodG",
+        "t2": "tr_1UBIdmH7FWYUN3jhp8MeDMPj"
+      },
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "P2-BP4-casefold-two-transfers",
+      "lens": "BP4",
+      "severity": "P2",
+      "title": "casefold da idempotency_key = 2 Transfers (app gera lowercase wd_)",
+      "actor": "seller JWT hostil",
+      "pre": "sem casefold no hash",
+      "repro": "PREFIX_CaseFoldK vs PREFIX_casefoldk",
+      "expected": "defesa: casefold opcional; app já é estável",
+      "obtained": {
+        "t1": "tr_1UBIdpH7FWYUN3jhEBABGfih",
+        "t2": "tr_1UBIdsH7FWYUN3jhOYGV9fX4"
+      },
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "P2-BP4-fullwidth-two-transfers",
+      "lens": "BP4",
+      "severity": "P2",
+      "title": "NFKC fullwidth vs ASCII = 2 Transfers",
+      "actor": "seller JWT hostil",
+      "pre": "só NFC",
+      "repro": "fwkey vs ｆｗkey",
+      "expected": "NFKC se quiserem colapsar compatibility",
+      "obtained": {
+        "t1": "tr_1UBIdvH7FWYUN3jhqAYYz0WB",
+        "t2": "tr_1UBIdxH7FWYUN3jhylCi0x9v"
+      },
+      "proven": true,
+      "evidence": {}
+    }
+  ],
+  "blocked": [
+    {
+      "id": "http.put",
+      "lens": "BP1",
+      "title": "PUT Transfer 405 (exacto, não contar)",
+      "ev": "405 loc=- acao=* {\"error\":\"Method not allowed.\"}"
+    },
+    {
+      "id": "http.patch",
+      "lens": "BP1",
+      "title": "PATCH connect rejeitado",
+      "ev": "405 loc=- acao=* {\"error\":\"Method not allowed.\"}"
+    },
+    {
+      "id": "http.delete",
+      "lens": "BP1",
+      "title": "DELETE connect rejeitado",
+      "ev": "405 loc=- acao=* {\"error\":\"Method not allowed.\"}"
+    },
+    {
+      "id": "uid.spoof",
+      "lens": "BP6",
+      "title": "user_id alheio rejeitado",
+      "ev": "400 loc=- acao=* {\"error\":\"Cannot create another user Stripe account.\",\"code\":\"payout_failed\"}"
+    },
+    {
+      "id": "amt.array",
+      "lens": "BP1",
+      "title": "amount:[100] rejeitado",
+      "ev": "400 loc=- acao=* {\"error\":\"Valor de levantamento inválido.\",\"code\":\"payout_failed\"}"
+    },
+    {
+      "id": "amt.obj",
+      "lens": "BP1",
+      "title": "amount object rejeitado",
+      "ev": "400 loc=- acao=* {\"error\":\"Valor de levantamento inválido.\",\"code\":\"payout_failed\"}"
+    },
+    {
+      "id": "amt.sci",
+      "lens": "BP1",
+      "title": "amount 1e2 rejeitado",
+      "ev": "400 loc=- acao=* {\"error\":\"Valor de levantamento inválido.\",\"code\":\"payout_failed\"}"
+    },
+    {
+      "id": "amt.hex",
+      "lens": "BP1",
+      "title": "amount 0x64 rejeitado",
+      "ev": "400 loc=- acao=* {\"error\":\"Valor de levantamento inválido.\",\"code\":\"payout_failed\"}"
+    },
+    {
+      "id": "amt.frac",
+      "lens": "BP1",
+      "title": "amount 100.5 rejeitado",
+      "ev": "400 loc=- acao=* {\"error\":\"O valor do levantamento tem de ser em cêntimos.\",\"code\":\"payout_failed\"}"
+    },
+    {
+      "id": "amt.true",
+      "lens": "BP1",
+      "title": "amount:true rejeitado (exacto, não contar)",
+      "ev": "400 loc=- acao=* {\"error\":\"Valor de levantamento inválido.\",\"code\":\"payout_failed\"}"
+    },
+    {
+      "id": "rpc.debit",
+      "lens": "BP6",
+      "title": "JWT não executa batata_wallet_payout_debit",
+      "ev": "403 loc=- acao=- {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_wallet_payout_debit\"}"
+    },
+    {
+      "id": "rpc.finish",
+      "lens": "BP6",
+      "title": "JWT não executa batata_wallet_payout_finish",
+      "ev": "403 loc=- acao=- {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_wallet_payout_finish\"}"
+    },
+    {
+      "id": "rpc.debit.anon",
+      "lens": "BP6",
+      "title": "anon não executa payout debit",
+      "ev": "401 loc=- acao=- {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_wallet_payout_debit\"}"
+    },
+    {
+      "id": "wallet.patch",
+      "lens": "BP4",
+      "title": "JWT PATCH wallets stripe_account_id/balance bloqueado",
+      "ev": {
+        "hit": "200 loc=- acao=- []",
+        "acct_now": "acct_1U5mYbQeUNx8ar08",
+        "bal_now": 15.0
+      }
+    },
+    {
+      "id": "wallet.insert",
+      "lens": "BP4",
+      "title": "JWT INSERT wallets bloqueado",
+      "ev": "403 loc=- acao=- {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table wallets\"}"
+    },
+    {
+      "id": "ret.evil",
+      "lens": "BP2",
+      "title": "evil.com não redirecciona",
+      "ev": "200 loc=- acao=* <!DOCTYPE html><html lang=\"pt\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Fleaber</title><script>window.setTimeout(function(){ window.location.href = \"fleaber:/…"
+    },
+    {
+      "id": "ret.userinfo",
+      "lens": "BP2",
+      "title": "userinfo não hijack",
+      "ev": "200 loc=- acao=* <!DOCTYPE html><html lang=\"pt\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Fleaber</title><script>window.setTimeout(function(){ window.location.href = \"fleaber:/…"
+    },
+    {
+      "id": "ret.sub",
+      "lens": "BP2",
+      "title": "attacker.fleaber.pt rejeitado",
+      "ev": "200 loc=- acao=* <!DOCTYPE html><html lang=\"pt\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Fleaber</title><script>window.setTimeout(function(){ window.location.href = \"fleaber:/…"
+    },
+    {
+      "id": "ret.idn",
+      "lens": "BP2",
+      "title": "ligature host não hijack",
+      "ev": "303 loc=https://fleaber.pt/wallet acao=* "
+    },
+    {
+      "id": "ret.file",
+      "lens": "BP2",
+      "title": "file: rejeitado",
+      "ev": "200 loc=- acao=* <!DOCTYPE html><html lang=\"pt\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Fleaber</title><script>window.setTimeout(function(){ window.location.href = \"fleaber:/…"
+    },
+    {
+      "id": "ret.js",
+      "lens": "BP2",
+      "title": "javascript: rejeitado",
+      "ev": "403 loc=- acao=- <!DOCTYPE html>\n<!--[if lt IE 7]> <html class=\"no-js ie6 oldie\" lang=\"en-US\"> <![endif]-->\n<!--[if IE 7]>    <html class=\"no-js ie7 oldie\" lang=\"en-US\"> <![endif]-->\n<!--[if IE 8]>    <html class=\"no-js ie8 oldie\" lang=\"…"
+    },
+    {
+      "id": "ret.ipv6",
+      "lens": "BP2",
+      "title": "IPv6 loopback rejeitado",
+      "ev": "200 loc=- acao=* <!DOCTYPE html><html lang=\"pt\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Fleaber</title><script>window.setTimeout(function(){ window.location.href = \"fleaber:/…"
+    },
+    {
+      "id": "idemp.nfc-nfd",
+      "lens": "BP4",
+      "title": "NFC=NFD mesma Transfer (fecho ok, não contar)",
+      "ev": "tr_1UBIdVH7FWYUN3jhOcljLZJX"
+    },
+    {
+      "id": "idemp.bom",
+      "lens": "BP4",
+      "title": "BOM não duplicou Transfer (ou ambos falharam igual)",
+      "ev": {
+        "t1": "tr_1UBIdfH7FWYUN3jhxkW2BF4u",
+        "t2": "tr_1UBIdfH7FWYUN3jhxkW2BF4u",
+        "s1": 200,
+        "s2": 200
+      }
+    },
+    {
+      "id": "idemp.race",
+      "lens": "BP4",
+      "title": "race mesma key ≤1 Transfer",
+      "ev": {
+        "n": 1,
+        "a": 200,
+        "b": 200
+      }
+    },
+    {
+      "id": "crash.nosec",
+      "lens": "BP4",
+      "title": "crash_inject ignorado sem secret",
+      "ev": "200 loc=- acao=* {\"success\":true,\"transferId\":\"tr_1UBIe2H7FWYUN3jhomOUcrdt\",\"balance\":3}"
+    },
+    {
+      "id": "crash.retry",
+      "lens": "BP4",
+      "title": "retry após crash não criou 2ª Transfer distinta",
+      "ev": {
+        "crash_tid": "",
+        "retry_tid": "tr_1UBIe6H7FWYUN3jhgBhMMAJZ",
+        "retry_idem": ""
+      }
+    },
+    {
+      "id": "crash2.retry",
+      "lens": "BP4",
+      "title": "retry após Transfer não duplicou id",
+      "ev": {
+        "crash": "tr_1UBIe9H7FWYUN3jh1wcMx17N",
+        "retry": "tr_1UBIe9H7FWYUN3jh1wcMx17N",
+        "idem": ""
+      }
+    },
+    {
+      "id": "bp6.onboard.s2",
+      "lens": "BP6",
+      "title": "buyer não cria Connect de S2",
+      "ev": "400 loc=- acao=* {\"error\":\"Cannot create another user Stripe account.\",\"code\":\"payout_failed\"}"
+    }
+  ],
+  "skipped": [],
+  "notes": [
+    {
+      "id": "wallet.s1",
+      "lens": "BP7",
+      "title": "seller wallet before",
+      "ev": {
+        "id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+        "balance": 16.0,
+        "stripe_account_id": "acct_1U5mYbQeUNx8ar08",
+        "updated_at": "2026-09-02T18:05:14.686878+00:00"
+      }
+    },
+    {
+      "id": "ledger.s1",
+      "lens": "BP4",
+      "title": "ledger head",
+      "ev": [
+        {
+          "k": "p_c30f2add1f96d3d1008a808a5cf926cff1f0047413d16cf84a00226c517831",
+          "st": "transferred",
+          "tr": "tr_1UBIX8H7FWYUN3jh4bPp6A6m",
+          "cents": 100
+        },
+        {
+          "k": "p_cd4270daf41a25a99e63644e4eed2b0b9d543e3b084238bd618487b3f71b88",
+          "st": "transferred",
+          "tr": "tr_1UBIVlH7FWYUN3jhJje2Mwst",
+          "cents": 100
+        },
+        {
+          "k": "p_accfe59886e906ea69a675921256f2bcca1bf6856b41f81644111989e837b2",
+          "st": "transferred",
+          "tr": "tr_1UBIIAH7FWYUN3jhND6g1NhV",
+          "cents": 100
+        },
+        {
+          "k": "p_bb3d5cd0604d49ff8adf6366a6328469c33e5a3575e40edf4188e4ac0541f5",
+          "st": "transferred",
+          "tr": "tr_1UBI3RH7FWYUN3jhFoOejPyY",
+          "cents": 100
+        },
+        {
+          "k": "p_9d1e35b38172bc08462902b2751168c1dabd7a4da0db1947ca731faff5a710",
+          "st": "transferred",
+          "tr": "tr_1UBI3RH7FWYUN3jhABtrudnW",
+          "cents": 100
+        }
+      ]
+    },
+    {
+      "id": "http.put",
+      "lens": "BP1",
+      "title": "PUT connect (exacto AX — não contar)",
+      "ev": "405 loc=- acao=* {\"error\":\"Method not allowed.\"}"
+    },
+    {
+      "id": "dest.body",
+      "lens": "BP4",
+      "title": "destination extra fields",
+      "ev": "200 loc=- acao=* {\"success\":true,\"transferId\":\"tr_1UBIdMH7FWYUN3jhyNNNFyZU\",\"balance\":15}"
+    },
+    {
+      "id": "dest.body.ok",
+      "lens": "BP4",
+      "title": "payout succeeded — destination field ignored? check ledger dest via Stripe n/a",
+      "ev": "tr_1UBIdMH7FWYUN3jhyNNNFyZU"
+    },
+    {
+      "id": "amt.true",
+      "lens": "BP1",
+      "title": "amount:true (exacto AX — não contar)",
+      "ev": "400 loc=- acao=* {\"error\":\"Valor de levantamento inválido.\",\"code\":\"payout_failed\"}"
+    },
+    {
+      "id": "buyer.payout",
+      "lens": "BP6",
+      "title": "buyer tenta levantamento",
+      "ev": "400 loc=- acao=* {\"error\":\"Falta associar a conta bancária no Stripe. Abre outra vez Configurar conta bancária e adiciona o IBAN de teste.\",\"code\":\"payout_failed\"}"
+    },
+    {
+      "id": "ret.idn",
+      "lens": "BP2",
+      "title": "IDN ligature ﬂeaber.pt",
+      "ev": "303 loc=https://fleaber.pt/wallet acao=* "
+    },
+    {
+      "id": "ret.ipdec",
+      "lens": "BP2",
+      "title": "IP decimal (baseline — só regressão)",
+      "ev": "303 loc=https://127.0.0.1/wallet acao=* "
+    },
+    {
+      "id": "ret.tab",
+      "lens": "BP2",
+      "title": "tab encoded host",
+      "ev": "200 loc=- acao=* <!DOCTYPE html><html lang=\"pt\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Fleaber</title><script>window.setTimeout(function(){ window.location.href = \"fleaber:/…"
+    },
+    {
+      "id": "idemp.nfc",
+      "lens": "BP4",
+      "title": "NFC (exacto — não contar)",
+      "ev": "200 loc=- acao=* {\"success\":true,\"transferId\":\"tr_1UBIdVH7FWYUN3jhOcljLZJX\",\"balance\":14}"
+    },
+    {
+      "id": "idemp.nfd",
+      "lens": "BP4",
+      "title": "NFD (exacto — não contar)",
+      "ev": "200 loc=- acao=* {\"success\":true,\"transferId\":\"tr_1UBIdVH7FWYUN3jhOcljLZJX\",\"balance\":14,\"idempotent\":true}"
+    },
+    {
+      "id": "idemp.nfkc.a",
+      "lens": "BP4",
+      "title": "NFKC ascii fi",
+      "ev": "200 loc=- acao=* {\"success\":true,\"transferId\":\"tr_1UBIdZH7FWYUN3jhcYUleECR\",\"balance\":13}"
+    },
+    {
+      "id": "idemp.nfkc.b",
+      "lens": "BP4",
+      "title": "NFKC ligature fi",
+      "ev": "200 loc=- acao=* {\"success\":true,\"transferId\":\"tr_1UBIdcH7FWYUN3jhp2DDkdsz\",\"balance\":12}"
+    },
+    {
+      "id": "idemp.bom.1",
+      "lens": "BP4",
+      "title": "BOM none",
+      "ev": "200 loc=- acao=* {\"success\":true,\"transferId\":\"tr_1UBIdfH7FWYUN3jhxkW2BF4u\",\"balance\":11}"
+    },
+    {
+      "id": "idemp.bom.2",
+      "lens": "BP4",
+      "title": "BOM prefix",
+      "ev": "200 loc=- acao=* {\"success\":true,\"transferId\":\"tr_1UBIdfH7FWYUN3jhxkW2BF4u\",\"balance\":11,\"idempotent\":true}"
+    },
+    {
+      "id": "idemp.zwj.a",
+      "lens": "BP4",
+      "title": "ZWJ none",
+      "ev": "200 loc=- acao=* {\"success\":true,\"transferId\":\"tr_1UBIdkH7FWYUN3jhTigmFodG\",\"balance\":10}"
+    },
+    {
+      "id": "idemp.zwj.b",
+      "lens": "BP4",
+      "title": "ZWJ mid",
+      "ev": "200 loc=- acao=* {\"success\":true,\"transferId\":\"tr_1UBIdmH7FWYUN3jhp8MeDMPj\",\"balance\":9}"
+    },
+    {
+      "id": "idemp.case.a",
+      "lens": "BP4",
+      "title": "CaseFold",
+      "ev": "200 loc=- acao=* {\"success\":true,\"transferId\":\"tr_1UBIdpH7FWYUN3jhEBABGfih\",\"balance\":8}"
+    },
+    {
+      "id": "idemp.case.b",
+      "lens": "BP4",
+      "title": "casefold",
+      "ev": "200 loc=- acao=* {\"success\":true,\"transferId\":\"tr_1UBIdsH7FWYUN3jhOYGV9fX4\",\"balance\":7}"
+    },
+    {
+      "id": "idemp.fw.a",
+      "lens": "BP4",
+      "title": "fullwidth ascii",
+      "ev": "200 loc=- acao=* {\"success\":true,\"transferId\":\"tr_1UBIdvH7FWYUN3jhqAYYz0WB\",\"balance\":6}"
+    },
+    {
+      "id": "idemp.fw.b",
+      "lens": "BP4",
+      "title": "fullwidth fw",
+      "ev": "200 loc=- acao=* {\"success\":true,\"transferId\":\"tr_1UBIdxH7FWYUN3jhylCi0x9v\",\"balance\":5}"
+    },
+    {
+      "id": "idemp.race",
+      "lens": "BP4",
+      "title": "Future.wait mesma key",
+      "ev": {
+        "a": "200 loc=- acao=* {\"success\":true,\"transferId\":\"tr_1UBIe0H7FWYUN3jh0BjGefYe\",\"balance\":4}",
+        "b": "200 loc=- acao=* {\"success\":true,\"transferId\":\"tr_1UBIe0H7FWYUN3jh0BjGefYe\",\"balance\":4}",
+        "uniq": [
+          "tr_1UBIe0H7FWYUN3jh0BjGefYe"
+        ]
+      }
+    },
+    {
+      "id": "crash.nosec",
+      "lens": "BP4",
+      "title": "crash_inject sem header secret",
+      "ev": "200 loc=- acao=* {\"success\":true,\"transferId\":\"tr_1UBIe2H7FWYUN3jhomOUcrdt\",\"balance\":3}"
+    },
+    {
+      "id": "crash.sec",
+      "lens": "BP4",
+      "title": "crash after_debit_before_stripe",
+      "ev": "500 loc=- acao=* {\"success\":false,\"error\":\"crash_inject:after_debit_before_stripe\",\"code\":\"payout_pending_reconcile\",\"needs_reconcile\":true,\"idempotency_key\":\"p_8d018b546f881c5e3e54889d038096756235b4169e16a5120fc437fbca28a4\",\"crash_injec…"
+    },
+    {
+      "id": "crash.retry",
+      "lens": "BP4",
+      "title": "retry mesma key após crash",
+      "ev": "200 loc=- acao=* {\"success\":true,\"transferId\":\"tr_1UBIe6H7FWYUN3jhgBhMMAJZ\",\"balance\":2}"
+    },
+    {
+      "id": "crash.ledger",
+      "lens": "BP7",
+      "title": "ledger após crash+retry",
+      "ev": {
+        "before_bal": 3.0,
+        "mid_bal": 2.0,
+        "crash500": true,
+        "retry": "200 loc=- acao=* {\"success\":true,\"transferId\":\"tr_1UBIe6H7FWYUN3jhgBhMMAJZ\",\"balance\":2}",
+        "rows": [
+          {
+            "st": "transferred",
+            "tr": "tr_1UBIe6H7FWYUN3jhgBhMMAJZ",
+            "cents": 100
+          },
+          {
+            "st": "transferred",
+            "tr": "tr_1UBIe2H7FWYUN3jhomOUcrdt",
+            "cents": 100
+          },
+          {
+            "st": "transferred",
+            "tr": "tr_1UBIe0H7FWYUN3jh0BjGefYe",
+            "cents": 100
+          },
+          {
+            "st": "transferred",
+            "tr": "tr_1UBIdxH7FWYUN3jhylCi0x9v",
+            "cents": 100
+          },
+          {
+            "st": "transferred",
+            "tr": "tr_1UBIdvH7FWYUN3jhqAYYz0WB",
+            "cents": 100
+          },
+          {
+            "st": "transferred",
+            "tr": "tr_1UBIdsH7FWYUN3jhOYGV9fX4",
+            "cents": 100
+          }
+        ]
+      }
+    },
+    {
+      "id": "crash2",
+      "lens": "BP4",
+      "title": "after_stripe_before_finish + retry",
+      "ev": {
+        "crash": "500 loc=- acao=* {\"success\":false,\"error\":\"crash_inject:after_stripe_before_finish\",\"code\":\"payout_pending_reconcile\",\"needs_reconcile\":true,\"transferId\":\"tr_1UBIe9H7FWYUN3jh1wcMx17N\",\"idempotency_key\":\"p_6f34ab74a9cce120a8391fbce857508a…",
+        "retry": "200 loc=- acao=* {\"success\":true,\"transferId\":\"tr_1UBIe9H7FWYUN3jh1wcMx17N\",\"balance\":1}"
+      }
+    }
+  ],
+  "actors": {
+    "buyer": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+    "seller": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+    "buyer2": "3b4dc069-843d-4b63-82c3-144ee922a076",
+    "seller2": "29e3baf2-0180-48a5-b90f-d6eba615c6b1"
+  },
+  "created": {
+    "products": [],
+    "orders": []
+  }
+}

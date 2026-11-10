@@ -1,0 +1,133 @@
+{
+  "frozen_at": "2026-08-30T12:05:00Z",
+  "project": "fxdknzrqjenzqcvnwqqq",
+  "stripe": "TEST",
+  "production_touched": false,
+  "fase4_started": false,
+  "fixes_implemented": false,
+  "verdict": "PASS_CEGO_SATURADO",
+  "saturation": true,
+  "p0_count": 0,
+  "p1_count": 0,
+  "p0_open": false,
+  "p1_open": false,
+  "checklist": {
+    "1_p0_open": "NÃO",
+    "2_p0_count": 0,
+    "3_p1_open": "NÃO",
+    "4_p1_count": 0,
+    "5_buyer_price_authority": "NÃO",
+    "6_buyer_qty_authority": "NÃO",
+    "7_seller_fake_platform_payment": "NÃO",
+    "8_jwt_mint_balance": "NÃO",
+    "9_refund_exceeds_capture": "NÃO",
+    "10_release_refund_net_money": "NÃO",
+    "11_payout_duplicate_transfer": "NÃO",
+    "12_stock1_two_valid_sales": "NÃO",
+    "13_stock1_two_permanent_captures": "NÃO",
+    "14_capacity_bypass": "NÃO",
+    "15_cross_user_financial": "NÃO",
+    "16_cross_user_sensitive": "NÃO",
+    "17_buyer_as_seller_admin": "NÃO",
+    "18_seller_as_buyer_admin": "NÃO",
+    "19_forged_duplicate_reviews": "NÃO",
+    "20_dangerous_security_definer": "NÃO",
+    "21_critical_rls_broken": "NÃO",
+    "22_edge_trusts_client_authority": "NÃO",
+    "23_critical_unproven": "SIM",
+    "24_functional_regression": "NÃO",
+    "25_last_pass_new_p0_p1": "NÃO",
+    "26_saturation": "SIM",
+    "27_production_touched": "NÃO",
+    "28_fase4_started": "NÃO"
+  },
+  "invariants": {
+    "A_stripe_charges_server_contract": "HOLD",
+    "B_buyer_no_price_qty_authority": "HOLD",
+    "C_no_over_distribution": "HOLD",
+    "D_no_double_sale_unit": "HOLD",
+    "E_jwt_no_privileged_money_fields": "HOLD",
+    "F_off_platform_no_fleaber_balance": "HOLD",
+    "G_refund_leq_capture": "HOLD",
+    "H_parties_coherent": "HOLD",
+    "I_one_intent_one_transfer_same_key": "HOLD",
+    "J_two_intents_two_transfers": "HOLD",
+    "K_catalog_not_retroactive": "HOLD",
+    "L_offer_bag_authority": "HOLD"
+  },
+  "findings": [
+    {
+      "id": "CEGA-P3-01",
+      "severity": "P3",
+      "title": "batata_live_item_stock executável por anon",
+      "actor": "anon",
+      "state": "OPEN",
+      "impact": "leitura de inventário live sem mutação"
+    },
+    {
+      "id": "CEGA-P3-02",
+      "severity": "P3",
+      "title": "Seller JWT enumera email→UUID (rate 5/h)",
+      "actor": "seller JWT",
+      "state": "OPEN",
+      "impact": "enumeração de contas"
+    },
+    {
+      "id": "CEGA-P3-03",
+      "severity": "P3",
+      "title": "JWT EXECUTE em release/refund RPC (fail-closed)",
+      "actor": "buyer/seller JWT",
+      "state": "OPEN",
+      "impact": "superfície extra; sem mint no repro isolado"
+    },
+    {
+      "id": "CEGA-P3-04",
+      "severity": "P3",
+      "title": "Dual refund flags HTTP inconsistentes, mesmo refund_id",
+      "actor": "seller JWT",
+      "state": "OPEN",
+      "impact": "higiene de resposta; uma captura Stripe"
+    },
+    {
+      "id": "CEGA-P3-05",
+      "severity": "P3",
+      "title": "Review off-platform inserível sem inflacionar média pública",
+      "actor": "buyer JWT",
+      "state": "OPEN",
+      "impact": "purchase_verified=false; fora de reviews_public_ratings"
+    },
+    {
+      "id": "CEGA-P2-01",
+      "severity": "P2",
+      "title": "Payout resume-by-amount pode colapsar intenções concorrentes da mesma conta",
+      "actor": "seller JWT",
+      "state": "OPEN",
+      "impact": "não duplica Transfer; funde retries/concorrência do mesmo amount_cents"
+    }
+  ],
+  "identities": {
+    "buyer": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+    "seller": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+    "buyer2_disposable": "7c0e2202-2f11-4c0f-a87f-122527593a29"
+  },
+  "limitations": [
+    "lab accounts shared with parallel staging testers",
+    "no local STRIPE_SECRET_KEY — Checkout Sessions not paid with 4242; captures via staging e2e harness as fixture only",
+    "two distinct paid Checkout Sessions on stock=1 not completed (second order cannot insert; same-order sessions reused)",
+    "OpenAPI dump denied to anon"
+  ],
+  "probes": [
+    "tool/redteam_cega_20260830T1243/pass1_discover.dart",
+    "tool/redteam_cega_20260830T1243/pass2_hostile.dart",
+    "tool/redteam_cega_20260830T1243/pass3_compose.dart",
+    "tool/redteam_cega_20260830T1243/pass3b_verify.dart",
+    "tool/redteam_cega_20260830T1243/pass4.dart"
+  ],
+  "evidence_files": [
+    "tool/redteam_cega_20260830T1243/out/pass1.json",
+    "tool/redteam_cega_20260830T1243/out/pass2.json",
+    "tool/redteam_cega_20260830T1243/out/pass3.json",
+    "tool/redteam_cega_20260830T1243/out/pass3b_verify.json",
+    "tool/redteam_cega_20260830T1243/out/pass4.json"
+  ]
+}

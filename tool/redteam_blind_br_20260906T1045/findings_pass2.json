@@ -1,0 +1,343 @@
+{
+  "stamp": "20260906T1045",
+  "prefix": "RTBR-20260906T1045",
+  "lenses": [
+    "BR1",
+    "BR2",
+    "BR6",
+    "BR7"
+  ],
+  "findings": [
+    {
+      "id": "BR1-BAG-9-9-UNDERPAY",
+      "lens": "BR1",
+      "severity": "P0",
+      "title": "Saco 9€+9€ Session abaixo de 19,55 €",
+      "actor": "buyer JWT",
+      "pre": "2 SKUs 9€",
+      "repro": "POST CPI bag_checkout 2 linhas",
+      "expected": 1955,
+      "obtained": 1766,
+      "proven": true,
+      "evidence": {
+        "contracts": [
+          {
+            "id": "f9cd553c-5974-4266-9dc1-a2b2dd1a5319",
+            "status": "reserva_pendente",
+            "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+            "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+            "product_id": "69899c80-4cec-427b-bd19-17004e1df7c6",
+            "quantity": 1,
+            "price_total": 9.0,
+            "amount_paid_cents": "",
+            "payment_method": "Pagamento na app",
+            "shipping_method": "entrega em mão",
+            "stripe_payment_intent_id": "",
+            "stripe_checkout_session_id": "",
+            "stripe_refund_id": "",
+            "live_item_id": "",
+            "live_id": "",
+            "stock_units_applied": "",
+            "contract_unit_cents": 900,
+            "contract_qty": 1,
+            "bundle_id": "",
+            "product_offer_id": ""
+          },
+          {
+            "id": "ed0fbe43-3bdf-4655-b0eb-941caa8771ac",
+            "status": "reserva_pendente",
+            "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+            "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+            "product_id": "0b26fa91-3e93-4dba-b546-6853d4dd96c5",
+            "quantity": 1,
+            "price_total": 9.0,
+            "amount_paid_cents": "",
+            "payment_method": "Pagamento na app",
+            "shipping_method": "entrega em mão",
+            "stripe_payment_intent_id": "",
+            "stripe_checkout_session_id": "",
+            "stripe_refund_id": "",
+            "live_item_id": "",
+            "live_id": "",
+            "stock_units_applied": "",
+            "contract_unit_cents": 900,
+            "contract_qty": 1,
+            "bundle_id": "",
+            "product_offer_id": ""
+          }
+        ],
+        "map": {
+          "checkoutUrl": "https://checkout.stripe.com/c/pay/cs_test_a1Iy5ccgf9PF6WCK5Uex0TNoglLPxuObf3GHuxNxAbibHhTYT4YvZylBoW#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21oYWlsUnxrVkRhQUQyNlJjSWBCN3BXNXVvVT1hamlcf3Fjd1dRMGJmREk9Yz09PH1CMzVTY0pBXD1kMU5HZl1da05gf0s1XGQ1NWA3bVFBNzNMJyknY3dqaFZgd3Ngdyc%2FcXdwYCknZ2RmbmJ3anBrYUZqaWp3Jz8nJmNjY2NjYycpJ2lkfGpwcVF8dWAnPyd2bGtiaWBabHFgaCcpJ2BrZGdpYFVpZGZgbWppYWB3dic%2FcXdwYHgl",
+          "checkoutSessionId": "cs_test_a1Iy5ccgf9PF6WCK5Uex0TNoglLPxuObf3GHuxNxAbibHhTYT4YvZylBoW",
+          "paidChatId": "",
+          "server_amount_cents": 1766,
+          "amount_total": 1766
+        }
+      }
+    },
+    {
+      "id": "BR6-TRIPLE-BAG-RACE",
+      "lens": "BR6",
+      "severity": "P1",
+      "title": "Corrida 3 sacos A∩B∩C criou 3 Sessions (BD ficou com 1)",
+      "actor": "buyer JWT",
+      "pre": "3 orders; bags AB∥BC∥CA paralelo",
+      "repro": "Future.wait 3× bag_checkout",
+      "expected": "1 cs_ (claim+expire overlap)",
+      "obtained": {
+        "returned": [
+          "cs_test_a1RJdSQewAoyPJApjGd4LzVeRSmygHPwRcm40uSfpVktaWCDkjoERl8xHg",
+          "cs_test_a1mHlRGPvsbw96Qi2UVkt0clroUUMeDbmKMCYMmnMTHwpl4YLkQhLI5O1R",
+          "cs_test_a1yEnlu4vKmhFQVHUewXg1KsSGvyfOmyTKsj1lVSFzg1Ku0tBQaJxlQ3S9"
+        ],
+        "on_orders": [
+          "cs_test_a1mHlRGPvsbw96Qi2UVkt0clroUUMeDbmKMCYMmnMTHwpl4YLkQhLI5O1R"
+        ]
+      },
+      "proven": true,
+      "evidence": {
+        "rows": {
+          "oa": {
+            "id": "ec676da8-4231-42f2-9b2e-c6784f92631f",
+            "status": "reserva_pendente",
+            "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+            "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+            "product_id": "081f20a9-47d0-4a2b-9cd5-bddd1d7a683b",
+            "quantity": 1,
+            "price_total": 6.94,
+            "amount_paid_cents": "",
+            "payment_method": "Pagamento na app",
+            "shipping_method": "entrega em mão",
+            "stripe_payment_intent_id": "",
+            "stripe_checkout_session_id": "",
+            "stripe_refund_id": "",
+            "live_item_id": "",
+            "live_id": "",
+            "stock_units_applied": "",
+            "contract_unit_cents": 700,
+            "contract_qty": 1,
+            "bundle_id": "",
+            "product_offer_id": ""
+          },
+          "ob": {
+            "id": "ffac61f2-79c6-4c6f-9eac-da80c6657456",
+            "status": "reserva_pendente",
+            "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+            "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+            "product_id": "7c6d5993-498c-4498-825c-b754be68d69f",
+            "quantity": 1,
+            "price_total": 6.94,
+            "amount_paid_cents": "",
+            "payment_method": "Pagamento na app",
+            "shipping_method": "entrega em mão",
+            "stripe_payment_intent_id": "",
+            "stripe_checkout_session_id": "cs_test_a1mHlRGPvsbw96Qi2UVkt0clroUUMeDbmKMCYMmnMTHwpl4YLkQhLI5O1R",
+            "stripe_refund_id": "",
+            "live_item_id": "",
+            "live_id": "",
+            "stock_units_applied": "",
+            "contract_unit_cents": 700,
+            "contract_qty": 1,
+            "bundle_id": "",
+            "product_offer_id": ""
+          },
+          "oc": {
+            "id": "07964454-f266-448a-81c1-58b7f9bc35ec",
+            "status": "reserva_pendente",
+            "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+            "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+            "product_id": "0113dd9a-2a6f-46a1-ab01-4953fa4e9720",
+            "quantity": 1,
+            "price_total": 6.94,
+            "amount_paid_cents": "",
+            "payment_method": "Pagamento na app",
+            "shipping_method": "entrega em mão",
+            "stripe_payment_intent_id": "",
+            "stripe_checkout_session_id": "cs_test_a1mHlRGPvsbw96Qi2UVkt0clroUUMeDbmKMCYMmnMTHwpl4YLkQhLI5O1R",
+            "stripe_refund_id": "",
+            "live_item_id": "",
+            "live_id": "",
+            "stock_units_applied": "",
+            "contract_unit_cents": 700,
+            "contract_qty": 1,
+            "bundle_id": "",
+            "product_offer_id": ""
+          }
+        }
+      }
+    }
+  ],
+  "blocked": [
+    {
+      "id": "BR7-ANON-KEY-CHECKOUT",
+      "lens": "BR7",
+      "title": "anon key recusado",
+      "ev": "400 {\"error\":\"Invalid checkout user.\"}"
+    },
+    {
+      "id": "BR7-JUNK-JWT-CHECKOUT",
+      "lens": "BR7",
+      "title": "jwt lixo recusado",
+      "ev": "400 {\"error\":\"Invalid checkout user.\"}"
+    },
+    {
+      "id": "BR2-HYPHEN-DUMP",
+      "lens": "BR2",
+      "title": "exact hífen (n/c) dump",
+      "ev": "amt=1766 expect=1955 reused=false"
+    },
+    {
+      "id": "BR2-SESSION-REOPEN-AFTER-EXPIRE",
+      "lens": "BR2",
+      "title": "FP retract — reuse de cs_ open, expire Stripe não executado",
+      "ev": "no sk_test_"
+    },
+    {
+      "id": "BR7-NO-AUTHORIZATION",
+      "lens": "BR7",
+      "title": "sem Authorization recusado",
+      "ev": "400 {\"error\":\"Missing authorization.\"}"
+    }
+  ],
+  "skipped": [],
+  "notes": [
+    {
+      "id": "P2.ANON.key",
+      "lens": "BR7",
+      "title": "Bearer=anon key",
+      "ev": "400 {\"error\":\"Invalid checkout user.\"}"
+    },
+    {
+      "id": "P2.ANON.junk",
+      "lens": "BR7",
+      "title": "Bearer=not-a-jwt",
+      "ev": "400 {\"error\":\"Invalid checkout user.\"}"
+    },
+    {
+      "id": "P2.99.quote",
+      "lens": "BR1",
+      "title": "saco limpo 9+9",
+      "ev": {
+        "c1": 900,
+        "c2": 900,
+        "amt": 1766,
+        "expect": 1955,
+        "raw": {
+          "checkoutUrl": "https://checkout.stripe.com/c/pay/cs_test_a1Iy5ccgf9PF6WCK5Uex0TNoglLPxuObf3GHuxNxAbibHhTYT4YvZylBoW#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21oYWlsUnxrVkRhQUQyNlJjSWBCN3BXNXVvVT1hamlcf3Fjd1dRMGJmREk9Yz09PH1CMzVTY0pBXD1kMU5HZl1da05gf0s1XGQ1NWA3bVFBNzNMJyknY3dqaFZgd3Ngdyc%2FcXdwYCknZ2RmbmJ3anBrYUZqaWp3Jz8nJmNjY2NjYycpJ2lkfGpwcVF8dWAnPyd2bGtiaWBabHFgaCcpJ2BrZGdpYFVpZGZgbWppYWB3dic%2FcXdwYHgl",
+          "checkoutSessionId": "cs_test_a1Iy5ccgf9PF6WCK5Uex0TNoglLPxuObf3GHuxNxAbibHhTYT4YvZylBoW",
+          "paidChatId": "",
+          "server_amount_cents": 1766,
+          "amount_total": 1766
+        },
+        "brief": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1Iy5ccgf9PF6WCK5Uex0TNoglLPxuObf3GHuxNxAbibHhTYT4YvZylBoW#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21…"
+      }
+    },
+    {
+      "id": "P2.HYPHEN.dump",
+      "lens": "BR2",
+      "title": "hífen+compact dump completo",
+      "ev": {
+        "amt": 1766,
+        "expect2": 1955,
+        "reused": false,
+        "map": {
+          "checkoutUrl": "https://checkout.stripe.com/c/pay/cs_test_a1ep3XrpxxYC6mb4HKx2L99ccOPTYAU2ZF5RoTKNIAz4wsizWxz3CcwjU7#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21oYWlsUnxrVkRhQUQyNlJjSWBCN3BXNXVvVT1hamlcf3Fjd1dRMGJmREk9Yz09PH1CMzVTY0pBXD1kMU5HZl1da05gf0s1XGQ1NWA3bVFBNzNMJyknY3dqaFZgd3Ngdyc%2FcXdwYCknZ2RmbmJ3anBrYUZqaWp3Jz8nJmNjY2NjYycpJ2lkfGpwcVF8dWAnPyd2bGtiaWBabHFgaCcpJ2BrZGdpYFVpZGZgbWppYWB3dic%2FcXdwYHgl",
+          "checkoutSessionId": "cs_test_a1ep3XrpxxYC6mb4HKx2L99ccOPTYAU2ZF5RoTKNIAz4wsizWxz3CcwjU7",
+          "paidChatId": "",
+          "server_amount_cents": 1766,
+          "amount_total": 1766
+        },
+        "o1": "3ab8f2c2-43bd-40c4-9258-e144c35ad1d7",
+        "compact": "3ab8f2c243bd40c49258e144c35ad1d7"
+      }
+    },
+    {
+      "id": "P2.TRIPLE.persist",
+      "lens": "BR6",
+      "title": "corrida 3 sacos SIDs vs BD",
+      "ev": {
+        "returned": [
+          "cs_test_a1RJdSQewAoyPJApjGd4LzVeRSmygHPwRcm40uSfpVktaWCDkjoERl8xHg",
+          "cs_test_a1mHlRGPvsbw96Qi2UVkt0clroUUMeDbmKMCYMmnMTHwpl4YLkQhLI5O1R",
+          "cs_test_a1yEnlu4vKmhFQVHUewXg1KsSGvyfOmyTKsj1lVSFzg1Ku0tBQaJxlQ3S9"
+        ],
+        "on_orders": [
+          "cs_test_a1mHlRGPvsbw96Qi2UVkt0clroUUMeDbmKMCYMmnMTHwpl4YLkQhLI5O1R"
+        ],
+        "rows": {
+          "oa": {
+            "status": "reserva_pendente",
+            "sid": "",
+            "amt_paid": ""
+          },
+          "ob": {
+            "status": "reserva_pendente",
+            "sid": "cs_test_a1mHlRGPvsbw96Qi2UVkt0clroUUMeDbmKMCYMmnMTHwpl4YLkQhLI5O1R",
+            "amt_paid": ""
+          },
+          "oc": {
+            "status": "reserva_pendente",
+            "sid": "cs_test_a1mHlRGPvsbw96Qi2UVkt0clroUUMeDbmKMCYMmnMTHwpl4YLkQhLI5O1R",
+            "amt_paid": ""
+          }
+        },
+        "amts": [
+          1388,
+          1388,
+          1388
+        ],
+        "reused": [
+          false,
+          false,
+          false
+        ]
+      }
+    },
+    {
+      "id": "P2.RETRACT.reopen",
+      "lens": "BR2",
+      "title": "BR2-SESSION-REOPEN-AFTER-EXPIRE é FP: sem sk_test não houve expire; ck2 reusou Session ABERTA (desenho 1-order-1-session)",
+      "ev": "retracted"
+    },
+    {
+      "id": "P2.NOAUTH",
+      "lens": "BR7",
+      "title": "CPI sem Authorization",
+      "ev": "400 {\"error\":\"Missing authorization.\"}"
+    }
+  ],
+  "actors": {
+    "buyer": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+    "seller": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+    "buyer2": "76b6d470-2dc3-412f-be96-25773ac092e0",
+    "seller2": null
+  },
+  "created": {
+    "lives": [],
+    "items": [],
+    "orders": [
+      "b64d2807-0823-42bf-aaa7-65bbdf62dfc5",
+      "f9cd553c-5974-4266-9dc1-a2b2dd1a5319",
+      "ed0fbe43-3bdf-4655-b0eb-941caa8771ac",
+      "3ab8f2c2-43bd-40c4-9258-e144c35ad1d7",
+      "9c601d9c-1e2a-4c49-87c9-4557ce1bd0ac",
+      "ec676da8-4231-42f2-9b2e-c6784f92631f",
+      "ffac61f2-79c6-4c6f-9eac-da80c6657456",
+      "07964454-f266-448a-81c1-58b7f9bc35ec",
+      "e24fce0b-ccdd-43f9-8fd2-e6919a00a599"
+    ],
+    "products": [
+      "054db860-2009-4e08-aea0-dbf38b29a8dc",
+      "69899c80-4cec-427b-bd19-17004e1df7c6",
+      "0b26fa91-3e93-4dba-b546-6853d4dd96c5",
+      "38898bed-29fd-45a0-a380-cb589aa4743a",
+      "ee05fde2-dcb5-4982-972c-035d07957bbe",
+      "081f20a9-47d0-4a2b-9cd5-bddd1d7a683b",
+      "7c6d5993-498c-4498-825c-b754be68d69f",
+      "0113dd9a-2a6f-46a1-ab01-4953fa4e9720",
+      "94fdcf90-8c1f-484d-ac6e-ca8f008e3461"
+    ],
+    "bundles": [],
+    "offers": []
+  }
+}

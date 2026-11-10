@@ -1,0 +1,150 @@
+{
+  "audit_id": "redteam_blind_g_20260829",
+  "frozen_at": "2026-08-29T16:55:52Z",
+  "project": "fxdknzrqjenzqcvnwqqq",
+  "environment": "staging",
+  "stripe": "TEST",
+  "production_touched": false,
+  "fase4": false,
+  "fixes_implemented": false,
+  "service_role": "setup_observe_cleanup_only",
+  "verdict": "INCONCLUSIVO",
+  "verdict_code": "C",
+  "saturation": false,
+  "p0_count": 0,
+  "p1_count": 0,
+  "p2_count": 4,
+  "last_pass_new_p0_p1_class": false,
+  "checklist": {
+    "p0_open": false,
+    "p0_count": 0,
+    "p1_open": false,
+    "p1_count": 0,
+    "buyer_manipulates_authoritative_price": false,
+    "buyer_manipulates_authoritative_qty": false,
+    "seller_fakes_platform_payment": false,
+    "jwt_mints_balance": false,
+    "refund_exceeds_capture": false,
+    "release_plus_refund_nets_money": false,
+    "payout_duplicates_same_intent": false,
+    "stock1_two_valid_sales": "NOT_PROVEN",
+    "stock1_two_permanent_captures": "NOT_PROVEN",
+    "capacity_bypass": false,
+    "cross_user_financial": false,
+    "cross_user_sensitive_data": false,
+    "buyer_assumes_seller_admin": false,
+    "seller_assumes_buyer_admin": false,
+    "reviews_forged_or_duplicated": false,
+    "dangerous_security_definer": false,
+    "critical_rls_broken": false,
+    "edge_trusts_client_authority": false,
+    "critical_conclusion_unproven": true,
+    "relevant_functional_regression": false,
+    "last_pass_new_p0_p1_class": false,
+    "saturation": false,
+    "production_touched": false,
+    "fase4": false
+  },
+  "invariants": {
+    "A_stripe_matches_server_contract": "HOLDS",
+    "B_buyer_cannot_set_price_qty": "HOLDS",
+    "C_disbursement_le_platform_funds": "HOLDS",
+    "D_one_unit_two_sales": "NOT_PROVEN",
+    "E_jwt_cannot_mint": "HOLDS",
+    "F_offplatform_no_wallet_mint": "HOLDS",
+    "G_refund_le_capture": "HOLDS_NO_OVERREFUND_OBSERVED",
+    "H_party_coherence": "HOLDS",
+    "I_payout_one_intent_one_transfer": "HOLDS",
+    "J_two_intents_two_transfers": "HOLDS",
+    "K_catalog_not_retroactive": "HOLDS",
+    "L_offer_authority": "HOLDS"
+  },
+  "findings": [
+    {
+      "id": "G-P2-01",
+      "severity": "P2",
+      "title": "notifications_view readable by anonymous role",
+      "actor": "anon",
+      "preconditions": "none",
+      "reproduction": "GET /rest/v1/notifications_view?select=*&limit=3 with anon JWT/apikey",
+      "impact": "Other users' UUIDs, display names, profile photos, product titles from favorites activity",
+      "state": "OPEN"
+    },
+    {
+      "id": "G-P2-02",
+      "severity": "P2",
+      "title": "Review after seller-confirmed MB WAY pago without platform capture",
+      "actor": "buyer+seller collusion",
+      "preconditions": "MB WAY order; seller PATCH reservado then pago",
+      "reproduction": "Seller confirms pago; buyer INSERT reviews. Row has purchase_verified=false",
+      "impact": "Reputation without Stripe funds; flag distinguishes from platform-verified reviews",
+      "state": "OPEN"
+    },
+    {
+      "id": "G-P2-03",
+      "severity": "P2",
+      "title": "Two Stripe Checkout Sessions for stock=1",
+      "actor": "buyer",
+      "preconditions": "product.quantity=1; two pending orders",
+      "reproduction": "Parallel create-payment-intent; both HTTP 200 amount_total=590",
+      "impact": "Two sessions exist. Dual permanent capture NOT_PROVEN (checkout URL rejected by Stripe as incomplete)",
+      "state": "OPEN_CAPTURE_NOT_PROVEN"
+    },
+    {
+      "id": "G-P2-04",
+      "severity": "P2",
+      "title": "Authenticated SELECT live_raffle_winners includes draw_proof",
+      "actor": "buyer JWT",
+      "preconditions": "existing raffle winners",
+      "reproduction": "GET /rest/v1/live_raffle_winners?select=*&limit=1",
+      "impact": "Winner identity and draw_proof visible; INSERT denied 403; prize RPC EXECUTE denied 403",
+      "state": "OPEN"
+    }
+  ],
+  "false_positives": [
+    {
+      "id": "FP-release-true",
+      "note": "batata_release_seller_wallet_for_order returned true on MB WAY concluido but wallet balance 6.41→6.41 (zero platform funds branch)"
+    },
+    {
+      "id": "FP-email-oracle-extra",
+      "note": "Disposable user profile INSERT landed user_type=vendedor; lab comprador find_user_id_by_email returns null"
+    },
+    {
+      "id": "FP-device-tokens",
+      "note": "seller_device_tokens rows belonged to lab buyer id (own tokens)"
+    },
+    {
+      "id": "FP-chat-cross-heuristic",
+      "note": "Pass1 leak heuristic on chats/wallet_transactions matched own-party rows"
+    }
+  ],
+  "stripe_test": {
+    "session_created": true,
+    "real_test_capture": false,
+    "dual_permanent_net_capture": "NOT_PROVEN",
+    "example_amount_cents": 590,
+    "checkout_url_issue": "Stripe Checkout reports link incomplete; hash fragment identical across distinct cs_test ids"
+  },
+  "races": [
+    {"name": "12 order inserts stock=1", "created": 12, "final": "pending orders only"},
+    {"name": "2 CPI sessions stock=1", "sessions": 2, "amount_cents": 590, "captures": "NOT_PROVEN"},
+    {"name": "unpaid GET settle", "result": "order remains reserva_pendente"},
+    {"name": "payout same idempotency key", "result": "one transfer, idempotent true"},
+    {"name": "payout two keys", "result": "two transfers 1 cent each"}
+  ],
+  "limitations": [
+    "Could not complete Stripe TEST payment of dual stock=1 sessions (checkout URL rejected)",
+    "No STRIPE_SECRET_KEY in live_ops_staging.env for API confirm",
+    "JWT OpenAPI returned 0 paths; RPC inventory via hostile execute + service_role OpenAPI (237 paths)"
+  ],
+  "artifacts": [
+    "tool/redteam_blind_g_20260829/pass1_raw.json",
+    "tool/redteam_blind_g_20260829/pass2_raw.json",
+    "tool/redteam_blind_g_20260829/pass3_raw.json",
+    "tool/redteam_blind_g_20260829/pass3b_full_urls.json",
+    "tool/redteam_blind_g_20260829/pass3c_raw.json",
+    "tool/redteam_blind_g_20260829/cpi_raw_body.txt",
+    "tool/redteam_blind_g_20260829/probes/"
+  ]
+}

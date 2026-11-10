@@ -1,0 +1,111 @@
+{
+  "pass": 3,
+  "prefix": "RTH-20260831T1706",
+  "sku": "e8b0ee24-a387-48df-b0f2-86e468403311",
+  "order": "ede9c76e-2b97-42c1-ae45-3c8ba912dcfe",
+  "notes": [
+    {
+      "id": "p3.h3.patch.order",
+      "lens": "H3",
+      "title": "buyer2 PATCH order B1",
+      "ev": "200 []"
+    },
+    {
+      "id": "p3.h3.select",
+      "lens": "H3",
+      "title": "buyer2 SELECT order B1",
+      "ev": "200 []"
+    },
+    {
+      "id": "p3.h3.review",
+      "lens": "H3",
+      "title": "buyer2 review order B1",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"review_order_not_yours\"}"
+    },
+    {
+      "id": "p3.h3.dispute",
+      "lens": "H3",
+      "title": "buyer2 disputa order B1",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"new row violates row-level security policy for table \\\"order_disputes\\\"\"}"
+    },
+    {
+      "id": "p3.h3.chat.forge",
+      "lens": "H3",
+      "title": "buyer2 INSERT chat B1-S1",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"new row violates row-level security policy for table \\\"chats\\\"\"}"
+    },
+    {
+      "id": "p3.h3.chat.real",
+      "lens": "H3",
+      "title": "B1 INSERT chat",
+      "ev": "201 [{\"id\":\"d688b7a2-0f3c-439c-be62-0df1c464ff16\",\"created_at\":\"2026-08-31T16:20:14.531588+00:00\",\"user_a\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"user_b\":\"980f4fa1-0004-42f9-abca-69f1…"
+    },
+    {
+      "id": "p3.h3.chat.swap",
+      "lens": "H3",
+      "title": "B1 PATCH user_a=B2",
+      "ev": "200 [{\"id\":\"d688b7a2-0f3c-439c-be62-0df1c464ff16\",\"created_at\":\"2026-08-31T16:20:14.531588+00:00\",\"user_a\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"user_b\":\"980f4fa1-0004-42f9-abca-69f1…"
+    },
+    {
+      "id": "p3.h3.msg",
+      "lens": "H3",
+      "title": "buyer2 INSERT msg no chat B1",
+      "ev": "400 {\"code\":\"PGRST204\",\"details\":null,\"hint\":null,\"message\":\"Could not find the 'content' column of 'chat_messages' in the schema cache\"}"
+    },
+    {
+      "id": "p3.h3.msg.read",
+      "lens": "H3",
+      "title": "buyer2 lê msgs B1",
+      "ev": "400 {\"code\":\"42703\",\"details\":null,\"hint\":null,\"message\":\"column chat_messages.content does not exist\"}"
+    },
+    {
+      "id": "p3.h3.seller.forge",
+      "lens": "H3",
+      "title": "seller INSERT order buyer=B2",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"order_buyer_attribution_denied\"}"
+    },
+    {
+      "id": "p3.h6.pi.spoof",
+      "lens": "H6",
+      "title": "B2 checkout order B1 com buyer_id=B1",
+      "ev": "400 {\"error\":\"Invalid checkout user.\"}"
+    },
+    {
+      "id": "p3.h6.pi.ownid",
+      "lens": "H6",
+      "title": "B2 checkout order B1 com o próprio buyer_id",
+      "ev": "400 {\"error\":\"Checkout blocked: order does not belong to buyer.\"}"
+    },
+    {
+      "id": "p3.h6.refund.b2",
+      "lens": "H6",
+      "title": "B2 refund order B1",
+      "ev": "403 {\"ok\":false,\"error\":\"Sem permissão.\"}"
+    },
+    {
+      "id": "p3.h6.refund.b1",
+      "lens": "H6",
+      "title": "B1 refund própria",
+      "ev": "403 {\"ok\":false,\"error\":\"Sem permissão.\"}"
+    },
+    {
+      "id": "p3.h6.connect",
+      "lens": "H6",
+      "title": "B2 connect user_id=S1",
+      "ev": "400 {\"error\":\"Cannot create another user Stripe account.\",\"code\":\"payout_failed\"}"
+    },
+    {
+      "id": "p3.h6.complete",
+      "lens": "H6",
+      "title": "B2 complete live S1",
+      "ev": "403 {\"error\":\"Sem permissão para esta live.\",\"step\":\"auth\"}"
+    },
+    {
+      "id": "p3.h6.e2e.jwt",
+      "lens": "H6",
+      "title": "JWT tenta caminho e2e settle",
+      "ev": "400 {\"error\":\"Checkout blocked: order does not belong to buyer.\"}"
+    }
+  ],
+  "findings": []
+}

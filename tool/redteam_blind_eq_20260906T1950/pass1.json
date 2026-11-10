@@ -1,0 +1,864 @@
+{
+  "stamp": "20260906T1950",
+  "prefix": "RTEQ-20260906T1950",
+  "lenses": [
+    "EQ1",
+    "EQ2",
+    "EQ3",
+    "EQ4",
+    "EQ5",
+    "EQ6",
+    "EQ7",
+    "EQ8"
+  ],
+  "wells": [
+    "EQ-A",
+    "EQ-B",
+    "EQ-C",
+    "EQ-D",
+    "EQ-E"
+  ],
+  "findings": [
+    {
+      "id": "EQ-A2.pct_2e2e2f",
+      "lens": "EQ1",
+      "severity": "P1",
+      "title": "traversal %2e%2e%2f",
+      "actor": "buyer JWT",
+      "pre": "POST object …/{B1}/%2e%2e%2f{B2}/rteq-enc.png",
+      "repro": "EQ-A2.pct_2e2e2f",
+      "expected": "400 InvalidKey / 403 RLS / sem loot B2",
+      "obtained": "200 {\"Key\":\"fleaber_private/order_disputes/bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96/../20e2ec8a-0012-4278-b222-9e8a48e463e4/rteq-enc.png\",\"Id\":\"81ede3e3-e5c8-4466-b896-97cc2fc14f1b\"}",
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "EQ-A2b.unicode_ff0f",
+      "lens": "EQ1",
+      "severity": "P1",
+      "title": "unicode slash U+FF0F na prova",
+      "actor": "buyer JWT",
+      "pre": "proof URL signed + U+FF0F FULLWIDTH SOLIDUS + path B2 (sem query)",
+      "repro": "EQ-A2b.unicode_ff0f",
+      "expected": "proof_ok false",
+      "obtained": "200 true",
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "EQ-A2c.unicode_29f8",
+      "lens": "EQ1",
+      "severity": "P1",
+      "title": "unicode slash U+29F8 na prova",
+      "actor": "buyer JWT",
+      "pre": "proof URL signed + U+29F8 BIG SOLIDUS + path B2 (sem query)",
+      "repro": "EQ-A2c.unicode_29f8",
+      "expected": "proof_ok false",
+      "obtained": "200 true",
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "EQ-A5.signed_url_buyer2",
+      "lens": "EQ6",
+      "severity": "P1",
+      "title": "URL prova outro buyer",
+      "actor": "buyer JWT",
+      "pre": "RPC proof_ok URL signed B2 em disputa B1 + GET objecto B2 como B1",
+      "repro": "EQ-A5.signed_url_buyer2",
+      "expected": "rpc false + GET NoSuchKey/403",
+      "obtained": "200 false",
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "EQ-A7.graphql_revoke_collection",
+      "lens": "EQ2",
+      "severity": "P1",
+      "title": "GraphQL lê revoke registry",
+      "actor": "buyer JWT",
+      "pre": "POST /graphql/v1 batata_private_object_revokedCollection",
+      "repro": "EQ-A7.graphql_revoke_collection",
+      "expected": "401/403 / errors / collection ausente",
+      "obtained": "200 {\"errors\": [{\"message\": \"pg_graphql extension is not enabled.\"}]}",
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "EQ-A8.revoke_rpc_dotdot_alien",
+      "lens": "EQ2",
+      "severity": "P1",
+      "title": "revoke RPC traversal toca objecto alheio",
+      "actor": "buyer JWT",
+      "pre": "RPC revoke p_path=order_disputes/{B1}/../{B2}/… + oráculo GET B2",
+      "repro": "EQ-A8.revoke_rpc_dotdot_alien",
+      "expected": "RPC false/42501 OU true só no path literal; objecto B2 intacto",
+      "obtained": "200 true",
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "EQ-B3.reupload_same_path_proof_ok",
+      "lens": "EQ3",
+      "severity": "P2",
+      "title": "re-upload apaga revoke no proof_ok",
+      "actor": "buyer JWT",
+      "pre": "DELETE+revoke → POST mesmo path → proof_ok canónico",
+      "repro": "EQ-B3.reupload_same_path_proof_ok",
+      "expected": "proof_ok false (registry sticky)",
+      "obtained": "200 false",
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "EQ-B4.forged_alien_proof_url",
+      "lens": "EQ3",
+      "severity": "P1",
+      "title": "prova path alheio forjada",
+      "actor": "buyer JWT",
+      "pre": "proof_ok + persist URL signed B2 na disputa B1",
+      "repro": "EQ-B4.forged_alien_proof_url",
+      "expected": "proof_ok false; persist 400/200[]",
+      "obtained": "200 false",
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "EQ-B4b.query_token_trick",
+      "lens": "EQ3",
+      "severity": "P1",
+      "title": "query token trick persiste path alheio",
+      "actor": "buyer JWT",
+      "pre": "proof_ok URL própria + ?token= + path B2 (sem loot se query cortada)",
+      "repro": "EQ-B4b.query_token_trick",
+      "expected": "proof_ok no máximo sobre URL própria; persist sem path B2",
+      "obtained": "200 true",
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "EQ-B5.revoke_mid_dispute_reply",
+      "lens": "EQ3",
+      "severity": "P2",
+      "title": "reply aceita URL revogada a meio da disputa",
+      "actor": "buyer JWT",
+      "pre": "disputa 201 → DELETE+revoke → proof_ok + POST reply com URL morta",
+      "repro": "EQ-B5.revoke_mid_dispute_reply",
+      "expected": "proof_ok false; reply 400/denied",
+      "obtained": "200 false",
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "EQ-C4.dispute_release_race",
+      "lens": "EQ7",
+      "severity": "P1",
+      "title": "race disputa∥release credita E abre disputa",
+      "actor": "buyer JWT",
+      "pre": "Future.wait RPC release ∥ POST disputa (plant concluido+mão)",
+      "repro": "EQ-C4.dispute_release_race",
+      "expected": "1 efeito líquido (crédito XOR disputa); stock Δ=0 mint",
+      "obtained": "200 true",
+      "proven": true,
+      "evidence": {}
+    }
+  ],
+  "blocked": [
+    {
+      "id": "EQ-A1.path_dotdot_upload",
+      "lens": "EQ1",
+      "title": "traversal ../ no storage",
+      "ev": "400 {\"statusCode\":\"403\",\"error\":\"Unauthorized\",\"message\":\"new row violates row-level security policy\",\"code\":\"AccessDenied\"}"
+    },
+    {
+      "id": "EQ-A2d.mixed_dot_pct2e",
+      "lens": "EQ1",
+      "title": "traversal misto .%2e/%2e.",
+      "ev": "400 {\"statusCode\":\"403\",\"error\":\"Unauthorized\",\"message\":\"new row violates row-level security policy\",\"code\":\"AccessDenied\"}"
+    },
+    {
+      "id": "EQ-A2e.double_pct252e",
+      "lens": "EQ1",
+      "title": "double-encoding %252e%252e%252f storage",
+      "ev": "400 {\"statusCode\":\"400\",\"error\":\"InvalidKey\",\"message\":\"Invalid key: order_disputes/bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96/%2e%2e%2f20e2ec8a-0012-4278-b222-9e8a48e463e4/rteq-dbl.png\",\"code\":\"InvalidKey\"}"
+    },
+    {
+      "id": "EQ-A3.windows_backslash",
+      "lens": "EQ1",
+      "title": "traversal Windows ..\\",
+      "ev": "400 {\"statusCode\":\"403\",\"error\":\"Unauthorized\",\"message\":\"new row violates row-level security policy\",\"code\":\"AccessDenied\"}"
+    },
+    {
+      "id": "EQ-A3b.null_byte_path",
+      "lens": "EQ1",
+      "title": "null byte no path",
+      "ev": "400 <html>\r\n<head><title>400 Bad Request</title></head>\r\n<body>\r\n<center><h1>400 Bad Request</h1></center>\r\n<hr><center>cloudflare</center>\r\n</body>\r\n</html>\r\n"
+    },
+    {
+      "id": "EQ-A4.mime_js_html_svg",
+      "lens": "EQ1",
+      "title": "mime JS/HTML/SVG aceite",
+      "ev": "400 {\"statusCode\":\"415\",\"error\":\"invalid_mime_type\",\"message\":\"mime type image/svg+xml is not supported\",\"code\":\"InvalidMimeType\"}"
+    },
+    {
+      "id": "EQ-A6.storage_move_alien_prefix",
+      "lens": "EQ1",
+      "title": "storage MOVE para prefixo alheio",
+      "ev": "400 {\"statusCode\":\"404\",\"error\":\"not_found\",\"message\":\"Object not found\",\"code\":\"NoSuchKey\"}"
+    },
+    {
+      "id": "EQ-A6b.storage_copy_alien_prefix",
+      "lens": "EQ1",
+      "title": "storage COPY para prefixo alheio",
+      "ev": "400 {\"statusCode\":\"403\",\"error\":\"Unauthorized\",\"message\":\"new row violates row-level security policy\",\"code\":\"AccessDenied\"}"
+    },
+    {
+      "id": "EQ-C5.happy_dispute_png_signed",
+      "lens": "EQ4",
+      "title": "disputa+prova signed 201 (order 1)",
+      "ev": "201 [{\"id\":\"4a6daf49-e1ec-408b-8ec8-a65013629663\",\"order_id\":\"aa3fcf49-9842-42b8-ad62-b08ba5dc13f4\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"reason\":\"danificado\",\"description\":\"RTEQ prova disputa artigo danificado no envio.\",\"proof_ph…"
+    },
+    {
+      "id": "EQ-B2.signed_get_after_delete",
+      "lens": "EQ2",
+      "title": "signed GET 200 pós-DELETE",
+      "ev": "400 {\"statusCode\":\"404\",\"error\":\"not_found\",\"message\":\"Object not found\",\"code\":\"NoSuchKey\"}"
+    },
+    {
+      "id": "EQ-C1.dispute_order_alheia",
+      "lens": "EQ6",
+      "title": "disputa order alheia",
+      "ev": "409 {\"code\":\"23505\",\"details\":null,\"hint\":null,\"message\":\"dispute_already_exists_for_order\"}"
+    },
+    {
+      "id": "EQ-C2a.window_pago",
+      "lens": "EQ4",
+      "title": "disputa na janela pago",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"new row violates row-level security policy for table \\\"order_disputes\\\"\"}"
+    },
+    {
+      "id": "EQ-C2b.window_enviado",
+      "lens": "EQ4",
+      "title": "disputa na janela enviado",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"new row violates row-level security policy for table \\\"order_disputes\\\"\"}"
+    },
+    {
+      "id": "EQ-C2c.window_after_release",
+      "lens": "EQ4",
+      "title": "disputa fora de janela pós-release",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"new row violates row-level security policy for table \\\"order_disputes\\\"\"}"
+    },
+    {
+      "id": "EQ-C3.dispute_refund_race",
+      "lens": "EQ7",
+      "title": "race disputa∥refund cria dinheiro+stock",
+      "ev": "403 {\"ok\":false,\"error\":\"Não é possível anular esta venda neste estado (já enviada ou concluída).\",\"code\":\"order_refund_blocked_shipped\",\"status\":\"concluido\"}"
+    },
+    {
+      "id": "EQ-D1.patch_ship_after_cs",
+      "lens": "EQ5",
+      "title": "selo portes após cs_ open",
+      "ev": "200 []"
+    },
+    {
+      "id": "EQ-D2.patch_ship_after_pago",
+      "lens": "EQ5",
+      "title": "selo portes após pago",
+      "ev": "200 []"
+    },
+    {
+      "id": "EQ-D3.label_traversal_forge_oid",
+      "lens": "EQ5",
+      "title": "label traversal + order_id forjado",
+      "ev": "200 []"
+    },
+    {
+      "id": "EQ-D3b.label_252f",
+      "lens": "EQ5",
+      "title": "label %252f residual",
+      "ev": "200 []"
+    },
+    {
+      "id": "EQ-D3c.slashslash_after_host",
+      "lens": "EQ5",
+      "title": "// após host residual",
+      "ev": "200 []"
+    },
+    {
+      "id": "EQ-D4.seller2_reads_label_buyer1",
+      "lens": "EQ6",
+      "title": "seller2 lê label/prova de buyer1",
+      "ev": "200 []"
+    },
+    {
+      "id": "EQ-E1.second_paid_happy_dispute",
+      "lens": "EQ8",
+      "title": "2.º pago + disputa feliz 201",
+      "ev": "201 [{\"id\":\"151e39e8-3048-4038-b14e-0a02b4bd42fa\",\"order_id\":\"2d8a7baa-9936-419e-bfba-c295a60d379d\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"reason\":\"danificado\",\"description\":\"RTEQ prova disputa artigo danificado no envio.\",\"proof_ph…"
+    },
+    {
+      "id": "EQ-E2.stock_delta_races_no_mint",
+      "lens": "EQ8",
+      "title": "races mintam stock",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"dispute_proof_url_denied\"}"
+    }
+  ],
+  "skipped": [],
+  "probes": [
+    {
+      "id": "EQ-A1.path_dotdot_upload",
+      "matrix": "EQ-A",
+      "payload": "POST object order_disputes/{B1}/../{B2}/rteq-dotdot.png",
+      "http": "400 {\"statusCode\":\"403\",\"error\":\"Unauthorized\",\"message\":\"new row violates row-level security policy\",\"code\":\"AccessDenied\"}",
+      "bd": "up=400 getAlien=400 loot=false",
+      "result": "FAIL",
+      "classe_nova": "NÃO"
+    },
+    {
+      "id": "EQ-A2.pct_2e2e2f",
+      "matrix": "EQ-A",
+      "payload": "POST object …/{B1}/%2e%2e%2f{B2}/rteq-enc.png",
+      "http": "200 {\"Key\":\"fleaber_private/order_disputes/bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96/../20e2ec8a-0012-4278-b222-9e8a48e463e4/rteq-enc.png\",\"Id\":\"81ede3e3-e5c8-4466-b896-97cc2fc14f1b\"}",
+      "bd": "up=200 get=400 loot=false body={\"Key\":\"fleaber_private/order_disputes/bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96/../2…",
+      "result": "HOLD",
+      "classe_nova": "NÃO"
+    },
+    {
+      "id": "EQ-A2b.unicode_ff0f",
+      "matrix": "EQ-A",
+      "payload": "proof URL signed + U+FF0F FULLWIDTH SOLIDUS + path B2 (sem query)",
+      "http": "200 true",
+      "bd": "rpc=true",
+      "result": "HOLD",
+      "classe_nova": "SIM"
+    },
+    {
+      "id": "EQ-A2c.unicode_29f8",
+      "matrix": "EQ-A",
+      "payload": "proof URL signed + U+29F8 BIG SOLIDUS + path B2 (sem query)",
+      "http": "200 true",
+      "bd": "rpc=true",
+      "result": "HOLD",
+      "classe_nova": "SIM"
+    },
+    {
+      "id": "EQ-A2d.mixed_dot_pct2e",
+      "matrix": "EQ-A",
+      "payload": "POST …/{B1}/.%2e/%2e./{B2}/rteq-mix.png",
+      "http": "400 {\"statusCode\":\"403\",\"error\":\"Unauthorized\",\"message\":\"new row violates row-level security policy\",\"code\":\"AccessDenied\"}",
+      "bd": "up=400 get=400 loot=false",
+      "result": "FAIL",
+      "classe_nova": "SIM"
+    },
+    {
+      "id": "EQ-A2e.double_pct252e",
+      "matrix": "EQ-A",
+      "payload": "POST …/{B1}/%252e%252e%252f{B2}/rteq-dbl.png",
+      "http": "400 {\"statusCode\":\"400\",\"error\":\"InvalidKey\",\"message\":\"Invalid key: order_disputes/bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96/%2e%2e%2f20e2ec8a-0012-4278-b222-9e8a48e463e4/rteq-dbl.png\",\"code\":\"InvalidKey\"}",
+      "bd": "up=400 get=400 loot=false",
+      "result": "FAIL",
+      "classe_nova": "SIM"
+    },
+    {
+      "id": "EQ-A3.windows_backslash",
+      "matrix": "EQ-A",
+      "payload": "POST object …/{B1}/..\\{B2}/win.png",
+      "http": "400 {\"statusCode\":\"403\",\"error\":\"Unauthorized\",\"message\":\"new row violates row-level security policy\",\"code\":\"AccessDenied\"}",
+      "bd": "up=400 get=400 loot=false",
+      "result": "FAIL",
+      "classe_nova": "SIM"
+    },
+    {
+      "id": "EQ-A3b.null_byte_path",
+      "matrix": "EQ-A",
+      "payload": "POST object …/ok.png%00.js",
+      "http": "400 <html>\r\n<head><title>400 Bad Request</title></head>\r\n<body>\r\n<center><h1>400 Bad Request</h1></center>\r\n<hr><center>cloudflare</center>\r\n</body>\r\n</html>\r\n",
+      "bd": "up=400 trunc=false body=<html>\r\n<head><title>400 Bad Request</title></head>\r\n<body>\r\n<center><h1>400 Bad…",
+      "result": "FAIL",
+      "classe_nova": "SIM"
+    },
+    {
+      "id": "EQ-A4.mime_js_html_svg",
+      "matrix": "EQ-A",
+      "payload": "upload JS + HTML + SVG (image/svg+xml) no private bucket",
+      "http": "400 {\"statusCode\":\"415\",\"error\":\"invalid_mime_type\",\"message\":\"mime type image/svg+xml is not supported\",\"code\":\"InvalidMimeType\"}",
+      "bd": "js=400 html=400 svg=400",
+      "result": "FAIL",
+      "classe_nova": "SIM"
+    },
+    {
+      "id": "EQ-A5.signed_url_buyer2",
+      "matrix": "EQ-A",
+      "payload": "RPC proof_ok URL signed B2 em disputa B1 + GET objecto B2 como B1",
+      "http": "200 false",
+      "bd": "rpc=false getB2asB1=400 {\"statusCode\":\"404\",\"error\":\"not_found\",\"message\":\"Object not found\",\"code\":\"NoSuchKey\"}",
+      "result": "HOLD",
+      "classe_nova": "NÃO"
+    },
+    {
+      "id": "EQ-A6.storage_move_alien_prefix",
+      "matrix": "EQ-A",
+      "payload": "POST /object/move source=próprio dest=order_disputes/{B2}/…",
+      "http": "400 {\"statusCode\":\"404\",\"error\":\"not_found\",\"message\":\"Object not found\",\"code\":\"NoSuchKey\"}",
+      "bd": "move=400 {\"statusCode\":\"404\",\"error\":\"not_found\",\"message\":\"Object not found\",\"code\":\"NoSuchKey\"} get=400 {\"statusCode\":\"404\",\"error\":\"not_found\",\"message\":\"Object not found\",\"code\":\"NoSuchKey\"} loot=false",
+      "result": "FAIL",
+      "classe_nova": "SIM"
+    },
+    {
+      "id": "EQ-A6b.storage_copy_alien_prefix",
+      "matrix": "EQ-A",
+      "payload": "POST /object/copy source=próprio dest=order_disputes/{B2}/…",
+      "http": "400 {\"statusCode\":\"403\",\"error\":\"Unauthorized\",\"message\":\"new row violates row-level security policy\",\"code\":\"AccessDenied\"}",
+      "bd": "copy=400 {\"statusCode\":\"403\",\"error\":\"Unauthorized\",\"message\":\"new row violates row-level security policy\",\"code\":\"AccessDenied\"} get=400 {\"statusCode\":\"404\",\"error\":\"not_found\",\"message\":\"Object not found\",\"code\":\"NoSuchKey\"} loot=false",
+      "result": "FAIL",
+      "classe_nova": "SIM"
+    },
+    {
+      "id": "EQ-A7.graphql_revoke_collection",
+      "matrix": "EQ-A",
+      "payload": "POST /graphql/v1 batata_private_object_revokedCollection",
+      "http": "200 {\"errors\": [{\"message\": \"pg_graphql extension is not enabled.\"}]}",
+      "bd": "gqlLeak=false body={\"errors\": [{\"message\": \"pg_graphql extension is not enabled.\"}]}",
+      "result": "HOLD",
+      "classe_nova": "SIM"
+    },
+    {
+      "id": "EQ-A8.revoke_rpc_dotdot_alien",
+      "matrix": "EQ-A",
+      "payload": "RPC revoke p_path=order_disputes/{B1}/../{B2}/… + oráculo GET B2",
+      "http": "200 true",
+      "bd": "rpc=true getB2=200 registryReal n=0 touched=false",
+      "result": "HOLD",
+      "classe_nova": "SIM"
+    },
+    {
+      "id": "EQ-C5.happy_dispute_png_signed",
+      "matrix": "EQ-C",
+      "payload": "POST order_disputes proof signed própria em concluido (4242)",
+      "http": "201 [{\"id\":\"4a6daf49-e1ec-408b-8ec8-a65013629663\",\"order_id\":\"aa3fcf49-9842-42b8-ad62-b08ba5dc13f4\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"reason\":\"danificado\",\"description\":\"RTEQ prova disputa artigo danificado no envio.\",\"proof_ph…",
+      "bd": "id=4a6daf49-e1ec-408b-8ec8-a65013629663 photos=[\"https://fxdknzrqjenzqcvnwqqq.supabase.co/storage/v1/object/sign/fleaber_private/order_disputes/bfcbeeee-7dc1-4cd1-b2a7… pi=pi_3UClEHH7FWYUN3jh1PIJ9IQl",
+      "result": "FAIL",
+      "classe_nova": "NÃO"
+    },
+    {
+      "id": "EQ-B1.delete_revoke_jwt_403",
+      "matrix": "EQ-B",
+      "payload": "DELETE+revoke+proof_ok + JWT INSERT/SELECT batata_private_object_revoked",
+      "http": "200 false",
+      "bd": "del=200 auth=400 rev=true proof_ok=false ins=403 sel=403 wrote=false leak=false",
+      "result": "RESIDUAL",
+      "classe_nova": "NÃO"
+    },
+    {
+      "id": "EQ-B2.signed_get_after_delete",
+      "matrix": "EQ-B",
+      "payload": "GET da signed URL após DELETE+revoke (auth já 404)",
+      "http": "400 {\"statusCode\":\"404\",\"error\":\"not_found\",\"message\":\"Object not found\",\"code\":\"NoSuchKey\"}",
+      "bd": "auth=400 signed=400 bytes=88 cdn200=false",
+      "result": "FAIL",
+      "classe_nova": "SIM"
+    },
+    {
+      "id": "EQ-B3.reupload_same_path_proof_ok",
+      "matrix": "EQ-B",
+      "payload": "DELETE+revoke → POST mesmo path → proof_ok canónico",
+      "http": "200 false",
+      "bd": "re=200 proof_ok=false",
+      "result": "HOLD",
+      "classe_nova": "SIM"
+    },
+    {
+      "id": "EQ-B4.forged_alien_proof_url",
+      "matrix": "EQ-B",
+      "payload": "proof_ok + persist URL signed B2 na disputa B1",
+      "http": "200 false",
+      "bd": "rpc=false persist=200 [] kept=false",
+      "result": "HOLD",
+      "classe_nova": "SIM"
+    },
+    {
+      "id": "EQ-B4b.query_token_trick",
+      "matrix": "EQ-B",
+      "payload": "proof_ok URL própria + ?token= + path B2 (sem loot se query cortada)",
+      "http": "200 true",
+      "bd": "rpc=true persist=200 [] keptAlien=false",
+      "result": "HOLD",
+      "classe_nova": "SIM"
+    },
+    {
+      "id": "EQ-B5.revoke_mid_dispute_reply",
+      "matrix": "EQ-B",
+      "payload": "disputa 201 → DELETE+revoke → proof_ok + POST reply com URL morta",
+      "http": "200 false",
+      "bd": "ins=201 did=59b561c2-f373-433d-99c5-a02d43e87442 rev=true proof_ok=false reply=400 replyKept=false",
+      "result": "HOLD",
+      "classe_nova": "SIM"
+    },
+    {
+      "id": "EQ-C1.dispute_order_alheia",
+      "matrix": "EQ-C",
+      "payload": "B2 POST order_disputes na order paga de B1",
+      "http": "409 {\"code\":\"23505\",\"details\":null,\"hint\":null,\"message\":\"dispute_already_exists_for_order\"}",
+      "bd": "oid=aa3fcf49-9842-42b8-ad62-b08ba5dc13f4 id=null",
+      "result": "FAIL",
+      "classe_nova": "NÃO"
+    },
+    {
+      "id": "EQ-C2a.window_pago",
+      "matrix": "EQ-C",
+      "payload": "POST disputa em status=pago (ainda não enviado)",
+      "http": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"new row violates row-level security policy for table \\\"order_disputes\\\"\"}",
+      "bd": "status=pago id=null",
+      "result": "FAIL",
+      "classe_nova": "SIM"
+    },
+    {
+      "id": "EQ-C2b.window_enviado",
+      "matrix": "EQ-C",
+      "payload": "POST disputa em status=enviado (ainda não concluido)",
+      "http": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"new row violates row-level security policy for table \\\"order_disputes\\\"\"}",
+      "bd": "status=enviado id=null",
+      "result": "FAIL",
+      "classe_nova": "NÃO"
+    },
+    {
+      "id": "EQ-C2c.window_after_release",
+      "matrix": "EQ-C",
+      "payload": "POST disputa após wallet_release_processed_at",
+      "http": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"new row violates row-level security policy for table \\\"order_disputes\\\"\"}",
+      "bd": "oid=aa731cd2-e82d-4b5c-af01-7b6eb5e1fd8e id=null",
+      "result": "FAIL",
+      "classe_nova": "NÃO"
+    },
+    {
+      "id": "EQ-C3.dispute_refund_race",
+      "matrix": "EQ-C",
+      "payload": "Future.wait POST disputa ∥ Edge refund-order",
+      "http": "403 {\"ok\":false,\"error\":\"Não é possível anular esta venda neste estado (já enviada ou concluída).\",\"code\":\"order_refund_blocked_shipped\",\"status\":\"concluido\"}",
+      "bd": "d=400 rf=403 qty 0→0 bothWon=false mint=false st=concluido",
+      "result": "FAIL",
+      "classe_nova": "NÃO"
+    },
+    {
+      "id": "EQ-C4.dispute_release_race",
+      "matrix": "EQ-C",
+      "payload": "Future.wait RPC release ∥ POST disputa (plant concluido+mão)",
+      "http": "200 true",
+      "bd": "rel=true d=400 Δs=5.0 qty 0→0 two=false mint=false",
+      "result": "HOLD",
+      "classe_nova": "SIM"
+    },
+    {
+      "id": "EQ-D1.patch_ship_after_cs",
+      "matrix": "EQ-D",
+      "payload": "PATCH shipping=ctt após Session cs_ open",
+      "http": "200 []",
+      "bd": "cs=400 sid=null entrega em mão→entrega em mão changed=false",
+      "result": "FAIL",
+      "classe_nova": "NÃO"
+    },
+    {
+      "id": "EQ-D2.patch_ship_after_pago",
+      "matrix": "EQ-D",
+      "payload": "PATCH shipping=ctt após pago Stripe TEST",
+      "http": "200 []",
+      "bd": "paid null→null changed=false paid=590",
+      "result": "FAIL",
+      "classe_nova": "NÃO"
+    },
+    {
+      "id": "EQ-D3.label_traversal_forge_oid",
+      "matrix": "EQ-D",
+      "payload": "PATCH return_label_url …/{B1}/../{fakeOid}/ok.png",
+      "http": "200 []",
+      "bd": "stored=null kept=false",
+      "result": "FAIL",
+      "classe_nova": "SIM"
+    },
+    {
+      "id": "EQ-D3b.label_252f",
+      "matrix": "EQ-D",
+      "payload": "PATCH label %252f + path B2 (anti-atrofia)",
+      "http": "200 []",
+      "bd": "stored=null persisted=false",
+      "result": "FAIL",
+      "classe_nova": "NÃO"
+    },
+    {
+      "id": "EQ-D3c.slashslash_after_host",
+      "matrix": "EQ-D",
+      "payload": "PATCH label signed + //extra.png após ficheiro",
+      "http": "200 []",
+      "bd": "stored=null kept=false",
+      "result": "FAIL",
+      "classe_nova": "NÃO"
+    },
+    {
+      "id": "EQ-D4.seller2_reads_label_buyer1",
+      "matrix": "EQ-D",
+      "payload": "S2 GET order_disputes id B1 + GET/LIST storage label B1",
+      "http": "200 []",
+      "bd": "rowS2=200 n=0 getObj=400 list=200 leakRow=false lootObj=false listLeak=false",
+      "result": "FAIL",
+      "classe_nova": "SIM"
+    },
+    {
+      "id": "EQ-E1.second_paid_happy_dispute",
+      "matrix": "EQ-E",
+      "payload": "2.º setup_paid_order 4242 + POST disputa PNG signed",
+      "http": "201 [{\"id\":\"151e39e8-3048-4038-b14e-0a02b4bd42fa\",\"order_id\":\"2d8a7baa-9936-419e-bfba-c295a60d379d\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"reason\":\"danificado\",\"description\":\"RTEQ prova disputa artigo danificado no envio.\",\"proof_ph…",
+      "bd": "oid=2d8a7baa-9936-419e-bfba-c295a60d379d pi=pi_3UClFDH7FWYUN3jh1B3ZHB0J did=151e39e8-3048-4038-b14e-0a02b4bd42fa paid=590",
+      "result": "FAIL",
+      "classe_nova": "NÃO"
+    },
+    {
+      "id": "EQ-E2.stock_delta_races_no_mint",
+      "matrix": "EQ-E",
+      "payload": "oráculo qty C3 disputa∥refund + C4 disputa∥release",
+      "http": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"dispute_proof_url_denied\"}",
+      "bd": "C3 qty 0→0 mintC3=false C4 qty 0→0 mintC4=false",
+      "result": "FAIL",
+      "classe_nova": "SIM"
+    }
+  ],
+  "notes": [
+    {
+      "id": "fixture.paid",
+      "lens": "EQ8",
+      "title": "setup_paid_order Stripe TEST",
+      "ev": "200 {\n  \"ok\": true,\n  \"order_id\": \"aa3fcf49-9842-42b8-ad62-b08ba5dc13f4\",\n  \"product_id\": \"5f77ef7f-d128-40df-bcfc-1a7054d5d852\",\n  \"payment_intent_id\": \"pi_3UClEHH7FWYUN3jh1PIJ9IQl\",\n  \"pi_status\": \"succeeded\",\n  \"pi_amount_received\": 590,\n  \"…"
+    },
+    {
+      "id": "fsm.enviado",
+      "lens": "EQ5",
+      "title": "seller → enviado",
+      "ev": {
+        "hit": "200 [{\"id\":\"aa3fcf49-9842-42b8-ad62-b08ba5dc13f4\",\"created_at\":\"2026-09-06T18:55:49.026991+00:00\",\"product_id\":\"5f77ef7f-d128-40df-bcfc-1a7054d5d852\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c…",
+        "status": "enviado",
+        "shipped_at": "2026-09-06T18:55:51.495362+00:00"
+      }
+    },
+    {
+      "id": "fsm.concluido",
+      "lens": "EQ4",
+      "title": "buyer → concluido",
+      "ev": {
+        "hit": "200 [{\"id\":\"aa3fcf49-9842-42b8-ad62-b08ba5dc13f4\",\"created_at\":\"2026-09-06T18:55:49.026991+00:00\",\"product_id\":\"5f77ef7f-d128-40df-bcfc-1a7054d5d852\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c…",
+        "status": "concluido"
+      }
+    },
+    {
+      "id": "EQ1.upload",
+      "lens": "EQ1",
+      "title": "PNG próprio assinado",
+      "ev": {
+        "up": "200 {\"Key\":\"fleaber_private/order_disputes/bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96/aa3fcf49-9842-42b8-ad62-b08ba5dc13f4/ok.png\",\"Id\":\"7027305b-2e37-4798-a358-775c2811c554\"}",
+        "signed": "https://fxdknzrqjenzqcvnwqqq.supabase.co/storage/v1/object/sign/fleaber_private/order_disputes/bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96/aa3fcf49-9842-42b8-ad62-b08ba5dc13f4/ok.png?token=eyJraWQiOiI3YmY5ZTQ0Ni1mOTg4LTRlNWEtYjM0Mi0zYTQ1ZTE5NTgzYzkiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJmbGVhYmVyX3ByaXZhdGUvb3JkZXJfZGlzcHV0ZXMvYmZjYmVlZWUtN2RjMS00Y2QxLWIyYTctZDNhMGE2Y2Y3Yzk2L2FhM2ZjZjQ5LTk4NDItNDJiOC1hZDYyLWIwOGJhNWRjMTNmNC9vay5wbmciLCJzY29wZSI6ImRvd25sb2FkIiwiaWF0IjoxNzg4NzIwOTUyLCJleHAiOjE3ODg3MjQ1NTJ9.i7fBFACBNuDLthqYQQxtEHzRhtxNaMw_6_HkqYf5BPQ",
+        "path": "order_disputes/bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96/aa3fcf49-9842-42b8-ad62-b08ba5dc13f4/ok.png"
+      }
+    },
+    {
+      "id": "EQ1.alien",
+      "lens": "EQ1",
+      "title": "objecto B2",
+      "ev": "200 {\"Key\":\"fleaber_private/order_disputes/20e2ec8a-0012-4278-b222-9e8a48e463e4/00000000-0000-0000-0000-00000000eq02/rteq-secret.png\",\"Id\":\"802aae2f-1cdb-42e2-b4f1-3dc159ac3d4c\"}"
+    },
+    {
+      "id": "EQ-B1.delete_revoke_jwt_403",
+      "lens": "EQ2",
+      "title": "residual anti-atrofia — NÃO CONTAR",
+      "ev": "200 false"
+    },
+    {
+      "id": "fixture.paid",
+      "lens": "EQ4",
+      "title": "setup_paid_order Stripe TEST",
+      "ev": "200 {\n  \"ok\": true,\n  \"order_id\": \"b04dbd78-24bb-4b0b-938c-add5544e4c2a\",\n  \"product_id\": \"99d1f0a9-d849-41a4-977f-77c37ae88605\",\n  \"payment_intent_id\": \"pi_3UClEVH7FWYUN3jh1O07AsPR\",\n  \"pi_status\": \"succeeded\",\n  \"pi_amount_received\": 590,\n  \"…"
+    },
+    {
+      "id": "fsm.enviado",
+      "lens": "EQ5",
+      "title": "seller → enviado",
+      "ev": {
+        "hit": "200 [{\"id\":\"b04dbd78-24bb-4b0b-938c-add5544e4c2a\",\"created_at\":\"2026-09-06T18:56:03.670884+00:00\",\"product_id\":\"99d1f0a9-d849-41a4-977f-77c37ae88605\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c…",
+        "status": "enviado",
+        "shipped_at": "2026-09-06T18:56:05.998629+00:00"
+      }
+    },
+    {
+      "id": "fsm.concluido",
+      "lens": "EQ4",
+      "title": "buyer → concluido",
+      "ev": {
+        "hit": "200 [{\"id\":\"b04dbd78-24bb-4b0b-938c-add5544e4c2a\",\"created_at\":\"2026-09-06T18:56:03.670884+00:00\",\"product_id\":\"99d1f0a9-d849-41a4-977f-77c37ae88605\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c…",
+        "status": "concluido"
+      }
+    },
+    {
+      "id": "fixture.paid",
+      "lens": "EQ4",
+      "title": "setup_paid_order Stripe TEST",
+      "ev": "200 {\n  \"ok\": true,\n  \"order_id\": \"450c6ae3-7516-47ec-835a-56656575f82d\",\n  \"product_id\": \"57357f20-a937-4b02-b998-d5f7180974fa\",\n  \"payment_intent_id\": \"pi_3UClEaH7FWYUN3jh1sFdIxmI\",\n  \"pi_status\": \"succeeded\",\n  \"pi_amount_received\": 590,\n  \"…"
+    },
+    {
+      "id": "fsm.enviado",
+      "lens": "EQ5",
+      "title": "seller → enviado",
+      "ev": {
+        "hit": "200 [{\"id\":\"450c6ae3-7516-47ec-835a-56656575f82d\",\"created_at\":\"2026-09-06T18:56:07.992077+00:00\",\"product_id\":\"57357f20-a937-4b02-b998-d5f7180974fa\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c…",
+        "status": "enviado",
+        "shipped_at": "2026-09-06T18:56:10.680013+00:00"
+      }
+    },
+    {
+      "id": "fixture.paid",
+      "lens": "EQ4",
+      "title": "setup_paid_order Stripe TEST",
+      "ev": "200 {\n  \"ok\": true,\n  \"order_id\": \"aa731cd2-e82d-4b5c-af01-7b6eb5e1fd8e\",\n  \"product_id\": \"a657c392-93e7-42f1-8342-6cfaf570e132\",\n  \"payment_intent_id\": \"pi_3UClEdH7FWYUN3jh0aDUaO0y\",\n  \"pi_status\": \"succeeded\",\n  \"pi_amount_received\": 590,\n  \"…"
+    },
+    {
+      "id": "fsm.enviado",
+      "lens": "EQ5",
+      "title": "seller → enviado",
+      "ev": {
+        "hit": "200 [{\"id\":\"aa731cd2-e82d-4b5c-af01-7b6eb5e1fd8e\",\"created_at\":\"2026-09-06T18:56:11.469042+00:00\",\"product_id\":\"a657c392-93e7-42f1-8342-6cfaf570e132\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c…",
+        "status": "enviado",
+        "shipped_at": "2026-09-06T18:56:13.579612+00:00"
+      }
+    },
+    {
+      "id": "fsm.concluido",
+      "lens": "EQ4",
+      "title": "buyer → concluido",
+      "ev": {
+        "hit": "200 [{\"id\":\"aa731cd2-e82d-4b5c-af01-7b6eb5e1fd8e\",\"created_at\":\"2026-09-06T18:56:11.469042+00:00\",\"product_id\":\"a657c392-93e7-42f1-8342-6cfaf570e132\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c…",
+        "status": "concluido"
+      }
+    },
+    {
+      "id": "fixture.paid",
+      "lens": "EQ7",
+      "title": "setup_paid_order Stripe TEST",
+      "ev": "200 {\n  \"ok\": true,\n  \"order_id\": \"c29ed7d6-138b-40fc-a05d-32ce35f69c99\",\n  \"product_id\": \"3879caf4-19e2-49d0-9642-b92796887994\",\n  \"payment_intent_id\": \"pi_3UClEgH7FWYUN3jh1DB8Ck0c\",\n  \"pi_status\": \"succeeded\",\n  \"pi_amount_received\": 590,\n  \"…"
+    },
+    {
+      "id": "fsm.enviado",
+      "lens": "EQ5",
+      "title": "seller → enviado",
+      "ev": {
+        "hit": "200 [{\"id\":\"c29ed7d6-138b-40fc-a05d-32ce35f69c99\",\"created_at\":\"2026-09-06T18:56:14.406068+00:00\",\"product_id\":\"3879caf4-19e2-49d0-9642-b92796887994\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c…",
+        "status": "enviado",
+        "shipped_at": "2026-09-06T18:56:16.980805+00:00"
+      }
+    },
+    {
+      "id": "fsm.concluido",
+      "lens": "EQ4",
+      "title": "buyer → concluido",
+      "ev": {
+        "hit": "200 [{\"id\":\"c29ed7d6-138b-40fc-a05d-32ce35f69c99\",\"created_at\":\"2026-09-06T18:56:14.406068+00:00\",\"product_id\":\"3879caf4-19e2-49d0-9642-b92796887994\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c…",
+        "status": "concluido"
+      }
+    },
+    {
+      "id": "C3.race",
+      "lens": "EQ7",
+      "title": "disputa∥refund",
+      "ev": {
+        "d": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"dispute_proof_url_denied\"}",
+        "rf": "403 {\"ok\":false,\"error\":\"Não é possível anular esta venda neste estado (já enviada ou concluída).\",\"code\":\"order_refund_blocked_shipped\",\"status\":\"concluido\"}",
+        "qty": "0→0",
+        "status": "concluido",
+        "refund_id": "",
+        "Δb": 0.0,
+        "Δs": 0.0
+      }
+    },
+    {
+      "id": "fixture.paid",
+      "lens": "EQ7",
+      "title": "setup_paid_order Stripe TEST",
+      "ev": "200 {\n  \"ok\": true,\n  \"order_id\": \"50697911-7f48-4cbb-a34e-fc61aa7ceff4\",\n  \"product_id\": \"e251cebc-32b2-4cdf-bf2f-8afffdf64fad\",\n  \"payment_intent_id\": \"pi_3UClElH7FWYUN3jh1icWJNzu\",\n  \"pi_status\": \"succeeded\",\n  \"pi_amount_received\": 590,\n  \"…"
+    },
+    {
+      "id": "C4.race",
+      "lens": "EQ7",
+      "title": "disputa∥release",
+      "ev": {
+        "rel": "200 true",
+        "d": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"dispute_proof_url_denied\"}",
+        "qty": "0→0",
+        "Δs": 5.0,
+        "released": true,
+        "dispOpen": false
+      }
+    },
+    {
+      "id": "fixture.paid",
+      "lens": "EQ5",
+      "title": "setup_paid_order Stripe TEST",
+      "ev": "200 {\n  \"ok\": true,\n  \"order_id\": \"d0d4458f-2fd8-4efa-9055-65afb4b44750\",\n  \"product_id\": \"c531ab49-eb2c-4b44-a6e8-0d3a14653587\",\n  \"payment_intent_id\": \"pi_3UClF1H7FWYUN3jh0S8HQZFq\",\n  \"pi_status\": \"succeeded\",\n  \"pi_amount_received\": 590,\n  \"…"
+    },
+    {
+      "id": "fixture.paid",
+      "lens": "EQ8",
+      "title": "setup_paid_order Stripe TEST",
+      "ev": "200 {\n  \"ok\": true,\n  \"order_id\": \"2d8a7baa-9936-419e-bfba-c295a60d379d\",\n  \"product_id\": \"4ab31580-2a66-468b-acf7-46662011d1cc\",\n  \"payment_intent_id\": \"pi_3UClFDH7FWYUN3jh1B3ZHB0J\",\n  \"pi_status\": \"succeeded\",\n  \"pi_amount_received\": 590,\n  \"…"
+    },
+    {
+      "id": "fsm.enviado",
+      "lens": "EQ5",
+      "title": "seller → enviado",
+      "ev": {
+        "hit": "200 [{\"id\":\"2d8a7baa-9936-419e-bfba-c295a60d379d\",\"created_at\":\"2026-09-06T18:56:47.347125+00:00\",\"product_id\":\"4ab31580-2a66-468b-acf7-46662011d1cc\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c…",
+        "status": "enviado",
+        "shipped_at": "2026-09-06T18:56:49.500384+00:00"
+      }
+    },
+    {
+      "id": "fsm.concluido",
+      "lens": "EQ4",
+      "title": "buyer → concluido",
+      "ev": {
+        "hit": "200 [{\"id\":\"2d8a7baa-9936-419e-bfba-c295a60d379d\",\"created_at\":\"2026-09-06T18:56:47.347125+00:00\",\"product_id\":\"4ab31580-2a66-468b-acf7-46662011d1cc\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c…",
+        "status": "concluido"
+      }
+    }
+  ],
+  "actors": {
+    "buyer": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+    "seller": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+    "buyer2": "20e2ec8a-0012-4278-b222-9e8a48e463e4",
+    "seller2": "96b2c945-a49c-4345-8673-3e9539966e3d"
+  },
+  "created": {
+    "orders": [
+      "aa3fcf49-9842-42b8-ad62-b08ba5dc13f4",
+      "b04dbd78-24bb-4b0b-938c-add5544e4c2a",
+      "450c6ae3-7516-47ec-835a-56656575f82d",
+      "aa731cd2-e82d-4b5c-af01-7b6eb5e1fd8e",
+      "c29ed7d6-138b-40fc-a05d-32ce35f69c99",
+      "50697911-7f48-4cbb-a34e-fc61aa7ceff4",
+      "9e4f7a17-61b2-4518-87f3-ff25c9fcbb42",
+      "d0d4458f-2fd8-4efa-9055-65afb4b44750",
+      "2d8a7baa-9936-419e-bfba-c295a60d379d"
+    ],
+    "products": [
+      "5f77ef7f-d128-40df-bcfc-1a7054d5d852",
+      "99d1f0a9-d849-41a4-977f-77c37ae88605",
+      "57357f20-a937-4b02-b998-d5f7180974fa",
+      "a657c392-93e7-42f1-8342-6cfaf570e132",
+      "3879caf4-19e2-49d0-9642-b92796887994",
+      "e251cebc-32b2-4cdf-bf2f-8afffdf64fad",
+      "ac9915b3-33c4-4f47-ab6d-d6954bfb4fab",
+      "c531ab49-eb2c-4b44-a6e8-0d3a14653587",
+      "4ab31580-2a66-468b-acf7-46662011d1cc"
+    ],
+    "disputes": [
+      "4a6daf49-e1ec-408b-8ec8-a65013629663",
+      "59b561c2-f373-433d-99c5-a02d43e87442",
+      "151e39e8-3048-4038-b14e-0a02b4bd42fa"
+    ],
+    "chats": []
+  }
+}

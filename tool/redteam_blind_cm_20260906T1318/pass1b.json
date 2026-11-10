@@ -1,0 +1,53 @@
+{
+  "probes": [
+    {
+      "probe_id": "A3b",
+      "poco": "CM-A",
+      "payload": "GET hub_live_items_* unpublished select id,title,price",
+      "http": "{\"pub\":\"200 260ms []\",\"disc\":\"200 200ms []\"}",
+      "bd": "",
+      "result": "HOLD",
+      "lens": "CM1",
+      "residual": false,
+      "count_finding": false
+    },
+    {
+      "probe_id": "A4b",
+      "poco": "CM-A",
+      "payload": "GET hub_products_public unpublished select id,title,price",
+      "http": "200 195ms []",
+      "bd": "",
+      "result": "HOLD",
+      "lens": "CM1",
+      "residual": false,
+      "count_finding": false
+    },
+    {
+      "probe_id": "A11b",
+      "poco": "CM-A",
+      "payload": "BD follows following_id=ghost UUID",
+      "http": "200 188ms [{\"id\":\"cb1db287-0825-4f57-b177-cc6bda6924e8\",\"follower_id\":\"29a701c1-a9fc-47ff-8d6c-051a023c7b64\",\"following_id\":\"00000000-0000-4000-a000-0000000000c1\"}]",
+      "bd": "{\"n\":1,\"rows\":\"[{\\\"id\\\":\\\"cb1db287-0825-4f57-b177-cc6bda6924e8\\\",\\\"follower_id\\\":\\\"29a701c1-a9fc-47ff-8d6c-051a023c7b64\\\",\\\"following_id\\\":\\\"00000000-0000-4000-a000-0000000000c1\\\"}]\"}",
+      "result": "FAIL",
+      "lens": "CM1",
+      "residual": false,
+      "count_finding": false
+    },
+    {
+      "probe_id": "A13b",
+      "poco": "CM-A",
+      "payload": "B1 POST favorites product_id ghost UUID (oracle vs A13)",
+      "http": "409 224ms {\"code\":\"23503\",\"details\":\"Key is not present in table \\\"products\\\".\",\"hint\":null,\"message\":\"insert or update on table \\\"favorites\\\" violates foreign key constraint \\\"favorites_product_id_fkey\\\"\"}",
+      "bd": "",
+      "result": "HOLD",
+      "lens": "CM1",
+      "residual": false,
+      "count_finding": false
+    }
+  ],
+  "notes": [],
+  "ghostFollow": "200 188ms [{\"id\":\"cb1db287-0825-4f57-b177-cc6bda6924e8\",\"follower_id\":\"29a701c1-a9fc-47ff-8d6c-051a023c7b64\",\"following_id\":\"00000000-0000-4000-a000-0000000000c1\"}]",
+  "favGhost": "409 224ms {\"code\":\"23503\",\"details\":\"Key is not present in table \\\"products\\\".\",\"hint\":null,\"message\":\"insert or update on table \\\"favorites\\\" violates foreign key constraint \\\"favorites_product_id_fkey\\\"\"}",
+  "a3": "200 260ms []",
+  "a4": "200 195ms []"
+}

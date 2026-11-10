@@ -1,0 +1,207 @@
+{
+  "stamp": "20260902T1005",
+  "prefix": "RTAO-20260902T1005",
+  "auditor": "REDTEAM_BLIND_AO_CHAT_POS_AHAM_v1",
+  "lenses": [
+    "AO1",
+    "AO2",
+    "AO3",
+    "AO4",
+    "AO5",
+    "AO7",
+    "AO8"
+  ],
+  "findings": [
+    {
+      "id": "AO1.display-refund-persisted",
+      "lens": "AO1",
+      "severity": "P2",
+      "title": "Card cancel com display Refund 50 EUR persistido; Flutter mostra display",
+      "actor": "seller JWT",
+      "pre": "assert só bloqueia Reembolso/PayPal/…; Flutter _buildCancelOutcomeFromPayload usa display",
+      "repro": "POST cancel_request_outcome display=Refund 50 EUR processed; GET id=1200",
+      "expected": "chat_system_card_display_forbidden",
+      "obtained": "FLEABER_JSON_V1:{\"kind\":\"cancel_request_outcome\",\"order_id\":\"2a975658-318c-4482-9ea5-25e37e37f42a\",\"outcome\":\"rejected\",\"display\":\"Refund 50 EUR processed\"}",
+      "proven": true,
+      "evidence": {
+        "id": "1200",
+        "order": "2a975658-318c-4482-9ea5-25e37e37f42a"
+      }
+    },
+    {
+      "id": "AO1.notes-wise-persisted",
+      "lens": "AO1",
+      "severity": "P2",
+      "title": "Comprovativo notes Wise 50€ persistido; Flutter mostra Observações",
+      "actor": "buyer JWT",
+      "pre": "payment_lie_text não inclui Wise/Revolut/Apple Pay",
+      "repro": "POST reservation_payment_submitted notes=Wise 50€ já caiu",
+      "expected": "notes_forbidden",
+      "obtained": "FLEABER_JSON_V1:{\"kind\":\"reservation_payment_submitted\",\"order_id\":\"2a975658-318c-4482-9ea5-25e37e37f42a\",\"notes\":\"Wise 50€ já caiu\"}",
+      "proven": true,
+      "evidence": {
+        "id": "1206"
+      }
+    },
+    {
+      "id": "AO4.chat-image-public-persisted",
+      "lens": "AO4",
+      "severity": "P2",
+      "title": "chat_image url=storage public persistida (allowlist storage/% não restringe bucket)",
+      "actor": "buyer JWT",
+      "pre": "assert url like supabase.co/storage/% ; Flutter usa url http",
+      "repro": "POST chat_image path=chat_uploads/{uid}/x url=.../object/public/avatars/x.png",
+      "expected": "url_denied (só fleaber_private)",
+      "obtained": "FLEABER_JSON_V1:{\"kind\":\"chat_image\",\"path\":\"chat_uploads/bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96/rtao.png\",\"url\":\"https://fxdknzrqjenzqcvnwqqq.supabase.co/storage/v1/object/public/avatars/x.png\"}",
+      "proven": true,
+      "evidence": {
+        "id": "1238"
+      }
+    },
+    {
+      "id": "AO5.inbox-lie-persisted",
+      "lens": "AO5",
+      "severity": "P2",
+      "title": "Inbox last_message mentiroso persistido (regex só pega PayPal/PIX/€ depois de keyword)",
+      "actor": "buyer JWT",
+      "pre": "PayPal 50€ bloqueado; Wise/Revolut/MB WAY aprovado/Pagamento recebido passam",
+      "repro": "PATCH chats last_message; GET chats",
+      "expected": "chat_inbox_preview_forbidden",
+      "obtained": "Recebi no Wise",
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "AO5.delete-nbsp-prefix-bubble",
+      "lens": "AO5",
+      "severity": "P3",
+      "title": "DELETE removeu bolha com NBSP+FLEABER_JSON_V1 (imutabilidade só prefixo exacto)",
+      "actor": "seller JWT",
+      "pre": "guard_delete like FLEABER_JSON_V1:% ou btrim {%",
+      "repro": "DELETE id de text=U+00A0+FLEABER_JSON_V1:…",
+      "expected": "chat_system_card_immutable",
+      "obtained": "200 [{\"id\":1220,\"created_at\":\"2026-09-02T09:14:22.2683+00:00\",\"chat_id\":\"ac2902d3-a3ca-4f82-b7de-2532db9cafba\",\"sender_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"text\":\" FLEABER_JSON_V1:{\\\"kind\\\":\\\"cancel_request_outcome\\\",\\\"order_id\\\":\\\"2a975…",
+      "proven": true,
+      "evidence": {
+        "id": "1220"
+      }
+    }
+  ],
+  "blocked": [
+    {
+      "id": "AO3.patch-silent-200",
+      "lens": "AO3",
+      "title": "PATCH created_at 200 sem mutar (ainda 2026-09-02T09:14:23.090058+00:00)",
+      "ev": {
+        "id": 1229,
+        "text": "RTAO ping cronologia",
+        "created_at": "2026-09-02T09:14:23.090058+00:00",
+        "sender_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96"
+      }
+    },
+    {
+      "id": "AO7.b2-patch-empty",
+      "lens": "AO7",
+      "title": "B2 PATCH 200 [] sem mutar last_message=Recebi no Wise",
+      "ev": {
+        "id": "ac2902d3-a3ca-4f82-b7de-2532db9cafba",
+        "last_message": "Recebi no Wise",
+        "last_message_time": "2026-09-02T09:14:23.273924+00:00",
+        "user_a": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+        "user_b": "980f4fa1-0004-42f9-abca-69f1a9c29588"
+      }
+    },
+    {
+      "id": "AO4.signed-correct-accepted",
+      "lens": "AO4",
+      "title": "signed /storage/v1/object/sign aceite (AHAM)",
+      "ev": "201 [{\"id\":1247,\"created_at\":\"2026-09-02T09:17:28.520576+00:00\",\"chat_id\":\"ac2902d3-a3ca-4f82-b7de-2532db9cafba\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"reservation_payment_submitted\\\",\\\"order_id\\\"…"
+    },
+    {
+      "id": "AO2.zwj-inside-keyword",
+      "lens": "AO2",
+      "title": "ZWSP intra-keyword stripped→blocked",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_display_forbidden\"}"
+    },
+    {
+      "id": "AO2.zwj-notes",
+      "lens": "AO2",
+      "title": "ZWSP notes bloqueado",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_notes_forbidden\"}"
+    }
+  ],
+  "skipped": [],
+  "notes": [
+    {
+      "id": "p2.refund-stored",
+      "lens": "AO1",
+      "title": "msg 1200 text",
+      "ev": "FLEABER_JSON_V1:{\"kind\":\"cancel_request_outcome\",\"order_id\":\"2a975658-318c-4482-9ea5-25e37e37f42a\",\"outcome\":\"rejected\",\"display\":\"Refund 50 EUR processed\"}"
+    },
+    {
+      "id": "p2.notes-stored",
+      "lens": "AO1",
+      "title": "wise notes text",
+      "ev": "FLEABER_JSON_V1:{\"kind\":\"reservation_payment_submitted\",\"order_id\":\"2a975658-318c-4482-9ea5-25e37e37f42a\",\"notes\":\"Wise 50€ já caiu\"}"
+    },
+    {
+      "id": "p2.image-stored",
+      "lens": "AO4",
+      "title": "chat_image text",
+      "ev": "FLEABER_JSON_V1:{\"kind\":\"chat_image\",\"path\":\"chat_uploads/bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96/rtao.png\",\"url\":\"https://fxdknzrqjenzqcvnwqqq.supabase.co/storage/v1/object/public/avatars/x.png\"}"
+    },
+    {
+      "id": "p2.created-at",
+      "lens": "AO3",
+      "title": "PATCH 200 mas created_at",
+      "ev": "2026-09-02T09:14:23.090058+00:00"
+    },
+    {
+      "id": "p2.inbox",
+      "lens": "AO5",
+      "title": "last_message actual",
+      "ev": "Recebi no Wise"
+    },
+    {
+      "id": "p2.seguro-escape",
+      "lens": "AO2",
+      "title": "kind stored",
+      "ev": "FLEABER_JSON_V1:{\"kind\":\"\\u0073eguro_fleaber_paid\",\"order_id\":\"2a975658-318c-4482-9ea5-25e37e37f42a\",\"total\":5.90}"
+    },
+    {
+      "id": "p2.signed-abs",
+      "lens": "AO4",
+      "title": "URL",
+      "ev": "https://fxdknzrqjenzqcvnwqqq.supabase.co/storage/v1/object/sign/fleaber_private/order_proofs/bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96/2a975658-318c-4482-9ea5-25e37e37f42a/RTAO-20260902T1005-own.png?token=eyJraWQiOiI3YmY5ZTQ0Ni1mOTg4LTRlNWEtYjM0Mi0zYTQ1ZTE5NTgzYzkiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJmbGVhYmVyX3ByaXZhdGUvb3JkZXJfcHJvb2ZzL2JmY2JlZWVlLTdkYzEtNGNkMS1iMmE3LWQzYTBhNmNmN2M5Ni8yYTk3NTY1OC0zMThjLTQ0ODItOWVhNS0yNWUzN2UzN2Y0MmEvUlRBTy0yMDI2MDkwMlQxMDA1LW93bi5wbmciLCJzY29wZSI6ImRvd25sb2FkIiwiaWF0IjoxNzg4MzQwNjQ4LCJleHAiOjE3ODgzNDQyNDh9.oH9c00B2AWMHcZ4Y9zsjo7--L5N02Zf7-9ztUKMzLpM"
+    },
+    {
+      "id": "p2.restore-inbox",
+      "lens": "AO5",
+      "title": "last_message reset",
+      "ev": "200 [{\"id\":\"ac2902d3-a3ca-4f82-b7de-2532db9cafba\",\"created_at\":\"2026-08-27T06:37:32.277448+00:00\",\"user_a\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"user_b\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"last_message\":\"RTAO cleanup\",\"last_message_time\":…"
+    },
+    {
+      "id": "p2.books",
+      "lens": "AO8",
+      "title": "order ainda pago",
+      "ev": {
+        "status": "pago",
+        "paid": 590,
+        "refund": ""
+      }
+    }
+  ],
+  "actors": {
+    "buyer": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+    "seller": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+    "buyer2": "8280a8cd-7e71-48f6-9f3d-58946ffe917f"
+  },
+  "created": {
+    "orders": [],
+    "products": [],
+    "chats": [],
+    "messages": [
+      "1247"
+    ]
+  }
+}

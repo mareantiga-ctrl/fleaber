@@ -1,0 +1,189 @@
+{
+  "stamp": "20260902T1821",
+  "prefix": "RTBH-20260902T1821",
+  "auditor": "REDTEAM_BLIND_BH_LIVE_POS_ATBE_v1",
+  "lenses": [
+    "BH4",
+    "BH5",
+    "BH6",
+    "BH7"
+  ],
+  "findings": [
+    {
+      "id": "BH6-01",
+      "lens": "BH6",
+      "severity": "P1",
+      "title": "Accept reserva após live ended (sem reopen)",
+      "actor": "seller JWT",
+      "pre": "pending criado no ar; live agora ended",
+      "repro": "PATCH accepted após status=ended",
+      "expected": "denied",
+      "obtained": "200 [{\"id\":\"e81334d1-430e-4b64-9c60-75a3ee5568b6\",\"live_id\":\"c626f399-7c3f-4df1-b8b5-470fb5617463\",\"live_item_id\":\"712cbd44-2507-4aac-9318-8985c4f07247\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0…",
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "BH6-02",
+      "lens": "BH6",
+      "severity": "P1",
+      "title": "INSERT reserva em live ended",
+      "actor": "buyer JWT",
+      "pre": "live ended",
+      "repro": "POST live_reservation_requests",
+      "expected": "denied",
+      "obtained": "201 [{\"id\":\"51675161-5504-4945-a6b9-6906467c1b38\",\"live_id\":\"c626f399-7c3f-4df1-b8b5-470fb5617463\",\"live_item_id\":\"712cbd44-2507-4aac-9318-8985c4f07247\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0…",
+      "proven": true,
+      "evidence": {}
+    }
+  ],
+  "blocked": [
+    {
+      "id": "BH4-01",
+      "lens": "BH4",
+      "title": "INSERT hitch alien checkout",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"live_item_checkout_product_seller_mismatch\"}"
+    },
+    {
+      "id": "BH4-02",
+      "lens": "BH4",
+      "title": "PATCH hitch checkout_product_id alheio",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"live_item_checkout_product_seller_mismatch\"}"
+    },
+    {
+      "id": "BH4-03",
+      "lens": "BH4",
+      "title": "hitch own extra mark_sold sem unlist",
+      "ev": {
+        "mark": "200 {\"ok\": true, \"price\": 12.5, \"live_id\": \"c626f399-7c3f-4df1-b8b5-470fb5617463\", \"ref_code\": \"BH801962\", \"item_kind\": \"live_only\", \"total_qty\": 2, \"product_id\": null, \"blocked_qty\": 0, \"live_status\": \"live\", \"live_item_id\": \"712cbd44-2507-4aa…",
+        "after": {
+          "id": "b9faac1c-7d62-4da1-b73f-4517ea68a97e",
+          "quantity": 1,
+          "is_sold": false,
+          "list_on_marketplace": true,
+          "price": 22.0,
+          "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+          "title": "RTBH-20260902T1821-extra"
+        }
+      }
+    },
+    {
+      "id": "BH4-04",
+      "lens": "BH4",
+      "title": "Buyer mark_sold item da live A",
+      "ev": "200 {\"ok\": false, \"error\": \"not_allowed\"}"
+    },
+    {
+      "id": "BH4-05",
+      "lens": "BH4",
+      "title": "Seller2 mark_sold no item da live A",
+      "ev": "200 {\"ok\": false, \"error\": \"not_allowed\"}"
+    },
+    {
+      "id": "BH4-06",
+      "lens": "BH4",
+      "title": "INSERT live_item status=sold (bypass RPC)",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"live_item_status_sold_rpc_only\"}"
+    },
+    {
+      "id": "BH4-07",
+      "lens": "BH4",
+      "title": "PATCH status=sold directo sem RPC",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"live_item_status_sold_rpc_only\"}"
+    },
+    {
+      "id": "BH4-08",
+      "lens": "BH4",
+      "title": "upsert marketplace live_item com SKU seller2",
+      "ev": "400 {\"code\":\"P0001\",\"details\":null,\"hint\":null,\"message\":\"not_allowed\"}"
+    },
+    {
+      "id": "BH5-01",
+      "lens": "BH5",
+      "title": "dono qty increase live_only",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"live_item_qty_increase_not_allowed\"}"
+    },
+    {
+      "id": "BH5-02",
+      "lens": "BH5",
+      "title": "Mover live_item da live A para live B (seller2)",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"live_item_not_authorized\"}"
+    },
+    {
+      "id": "BH5-03",
+      "lens": "BH5",
+      "title": "qty cap 2",
+      "ev": "201 [{\"id\":\"b1ba48df-66e0-46dd-a07c-b99937b359ef\",\"live_id\":\"c626f399-7c3f-4df1-b8b5-470fb5617463\",\"live_item_id\":\"712cbd44-2507-4aac-9318-8985c4f07247\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0…"
+    },
+    {
+      "id": "BH5-04",
+      "lens": "BH5",
+      "title": "Reserva item A com live_id da live B",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"live_item_live_mismatch\"}"
+    },
+    {
+      "id": "BH5-05",
+      "lens": "BH5",
+      "title": "helper mark qty live_only",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"live_item_not_authorized\"}"
+    },
+    {
+      "id": "BH6-03",
+      "lens": "BH6",
+      "title": "seller não reabre ended",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table lives\"}"
+    },
+    {
+      "id": "BH6-04",
+      "lens": "BH7",
+      "title": "Seller2 reabre live A",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table lives\"}"
+    }
+  ],
+  "skipped": [],
+  "notes": [
+    {
+      "id": "BH4-03a",
+      "lens": "BH4",
+      "title": "hitch checkout próprio extra",
+      "ev": "200 [{\"id\":\"712cbd44-2507-4aac-9318-8985c4f07247\",\"live_id\":\"c626f399-7c3f-4df1-b8b5-470fb5617463\",\"seller_id\":null,\"ref_code\":\"BH801962\",\"title\":\"RTBH-20260902T1821-p2-only\",\"description\":null,\"price\":12.5,\"image_url\":null,\"size\":null,\"color\":…"
+    },
+    {
+      "id": "BH6-03a",
+      "lens": "BH6",
+      "title": "seller reopen ended→live",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table lives\"}"
+    }
+  ],
+  "actors": {
+    "buyer": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+    "seller": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+    "buyer2": "7d12f556-007f-40fd-9671-c07eb3bd354f",
+    "seller2": "e725febc-f8bb-40a8-812d-bcbf50808ca8",
+    "helperChat": "e58bbcbd-3b6a-433c-8761-902e0aee7b10",
+    "helperMark": "0afed221-1913-44b0-8afd-f23873c977bb",
+    "helperView": "75bbea44-18b3-48fe-83a0-3c09a9d67069",
+    "helperRes": "35e26df6-32c3-4dc9-952e-131d69cef20a"
+  },
+  "created": {
+    "orders": [],
+    "products": [
+      "b9faac1c-7d62-4da1-b73f-4517ea68a97e",
+      "b9122716-44af-48c4-b0b3-f53144cd2ec4",
+      "de145165-1f4f-4d15-90d6-7eb801feb714"
+    ],
+    "lives": [
+      "c626f399-7c3f-4df1-b8b5-470fb5617463",
+      "e7f5a374-108f-4192-9983-4079553d03a4"
+    ],
+    "items": [
+      "712cbd44-2507-4aac-9318-8985c4f07247",
+      "5bc0ceed-9636-474a-a98a-9033f020d61b",
+      "c0979020-dae4-40d4-a57f-9a11bd0e2cd0"
+    ],
+    "reservations": [
+      "b1ba48df-66e0-46dd-a07c-b99937b359ef",
+      "e81334d1-430e-4b64-9c60-75a3ee5568b6"
+    ],
+    "helpers": []
+  }
+}

@@ -1,0 +1,321 @@
+{
+  "auditor": "REDTEAM_BLIND_BN_LIVE_POS_BFBK_v1",
+  "stamp": "20260902T1903",
+  "findings": [],
+  "blocked": [
+    {
+      "id": "P2-BN5-pool-not-both",
+      "lens": "BN5",
+      "title": "pool not both accepted",
+      "ev": {
+        "r1": "accepted",
+        "r2": "accepted",
+        "logical": [
+          null,
+          "46c5aa18-8f48-44ea-a991-978a7fe594c1"
+        ]
+      }
+    },
+    {
+      "id": "BN5-sameref",
+      "lens": "BN5",
+      "title": "same ref double",
+      "ev": {
+        "n": 0,
+        "shared": false,
+        "logA": null,
+        "logB": null,
+        "p1": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"qty_exceeds_stock\"}",
+        "p2": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"qty_exceeds_stock\"}"
+      }
+    },
+    {
+      "id": "BN6-mux-race",
+      "lens": "BN6",
+      "title": "mux end||accept",
+      "ev": {
+        "ended": false,
+        "accepted": true,
+        "mux": "400 {\"error\":\"mux_live_id em falta nesta live.\",\"step\":\"validation\"}"
+      }
+    },
+    {
+      "id": "BN2-05",
+      "lens": "BN2",
+      "title": "helper self-escalate",
+      "ev": {
+        "patch": "200 []",
+        "before": {
+          "can_manage_chat": true,
+          "can_mark_items_sold": false,
+          "can_change_current_item": false,
+          "can_manage_reservations": false
+        },
+        "after": {
+          "can_manage_chat": true,
+          "can_mark_items_sold": false,
+          "can_change_current_item": false,
+          "can_manage_reservations": false
+        }
+      }
+    }
+  ],
+  "notes": [
+    {
+      "id": "p2.pool.obs",
+      "lens": "BN5",
+      "title": "pool observe",
+      "ev": {
+        "r1": {
+          "id": "954cc131-3a14-4bf1-b2c2-a33b234826f0",
+          "live_id": "7f8c0a1b-5a41-4399-9ffe-aee37847b318",
+          "live_item_id": "46c5aa18-8f48-44ea-a991-978a7fe594c1",
+          "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+          "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+          "source": "fleaber_live",
+          "status": "accepted",
+          "requested_qty": 1,
+          "processed_by_user_id": null,
+          "notes": null
+        },
+        "r2": {
+          "id": "7b54ee0f-3985-4a8a-bbad-b5d4e9bfea53",
+          "live_id": "7f8c0a1b-5a41-4399-9ffe-aee37847b318",
+          "live_item_id": "6de541a1-2736-47df-acbb-33ca00276182",
+          "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+          "buyer_id": "22d46fc2-f264-4b57-bdf5-59e0a76ae742",
+          "source": "fleaber_live",
+          "status": "accepted",
+          "requested_qty": 1,
+          "processed_by_user_id": null,
+          "notes": null
+        },
+        "i1": {
+          "id": "46c5aa18-8f48-44ea-a991-978a7fe594c1",
+          "live_id": "7f8c0a1b-5a41-4399-9ffe-aee37847b318",
+          "product_id": null,
+          "checkout_product_id": null,
+          "item_kind": "live_only",
+          "quantity": 1,
+          "status": "available",
+          "price": 9.0,
+          "ref_code": "BNPOOL",
+          "is_active": true,
+          "logical_item_id": null
+        },
+        "i2": {
+          "id": "6de541a1-2736-47df-acbb-33ca00276182",
+          "live_id": "7f8c0a1b-5a41-4399-9ffe-aee37847b318",
+          "product_id": null,
+          "checkout_product_id": null,
+          "item_kind": "live_only",
+          "quantity": 1,
+          "status": "available",
+          "price": 9.0,
+          "ref_code": "BNPOOL2",
+          "is_active": true,
+          "logical_item_id": "46c5aa18-8f48-44ea-a991-978a7fe594c1"
+        },
+        "st1": {
+          "ok": false,
+          "error": "live_item_not_found"
+        },
+        "st2": {
+          "ok": false,
+          "error": "live_item_not_found"
+        },
+        "remaining": 0,
+        "base": 1
+      }
+    },
+    {
+      "id": "p2.sameref.insert",
+      "lens": "BN5",
+      "title": "seller same ref",
+      "ev": {
+        "a": "f8b4c409-fab0-4e0e-aa6b-2ab6c0ecce38",
+        "b": "9d946941-6f47-41d7-a3a6-e2bfd36ebdc5",
+        "rowA": {
+          "id": "f8b4c409-fab0-4e0e-aa6b-2ab6c0ecce38",
+          "live_id": "1ea3598d-8445-40b9-bdb7-b9451d4232d2",
+          "product_id": null,
+          "checkout_product_id": null,
+          "item_kind": "live_only",
+          "quantity": 1,
+          "status": "available",
+          "price": 9.0,
+          "ref_code": "BNSAME",
+          "is_active": true,
+          "logical_item_id": null
+        },
+        "rowB": {
+          "id": "9d946941-6f47-41d7-a3a6-e2bfd36ebdc5",
+          "live_id": "1ea3598d-8445-40b9-bdb7-b9451d4232d2",
+          "product_id": null,
+          "checkout_product_id": null,
+          "item_kind": "live_only",
+          "quantity": 1,
+          "status": "available",
+          "price": 9.0,
+          "ref_code": "BNSAME",
+          "is_active": true,
+          "logical_item_id": null
+        }
+      }
+    },
+    {
+      "id": "p2.logical.patch",
+      "lens": "BN5",
+      "title": "seller PATCH logical_item_id",
+      "ev": "200 [{\"id\":\"9d946941-6f47-41d7-a3a6-e2bfd36ebdc5\",\"live_id\":\"1ea3598d-8445-40b9-bdb7-b9451d4232d2\",\"seller_id\":null,\"ref_code\":\"BNSAME\",\"title\":\"RTBN-20260902T1903 live_only\",\"description\":null,\"price\":9.0,\"image_url\":null,\"size\":null,\"color\":n…"
+    },
+    {
+      "id": "p2.race.mux",
+      "lens": "BN6",
+      "title": "complete-mux || accept",
+      "ev": {
+        "mux": "400 {\"error\":\"mux_live_id em falta nesta live.\",\"step\":\"validation\"}",
+        "accept": "200 [{\"id\":\"7b4b628a-52a2-46c4-8bc0-c76745cb252b\",\"live_id\":\"1ea3598d-8445-40b9-bdb7-b9451d4232d2\",\"live_item_id\":\"fb300d29-c875-4aca-9869-82f56d8d035f\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0…",
+        "live": {
+          "id": "1ea3598d-8445-40b9-bdb7-b9451d4232d2",
+          "status": "live",
+          "is_active": true
+        },
+        "req": "accepted"
+      }
+    },
+    {
+      "id": "p2.helper.rows",
+      "lens": "BN2",
+      "title": "helper chat rows",
+      "ev": "200 [{\"id\":\"3c7e4045-9921-49f5-951a-81ddb703000d\",\"permissions\":{\"can_manage_chat\": true, \"can_mark_items_sold\": false, \"can_change_current_item\": false, \"can_manage_reservations\": false},\"active\":true,\"invitation_status\":\"accepted\"}]"
+    },
+    {
+      "id": "p2.fomo.persist",
+      "lens": "BN2",
+      "title": "FOMO still in live_messages",
+      "ev": {
+        "n": 8,
+        "sample": [
+          "Item claimed by helper",
+          "Ana cоmprou o casaco",
+          "Ana ｃｏｍｐｒｏｕ o casaco",
+          "⠀ claimed by Ana",
+          "Ana took it",
+          "Ana grabbed the last one",
+          "Item claimed by Ana",
+          "Ana just snapped up the jacket"
+        ]
+      }
+    },
+    {
+      "id": "p2.accept.msg",
+      "lens": "BN1",
+      "title": "accept_broadcast still posted",
+      "ev": true
+    },
+    {
+      "id": "p2.rest.converted",
+      "lens": "BN1",
+      "title": "REST insert converted actual status",
+      "ev": {
+        "id": "5cf3a117-9e20-49d5-a154-530dc172e9ee",
+        "live_id": "7f8c0a1b-5a41-4399-9ffe-aee37847b318",
+        "live_item_id": "138ce4e1-78b7-4be4-8340-87ff36a2e86f",
+        "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+        "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+        "source": "fleaber_live",
+        "status": "pending",
+        "requested_qty": 1,
+        "processed_by_user_id": null,
+        "notes": null
+      }
+    },
+    {
+      "id": "p2.hitch",
+      "lens": "BN4",
+      "title": "hitch after mark_sold",
+      "ev": {
+        "item": {
+          "id": "eb5ee2ac-6c2c-4fd7-b7b5-67bed4c22b55",
+          "live_id": "7f8c0a1b-5a41-4399-9ffe-aee37847b318",
+          "product_id": null,
+          "checkout_product_id": "05ba755e-b70d-4a55-9c43-571e4c080893",
+          "item_kind": "live_only",
+          "quantity": 1,
+          "status": "available",
+          "price": 9.0,
+          "ref_code": "BNHITCH",
+          "is_active": true,
+          "logical_item_id": null
+        },
+        "sku": {
+          "id": "05ba755e-b70d-4a55-9c43-571e4c080893",
+          "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+          "title": "RTBN-20260902T1903-extra",
+          "price": 12.0,
+          "quantity": 1,
+          "is_sold": false,
+          "list_on_marketplace": true,
+          "available_for_live": true
+        }
+      }
+    },
+    {
+      "id": "p2.orders",
+      "lens": "BN8",
+      "title": "fake pago leftover",
+      "ev": {
+        "jwt": {
+          "id": "3bdaf76b-276e-4131-af00-6d66d4b07812",
+          "status": "reserva_pendente",
+          "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+          "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+          "product_id": "74c6fdb1-b3a3-4467-8597-d28ecb62c07b",
+          "quantity": 1,
+          "price_total": 12.0,
+          "amount_paid_cents": null,
+          "payment_method": "Pagamento na app",
+          "stripe_payment_intent_id": null,
+          "live_item_id": "7eaeec58-1f86-4f1f-9226-6e1d5bd187af",
+          "live_id": "7f8c0a1b-5a41-4399-9ffe-aee37847b318",
+          "stock_units_applied": null
+        },
+        "svc": {
+          "id": "c7f0cdb5-a002-44b3-b28d-0a9ba4c46fd0",
+          "status": "pago",
+          "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+          "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+          "product_id": "74c6fdb1-b3a3-4467-8597-d28ecb62c07b",
+          "quantity": 1,
+          "price_total": 12.0,
+          "amount_paid_cents": 1200,
+          "payment_method": "Pagamento na app",
+          "stripe_payment_intent_id": "pi_rtbn_svc_20260902T1903",
+          "live_item_id": "7eaeec58-1f86-4f1f-9226-6e1d5bd187af",
+          "live_id": "7f8c0a1b-5a41-4399-9ffe-aee37847b318",
+          "stock_units_applied": 1
+        }
+      }
+    },
+    {
+      "id": "p2.wallets",
+      "lens": "BN8",
+      "title": "wallets",
+      "ev": {
+        "buyer": 61.1,
+        "seller": 16.0,
+        "buyer2": 0,
+        "seller2": 0
+      }
+    }
+  ],
+  "lenses": [
+    "BN1",
+    "BN2",
+    "BN4",
+    "BN5",
+    "BN6",
+    "BN8"
+  ]
+}

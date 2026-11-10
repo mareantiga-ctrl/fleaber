@@ -1,0 +1,117 @@
+{
+  "stamp": "20260902T1819",
+  "findings": [
+    {
+      "id": "RTBF-BF2-dup-hyphen-compact-noprod",
+      "lens": "BF2",
+      "severity": "P2",
+      "title": "Mesma order hífen+compact (sem product_id) altera o total do saco",
+      "actor": "buyer JWT",
+      "pre": "1 order 15€",
+      "repro": "bag_lines: [{order_id: hífen}, {order_id: compact}]",
+      "expected": "1 linha 1640",
+      "obtained": {
+        "amt": 2900,
+        "single": 1640,
+        "sid": "cs_test_a1v53ak4W9vZIxS5ACzrskbxotBgPkK1oRmwW791g5YdZKJwAemmRZY1C2",
+        "brief": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1v53ak4W9vZIxS5ACzrskbxotBgPkK1oRmwW791g5YdZKJwAemmRZY1C2#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDR…"
+      },
+      "proven": true,
+      "evidence": {}
+    }
+  ],
+  "blocked": [
+    {
+      "id": "RTBF-BF2-s1-alive-after-composition-change",
+      "lens": "BF2",
+      "title": "S1 expirada ou mesma Session",
+      "ev": {
+        "sid1": "cs_test_a14p5zJZqFyQvhh9G57lsQPUoQ0iYVQJ6bOrfPiKDALnlC18wtvnhVFLFK",
+        "sid2": "cs_test_a1lrlzjckwCau1LqCsnc8Aad3li8VZTZxV0DwA9yudz7a6g0c0TAUg8iC5",
+        "class1": "expired",
+        "class2": "expired"
+      }
+    }
+  ],
+  "notes": [
+    {
+      "id": "p2.dup.noprod",
+      "lens": "BF2",
+      "title": "hífen+compact SEM product_id",
+      "ev": {
+        "oid": "3c4036de-d9b3-4e33-b819-f77446775223",
+        "amt": 2900,
+        "single": 1640,
+        "sid": "cs_test_a1v53ak4W9vZIxS5ACzrskbxotBgPkK1oRmwW791g5YdZKJwAemmRZY1C2",
+        "brief": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1v53ak4W9vZIxS5ACzrskbxotBgPkK1oRmwW791g5YdZKJwAemmRZY1C2#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDR…",
+        "reused": null
+      }
+    },
+    {
+      "id": "p2.two-bags",
+      "lens": "BF2",
+      "title": "race + GET urls sem Authorization",
+      "ev": {
+        "oa": "15bd1139-7511-431a-a176-68a9cd28f65a",
+        "ob": "18aceca3-4cc8-4b2f-b3c1-62630c6c36ae",
+        "oc": "3af0a7a6-3463-4eee-828a-7662fcd66d66",
+        "sids": [
+          "cs_test_a1MFdUkkabBv0wchpeFAsiyJxcr4LA4NswsqEBsTY1ER00RKEDUIUQhfqL",
+          "cs_test_a1HmBkhJWejmFh2A5eN2krKVoZy30OitAJoZpjA4AQj89V4YkHwEYbdcrg"
+        ],
+        "urls": [
+          "https://checkout.stripe.com/c/pay/cs_test_a1MFdUkkabBv0wchpeFAsiyJxcr4LA4NswsqEBsTY1ER00RKEDUIUQhfqL",
+          "https://checkout.stripe.com/c/pay/cs_test_a1HmBkhJWejmFh2A5eN2krKVoZy30OitAJoZpjA4AQj89V4YkHwEYbdcrg"
+        ],
+        "amts": [
+          2428,
+          2050
+        ],
+        "stored": {
+          "A": "cs_test_a1MFdUkkabBv0wchpeFAsiyJxcr4LA4NswsqEBsTY1ER00RKEDUIUQhfqL",
+          "B": "cs_test_a1MFdUkkabBv0wchpeFAsiyJxcr4LA4NswsqEBsTY1ER00RKEDUIUQhfqL",
+          "C": "cs_test_a1HmBkhJWejmFh2A5eN2krKVoZy30OitAJoZpjA4AQj89V4YkHwEYbdcrg"
+        },
+        "probes": [
+          {
+            "url": "https://checkout.stripe.com/c/pay/cs_test_a1MFdUkkabBv0wchpeFAsiyJxcr4LA4NswsqEBsTY1ER00RKEDUIUQhfqL",
+            "status": 200,
+            "expired": true,
+            "has_pay": true,
+            "snippet": "<!doctype html><html lang=\"en\" translate=\"no\" class=\"App--classic\"><head><link rel=\"dns-prefetch\" href=\"https://api.stripe.com\"/><link rel=\"dns-prefetch\" href=\"https://merchant-ui-api.stripe.com\"/><link rel=\"preconnect\" …"
+          },
+          {
+            "url": "https://checkout.stripe.com/c/pay/cs_test_a1HmBkhJWejmFh2A5eN2krKVoZy30OitAJoZpjA4AQj89V4YkHwEYbdcrg",
+            "status": 200,
+            "expired": true,
+            "has_pay": true,
+            "snippet": "<!doctype html><html lang=\"en\" translate=\"no\" class=\"App--classic\"><head><link rel=\"dns-prefetch\" href=\"https://api.stripe.com\"/><link rel=\"dns-prefetch\" href=\"https://merchant-ui-api.stripe.com\"/><link rel=\"preconnect\" …"
+          }
+        ],
+        "briefs": [
+          "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1MFdUkkabBv0wchpeFAsiyJxcr4LA4NswsqEBsTY1ER00RKEDUIUQhfqL#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDR…",
+          "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1HmBkhJWejmFh2A5eN2krKVoZy30OitAJoZpjA4AQj89V4YkHwEYbdcrg#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDR…"
+        ]
+      }
+    },
+    {
+      "id": "p2.expire.urls",
+      "lens": "BF2",
+      "title": "S1 vs S2 após troca de composição",
+      "ev": {
+        "sid1": "cs_test_a14p5zJZqFyQvhh9G57lsQPUoQ0iYVQJ6bOrfPiKDALnlC18wtvnhVFLFK",
+        "sid2": "cs_test_a1lrlzjckwCau1LqCsnc8Aad3li8VZTZxV0DwA9yudz7a6g0c0TAUg8iC5",
+        "url1": "https://checkout.stripe.com/c/pay/cs_test_a14p5zJZqFyQvhh9G57lsQPUoQ0iYVQJ6bOrfPiKDALnlC18wtvnhVFLFK",
+        "url2": "https://checkout.stripe.com/c/pay/cs_test_a1lrlzjckwCau1LqCsnc8Aad3li8VZTZxV0DwA9yudz7a6g0c0TAUg8iC5",
+        "class1": "expired",
+        "class2": "expired",
+        "snip1": "<!doctype html><html lang=\"en\" translate=\"no\" class=\"App--classic\"><head><link rel=\"dns-prefetch\" href=\"https://api.stripe.com\"/><link rel=\"dns-prefetch\" href=\"https://merchant-ui-api.stripe.com\"/><li…",
+        "snip2": "<!doctype html><html lang=\"en\" translate=\"no\" class=\"App--classic\"><head><link rel=\"dns-prefetch\" href=\"https://api.stripe.com\"/><link rel=\"dns-prefetch\" href=\"https://merchant-ui-api.stripe.com\"/><li…",
+        "same_sid": false
+      }
+    }
+  ],
+  "lenses": [
+    "BF2"
+  ]
+}

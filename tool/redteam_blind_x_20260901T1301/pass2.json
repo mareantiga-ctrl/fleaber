@@ -1,0 +1,430 @@
+{
+  "auditor": "REDTEAM_BLIND_X_LIVE_MANUAL_STAFF_v1",
+  "pass": 2,
+  "production_touched": false,
+  "fase4": false,
+  "lenses": [
+    "X2",
+    "X3",
+    "X4",
+    "X6",
+    "X7",
+    "X8"
+  ],
+  "findings": [
+    {
+      "id": "RTX-X3-inflate-then-accept-over-original",
+      "lens": "X3",
+      "severity": "P1",
+      "title": "PATCH quantity mid-live aumenta available e aceita qty>original",
+      "actor": "seller JWT",
+      "pre": "live_only qty=1; PATCH 8; facebook_manual qty=5",
+      "repro": "PATCH live_items.quantity=8 → rpc accept qty=5",
+      "expected": "total_qty/pool estável; accept qty=5 recusado",
+      "obtained": {
+        "avail0": 1,
+        "avail1": 8,
+        "accept": {
+          "ok": true,
+          "item_qty": 8,
+          "request_id": "c8c0b0bd-eb30-4088-a10c-539cd6fb7a61",
+          "item_status": "reserved_partial",
+          "reserved_qty": 5
+        },
+        "stock2": {
+          "ok": true,
+          "price": 9.0,
+          "live_id": "88da5f2f-8ba7-41d3-ae8a-a29170fe85c7",
+          "ref_code": "XINF",
+          "item_kind": "live_only",
+          "total_qty": 8,
+          "product_id": null,
+          "blocked_qty": 0,
+          "live_status": "live",
+          "live_item_id": "52e19b4f-9ca6-4bfc-bb2f-a8dcd1934c67",
+          "available_qty": 3,
+          "pending_bag_qty": 0,
+          "sold_converted_qty": 0,
+          "checkout_product_id": null,
+          "reserved_accepted_qty": 5
+        }
+      },
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "RTX-X8-helper-manual-convert-no-pi",
+      "lens": "X8",
+      "severity": "P1",
+      "title": "convert helper_manual sem encomenda paga",
+      "actor": "helper JWT",
+      "pre": "source=helper_manual accepted; item qty=2; zero PI",
+      "repro": "rpc convert JWT helper source=helper_manual",
+      "expected": "convert_requires_paid_order",
+      "obtained": {
+        "rpc": {
+          "ok": true,
+          "item_qty": 2,
+          "request_id": "28451b16-3f71-4763-be78-eb0b75bd0334",
+          "item_status": "available",
+          "reserved_qty": 1
+        },
+        "row": {
+          "id": "28451b16-3f71-4763-be78-eb0b75bd0334",
+          "live_id": "88da5f2f-8ba7-41d3-ae8a-a29170fe85c7",
+          "live_item_id": "83d7c154-09b0-4c57-b3b7-9236bad67938",
+          "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+          "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+          "source": "helper_manual",
+          "status": "converted",
+          "requested_qty": 1,
+          "processed_by_user_id": "b55ff762-053e-455c-8d57-52a928af4c88",
+          "notes": ""
+        }
+      },
+      "proven": true,
+      "evidence": {}
+    }
+  ],
+  "blocked": [
+    {
+      "id": "RTX-X7-s2-patch-item-qty",
+      "lens": "X7",
+      "title": "200 [] sem mutação — RLS filtrou (falso positivo pass1)",
+      "ev": {
+        "qty_before": 3,
+        "qty_after": 3,
+        "patch": "200 []"
+      }
+    },
+    {
+      "id": "RTX-X3-pending-overqty-convert",
+      "lens": "X3",
+      "title": "convert pending over-qty recusado",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"qty_exceeds_stock\"}"
+    },
+    {
+      "id": "RTX-X3-race-convert-qty1",
+      "lens": "X3",
+      "title": "race convert: ≤1 converted",
+      "ev": {
+        "n": 0,
+        "a": "pending",
+        "b": "pending",
+        "rpc0": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"live_item_qty_below_reservations\"}",
+        "rpc1": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"live_item_qty_below_reservations\"}"
+      }
+    },
+    {
+      "id": "RTX-X8-mkt-fb-convert-no-pi",
+      "lens": "X8",
+      "title": "marketplace convert facebook_manual recusado",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"live_item_qty_below_reservations\"}"
+    },
+    {
+      "id": "RTX-X6-draw-foreign",
+      "lens": "X6",
+      "title": "draw foreign recusado",
+      "ev": "400 {\"code\":\"P0001\",\"details\":null,\"hint\":null,\"message\":\"not_allowed\"}"
+    },
+    {
+      "id": "RTX-X6-helper-draw",
+      "lens": "X6",
+      "title": "helper draw recusado",
+      "ev": "400 {\"code\":\"P0001\",\"details\":null,\"hint\":null,\"message\":\"not_allowed\"}"
+    },
+    {
+      "id": "RTX-X4-same-ref-two-lives-convert",
+      "lens": "X4",
+      "title": "pool ref recusou segundo convert ou accept",
+      "ev": {
+        "sa": "pending",
+        "sb": "pending",
+        "cB": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"qty_exceeds_stock\"}"
+      }
+    }
+  ],
+  "skipped": [],
+  "notes": [
+    {
+      "id": "p2.helper.existing",
+      "lens": "X2",
+      "title": "helper row",
+      "ev": {
+        "id": "f93602e8-13ea-436e-b865-3b860eb417a7",
+        "active": true,
+        "invitation_status": "accepted",
+        "permissions": {
+          "can_manage_reservations": true,
+          "can_view_live_dashboard": true
+        }
+      }
+    },
+    {
+      "id": "p2.x7.patch-observe",
+      "lens": "X7",
+      "title": "seller2 PATCH vs GET",
+      "ev": {
+        "patch": "200 []",
+        "qty_before": 3,
+        "qty_after": 3,
+        "status_after": "available"
+      }
+    },
+    {
+      "id": "p2.x3.inflate-accept",
+      "lens": "X3",
+      "title": "inflate 1→8 then accept qty=5",
+      "ev": {
+        "stock0": {
+          "ok": true,
+          "price": 9.0,
+          "live_id": "88da5f2f-8ba7-41d3-ae8a-a29170fe85c7",
+          "ref_code": "XINF",
+          "item_kind": "live_only",
+          "total_qty": 1,
+          "product_id": null,
+          "blocked_qty": 0,
+          "live_status": "live",
+          "live_item_id": "52e19b4f-9ca6-4bfc-bb2f-a8dcd1934c67",
+          "available_qty": 1,
+          "pending_bag_qty": 0,
+          "sold_converted_qty": 0,
+          "checkout_product_id": null,
+          "reserved_accepted_qty": 0
+        },
+        "patch": "200 [{\"id\":\"52e19b4f-9ca6-4bfc-bb2f-a8dcd1934c67\",\"live_id\":\"88da5f2f-8ba7-41d3-ae8a-a29170fe85c7\",\"seller_id\":null,\"ref_code\":\"XINF\",\"title\":\"RTX-20260901T1301 live_only\",\"description\":null,\"price\":9.0,\"image_url\":null,\"size\":null,\"color\":null…",
+        "stock1": {
+          "ok": true,
+          "price": 9.0,
+          "live_id": "88da5f2f-8ba7-41d3-ae8a-a29170fe85c7",
+          "ref_code": "XINF",
+          "item_kind": "live_only",
+          "total_qty": 8,
+          "product_id": null,
+          "blocked_qty": 0,
+          "live_status": "live",
+          "live_item_id": "52e19b4f-9ca6-4bfc-bb2f-a8dcd1934c67",
+          "available_qty": 8,
+          "pending_bag_qty": 0,
+          "sold_converted_qty": 0,
+          "checkout_product_id": null,
+          "reserved_accepted_qty": 0
+        },
+        "insert": "201 [{\"id\":\"c8c0b0bd-eb30-4088-a10c-539cd6fb7a61\",\"live_id\":\"88da5f2f-8ba7-41d3-ae8a-a29170fe85c7\",\"live_item_id\":\"52e19b4f-9ca6-4bfc-bb2f-a8dcd1934c67\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0…",
+        "accept": "200 {\"ok\": true, \"item_qty\": 8, \"request_id\": \"c8c0b0bd-eb30-4088-a10c-539cd6fb7a61\", \"item_status\": \"reserved_partial\", \"reserved_qty\": 5}",
+        "stock2": {
+          "ok": true,
+          "price": 9.0,
+          "live_id": "88da5f2f-8ba7-41d3-ae8a-a29170fe85c7",
+          "ref_code": "XINF",
+          "item_kind": "live_only",
+          "total_qty": 8,
+          "product_id": null,
+          "blocked_qty": 0,
+          "live_status": "live",
+          "live_item_id": "52e19b4f-9ca6-4bfc-bb2f-a8dcd1934c67",
+          "available_qty": 3,
+          "pending_bag_qty": 0,
+          "sold_converted_qty": 0,
+          "checkout_product_id": null,
+          "reserved_accepted_qty": 5
+        },
+        "item": {
+          "id": "52e19b4f-9ca6-4bfc-bb2f-a8dcd1934c67",
+          "live_id": "88da5f2f-8ba7-41d3-ae8a-a29170fe85c7",
+          "product_id": null,
+          "item_kind": "live_only",
+          "quantity": 8,
+          "status": "reserved_partial",
+          "price": 9.0,
+          "ref_code": "XINF"
+        }
+      }
+    },
+    {
+      "id": "p2.x3.pend-hi",
+      "lens": "X3",
+      "title": "INSERT pending qty=4 em item qty=1",
+      "ev": "201 [{\"id\":\"af7d5cce-eb60-4c90-9b34-14ecb7defe2a\",\"live_id\":\"88da5f2f-8ba7-41d3-ae8a-a29170fe85c7\",\"live_item_id\":\"a20d6b21-ba08-4e0d-b09c-0ad0af011d5a\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"buyer_id\":\"68f4688d-2898-4137-8c14-c7c4…"
+    },
+    {
+      "id": "p2.x3.pend-convert",
+      "lens": "X3",
+      "title": "convert pending qty=4",
+      "ev": {
+        "rpc": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"qty_exceeds_stock\"}",
+        "row": {
+          "id": "af7d5cce-eb60-4c90-9b34-14ecb7defe2a",
+          "live_id": "88da5f2f-8ba7-41d3-ae8a-a29170fe85c7",
+          "live_item_id": "a20d6b21-ba08-4e0d-b09c-0ad0af011d5a",
+          "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+          "buyer_id": "68f4688d-2898-4137-8c14-c7c47f57a91c",
+          "source": "facebook_manual",
+          "status": "pending",
+          "requested_qty": 4,
+          "processed_by_user_id": null,
+          "notes": null
+        },
+        "stock": {
+          "ok": true,
+          "price": 9.0,
+          "live_id": "88da5f2f-8ba7-41d3-ae8a-a29170fe85c7",
+          "ref_code": "XPND",
+          "item_kind": "live_only",
+          "total_qty": 1,
+          "product_id": null,
+          "blocked_qty": 0,
+          "live_status": "live",
+          "live_item_id": "a20d6b21-ba08-4e0d-b09c-0ad0af011d5a",
+          "available_qty": 1,
+          "pending_bag_qty": 0,
+          "sold_converted_qty": 0,
+          "checkout_product_id": null,
+          "reserved_accepted_qty": 0
+        }
+      }
+    },
+    {
+      "id": "p2.x3.race-convert",
+      "lens": "X3",
+      "title": "dois convert pending paralelo qty=1",
+      "ev": {
+        "rpc0": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"live_item_qty_below_reservations\"}",
+        "rpc1": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"live_item_qty_below_reservations\"}",
+        "a": "pending",
+        "b": "pending"
+      }
+    },
+    {
+      "id": "p2.x8.mkt.convert",
+      "lens": "X8",
+      "title": "marketplace facebook convert",
+      "ev": {
+        "insert": "201 [{\"id\":\"4529745c-6f5f-4543-866f-c523265ef6ec\",\"live_id\":\"88da5f2f-8ba7-41d3-ae8a-a29170fe85c7\",\"live_item_id\":\"f0a0266c-8ea0-4108-beaf-6b5ca3de80e8\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0…",
+        "accept": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"live_item_qty_below_reservations\"}",
+        "convert": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"live_item_qty_below_reservations\"}",
+        "product": {
+          "id": "02ed4f82-07f6-4b44-893c-23ec296a2c51",
+          "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+          "title": "RTX-20260901T1301-p2-mkt",
+          "price": 15.0,
+          "quantity": 1,
+          "is_sold": false,
+          "list_on_marketplace": true,
+          "available_for_live": true
+        },
+        "item": {
+          "id": "f0a0266c-8ea0-4108-beaf-6b5ca3de80e8",
+          "live_id": "88da5f2f-8ba7-41d3-ae8a-a29170fe85c7",
+          "product_id": "02ed4f82-07f6-4b44-893c-23ec296a2c51",
+          "item_kind": "marketplace_product",
+          "quantity": null,
+          "status": "available",
+          "price": 12.0,
+          "ref_code": "XMKT"
+        },
+        "orders": []
+      }
+    },
+    {
+      "id": "p2.wallets.mkt",
+      "lens": "X8",
+      "title": "wallets após mkt convert",
+      "ev": {
+        "buyer": 61.1,
+        "seller": 18.97,
+        "buyer2": 0,
+        "seller2": 0,
+        "helper": 0
+      }
+    },
+    {
+      "id": "p2.x8.hm.insert",
+      "lens": "X8",
+      "title": "helper_manual INSERT",
+      "ev": "201 [{\"id\":\"28451b16-3f71-4763-be78-eb0b75bd0334\",\"live_id\":\"88da5f2f-8ba7-41d3-ae8a-a29170fe85c7\",\"live_item_id\":\"83d7c154-09b0-4c57-b3b7-9236bad67938\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0…"
+    },
+    {
+      "id": "p2.x8.hm.convert",
+      "lens": "X8",
+      "title": "helper_manual accept+convert",
+      "ev": {
+        "accept": "200 {\"ok\": true, \"item_qty\": 2, \"request_id\": \"28451b16-3f71-4763-be78-eb0b75bd0334\", \"item_status\": \"reserved_partial\", \"reserved_qty\": 1}",
+        "convert": "200 {\"ok\": true, \"item_qty\": 2, \"request_id\": \"28451b16-3f71-4763-be78-eb0b75bd0334\", \"item_status\": \"available\", \"reserved_qty\": 1}",
+        "row": {
+          "id": "28451b16-3f71-4763-be78-eb0b75bd0334",
+          "live_id": "88da5f2f-8ba7-41d3-ae8a-a29170fe85c7",
+          "live_item_id": "83d7c154-09b0-4c57-b3b7-9236bad67938",
+          "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+          "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+          "source": "helper_manual",
+          "status": "converted",
+          "requested_qty": 1,
+          "processed_by_user_id": "b55ff762-053e-455c-8d57-52a928af4c88",
+          "notes": ""
+        }
+      }
+    },
+    {
+      "id": "p2.x6.create",
+      "lens": "X6",
+      "title": "create raffle",
+      "ev": "200 {\"ok\": true, \"status\": \"active\", \"raffle_id\": \"7cba2bc5-0bf4-4a27-bf72-39592018e4b4\"}"
+    },
+    {
+      "id": "p2.x6.draw.s2",
+      "lens": "X6",
+      "title": "seller2 draw",
+      "ev": "400 {\"code\":\"P0001\",\"details\":null,\"hint\":null,\"message\":\"not_allowed\"}"
+    },
+    {
+      "id": "p2.x6.draw.helper",
+      "lens": "X6",
+      "title": "helper draw",
+      "ev": "400 {\"code\":\"P0001\",\"details\":null,\"hint\":null,\"message\":\"not_allowed\"}"
+    },
+    {
+      "id": "p2.x4.ref-pool",
+      "lens": "X4",
+      "title": "mesmo ref_code duas lives convert",
+      "ev": {
+        "cA": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"qty_exceeds_stock\"}",
+        "cB": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"qty_exceeds_stock\"}",
+        "sA": "pending",
+        "sB": "pending"
+      }
+    }
+  ],
+  "ids": {
+    "lives": [
+      "88da5f2f-8ba7-41d3-ae8a-a29170fe85c7",
+      "8b1b1bf7-b842-4e48-a0e8-7bc5015d5ed5",
+      "50f558cb-0131-471e-acbe-584134fed5c3"
+    ],
+    "items": [
+      "a45d740e-94bf-42ee-ac0c-6066205d3770",
+      "52e19b4f-9ca6-4bfc-bb2f-a8dcd1934c67",
+      "a20d6b21-ba08-4e0d-b09c-0ad0af011d5a",
+      "aafa4a4d-6e33-469f-863a-41358a95c512",
+      "f0a0266c-8ea0-4108-beaf-6b5ca3de80e8",
+      "83d7c154-09b0-4c57-b3b7-9236bad67938",
+      "9b727877-49f5-4812-bdf3-6de55b388b03",
+      "d1250a9c-81a0-4666-8e4e-0131147eac80"
+    ],
+    "reqs": [
+      "c8c0b0bd-eb30-4088-a10c-539cd6fb7a61",
+      "af7d5cce-eb60-4c90-9b34-14ecb7defe2a",
+      "a4f92769-4d1b-42be-86bd-6dc08ed1c5a7",
+      "154993ab-78d1-45fb-be9f-0d6fac4e9907",
+      "4529745c-6f5f-4543-866f-c523265ef6ec",
+      "28451b16-3f71-4763-be78-eb0b75bd0334",
+      "8daaafc8-85f5-4317-a296-d70e832cea58",
+      "4e81d1a2-bb83-48e3-94b4-5dae914fc9fb"
+    ],
+    "products": [
+      "02ed4f82-07f6-4b44-893c-23ec296a2c51"
+    ],
+    "orders": []
+  }
+}

@@ -1,0 +1,283 @@
+{
+  "pass": "1b",
+  "findings": [
+    {
+      "id": "T1-02",
+      "lens": "T1",
+      "severity": "P1",
+      "title": "Seller move live_item para outro live; reserva accepted fica com live_id antigo",
+      "actor": "seller JWT",
+      "pre": "reserva accepted live A; PATCH item.live_id=B",
+      "repro": "PATCH live_items.live_id após accept",
+      "expected": "bloquear move enquanto reservas consomem o item",
+      "obtained": {
+        "item": {
+          "id": "333daa5f-b59a-4df0-afe1-3219e605e496",
+          "live_id": "e549627e-5b13-4d27-bc65-eea41b0b493f",
+          "product_id": null,
+          "seller_id": null,
+          "quantity": 2,
+          "status": "reserved_partial",
+          "item_kind": "live_only",
+          "price": 12.0
+        },
+        "res": {
+          "id": "2a4b6530-d6be-4f2c-afa8-a90b38f8b9f9",
+          "live_id": "84013fb2-8244-4989-a277-52693ce66fc1",
+          "live_item_id": "333daa5f-b59a-4df0-afe1-3219e605e496",
+          "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+          "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+          "status": "accepted",
+          "requested_qty": 1,
+          "source": "fleaber_live",
+          "notes": ""
+        },
+        "checkout": "400 {\"error\":\"Missing payment metadata.\"}"
+      },
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "T2-01",
+      "lens": "T2",
+      "severity": "P1",
+      "title": "Seller converte reserva fleaber_live (saco) sem PaymentIntent",
+      "actor": "seller JWT",
+      "pre": "accepted origem fleaber_live, sem order paga",
+      "repro": "rpc process_live_reservation_request action=convert",
+      "expected": "convert de fleaber_live só após Stripe/reconcile",
+      "obtained": {
+        "res": {
+          "id": "79aec8a0-ae70-4209-b79d-eace541b3827",
+          "live_id": "bc5ad107-cf1b-4e8b-a90b-213be314740b",
+          "live_item_id": "ff9566fb-c44f-4cf4-bab8-ee44424b5dce",
+          "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+          "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+          "status": "converted",
+          "requested_qty": 1,
+          "source": "fleaber_live",
+          "notes": ""
+        },
+        "item": {
+          "id": "ff9566fb-c44f-4cf4-bab8-ee44424b5dce",
+          "live_id": "bc5ad107-cf1b-4e8b-a90b-213be314740b",
+          "product_id": null,
+          "seller_id": null,
+          "quantity": 1,
+          "status": "sold",
+          "item_kind": "live_only",
+          "price": 12.0
+        },
+        "conv": "200 {\"ok\": true, \"item_qty\": 1, \"request_id\": \"79aec8a0-ae70-4209-b79d-eace541b3827\", \"item_status\": \"sold\", \"reserved_qty\": 1}"
+      },
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "T6-01",
+      "lens": "T6",
+      "severity": "P1",
+      "title": "Race convert∥expire deixa reserva e live_item incoerentes",
+      "actor": "seller JWT ×2",
+      "pre": "accepted qty=1",
+      "repro": "Future.wait convert ∥ expire",
+      "expected": "um vencedor; item.sold iff reserva.converted",
+      "obtained": {
+        "res": {
+          "id": "6dc5d1b7-920a-4dd1-b37d-632d2d601d03",
+          "live_id": "109f382f-37b5-407d-98ff-c1da87b5dbf7",
+          "live_item_id": "f3571f5e-9416-46cf-b789-5f21d48c971a",
+          "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+          "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+          "status": "expired",
+          "requested_qty": 1,
+          "source": "fleaber_live",
+          "notes": ""
+        },
+        "item": {
+          "id": "f3571f5e-9416-46cf-b789-5f21d48c971a",
+          "live_id": "109f382f-37b5-407d-98ff-c1da87b5dbf7",
+          "product_id": null,
+          "seller_id": null,
+          "quantity": 1,
+          "status": "sold",
+          "item_kind": "live_only",
+          "price": 12.0
+        },
+        "http": [
+          "200 {\"ok\": true, \"item_qty\": 1, \"request_id\": \"6dc5d1b7-920a-4dd1-b37d-632d2d601d03\", \"item_status\": \"sold\", \"reserved_qty\": 1}",
+          "200 {\"ok\": true, \"request_id\": \"6dc5d1b7-920a-4dd1-b37d-632d2d601d03\", \"item_status\": \"sold\"}"
+        ]
+      },
+      "proven": true,
+      "evidence": {}
+    }
+  ],
+  "blocked": [
+    {
+      "id": "T2-03",
+      "lens": "T2",
+      "title": "reconcile cross-pool não converteu",
+      "ev": {
+        "recon": "200 {\"ok\": true, \"reconciled\": true, \"request_id\": \"944eb4ce-48eb-4a4d-9825-63615b7fb4a2\", \"item_status\": \"reserved_full\", \"live_item_id\": \"255c03dd-1c08-44ec-a32a-0309701079c5\"}",
+        "res": {
+          "id": "944eb4ce-48eb-4a4d-9825-63615b7fb4a2",
+          "live_id": "59fc0284-a7b4-4938-846a-b51afedcb0d8",
+          "live_item_id": "255c03dd-1c08-44ec-a32a-0309701079c5",
+          "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+          "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+          "status": "pending",
+          "requested_qty": 1,
+          "source": "fleaber_live",
+          "notes": "stripe_paid:2fe21212-a933-4bad-a847-4241f909b585"
+        }
+      }
+    },
+    {
+      "id": "T2-04",
+      "lens": "T2",
+      "title": "checkout alien reservation blocked",
+      "ev": "400 {\"error\":\"Checkout blocked: live item does not match order.\"}"
+    }
+  ],
+  "notes": [
+    {
+      "id": "T1.move2",
+      "lens": "T1",
+      "title": "move item A→B",
+      "ev": {
+        "mv": "200 [{\"id\":\"333daa5f-b59a-4df0-afe1-3219e605e496\",\"live_id\":\"e549627e-5b13-4d27-bc65-eea41b0b493f\",\"seller_id\":null,\"ref_code\":\"RTT1\",\"title\":\"RTT-20260901T0730 move2\",\"description\":null,\"price\":12.0,\"image_url\":null,\"size\":…",
+        "item": {
+          "id": "333daa5f-b59a-4df0-afe1-3219e605e496",
+          "live_id": "e549627e-5b13-4d27-bc65-eea41b0b493f",
+          "product_id": null,
+          "seller_id": null,
+          "quantity": 2,
+          "status": "reserved_partial",
+          "item_kind": "live_only",
+          "price": 12.0
+        },
+        "res": {
+          "id": "2a4b6530-d6be-4f2c-afa8-a90b38f8b9f9",
+          "live_id": "84013fb2-8244-4989-a277-52693ce66fc1",
+          "live_item_id": "333daa5f-b59a-4df0-afe1-3219e605e496",
+          "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+          "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+          "status": "accepted",
+          "requested_qty": 1,
+          "source": "fleaber_live",
+          "notes": ""
+        }
+      }
+    },
+    {
+      "id": "T1.move2.ck",
+      "lens": "T1",
+      "title": "checkout após item noutro live",
+      "ev": "400 {\"error\":\"Missing payment metadata.\"}"
+    },
+    {
+      "id": "T2.conv2",
+      "lens": "T2",
+      "title": "seller convert fleaber_live sem PI",
+      "ev": {
+        "conv": "200 {\"ok\": true, \"item_qty\": 1, \"request_id\": \"79aec8a0-ae70-4209-b79d-eace541b3827\", \"item_status\": \"sold\", \"reserved_qty\": 1}",
+        "res": {
+          "id": "79aec8a0-ae70-4209-b79d-eace541b3827",
+          "live_id": "bc5ad107-cf1b-4e8b-a90b-213be314740b",
+          "live_item_id": "ff9566fb-c44f-4cf4-bab8-ee44424b5dce",
+          "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+          "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+          "status": "converted",
+          "requested_qty": 1,
+          "source": "fleaber_live",
+          "notes": ""
+        },
+        "item": {
+          "id": "ff9566fb-c44f-4cf4-bab8-ee44424b5dce",
+          "live_id": "bc5ad107-cf1b-4e8b-a90b-213be314740b",
+          "product_id": null,
+          "seller_id": null,
+          "quantity": 1,
+          "status": "sold",
+          "item_kind": "live_only",
+          "price": 12.0
+        }
+      }
+    },
+    {
+      "id": "fixture.paid",
+      "lens": "T3",
+      "title": "setup_paid_order Stripe TEST",
+      "ev": "200 {\n  \"ok\": true,\n  \"order_id\": \"2fe21212-a933-4bad-a847-4241f909b585\",\n  \"product_id\": \"eb57b2cb-2750-4395-be35-f48ac4dda5fc\",\n  \"payment_intent_id\": \"pi_3UAlOzH7FWYUN3jh1dttQcjZ\",\n  \"pi_status\": \"succeeded\",\n  \"pi_amount…"
+    },
+    {
+      "id": "T2.recon2",
+      "lens": "T2",
+      "title": "reconcile PI marketplace → reserva live",
+      "ev": {
+        "recon": "200 {\"ok\": true, \"reconciled\": true, \"request_id\": \"944eb4ce-48eb-4a4d-9825-63615b7fb4a2\", \"item_status\": \"reserved_full\", \"live_item_id\": \"255c03dd-1c08-44ec-a32a-0309701079c5\"}",
+        "res": {
+          "id": "944eb4ce-48eb-4a4d-9825-63615b7fb4a2",
+          "live_id": "59fc0284-a7b4-4938-846a-b51afedcb0d8",
+          "live_item_id": "255c03dd-1c08-44ec-a32a-0309701079c5",
+          "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+          "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+          "status": "pending",
+          "requested_qty": 1,
+          "source": "fleaber_live",
+          "notes": "stripe_paid:2fe21212-a933-4bad-a847-4241f909b585"
+        },
+        "item": {
+          "id": "255c03dd-1c08-44ec-a32a-0309701079c5",
+          "live_id": "59fc0284-a7b4-4938-846a-b51afedcb0d8",
+          "product_id": null,
+          "seller_id": null,
+          "quantity": 1,
+          "status": "reserved_full",
+          "item_kind": "live_only",
+          "price": 12.0
+        },
+        "orderLive": null,
+        "orderItem": null,
+        "pi": "pi_3UAlOzH7FWYUN3jh1dttQcjZ"
+      }
+    },
+    {
+      "id": "T6.ce2",
+      "lens": "T6",
+      "title": "convert∥expire",
+      "ev": {
+        "c": "200 {\"ok\": true, \"item_qty\": 1, \"request_id\": \"6dc5d1b7-920a-4dd1-b37d-632d2d601d03\", \"item_status\": \"sold\", \"reserved_qty\": 1}",
+        "e": "200 {\"ok\": true, \"request_id\": \"6dc5d1b7-920a-4dd1-b37d-632d2d601d03\", \"item_status\": \"sold\"}",
+        "res": {
+          "id": "6dc5d1b7-920a-4dd1-b37d-632d2d601d03",
+          "live_id": "109f382f-37b5-407d-98ff-c1da87b5dbf7",
+          "live_item_id": "f3571f5e-9416-46cf-b789-5f21d48c971a",
+          "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+          "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+          "status": "expired",
+          "requested_qty": 1,
+          "source": "fleaber_live",
+          "notes": ""
+        },
+        "item": {
+          "id": "f3571f5e-9416-46cf-b789-5f21d48c971a",
+          "live_id": "109f382f-37b5-407d-98ff-c1da87b5dbf7",
+          "product_id": null,
+          "seller_id": null,
+          "quantity": 1,
+          "status": "sold",
+          "item_kind": "live_only",
+          "price": 12.0
+        }
+      }
+    },
+    {
+      "id": "T2.alien2",
+      "lens": "T2",
+      "title": "B2 PI com reservation B1 (order marketplace B2)",
+      "ev": "400 {\"error\":\"Checkout blocked: live item does not match order.\"}"
+    }
+  ]
+}

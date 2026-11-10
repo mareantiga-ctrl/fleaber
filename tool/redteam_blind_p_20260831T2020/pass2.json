@@ -1,0 +1,233 @@
+{
+  "pass": 2,
+  "findings": [],
+  "notes": [
+    {
+      "id": "p2.w0",
+      "lens": "P10",
+      "title": "wallets",
+      "ev": {
+        "buyer": 46.35,
+        "seller": 0.0,
+        "buyer2": 0,
+        "seller2": 0
+      }
+    },
+    {
+      "id": "p2.p3.price",
+      "lens": "P3",
+      "title": "checkout após price=1 (produto coerente)",
+      "ev": {
+        "order": "c05ce354-f420-4063-8955-3616a90074a2",
+        "product_price": 1.0,
+        "http": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1CbOWmtsVyO4oIutuCHOVOgvpMfCXVofCPrTNazVvUqWlNZ7d3SptbwUA#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDR…",
+        "amount": 958,
+        "sid": "cs_test_a1CbOWmtsVyO4oIutuCHOVOgvpMfCXVofCPrTNazVvUqWlNZ7d3SptbwUA"
+      }
+    },
+    {
+      "id": "p2.p3.unlist",
+      "lens": "P3",
+      "title": "unlist sem sold → checkout",
+      "ev": {
+        "http": "400 {\"error\":\"Checkout blocked: product is not listed.\"}",
+        "sid": null,
+        "amount": null
+      }
+    },
+    {
+      "id": "p2.p3.qty",
+      "lens": "P3",
+      "title": "PATCH qty 1→5 + checkout",
+      "ev": {
+        "patch": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"order_money_fields_immutable\"}",
+        "row_qty": 1,
+        "checkout": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a12tisW4NnY06j5EgQoo58YaLwhxxYSD3m9eyS4ea0MpfTulz0rkfyY24e#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDR…",
+        "amount": 958
+      }
+    },
+    {
+      "id": "p2.p9.credit",
+      "lens": "P9",
+      "title": "credit_wallet_once JWT/anon",
+      "ev": {
+        "jwt": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_credit_wallet_once\"}",
+        "anon": "401 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_credit_wallet_once\"}"
+      }
+    },
+    {
+      "id": "p2.p8.tip",
+      "lens": "P8",
+      "title": "tip 2€ seller2 live forjado",
+      "ev": "400 {\"error\":\"[object Object]\"}"
+    },
+    {
+      "id": "p2.p5.paid",
+      "lens": "P5",
+      "title": "pago Stripe TEST (fica pago)",
+      "ev": "200 {\n  \"ok\": true,\n  \"order_id\": \"ec49661c-76c7-48e4-b408-f11bb94affbc\",\n  \"product_id\": \"d39a9710-a9de-4f39-bbdc-c1e76cb372f4\",\n  \"payment_intent_id\": \"pi_3UAaurH7FWYUN3jh08l7XFfc\",\n  \"pi_status\": \"succeeded\",\n  \"pi_amount…"
+    },
+    {
+      "id": "p2.p5.race.pago",
+      "lens": "P5",
+      "title": "refund∥release∥refund-wallet em pago",
+      "ev": {
+        "ref": "200 {\"ok\":true,\"already_refunded\":true,\"idempotent\":true,\"refund_id\":\"re_3UAaurH7FWYUN3jh0TEkGNtb\",\"status\":\"cancelado\",\"stock_units_applied\":null,\"amount_cents\":590,\"payment_intent\":\"pi_3UAaurH7FWYUN3jh08l7XFfc\",\"status_str…",
+        "rel": "200 false",
+        "refW": "200 false",
+        "status": "cancelado",
+        "refund_id": "re_3UAaurH7FWYUN3jh0TEkGNtb",
+        "release_at": "2026-08-31T19:30:54.823157+00:00",
+        "dBuyer": 0.0,
+        "dSeller": 0.0
+      }
+    },
+    {
+      "id": "p2.p5.disp",
+      "lens": "P5",
+      "title": "INSERT order_disputes",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"new row violates row-level security policy for table \\\"order_disputes\\\"\"}"
+    },
+    {
+      "id": "p2.p5.ref.disp",
+      "lens": "P5",
+      "title": "refund após disputa",
+      "ev": "200 {\"ok\":true,\"already_refunded\":true,\"idempotent\":true,\"refund_id\":\"re_3UAaurH7FWYUN3jh0TEkGNtb\",\"status\":\"cancelado\",\"stock_units_applied\":null,\"amount_cents\":590,\"payment_intent\":\"pi_3UAaurH7FWYUN3jh08l7XFfc\"}"
+    },
+    {
+      "id": "p2.p5b.paid",
+      "lens": "P5",
+      "title": "2.º pago para concluido+release buyer",
+      "ev": "200 {\n  \"ok\": true,\n  \"order_id\": \"c88d2171-09ec-4065-8075-48699ce04661\",\n  \"product_id\": \"f474a233-db07-470d-a1f8-e09fe36ee8f3\",\n  \"payment_intent_id\": \"pi_3UAauzH7FWYUN3jh0oFpwNGC\",\n  \"pi_status\": \"succeeded\",\n  \"pi_amount…"
+    },
+    {
+      "id": "p2.p5b.release",
+      "lens": "P5",
+      "title": "buyer release ×2 + refund",
+      "ev": {
+        "rel1": "200 true",
+        "rel2": "200 false",
+        "refund": "403 {\"ok\":false,\"error\":\"Não é possível anular esta venda neste estado (já enviada ou concluída).\",\"code\":\"order_refund_blocked_status\",\"status\":\"concluido\"}",
+        "dSeller": 5.0,
+        "dBuyer": 0.0,
+        "release_at": "2026-08-31T19:31:02.025758+00:00",
+        "refund_id": null
+      }
+    },
+    {
+      "id": "p2.p7.bag",
+      "lens": "P7",
+      "title": "bag ids",
+      "ev": {
+        "ok": true,
+        "oa": "52ee5937-3ef9-4e38-9283-c50ea7cf5ce8",
+        "ob": "1b4cafb7-11ab-4e21-a060-ae896cc67a56",
+        "pi": "pi_3UAav7H7FWYUN3jh1BFulKZE",
+        "paid_a": 335,
+        "paid_b": 780,
+        "pi_cents": 1115
+      }
+    },
+    {
+      "id": "p2.p7.refA",
+      "lens": "P7",
+      "title": "refund A; B e PI",
+      "ev": {
+        "ref": "200 {\"ok\":true,\"already_refunded\":true,\"idempotent\":true,\"refund_id\":\"re_3UAav7H7FWYUN3jh1V1zmpLn\",\"status\":\"cancelado\",\"stock_units_applied\":null,\"amount_cents\":335,\"payment_intent\":\"pi_3UAav7H7FWYUN3jh1BFulKZE\",\"status_str…",
+        "A0": {
+          "st": "pago",
+          "paid": 335,
+          "rid": null
+        },
+        "A1": {
+          "st": "cancelado",
+          "paid": 335,
+          "rid": "re_3UAav7H7FWYUN3jh1V1zmpLn"
+        },
+        "B0": {
+          "st": "pago",
+          "paid": 780,
+          "rid": null
+        },
+        "B1": {
+          "st": "pago",
+          "paid": 780,
+          "rid": null
+        },
+        "stripe": {
+          "ok": true,
+          "payment_intent": {
+            "id": "pi_3UAav7H7FWYUN3jh1BFulKZE",
+            "status": "succeeded",
+            "amount": 1115,
+            "amount_received": 1115
+          },
+          "refunds": [
+            {
+              "id": "re_3UAav7H7FWYUN3jh1V1zmpLn",
+              "status": "succeeded",
+              "amount": 335,
+              "metadata": {
+                "fleaber_actor_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+                "fleaber_order_id": "52ee5937-3ef9-4e38-9283-c50ea7cf5ce8"
+              }
+            }
+          ],
+          "refund_count": 1
+        }
+      }
+    },
+    {
+      "id": "p2.p7.sums",
+      "lens": "P7",
+      "title": "refundSum vs PI",
+      "ev": {
+        "refundSum": 335,
+        "piAmt": 1115,
+        "refundCount": 1
+      }
+    },
+    {
+      "id": "p2.p2.seq",
+      "lens": "P2",
+      "title": "holds sequenciais qty=1",
+      "ev": {
+        "b1": "201 [{\"id\":\"00a42a1a-b77c-46e1-87b8-1492d506142e\",\"created_at\":\"2026-08-31T19:31:12.061126+00:00\",\"product_id\":\"79a2abf0-ceda-4a79-8e9f-cde4775cd90e\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-00…",
+        "b2": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"order_hold_exceeds_stock\"}",
+        "id1": "00a42a1a-b77c-46e1-87b8-1492d506142e",
+        "id2": null
+      }
+    },
+    {
+      "id": "p2.wEnd",
+      "lens": "P10",
+      "title": "wallets",
+      "ev": {
+        "w0": {
+          "buyer": 46.35,
+          "seller": 0.0,
+          "buyer2": 0,
+          "seller2": 0
+        },
+        "wEnd": {
+          "buyer": 46.35,
+          "seller": 10.0,
+          "buyer2": 0,
+          "seller2": 0
+        }
+      }
+    }
+  ],
+  "w0": {
+    "buyer": 46.35,
+    "seller": 0.0,
+    "buyer2": 0,
+    "seller2": 0
+  },
+  "wEnd": {
+    "buyer": 46.35,
+    "seller": 10.0,
+    "buyer2": 0,
+    "seller2": 0
+  }
+}

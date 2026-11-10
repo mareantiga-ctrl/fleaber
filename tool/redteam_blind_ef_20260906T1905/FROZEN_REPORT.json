@@ -1,0 +1,50 @@
+{
+  "auditor": "REDTEAM_BLIND_EF_BAG_MUTEX_POS_OPEN_v1",
+  "frozen_at": "2026-09-06T19:15:00+01:00",
+  "production_touched": false,
+  "fase4": false,
+  "corrections_applied": false,
+  "prefix": "RTEF-20260906T1905",
+  "staging": "fxdknzrqjenzqcvnwqqq",
+  "probes_na_tabela": 22,
+  "classes_novas": 11,
+  "races": 12,
+  "stripe_test_pago": true,
+  "veredicto": "FAIL_P1",
+  "contagem": {
+    "P0": 0,
+    "P1": 1,
+    "P2": 1,
+    "P3": 0,
+    "P4": 0,
+    "TOTAL_P0_P3": 2
+  },
+  "resumo_numerico": "P0=0 P1=1 P2=1 P3=0 TOTAL=2",
+  "findings": [
+    {
+      "id": "P1-1",
+      "severity": "P1",
+      "title": "Overlaps de conjuntos diferentes: duas Sessions (6∥4, ABCDE∥C, bag∥single, shrink/expand)",
+      "probes": ["B1", "B3", "B5", "B6", "B7"],
+      "gate": "dual cs_ HTTP 200 reused=false; ledger aponta ao vencedor; órfã settle 402 sem prova expire nativo"
+    },
+    {
+      "id": "P2-1",
+      "severity": "P2",
+      "title": "Denylist off residual: bizum abre Session Stripe",
+      "probes": ["C5"]
+    }
+  ],
+  "closed_identical_bag": {
+    "A6": "1 cs_ reused",
+    "B4": "1 cs_ reused UUID invertido",
+    "B8": "1 cs_ 3x paralelo"
+  },
+  "pago": {
+    "order_id": "288b227d-5c3a-4916-a072-f2fd775d2669",
+    "pi": "pi_3UCkYjH7FWYUN3jh17eVMiSc",
+    "cents": 590,
+    "stock_applied": 1
+  },
+  "hold_ratio": "6/22=27%"
+}

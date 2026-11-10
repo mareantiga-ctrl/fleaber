@@ -1,0 +1,100 @@
+{
+  "auditor": "REDTEAM_BLIND_D_COSTURA_v1",
+  "frozen_at": "2026-08-30T16:33:20Z",
+  "stamp": "20260830T1721",
+  "prefix": "RTD-20260830T1721",
+  "production_touched": false,
+  "fase4": false,
+  "corrections_applied": false,
+  "project": "fxdknzrqjenzqcvnwqqq",
+  "actors": {
+    "buyer1": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+    "seller1": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+    "buyer2": "ce3f90f6-4ba2-43f8-9251-f4045cb2190f",
+    "seller2": "a8956587-5bb2-4640-aae2-0c85efe3344e"
+  },
+  "lenses": ["D1", "D2", "D3", "D4", "D5", "D6", "D7", "D8", "D9", "D10"],
+  "counts": { "P0": 0, "P1": 2, "P2": 5, "P3": 0 },
+  "findings": [
+    {
+      "id": "D1-EARLY-CONFIRM-PAYOUT",
+      "title": "Buyer concluiu sem envio e libertou carteira do vendedor",
+      "actor": "buyer1 (reproduzido buyer2×seller2)",
+      "preconditions": "order pago TEST, nunca enviado, wallet_release null",
+      "request": "PATCH /orders status=concluido; POST rpc/batata_release_seller_wallet_for_order",
+      "state_before": "status=pago wS1=28.39 release=null e6e89129-1adf-4fe2-95d3-00095e21c4f0 pi_3UABbNH7FWYUN3jh1jrHDYLj amount_paid_cents=590",
+      "state_after": "status=concluido wS1=33.39 release=2026-08-30T16:29:04.423094+00:00; B2×S2 3bb09609-c8a6-4ac1-925c-7296024ca7e7 wS2 null→5.00",
+      "impact": "hold de envio e janela de disputa saltados; INSERT disputa em race 403",
+      "reproduction": "setup_paid_order; JWT buyer PATCH concluido; RPC release",
+      "severity": "P1",
+      "lens": "D1"
+    },
+    {
+      "id": "D1-DISPUTE-UPDATE-UNCONSTRAINED",
+      "title": "Seller fecha disputa via PATCH e desbloqueia payout",
+      "actor": "seller1",
+      "preconditions": "order paga TEST enviado+concluido, disputa aberta, release false",
+      "request": "PATCH /order_disputes status=resolvida; JWT buyer RPC release",
+      "state_before": "dispute 046f72a3 aberta; order 54330c3a release=null; wS1=28.39; RPC com disputa aberta=false",
+      "state_after": "dispute resolvida; RPC true; wS1=33.39; release=2026-08-30T16:31:37.993041+00:00; mesma superfície aceita recusada (739eee8b / ce5e0486)",
+      "impact": "autoridade de disputa + Δwallet; B2 PATCH 200 []",
+      "reproduction": "pós-pago até disputa aberta; JWT seller PATCH resolvida; RPC release",
+      "severity": "P1",
+      "lens": "D1"
+    }
+  ],
+  "p2": [
+    "D4-JSON-CARD-SELF",
+    "D1-DISPUTE-REOPEN",
+    "RLS-SILENT-200",
+    "SETTLE-200-UNPAID",
+    "D10-MBWAY-NO-MINT"
+  ],
+  "races": [
+    {
+      "id": "dispute∥release",
+      "result": "release true +5; dispute 403",
+      "p0_p1_race": false
+    },
+    {
+      "id": "seller_ship∥buyer_cancel",
+      "result": "final enviado; cancel reverted",
+      "p0_p1_race": false
+    }
+  ],
+  "stripe": {
+    "test_only": true,
+    "pi_refunded_closed": "pi_3UABbNH7FWYUN3jh1jrHDYLj / re_3UABbNH7FWYUN3jh1eYTA0x0 / wallet +5 then estorno -5",
+    "pi_p1_residual": [
+      "pi_3UABdqH7FWYUN3jh0BDU5aEE order 54330c3a +5 after dispute kill",
+      "pi_3UABdvH7FWYUN3jh1BB74Qyl order 3bb09609 B2S2 +5 early confirm"
+    ]
+  },
+  "gaps": [
+    "no local STRIPE_SECRET_KEY — Checkout Session not paid with 4242; capture = e2e PI TEST",
+    "OpenAPI RPC list empty from /rest/v1/ root",
+    "partial refund dispute path not_allowed outside accepted-offer turn",
+    "auto_feedback cron 48h not waited; JWT 403",
+    "Connect Transfer not run"
+  ],
+  "verdict": {
+    "P0": 0,
+    "P1": 2,
+    "P2": 5,
+    "money_mint": "NÃO",
+    "oversell": "NÃO",
+    "identity_jwt_ne_resource": "NÃO",
+    "cross_user": "NÃO",
+    "race_p0_p1": "NÃO",
+    "costura_to_cash_p0_p1": "SIM",
+    "partial_fail_post_pay": "SIM",
+    "webhook_return_exploitable": "NÃO",
+    "two_buyers_two_sellers": "SIM",
+    "post_pay_flow": "SIM",
+    "last_cycle_new_p0_p1_class": "NÃO",
+    "saturation": "SIM",
+    "production_touched": "NÃO",
+    "fase4": "NÃO",
+    "label": "FAIL_P1"
+  }
+}

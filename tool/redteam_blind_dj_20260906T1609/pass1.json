@@ -1,0 +1,416 @@
+{
+  "auditor": "REDTEAM_BLIND_DJ_LIVE_STOCK_POS_DBDG_v1",
+  "prefix": "RTDJ-20260906T1609",
+  "findings": [],
+  "blocked": [
+    {
+      "id": "A1.welcome",
+      "lens": "DJ1",
+      "title": "controlo positivo OK",
+      "ev": {
+        "rpc": "200 {\"ok\": true}",
+        "vis": {
+          "rest_buyer": false,
+          "hub_buyer": true,
+          "hub_anon": true,
+          "visible_hub": true
+        }
+      }
+    },
+    {
+      "id": "A2.directo.comecar",
+      "lens": "DJ1",
+      "title": "controlo positivo OK",
+      "ev": {
+        "rpc": "200 {\"ok\": true}",
+        "vis": {
+          "rest_buyer": false,
+          "hub_buyer": true,
+          "hub_anon": true,
+          "visible_hub": true
+        }
+      }
+    },
+    {
+      "id": "A3.voou_tudo",
+      "lens": "DJ2",
+      "title": "FOMO deny (HOLD residual)",
+      "ev": "200 {\"ok\": false, \"error\": \"purchase_announce_via_broadcast_only\"}"
+    },
+    {
+      "id": "B1.two_buyers.same_unit",
+      "lens": "DJ3",
+      "title": "1 unidade no máximo (HOLD)",
+      "ev": {
+        "r1": {
+          "id": "d7a2d4db-7001-41f8-ac04-4332ad68f257",
+          "status": "accepted",
+          "requested_qty": 1,
+          "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+          "live_id": "2e61436d-b68f-4f7e-a94b-0ebd31b5c12a",
+          "live_item_id": "cf6b48ad-9d09-4059-abc2-88e72003ed13"
+        },
+        "r2": {
+          "id": "0f6ad6eb-6be1-455b-a0dd-6f6f27a93f85",
+          "status": "pending",
+          "requested_qty": 1,
+          "buyer_id": "514d4e87-e690-44d4-8062-b489ed834d1d",
+          "live_id": "2e61436d-b68f-4f7e-a94b-0ebd31b5c12a",
+          "live_item_id": "cf6b48ad-9d09-4059-abc2-88e72003ed13"
+        },
+        "a1": "200 [{\"id\":\"d7a2d4db-7001-41f8-ac04-4332ad68f257\",\"live_id\":\"2e61436d-b68f-4f7e-a94b-0ebd31b5c12a\",\"live_item_id\":\"cf6b48ad-9d09-4059-abc2-88e72003ed13\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"buyer_id\":\"bfcbeeee…",
+        "a2": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"qty_exceeds_stock\"}",
+        "n_accepted": 1
+      }
+    },
+    {
+      "id": "B2.hitch.qty_gt_avail",
+      "lens": "DJ4",
+      "title": "qty clamp/deny (HOLD)",
+      "ev": {
+        "pending": {
+          "id": "53aab03b-bf7b-4655-b96b-99e0e9763944",
+          "status": "pending",
+          "requested_qty": 1,
+          "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+          "live_id": "ac2d33cf-83cd-4e0d-9077-1471312944d2",
+          "live_item_id": "7933d7a3-3fe8-4838-b410-1bc281a77307"
+        },
+        "accept": "200 [{\"id\":\"53aab03b-bf7b-4655-b96b-99e0e9763944\",\"live_id\":\"ac2d33cf-83cd-4e0d-9077-1471312944d2\",\"live_item_id\":\"7933d7a3-3fe8-4838-b410-1bc281a77307\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"buyer_id\":\"bfcbeeee…",
+        "after": {
+          "id": "53aab03b-bf7b-4655-b96b-99e0e9763944",
+          "status": "accepted",
+          "requested_qty": 1,
+          "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+          "live_id": "ac2d33cf-83cd-4e0d-9077-1471312944d2",
+          "live_item_id": "7933d7a3-3fe8-4838-b410-1bc281a77307"
+        }
+      }
+    },
+    {
+      "id": "B3.accept_reject.parallel",
+      "lens": "DJ7",
+      "title": "estado terminal único (HOLD)",
+      "ev": {
+        "id": "d7084c81-ea01-4f42-8d56-0d08d3cc9748",
+        "status": "accepted",
+        "requested_qty": 1,
+        "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+        "live_id": "0ddee335-f36b-4e46-8f59-cd9e167b013e",
+        "live_item_id": "93d801fd-4e1f-47fb-94be-2cdc94532687"
+      }
+    },
+    {
+      "id": "B4.end_live.parallel_accept",
+      "lens": "DJ7",
+      "title": "end∥accept sem caixa (HOLD)",
+      "ev": {
+        "res": {
+          "id": "38dc6d8f-94fd-4f88-8e31-1ef3e6b5147f",
+          "status": "accepted",
+          "requested_qty": 1,
+          "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+          "live_id": "ad3df82c-dc54-4997-be7a-e5fcb0e25e1b",
+          "live_item_id": "8ee7187a-886f-42e4-8d6b-db0c9f11a171"
+        },
+        "live": {
+          "id": "ad3df82c-dc54-4997-be7a-e5fcb0e25e1b",
+          "status": "ended",
+          "is_active": false
+        }
+      }
+    },
+    {
+      "id": "B5.reserve.after.ended",
+      "lens": "DJ4",
+      "title": "reserva/accept pós-end recusado (HOLD)",
+      "ev": {
+        "insert_id": null,
+        "accept": null,
+        "row": null
+      }
+    },
+    {
+      "id": "B6.hitch.mkt_live_only",
+      "lens": "DJ3",
+      "title": "2º hitch recusado (HOLD)",
+      "ev": {
+        "m": {
+          "id": "9d44dc32-ec04-44cf-9cc4-7ef281c994c7",
+          "status": "accepted",
+          "requested_qty": 1,
+          "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+          "live_id": "fb0a54c4-fde8-453b-8567-305d029bf761",
+          "live_item_id": "416549db-d539-4bdf-955b-6416b7545a97"
+        },
+        "l": {
+          "id": "97f67d2c-4ee6-445e-b49c-209c2477283c",
+          "status": "pending",
+          "requested_qty": 1,
+          "buyer_id": "514d4e87-e690-44d4-8062-b489ed834d1d",
+          "live_id": "fb0a54c4-fde8-453b-8567-305d029bf761",
+          "live_item_id": "1cce0891-85a0-4fdc-aefd-c3870c18e169"
+        },
+        "a2": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"qty_exceeds_stock\"}"
+      }
+    },
+    {
+      "id": "C1.convert.nopi",
+      "lens": "DJ5",
+      "title": "convert sem PI recusado (HOLD)",
+      "ev": {
+        "rpc": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_live_reservation_stripe_convert\"}",
+        "patch": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"convert_requires_paid_order\"}",
+        "status": "accepted"
+      }
+    },
+    {
+      "id": "C2.convert.pi_alheio",
+      "lens": "DJ5",
+      "title": "PI alheio recusado (HOLD)",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"convert_requires_paid_order\"}"
+    },
+    {
+      "id": "C3.convert.after.unpublish",
+      "lens": "DJ5",
+      "title": "convert pós-unpublish sem PI recusado (HOLD)",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"convert_requires_paid_order\"}"
+    },
+    {
+      "id": "C4.raffle.follow.unpublished",
+      "lens": "DJ6",
+      "title": "follow unpublished deny / 0 tickets (HOLD residual)",
+      "ev": {
+        "http": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"new row violates row-level security policy for table \\\"follows\\\"\"}",
+        "tickets": 0,
+        "followed": false
+      }
+    },
+    {
+      "id": "C4.raffle.follow.published",
+      "lens": "DJ6",
+      "title": "follow published OK (HOLD)",
+      "ev": {
+        "http": "201 [{\"id\":\"d1d07742-5c25-4e43-87dd-5ab8fcf09925\",\"follower_id\":\"514d4e87-e690-44d4-8062-b489ed834d1d\",\"following_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"created_at\":\"2026-09-06T15:16:26.795604+00:00\"}]",
+        "tickets": 1
+      }
+    },
+    {
+      "id": "C5.buyer.playback.unpublished",
+      "lens": "DJ8",
+      "title": "buyer não lê playback unpublished (HOLD)",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table lives\"}"
+    },
+    {
+      "id": "C6.tip.mid_live",
+      "lens": "DJ5",
+      "title": "tip mid-live sem crédito (HOLD residual)",
+      "ev": {
+        "http": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a16XWgfQkehSa2xktaMuWRp7n8ABOpwjDpvoSMJTkdMHxYNCG8g4aELz7S#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDR…",
+        "status": "pending",
+        "dWallet": 0.0
+      }
+    }
+  ],
+  "notes": [
+    {
+      "id": "res.fail",
+      "title": "insertReservation 403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"live_ended\"}",
+      "ev": {
+        "live": "f9286839-88b4-4205-bc4d-991bf8203863",
+        "item": "1419561f-3cf6-4e0a-9f93-685b4c36a9c2",
+        "status": "pending",
+        "source": "fleaber_live",
+        "qty": 1
+      }
+    }
+  ],
+  "probes": [
+    {
+      "probe_id": "A1.welcome",
+      "poco": "DJ-A",
+      "payload": "Bem-vindos ao directo!",
+      "http": "200 {\"ok\": true}",
+      "bd": "{\"rest_buyer\":false,\"hub_buyer\":true,\"hub_anon\":true,\"visible_hub\":true}",
+      "result": "HOLD",
+      "lens": "DJ1",
+      "residual": false,
+      "count_finding": false
+    },
+    {
+      "probe_id": "A2.directo.comecar",
+      "poco": "DJ-A",
+      "payload": "O directo está a começar",
+      "http": "200 {\"ok\": true}",
+      "bd": "{\"rest_buyer\":false,\"hub_buyer\":true,\"hub_anon\":true,\"visible_hub\":true}",
+      "result": "HOLD",
+      "lens": "DJ1",
+      "residual": false,
+      "count_finding": false
+    },
+    {
+      "probe_id": "A3.voou_tudo",
+      "poco": "DJ-A",
+      "payload": "voou tudo",
+      "http": "200 {\"ok\": false, \"error\": \"purchase_announce_via_broadcast_only\"}",
+      "bd": "{}",
+      "result": "HOLD",
+      "lens": "DJ2",
+      "residual": true,
+      "count_finding": false
+    },
+    {
+      "probe_id": "B1.two_buyers.same_unit",
+      "poco": "DJ-B",
+      "payload": "2 buyers hitch mesma unidade qty=1 accept∥accept",
+      "http": "200 [{\"id\":\"d7a2d4db-7001-41f8-ac04-4332ad68f257\",\"live_id\":\"2e61436d-b68f-4f7e-a94b-0ebd31b5c12a\",\"live_item_id\":\"cf6b48ad-9d09-4059-abc2-88e72003ed13\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"buyer_id\":\"bfcbeeee… | 400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"mess…",
+      "bd": "{\"r1\":{\"id\":\"d7a2d4db-7001-41f8-ac04-4332ad68f257\",\"status\":\"accepted\",\"requested_qty\":1,\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"live_id\":\"2e61436d-b68f-4f7e-a94b-0ebd31b5c12a\",\"live_item_id\":\"cf6b48ad-9d09-4059-abc2-88e72003ed13\"},\"r2\":{\"id\":\"0f6ad6eb-6be1-455b-a0dd-6…",
+      "result": "HOLD",
+      "lens": "DJ7",
+      "residual": false,
+      "count_finding": false
+    },
+    {
+      "probe_id": "B2.hitch.qty_gt_avail",
+      "poco": "DJ-B",
+      "payload": "hitch requested_qty=5 em item qty=1",
+      "http": "200 [{\"id\":\"53aab03b-bf7b-4655-b96b-99e0e9763944\",\"live_id\":\"ac2d33cf-83cd-4e0d-9077-1471312944d2\",\"live_item_id\":\"7933d7a3-3fe8-4838-b410-1bc281a77307\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"buyer_id\":\"bfcbeeee…",
+      "bd": "{\"pending\":{\"id\":\"53aab03b-bf7b-4655-b96b-99e0e9763944\",\"status\":\"pending\",\"requested_qty\":1,\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"live_id\":\"ac2d33cf-83cd-4e0d-9077-1471312944d2\",\"live_item_id\":\"7933d7a3-3fe8-4838-b410-1bc281a77307\"},\"after\":{\"id\":\"53aab03b-bf7b-4655…",
+      "result": "HOLD",
+      "lens": "DJ4",
+      "residual": false,
+      "count_finding": false
+    },
+    {
+      "probe_id": "B3.accept_reject.parallel",
+      "poco": "DJ-B",
+      "payload": "accept ∥ reject mesma reserva",
+      "http": "200 [{\"id\":\"d7084c81-ea01-4f42-8d56-0d08d3cc9748\",\"live_id\":\"0ddee335-f36b-4e46-8f59-cd9e167b013e\",\"live_item_id\":\"93d801fd-4e1f-47fb-94be-2cdc94532687\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"buyer_id\":\"bfcbeeee… | 200 [{\"id\":\"d7084c81-ea01-4f42-8d56-0d08d3cc9748\",\"l…",
+      "bd": "{\"id\":\"d7084c81-ea01-4f42-8d56-0d08d3cc9748\",\"status\":\"accepted\",\"requested_qty\":1,\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"live_id\":\"0ddee335-f36b-4e46-8f59-cd9e167b013e\",\"live_item_id\":\"93d801fd-4e1f-47fb-94be-2cdc94532687\"}",
+      "result": "HOLD",
+      "lens": "DJ7",
+      "residual": false,
+      "count_finding": false
+    },
+    {
+      "probe_id": "B4.end_live.parallel_accept",
+      "poco": "DJ-B",
+      "payload": "end_live ∥ PATCH accepted",
+      "http": "200 [{\"id\":\"38dc6d8f-94fd-4f88-8e31-1ef3e6b5147f\",\"live_id\":\"ad3df82c-dc54-4997-be7a-e5fcb0e25e1b\",\"live_item_id\":\"8ee7187a-886f-42e4-8d6b-db0c9f11a171\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"buyer_id\":\"bfcbeeee… | 200 [{\"id\":\"ad3df82c-dc54-4997-be7a-e5fcb0e25e1b\",\"c…",
+      "bd": "{\"res\":{\"id\":\"38dc6d8f-94fd-4f88-8e31-1ef3e6b5147f\",\"status\":\"accepted\",\"requested_qty\":1,\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"live_id\":\"ad3df82c-dc54-4997-be7a-e5fcb0e25e1b\",\"live_item_id\":\"8ee7187a-886f-42e4-8d6b-db0c9f11a171\"},\"live\":{\"id\":\"ad3df82c-dc54-4997-be7…",
+      "result": "HOLD",
+      "lens": "DJ7",
+      "residual": false,
+      "count_finding": false
+    },
+    {
+      "probe_id": "B5.reserve.after.ended",
+      "poco": "DJ-B",
+      "payload": "POST reservation + accept após lives.status=ended",
+      "http": "insert deny",
+      "bd": "{\"insert_id\":null,\"row\":null}",
+      "result": "HOLD",
+      "lens": "DJ4",
+      "residual": false,
+      "count_finding": false
+    },
+    {
+      "probe_id": "B6.hitch.mkt_live_only",
+      "poco": "DJ-B",
+      "payload": "hitch marketplace_product + live_only mesmo SKU qty=1",
+      "http": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"qty_exceeds_stock\"}",
+      "bd": "{\"m\":{\"id\":\"9d44dc32-ec04-44cf-9cc4-7ef281c994c7\",\"status\":\"accepted\",\"requested_qty\":1,\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"live_id\":\"fb0a54c4-fde8-453b-8567-305d029bf761\",\"live_item_id\":\"416549db-d539-4bdf-955b-6416b7545a97\"},\"l\":{\"id\":\"97f67d2c-4ee6-445e-b49c-209…",
+      "result": "HOLD",
+      "lens": "DJ3",
+      "residual": false,
+      "count_finding": false
+    },
+    {
+      "probe_id": "C1.convert.nopi",
+      "poco": "DJ-C",
+      "payload": "convert accepted sem PI (RPC + PATCH)",
+      "http": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_live_reservation_stripe_convert\"} | 403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"convert_requires_paid_order\"}",
+      "bd": "{\"id\":\"1141bd1b-97eb-4419-b50e-4d5320337ad5\",\"status\":\"accepted\",\"requested_qty\":1,\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"live_id\":\"1164b2e2-4363-4a5a-8f65-2cccbefa6ac4\",\"live_item_id\":\"2e0a6e08-1dd2-4003-a69f-565f25818411\"}",
+      "result": "HOLD",
+      "lens": "DJ5",
+      "residual": false,
+      "count_finding": false
+    },
+    {
+      "probe_id": "C2.convert.pi_alheio",
+      "poco": "DJ-C",
+      "payload": "reconcile PI liveA buyer1 → res liveB buyer2",
+      "http": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"convert_requires_paid_order\"}",
+      "bd": "{\"id\":\"addf2f93-fdb4-477d-92b8-9d22aed108a6\",\"status\":\"accepted\",\"requested_qty\":1,\"buyer_id\":\"514d4e87-e690-44d4-8062-b489ed834d1d\",\"live_id\":\"7e6a9f7d-bdf7-451b-9782-0cb7ccdd9ac5\",\"live_item_id\":\"c746138b-dc77-4452-85ad-c8202f11bcc1\"}",
+      "result": "HOLD",
+      "lens": "DJ5",
+      "residual": false,
+      "count_finding": false
+    },
+    {
+      "probe_id": "C3.convert.after.unpublish",
+      "poco": "DJ-C",
+      "payload": "PATCH converted após hub unpublish + live ended sem PI",
+      "http": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"convert_requires_paid_order\"}",
+      "bd": "{\"id\":\"7c5f5814-0741-4c57-9872-b0d26dd81a4c\",\"status\":\"accepted\",\"requested_qty\":1,\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"live_id\":\"7ae9a322-1b75-4b4d-b4ff-c8478b70df10\",\"live_item_id\":\"9c758dcc-1b58-4f97-ac69-8d34f2293c04\"}",
+      "result": "HOLD",
+      "lens": "DJ5",
+      "residual": false,
+      "count_finding": false
+    },
+    {
+      "probe_id": "C4.raffle.follow.unpublished",
+      "poco": "DJ-C",
+      "payload": "B2 follow S2 unpublished + raffle active",
+      "http": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"new row violates row-level security policy for table \\\"follows\\\"\"}",
+      "bd": "{\"tickets\":0,\"raffle\":\"4b1f9d23-5387-45e6-995c-3b3bb54f9665\"}",
+      "result": "HOLD",
+      "lens": "DJ6",
+      "residual": true,
+      "count_finding": false
+    },
+    {
+      "probe_id": "C4.raffle.follow.published",
+      "poco": "DJ-C",
+      "payload": "B2 follow S1 published + raffle active",
+      "http": "201 [{\"id\":\"d1d07742-5c25-4e43-87dd-5ab8fcf09925\",\"follower_id\":\"514d4e87-e690-44d4-8062-b489ed834d1d\",\"following_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"created_at\":\"2026-09-06T15:16:26.795604+00:00\"}]",
+      "bd": "{\"tickets\":1,\"raffle\":\"8d0339c2-e3f0-4654-93c9-16426b157fbd\"}",
+      "result": "HOLD",
+      "lens": "DJ6",
+      "residual": false,
+      "count_finding": false
+    },
+    {
+      "probe_id": "C5.buyer.playback.unpublished",
+      "poco": "DJ-C",
+      "payload": "GET lives playback/mux/livekit unpublished",
+      "http": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table lives\"}",
+      "bd": "{\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table lives\"}",
+      "result": "HOLD",
+      "lens": "DJ8",
+      "residual": false,
+      "count_finding": false
+    },
+    {
+      "probe_id": "C6.tip.mid_live",
+      "poco": "DJ-C",
+      "payload": "create-live-tip-checkout mid-live amount_eur=2 sem pay",
+      "http": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a16XWgfQkehSa2xktaMuWRp7n8ABOpwjDpvoSMJTkdMHxYNCG8g4aELz7S#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDR…",
+      "bd": "{\"tipId\":\"4de4e7c7-d8f7-4e34-8a19-f93690abb37e\",\"status\":\"pending\",\"dWallet\":0.0}",
+      "result": "HOLD",
+      "lens": "DJ5",
+      "residual": true,
+      "count_finding": false
+    }
+  ],
+  "lenses": [
+    "DJ1",
+    "DJ2",
+    "DJ3",
+    "DJ4",
+    "DJ5",
+    "DJ6",
+    "DJ7",
+    "DJ8"
+  ]
+}

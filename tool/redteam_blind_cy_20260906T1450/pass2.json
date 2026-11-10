@@ -1,0 +1,57 @@
+{
+  "probes": [
+    {
+      "probe_id": "B1",
+      "poco": "CY-B",
+      "payload": "tip Session S2 published → unpublish → GET return (sem sk_test local)",
+      "http": "{\"create\":\"400 acao=* 767ms {\\\"error\\\":\\\"Tips only allowed for published hub sellers.\\\"}\",\"getUnpaid\":null,\"pay\":null,\"getAfterPay\":null}",
+      "bd": "{\"tipStatus\":\"\",\"credited\":false,\"paidStripe\":false,\"hub_after\":false,\"has_sk_test\":false}",
+      "result": "SKIP",
+      "lens": "CY3",
+      "residual": false,
+      "count_finding": false
+    },
+    {
+      "probe_id": "B2",
+      "poco": "CY-B",
+      "payload": "amount 0/0.01/-1/0.5/501 + tip_id cliente + seller≠owner live",
+      "http": "{\"amounts\":{\"0\":\"400 acao=* 398ms {\\\"error\\\":\\\"Invalid tip amount.\\\"}\",\"0.01\":\"400 acao=* 407ms {\\\"error\\\":\\\"Invalid tip amount.\\\"}\",\"-1\":\"400 acao=* 489ms {\\\"error\\\":\\\"Invalid tip amount.\\\"}\",\"0.5\":\"400 acao=* 404ms {\\\"error\\\":\\\"Invalid tip amount.\\\"}\",\"501\":\"400 acao=* 640ms {\\…",
+      "bd": "",
+      "result": "HOLD",
+      "lens": "CY3",
+      "residual": false,
+      "count_finding": false
+    },
+    {
+      "probe_id": "B3",
+      "poco": "CY-B",
+      "payload": "GET settle unpaid B2/anon + RPC settle JWT (Session não paga)",
+      "http": "{\"create\":\"200 acao=* 1292ms {\\\"checkoutUrl\\\":\\\"https://checkout.stripe.com/c/pay/cs_test_a1Mol6IEXxdcujMIB9z931quKhCZlpBcH2FNY32WbEQ9PTun8Lqjh0jhEq#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDR…\",\"getB2\":\"200 acao=* 574ms…",
+      "bd": "{\"status\":\"pending\",\"deltaWallet\":0.0}",
+      "result": "HOLD",
+      "lens": "CY3",
+      "residual": false,
+      "count_finding": false
+    }
+  ],
+  "findings": [],
+  "notes": [
+    {
+      "id": "b1.create",
+      "lens": "CY3",
+      "title": "tip session S2 published",
+      "ev": "400 acao=* 767ms {\"error\":\"Tips only allowed for published hub sellers.\"}"
+    }
+  ],
+  "skipped": [
+    {
+      "id": "B1",
+      "lens": "CY3",
+      "title": "não criou Session com S2 published",
+      "ev": "400 acao=* 767ms {\"error\":\"Tips only allowed for published hub sellers.\"}"
+    }
+  ],
+  "lenses": [
+    "CY3"
+  ]
+}

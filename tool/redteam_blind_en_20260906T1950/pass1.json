@@ -1,0 +1,630 @@
+{
+  "auditor": "REDTEAM_BLIND_EN_BAG_COMPOSICAO_RETEST_POS_OPEN_v1",
+  "prefix": "RTEN-20260906T1950",
+  "staging": "fxdknzrqjenzqcvnwqqq",
+  "probes": [
+    {
+      "probe_id": "A1",
+      "surfaces": "bag 6∥4 + Hub leftover + orders",
+      "action": "pago leftover + Future.wait ABCDEF ∥ BCDE",
+      "http": "{\"paid\":\"200 {\\n  \\\"ok\\\": true,\\n  \\\"order_id\\\": \\\"64373764-6172-4176-8ea0-3298b64a144e\\\",\\n  \\\"product_id\\\": \\\"0a14e6d4-f946-4973-a0df-2462952f4876\\\",\\n  \\\"payment_intent_id\\\": \\\"pi_3UClEBH7FWYUN3jh06gXafRV\\\",\\n  \\\"pi_status\\\": \\\"succeeded\\\",\\n  \\\"pi_amount…\",\"bag6\":\"400 {\\\"error\\\":\\\"Checkout blocked: overlapping bag …",
+      "oracles": "{\"dual\":false,\"s6\":{\"sid\":null,\"status\":\"n/a\"},\"s4\":{\"sid\":\"cs_test_a1TUcx027qD6MWHi0qDCavXy3DnFEbxA5D0xykKDnfZE7mLOlsEug7R08X\",\"http\":0,\"status\":null,\"payment_status\":null,\"amount_total\":null},\"leftover_hub\":1,\"leftover_qty\":1,\"hub\":[1,1,1,1,1,1],\"ledger\":[\"\",\"cs_test_a1TUcx027qD6MWHi0qDCavXy3DnFEbxA5D0xykKDnfZE7mLOlsEug7R08X\",\"cs_test_a1TUcx027qD6MWHi0qDCavXy3DnFEbxA5D0xykKDnfZE7mLOlsEug7R08X\",\"cs_test_a1TUcx027qD6…",
+      "result": "FAIL",
+      "lens": "EN6",
+      "residual": false,
+      "count_finding": false,
+      "classe_nova": true
+    },
+    {
+      "probe_id": "A2",
+      "surfaces": "bag expand + Hub + Stripe Session",
+      "action": "subset AB →50ms superset ABCD + Hub",
+      "http": "{\"sub\":\"200 {\\\"checkoutUrl\\\":\\\"https://checkout.stripe.com/c/pay/cs_test_a1EHt2x3gjI04h9vQoQNFUoy8iS5B8T25162Hy7o0lmhE4KQhUQgPQ2zyY#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDR…\",\"super\":\"400 {\\\"error\\\":\\\"Checkout blocked: overlapping bag session.\\\"}\"}",
+      "oracles": "{\"dual\":false,\"sub\":{\"sid\":\"cs_test_a1EHt2x3gjI04h9vQoQNFUoy8iS5B8T25162Hy7o0lmhE4KQhUQgPQ2zyY\",\"http\":0,\"status\":null,\"payment_status\":null,\"amount_total\":null},\"super\":{\"sid\":null,\"status\":\"n/a\"},\"hub\":[1,1,1,1]}",
+      "result": "FAIL",
+      "lens": "EN6",
+      "residual": false,
+      "count_finding": false,
+      "classe_nova": true
+    },
+    {
+      "probe_id": "A3",
+      "surfaces": "bag + single CPI + Hub + orders",
+      "action": "Future.wait saco ABC ∥ avulso B; Hub",
+      "http": "{\"bag\":\"200 {\\\"checkoutUrl\\\":\\\"https://checkout.stripe.com/c/pay/cs_test_a1t3Sv4jHvUSYHjdBy5sRp0YWMKgu6rLuAPjiClbqfqCNKVthzS0dRtiGn#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDR…\",\"single\":\"200 {\\\"checkoutUrl\\\":\\\"https://checkout.stripe.com/c/pay/cs_test_a16qvki…",
+      "oracles": "{\"dual\":true,\"bag\":{\"sid\":\"cs_test_a1t3Sv4jHvUSYHjdBy5sRp0YWMKgu6rLuAPjiClbqfqCNKVthzS0dRtiGn\",\"http\":0,\"status\":null,\"payment_status\":null,\"amount_total\":null},\"single\":{\"sid\":\"cs_test_a16qvkig1jQwUlGQJ3dAjmUTJLicn9jiWrgbnoxWWoeKbOUvQpjIBzJrKL\",\"http\":0,\"status\":null,\"payment_status\":null,\"amount_total\":null},\"hub\":[1,1,1],\"ledger\":[\"cs_test_a1t3Sv4jHvUSYHjdBy5sRp0YWMKgu6rLuAPjiClbqfqCNKVthzS0dRtiGn\",\"cs_test_a1t3Sv…",
+      "result": "HOLD",
+      "lens": "EN6",
+      "residual": false,
+      "count_finding": true,
+      "classe_nova": true
+    },
+    {
+      "probe_id": "A4",
+      "surfaces": "bag shrink + Hub + Stripe Session",
+      "action": "full ABCD →50ms subset AB + Hub",
+      "http": "{\"full\":\"400 {\\\"error\\\":\\\"Checkout blocked: overlapping bag session.\\\"}\",\"small\":\"200 {\\\"checkoutUrl\\\":\\\"https://checkout.stripe.com/c/pay/cs_test_a1XLf4u51UIbIYO3v0qFSiVCS1gyVCMt8JkcZX00aQ2eHow4WgF5te14VU#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDR…\"}",
+      "oracles": "{\"dual\":false,\"full\":{\"sid\":null,\"status\":\"n/a\"},\"small\":{\"sid\":\"cs_test_a1XLf4u51UIbIYO3v0qFSiVCS1gyVCMt8JkcZX00aQ2eHow4WgF5te14VU\",\"http\":0,\"status\":null,\"payment_status\":null,\"amount_total\":null},\"hub\":[1,1,1,1]}",
+      "result": "FAIL",
+      "lens": "EN6",
+      "residual": false,
+      "count_finding": false,
+      "classe_nova": true
+    },
+    {
+      "probe_id": "A5",
+      "surfaces": "bag idêntico + Hub + orders",
+      "action": "Future.wait 2× mesmo saco ABC + Hub",
+      "http": "{\"h1\":\"200 {\\\"checkoutUrl\\\":\\\"https://checkout.stripe.com/c/pay/cs_test_a1JLIk2WqIQIhQpw6yy1iIBh0faBpMfF3gqDCQ0A8gEceThqfzE3dpZCjQ#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDR…\",\"h2\":\"200 {\\\"checkoutUrl\\\":\\\"https://checkout.stripe.com/c/pay/cs_test_a1JLIk2WqIQI…",
+      "oracles": "{\"dual\":false,\"sids\":[\"cs_test_a1JLIk2WqIQIhQpw6yy1iIBh0faBpMfF3gqDCQ0A8gEceThqfzE3dpZCjQ\"],\"reused\":[true,false],\"hub\":[1,1,1]}",
+      "result": "FAIL",
+      "lens": "EN6",
+      "residual": false,
+      "count_finding": false,
+      "classe_nova": true
+    },
+    {
+      "probe_id": "B1",
+      "surfaces": "Hub + CPI B2 + CPI B3 + orders",
+      "action": "Future.wait 2 buyers qty=1 Hub-visível",
+      "http": "{\"hub\":\"200 [{\\\"id\\\":\\\"055ebd5b-a425-4b54-a804-e65d9c0c90d2\\\",\\\"title\\\":\\\"RTEN-20260906T1950 B1 two-buyers\\\",\\\"seller_id\\\":\\\"980f4fa1-0004-42f9-abca-69f1a9c29588\\\",\\\"is_sold\\\":false,\\\"price\\\":12.0}]\",\"b2\":\"200 {\\\"checkoutUrl\\\":\\\"https://checkout.stripe.com/c/pay/cs_test_a1PSuzieGrmQg5cn4r9JtmQJcwhwW6pvaIMsYQ9qthPqnCwKr…",
+      "oracles": "{\"hub0\":1,\"hub1\":0,\"cs_n\":1,\"sid1\":\"cs_test_a1PSuzieGrmQg5cn4r9JtmQJcwhwW6pvaIMsYQ9qthPqnCwKrutOddzJOZ\",\"sid2\":null,\"o2_ok\":false}",
+      "result": "FAIL",
+      "lens": "EN5",
+      "residual": false,
+      "count_finding": false,
+      "classe_nova": false
+    },
+    {
+      "probe_id": "B2",
+      "surfaces": "rifa + Hub + live_item + insert",
+      "action": "draw winner + Hub + live_item ≠ available",
+      "http": "{\"raf\":\"201 [{\\\"id\\\":\\\"e0f1deff-8793-4d2c-8224-05eff642c486\\\",\\\"live_id\\\":\\\"ad5e768e-8180-4117-9ec0-b434a10b7303\\\",\\\"seller_id\\\":\\\"980f4fa1-0004-42f9-abca-69f1a9c29588\\\",\\\"title\\\":\\\"RTEN-20260906T1950 B2 prize\\\",\\\"description\\\":null,\\\"photo_url\\\":null,…\",\"draw\":\"200 {\\\"ok\\\": true, \\\"status\\\": \\\"drawn\\\", \\\"winners\\\": [{…",
+      "oracles": "{\"hub_n\":0,\"qty\":0,\"winners\":1,\"ins_ok\":false,\"item\":\"sold\",\"item_active\":false}",
+      "result": "FAIL",
+      "lens": "EN7",
+      "residual": false,
+      "count_finding": false,
+      "classe_nova": true
+    },
+    {
+      "probe_id": "B3",
+      "surfaces": "rifa + live accept + bag outra linha + Hub",
+      "action": "rifa activa A + accept hitch A + bag CPI SKU-B",
+      "http": "{\"acc\":\"200 [{\\\"id\\\":\\\"e8050d03-8305-459d-94b5-9b2f6499bb01\\\",\\\"live_id\\\":\\\"0d4eff8d-ec1c-4dcf-8caa-ac5ff1a78cb8\\\",\\\"live_item_id\\\":\\\"5dfb2321-34f3-4294-a396-6e009bf59214\\\",\\\"seller_id\\\":\\\"980f4fa1-0004-42f9-abca-69f1a9c29588\\\",\\\"buyer_id\\\":\\\"2d5c8006…\",\"bag\":\"200 {\\\"checkoutUrl\\\":\\\"https://checkout.stripe.com/c/pay/cs…",
+      "oracles": "{\"res\":\"accepted\",\"bag_cs\":\"cs_test_a1SQaNvFb3NTC0BFHUjxvWTpw1C7BHdS9gP4tdEsXbfjDQfOMqNh8za8ca\",\"hubA_n\":0,\"hubB_n\":0}",
+      "result": "FAIL",
+      "lens": "EN2",
+      "residual": false,
+      "count_finding": false,
+      "classe_nova": true
+    },
+    {
+      "probe_id": "B4",
+      "surfaces": "Hub + CPI + products unlist",
+      "action": "Future.wait CPI ∥ unlist+qty=0 + Hub",
+      "http": "{\"ck\":\"400 {\\\"error\\\":\\\"Checkout blocked: product is not listed.\\\"}\",\"patch\":\"200 [{\\\"id\\\":\\\"be07f630-5690-4aab-9962-503aabf684a5\\\",\\\"created_at\\\":\\\"2026-09-06T18:57:02.319925+00:00\\\",\\\"seller_id\\\":\\\"980f4fa1-0004-42f9-abca-69f1a9c29588\\\",\\\"title\\\":\\\"RTEN-20260906T1950 B4 unlist\\\",\\\"price\\\":13.0,\\\"ref_code\\\":null,\\\"cat…",
+      "oracles": "{\"dual\":false,\"listed\":false,\"qty\":0,\"hub_n\":0,\"cs\":null}",
+      "result": "FAIL",
+      "lens": "EN5",
+      "residual": false,
+      "count_finding": false,
+      "classe_nova": true
+    },
+    {
+      "probe_id": "C1",
+      "surfaces": "Hub + orders + chat + wallet",
+      "action": "saco pago Stripe TEST 4242 → 4 oráculos",
+      "http": "200 {\n  \"ok\": true,\n  \"probe\": \"setup_paid_bag\",\n  \"payment_intent_id\": \"pi_3UClFUH7FWYUN3jh1bU30kdl\",\n  \"pi_amount_cents\": 1115,\n  \"total_cents_quote\": 1115,\n  \"items_cents\": 1000,\n  \"protection_cents\": 115,\n  \"share_a_cent…",
+      "oracles": "{\"both_pago\":true,\"paidA\":335,\"paidB\":780,\"pi_amt\":1115,\"hubA_n\":1,\"hubB_n\":1,\"qtyA\":2,\"qtyB\":2,\"dSeller\":0.0,\"dBuyer\":0.0,\"cardA_ok\":false,\"cardB_ok\":false,\"pi\":\"pi_3UClFUH7FWYUN3jh1bU30kdl\"}",
+      "result": "FAIL",
+      "lens": "EN8",
+      "residual": false,
+      "count_finding": false,
+      "classe_nova": true
+    },
+    {
+      "probe_id": "C2",
+      "surfaces": "offer + CPI + Hub + orders",
+      "action": "oferta 8€ aceite + CPI amount=1 (selo servidor)",
+      "http": "{\"off\":\"201 [{\\\"id\\\":\\\"663921e8-84fa-44eb-b9a0-6cf66509737b\\\",\\\"product_id\\\":\\\"4a8145a1-f7ef-400a-b634-3612ba1c76a7\\\",\\\"chat_id\\\":null,\\\"buyer_id\\\":\\\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\\\",\\\"seller_id\\\":\\\"980f4fa1-0004-42f9-abca-69f1a9c29588\\\",\\\"amoun…\",\"acc\":\"200 [{\\\"id\\\":\\\"663921e8-84fa-44eb-b9a0-6cf66509737b\\\",\\\"pro…",
+      "oracles": "{\"offer_amt\":8.0,\"offer_st\":\"accepted\",\"sealed_cents\":905,\"hub_n\":1,\"order\":\"reserva_pendente\"}",
+      "result": "FAIL",
+      "lens": "EN6",
+      "residual": false,
+      "count_finding": false,
+      "classe_nova": true
+    },
+    {
+      "probe_id": "C3",
+      "surfaces": "wallet + disputa + Hub leftover",
+      "action": "Future.wait release∥disputa em concluido+mão",
+      "http": "{\"plant\":\"200 [{\\\"id\\\":\\\"baf2281f-5d14-4404-bbb4-d0ae11155045\\\",\\\"created_at\\\":\\\"2026-09-06T18:57:10.897949+00:00\\\",\\\"product_id\\\":\\\"1b4e54a9-0497-4ca7-a799-deb3be3d7065\\\",\\\"buyer_id\\\":\\\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\\\",\\\"seller_id\\\":\\\"980f4fa1-00…\",\"rel\":\"200 true\",\"disp\":\"201 [{\\\"id\\\":\\\"fe138547-b428-4ebe-bde8-…",
+      "oracles": "{\"released\":true,\"dWallet\":0.0,\"disp_open\":true,\"disp_st\":\"aberta\",\"status\":\"concluido\",\"hub_n\":1,\"pi\":\"pi_3UClFbH7FWYUN3jh1xnFduH9\"}",
+      "result": "FAIL",
+      "lens": "EN4",
+      "residual": false,
+      "count_finding": false,
+      "classe_nova": true
+    },
+    {
+      "probe_id": "C4",
+      "surfaces": "Hub + orders + CPI leftover",
+      "action": "leftover após pago parcial qty 2→1",
+      "http": "{\"paid\":\"200 {\\n  \\\"ok\\\": true,\\n  \\\"order_id\\\": \\\"78a45330-01ae-4ae2-aea4-8595a7c96675\\\",\\n  \\\"product_id\\\": \\\"899c43a0-2d1c-46f9-a6cb-0c2b2a6e893b\\\",\\n  \\\"payment_intent_id\\\": \\\"pi_3UClFfH7FWYUN3jh1AnArZSG\\\",\\n  \\\"pi_status\\\": \\\"succeeded\\\",\\n  \\\"pi_amount…\",\"cpi\":\"200 {\\\"checkoutUrl\\\":\\\"https://checkout.stripe.com/c…",
+      "oracles": "{\"status\":\"pago\",\"qty\":1,\"hub_n\":1,\"leftover_cs\":\"cs_test_a1484E6wDCIdglFZG2RZmjp7ihb2WqD2ekb7a5jI1da84ulXu9ZDSPaP3z\",\"buyable\":true,\"pi\":\"pi_3UClFfH7FWYUN3jh1AnArZSG\"}",
+      "result": "FAIL",
+      "lens": "EN1",
+      "residual": false,
+      "count_finding": false,
+      "classe_nova": false
+    },
+    {
+      "probe_id": "C5",
+      "surfaces": "orders + CPI denylist",
+      "action": "payment_method bizum (1 linha) → sem cs_",
+      "http": "400 {\"error\":\"Checkout blocked: order is off-platform payment (no Stripe Session).\"}",
+      "oracles": "{\"pm\":\"bizum\",\"sid\":null,\"off_bypass\":false}",
+      "result": "FAIL",
+      "lens": "EN6",
+      "residual": false,
+      "count_finding": false,
+      "classe_nova": true
+    }
+  ],
+  "findings": [
+    {
+      "id": "P1-A3-BAG-SINGLE-HUB",
+      "lens": "EN6",
+      "severity": "P1",
+      "title": "Saco de 3 e pagamento avulso da linha do meio: dois links",
+      "actor": "B3 bag ABC ∥ CPI linha B",
+      "pre": "3 SKUs qty=2 Hub visíveis",
+      "repro": "Future.wait checkoutBag ABC ∥ checkout single B",
+      "expected": "≤1 cs_ útil; Hub coerente",
+      "obtained": {
+        "bag": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1t3Sv4jHvUSYHjdBy5sRp0YWMKgu6rLuAPjiClbqfqCNKVthzS0dRtiGn#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDR…",
+        "single": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a16qvkig1jQwUlGQJ3dAjmUTJLicn9jiWrgbnoxWWoeKbOUvQpjIBzJrKL#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDR…",
+        "bagOr": {
+          "sid": "cs_test_a1t3Sv4jHvUSYHjdBy5sRp0YWMKgu6rLuAPjiClbqfqCNKVthzS0dRtiGn",
+          "http": 0,
+          "status": null,
+          "payment_status": null,
+          "amount_total": null
+        },
+        "singleOr": {
+          "sid": "cs_test_a16qvkig1jQwUlGQJ3dAjmUTJLicn9jiWrgbnoxWWoeKbOUvQpjIBzJrKL",
+          "http": 0,
+          "status": null,
+          "payment_status": null,
+          "amount_total": null
+        },
+        "hub": [
+          1,
+          1,
+          1
+        ],
+        "ledger": [
+          "cs_test_a1t3Sv4jHvUSYHjdBy5sRp0YWMKgu6rLuAPjiClbqfqCNKVthzS0dRtiGn",
+          "cs_test_a1t3Sv4jHvUSYHjdBy5sRp0YWMKgu6rLuAPjiClbqfqCNKVthzS0dRtiGn",
+          "cs_test_a1t3Sv4jHvUSYHjdBy5sRp0YWMKgu6rLuAPjiClbqfqCNKVthzS0dRtiGn"
+        ]
+      },
+      "proven": true,
+      "count_exact_closed": false,
+      "evidence": {}
+    }
+  ],
+  "blocked": [
+    {
+      "id": "A1",
+      "lens": "EN6",
+      "title": "6∥4 fail-closed + leftover Hub coerente",
+      "ev": {
+        "bag6": "400 {\"error\":\"Checkout blocked: overlapping bag session.\"}",
+        "bag4": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1TUcx027qD6MWHi0qDCavXy3DnFEbxA5D0xykKDnfZE7mLOlsEug7R08X#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDR…",
+        "s6": {
+          "sid": null,
+          "status": "n/a"
+        },
+        "s4": {
+          "sid": "cs_test_a1TUcx027qD6MWHi0qDCavXy3DnFEbxA5D0xykKDnfZE7mLOlsEug7R08X",
+          "http": 0,
+          "status": null,
+          "payment_status": null,
+          "amount_total": null
+        },
+        "leftover_hub": 1,
+        "leftover_qty": 1,
+        "hub": [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "paid": "pago"
+      }
+    },
+    {
+      "id": "A2",
+      "lens": "EN6",
+      "title": "expand fail-closed (sem 2.ª Session)",
+      "ev": {
+        "sub": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1EHt2x3gjI04h9vQoQNFUoy8iS5B8T25162Hy7o0lmhE4KQhUQgPQ2zyY#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDR…",
+        "super": "400 {\"error\":\"Checkout blocked: overlapping bag session.\"}",
+        "subOr": {
+          "sid": "cs_test_a1EHt2x3gjI04h9vQoQNFUoy8iS5B8T25162Hy7o0lmhE4KQhUQgPQ2zyY",
+          "http": 0,
+          "status": null,
+          "payment_status": null,
+          "amount_total": null
+        },
+        "superOr": {
+          "sid": null,
+          "status": "n/a"
+        },
+        "hub": [
+          1,
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "id": "A4",
+      "lens": "EN6",
+      "title": "shrink fail-closed + Hub",
+      "ev": {
+        "full": "400 {\"error\":\"Checkout blocked: overlapping bag session.\"}",
+        "small": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1XLf4u51UIbIYO3v0qFSiVCS1gyVCMt8JkcZX00aQ2eHow4WgF5te14VU#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDR…",
+        "fullOr": {
+          "sid": null,
+          "status": "n/a"
+        },
+        "smallOr": {
+          "sid": "cs_test_a1XLf4u51UIbIYO3v0qFSiVCS1gyVCMt8JkcZX00aQ2eHow4WgF5te14VU",
+          "http": 0,
+          "status": null,
+          "payment_status": null,
+          "amount_total": null
+        },
+        "hub": [
+          1,
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "id": "A5",
+      "lens": "EN6",
+      "title": "2× idêntico → 1 cs_ reused + Hub",
+      "ev": {
+        "h1": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1JLIk2WqIQIhQpw6yy1iIBh0faBpMfF3gqDCQ0A8gEceThqfzE3dpZCjQ#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDR…",
+        "h2": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1JLIk2WqIQIhQpw6yy1iIBh0faBpMfF3gqDCQ0A8gEceThqfzE3dpZCjQ#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDR…",
+        "sids": [
+          "cs_test_a1JLIk2WqIQIhQpw6yy1iIBh0faBpMfF3gqDCQ0A8gEceThqfzE3dpZCjQ"
+        ],
+        "reused_ok": true,
+        "hub": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "id": "B1",
+      "lens": "EN5",
+      "title": "2 buyers Hub: ≤1 cs_",
+      "ev": {
+        "hub0": 1,
+        "hub1": 0,
+        "cs_n": 1,
+        "o2": null,
+        "b2": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1PSuzieGrmQg5cn4r9JtmQJcwhwW6pvaIMsYQ9qthPqnCwKrutOddzJOZ#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDR…",
+        "b3": "0 no_o2"
+      }
+    },
+    {
+      "id": "B2",
+      "lens": "EN7",
+      "title": "rifa drawn + Hub + live_item selados",
+      "ev": {
+        "hub_n": 0,
+        "qty": 0,
+        "ins": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"order_hold_exceeds_stock\"}",
+        "winners": 1,
+        "item": "sold",
+        "item_active": false
+      }
+    },
+    {
+      "id": "B3",
+      "lens": "EN2",
+      "title": "rifa+accept A não cega bag B; Hub A/B",
+      "ev": {
+        "accepted": true,
+        "bag_cs": "cs_test_a1SQaNvFb3NTC0BFHUjxvWTpw1C7BHdS9gP4tdEsXbfjDQfOMqNh8za8ca",
+        "hubA": 0,
+        "hubB": 0
+      }
+    },
+    {
+      "id": "B4",
+      "lens": "EN5",
+      "title": "unlist∥CPI sem Session+qty0 simultâneo",
+      "ev": {
+        "ck": "400 {\"error\":\"Checkout blocked: product is not listed.\"}",
+        "patch": "200 [{\"id\":\"be07f630-5690-4aab-9962-503aabf684a5\",\"created_at\":\"2026-09-06T18:57:02.319925+00:00\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"title\":\"RTEN-20260906T1950 B4 unlist\",\"price\":13.0,\"ref_code\":null,\"catego…",
+        "listed": false,
+        "qty": 0,
+        "hub_n": 0
+      }
+    },
+    {
+      "id": "C1",
+      "lens": "EN8",
+      "title": "bag pago único: 4 sítios observados",
+      "ev": {
+        "both_pago": true,
+        "paidA": 335,
+        "paidB": 780,
+        "pi": 1115,
+        "hubA": 1,
+        "hubB": 1,
+        "qtyA": 2,
+        "qtyB": 2,
+        "dSeller": 0.0,
+        "dBuyer": 0.0,
+        "cardA": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_notes_forbidden\"}",
+        "cardB": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_notes_forbidden\"}",
+        "pi_id": "pi_3UClFUH7FWYUN3jh1bU30kdl"
+      }
+    },
+    {
+      "id": "C2",
+      "lens": "EN6",
+      "title": "oferta aceite: selo servidor vs amount=1",
+      "ev": {
+        "offer": 8.0,
+        "status": "accepted",
+        "sealed": 905,
+        "hub_n": 1,
+        "cpi": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1CQlcO2L1oJjPsAxFjOQdCJufbIKeVTUV3uUUR7Ve9on9u1wnGgk6wqOd#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDR…"
+      }
+    },
+    {
+      "id": "C3",
+      "lens": "EN4",
+      "title": "release∥disputa: 1 efeito (anti-atrofia)",
+      "ev": {
+        "rel": "200 true",
+        "disp": "201 [{\"id\":\"fe138547-b428-4ebe-bde8-f003dce76467\",\"order_id\":\"baf2281f-5d14-4404-bbb4-d0ae11155045\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"reason\":\"danificado\",\"description\":\"RTDM disputa composição artigo danifi…",
+        "dWallet": 0.0,
+        "released": true,
+        "disp_open": true,
+        "status": "concluido",
+        "hub_n": 1,
+        "plant": "200 [{\"id\":\"baf2281f-5d14-4404-bbb4-d0ae11155045\",\"created_at\":\"2026-09-06T18:57:10.897949+00:00\",\"product_id\":\"1b4e54a9-0497-4ca7-a799-deb3be3d7065\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-00…"
+      }
+    },
+    {
+      "id": "C4",
+      "lens": "EN1",
+      "title": "leftover qty 2→1 Hub+CPI observados",
+      "ev": {
+        "status": "pago",
+        "qty": 1,
+        "hub_n": 1,
+        "leftover_cs": "cs_test_a1484E6wDCIdglFZG2RZmjp7ihb2WqD2ekb7a5jI1da84ulXu9ZDSPaP3z",
+        "buyable": true,
+        "pi": "pi_3UClFfH7FWYUN3jh1AnArZSG"
+      }
+    },
+    {
+      "id": "C5",
+      "lens": "EN6",
+      "title": "bizum fail-closed; sem cs_ off",
+      "ev": {
+        "hit": "400 {\"error\":\"Checkout blocked: order is off-platform payment (no Stripe Session).\"}",
+        "pm": "bizum",
+        "sid": null
+      }
+    }
+  ],
+  "skipped": [],
+  "notes": [
+    {
+      "id": "fix.s1",
+      "lens": "EN1",
+      "title": "S1 published",
+      "ev": {
+        "id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+        "handle": "fleahub-demo-ux",
+        "hub_published": true,
+        "user_type": "vendedor",
+        "full_name": "Maria Demo FleaHub",
+        "is_live": false
+      }
+    },
+    {
+      "id": "fix.b3",
+      "lens": "EN6",
+      "title": "B3 fresco CPI saco",
+      "ev": "8b2fd649-d025-4d21-b670-80be74dc845c"
+    },
+    {
+      "id": "sk",
+      "lens": "EN8",
+      "title": "stripe test key",
+      "ev": false
+    },
+    {
+      "id": "fixture.paid",
+      "lens": "EN8",
+      "title": "setup_paid_order Stripe TEST",
+      "ev": "200 {\n  \"ok\": true,\n  \"order_id\": \"64373764-6172-4176-8ea0-3298b64a144e\",\n  \"product_id\": \"0a14e6d4-f946-4973-a0df-2462952f4876\",\n  \"payment_intent_id\": \"pi_3UClEBH7FWYUN3jh06gXafRV\",\n  \"pi_status\": \"succeeded\",\n  \"pi_amount…"
+    },
+    {
+      "id": "order.fail",
+      "title": "insertOrder",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"order_hold_exceeds_stock\"}"
+    },
+    {
+      "id": "fixture.bag",
+      "lens": "EN8",
+      "title": "setup_paid_bag Stripe TEST 4242",
+      "ev": "200 {\n  \"ok\": true,\n  \"probe\": \"setup_paid_bag\",\n  \"payment_intent_id\": \"pi_3UClFUH7FWYUN3jh1bU30kdl\",\n  \"pi_amount_cents\": 1115,\n  \"total_cents_quote\": 1115,\n  \"items_cents\": 1000,\n  \"protection_cents\": 115,\n  \"share_a_cent…"
+    },
+    {
+      "id": "fixture.paid",
+      "lens": "EN4",
+      "title": "setup_paid_order Stripe TEST",
+      "ev": "200 {\n  \"ok\": true,\n  \"order_id\": \"baf2281f-5d14-4404-bbb4-d0ae11155045\",\n  \"product_id\": \"1b4e54a9-0497-4ca7-a799-deb3be3d7065\",\n  \"payment_intent_id\": \"pi_3UClFbH7FWYUN3jh1xnFduH9\",\n  \"pi_status\": \"succeeded\",\n  \"pi_amount…"
+    },
+    {
+      "id": "fixture.paid",
+      "lens": "EN8",
+      "title": "setup_paid_order Stripe TEST",
+      "ev": "200 {\n  \"ok\": true,\n  \"order_id\": \"78a45330-01ae-4ae2-aea4-8595a7c96675\",\n  \"product_id\": \"899c43a0-2d1c-46f9-a6cb-0c2b2a6e893b\",\n  \"payment_intent_id\": \"pi_3UClFfH7FWYUN3jh1AnArZSG\",\n  \"pi_status\": \"succeeded\",\n  \"pi_amount…"
+    }
+  ],
+  "lenses": [
+    "EN1",
+    "EN2",
+    "EN4",
+    "EN5",
+    "EN6",
+    "EN7",
+    "EN8"
+  ],
+  "classe_nova": [
+    "A1",
+    "A2",
+    "A3",
+    "A4",
+    "A5",
+    "B2",
+    "B3",
+    "B4",
+    "C1",
+    "C2",
+    "C3",
+    "C5"
+  ],
+  "actors": {
+    "b1": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+    "s1": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+    "b2": "2d5c8006-d3e8-4db9-8fc9-12be1d0d8e28",
+    "s2": "c70dd242-f0cc-454e-8819-2a0b49aa1e6a",
+    "b3": "8b2fd649-d025-4d21-b670-80be74dc845c"
+  },
+  "created": {
+    "products": [
+      "0a14e6d4-f946-4973-a0df-2462952f4876",
+      "7dce4eea-ca8a-473d-b2a8-7bf7088654c1",
+      "758794de-d84a-4496-aabf-3e80ede855c5",
+      "41d5d7e8-28a1-462b-b172-706c8cd63325",
+      "ea4399e4-01d6-4c82-9340-b7cc1f3e6ac1",
+      "c391d404-5e9d-4bb3-bb08-4acc4b611013",
+      "09ccc957-cc69-4f1f-9e18-35ffbcb06b36",
+      "492000cd-58bf-487f-87e3-20fdf52138c8",
+      "adf60c79-4f93-43ff-86f1-d22466b68bd3",
+      "dcd630f8-a89c-4d05-9364-9afd51865f0d",
+      "e9e1c749-9d13-4db2-b9cb-40281e12e5a7",
+      "0bfa7b7f-7081-4c7f-9ef0-c7b0a28f3a4a",
+      "c9f6029c-f2ed-48b0-87f2-1ba3067f6bd8",
+      "ff4d4d96-c368-45f8-85f1-9a542c2a6374",
+      "7bba1627-93fe-4948-9afd-fae0c899e9b8",
+      "93d708ff-9295-445c-9eb4-1fd8b084e4d6",
+      "91114bbc-2325-42b3-b909-459bb06bdd6b",
+      "a92c73e1-5303-4683-9228-e2ff7aef0e26",
+      "ed67046b-a5bf-4fcb-8fc2-2b331bdb0bd2",
+      "99e19785-d9ed-45a2-abc8-d75c1ad0d52f",
+      "9ddfe9ae-6d8c-42ac-abfd-0b5df789e6d0",
+      "055ebd5b-a425-4b54-a804-e65d9c0c90d2",
+      "9213074e-a222-40fe-9b92-63dde13efad8",
+      "e6e40533-1e0e-4ec6-930b-725b54243368",
+      "96f1599f-543d-44f0-9f09-f718b0010087",
+      "be07f630-5690-4aab-9962-503aabf684a5",
+      "1c6f5062-5f4c-4112-b851-598793a2132e",
+      "d48ad5bf-a1d2-4682-84a7-a4983971bcc3",
+      "4a8145a1-f7ef-400a-b634-3612ba1c76a7",
+      "1b4e54a9-0497-4ca7-a799-deb3be3d7065",
+      "899c43a0-2d1c-46f9-a6cb-0c2b2a6e893b",
+      "f7274816-633d-4518-b99c-6543b4afa5d6"
+    ],
+    "orders": [
+      "64373764-6172-4176-8ea0-3298b64a144e",
+      "18ad5f43-7fd5-4d39-a6f2-eb4069ae2c92",
+      "c37aa64e-6bbe-4bb8-936b-ffbc28dad5c8",
+      "4ac6a30c-adbd-46cf-b843-9c0b9e381f67",
+      "367a07e2-afab-4672-9d4b-266ed23b1c1d",
+      "dace6b79-0aa3-4e02-9877-6bebc81bc1ac",
+      "7058ca0f-f1ff-4bd0-b910-6a32b19326ac",
+      "74f70b18-61bc-4da2-910d-53555717be7a",
+      "e1960650-57da-4b7a-9072-8d609901fa9e",
+      "784e37ea-ac47-4381-ac0a-14ab50499bf1",
+      "5fe37ba5-2067-40c8-81a0-cf87f0c626a8",
+      "456d0466-db04-4d1b-af70-b5970f265b87",
+      "9da9b1a2-d8a6-4dd2-a85e-6d25b5ed88ba",
+      "2fef263e-626a-4056-8da6-c2251030a26b",
+      "5f697d9f-ed0a-4cb8-81e6-1c0bb75f74eb",
+      "068d8cdb-4b97-4fed-b664-a9ace828a156",
+      "f1cf43f8-ba5b-46a1-bb9d-78374771ed35",
+      "0492e273-860b-4b5c-a69b-02f5d7f0630b",
+      "3080c52e-af08-460a-a921-ae46e448a7cf",
+      "ef5d53ba-de18-4207-a403-c4b5ba2be1cf",
+      "c8fa1b64-8a71-4d85-99e7-9f424f44874b",
+      "73745b9a-dbc8-490d-ab63-4134285b4bca",
+      "57aa49e9-8316-41a2-8caf-2fb45df7c764",
+      "5dfddf70-391f-48b2-b6e6-70c2736f8e95",
+      "0308c1fd-7693-4784-a5b5-1a9635847d55",
+      "ef4d29f9-645d-4902-abd7-2adfc56f8dee",
+      "0a4ede03-84f4-4dad-8451-901084faf730",
+      "baf2281f-5d14-4404-bbb4-d0ae11155045",
+      "78a45330-01ae-4ae2-aea4-8595a7c96675",
+      "be693097-b043-4d21-9d4a-80cc7ef04ef9",
+      "5f9e2123-5e53-467f-a10a-7541f49b508a"
+    ],
+    "lives": [
+      "ad5e768e-8180-4117-9ec0-b434a10b7303",
+      "0d4eff8d-ec1c-4dcf-8caa-ac5ff1a78cb8"
+    ],
+    "items": [
+      "e35a2d50-ebb2-4d7c-83e3-7d4cf4968e72",
+      "5dfb2321-34f3-4294-a396-6e009bf59214"
+    ],
+    "res": [
+      "e8050d03-8305-459d-94b5-9b2f6499bb01"
+    ],
+    "offers": [
+      "663921e8-84fa-44eb-b9a0-6cf66509737b"
+    ],
+    "raffles": [
+      "e0f1deff-8793-4d2c-8224-05eff642c486",
+      "fa0c6345-a783-44d7-87d2-3d0b1df7f4df"
+    ],
+    "disputes": [
+      "fe138547-b428-4ebe-bde8-f003dce76467"
+    ],
+    "sessions": [
+      "cs_test_a1TUcx027qD6MWHi0qDCavXy3DnFEbxA5D0xykKDnfZE7mLOlsEug7R08X",
+      "cs_test_a1EHt2x3gjI04h9vQoQNFUoy8iS5B8T25162Hy7o0lmhE4KQhUQgPQ2zyY",
+      "cs_test_a1t3Sv4jHvUSYHjdBy5sRp0YWMKgu6rLuAPjiClbqfqCNKVthzS0dRtiGn",
+      "cs_test_a16qvkig1jQwUlGQJ3dAjmUTJLicn9jiWrgbnoxWWoeKbOUvQpjIBzJrKL",
+      "cs_test_a1XLf4u51UIbIYO3v0qFSiVCS1gyVCMt8JkcZX00aQ2eHow4WgF5te14VU",
+      "cs_test_a1JLIk2WqIQIhQpw6yy1iIBh0faBpMfF3gqDCQ0A8gEceThqfzE3dpZCjQ",
+      "cs_test_a1JLIk2WqIQIhQpw6yy1iIBh0faBpMfF3gqDCQ0A8gEceThqfzE3dpZCjQ",
+      "cs_test_a1PSuzieGrmQg5cn4r9JtmQJcwhwW6pvaIMsYQ9qthPqnCwKrutOddzJOZ",
+      "cs_test_a1SQaNvFb3NTC0BFHUjxvWTpw1C7BHdS9gP4tdEsXbfjDQfOMqNh8za8ca",
+      "cs_test_a1CQlcO2L1oJjPsAxFjOQdCJufbIKeVTUV3uUUR7Ve9on9u1wnGgk6wqOd",
+      "cs_test_a1484E6wDCIdglFZG2RZmjp7ihb2WqD2ekb7a5jI1da84ulXu9ZDSPaP3z"
+    ]
+  }
+}

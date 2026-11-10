@@ -1,0 +1,72 @@
+{
+  "lenses": [
+    "CM3"
+  ],
+  "probes": [
+    {
+      "probe_id": "B1",
+      "poco": "CM-B",
+      "payload": "tip Session S2 published → unpublish → GET return (sem sk_test)",
+      "http": "{\"create\":\"400 acao=* 840ms {\\\"error\\\":\\\"Tips only allowed for published hub sellers.\\\"}\",\"getUnpaid\":null,\"pay\":null,\"getAfterPay\":null}",
+      "bd": "{\"tipStatus\":\"\",\"credited\":false,\"paidStripe\":false,\"hub_after\":false}",
+      "result": "SKIP",
+      "lens": "CM3",
+      "residual": false,
+      "count_finding": false
+    },
+    {
+      "probe_id": "B2",
+      "poco": "CM-B",
+      "payload": "tip bind live published → end+unpublish → GET settle unpaid",
+      "http": "{\"create\":\"400 acao=* 660ms {\\\"error\\\":\\\"Tips only allowed for published hub sellers.\\\"}\",\"get\":null}",
+      "bd": "{\"status\":\"\",\"live\":\"aed5feae-5f4f-4a2a-b143-0b0698b78777\"}",
+      "result": "SKIP",
+      "lens": "CM3",
+      "residual": false,
+      "count_finding": false
+    },
+    {
+      "probe_id": "B3",
+      "poco": "CM-B",
+      "payload": "amount 0/0.01/-1/0.5/501 + tip_id cliente + seller≠owner",
+      "http": "{\"amounts\":{\"0\":\"400 acao=* 463ms {\\\"error\\\":\\\"Invalid tip amount.\\\"}\",\"0.01\":\"400 acao=* 472ms {\\\"error\\\":\\\"Invalid tip amount.\\\"}\",\"-1\":\"400 acao=* 446ms {\\\"error\\\":\\\"Invalid tip amount.\\\"}\",\"0.5\":\"400 acao=* 470ms {\\\"error\\\":\\\"Invalid tip amount.\\\"}\",\"501\":\"400 acao=* 658ms {\\…",
+      "bd": "",
+      "result": "HOLD",
+      "lens": "CM3",
+      "residual": false,
+      "count_finding": false
+    },
+    {
+      "probe_id": "B4",
+      "poco": "CM-B",
+      "payload": "GET settle unpaid B2/anon/replay + RPC settle JWT",
+      "http": "{\"create\":\"200 acao=* 1383ms {\\\"checkoutUrl\\\":\\\"https://checkout.stripe.com/c/pay/cs_test_a1ClfoJW8eotkHo0zvgE5cgn7ey325e407kX2qM7W5i2G1Q3DFGQpU1zbY#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDR…\",\"b2\":\"200 acao=* 734ms Pa…",
+      "bd": "{\"status\":\"pending\",\"delta\":0.0}",
+      "result": "HOLD",
+      "lens": "CM3",
+      "residual": false,
+      "count_finding": false
+    }
+  ],
+  "findings": [],
+  "blocked": [],
+  "notes": [
+    {
+      "id": "b1.create",
+      "lens": "CM3",
+      "title": "tip session while S2 published",
+      "ev": "400 acao=* 840ms {\"error\":\"Tips only allowed for published hub sellers.\"}"
+    }
+  ],
+  "skipped": [
+    {
+      "id": "B1",
+      "lens": "CM3",
+      "title": "não criou Session com S2 published",
+      "ev": "400 acao=* 840ms {\"error\":\"Tips only allowed for published hub sellers.\"}"
+    }
+  ],
+  "tipIdB1": null,
+  "sessionIdB1": null,
+  "stripeKeyPresent": false
+}

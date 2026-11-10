@@ -1,0 +1,90 @@
+{
+  "auditor": "REDTEAM_BLIND_X_LIVE_MANUAL_STAFF_v1",
+  "pass": 3,
+  "production_touched": false,
+  "fase4": false,
+  "lenses": [
+    "X2",
+    "X6"
+  ],
+  "findings": [
+    {
+      "id": "RTX-X2-helper-inflate-qty",
+      "lens": "X2",
+      "severity": "P1",
+      "title": "helper inflaciona quantity do live_item",
+      "actor": "helper JWT",
+      "pre": "can_manage_reservations; item qty=2",
+      "repro": "PATCH live_items.quantity=40 JWT helper",
+      "expected": "RLS recusa (só dono da live)",
+      "obtained": {
+        "id": "c008e232-dd4d-40fb-b433-689ef5f9f8a1",
+        "live_id": "f643dd7e-c3e8-408f-bb1b-21a747a616ab",
+        "product_id": null,
+        "item_kind": "live_only",
+        "quantity": 40,
+        "status": "available",
+        "price": 9.0,
+        "ref_code": "XH3"
+      },
+      "proven": true,
+      "evidence": {}
+    }
+  ],
+  "blocked": [
+    {
+      "id": "RTX-X2-helper-mark-sold-without-perm",
+      "lens": "X2",
+      "title": "helper mark_sold recusado",
+      "ev": "200 {\"ok\": false, \"error\": \"not_allowed\"}"
+    },
+    {
+      "id": "RTX-X6-s2-share-foreign-raffle",
+      "lens": "X6",
+      "title": "share foreign recusado ou não aplica",
+      "ev": "200 {\"ok\": false, \"error\": \"join_required\"}"
+    }
+  ],
+  "skipped": [],
+  "notes": [
+    {
+      "id": "p3.helper.patch-qty",
+      "lens": "X2",
+      "title": "helper PATCH live_items.quantity",
+      "ev": {
+        "patch": "200 [{\"id\":\"c008e232-dd4d-40fb-b433-689ef5f9f8a1\",\"live_id\":\"f643dd7e-c3e8-408f-bb1b-21a747a616ab\",\"seller_id\":null,\"ref_code\":\"XH3\",\"title\":\"RTX-20260901T1301 live_only\",\"description\":null,\"price\":9.0,\"image_url\":null,\"size\":null,\"color\":null,…",
+        "qty": 40
+      }
+    },
+    {
+      "id": "p3.helper.mark-sold",
+      "lens": "X2",
+      "title": "helper mark_sold sem can_mark_items_sold",
+      "ev": {
+        "rpc": "200 {\"ok\": false, \"error\": \"not_allowed\"}",
+        "item": {
+          "id": "c008e232-dd4d-40fb-b433-689ef5f9f8a1",
+          "live_id": "f643dd7e-c3e8-408f-bb1b-21a747a616ab",
+          "product_id": null,
+          "item_kind": "live_only",
+          "quantity": 40,
+          "status": "available",
+          "price": 9.0,
+          "ref_code": "XH3"
+        }
+      }
+    },
+    {
+      "id": "p3.raffle",
+      "lens": "X6",
+      "title": "create",
+      "ev": "200 {\"ok\": true, \"status\": \"active\", \"raffle_id\": \"46ddfd86-21f0-4905-a117-3cf848ad6d0a\"}"
+    },
+    {
+      "id": "p3.share.s2",
+      "lens": "X6",
+      "title": "seller2 claim share rifa alheia",
+      "ev": "200 {\"ok\": false, \"error\": \"join_required\"}"
+    }
+  ]
+}

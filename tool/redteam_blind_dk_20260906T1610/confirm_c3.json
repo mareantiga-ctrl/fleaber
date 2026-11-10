@@ -1,0 +1,84 @@
+{
+  "stamp": "20260906T1610",
+  "prefix": "RTDK-20260906T1610",
+  "lenses": [
+    "DK3",
+    "DK5"
+  ],
+  "wells": [],
+  "findings": [],
+  "blocked": [
+    {
+      "id": "DK-C3.refund_stock_x2",
+      "lens": "DK5",
+      "title": "refund stock +1 não ×2",
+      "ev": {
+        "qty": "0→1→1",
+        "restoredOnce": true,
+        "rf1": "200 {\"ok\":true,\"already_refunded\":true,\"idempotent\":true,\"refund_id\":\"re_3UChpiH7FWYUN3jh1tJd6Ua6\",\"status\":\"cancelado\",\"stock_units_applied\":null,\"amount_cents\":590,\"payment_intent\":\"pi_3UChpiH7FWYUN3jh13k9uciI\",\"status_stripe\":\"succeeded\"}",
+        "rf2": "200 {\"ok\":true,\"already_refunded\":true,\"idempotent\":true,\"refund_id\":\"re_3UChpiH7FWYUN3jh1tJd6Ua6\",\"status\":\"cancelado\",\"stock_units_applied\":null,\"amount_cents\":590,\"payment_intent\":\"pi_3UChpiH7FWYUN3jh13k9uciI\"}",
+        "refund_id": "re_3UChpiH7FWYUN3jh1tJd6Ua6",
+        "dS1": 0.0,
+        "dS2": 0.0,
+        "dB1": 0.0
+      }
+    },
+    {
+      "id": "DK-B1d.patch_wallet_release_flag",
+      "lens": "DK3",
+      "title": "wallet release flag immutable",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"order_wallet_release_flag_immutable\"}"
+    }
+  ],
+  "skipped": [],
+  "probes": [
+    {
+      "id": "DK-C3.refund_stock_x2",
+      "matrix": "DK-C",
+      "payload": "refund-order ×2 em pago (não enviado)",
+      "http": "200 {\"ok\":true,\"already_refunded\":true,\"idempotent\":true,\"refund_id\":\"re_3UChpiH7FWYUN3jh1tJd6Ua6\",\"status\":\"cancelado\",\"stock_units_applied\":null,\"amount_cents\":590,\"payment_intent\":\"pi_3UChpiH7FWYUN3jh13k9uciI\",\"status_stripe\":\"succeeded\"} || 200 {\"ok\":true,\"already_refunded\":true,\"idempotent\":true,\"refund_id\":\"re_3UChpiH7FWYUN3jh1tJd6Ua6\",\"status\":\"cancelado\",\"stock_units_applied\":null,\"amount_cents\":590,\"payment_intent\":\"pi_3UChpiH7FWYUN3jh13k9uciI\"}",
+      "bd": "qty 0→1→1 st pago→cancelado→cancelado refund_id=re_3UChpiH7FWYUN3jh1tJd6Ua6 Δs1=0.0 Δs2=0.0 Δb1=0.0",
+      "result": "FAIL"
+    },
+    {
+      "id": "DK-B1d.patch_wallet_release_flag",
+      "matrix": "DK-B",
+      "payload": "B1 PATCH wallet_release_processed_at",
+      "http": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"order_wallet_release_flag_immutable\"}",
+      "bd": "flag=null",
+      "result": "FAIL"
+    }
+  ],
+  "notes": [
+    {
+      "id": "fixture.paid",
+      "lens": "DK5",
+      "title": "setup_paid_order Stripe TEST",
+      "ev": "200 {\n  \"ok\": true,\n  \"order_id\": \"00da6765-f8f7-4e81-9988-7652b3e260c2\",\n  \"product_id\": \"075580ab-5587-459b-80af-e8766adb4ee5\",\n  \"payment_intent_id\": \"pi_3UChpiH7FWYUN3jh13k9uciI\",\n  \"pi_status\": \"succeeded\",\n  \"pi_amount_received\": 590,\n  \"…"
+    },
+    {
+      "id": "fixture.paid",
+      "lens": "DK3",
+      "title": "setup_paid_order Stripe TEST",
+      "ev": "200 {\n  \"ok\": true,\n  \"order_id\": \"75967cae-dc95-4f5d-b5ea-23f880dda022\",\n  \"product_id\": \"d7f53315-5b86-4c6e-b0fa-34dd32a2c8f7\",\n  \"payment_intent_id\": \"pi_3UChprH7FWYUN3jh1kU0S1Pa\",\n  \"pi_status\": \"succeeded\",\n  \"pi_amount_received\": 590,\n  \"…"
+    }
+  ],
+  "actors": {
+    "buyer": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+    "seller": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+    "buyer2": null,
+    "seller2": null
+  },
+  "created": {
+    "orders": [
+      "00da6765-f8f7-4e81-9988-7652b3e260c2",
+      "75967cae-dc95-4f5d-b5ea-23f880dda022"
+    ],
+    "products": [
+      "075580ab-5587-459b-80af-e8766adb4ee5",
+      "d7f53315-5b86-4c6e-b0fa-34dd32a2c8f7"
+    ],
+    "disputes": [],
+    "chats": []
+  }
+}

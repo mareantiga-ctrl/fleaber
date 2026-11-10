@@ -1,0 +1,529 @@
+{
+  "prefix": "RTY-20260901T1715",
+  "findings": [
+    {
+      "id": "RTY-Y1-010-aguarda_confirmacao",
+      "lens": "Y1",
+      "severity": "P1",
+      "title": "Hop pago→aguarda_confirmacao depois refund Stripe (sem shipped_at)",
+      "actor": "seller JWT",
+      "pre": "Stripe TEST pago",
+      "repro": "PATCH status=aguarda_confirmacao → POST refund-order",
+      "expected": "refund só em pago pré-envio, ou bloqueio do hop",
+      "obtained": {
+        "patch": "200 [{\"id\":\"d3ee9f82-acb4-48ad-9b7c-7e6cedae8a62\",\"created_at\":\"2026-09-01T16:26:59.903478+00:00\",\"product_id\":\"df97fd2a-6933-44d8-ac54-f279975bb737\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-00…",
+        "refund": "200 {\"ok\":true,\"already_refunded\":true,\"idempotent\":true,\"refund_id\":\"re_3UAuWWH7FWYUN3jh0VnaK7ZA\",\"status\":\"cancelado\",\"stock_units_applied\":null,\"amount_cents\":590,\"payment_intent\":\"pi_3UAuWWH7FWYUN3jh0tjtKWV0\",\"status_str…",
+        "after": {
+          "id": "d3ee9f82-acb4-48ad-9b7c-7e6cedae8a62",
+          "status": "cancelado",
+          "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+          "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+          "product_id": "df97fd2a-6933-44d8-ac54-f279975bb737",
+          "quantity": 1,
+          "price_total": 5.9,
+          "amount_paid_cents": 590,
+          "payment_method": "pagamento na app",
+          "shipping_method": "mao",
+          "stripe_payment_intent_id": "pi_3UAuWWH7FWYUN3jh0tjtKWV0",
+          "stripe_checkout_session_id": null,
+          "stripe_refund_id": "re_3UAuWWH7FWYUN3jh0VnaK7ZA",
+          "wallet_release_processed_at": "2026-09-01T16:27:04.87623+00:00",
+          "wallet_refund_processed_at": "2026-09-01T16:27:04.87623+00:00",
+          "stock_units_applied": null,
+          "shipped_at": null,
+          "bundle_id": null,
+          "contract_unit_cents": 590,
+          "contract_qty": 1,
+          "product_offer_id": null
+        }
+      },
+      "impact": "Estado fora de enviado mas refund ainda possível — se o hop for pós-envio conceptual, fura o selo",
+      "evidence": {}
+    },
+    {
+      "id": "RTY-Y1-010-reservado",
+      "lens": "Y1",
+      "severity": "P1",
+      "title": "Hop pago→reservado depois refund Stripe (sem shipped_at)",
+      "actor": "seller JWT",
+      "pre": "Stripe TEST pago",
+      "repro": "PATCH status=reservado → POST refund-order",
+      "expected": "refund só em pago pré-envio, ou bloqueio do hop",
+      "obtained": {
+        "patch": "200 [{\"id\":\"0b625fcb-8227-4d83-abda-cc369c129d2b\",\"created_at\":\"2026-09-01T16:27:05.49196+00:00\",\"product_id\":\"cae45988-d92a-4dc0-8632-0d48779aeed6\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-000…",
+        "refund": "200 {\"ok\":true,\"already_refunded\":true,\"idempotent\":true,\"refund_id\":\"re_3UAuWbH7FWYUN3jh1jP6Wm44\",\"status\":\"cancelado\",\"stock_units_applied\":null,\"amount_cents\":590,\"payment_intent\":\"pi_3UAuWbH7FWYUN3jh1TVO4Nw9\",\"status_str…",
+        "after": {
+          "id": "0b625fcb-8227-4d83-abda-cc369c129d2b",
+          "status": "cancelado",
+          "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+          "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+          "product_id": "cae45988-d92a-4dc0-8632-0d48779aeed6",
+          "quantity": 1,
+          "price_total": 5.9,
+          "amount_paid_cents": 590,
+          "payment_method": "pagamento na app",
+          "shipping_method": "mao",
+          "stripe_payment_intent_id": "pi_3UAuWbH7FWYUN3jh1TVO4Nw9",
+          "stripe_checkout_session_id": null,
+          "stripe_refund_id": "re_3UAuWbH7FWYUN3jh1jP6Wm44",
+          "wallet_release_processed_at": "2026-09-01T16:27:11.054879+00:00",
+          "wallet_refund_processed_at": "2026-09-01T16:27:11.054879+00:00",
+          "stock_units_applied": null,
+          "shipped_at": null,
+          "bundle_id": null,
+          "contract_unit_cents": 590,
+          "contract_qty": 1,
+          "product_offer_id": null
+        }
+      },
+      "impact": "Estado fora de enviado mas refund ainda possível — se o hop for pós-envio conceptual, fura o selo",
+      "evidence": {}
+    },
+    {
+      "id": "RTY-Y1-010-pendente",
+      "lens": "Y1",
+      "severity": "P1",
+      "title": "Hop pago→pendente depois refund Stripe (sem shipped_at)",
+      "actor": "seller JWT",
+      "pre": "Stripe TEST pago",
+      "repro": "PATCH status=pendente → POST refund-order",
+      "expected": "refund só em pago pré-envio, ou bloqueio do hop",
+      "obtained": {
+        "patch": "200 [{\"id\":\"4187c72e-3954-412a-a4cb-18be4822d54e\",\"created_at\":\"2026-09-01T16:27:11.754426+00:00\",\"product_id\":\"c2c6b7d7-7be9-4566-ad00-cacf4442fdbb\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-00…",
+        "refund": "200 {\"ok\":true,\"already_refunded\":true,\"idempotent\":true,\"refund_id\":\"re_3UAuWiH7FWYUN3jh0qX777yX\",\"status\":\"cancelado\",\"stock_units_applied\":null,\"amount_cents\":590,\"payment_intent\":\"pi_3UAuWiH7FWYUN3jh0fGnUZsu\",\"status_str…",
+        "after": {
+          "id": "4187c72e-3954-412a-a4cb-18be4822d54e",
+          "status": "cancelado",
+          "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+          "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+          "product_id": "c2c6b7d7-7be9-4566-ad00-cacf4442fdbb",
+          "quantity": 1,
+          "price_total": 5.9,
+          "amount_paid_cents": 590,
+          "payment_method": "pagamento na app",
+          "shipping_method": "mao",
+          "stripe_payment_intent_id": "pi_3UAuWiH7FWYUN3jh0fGnUZsu",
+          "stripe_checkout_session_id": null,
+          "stripe_refund_id": "re_3UAuWiH7FWYUN3jh0qX777yX",
+          "wallet_release_processed_at": "2026-09-01T16:27:16.596559+00:00",
+          "wallet_refund_processed_at": "2026-09-01T16:27:16.596559+00:00",
+          "stock_units_applied": null,
+          "shipped_at": null,
+          "bundle_id": null,
+          "contract_unit_cents": 590,
+          "contract_qty": 1,
+          "product_offer_id": null
+        }
+      },
+      "impact": "Estado fora de enviado mas refund ainda possível — se o hop for pós-envio conceptual, fura o selo",
+      "evidence": {}
+    },
+    {
+      "id": "RTY-Y1-010-reserva_pendente",
+      "lens": "Y1",
+      "severity": "P1",
+      "title": "Hop pago→reserva_pendente depois refund Stripe (sem shipped_at)",
+      "actor": "seller JWT",
+      "pre": "Stripe TEST pago",
+      "repro": "PATCH status=reserva_pendente → POST refund-order",
+      "expected": "refund só em pago pré-envio, ou bloqueio do hop",
+      "obtained": {
+        "patch": "200 [{\"id\":\"981f3f8a-d6c6-47dd-9fa2-a34904e76eb4\",\"created_at\":\"2026-09-01T16:27:17.278804+00:00\",\"product_id\":\"05c139b7-13f7-4b5f-a776-167d9e0b651a\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-00…",
+        "refund": "200 {\"ok\":true,\"already_refunded\":true,\"idempotent\":true,\"refund_id\":\"re_3UAuWnH7FWYUN3jh1JWQNQjx\",\"status\":\"cancelado\",\"stock_units_applied\":null,\"amount_cents\":590,\"payment_intent\":\"pi_3UAuWnH7FWYUN3jh1nexJKte\",\"status_str…",
+        "after": {
+          "id": "981f3f8a-d6c6-47dd-9fa2-a34904e76eb4",
+          "status": "cancelado",
+          "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+          "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+          "product_id": "05c139b7-13f7-4b5f-a776-167d9e0b651a",
+          "quantity": 1,
+          "price_total": 5.9,
+          "amount_paid_cents": 590,
+          "payment_method": "pagamento na app",
+          "shipping_method": "mao",
+          "stripe_payment_intent_id": "pi_3UAuWnH7FWYUN3jh1nexJKte",
+          "stripe_checkout_session_id": null,
+          "stripe_refund_id": "re_3UAuWnH7FWYUN3jh1JWQNQjx",
+          "wallet_release_processed_at": "2026-09-01T16:27:22.315964+00:00",
+          "wallet_refund_processed_at": "2026-09-01T16:27:22.315964+00:00",
+          "stock_units_applied": null,
+          "shipped_at": null,
+          "bundle_id": null,
+          "contract_unit_cents": 590,
+          "contract_qty": 1,
+          "product_offer_id": null
+        }
+      },
+      "impact": "Estado fora de enviado mas refund ainda possível — se o hop for pós-envio conceptual, fura o selo",
+      "evidence": {}
+    },
+    {
+      "id": "RTY-Y2-001",
+      "lens": "Y2",
+      "severity": "P0",
+      "title": "Conjunto aceite: total_eur ignora quantity extra",
+      "actor": "buyer JWT",
+      "pre": "bundle A+B total=20.0; orders 3+1",
+      "repro": "bag create-payment-intent",
+      "expected": "cobrar 3A+1B ou recusar qty≠1",
+      "obtained": {
+        "cents": 2165,
+        "bundle_total": 20.0,
+        "quote": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1VvJ1yaK9VNvtXUGWhMdwlKoukZRODbvQe0Egqzo6PJ13gn3Stzp0bVSd#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDR…"
+      },
+      "impact": "Pagar ~2 unidades, hold/settle 4",
+      "evidence": {}
+    },
+    {
+      "id": "RTY-Y2-002",
+      "lens": "Y2",
+      "severity": "P1",
+      "title": "B1 anexa bundle aceite de B2 e checkout usa total_eur alheio",
+      "actor": "buyer JWT",
+      "pre": "bundle B2 aceite 50%",
+      "repro": "PATCH orders.bundle_id=bundle_B2 → bag checkout",
+      "expected": "bundle.buyer_id tem de coincidir com order.buyer_id",
+      "obtained": {
+        "cents": 2690,
+        "bundle": "8aeb4499-e1b3-4931-bb73-fb964e287957",
+        "quote": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1kaIeKDqUomFbxlnlqzJL4Lbal0FlMCvHarJ8nnDkpNc0cjWer5O4RKsj#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDR…"
+      },
+      "evidence": {}
+    },
+    {
+      "id": "RTY-Y3-001",
+      "lens": "Y3",
+      "severity": "P1",
+      "title": "Reuse Session barata quando o saco já é A+B",
+      "actor": "buyer JWT",
+      "pre": "cs_ da order 8€ ainda open",
+      "repro": "checkout A; bag A+B",
+      "expected": "nova Session com total A+B",
+      "obtained": {
+        "sid1": "cs_test_a1EkbNvY8DCT8dfX0Ap0A8qyltwwt7FOPY3RRDlbqDgltInYbrpoRS6Ktg",
+        "sid2": "cs_test_a1EkbNvY8DCT8dfX0Ap0A8qyltwwt7FOPY3RRDlbqDgltInYbrpoRS6Ktg",
+        "amt1": 905,
+        "server_amount_cents": 5105,
+        "amount_total": 905
+      },
+      "evidence": {}
+    },
+    {
+      "id": "RTY-Y5-002",
+      "lens": "Y5",
+      "severity": "P1",
+      "title": "refund-order com disputa aberta",
+      "actor": "seller JWT",
+      "pre": "pago + disputa",
+      "repro": "POST refund-order",
+      "expected": "403 open_dispute",
+      "obtained": "200 {\"ok\":true,\"already_refunded\":true,\"idempotent\":true,\"refund_id\":\"re_3UAuXAH7FWYUN3jh12wR1T03\",\"status\":\"cancelado\",\"stock_units_applied\":null,\"amount_cents\":590,\"payment_intent\":\"pi_3UAuXAH7FWYUN3jh1pH3p1O5\",\"status_str…",
+      "evidence": {}
+    }
+  ],
+  "closed": [
+    {
+      "id": "Y1.allow.premio_rifa",
+      "lens": "Y1",
+      "title": "não persistiu",
+      "ev": "200 [{\"id\":\"46d9defa-dd7a-456a-a56f-92f5874ed002\",\"created_at\":\"2026-09-01T16:26:56.851512+00:00\",\"product_id\":\"f3f4712b-6dee-492a-aa52-ed2e4e18f7e9\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-00…"
+    },
+    {
+      "id": "Y6.toctou",
+      "lens": "Y6",
+      "title": "não ficou shipped+refund",
+      "ev": {
+        "id": "a7d4a729-03e7-4b5d-9491-9e4ddd72bca5",
+        "status": "enviado",
+        "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+        "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+        "product_id": "e7a34c9e-a433-4b2a-b534-acb804fe9af0",
+        "quantity": 1,
+        "price_total": 5.9,
+        "amount_paid_cents": 590,
+        "payment_method": "pagamento na app",
+        "shipping_method": "mao",
+        "stripe_payment_intent_id": "pi_3UAuWtH7FWYUN3jh1YYq2b4s",
+        "stripe_checkout_session_id": null,
+        "stripe_refund_id": null,
+        "wallet_release_processed_at": null,
+        "wallet_refund_processed_at": null,
+        "stock_units_applied": 1,
+        "shipped_at": "2026-09-01T16:27:25.698632+00:00",
+        "bundle_id": null,
+        "contract_unit_cents": 590,
+        "contract_qty": 1,
+        "product_offer_id": null
+      }
+    },
+    {
+      "id": "Y2.two_bundles",
+      "lens": "Y2",
+      "title": "recusou 2 bundle_id",
+      "ev": "400 {\"error\":\"Checkout blocked: bag cannot mix multiple bundle contracts.\"}"
+    },
+    {
+      "id": "Y3.race3",
+      "lens": "Y3",
+      "title": "1 session",
+      "ev": [
+        "cs_test_a1iM6FxHY3m4oqLsUHVXWxqoBYesDwm7fBLRzZOlwxxU2KQToYjo3QPSGi"
+      ]
+    },
+    {
+      "id": "happy",
+      "lens": "Y1",
+      "title": "refund pré-envio OK",
+      "ev": {
+        "id": "24944a99-a97c-4daf-9f9a-7d85d1fe480c",
+        "status": "cancelado",
+        "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+        "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+        "product_id": "6681ba90-71df-4de4-b2f8-72f6dc71083c",
+        "quantity": 1,
+        "price_total": 5.9,
+        "amount_paid_cents": 590,
+        "payment_method": "pagamento na app",
+        "shipping_method": "mao",
+        "stripe_payment_intent_id": "pi_3UAuXFH7FWYUN3jh0aW74ML6",
+        "stripe_checkout_session_id": null,
+        "stripe_refund_id": "re_3UAuXFH7FWYUN3jh0R4I4rUM",
+        "wallet_release_processed_at": "2026-09-01T16:27:49.220636+00:00",
+        "wallet_refund_processed_at": "2026-09-01T16:27:49.220636+00:00",
+        "stock_units_applied": null,
+        "shipped_at": null,
+        "bundle_id": null,
+        "contract_unit_cents": 590,
+        "contract_qty": 1,
+        "product_offer_id": null
+      }
+    }
+  ],
+  "notes": [
+    {
+      "id": "Y1.allow.premio_rifa",
+      "lens": "Y1",
+      "title": "PATCH allowlist",
+      "ev": {
+        "http": 200,
+        "status": "pago",
+        "shipped_at": null
+      }
+    },
+    {
+      "id": "Y1.allow.aguarda_confirmacao",
+      "lens": "Y1",
+      "title": "PATCH allowlist",
+      "ev": {
+        "http": 200,
+        "status": "aguarda_confirmacao",
+        "shipped_at": null
+      }
+    },
+    {
+      "id": "Y1.allow.reservado",
+      "lens": "Y1",
+      "title": "PATCH allowlist",
+      "ev": {
+        "http": 200,
+        "status": "reservado",
+        "shipped_at": null
+      }
+    },
+    {
+      "id": "Y1.allow.pendente",
+      "lens": "Y1",
+      "title": "PATCH allowlist",
+      "ev": {
+        "http": 200,
+        "status": "pendente",
+        "shipped_at": null
+      }
+    },
+    {
+      "id": "Y1.allow.reserva_pendente",
+      "lens": "Y1",
+      "title": "PATCH allowlist",
+      "ev": {
+        "http": 200,
+        "status": "reserva_pendente",
+        "shipped_at": null
+      }
+    },
+    {
+      "id": "Y6.toctou",
+      "lens": "Y6",
+      "title": "refund +250ms ship + refund",
+      "ev": {
+        "r1": "403 {\"ok\":false,\"error\":\"Não é possível anular esta venda neste estado (já enviada ou concluída).\",\"code\":\"order_refund_blocked_shipped\",\"status\":\"enviado\"}",
+        "ship": "200 [{\"id\":\"a7d4a729-03e7-4b5d-9491-9e4ddd72bca5\",\"created_at\":\"2026-09-01T16:27:22.936559+00:00\",\"product_id\":\"e7a34c9e-a433-4b2a-b534-acb804fe9af0\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-00…",
+        "r2": "403 {\"ok\":false,\"error\":\"Não é possível anular esta venda neste estado (já enviada ou concluída).\",\"code\":\"order_refund_blocked_shipped\",\"status\":\"enviado\"}",
+        "row": {
+          "id": "a7d4a729-03e7-4b5d-9491-9e4ddd72bca5",
+          "status": "enviado",
+          "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+          "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+          "product_id": "e7a34c9e-a433-4b2a-b534-acb804fe9af0",
+          "quantity": 1,
+          "price_total": 5.9,
+          "amount_paid_cents": 590,
+          "payment_method": "pagamento na app",
+          "shipping_method": "mao",
+          "stripe_payment_intent_id": "pi_3UAuWtH7FWYUN3jh1YYq2b4s",
+          "stripe_checkout_session_id": null,
+          "stripe_refund_id": null,
+          "wallet_release_processed_at": null,
+          "wallet_refund_processed_at": null,
+          "stock_units_applied": 1,
+          "shipped_at": "2026-09-01T16:27:25.698632+00:00",
+          "bundle_id": null,
+          "contract_unit_cents": 590,
+          "contract_qty": 1,
+          "product_offer_id": null
+        }
+      }
+    },
+    {
+      "id": "Y2.orders",
+      "lens": "Y2",
+      "title": "qty 3+1",
+      "ev": {
+        "oa": {
+          "id": "d7ba6f91-4fdd-47a9-aa00-58b0fb636eab",
+          "status": "reserva_pendente",
+          "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+          "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+          "product_id": "8a3bd159-2094-49a3-a5e8-2d6f98d70da6",
+          "quantity": 3,
+          "price_total": 60.0,
+          "amount_paid_cents": null,
+          "payment_method": "Pagamento na app",
+          "shipping_method": "mao",
+          "stripe_payment_intent_id": null,
+          "stripe_checkout_session_id": null,
+          "stripe_refund_id": null,
+          "wallet_release_processed_at": null,
+          "wallet_refund_processed_at": null,
+          "stock_units_applied": null,
+          "shipped_at": null,
+          "bundle_id": "96e7725b-0382-4961-907c-3b8a935d2dec",
+          "contract_unit_cents": 2000,
+          "contract_qty": 3,
+          "product_offer_id": null
+        },
+        "ob": {
+          "id": "a0f6a4bd-662f-445a-b689-2ff73e407b6f",
+          "status": "reserva_pendente",
+          "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+          "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+          "product_id": "5a55b1fc-815a-489d-8087-536f55f3e11f",
+          "quantity": 1,
+          "price_total": 20.0,
+          "amount_paid_cents": null,
+          "payment_method": "Pagamento na app",
+          "shipping_method": "mao",
+          "stripe_payment_intent_id": null,
+          "stripe_checkout_session_id": null,
+          "stripe_refund_id": null,
+          "wallet_release_processed_at": null,
+          "wallet_refund_processed_at": null,
+          "stock_units_applied": null,
+          "shipped_at": null,
+          "bundle_id": "96e7725b-0382-4961-907c-3b8a935d2dec",
+          "contract_unit_cents": 2000,
+          "contract_qty": 1,
+          "product_offer_id": null
+        },
+        "bundleTotal": 20.0
+      }
+    },
+    {
+      "id": "Y2.extra_qty",
+      "lens": "Y2",
+      "title": "quote",
+      "ev": {
+        "cents": 2165,
+        "q": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1VvJ1yaK9VNvtXUGWhMdwlKoukZRODbvQe0Egqzo6PJ13gn3Stzp0bVSd#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDR…"
+      }
+    },
+    {
+      "id": "Y2.steal",
+      "lens": "Y2",
+      "title": "B1+bundle B2",
+      "ev": {
+        "attA": "200 [{\"id\":\"54445be6-2ec9-41dc-9f01-75ce4712e4d6\",\"created_at\":\"2026-09-01T16:27:29.626701+00:00\",\"product_id\":\"fb4a12d7-daaa-4e56-a848-d32a433da0d1\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-00…",
+        "attB": "200 [{\"id\":\"255aeb6a-b68d-430d-a2eb-b493fb9d8272\",\"created_at\":\"2026-09-01T16:27:29.737363+00:00\",\"product_id\":\"21345df6-4d6e-4b55-acc8-72a05f8d53b4\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-00…",
+        "bundle_id": "8aeb4499-e1b3-4931-bb73-fb964e287957",
+        "cents": 2690,
+        "q": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1kaIeKDqUomFbxlnlqzJL4Lbal0FlMCvHarJ8nnDkpNc0cjWer5O4RKsj#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDR…"
+      }
+    },
+    {
+      "id": "Y3.reuse",
+      "lens": "Y3",
+      "title": "A then A+B",
+      "ev": {
+        "s1": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1EkbNvY8DCT8dfX0Ap0A8qyltwwt7FOPY3RRDlbqDgltInYbrpoRS6Ktg#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDR…",
+        "s2": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1EkbNvY8DCT8dfX0Ap0A8qyltwwt7FOPY3RRDlbqDgltInYbrpoRS6Ktg#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDR…",
+        "sid1": "cs_test_a1EkbNvY8DCT8dfX0Ap0A8qyltwwt7FOPY3RRDlbqDgltInYbrpoRS6Ktg",
+        "sid2": "cs_test_a1EkbNvY8DCT8dfX0Ap0A8qyltwwt7FOPY3RRDlbqDgltInYbrpoRS6Ktg",
+        "amt1": 905,
+        "amt2": 5105,
+        "amount_total": 905,
+        "reused": true
+      }
+    },
+    {
+      "id": "Y3.race3",
+      "lens": "Y3",
+      "title": "3× checkout",
+      "ev": {
+        "briefs": [
+          "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1iM6FxHY3m4oqLsUHVXWxqoBYesDwm7fBLRzZOlwxxU2KQToYjo3QPSGi#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDR…",
+          "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1iM6FxHY3m4oqLsUHVXWxqoBYesDwm7fBLRzZOlwxxU2KQToYjo3QPSGi#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDR…",
+          "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1iM6FxHY3m4oqLsUHVXWxqoBYesDwm7fBLRzZOlwxxU2KQToYjo3QPSGi#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDR…"
+        ],
+        "sids": [
+          "cs_test_a1iM6FxHY3m4oqLsUHVXWxqoBYesDwm7fBLRzZOlwxxU2KQToYjo3QPSGi"
+        ]
+      }
+    },
+    {
+      "id": "Y5.disp",
+      "lens": "Y5",
+      "title": "insert disputa em pago",
+      "ev": "400 {\"code\":\"PGRST204\",\"details\":null,\"hint\":null,\"message\":\"Could not find the 'seller_id' column of 'order_disputes' in the schema cache\"}"
+    },
+    {
+      "id": "happy",
+      "lens": "Y1",
+      "title": "refund pré-envio",
+      "ev": {
+        "ref": "200 {\"ok\":true,\"already_refunded\":true,\"idempotent\":true,\"refund_id\":\"re_3UAuXFH7FWYUN3jh0R4I4rUM\",\"status\":\"cancelado\",\"stock_units_applied\":null,\"amount_cents\":590,\"payment_intent\":\"pi_3UAuXFH7FWYUN3jh0aW74ML6\",\"status_str…",
+        "after": {
+          "id": "24944a99-a97c-4daf-9f9a-7d85d1fe480c",
+          "status": "cancelado",
+          "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+          "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+          "product_id": "6681ba90-71df-4de4-b2f8-72f6dc71083c",
+          "quantity": 1,
+          "price_total": 5.9,
+          "amount_paid_cents": 590,
+          "payment_method": "pagamento na app",
+          "shipping_method": "mao",
+          "stripe_payment_intent_id": "pi_3UAuXFH7FWYUN3jh0aW74ML6",
+          "stripe_checkout_session_id": null,
+          "stripe_refund_id": "re_3UAuXFH7FWYUN3jh0R4I4rUM",
+          "wallet_release_processed_at": "2026-09-01T16:27:49.220636+00:00",
+          "wallet_refund_processed_at": "2026-09-01T16:27:49.220636+00:00",
+          "stock_units_applied": null,
+          "shipped_at": null,
+          "bundle_id": null,
+          "contract_unit_cents": 590,
+          "contract_qty": 1,
+          "product_offer_id": null
+        }
+      }
+    }
+  ]
+}

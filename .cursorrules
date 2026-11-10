@@ -1,0 +1,51 @@
+# Regra BATATA (Fleaber)
+
+## Produção primeiro (até lançamento público)
+
+- Destino de melhorias/correções/integrações (incl. DPD) = **produção** (código unificado). Sem segunda versão funcional em staging.
+- Staging só para testes isolados pontuais. Backup + validação antes de apply; sem destrutivo/pagamentos reais/acções externas irreversíveis sem autorização.
+- Detalhe: `.cursor/rules/production-first-until-launch.mdc`.
+
+- **Não remover, desactivar nem substituir funcionalidades** sem o utilizador pedir explicitamente.
+- **NUNCA mudar/apagar funcionalidades sem autorização explícita do utilizador** (sem atalhos).
+- Podes **sugerir** melhorias ou simplificações; não as implementes por conta própria para "atalhar".
+- Alterações devem ser **mínimas** e focadas no pedido.
+- Layout/UI do player live, carrossel de artigos na Arena, e fluxos Mux/LiveKit: não alterar sem combinar (ver também `.cursor/rules/live-streaming.mdc`).
+- **Segurança:** não reabrir buracos fechados (RLS, grants de stream keys, webhook verify, seller-only refund, etc.) para «fazer funcionar» — corrigir o cliente/fluxo sem enfraquecer a defesa.
+
+## Directo e telemóveis (QA)
+
+- **Não deixar um directo a correr** enquanto se edita código, YAML de testes ou se espera USB. Terminar a live na BD (`status=ended`, `is_active=false`) e fechar o player no comprador (Home / force-stop). Só abrir directo novo quando for mesmo testar; no fim, voltar a fechar.
+- **Obrigatório após testes:** varrer staging (`is_active=true` **ou** `status=live`) e encerrar órfãs de teste (P52/P4/QA). LiveKit/Mux custam dinheiro — ver `.cursor/rules/end-lives-after-tests.mdc`.
+- **Vendedor (V):** TCL. **Comprador (B):** Redmi. Se o Redmi ficar `offline` no cabo (comum neste setup), **usar Chrome como comprador** — não ficar à espera do USB nem marcar BLOQUEADO só por isso.
+- PS / Lab Facebook: fora de âmbito salvo pedido explícito.
+
+## Relatório de testes (briefing director)
+
+Quando se reportam testes, escrever **como briefing a um director que não conhece o projecto**: o que se testou, o que se esperava em cada sítio (ecrã + BD + outros sítios onde o dado aparece), o que se viu, e **porque** passou ou falhou. Sem jargão de programador (exit code, Maestro, warm). Modelo completo: `.cursor/rules/qa-director-report.mdc`.
+
+- No fim de uma ronda de testes: **ZIP de auditoria** com prints + BD + este briefing. No chat dizer o **caminho completo** do ZIP. Não afirmar «ZIP actualizado» se o ficheiro não foi gerado nesta ronda.
+- **Classificação obrigatória:** `PASS` só com prova completa do escopo pedido (UI relevante + BD quando aplicável). Se faltar qualquer parte da prova, marcar `PASS COM AVISO` com motivo explícito e plano de fecho para virar `PASS`.
+
+## Bottom sheet «Criar» (DRY)
+
+- O sheet glass «Criar» (Novo Anúncio / Novo Direto) vive **só** em `lib/widgets/fleaber_create_sheet.dart` — `FleaberCreateSheet.show(context)`.
+- **Não** duplicar `showModalBottomSheet`, blur 14, radius 20, handle 44×4 nem `ListTile`s noutros ecrãs (Home, Mensagens, Perfil, etc.).
+- Qualquer tweak visual ou de navegação (rotas, ícones, textos) → editar **apenas** `FleaberCreateSheet`; nos ecrãs manter só `FleaberCreateSheet.show(context)` (ou delegate de um método local).
+- Constantes de referência no widget: `_blurSigma = 14`, `_radius = 20`, handle `44×4`, `_sheetColor = 0xCC101518`, accent `0xFF00A3AD`.
+
+## CTA principal (FleaberPrimaryButton)
+
+- CTAs teal críticos (login, registo, produto, wallet, confirmações chat, etc.) → `lib/widgets/fleaber_primary_button.dart` — `FleaberPrimaryButton`.
+- Padrão: altura **48**, radius **16**, cor `0xFF007782`, loading inline via `loading:`.
+- Chip compacto (ex. «Seguir» live) → `FleaberPrimaryButton.compact`.
+- Altura/radius diferentes por contexto → passar `height` / `borderRadius` no construtor (não duplicar `FilledButton.styleFrom` com teal).
+- `FFButtonWidget` mantém-se para secundários (Google, links); não substituir botões outline/circle/icon-only.
+
+## Sombras (FFShadows / FleaberElevation)
+
+- Tokens em `lib/utils/fleaber_elevation.dart`; expostos também em `FlutterFlowTheme.of(context).shadow` (`FFShadows`).
+- **elevation-sm** → `FleaberElevation.sm` (chips/badges) ou `smNav` (bottom nav, offset `(0,-4)`).
+- **elevation-md** → `FleaberElevation.md` (live cards, cards destacados) ou `mdFab` (FAB teal Home).
+- Badge teal produto → `FleaberElevation.smAccent(cor)`.
+- Não duplicar `BoxShadow(blurRadius: …)` inline; usar os tokens acima.

@@ -1,0 +1,314 @@
+{
+  "project": "fxdknzrqjenzqcvnwqqq",
+  "pass": 3,
+  "matrix": [
+    {
+      "surface": "BAG",
+      "attack": "dup line + amount 1",
+      "identity": "buyer",
+      "result": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1q5UMYgPZIdWMKlYBl4HjZGHueSwiRa97PSehGlJAYX9Q54DR1AprX1mq#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21oYWlsUnxrVkRhQUQyNlJjSWBCN3BXNXVvVT1hamlcf3Fjd1dRMGJmREk9Yz0…",
+      "impact": "",
+      "severity": "",
+      "evidence": null
+    },
+    {
+      "surface": "ORDERS",
+      "attack": "observe foreign orders",
+      "identity": "service_role_observe",
+      "result": "200 [{\"id\":\"92b6dc7f-209f-45ad-a8a1-20159fdddcbf\",\"buyer_id\":\"97f3089e-6a84-4f9e-9d4a-4d68b2894fd6\",\"seller_id\":\"69104e91-6a00-40d9-a7c9-b1571422ae43\",\"status\":\"pago\"}, \n {\"id\":\"275fdd2a-9225-4a2b-8525-4f…",
+      "impact": "",
+      "severity": "",
+      "evidence": null
+    },
+    {
+      "surface": "CHECKOUT",
+      "attack": "checkout foreign order owner=97f3089e-6a84-4f9e-9d4a-4d68b2894fd6",
+      "identity": "buyer",
+      "result": "400 {\"error\":\"Checkout blocked: order does not belong to buyer.\"}",
+      "impact": "",
+      "severity": "",
+      "evidence": null
+    },
+    {
+      "surface": "TIPS",
+      "attack": "observe lives",
+      "identity": "observe",
+      "result": "200 [{\"id\":\"5dd5cfd2-63b1-4cd8-82b1-c888e9dc5234\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"vendedor_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\"}, \n {\"id\":\"301713b2-49b0-409c-b758-4c2153b2ddd1\",\"…",
+      "impact": "",
+      "severity": "",
+      "evidence": null
+    },
+    {
+      "surface": "TIPS",
+      "attack": "wallet tip 1eur",
+      "identity": "buyer",
+      "result": "200 \"9e01f9fc-cd4f-41b6-8b22-b4b5937a46d5\"",
+      "impact": "",
+      "severity": "",
+      "evidence": null
+    },
+    {
+      "surface": "TIPS",
+      "attack": "stripe tip 1eur",
+      "identity": "buyer",
+      "result": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1ScMhIJRpyPQ6gn6xMEicP0b8RlDwsQTiyIq2W0VHFa0IlUSnUSw4zNQJ#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21…",
+      "impact": "",
+      "severity": "",
+      "evidence": null
+    },
+    {
+      "surface": "TIPS",
+      "attack": "amount 999999",
+      "identity": "buyer",
+      "result": "400 {\"error\":\"Tip amount too high.\"}",
+      "impact": "",
+      "severity": "",
+      "evidence": null
+    },
+    {
+      "surface": "OCR",
+      "attack": "fake device token qty=99",
+      "identity": "buyer",
+      "result": "401 {\"ok\":false,\"error\":\"invalid_token\"}",
+      "impact": "",
+      "severity": "",
+      "evidence": null
+    },
+    {
+      "surface": "MUX",
+      "attack": "buyer create live",
+      "identity": "buyer",
+      "result": "403 {\"error\":\"Apenas contas de vendedor podem criar directos.\",\"step\":\"authz\"}",
+      "impact": "",
+      "severity": "",
+      "evidence": null
+    },
+    {
+      "surface": "LIVEKIT",
+      "attack": "buyer token for seller live",
+      "identity": "buyer",
+      "result": "403 {\"error\":\"Sem permissão para esta live.\",\"step\":\"auth\"}",
+      "impact": "",
+      "severity": "",
+      "evidence": null
+    },
+    {
+      "surface": "order_disputes",
+      "attack": "INSERT",
+      "identity": "buyer",
+      "result": "400 {\"code\":\"PGRST204\",\"details\":null,\"hint\":null,\"message\":\"Could not find the 'seller_id' column of 'order_disputes' in the schema cache\"}",
+      "impact": "",
+      "severity": "",
+      "evidence": null
+    },
+    {
+      "surface": "disputes",
+      "attack": "INSERT",
+      "identity": "buyer",
+      "result": "404 {\"code\":\"PGRST205\",\"details\":null,\"hint\":\"Perhaps you meant the table 'public.order_disputes'\",\"message\":\"Could not find the table 'public.disputes' in the schema cache\"}",
+      "impact": "",
+      "severity": "",
+      "evidence": null
+    },
+    {
+      "surface": "REFUND",
+      "attack": "buyer refund own + amount body",
+      "identity": "buyer",
+      "result": "403 {\"ok\":false,\"error\":\"Sem permissão.\"}",
+      "impact": "",
+      "severity": "",
+      "evidence": null
+    },
+    {
+      "surface": "REFUND",
+      "attack": "seller refund amount_cents body ignored?",
+      "identity": "seller",
+      "result": "422 {\"ok\":false,\"error\":\"Sem PaymentIntent Stripe nesta encomenda. Contacte suporte com o ID da encomenda.\"}",
+      "impact": "",
+      "severity": "",
+      "evidence": null
+    },
+    {
+      "surface": "REFUND",
+      "attack": "parallel seller refund",
+      "identity": "seller",
+      "result": "422 {\"ok\":false,\"error\":\"Sem PaymentIntent Stripe nesta encomenda. Contacte suporte com o ID da encomenda.\"}",
+      "impact": "",
+      "severity": "",
+      "evidence": null
+    },
+    {
+      "surface": "REFUND",
+      "attack": "parallel seller refund",
+      "identity": "seller",
+      "result": "422 {\"ok\":false,\"error\":\"Sem PaymentIntent Stripe nesta encomenda. Contacte suporte com o ID da encomenda.\"}",
+      "impact": "",
+      "severity": "",
+      "evidence": null
+    },
+    {
+      "surface": "REFUND",
+      "attack": "parallel seller refund",
+      "identity": "seller",
+      "result": "422 {\"ok\":false,\"error\":\"Sem PaymentIntent Stripe nesta encomenda. Contacte suporte com o ID da encomenda.\"}",
+      "impact": "",
+      "severity": "",
+      "evidence": null
+    },
+    {
+      "surface": "REFUND",
+      "attack": "parallel seller refund",
+      "identity": "seller",
+      "result": "422 {\"ok\":false,\"error\":\"Sem PaymentIntent Stripe nesta encomenda. Contacte suporte com o ID da encomenda.\"}",
+      "impact": "",
+      "severity": "",
+      "evidence": null
+    },
+    {
+      "surface": "REFUND",
+      "attack": "parallel seller refund",
+      "identity": "seller",
+      "result": "422 {\"ok\":false,\"error\":\"Sem PaymentIntent Stripe nesta encomenda. Contacte suporte com o ID da encomenda.\"}",
+      "impact": "",
+      "severity": "",
+      "evidence": null
+    },
+    {
+      "surface": "REFUND",
+      "attack": "parallel seller refund",
+      "identity": "seller",
+      "result": "422 {\"ok\":false,\"error\":\"Sem PaymentIntent Stripe nesta encomenda. Contacte suporte com o ID da encomenda.\"}",
+      "impact": "",
+      "severity": "",
+      "evidence": null
+    },
+    {
+      "surface": "WALLET",
+      "attack": "ensure_wallet(seller)",
+      "identity": "buyer",
+      "result": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_ensure_wallet\"}",
+      "impact": "",
+      "severity": "",
+      "evidence": null
+    },
+    {
+      "surface": "RPC",
+      "attack": "anon batata_create_live_tip_pending",
+      "identity": "anon",
+      "result": "404 {\"code\":\"PGRST202\",\"details\":\"Searched for the function public.batata_create_live_tip_pending with parameters p_amount, p_amount_cents, p_live_id, p_live_item_id, p_order_id, p_payment_intent_id, p_ra…",
+      "impact": "",
+      "severity": "",
+      "evidence": null
+    },
+    {
+      "surface": "RPC",
+      "attack": "anon batata_mark_live_item_sold",
+      "identity": "anon",
+      "result": "404 {\"code\":\"PGRST202\",\"details\":\"Searched for the function public.batata_mark_live_item_sold with parameters p_amount, p_amount_cents, p_live_id, p_live_item_id, p_order_id, p_payment_intent_id, p_raffle…",
+      "impact": "",
+      "severity": "",
+      "evidence": null
+    },
+    {
+      "surface": "RPC",
+      "attack": "anon batata_release_seller_wallet_for_order",
+      "identity": "anon",
+      "result": "404 {\"code\":\"PGRST202\",\"details\":\"Searched for the function public.batata_release_seller_wallet_for_order with parameters p_amount, p_amount_cents, p_live_id, p_live_item_id, p_order_id, p_payment_intent_…",
+      "impact": "",
+      "severity": "",
+      "evidence": null
+    },
+    {
+      "surface": "RPC",
+      "attack": "anon batata_finalize_stripe_order_refund",
+      "identity": "anon",
+      "result": "404 {\"code\":\"PGRST202\",\"details\":\"Searched for the function public.batata_finalize_stripe_order_refund with parameters p_amount, p_amount_cents, p_live_id, p_live_item_id, p_order_id, p_payment_intent_id,…",
+      "impact": "",
+      "severity": "",
+      "evidence": null
+    },
+    {
+      "surface": "RPC",
+      "attack": "anon batata_draw_live_raffle_winners",
+      "identity": "anon",
+      "result": "404 {\"code\":\"PGRST202\",\"details\":\"Searched for the function public.batata_draw_live_raffle_winners with parameters p_amount, p_amount_cents, p_live_id, p_live_item_id, p_order_id, p_payment_intent_id, p_r…",
+      "impact": "",
+      "severity": "",
+      "evidence": null
+    },
+    {
+      "surface": "STORAGE",
+      "attack": "list chat-attachments",
+      "identity": "buyer",
+      "result": "200 []",
+      "impact": "",
+      "severity": "",
+      "evidence": null
+    },
+    {
+      "surface": "STORAGE",
+      "attack": "list dispute-evidence",
+      "identity": "buyer",
+      "result": "200 []",
+      "impact": "",
+      "severity": "",
+      "evidence": null
+    },
+    {
+      "surface": "STORAGE",
+      "attack": "list product-images",
+      "identity": "buyer",
+      "result": "200 []",
+      "impact": "",
+      "severity": "",
+      "evidence": null
+    },
+    {
+      "surface": "STORAGE",
+      "attack": "list avatars",
+      "identity": "buyer",
+      "result": "200 []",
+      "impact": "",
+      "severity": "",
+      "evidence": null
+    },
+    {
+      "surface": "STORAGE",
+      "attack": "list returns",
+      "identity": "buyer",
+      "result": "200 []",
+      "impact": "",
+      "severity": "",
+      "evidence": null
+    },
+    {
+      "surface": "messages",
+      "attack": "SELECT 20",
+      "identity": "buyer",
+      "result": "404 {\"code\":\"PGRST205\",\"details\":null,\"hint\":\"Perhaps you meant the table 'public.live_messages'\",\"message\":\"Could not find the table 'public.messages' in the schema cache\"}",
+      "impact": "",
+      "severity": "",
+      "evidence": null
+    },
+    {
+      "surface": "chat_messages",
+      "attack": "SELECT 20",
+      "identity": "buyer",
+      "result": "200 [{\"id\":807,\"created_at\":\"2026-08-30T15:25:53.290694+00:00\",\"chat_id\":\"5556ff25-c9a2-457a-bb27-e080d74f381d\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"seguro_fleaber_paid\\\",\\\"o…",
+      "impact": "",
+      "severity": "",
+      "evidence": null
+    },
+    {
+      "surface": "chats",
+      "attack": "SELECT 20",
+      "identity": "buyer",
+      "result": "200 [{\"id\":\"ac2902d3-a3ca-4f82-b7de-2532db9cafba\",\"created_at\":\"2026-08-27T06:37:32.277448+00:00\",\"user_a\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"user_b\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"last_message\":\"CEGA-PRIO ping…",
+      "impact": "",
+      "severity": "",
+      "evidence": null
+    }
+  ],
+  "findings": [],
+  "gaps": []
+}

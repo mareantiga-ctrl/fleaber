@@ -1,0 +1,556 @@
+{
+  "auditor": "REDTEAM_BLIND_ET_BAG_SINGLE_HUB_RETEST_v1",
+  "prefix": "RTET-20260906T2030",
+  "staging": "fxdknzrqjenzqcvnwqqq",
+  "probes": [
+    {
+      "probe_id": "A1",
+      "surfaces": "bag ABC + single B + Hub + orders",
+      "action": "Future.wait saco ABC ∥ avulso B t=0; Hub",
+      "http": "{\"bag\":\"200 {\\\"checkoutUrl\\\":\\\"https://checkout.stripe.com/c/pay/cs_test_a1en8cBvmtLqYyaALNIAOu7XbBnzDR0Q8a19kMLSMs6TzhHTK06CEA9kH2#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRâ€¦\",\"single\":\"200 {\\\"checkoutUrl\\\":\\\"https://checkout.stripe.com/c/pay/cs_test_a1hsNâ€¦",
+      "oracles": "{\"dual\":true,\"bag\":{\"sid\":\"cs_test_a1en8cBvmtLqYyaALNIAOu7XbBnzDR0Q8a19kMLSMs6TzhHTK06CEA9kH2\",\"http\":0,\"status\":null,\"payment_status\":null,\"amount_total\":null},\"single\":{\"sid\":\"cs_test_a1hsN6VoLnZKx3t9ixRnbqm467X2SMFNXyr6GgqWtUmd04nhYHAOEPSXC3\",\"http\":0,\"status\":null,\"payment_status\":null,\"amount_total\":null},\"hub\":[1,1,1],\"ledger\":[\"cs_test_a1en8cBvmtLqYyaALNIAOu7XbBnzDR0Q8a19kMLSMs6TzhHTK06CEA9kH2\",\"cs_test_a1en8câ€¦",
+      "result": "HOLD",
+      "lens": "ET-A",
+      "residual": false,
+      "count_finding": true,
+      "classe_nova": true
+    },
+    {
+      "probe_id": "A2",
+      "surfaces": "bag∥single t=50 + Hub leftover + orders",
+      "action": "pago leftover + bag first →50ms single B; Hub",
+      "http": "{\"paid\":\"200 {\\n  \\\"ok\\\": true,\\n  \\\"order_id\\\": \\\"5f7e498a-cb8a-4bb2-a35d-47993f9e9ac6\\\",\\n  \\\"product_id\\\": \\\"e91a29bc-6a88-47e5-9431-0268b766ba6b\\\",\\n  \\\"payment_intent_id\\\": \\\"pi_3UCls6H7FWYUN3jh00NFl8i0\\\",\\n  \\\"pi_status\\\": \\\"succeeded\\\",\\n  \\\"pi_amountâ€¦\",\"bag\":\"200 {\\\"checkoutUrl\\\":\\\"https://checkout.stripe.comâ€¦",
+      "oracles": "{\"dual\":false,\"leftover_hub\":1,\"leftover_qty\":1,\"hub\":[1,1,1],\"ledger\":[\"\",\"cs_test_a1joRMrbjT4V200jCbo4YsOAXMfIcTYzzhtLt2PVPDaUm6QZlHD4HkiSku\",\"\"],\"pi\":\"pi_3UCls6H7FWYUN3jh00NFl8i0\"}",
+      "result": "FAIL",
+      "lens": "ET-A",
+      "residual": false,
+      "count_finding": false,
+      "classe_nova": true
+    },
+    {
+      "probe_id": "A3",
+      "surfaces": "single first + bag + Hub + orders",
+      "action": "avulso B first →50ms saco ABC; Hub",
+      "http": "{\"single\":\"200 {\\\"checkoutUrl\\\":\\\"https://checkout.stripe.com/c/pay/cs_test_a1vwaLdSDtMoOWYbVzBFJE2uQxvEsTfC9BLoLaqPKh7t7PqiDbJJFNv47W#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRâ€¦\",\"bag\":\"200 {\\\"checkoutUrl\\\":\\\"https://checkout.stripe.com/c/pay/cs_test_a1vwaâ€¦",
+      "oracles": "{\"dual\":false,\"single\":{\"sid\":\"cs_test_a1vwaLdSDtMoOWYbVzBFJE2uQxvEsTfC9BLoLaqPKh7t7PqiDbJJFNv47W\",\"http\":0,\"status\":null,\"payment_status\":null,\"amount_total\":null},\"bag\":{\"sid\":\"cs_test_a1vwaLdSDtMoOWYbVzBFJE2uQxvEsTfC9BLoLaqPKh7t7PqiDbJJFNv47W\",\"http\":0,\"status\":null,\"payment_status\":null,\"amount_total\":null},\"hub\":[1,1,1],\"ledger\":[\"\",\"cs_test_a1vwaLdSDtMoOWYbVzBFJE2uQxvEsTfC9BLoLaqPKh7t7PqiDbJJFNv47W\",\"\"]}",
+      "result": "FAIL",
+      "lens": "ET-A",
+      "residual": false,
+      "count_finding": false,
+      "classe_nova": true
+    },
+    {
+      "probe_id": "A4",
+      "surfaces": "bag∥single∥bag + Hub + orders",
+      "action": "Future.wait 3 corrotinas bag ABC ∥ single B ∥ bag ABC; Hub",
+      "http": "{\"bag1\":\"200 {\\\"checkoutUrl\\\":\\\"https://checkout.stripe.com/c/pay/cs_test_a1TqtYs3io2Bx1pJHGcxSv2E5O6NeG2O7Wl9xJqW4du8rQOBNq64XUyvNu#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRâ€¦\",\"single\":\"200 {\\\"checkoutUrl\\\":\\\"https://checkout.stripe.com/c/pay/cs_test_a1Tqâ€¦",
+      "oracles": "{\"dual\":true,\"creates\":2,\"hub\":[1,1,1],\"ledger\":[\"cs_test_a1FIeVxTCJiIvuS6EoHUpPhleIyzACM1LeenDJ6y8iNeB4mTws4K2NF9hF\",\"cs_test_a1FIeVxTCJiIvuS6EoHUpPhleIyzACM1LeenDJ6y8iNeB4mTws4K2NF9hF\",\"cs_test_a1FIeVxTCJiIvuS6EoHUpPhleIyzACM1LeenDJ6y8iNeB4mTws4K2NF9hF\"],\"reused\":[true,false,false]}",
+      "result": "HOLD",
+      "lens": "ET-A",
+      "residual": false,
+      "count_finding": true,
+      "classe_nova": true
+    },
+    {
+      "probe_id": "A5",
+      "surfaces": "bag 6∥4 + Hub + orders",
+      "action": "Future.wait ABCDEF ∥ BCDE (regressão ≤1); Hub",
+      "http": "{\"bag6\":\"400 {\\\"error\\\":\\\"Checkout blocked: overlapping bag session.\\\"}\",\"bag4\":\"200 {\\\"checkoutUrl\\\":\\\"https://checkout.stripe.com/c/pay/cs_test_a1hKF6xWXYdE6ETmndXgKxZEBACTt2blKROYlXRuqBe6yGBZx78o9scc18#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRâ€¦\"}",
+      "oracles": "{\"dual\":false,\"s6\":{\"sid\":null,\"status\":\"n/a\"},\"s4\":{\"sid\":\"cs_test_a1hKF6xWXYdE6ETmndXgKxZEBACTt2blKROYlXRuqBe6yGBZx78o9scc18\",\"http\":0,\"status\":null,\"payment_status\":null,\"amount_total\":null},\"hub\":[1,1,1,1,1,1],\"ledger\":[\"\",\"cs_test_a1hKF6xWXYdE6ETmndXgKxZEBACTt2blKROYlXRuqBe6yGBZx78o9scc18\",\"cs_test_a1hKF6xWXYdE6ETmndXgKxZEBACTt2blKROYlXRuqBe6yGBZx78o9scc18\",\"cs_test_a1hKF6xWXYdE6ETmndXgKxZEBACTt2blKROYlXRuqBe6yGâ€¦",
+      "result": "FAIL",
+      "lens": "ET-A",
+      "residual": false,
+      "count_finding": false,
+      "classe_nova": false
+    },
+    {
+      "probe_id": "B1",
+      "surfaces": "Hub + CPI B2 + CPI B3 + orders",
+      "action": "Future.wait 2 buyers qty=1 Hub-visível",
+      "http": "{\"hub\":\"200 [{\\\"id\\\":\\\"2547960b-e1bc-48e7-8624-bfe4f6ae287b\\\",\\\"title\\\":\\\"RTET-20260906T2030 B1 two-buyers\\\",\\\"seller_id\\\":\\\"980f4fa1-0004-42f9-abca-69f1a9c29588\\\",\\\"is_sold\\\":false,\\\"price\\\":12.0}]\",\"b2\":\"200 {\\\"checkoutUrl\\\":\\\"https://checkout.stripe.com/c/pay/cs_test_a1BdLw3qWYVU9Q7jDKldelXdEzQETp8N5BPZ7ptulX8xLvm7Nâ€¦",
+      "oracles": "{\"hub0\":1,\"hub1\":0,\"cs_n\":1,\"sid1\":\"cs_test_a1BdLw3qWYVU9Q7jDKldelXdEzQETp8N5BPZ7ptulX8xLvm7NdoH2lcydb\",\"sid2\":null,\"o2_ok\":false}",
+      "result": "FAIL",
+      "lens": "ET-B",
+      "residual": true,
+      "count_finding": false,
+      "classe_nova": false
+    },
+    {
+      "probe_id": "B2",
+      "surfaces": "bag expand + Hub + Session",
+      "action": "subset AB →50ms superset ABCD; Hub (regressão 400)",
+      "http": "{\"sub\":\"200 {\\\"checkoutUrl\\\":\\\"https://checkout.stripe.com/c/pay/cs_test_a1tV20avJWzV7nPiJybAp5z31hrY8mlZxY9sBmHt7xMhEWJl12thqRwF0B#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRâ€¦\",\"sup\":\"400 {\\\"error\\\":\\\"Checkout blocked: overlapping bag session.\\\"}\"}",
+      "oracles": "{\"dual\":false,\"sub\":{\"sid\":\"cs_test_a1tV20avJWzV7nPiJybAp5z31hrY8mlZxY9sBmHt7xMhEWJl12thqRwF0B\",\"http\":0,\"status\":null,\"payment_status\":null,\"amount_total\":null},\"sup\":{\"sid\":null,\"status\":\"n/a\"},\"hub\":[1,1,1,1]}",
+      "result": "FAIL",
+      "lens": "ET-B",
+      "residual": true,
+      "count_finding": false,
+      "classe_nova": false
+    },
+    {
+      "probe_id": "B3",
+      "surfaces": "bag idêntico + Hub + orders",
+      "action": "Future.wait 2× mesmo saco ABC + Hub",
+      "http": "{\"h1\":\"200 {\\\"checkoutUrl\\\":\\\"https://checkout.stripe.com/c/pay/cs_test_a1TbTPq41XIYe5gOpSeVliveFKJ2RQdVbihEuqZkIww2HQhJEuDdzHXbrl#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRâ€¦\",\"h2\":\"200 {\\\"checkoutUrl\\\":\\\"https://checkout.stripe.com/c/pay/cs_test_a1TbTPq41Xâ€¦",
+      "oracles": "{\"dual\":false,\"sids\":[\"cs_test_a1TbTPq41XIYe5gOpSeVliveFKJ2RQdVbihEuqZkIww2HQhJEuDdzHXbrl\"],\"reused\":[false,true],\"hub\":[1,1,1]}",
+      "result": "FAIL",
+      "lens": "ET-B",
+      "residual": true,
+      "count_finding": false,
+      "classe_nova": false
+    },
+    {
+      "probe_id": "C1",
+      "surfaces": "Hub + orders + chat + wallet",
+      "action": "saco pago Stripe TEST 4242 → 4 oráculos",
+      "http": "200 {\n  \"ok\": true,\n  \"probe\": \"setup_paid_bag\",\n  \"payment_intent_id\": \"pi_3UClsZH7FWYUN3jh1011Wc3D\",\n  \"pi_amount_cents\": 1115,\n  \"total_cents_quote\": 1115,\n  \"items_cents\": 1000,\n  \"protection_cents\": 115,\n  \"share_a_centâ€¦",
+      "oracles": "{\"both_pago\":true,\"paidA\":335,\"paidB\":780,\"pi_amt\":1115,\"hubA_n\":1,\"hubB_n\":1,\"qtyA\":2,\"qtyB\":2,\"dSeller\":0.0,\"dBuyer\":0.0,\"cardA_ok\":false,\"cardB_ok\":false,\"pi\":\"pi_3UClsZH7FWYUN3jh1011Wc3D\"}",
+      "result": "FAIL",
+      "lens": "ET-C",
+      "residual": false,
+      "count_finding": false,
+      "classe_nova": true
+    },
+    {
+      "probe_id": "C2",
+      "surfaces": "Hub + orders + CPI leftover",
+      "action": "leftover após pago parcial qty 2→1",
+      "http": "{\"paid\":\"200 {\\n  \\\"ok\\\": true,\\n  \\\"order_id\\\": \\\"908e119a-95c3-40c2-96a8-4b1519398b10\\\",\\n  \\\"product_id\\\": \\\"332c4373-6517-4273-9986-1875b86147bf\\\",\\n  \\\"payment_intent_id\\\": \\\"pi_3UClsdH7FWYUN3jh0the6rDd\\\",\\n  \\\"pi_status\\\": \\\"succeeded\\\",\\n  \\\"pi_amountâ€¦\",\"cpi\":\"200 {\\\"checkoutUrl\\\":\\\"https://checkout.stripe.comâ€¦",
+      "oracles": "{\"status\":\"pago\",\"qty\":1,\"hub_n\":1,\"leftover_cs\":\"cs_test_a14LmnOLsLtN62TDMhFn96CuyvWHfDXhlI3h6za8Itnlx49dW9FFW9ZS1X\",\"buyable\":true,\"pi\":\"pi_3UClsdH7FWYUN3jh0the6rDd\"}",
+      "result": "FAIL",
+      "lens": "ET-C",
+      "residual": true,
+      "count_finding": false,
+      "classe_nova": false
+    },
+    {
+      "probe_id": "C3",
+      "surfaces": "offer + CPI + Hub + orders",
+      "action": "oferta 8€ aceite + CPI amount=1 (selo servidor)",
+      "http": "{\"off\":\"201 [{\\\"id\\\":\\\"3e8b6492-9520-41ea-a9e4-a1c1e4c93f5e\\\",\\\"product_id\\\":\\\"bc72c078-88f5-461c-bc82-20fe3cfe5396\\\",\\\"chat_id\\\":null,\\\"buyer_id\\\":\\\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\\\",\\\"seller_id\\\":\\\"980f4fa1-0004-42f9-abca-69f1a9c29588\\\",\\\"amounâ€¦\",\"acc\":\"200 [{\\\"id\\\":\\\"3e8b6492-9520-41ea-a9e4-a1c1e4c93f5e\\\",\\\"pâ€¦",
+      "oracles": "{\"offer_amt\":8.0,\"offer_st\":\"accepted\",\"sealed_cents\":905,\"hub_n\":1,\"order\":\"reserva_pendente\"}",
+      "result": "FAIL",
+      "lens": "ET-C",
+      "residual": false,
+      "count_finding": false,
+      "classe_nova": true
+    },
+    {
+      "probe_id": "C4",
+      "surfaces": "wallet + disputa + Hub leftover",
+      "action": "Future.wait release∥disputa em concluido+mão (1 linha)",
+      "http": "{\"plant\":\"200 [{\\\"id\\\":\\\"e39d7ced-b1bb-4f97-bfed-dd928e2f84da\\\",\\\"created_at\\\":\\\"2026-09-06T19:38:25.525363+00:00\\\",\\\"product_id\\\":\\\"45ee3c19-162e-4c36-a984-55d2f1bfe835\\\",\\\"buyer_id\\\":\\\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\\\",\\\"seller_id\\\":\\\"980f4fa1-00â€¦\",\"rel\":\"200 true\",\"disp\":\"201 [{\\\"id\\\":\\\"409ca155-3f1a-4e8e-ab2â€¦",
+      "oracles": "{\"released\":true,\"dWallet\":0.0,\"disp_open\":true,\"disp_st\":\"aberta\",\"status\":\"concluido\",\"hub_n\":1,\"pi\":\"pi_3UCltVH7FWYUN3jh1zEriu75\"}",
+      "result": "FAIL",
+      "lens": "ET-C",
+      "residual": false,
+      "count_finding": false,
+      "classe_nova": true
+    }
+  ],
+  "findings": [
+    {
+      "id": "P1-A1-BAG-SINGLE-HUB",
+      "lens": "ET-A",
+      "severity": "P1",
+      "title": "Saco ABC e avulso da linha B ao mesmo tempo: dois links",
+      "actor": "B3 bag ABC ∥ CPI B t=0",
+      "pre": "3 SKUs qty=2 Hub visíveis",
+      "repro": "Future.wait checkoutBag ABC ∥ checkout single B",
+      "expected": "≤1 cs_ útil (200+400 / reused); Hub coerente; sem oversell",
+      "obtained": {
+        "bag": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1en8cBvmtLqYyaALNIAOu7XbBnzDR0Q8a19kMLSMs6TzhHTK06CEA9kH2#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRâ€¦",
+        "single": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1hsN6VoLnZKx3t9ixRnbqm467X2SMFNXyr6GgqWtUmd04nhYHAOEPSXC3#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRâ€¦",
+        "bagOr": {
+          "sid": "cs_test_a1en8cBvmtLqYyaALNIAOu7XbBnzDR0Q8a19kMLSMs6TzhHTK06CEA9kH2",
+          "http": 0,
+          "status": null,
+          "payment_status": null,
+          "amount_total": null
+        },
+        "singleOr": {
+          "sid": "cs_test_a1hsN6VoLnZKx3t9ixRnbqm467X2SMFNXyr6GgqWtUmd04nhYHAOEPSXC3",
+          "http": 0,
+          "status": null,
+          "payment_status": null,
+          "amount_total": null
+        },
+        "hub": [
+          1,
+          1,
+          1
+        ],
+        "ledger": [
+          "cs_test_a1en8cBvmtLqYyaALNIAOu7XbBnzDR0Q8a19kMLSMs6TzhHTK06CEA9kH2",
+          "cs_test_a1en8cBvmtLqYyaALNIAOu7XbBnzDR0Q8a19kMLSMs6TzhHTK06CEA9kH2",
+          "cs_test_a1en8cBvmtLqYyaALNIAOu7XbBnzDR0Q8a19kMLSMs6TzhHTK06CEA9kH2"
+        ]
+      },
+      "proven": true,
+      "count_exact_closed": false,
+      "evidence": {}
+    },
+    {
+      "id": "P1-A4-BAG-SINGLE-BAG-HUB",
+      "lens": "ET-A",
+      "severity": "P1",
+      "title": "Saco ∥ avulso ∥ saco: duas ou mais Sessions úteis",
+      "actor": "B3 bag∥single∥bag t=0",
+      "pre": "3 SKUs qty=2 Hub visíveis",
+      "repro": "Future.wait bag ABC ∥ single B ∥ bag ABC",
+      "expected": "≤1 cs_ útil (200+400 / reused); Hub coerente; sem oversell",
+      "obtained": {
+        "bag1": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1TqtYs3io2Bx1pJHGcxSv2E5O6NeG2O7Wl9xJqW4du8rQOBNq64XUyvNu#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRâ€¦",
+        "single": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1TqtYs3io2Bx1pJHGcxSv2E5O6NeG2O7Wl9xJqW4du8rQOBNq64XUyvNu#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRâ€¦",
+        "bag2": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1FIeVxTCJiIvuS6EoHUpPhleIyzACM1LeenDJ6y8iNeB4mTws4K2NF9hF#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRâ€¦",
+        "creates": 2,
+        "hub": [
+          1,
+          1,
+          1
+        ],
+        "ledger": [
+          "cs_test_a1FIeVxTCJiIvuS6EoHUpPhleIyzACM1LeenDJ6y8iNeB4mTws4K2NF9hF",
+          "cs_test_a1FIeVxTCJiIvuS6EoHUpPhleIyzACM1LeenDJ6y8iNeB4mTws4K2NF9hF",
+          "cs_test_a1FIeVxTCJiIvuS6EoHUpPhleIyzACM1LeenDJ6y8iNeB4mTws4K2NF9hF"
+        ]
+      },
+      "proven": true,
+      "count_exact_closed": false,
+      "evidence": {}
+    }
+  ],
+  "blocked": [
+    {
+      "id": "A2",
+      "lens": "ET-A",
+      "title": "bag∥single t=50 fail-closed + leftover Hub",
+      "ev": {
+        "bag": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1joRMrbjT4V200jCbo4YsOAXMfIcTYzzhtLt2PVPDaUm6QZlHD4HkiSku#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRâ€¦",
+        "single": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1joRMrbjT4V200jCbo4YsOAXMfIcTYzzhtLt2PVPDaUm6QZlHD4HkiSku#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRâ€¦",
+        "leftover_hub": 1,
+        "leftover_qty": 1,
+        "hub": [
+          1,
+          1,
+          1
+        ],
+        "paid": "pago"
+      }
+    },
+    {
+      "id": "A3",
+      "lens": "ET-A",
+      "title": "single-first→bag fail-closed + Hub",
+      "ev": {
+        "single": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1vwaLdSDtMoOWYbVzBFJE2uQxvEsTfC9BLoLaqPKh7t7PqiDbJJFNv47W#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRâ€¦",
+        "bag": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1vwaLdSDtMoOWYbVzBFJE2uQxvEsTfC9BLoLaqPKh7t7PqiDbJJFNv47W#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRâ€¦",
+        "hub": [
+          1,
+          1,
+          1
+        ],
+        "ledger": [
+          "",
+          "cs_test_a1vwaLdSDtMoOWYbVzBFJE2uQxvEsTfC9BLoLaqPKh7t7PqiDbJJFNv47W",
+          ""
+        ]
+      }
+    },
+    {
+      "id": "A5",
+      "lens": "ET-A",
+      "title": "6∥4 regressão fail-closed + Hub",
+      "ev": {
+        "bag6": "400 {\"error\":\"Checkout blocked: overlapping bag session.\"}",
+        "bag4": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1hKF6xWXYdE6ETmndXgKxZEBACTt2blKROYlXRuqBe6yGBZx78o9scc18#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRâ€¦",
+        "hub": [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "id": "B1",
+      "lens": "ET-B",
+      "title": "2 buyers Hub: ≤1 cs_",
+      "ev": {
+        "hub0": 1,
+        "hub1": 0,
+        "cs_n": 1,
+        "o2": null,
+        "b2": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1BdLw3qWYVU9Q7jDKldelXdEzQETp8N5BPZ7ptulX8xLvm7NdoH2lcydb#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRâ€¦",
+        "b3": "0 no_o2"
+      }
+    },
+    {
+      "id": "B2",
+      "lens": "ET-B",
+      "title": "expand 400 + Hub",
+      "ev": {
+        "sub": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1tV20avJWzV7nPiJybAp5z31hrY8mlZxY9sBmHt7xMhEWJl12thqRwF0B#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRâ€¦",
+        "sup": "400 {\"error\":\"Checkout blocked: overlapping bag session.\"}",
+        "hub": [
+          1,
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "id": "B3",
+      "lens": "ET-B",
+      "title": "2× idêntico → 1 cs_ reused + Hub",
+      "ev": {
+        "h1": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1TbTPq41XIYe5gOpSeVliveFKJ2RQdVbihEuqZkIww2HQhJEuDdzHXbrl#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRâ€¦",
+        "h2": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1TbTPq41XIYe5gOpSeVliveFKJ2RQdVbihEuqZkIww2HQhJEuDdzHXbrl#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRâ€¦",
+        "sids": [
+          "cs_test_a1TbTPq41XIYe5gOpSeVliveFKJ2RQdVbihEuqZkIww2HQhJEuDdzHXbrl"
+        ],
+        "hub": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "id": "C1",
+      "lens": "ET-C",
+      "title": "bag pago único: 4 sítios observados",
+      "ev": {
+        "both_pago": true,
+        "paidA": 335,
+        "paidB": 780,
+        "pi": 1115,
+        "hubA": 1,
+        "hubB": 1,
+        "qtyA": 2,
+        "qtyB": 2,
+        "dSeller": 0.0,
+        "dBuyer": 0.0,
+        "cardA": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_notes_forbidden\"}",
+        "cardB": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_notes_forbidden\"}",
+        "pi_id": "pi_3UClsZH7FWYUN3jh1011Wc3D"
+      }
+    },
+    {
+      "id": "C2",
+      "lens": "ET-C",
+      "title": "leftover qty 2→1 Hub+CPI observados",
+      "ev": {
+        "status": "pago",
+        "qty": 1,
+        "hub_n": 1,
+        "leftover_cs": "cs_test_a14LmnOLsLtN62TDMhFn96CuyvWHfDXhlI3h6za8Itnlx49dW9FFW9ZS1X",
+        "buyable": true,
+        "pi": "pi_3UClsdH7FWYUN3jh0the6rDd"
+      }
+    },
+    {
+      "id": "C3",
+      "lens": "ET-C",
+      "title": "oferta aceite: selo servidor vs amount=1",
+      "ev": {
+        "offer": 8.0,
+        "status": "accepted",
+        "sealed": 905,
+        "hub_n": 1,
+        "cpi": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a15UphIQJ4Qs0ewMOxSgU1unZgRUO2cbpgfRZjKpPHv3K7hkmePwQBNvId#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRâ€¦"
+      }
+    },
+    {
+      "id": "C4",
+      "lens": "ET-C",
+      "title": "release∥disputa: 1 efeito (anti-atrofia)",
+      "ev": {
+        "rel": "200 true",
+        "disp": "201 [{\"id\":\"409ca155-3f1a-4e8e-ab20-561095c717ef\",\"order_id\":\"e39d7ced-b1bb-4f97-bfed-dd928e2f84da\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"reason\":\"danificado\",\"description\":\"RTDM disputa composiÃ§Ã£o artigo daniâ€¦",
+        "dWallet": 0.0,
+        "released": true,
+        "disp_open": true,
+        "status": "concluido",
+        "hub_n": 1,
+        "plant": "200 [{\"id\":\"e39d7ced-b1bb-4f97-bfed-dd928e2f84da\",\"created_at\":\"2026-09-06T19:38:25.525363+00:00\",\"product_id\":\"45ee3c19-162e-4c36-a984-55d2f1bfe835\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-00â€¦"
+      }
+    }
+  ],
+  "skipped": [],
+  "notes": [
+    {
+      "id": "fix.s1",
+      "lens": "ET-A",
+      "title": "S1 published",
+      "ev": {
+        "id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+        "handle": "fleahub-demo-ux",
+        "hub_published": true,
+        "user_type": "vendedor",
+        "full_name": "Maria Demo FleaHub",
+        "is_live": false
+      }
+    },
+    {
+      "id": "fix.b3",
+      "lens": "ET-A",
+      "title": "B3 fresco CPI saco",
+      "ev": "fd08971a-256c-4145-9d28-e62f856c464c"
+    },
+    {
+      "id": "sk",
+      "lens": "ET-C",
+      "title": "stripe test key",
+      "ev": false
+    },
+    {
+      "id": "fixture.paid",
+      "lens": "ET-C",
+      "title": "setup_paid_order Stripe TEST",
+      "ev": "200 {\n  \"ok\": true,\n  \"order_id\": \"5f7e498a-cb8a-4bb2-a35d-47993f9e9ac6\",\n  \"product_id\": \"e91a29bc-6a88-47e5-9431-0268b766ba6b\",\n  \"payment_intent_id\": \"pi_3UCls6H7FWYUN3jh00NFl8i0\",\n  \"pi_status\": \"succeeded\",\n  \"pi_amountâ€¦"
+    },
+    {
+      "id": "order.fail",
+      "title": "insertOrder",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"order_hold_exceeds_stock\"}"
+    },
+    {
+      "id": "fixture.bag",
+      "lens": "ET-C",
+      "title": "setup_paid_bag Stripe TEST 4242",
+      "ev": "200 {\n  \"ok\": true,\n  \"probe\": \"setup_paid_bag\",\n  \"payment_intent_id\": \"pi_3UClsZH7FWYUN3jh1011Wc3D\",\n  \"pi_amount_cents\": 1115,\n  \"total_cents_quote\": 1115,\n  \"items_cents\": 1000,\n  \"protection_cents\": 115,\n  \"share_a_centâ€¦"
+    },
+    {
+      "id": "fixture.paid",
+      "lens": "ET-C",
+      "title": "setup_paid_order Stripe TEST",
+      "ev": "200 {\n  \"ok\": true,\n  \"order_id\": \"908e119a-95c3-40c2-96a8-4b1519398b10\",\n  \"product_id\": \"332c4373-6517-4273-9986-1875b86147bf\",\n  \"payment_intent_id\": \"pi_3UClsdH7FWYUN3jh0the6rDd\",\n  \"pi_status\": \"succeeded\",\n  \"pi_amountâ€¦"
+    },
+    {
+      "id": "fixture.paid",
+      "lens": "ET-C",
+      "title": "setup_paid_order Stripe TEST",
+      "ev": "200 {\n  \"ok\": true,\n  \"order_id\": \"e39d7ced-b1bb-4f97-bfed-dd928e2f84da\",\n  \"product_id\": \"45ee3c19-162e-4c36-a984-55d2f1bfe835\",\n  \"payment_intent_id\": \"pi_3UCltVH7FWYUN3jh1zEriu75\",\n  \"pi_status\": \"succeeded\",\n  \"pi_amountâ€¦"
+    }
+  ],
+  "lenses": [
+    "ET-A",
+    "ET-B",
+    "ET-C"
+  ],
+  "classe_nova": [
+    "A1",
+    "A2",
+    "A3",
+    "A4",
+    "C1",
+    "C3",
+    "C4"
+  ],
+  "actors": {
+    "b1": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+    "s1": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+    "b2": "e87f6154-ff98-4706-a463-f8858535b12a",
+    "s2": "a7ea0a38-5fe3-4c3b-b1c8-1a1b2ca52329",
+    "b3": "fd08971a-256c-4145-9d28-e62f856c464c"
+  },
+  "created": {
+    "products": [
+      "cdf9a8e3-5b9d-45d4-be3d-b5627e30fa68",
+      "d2ba20a6-e29d-4ac0-9da0-79369ff365e9",
+      "d38c9d13-ea22-4531-87ac-e9f8fc324480",
+      "e91a29bc-6a88-47e5-9431-0268b766ba6b",
+      "21b94458-349a-4887-a440-2beab2c83665",
+      "4a7bcfb5-aa69-49f7-ba66-e4d20243ffb6",
+      "e383b594-e6a8-48e7-9ffd-6c30b61807ff",
+      "84ba240e-2f30-462e-af76-2d8cfd3c9866",
+      "1f664c8b-4672-4c9e-ae9a-081889429be4",
+      "a9c7ccda-adde-4f11-b779-3dd51a9e1e58",
+      "e08f4c70-c83f-46e8-8c38-71e6fe460482",
+      "4fdb7628-1446-4b90-a742-f0fb3d5a0646",
+      "440838c2-4b73-4f1d-8c09-a7de2d2c9985",
+      "23c4eebe-5310-48b1-a350-7e04829d9fa0",
+      "2fac4c73-edaf-48ee-a6cc-3048470a07f6",
+      "c9b100f1-d5c2-4a7d-aecf-d45a3d338a1a",
+      "60a6df19-8024-48e8-ba13-204eee9e46a4",
+      "b5fa9d09-e897-46ca-bad8-73410e2d533f",
+      "ef2369e7-0d61-4a6b-8447-84702fb1a9a0",
+      "2547960b-e1bc-48e7-8624-bfe4f6ae287b",
+      "5082ca9a-b018-4260-8433-95f7e5363108",
+      "956c9ef0-fae3-4c11-b356-b7819eef4008",
+      "c8dd52d4-9e98-40bf-ab45-9b176ae8775c",
+      "4ff13d58-2e0c-4f84-b132-b0fd1104c5c1",
+      "74c586ab-c055-4177-9239-0408ba752296",
+      "201bc338-f2ea-4545-aac6-f62a9761ad2e",
+      "66a0be4e-769b-40cb-8d75-a125933095db",
+      "df25ba44-62c0-4dbd-9a2a-b2502d4c9ed7",
+      "609cde68-8b2a-4545-b100-15a731f76e48",
+      "332c4373-6517-4273-9986-1875b86147bf",
+      "bc72c078-88f5-461c-bc82-20fe3cfe5396",
+      "45ee3c19-162e-4c36-a984-55d2f1bfe835"
+    ],
+    "orders": [
+      "bbe26e9d-8b2a-4853-99cd-6c8475f5427b",
+      "6eabc906-e1e2-4be1-8596-1e7b490dd668",
+      "540830ab-4b40-4c1f-bf43-bea6ef59d9a4",
+      "5f7e498a-cb8a-4bb2-a35d-47993f9e9ac6",
+      "53253c7a-2530-4cd4-9c00-d6dfdb7f168a",
+      "c42f0d9d-d5ec-4c6a-98bd-044645f65f97",
+      "725f4ebd-77a6-4829-9b3c-db1d85802ca7",
+      "60391a2e-5b39-4819-8d06-333715dae57b",
+      "ab670512-b076-4aa0-a219-b0c52bec8c71",
+      "5bba3bbb-1843-49b5-9ff6-5fbe0cffc3e5",
+      "2aa431f4-75f1-4d10-9295-2bfc009c8b8d",
+      "56fc2f37-c7c3-4f8d-9e8e-98a96013a881",
+      "8fe1665d-81d5-4604-a10e-4ca843cb3ef4",
+      "a38bd925-c0ae-4760-aad7-9d3390bc549b",
+      "bd42987a-f48d-4764-97d1-263ac826c274",
+      "048ac73a-8b6b-4b82-a300-40d6e42925e8",
+      "2c4939d0-414d-4a80-a1b1-28bd99f6009d",
+      "2545465d-61ba-40b5-abe6-77b5f92bc8e7",
+      "3a31c81c-2836-4acf-8197-888d5a3369dc",
+      "708d1193-f3e2-4dc0-a93d-59847f162d2a",
+      "6f3e0738-ee65-48b0-80f0-1a80665c596e",
+      "dbc70e43-65f7-4720-a97b-7d4e41a06983",
+      "8bc956a9-a03d-4879-9a28-9305e63c4224",
+      "46a29f90-12d6-45a8-8a69-3450db299300",
+      "e0b29542-203a-4c85-bdbe-b598fed50ec4",
+      "8615e9a3-1220-4cba-ba5d-8a6c743daaf6",
+      "292e205a-a3c2-4eff-8830-4cf26b8bb576",
+      "20c80ca2-8819-47ef-b4c4-867066baaf7d",
+      "04852ebf-58f3-41ae-90f4-7b84647de899",
+      "908e119a-95c3-40c2-96a8-4b1519398b10",
+      "b55e1745-09e0-47cf-af7e-2ced27e59bc7",
+      "226401b2-966e-42e1-b2cb-ccadd5626244",
+      "e39d7ced-b1bb-4f97-bfed-dd928e2f84da"
+    ],
+    "sessions": [
+      "cs_test_a1en8cBvmtLqYyaALNIAOu7XbBnzDR0Q8a19kMLSMs6TzhHTK06CEA9kH2",
+      "cs_test_a1hsN6VoLnZKx3t9ixRnbqm467X2SMFNXyr6GgqWtUmd04nhYHAOEPSXC3",
+      "cs_test_a1joRMrbjT4V200jCbo4YsOAXMfIcTYzzhtLt2PVPDaUm6QZlHD4HkiSku",
+      "cs_test_a1joRMrbjT4V200jCbo4YsOAXMfIcTYzzhtLt2PVPDaUm6QZlHD4HkiSku",
+      "cs_test_a1vwaLdSDtMoOWYbVzBFJE2uQxvEsTfC9BLoLaqPKh7t7PqiDbJJFNv47W",
+      "cs_test_a1vwaLdSDtMoOWYbVzBFJE2uQxvEsTfC9BLoLaqPKh7t7PqiDbJJFNv47W",
+      "cs_test_a1TqtYs3io2Bx1pJHGcxSv2E5O6NeG2O7Wl9xJqW4du8rQOBNq64XUyvNu",
+      "cs_test_a1TqtYs3io2Bx1pJHGcxSv2E5O6NeG2O7Wl9xJqW4du8rQOBNq64XUyvNu",
+      "cs_test_a1FIeVxTCJiIvuS6EoHUpPhleIyzACM1LeenDJ6y8iNeB4mTws4K2NF9hF",
+      "cs_test_a1hKF6xWXYdE6ETmndXgKxZEBACTt2blKROYlXRuqBe6yGBZx78o9scc18",
+      "cs_test_a1BdLw3qWYVU9Q7jDKldelXdEzQETp8N5BPZ7ptulX8xLvm7NdoH2lcydb",
+      "cs_test_a1tV20avJWzV7nPiJybAp5z31hrY8mlZxY9sBmHt7xMhEWJl12thqRwF0B",
+      "cs_test_a1TbTPq41XIYe5gOpSeVliveFKJ2RQdVbihEuqZkIww2HQhJEuDdzHXbrl",
+      "cs_test_a1TbTPq41XIYe5gOpSeVliveFKJ2RQdVbihEuqZkIww2HQhJEuDdzHXbrl",
+      "cs_test_a14LmnOLsLtN62TDMhFn96CuyvWHfDXhlI3h6za8Itnlx49dW9FFW9ZS1X",
+      "cs_test_a15UphIQJ4Qs0ewMOxSgU1unZgRUO2cbpgfRZjKpPHv3K7hkmePwQBNvId"
+    ],
+    "offers": [
+      "3e8b6492-9520-41ea-a9e4-a1c1e4c93f5e"
+    ],
+    "disputes": [
+      "409ca155-3f1a-4e8e-ab20-561095c717ef"
+    ]
+  }
+}

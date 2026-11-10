@@ -1,0 +1,191 @@
+{
+  "pass": 3,
+  "stamp": "20260831T0817",
+  "hold_reservado": {
+    "http": 201,
+    "id": "e15ddf2c-0568-4b07-a7ba-83b38e4b861d",
+    "snip": "[{\"id\":\"e15ddf2c-0568-4b07-a7ba-83b38e4b861d\",\"created_at\":\"2026-08-31T07:32:08.203432+00:00\",\"product_id\":\"6edb515c-9a85-41f1-ac32-0f99536f819a\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"price_total\":8.50,\"shipping_method\":\"ctt\",\"payment_method\":null,\"proof_u…"
+  },
+  "pay_before_unlist_reservado": {
+    "http": 200,
+    "sess": true,
+    "snip": "{\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1lrmc4kkPuA9jbhoQZRKYy9v1cTKvWDqKAitirsnZHnfPYesHoY5BBThx#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDR…"
+  },
+  "hold_aguarda_confirmacao": {
+    "http": 201,
+    "id": "33f7ad5d-1e7b-4c93-a986-12624b9d8a68",
+    "snip": "[{\"id\":\"33f7ad5d-1e7b-4c93-a986-12624b9d8a68\",\"created_at\":\"2026-08-31T07:32:10.701942+00:00\",\"product_id\":\"7c0a1b33-a896-43dc-84c2-806ef0a85e74\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"price_total\":8.50,\"shipping_method\":\"ctt\",\"payment_method\":null,\"proof_u…"
+  },
+  "pay_before_unlist_aguarda_confirmacao": {
+    "http": 200,
+    "sess": true,
+    "snip": "{\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1pDCAUHwPHAsydcDeHaMjHiniIgUH1IewjQE1J7zOttzp9FHFEChVM6o8#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDR…"
+  },
+  "hold_reserva_pendente": {
+    "http": 201,
+    "id": "7de1a011-83e2-4580-b49c-1addd1f70071",
+    "snip": "[{\"id\":\"7de1a011-83e2-4580-b49c-1addd1f70071\",\"created_at\":\"2026-08-31T07:32:12.789928+00:00\",\"product_id\":\"34e2b4d0-a6e3-42a0-940e-9a3f187d65ac\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"price_total\":8.50,\"shipping_method\":\"ctt\",\"payment_method\":null,\"proof_u…"
+  },
+  "pay_before_unlist_reserva_pendente": {
+    "http": 200,
+    "sess": true,
+    "snip": "{\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1Q1MB0XfGXSpYckzzLhj8NhgQj08TUJ8z2kL7enqQxRgKIiz3gRWh53cK#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDR…"
+  },
+  "findings": [
+    {
+      "id": "E6-CHECKOUT-AFTER-UNLIST-reservado",
+      "lens": "E6",
+      "severity": "info",
+      "title": "Session checkout após unlist (order reservado)",
+      "pre": "hold reservado → unlist → create-payment-intent",
+      "repro": "POST create-payment-intent order=reservado after unlist",
+      "proven": false,
+      "evidence": {
+        "pid": "6edb515c-9a85-41f1-ac32-0f99536f819a",
+        "oid": "e15ddf2c-0568-4b07-a7ba-83b38e4b861d",
+        "listed": false,
+        "before_http": 200,
+        "after_http": 400,
+        "after_snip": "{\"error\":\"Checkout blocked: product is not listed.\"}"
+      }
+    },
+    {
+      "id": "E6-CHECKOUT-AFTER-UNLIST-aguarda_confirmacao",
+      "lens": "E6",
+      "severity": "info",
+      "title": "Session checkout após unlist (order aguarda_confirmacao)",
+      "pre": "hold aguarda_confirmacao → unlist → create-payment-intent",
+      "repro": "POST create-payment-intent order=aguarda_confirmacao after unlist",
+      "proven": false,
+      "evidence": {
+        "pid": "7c0a1b33-a896-43dc-84c2-806ef0a85e74",
+        "oid": "33f7ad5d-1e7b-4c93-a986-12624b9d8a68",
+        "listed": false,
+        "before_http": 200,
+        "after_http": 400,
+        "after_snip": "{\"error\":\"Checkout blocked: product is not listed.\"}"
+      }
+    },
+    {
+      "id": "E6-CHECKOUT-AFTER-UNLIST-reserva_pendente",
+      "lens": "E6",
+      "severity": "info",
+      "title": "Session checkout após unlist (order reserva_pendente)",
+      "pre": "hold reserva_pendente → unlist → create-payment-intent",
+      "repro": "POST create-payment-intent order=reserva_pendente after unlist",
+      "proven": false,
+      "evidence": {
+        "pid": "34e2b4d0-a6e3-42a0-940e-9a3f187d65ac",
+        "oid": "7de1a011-83e2-4580-b49c-1addd1f70071",
+        "listed": false,
+        "before_http": 200,
+        "after_http": 400,
+        "after_snip": "{\"error\":\"Checkout blocked: product is not listed.\"}"
+      }
+    },
+    {
+      "id": "E6-STATUS-ESCALATE-UNLIST",
+      "lens": "E6",
+      "severity": "info",
+      "title": "buyer PATCH pendente→reservado em unlist e faz checkout",
+      "pre": "race order unlistado",
+      "repro": "PATCH status=reservado; POST create-payment-intent",
+      "proven": false,
+      "evidence": {
+        "patch": {
+          "http": 200,
+          "snip": "[{\"id\":\"477310c4-7730-4b54-874e-cfd81f3f492b\",\"created_at\":\"2026-08-31T07:26:18.730603+00:00\",\"product_id\":\"a11ee70e-fc62-4295-8cf0-a1034f3268c5\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"price_total\":14.00,\"shipping_method\":null,\"payment_method\":null,\"proof_u…"
+        },
+        "pay": {
+          "http": 400,
+          "snip": "{\"error\":\"Checkout blocked: order status 'pendente' cannot start payment.\"}"
+        }
+      }
+    },
+    {
+      "id": "E6-CHECKOUT-AFTER-SOLD",
+      "lens": "E6",
+      "severity": "info",
+      "title": "Session checkout após is_sold=true (order reservado)",
+      "pre": "hold reservado → sold → checkout",
+      "repro": "POST create-payment-intent after is_sold",
+      "proven": false,
+      "evidence": {
+        "oid": "cde00919-7fa6-4592-838f-bc5d7198ec16",
+        "http": 400,
+        "snip": "{\"error\":\"Checkout blocked: product is marked sold.\"}"
+      }
+    },
+    {
+      "id": "E1-DISCOVERY-ENDED-UNPUB-RECHECK",
+      "lens": "E1",
+      "severity": "P2",
+      "title": "recheck: live ended unpublished ainda na discovery",
+      "pre": "GET hub_lives_discovery_public?id=eq.fixture",
+      "repro": "anon GET by id",
+      "proven": true,
+      "evidence": {
+        "body": "[{\"id\":\"53d40ca4-8bb5-40b6-8fea-9355bb848aba\",\"seller_id\":\"d28f5109-5e62-4058-a1c6-d82f30e2f629\",\"seller_name\":\"rte-20260831t0817-s2\",\"mux_playback_id\":\"rte0817fakeplay\",\"status\":\"ended\"}]"
+      }
+    },
+    {
+      "id": "E1-HUB-PUBLISH-OTHER",
+      "lens": "E1",
+      "severity": "info",
+      "title": "buyer2 publica Hub do seller",
+      "pre": "PATCH hub_published",
+      "repro": "PATCH profiles seller as buyer2",
+      "proven": false,
+      "evidence": {
+        "self": {
+          "http": 400,
+          "n": 0
+        },
+        "other": {
+          "http": 200,
+          "snip": "[]"
+        }
+      }
+    },
+    {
+      "id": "E4-SHIP-SEAL-FLIP",
+      "lens": "E4",
+      "severity": "info",
+      "title": "buyer muda shipping_method após selo",
+      "pre": "order reservado hand → PATCH ctt",
+      "repro": "PATCH orders shipping_method",
+      "proven": false,
+      "evidence": {
+        "http": 200,
+        "snip": "[{\"id\":\"e779d5f3-cef3-494f-a367-b22906a27000\",\"created_at\":\"2026-08-31T07:32:16.680793+00:00\",\"product_id\":\"48fece5a-6194-4b76-9f32-5fe674af1581\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"price_total\":10.00,\"shipping_method\":\"hand\",\"payment_method\":null,\"proof…"
+      }
+    },
+    {
+      "id": "E3-DEVICE-ANON",
+      "lens": "E3",
+      "severity": "info",
+      "title": "anon lê seller_device_tokens",
+      "pre": "GET seller_device_tokens",
+      "repro": "anon GET",
+      "proven": false,
+      "evidence": {
+        "http": 200,
+        "snip": "[]"
+      }
+    }
+  ],
+  "proven": [
+    {
+      "id": "E1-DISCOVERY-ENDED-UNPUB-RECHECK",
+      "lens": "E1",
+      "severity": "P2",
+      "title": "recheck: live ended unpublished ainda na discovery",
+      "pre": "GET hub_lives_discovery_public?id=eq.fixture",
+      "repro": "anon GET by id",
+      "proven": true,
+      "evidence": {
+        "body": "[{\"id\":\"53d40ca4-8bb5-40b6-8fea-9355bb848aba\",\"seller_id\":\"d28f5109-5e62-4058-a1c6-d82f30e2f629\",\"seller_name\":\"rte-20260831t0817-s2\",\"mux_playback_id\":\"rte0817fakeplay\",\"status\":\"ended\"}]"
+      }
+    }
+  ]
+}

@@ -1,0 +1,248 @@
+{
+  "stamp": "20260907T0928",
+  "prefix": "RTFB-20260907T0928",
+  "auditor": "REDTEAM_BLIND_FB_STOCK_MONEY_SMOKE_PRE_P4_v1",
+  "probes": [
+    {
+      "probe_id": "A1",
+      "poco": "FB-A",
+      "payload": "2 buyers mesmo SKU qty=1 (insert sequencial 2.º)",
+      "http_rpc": {
+        "h1": "201 [{\"id\":\"7164c765-2c12-4c2f-9572-c27360546dd1\",\"created_at\":\"2026-09-07T08:33:43.685932+00:00\",\"product_id\":\"cf4cd928-7ec6-4c3f-aa33-559075e9563d\",\"buyer_id\":\"d2dac1c6-2deb-41ca-91f6-4da1acd87c02\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"price_total\":11.00,\"shipping_met…",
+        "h2": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"order_hold_exceeds_stock\"}"
+      },
+      "bd_stripe": {
+        "pid": "cf4cd928-7ec6-4c3f-aa33-559075e9563d",
+        "o1": "7164c765-2c12-4c2f-9572-c27360546dd1",
+        "o2": null
+      },
+      "verdict": "FAIL",
+      "classe_nova": "NÃO",
+      "lens": "FB-A"
+    },
+    {
+      "probe_id": "A2",
+      "poco": "FB-A",
+      "payload": "Future.wait reserve∥reserve 0 ms qty=1",
+      "http_rpc": [
+        "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"order_hold_exceeds_stock\"}",
+        "201 [{\"id\":\"851e3f2a-d248-4855-9360-a6456b29cf08\",\"created_at\":\"2026-09-07T08:33:44.501998+00:00\",\"product_id\":\"60c4cc89-9295-4abe-93cb-2700a7248452\",\"buyer_id\":\"2bdb17c6-2607-4249-817a-d69b8871aca9\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"price_total\":11.00,\"shipping_met…"
+      ],
+      "bd_stripe": {
+        "ok": 1,
+        "qty": 1,
+        "sold": false
+      },
+      "verdict": "FAIL",
+      "classe_nova": "SIM",
+      "lens": "FB-A"
+    },
+    {
+      "probe_id": "A3",
+      "poco": "FB-A",
+      "payload": "após pago A qty=1: qty↓ · is_sold · Hub n (buyer+anon)",
+      "http_rpc": {
+        "hub_b": "200 []",
+        "hub_a": "200 []"
+      },
+      "bd_stripe": {
+        "status": "pago",
+        "qty": 0,
+        "sold": true,
+        "hub_b": 0,
+        "hub_anon": 0,
+        "pi": "pi_3UCxzpH7FWYUN3jh0G64xfaS",
+        "applied": 1
+      },
+      "verdict": "FAIL",
+      "classe_nova": "SIM",
+      "lens": "FB-A"
+    },
+    {
+      "probe_id": "A4",
+      "poco": "FB-A",
+      "payload": "2.º buyer tenta CPI na mesma unit após pago qty=1",
+      "http_rpc": "no cpi (insert deny)",
+      "bd_stripe": {
+        "qty": 0,
+        "sold": true,
+        "opened": false
+      },
+      "verdict": "FAIL",
+      "classe_nova": "SIM",
+      "lens": "FB-A"
+    },
+    {
+      "probe_id": "B1",
+      "poco": "FB-B",
+      "payload": "Hub público (buyer+anon) vs order+products após pago leftover",
+      "http_rpc": {
+        "hub_b": "200 [{\"id\":\"f6866de1-b0e4-4195-b2d8-eb762e3f7489\",\"title\":\"Refund crash E2E 1788770029357\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"is_sold\":false,\"price\":5.9,\"created_at\":\"2026-09-07T08:33:49.530031+00:00\"}]",
+        "hub_a": "200 [{\"id\":\"f6866de1-b0e4-4195-b2d8-eb762e3f7489\",\"title\":\"Refund crash E2E 1788770029357\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"is_sold\":false,\"price\":5.9,\"created_at\":\"2026-09-07T08:33:49.530031+00:00\"}]"
+      },
+      "bd_stripe": {
+        "status": "pago",
+        "qty": 1,
+        "hub_b": 1,
+        "hub_anon": 1,
+        "sold": false,
+        "pi": "pi_3UCxztH7FWYUN3jh0I9oohI0",
+        "applied": 1,
+        "sites": 4
+      },
+      "verdict": "FAIL",
+      "classe_nova": "SIM",
+      "lens": "FB-B"
+    },
+    {
+      "probe_id": "B2",
+      "poco": "FB-B",
+      "payload": "leftover qty 2→1 visível Hub (n=1 listed unsold)",
+      "http_rpc": "200 [{\"id\":\"f6866de1-b0e4-4195-b2d8-eb762e3f7489\",\"title\":\"Refund crash E2E 1788770029357\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"is_sold\":false,\"price\":5.9,\"created_at\":\"2026-09-07T08:33:49.530031+00:00\"}]",
+      "bd_stripe": {
+        "qty": 1,
+        "hub_n": 1,
+        "status": "pago"
+      },
+      "verdict": "FAIL",
+      "classe_nova": "NÃO",
+      "lens": "FB-B"
+    },
+    {
+      "probe_id": "B3",
+      "poco": "FB-B",
+      "payload": "bag pago 4 lines: todas pago ou nenhuma (sem meia liquidação)",
+      "http_rpc": {
+        "cpi": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1aPOA1lFPchgjJyN6oXw5100po3beR2StTFe87YoLwWsXKJzRciGORA5x#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21oYWlsUnxrVkRhQUQyNlJjSWBCN3BXNXVvVT1haml…",
+        "pay": {
+          "sid": "cs_test_a1aPOA1lFPchgjJyN6oXw5100po3beR2StTFe87YoLwWsXKJzRciGORA5x",
+          "paid": false,
+          "via": "none",
+          "page_http": 200,
+          "page_len": 564069,
+          "html_has_sid": false,
+          "html_secret_n": 0,
+          "html_real_pi_n": 0,
+          "pk": "pk_test_51LG…",
+          "cs_get_pk": "403 {\n  \"error\": {\n    \"code\": \"secret_key_required\",\n    \"doc_url\": \"https://stripe.com/docs/error-codes/secret-key-required\",\n    \"message\": \"This API call cannot be made with a publishable API key. Please use a secret API key. You can find a list of your API keys at https://dashbo…",
+          "pp_create": "400 {\n  \"error\": {\n    \"code\": \"parameter_missing\",\n    \"doc_url\": \"https://stripe.com/docs/error-codes/parameter-missing\",\n    \"message\": \"Missing required param: success_url.\",\n    \"param\": \"success_url\",\n    \"type\": \"invalid_request_error\"\n  }\n}\n",
+          "pp_init": "404 {\n  \"error\": {\n    \"code\": \"resource_missing\",\n    \"doc_url\": \"https://stripe.com/docs/error-codes/resource-missing\",\n    \"message\": \"No such checkout.session: 'cs_test_a1aPOA1lFPchgjJyN6oXw5100po3beR2StTFe87YoLwWsXKJzRciGORA5x'\",\n    \"param\": \"payment_page\",\n    \"type\": \"invalid…",
+          "pp_init_get": "404 {\n  \"error\": {\n    \"message\": \"Unrecognized request URL (GET: /v1/payment_pages/cs_test_a1aPOA1lFPchgjJyN6oXw5100po3beR2StTFe87YoLwWsXKJzRciGORA5x/init). Please see https://stripe.com/docs or we can help at https://support.stripe.com/.\",\n    \"type\": \"invalid_request_error\"\n  }\n}\n",
+          "pi": null,
+          "settle": "402 Pagamento ainda não confirmado. Se já pagaste, aguarda alguns segundos e volta à app Fleaber."
+        }
+      },
+      "bd_stripe": {
+        "n": 4,
+        "statuses": [
+          "reserva_pendente",
+          "reserva_pendente",
+          "reserva_pendente",
+          "reserva_pendente"
+        ],
+        "all_pago": false,
+        "any_pago": false,
+        "half": false
+      },
+      "verdict": "FAIL",
+      "classe_nova": "SIM",
+      "lens": "FB-B"
+    },
+    {
+      "probe_id": "C1",
+      "poco": "FB-C",
+      "payload": "underpay / total_eur=0 → amount catálogo",
+      "http_rpc": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1rZqXizo5PCmoHTk554seqh59OEcmJKKjFF1Nmsf7yGfWTXMtN2zNHKK5#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21oYWlsUnxrVkRhQUQyNlJjSWBCN3BXNXVvVT1haml…",
+      "bd_stripe": {
+        "quoted": 1325,
+        "stripeAmt": 1325,
+        "status": 200,
+        "client_won": false
+      },
+      "verdict": "FAIL",
+      "classe_nova": "SIM",
+      "lens": "FB-C"
+    },
+    {
+      "probe_id": "C2",
+      "poco": "FB-C",
+      "payload": "seller wallet antes/depois 1 pago + release mão (Δ esperado)",
+      "http_rpc": "200 true",
+      "bd_stripe": {
+        "dPago": 0.0,
+        "dRelease": 5.0,
+        "dTotal": 5.0,
+        "w0": 21.0,
+        "w1": 21.0,
+        "w2": 26.0,
+        "txn_n": 1,
+        "oid": "2a112865-03b8-4eea-8055-d4a35d3271c3",
+        "pi": "pi_3UCxztH7FWYUN3jh0I9oohI0"
+      },
+      "verdict": "FAIL",
+      "classe_nova": "SIM",
+      "lens": "FB-C"
+    },
+    {
+      "probe_id": "C3",
+      "poco": "FB-C",
+      "payload": "2× settle mesma session → 1 efeito (fallback GET)",
+      "http_rpc": {
+        "replay": "500 {\n  \"ok\": false,\n  \"error\": \"session missing payment_intent\",\n  \"session_id\": \"cs_test_a12UFugH5GdG6YUpUnToAZqimKRzP2Lcc7UQZXEhT1G7tIneWOmRzWDDEa\",\n  \"session_status\": \"open\",\n  \"session_payment_status\": \"unpaid\"\n}",
+        "s1": "402 Pagamento ainda não confirmado. Se já pagaste, aguarda alguns segundos e volta à app Fleaber.",
+        "s2": "402 Pagamento ainda não confirmado. Se já pagaste, aguarda alguns segundos e volta à app Fleaber."
+      },
+      "bd_stripe": {
+        "sid": "cs_test_a1rZqXizo5PCmoHTk554seqh59OEcmJKKjFF1Nmsf7yGfWTXMtN2zNHKK5"
+      },
+      "verdict": "FAIL",
+      "classe_nova": "SIM",
+      "lens": "FB-C"
+    },
+    {
+      "probe_id": "D1",
+      "poco": "FB-D",
+      "payload": "buyer refund-order (anti-atrofia residual ≤1)",
+      "http_rpc": "403 {\"ok\":false,\"error\":\"Sem permissão.\"}",
+      "bd_stripe": {
+        "oid": "2a112865-03b8-4eea-8055-d4a35d3271c3",
+        "status": 403
+      },
+      "verdict": "FAIL",
+      "classe_nova": "NÃO",
+      "lens": "FB-D"
+    },
+    {
+      "probe_id": "D2",
+      "poco": "FB-D",
+      "payload": "settle unpaid Session (anti-atrofia residual ≤1)",
+      "http_rpc": {
+        "cpi": "400 {\"error\":\"Checkout blocked: overlapping bag session.\"}",
+        "settle": null
+      },
+      "bd_stripe": {
+        "settle_status": null,
+        "credited": false
+      },
+      "verdict": "SKIP",
+      "classe_nova": "NÃO",
+      "lens": "FB-D"
+    }
+  ],
+  "n": 12,
+  "races": [
+    "A2"
+  ],
+  "classes_novas": [
+    "A2",
+    "A3",
+    "A4",
+    "B1",
+    "B3",
+    "C1",
+    "C2",
+    "C3"
+  ],
+  "findings": 0,
+  "findings_ids": []
+}

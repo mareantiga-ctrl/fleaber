@@ -1,0 +1,424 @@
+{
+  "auditor": "REDTEAM_BLIND_DU_RAFFLE_HUB_POS_DNDS_v1",
+  "pass": 2,
+  "prefix": "RTDU-20260906T1736",
+  "probes": [
+    {
+      "probe_id": "A5",
+      "surfaces": "rifa RPC",
+      "action": "JWT buyer draw em rifa closed com tickets",
+      "http": "400 {\"code\":\"P0001\",\"details\":null,\"hint\":null,\"message\":\"not_allowed\"}",
+      "oracles": "{\"tickets\":5,\"buyer_ok\":false,\"nWin\":1}",
+      "result": "HOLD",
+      "lens": "DU6",
+      "residual": false,
+      "count_finding": false,
+      "classe_nova": false,
+      "race": false
+    },
+    {
+      "probe_id": "A1",
+      "surfaces": "Hub + products + live_item + orders",
+      "action": "draw qty=1 marketplace hitch → Hub 0 + insert deny",
+      "http": "{\"close\":\"200 {\\\"ok\\\": true, \\\"status\\\": \\\"closed\\\"}\",\"draw\":\"200 {\\\"ok\\\": true, \\\"status\\\": \\\"drawn\\\", \\\"winners\\\": [{\\\"rank\\\": 1, \\\"user_id\\\": \\\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\\\", \\\"tickets_at_draw\\\": 5}], \\\"winner_name\\\": \\\"Maestro Buyer\\\", \\\"prize_orders\\\": []}\",\"ins\":\"400 {\\\"code\\\":\\\"23514\\\",\\\"details\\\":null,…",
+      "oracles": "{\"tickets\":5,\"qty\":\"1→0\",\"hub_n\":0,\"sold\":true,\"listed\":false,\"nWin\":1,\"prize_n\":0,\"li\":\"available\",\"status\":\"drawn\"}",
+      "result": "HOLD",
+      "lens": "DU2",
+      "residual": true,
+      "count_finding": false,
+      "classe_nova": false,
+      "race": false
+    },
+    {
+      "probe_id": "A4",
+      "surfaces": "rifa winners",
+      "action": "draw 2× idempotente",
+      "http": "200 {\"ok\": true, \"status\": \"drawn\", \"winners\": [{\"rank\": 1, \"user_id\": \"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\", \"tickets_at_draw\": 5}], \"winner_name\": \"Maestro Buyer\", \"prize_orders\": []} | 400 {\"code\":\"P0001\",\"details\":null,\"hint\":null,\"message\":\"invalid_status\"}",
+      "oracles": "{\"nWin\":1,\"status\":\"drawn\"}",
+      "result": "HOLD",
+      "lens": "DU1",
+      "residual": true,
+      "count_finding": false,
+      "classe_nova": false,
+      "race": false
+    },
+    {
+      "probe_id": "D2",
+      "surfaces": "draw return + products + Hub + orders",
+      "action": "prize_orders[] vs seal.ok",
+      "http": "{\"draw\":\"200 {\\\"ok\\\": true, \\\"status\\\": \\\"drawn\\\", \\\"winners\\\": [{\\\"rank\\\": 1, \\\"user_id\\\": \\\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\\\", \\\"tickets_at_draw\\\": 5}], \\\"winner_name\\\": \\\"Maestro Buyer\\\", \\\"prize_orders\\\": []}\",\"seal\":\"200 {\\\"ok\\\": true, \\\"winners\\\": 1, \\\"product_id\\\": \\\"6fadb23c-c3cb-4a14-9116-69c371df7e68\\\", …",
+      "oracles": "{\"prize_n\":0,\"seal\":\"200 {\\\"ok\\\": true, \\\"winners\\\": 1, \\\"product_id\\\": \\\"6fadb23c-c3cb-4a14-9116-69c371df7e68\\\", \\\"live_item_id\\\": \\\"01d82d01-07fc-4a55-826b-ff0dd49e67a9\\\"}\",\"hub_n\":0,\"qty\":0,\"draw_ok\":true}",
+      "result": "HOLD",
+      "lens": "DU7",
+      "residual": false,
+      "count_finding": false,
+      "classe_nova": true,
+      "race": false
+    },
+    {
+      "probe_id": "D3",
+      "surfaces": "live_item + rifa",
+      "action": "live_item status após draw",
+      "http": "200 {\"ok\": true, \"status\": \"drawn\", \"winners\": [{\"rank\": 1, \"user_id\": \"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\", \"tickets_at_draw\": 5}], \"winner_name\": \"Maestro Buyer\", \"prize_orders\": []}",
+      "oracles": "{\"status\":\"available\",\"active\":true,\"drawn\":\"drawn\"}",
+      "result": "FAIL",
+      "lens": "DU2",
+      "residual": false,
+      "count_finding": true,
+      "classe_nova": true,
+      "race": false
+    },
+    {
+      "probe_id": "B2",
+      "surfaces": "orders + CPI + Hub",
+      "action": "after drawn: CPI / insert order nova",
+      "http": "{\"ins\":\"400 {\\\"code\\\":\\\"23514\\\",\\\"details\\\":null,\\\"hint\\\":null,\\\"message\\\":\\\"order_hold_exceeds_stock\\\"}\",\"cpi\":null}",
+      "oracles": "{\"hub_n\":0,\"qty\":0,\"draw_ok\":true}",
+      "result": "HOLD",
+      "lens": "DU3",
+      "residual": false,
+      "count_finding": false,
+      "classe_nova": true,
+      "race": false
+    },
+    {
+      "probe_id": "A2",
+      "surfaces": "Hub + products + winners + orders",
+      "action": "draw winner_count=2 stock=2",
+      "http": "{\"draw\":\"200 {\\\"ok\\\": true, \\\"status\\\": \\\"drawn\\\", \\\"winners\\\": [{\\\"rank\\\": 1, \\\"user_id\\\": \\\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\\\", \\\"tickets_at_draw\\\": 4}, {\\\"rank\\\": 2, \\\"user_id\\\": \\\"56f10f8d-3951-4e80-b263-a64b164b447a\\\", \\\"tickets_at_draw\\\": 1}], \\\"wi…\",\"ins\":\"400 {\\\"code\\\":\\\"23514\\\",\\\"details\\\":null,\\\"hint\\\":nu…",
+      "oracles": "{\"nWin\":2,\"qty\":0,\"hub_n\":0,\"sold\":true,\"prize_n\":0}",
+      "result": "HOLD",
+      "lens": "DU5",
+      "residual": false,
+      "count_finding": false,
+      "classe_nova": true,
+      "race": false
+    },
+    {
+      "probe_id": "A3",
+      "surfaces": "live_item + rifa (sem product)",
+      "action": "draw live_only skipped vs leak",
+      "http": "200 {\"ok\": true, \"status\": \"drawn\", \"winners\": [{\"rank\": 1, \"user_id\": \"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\", \"tickets_at_draw\": 4}], \"winner_name\": \"Maestro Buyer\", \"prize_orders\": []}",
+      "oracles": "{\"li\":{\"id\":\"a6ae787e-382e-49b6-a53a-66029852c72d\",\"live_id\":\"85f8cb9b-542e-4f45-a66d-22c1bb8ebee9\",\"product_id\":null,\"checkout_product_id\":null,\"quantity\":1,\"status\":\"available\",\"is_active\":true,\"item_kind\":\"live_only\",\"title\":\"RTDU-20260906T1736 P2 A3 liveonly-li\"},\"nWin\":1,\"product_id\":null}",
+      "result": "FAIL",
+      "lens": "DU1",
+      "residual": false,
+      "count_finding": true,
+      "classe_nova": true,
+      "race": false
+    },
+    {
+      "probe_id": "B1",
+      "surfaces": "rifa + CPI + Hub + products",
+      "action": "award + draw∥CPI paralelo",
+      "http": "{\"draw\":\"200 {\\\"ok\\\": true, \\\"status\\\": \\\"drawn\\\", \\\"winners\\\": [{\\\"rank\\\": 1, \\\"user_id\\\": \\\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\\\", \\\"tickets_at_draw\\\": 5}], \\\"winner_name\\\": \\\"Maestro Buyer\\\", \\\"prize_orders\\\": []}\",\"cpi\":\"400 {\\\"error\\\":\\\"Checkout blocked: product is marked sold.\\\"}\",\"ins\":\"201 [{\\\"id\\\":\\\"c8b07046-…",
+      "oracles": "{\"qty\":0,\"hub_n\":0,\"nWin\":1,\"cs\":null}",
+      "result": "HOLD",
+      "lens": "DU4",
+      "residual": false,
+      "count_finding": false,
+      "classe_nova": true,
+      "race": true
+    },
+    {
+      "probe_id": "B3",
+      "surfaces": "Hub + products + winners",
+      "action": "leftover stock=3 winners=1",
+      "http": "{\"draw\":\"200 {\\\"ok\\\": true, \\\"status\\\": \\\"drawn\\\", \\\"winners\\\": [{\\\"rank\\\": 1, \\\"user_id\\\": \\\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\\\", \\\"tickets_at_draw\\\": 5}], \\\"winner_name\\\": \\\"Maestro Buyer\\\", \\\"prize_orders\\\": []}\",\"ins\":\"201 [{\\\"id\\\":\\\"ec9402d2-45d0-4816-8bde-7cc6d4786936\\\",\\\"created_at\\\":\\\"2026-09-06T16:48:58.002…",
+      "oracles": "{\"qty\":2,\"hub_n\":1,\"nWin\":1,\"listed\":true}",
+      "result": "HOLD",
+      "lens": "DU2",
+      "residual": false,
+      "count_finding": false,
+      "classe_nova": true,
+      "race": false
+    },
+    {
+      "probe_id": "B4",
+      "surfaces": "orders premio_rifa + Hub + products",
+      "action": "refund/cancel premio_rifa vs Hub restore",
+      "http": "{\"draw\":\"200 {\\\"ok\\\": true, \\\"status\\\": \\\"drawn\\\", \\\"winners\\\": [{\\\"rank\\\": 1, \\\"user_id\\\": \\\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\\\", \\\"tickets_at_draw\\\": 5}], \\\"winner_name\\\": \\\"Maestro Buyer\\\", \\\"prize_orders\\\": []}\",\"rf\":null}",
+      "oracles": "{\"prize_n\":0,\"qty\":\"0→0\",\"hub_n\":0,\"prize_status\":null}",
+      "result": "HOLD",
+      "lens": "DU3",
+      "residual": false,
+      "count_finding": false,
+      "classe_nova": true,
+      "race": false
+    },
+    {
+      "probe_id": "C2",
+      "surfaces": "live accept + rifa + Hub + products",
+      "action": "accept hitch + rifa mesmo SKU (award∥unlist)",
+      "http": "{\"unlist\":\"200 [{\\\"id\\\":\\\"03a35e59-d52c-45da-b6d3-ff48123ff8f2\\\",\\\"created_at\\\":\\\"2026-09-06T16:49:01.36166+00:00\\\",\\\"seller_id\\\":\\\"980f4fa1-0004-42f9-abca-69f1a9c29588\\\",\\\"title\\\":\\\"RTDU-20260906T1736 P2 C2 hitch\\\",\\\"price\\\":9.0,\\\"ref_code\\\":null,\\\"catego…\",\"acc\":\"200 [{\\\"id\\\":\\\"b76defe7-739f-48a0-b9e0-e22ad425743e\\\",…",
+      "oracles": "{\"res\":\"expired\",\"nWin\":1,\"qty\":0,\"hub_n\":0,\"listed\":false,\"double_claim\":false}",
+      "result": "HOLD",
+      "lens": "DU5",
+      "residual": false,
+      "count_finding": false,
+      "classe_nova": true,
+      "race": true
+    }
+  ],
+  "findings": [
+    {
+      "id": "P2-D3-LI-AVAILABLE",
+      "lens": "DU2",
+      "severity": "P2",
+      "title": "live_item continua available após drawn",
+      "actor": "S1 draw",
+      "pre": "hitch marketplace",
+      "repro": "GET live_items",
+      "expected": "sold/reserved ≠ available",
+      "obtained": {
+        "id": "01d82d01-07fc-4a55-826b-ff0dd49e67a9",
+        "live_id": "c69ad87c-4abc-439f-8b7c-77f9cb00f470",
+        "product_id": "6fadb23c-c3cb-4a14-9116-69c371df7e68",
+        "checkout_product_id": "6fadb23c-c3cb-4a14-9116-69c371df7e68",
+        "quantity": null,
+        "status": "available",
+        "is_active": true,
+        "item_kind": "marketplace_product",
+        "title": "RTDU-20260906T1736 P2 A1 hitch1-li"
+      },
+      "proven": true,
+      "count_exact_closed": false,
+      "evidence": {}
+    },
+    {
+      "id": "P2-A3-LIVEONLY-LEAK",
+      "lens": "DU1",
+      "severity": "P2",
+      "title": "Rifa live_only drawn deixa item available",
+      "actor": "S1 draw",
+      "pre": "live_only sem product_id",
+      "repro": "draw + GET live_items",
+      "expected": "sold/inactive",
+      "obtained": {
+        "draw": "200 {\"ok\": true, \"status\": \"drawn\", \"winners\": [{\"rank\": 1, \"user_id\": \"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\", \"tickets_at_draw\": 4}], \"winner_name\": \"Maestro Buyer\", \"prize_orders\": []}",
+        "li": {
+          "id": "a6ae787e-382e-49b6-a53a-66029852c72d",
+          "live_id": "85f8cb9b-542e-4f45-a66d-22c1bb8ebee9",
+          "product_id": null,
+          "checkout_product_id": null,
+          "quantity": 1,
+          "status": "available",
+          "is_active": true,
+          "item_kind": "live_only",
+          "title": "RTDU-20260906T1736 P2 A3 liveonly-li"
+        },
+        "nWin": 1
+      },
+      "proven": true,
+      "count_exact_closed": false,
+      "evidence": {}
+    }
+  ],
+  "blocked": [
+    {
+      "id": "A5",
+      "lens": "DU6",
+      "title": "buyer draw recusado (pass2 ripe)",
+      "ev": "400 {\"code\":\"P0001\",\"details\":null,\"hint\":null,\"message\":\"not_allowed\"}"
+    },
+    {
+      "id": "A1",
+      "lens": "DU2",
+      "title": "drawn qty=1 Hub/insert/qty",
+      "ev": {
+        "hub_n": 0,
+        "qty": "1→0",
+        "sold": true,
+        "ins": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"order_hold_exceeds_stock\"}",
+        "draw": "200 {\"ok\": true, \"status\": \"drawn\", \"winners\": [{\"rank\": 1, \"user_id\": \"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\", \"tickets_at_draw\": 5}], \"winner_name\": \"Maestro Buyer\", \"prize_orders\": []}",
+        "nWin": 1
+      }
+    },
+    {
+      "id": "A4",
+      "lens": "DU1",
+      "title": "2.º draw deny",
+      "ev": {
+        "d2": "400 {\"code\":\"P0001\",\"details\":null,\"hint\":null,\"message\":\"invalid_status\"}",
+        "nWin": 1,
+        "status": "drawn"
+      }
+    },
+    {
+      "id": "D2",
+      "lens": "DU7",
+      "title": "prize_orders vs seal",
+      "ev": {
+        "prize_n": 0,
+        "hub_n": 0,
+        "seal": "200 {\"ok\": true, \"winners\": 1, \"product_id\": \"6fadb23c-c3cb-4a14-9116-69c371df7e68\", \"live_item_id\": \"01d82d01-07fc-4a55-826b-ff0dd49e67a9\"}"
+      }
+    },
+    {
+      "id": "B2",
+      "lens": "DU3",
+      "title": "insert/CPI pós-drawn",
+      "ev": {
+        "ins": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"order_hold_exceeds_stock\"}",
+        "cpi": null,
+        "draw_ok": true
+      }
+    },
+    {
+      "id": "A2",
+      "lens": "DU5",
+      "title": "wc=2 selo",
+      "ev": {
+        "nWin": 2,
+        "qty": 0,
+        "hub_n": 0,
+        "ins": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"order_hold_exceeds_stock\"}",
+        "draw": "200 {\"ok\": true, \"status\": \"drawn\", \"winners\": [{\"rank\": 1, \"user_id\": \"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\", \"tickets_at_draw\": 4}, {\"rank\": 2, \"user_id\": \"56f10f8d-3951-4e80-b263-a64b164b447a\", \"tickets_at_draw\": 1}], \"wi…"
+      }
+    },
+    {
+      "id": "B1",
+      "lens": "DU4",
+      "title": "draw∥CPI",
+      "ev": {
+        "draw": "200 {\"ok\": true, \"status\": \"drawn\", \"winners\": [{\"rank\": 1, \"user_id\": \"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\", \"tickets_at_draw\": 5}], \"winner_name\": \"Maestro Buyer\", \"prize_orders\": []}",
+        "cpi": "400 {\"error\":\"Checkout blocked: product is marked sold.\"}",
+        "qty": 0,
+        "hub_n": 0,
+        "nWin": 1,
+        "cs": false
+      }
+    },
+    {
+      "id": "B3",
+      "lens": "DU2",
+      "title": "leftover qty",
+      "ev": {
+        "qty": 2,
+        "hub_n": 1,
+        "nWin": 1,
+        "ins_ok": true,
+        "draw": "200 {\"ok\": true, \"status\": \"drawn\", \"winners\": [{\"rank\": 1, \"user_id\": \"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\", \"tickets_at_draw\": 5}], \"winner_name\": \"Maestro Buyer\", \"prize_orders\": []}"
+      }
+    },
+    {
+      "id": "B4",
+      "lens": "DU3",
+      "title": "refund vs Hub",
+      "ev": {
+        "rf": null,
+        "qty": "0→0",
+        "hub_n": 0,
+        "prize_n": 0,
+        "draw": "200 {\"ok\": true, \"status\": \"drawn\", \"winners\": [{\"rank\": 1, \"user_id\": \"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\", \"tickets_at_draw\": 5}], \"winner_name\": \"Maestro Buyer\", \"prize_orders\": []}"
+      }
+    },
+    {
+      "id": "C2",
+      "lens": "DU5",
+      "title": "hitch+rifa",
+      "ev": {
+        "acc": "200 [{\"id\":\"b76defe7-739f-48a0-b9e0-e22ad425743e\",\"live_id\":\"12f320cc-f550-442b-9f88-c4108a204277\",\"live_item_id\":\"cbe2b829-d05b-4081-abcb-c8aed3a36d8b\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"buyer_id\":\"56f10f8d…",
+        "res": "expired",
+        "nWin": 1,
+        "qty": 0,
+        "hub_n": 0,
+        "unlist": "200 [{\"id\":\"03a35e59-d52c-45da-b6d3-ff48123ff8f2\",\"created_at\":\"2026-09-06T16:49:01.36166+00:00\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"title\":\"RTDU-20260906T1736 P2 C2 hitch\",\"price\":9.0,\"ref_code\":null,\"catego…",
+        "draw": "200 {\"ok\": true, \"status\": \"drawn\", \"winners\": [{\"rank\": 1, \"user_id\": \"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\", \"tickets_at_draw\": 5}], \"winner_name\": \"Maestro Buyer\", \"prize_orders\": []}",
+        "award_note": null
+      }
+    }
+  ],
+  "skipped": [],
+  "notes": [
+    {
+      "id": "p2.join",
+      "lens": "DU1",
+      "title": "join bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+      "ev": "200 {\"ok\": true, \"joined\": true, \"duplicate\": false, \"ticket_balance\": 1}"
+    },
+    {
+      "id": "p2.join",
+      "lens": "DU1",
+      "title": "join bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+      "ev": "200 {\"ok\": true, \"joined\": true, \"duplicate\": false, \"ticket_balance\": 1}"
+    },
+    {
+      "id": "p2.join",
+      "lens": "DU1",
+      "title": "join 56f10f8d-3951-4e80-b263-a64b164b447a",
+      "ev": "200 {\"ok\": true, \"joined\": true, \"duplicate\": false, \"ticket_balance\": 1}"
+    },
+    {
+      "id": "p2.join",
+      "lens": "DU1",
+      "title": "join bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+      "ev": "200 {\"ok\": true, \"joined\": true, \"duplicate\": false, \"ticket_balance\": 1}"
+    },
+    {
+      "id": "p2.join",
+      "lens": "DU1",
+      "title": "join bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+      "ev": "200 {\"ok\": true, \"joined\": true, \"duplicate\": false, \"ticket_balance\": 1}"
+    },
+    {
+      "id": "p2.join",
+      "lens": "DU1",
+      "title": "join bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+      "ev": "200 {\"ok\": true, \"joined\": true, \"duplicate\": false, \"ticket_balance\": 1}"
+    },
+    {
+      "id": "p2.join",
+      "lens": "DU1",
+      "title": "join bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+      "ev": "200 {\"ok\": true, \"joined\": true, \"duplicate\": false, \"ticket_balance\": 1}"
+    },
+    {
+      "id": "p2.join",
+      "lens": "DU1",
+      "title": "join bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+      "ev": "200 {\"ok\": true, \"joined\": true, \"duplicate\": false, \"ticket_balance\": 1}"
+    }
+  ],
+  "lenses": [
+    "DU1",
+    "DU2",
+    "DU3",
+    "DU4",
+    "DU5",
+    "DU6",
+    "DU7"
+  ],
+  "created": {
+    "products": [
+      "6fadb23c-c3cb-4a14-9116-69c371df7e68",
+      "5163c60e-37da-4cba-9f47-4a13b81401dd",
+      "05349594-e8b3-47c9-ab1a-faec47597198",
+      "06808de5-7448-4b7c-8ede-a3602593eb7a",
+      "4a839a9d-861a-4758-ba8a-d5d7db39c047",
+      "03a35e59-d52c-45da-b6d3-ff48123ff8f2"
+    ],
+    "raffles": [
+      "87938e29-8870-465a-ba6d-2d4edbe3ea3b",
+      "8a6dad13-e243-4627-b09e-e15e54b4882a",
+      "db46ad60-afcd-4cad-93b0-f78204359c39",
+      "90dcdd4e-7fb5-426b-85a3-fd7c36d00d49",
+      "42a1a0d4-cd9e-4929-932d-db8352c70ee5",
+      "25534b4d-57e8-4768-afaf-6d1f75db73ec",
+      "9dc46954-cd69-4f2b-9fff-817e3e7edad2"
+    ],
+    "lives": [
+      "c69ad87c-4abc-439f-8b7c-77f9cb00f470",
+      "cfe1c9f8-99d8-4aad-a85b-53b815eb98ea",
+      "85f8cb9b-542e-4f45-a66d-22c1bb8ebee9",
+      "395fb1bc-553f-425e-9b1e-db8d8594f890",
+      "ecf4dbf9-338d-4db1-9e39-aebd81483aca",
+      "0b9ea31a-2cb1-45c0-a5f9-3af52c6ff357",
+      "12f320cc-f550-442b-9f88-c4108a204277"
+    ],
+    "orders": [
+      "c8b07046-3dc3-44b6-8c0c-4743d17839bb",
+      "ec9402d2-45d0-4816-8bde-7cc6d4786936"
+    ]
+  }
+}

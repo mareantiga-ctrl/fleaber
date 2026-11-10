@@ -1,0 +1,229 @@
+{
+  "auditor": "REDTEAM_BLIND_AK_HUB_EDGE_POS_AEAFAG_v1",
+  "pass": 2,
+  "stamp": "20260902T0728",
+  "view_matrix": {
+    "hub_live_items_public": {
+      "anon": "401 loc=null acao=null {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_live_item_stock\"}",
+      "buyer": "200 loc=null acao=null [{\"id\":\"386a1d58-8834-4731-9f8e-c24aeda8c95f\",\"title\":\"RTAK-20260902T0728 reserved-full-qty1\",\"price\":7.0,\"status\":\"reserved_full\"}]",
+      "svc": "[{\"id\":\"386a1d58-8834-4731-9f8e-c24aeda8c95f\",\"title\":\"RTAK-20260902T0728 reserved-full-qty1\",\"price\":7.0,\"status\":\"reserved_full\"}]"
+    },
+    "hub_live_items_discovery_public": {
+      "anon": "401 loc=null acao=null {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_live_item_stock\"}",
+      "buyer": "200 loc=null acao=null []",
+      "svc": "[]"
+    },
+    "hub_lives_public": {
+      "anon": "200 loc=null acao=null [{\"id\":\"7148ec4f-395d-476e-9ba5-bdee9a6738b2\",\"status\":\"ended\",\"is_active\":false,\"mux_playback_id\":\"rtak_ended_pub_pb_20260902T0728\",\"mux_vod_playback_id\":\"rtak…",
+      "buyer": "200 loc=null acao=null [{\"id\":\"7148ec4f-395d-476e-9ba5-bdee9a6738b2\",\"status\":\"ended\",\"is_active\":false,\"mux_playback_id\":\"rtak_ended_pub_pb_20260902T0728\",\"mux_vod_playback_id\":\"rtak…",
+      "svc": "[{\"id\":\"7148ec4f-395d-476e-9ba5-bdee9a6738b2\",\"status\":\"ended\",\"is_active\":false,\"mux_playback_id\":\"rtak_ended_pub_pb_20260902T0728\",\"mux_vod_playback_id\":\"rtak_ended_pub_vod_20260902T0728\"}]"
+    },
+    "hub_lives_discovery_public": {
+      "anon": "200 loc=null acao=null []",
+      "buyer": "200 loc=null acao=null []",
+      "svc": "[]"
+    }
+  },
+  "storage_prefixes": {
+    "(root)": {
+      "status": 200,
+      "n": 0,
+      "brief": "[]"
+    },
+    "product_photos": {
+      "status": 200,
+      "n": 0,
+      "brief": "[]"
+    },
+    "live_item_photos": {
+      "status": 200,
+      "n": 0,
+      "brief": "[]"
+    },
+    "profile_photos": {
+      "status": 200,
+      "n": 0,
+      "brief": "[]"
+    }
+  },
+  "findings": [
+    {
+      "id": "RTAK-AK1-HUB-ITEMS-GRANT",
+      "lens": "AK1",
+      "severity": "P2",
+      "title": "Hub web (anon) não consegue ler hub_live_items_public: 42501 batata_live_item_stock",
+      "actor": "anon",
+      "pre": "view security_barrier chama stock() no WHERE; GRANT execute em falta para anon",
+      "repro": "GET /rest/v1/hub_live_items_public",
+      "expected": "200 [] ou linhas filtradas — não 401 que parte a loja Hub",
+      "obtained": "401 loc=null acao=null {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_live_item_stock\"}",
+      "proven": true,
+      "evidence": {
+        "buyer": "200 loc=null acao=null [{\"id\":\"386a1d58-8834-4731-9f8e-c24aeda8c95f\",\"title\":\"RTAK-20260902T0728 reserved-full-qty1\",\"price\":7.0,\"status\":\"reserved_full\"}]"
+      }
+    },
+    {
+      "id": "RTAK-AK1-RESERVED-FULL-IN-VIEW",
+      "lens": "AK1",
+      "severity": "P2",
+      "title": "JWT vê reserved_full no Hub (AEAFAG esconde no REST live_items; view não exclui o status)",
+      "actor": "buyer JWT",
+      "pre": "item status=reserved_full qty=1 available_qty=1",
+      "repro": "GET hub_live_items_public JWT",
+      "expected": "oculto como REST reserved_full",
+      "obtained": "[{\"id\":\"386a1d58-8834-4731-9f8e-c24aeda8c95f\",\"title\":\"RTAK-20260902T0728 reserved-full-qty1\",\"price\":7.0,\"status\":\"reserved_full\"}]",
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "RTAK-AK1-STOCK-RPC-BUYER",
+      "lens": "AK1",
+      "severity": "P3",
+      "title": "buyer executa batata_live_item_stock em item de gravado",
+      "actor": "buyer",
+      "pre": "UUID FOMO",
+      "repro": "POST rpc/batata_live_item_stock",
+      "expected": "anon sem GRANT; JWT só se item visível no player",
+      "obtained": "{\"ok\": true, \"price\": 7.0, \"live_id\": \"7148ec4f-395d-476e-9ba5-bdee9a6738b2\", \"ref_code\": \"RTAK1\", \"item_kind\": \"live_only\", \"total_qty\": 1, \"product_id\": null, \"blocked_qty\": 0, \"live_status\": \"ended\", \"live_item_id\": \"386a1d58-8834-4731-9f8e-c24aeda8c95f\", \"available_qty\": 1, \"pending_bag_qty\": 0, \"sold_converted_qty\": 0, \"checkout_product_id\": null, \"rese…",
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "RTAK-AK4-TIP-ENDED-PUB",
+      "lens": "AK4",
+      "severity": "P2",
+      "title": "Gorjeta Session em directo already ended (published)",
+      "actor": "buyer JWT",
+      "pre": "live ended published",
+      "repro": "POST create-live-tip-checkout live_id=ended",
+      "expected": "recusar live não activa",
+      "obtained": "{\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1dDiPJUomxH9P8xUrgLOhO2cwUPXKfHncYbn1TUcIMXZpFvfBSbXMsuLO#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21oYWlsUnxrVkRhQUQyNlJjSWBCN3BXNXVvVT1hamlcf3Fjd1dRMGJmREk9Yz09PH1CMzVTY0pBXD1kMU5HZl1da05gf0s1XGQ1NWA3bVFBNzNMJyknY3dqaFZ…",
+      "proven": true,
+      "evidence": {}
+    }
+  ],
+  "holds": [
+    {
+      "id": "RTAK-AK1-STOCK-RPC-ANON",
+      "lens": "AK1",
+      "title": "stock rpc anon recusado",
+      "actor": "anon",
+      "pre": "uuid",
+      "repro": "rpc stock",
+      "expected": "denied",
+      "obtained": "401 loc=null acao=null {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_live_item_stock\"}"
+    },
+    {
+      "id": "RTAK-AK1-HANDLE-SUGGESTED-OFFLINE",
+      "lens": "AK1",
+      "title": "resolve suggested alinhado com discovery ou not_found",
+      "actor": "anon",
+      "pre": "after end",
+      "repro": "rpc resolve",
+      "expected": "aligned",
+      "obtained": "found=false disc=0 hub=0"
+    },
+    {
+      "id": "RTAK-AK5-MUX-AFTER-END-UNPUB",
+      "lens": "AK5",
+      "title": "mux unpublished ended recusado após end",
+      "actor": "anon",
+      "pre": "ended",
+      "repro": "resolve-mux",
+      "expected": "404",
+      "obtained": "404 loc=null acao=* {\"error\":\"live_not_public\"}"
+    },
+    {
+      "id": "RTAK-AK6-CHAT-MEDIA-LIST",
+      "lens": "AK6",
+      "title": "list chat_media prefixos vazios (M fechado ou mascarado)",
+      "actor": "anon",
+      "pre": "prefixes",
+      "repro": "POST list",
+      "expected": "[]",
+      "obtained": "{(root): {status: 200, n: 0, brief: []}, product_photos: {status: 200, n: 0, brief: []}, live_item_photos: {status: 200, n: 0, brief: []}, profile_photos: {status: 200, n: 0, brief: []}}"
+    },
+    {
+      "id": "RTAK-AK4-WEBHOOK-NOSIG",
+      "lens": "AK4",
+      "title": "webhook sem sig recusado",
+      "actor": "anon",
+      "pre": "no sig",
+      "repro": "POST stripe-webhook",
+      "expected": "400",
+      "obtained": "400 loc=null acao=null {\"ok\":false,\"error\":\"missing_signature\"}"
+    }
+  ],
+  "notes": [
+    {
+      "id": "p2.hub_items",
+      "lens": "AK1",
+      "title": "anon vs buyer hub_live_items_public",
+      "ev": "anon=401 loc=null acao=null {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_live_item_stock\"} buyer=200 loc=null acao=null [{\"id\":\"386a1d58-8834-4731-9f8e-c24aeda8c95f\",\"title\":\"RTAK-20260902T0728 reserved-full-qty1\",\"price\":7.0,\"status\":\"reserved_full\"}]"
+    },
+    {
+      "id": "p2.stock_anon",
+      "lens": "AK1",
+      "title": "stock rpc anon",
+      "ev": "401 loc=null acao=null {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_live_item_stock\"}"
+    },
+    {
+      "id": "p2.stock_buyer",
+      "lens": "AK1",
+      "title": "stock rpc buyer",
+      "ev": "200 loc=null acao=null {\"ok\": true, \"price\": 7.0, \"live_id\": \"7148ec4f-395d-476e-9ba5-bdee9a6738b2\", \"ref_code\": \"RTAK1\", \"item_kind\": \"live_only\", \"total_qty\": 1, \"product_id\": null,…"
+    },
+    {
+      "id": "p2.resolve_after_end",
+      "lens": "AK1",
+      "title": "handle_suggested após endLives",
+      "ev": "rpc=200 loc=null acao=null {\"error\": \"not_found\", \"found\": false, \"http_status\": 404} disc=200 loc=null acao=null [] hub=200 loc=null acao=null [] lives=[{\"id\":\"0a535c48-0b19-4c78-8c11-0ba2e3cb2913\",\"status\":\"ended\",\"is_active\":false}, \n {\"id\":\"6e29503e-1633-4fb8-9817-0b40f2661e32\",\"status\":\"ended\",\"is_active\":false}, \n {\"id\":\"4e2f6b11-a2fd-4a02-82a4-…"
+    },
+    {
+      "id": "p2.mux_after_end",
+      "lens": "AK5",
+      "title": "resolve-mux após endLives",
+      "ev": "404 loc=null acao=* {\"error\":\"live_not_public\"}"
+    },
+    {
+      "id": "p2.mux_vod_pub",
+      "lens": "AK5",
+      "title": "resolve-mux published ended VOD",
+      "ev": "200 loc=null acao=* {\"playback_id\":\"rtak_ended_pub_vod_20260902T0728\",\"playback_url\":\"https://stream.mux.com/rtak_ended_pub_vod_20260902T0728.m3u8\",\"source\":\"cache\",\"is_live\":false…"
+    },
+    {
+      "id": "fix.live",
+      "title": "RTAK-20260902T0728 p2-active-then-end 201",
+      "ev": "201 loc=null acao=null [{\"id\":\"0e3fa36a-a0e1-42b4-ac31-0fe710961e11\",\"created_at\":\"2026-09-02T06:38:29.931113+00:00\",\"vendedor_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"mux_live_id\"…"
+    },
+    {
+      "id": "fix.item",
+      "title": "RTAK-20260902T0728 p2-cheap-5",
+      "ev": "400 loc=null acao=null {\"code\":\"23514\",\"details\":\"Failing row contains (22503c2c-c0eb-47b1-b991-8af2ab8d4148, 0e3fa36a-a0e1-42b4-ac31-0fe710961e11, null, RTAK1, RTAK-20260902T0728 p2-…"
+    },
+    {
+      "id": "p2.cheap_insert",
+      "lens": "AK7",
+      "title": "item on ACTIVE live",
+      "ev": "null"
+    },
+    {
+      "id": "p2.cheap_fail",
+      "lens": "AK7",
+      "title": "could not insert cheap on active live",
+      "ev": "skip AK7"
+    },
+    {
+      "id": "p2.tip_ended_pub",
+      "lens": "AK4",
+      "title": "tip on published ended live",
+      "ev": "200 loc=null acao=https://fleaber.pt {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1dDiPJUomxH9P8xUrgLOhO2cwUPXKfHncYbn1TUcIMXZpFvfBSbXMsuLO#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZ…"
+    },
+    {
+      "id": "p2.webhook",
+      "lens": "AK4",
+      "title": "stripe-webhook no sig",
+      "ev": "400 loc=null acao=null {\"ok\":false,\"error\":\"missing_signature\"}"
+    }
+  ]
+}

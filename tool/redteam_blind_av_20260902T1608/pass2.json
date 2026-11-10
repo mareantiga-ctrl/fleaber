@@ -1,0 +1,135 @@
+{
+  "stamp": "20260902T1608",
+  "prefix": "RTAV-20260902T1608",
+  "lenses": [
+    "AV1",
+    "AV2",
+    "AV3",
+    "AV6"
+  ],
+  "findings": [
+    {
+      "id": "AV2-05",
+      "lens": "AV2",
+      "severity": "P3",
+      "title": "Helper can_manage_chat publica system \"✅ comprou\" sem order paga",
+      "actor": "helper JWT can_manage_chat",
+      "pre": "sem can_mark_items_sold / can_manage_reservations; zero PI neste item",
+      "repro": "rpc batata_live_system_message",
+      "expected": "RPC permite staff chat (desenho). purchase_broadcast continua a exigir pago. Classificar P3 FOMO autorizado, não bypass de dinheiro.",
+      "obtained": {
+        "rpc": "200 {\"ok\": true}",
+        "rpcOk": true,
+        "rowPosted": true,
+        "msgs": [
+          {
+            "id": "966acaba-663c-4686-b5e8-568047921474",
+            "kind": "system",
+            "body": "✅ RTAV-P2-FOMO comprou RTAV-20260902T1608 p2-item",
+            "user_id": "f072210d-0597-40c4-a107-cddca0f75ee2",
+            "sender_label": "FOMO"
+          }
+        ]
+      },
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "AV3-02",
+      "lens": "AV3",
+      "severity": "P2",
+      "title": "Item sold qty=0 na vitrine Hub / REST buyer",
+      "actor": "anon + buyer JWT",
+      "pre": "service PATCH status=sold quantity=0",
+      "repro": "hub_live_items_discovery_public + live_items SELECT buyer",
+      "expected": "Hub vazio; buyer policy esconde sold",
+      "obtained": "200 [{\"id\":\"6e3f34cf-3b66-4ad6-85e4-696d4e657a6a\",\"status\":\"available\",\"quantity\":1}]",
+      "proven": true,
+      "evidence": {
+        "hub": {
+          "id": "6e3f34cf-3b66-4ad6-85e4-696d4e657a6a",
+          "live_id": "408a189e-8eac-4971-9b33-b117c3d62df2",
+          "status": "available",
+          "is_active": true
+        },
+        "buyer": "200 [{\"id\":\"6e3f34cf-3b66-4ad6-85e4-696d4e657a6a\",\"status\":\"available\",\"quantity\":1}]"
+      }
+    }
+  ],
+  "blocked": [
+    {
+      "id": "AV2-11",
+      "lens": "AV2",
+      "title": "Buyer PATCH chat → kind=system (verificar row)",
+      "ev": "200 []"
+    },
+    {
+      "id": "AV6-05",
+      "lens": "AV6",
+      "title": "Stock=1 duas accepts paralelas (contagem)",
+      "ev": "200 nAcc=1 s1=pending s2=accepted"
+    }
+  ],
+  "skipped": [],
+  "notes": [
+    {
+      "id": "av2.seller.fomo",
+      "lens": "AV2",
+      "title": "seller system_message FOMO",
+      "ev": "200 {\"ok\": true}"
+    },
+    {
+      "id": "order.paid.fail",
+      "title": "insertPaidOrder",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"order_live_item_product_missing\"}"
+    },
+    {
+      "id": "av2.helper.bc.paid",
+      "lens": "AV2",
+      "title": "helper broadcast com PI",
+      "ev": {
+        "order": "",
+        "bc": "200 false"
+      }
+    },
+    {
+      "id": "av1.convert.ended.paid",
+      "lens": "AV1",
+      "title": "convert após ended com PI",
+      "ev": {
+        "rpc": "200 {\"ok\": false, \"error\": \"convert_requires_paid_order\"}",
+        "status": "accepted"
+      }
+    }
+  ],
+  "actors": {
+    "buyer": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+    "seller": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+    "buyer2": "a40e5377-925d-45e5-a646-81d2a4d30b42",
+    "seller2": null,
+    "helper": "f072210d-0597-40c4-a107-cddca0f75ee2"
+  },
+  "created": {
+    "lives": [
+      "408a189e-8eac-4971-9b33-b117c3d62df2",
+      "5de71227-8406-4f51-a8d2-cae0d72b7bf3"
+    ],
+    "items": [
+      "d7828d7f-01db-43b5-a7b3-21925d25a38b",
+      "6e3f34cf-3b66-4ad6-85e4-696d4e657a6a",
+      "c3f9c8e0-31db-4822-878a-ad623d745c8f"
+    ],
+    "orders": [],
+    "products": [
+      "b0c431bd-fc9f-496d-977d-17fb2152f37a"
+    ],
+    "reservations": [
+      "c398096f-e576-48c3-9af7-07f5d67294ed",
+      "5e64c580-fefd-49e3-b854-61d768df2c31",
+      "c3b321f6-47c2-475c-8586-e23e94a0d742"
+    ],
+    "helpers": [
+      "035c8fec-dae0-43ea-b55c-444acb1e1c7a"
+    ]
+  }
+}

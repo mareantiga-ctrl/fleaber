@@ -1,0 +1,181 @@
+{
+  "stamp": "20260902T0906",
+  "prefix": "RTAR-20260902T0906",
+  "lentes": [
+    "AR4",
+    "AR6",
+    "AR7"
+  ],
+  "findings": [],
+  "blocked": [
+    {
+      "id": "AR7.ledger-cross",
+      "lens": "AR7",
+      "title": "GET ledger cruzado",
+      "ev": "200 []"
+    },
+    {
+      "id": "AR7.wallet-cross",
+      "lens": "AR7",
+      "title": "GET wallet cruzado",
+      "ev": "200 []"
+    },
+    {
+      "id": "AR4.foreign-key",
+      "lens": "AR4",
+      "title": "S2 não herda Transfer",
+      "ev": "400 {\"error\":\"Cannot create another user Stripe account.\",\"code\":\"payout_failed\"}"
+    },
+    {
+      "id": "AR7.race-dev-conc",
+      "lens": "AR7",
+      "title": "race sem líquido duplo",
+      "ev": {
+        "status": "concluido",
+        "dSeller": 0.0,
+        "dBuyer": 0.0,
+        "refund": "403 {\"ok\":false,\"error\":\"Não é possível anular esta venda neste estado (já enviada ou concluída).\",\"code\":\"order_refund_blocked_shipped\",\"status\":\"concluido\"}"
+      }
+    },
+    {
+      "id": "AR6.finalize-forged",
+      "lens": "AR6",
+      "title": "finalize forjado",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_finalize_stripe_order_refund\"}"
+    }
+  ],
+  "skipped": [],
+  "notes": [
+    {
+      "id": "p3.snap",
+      "lens": "AR7",
+      "title": "saldos",
+      "ev": {
+        "buyer": 61.1,
+        "seller": 33.97,
+        "buyer2": 0,
+        "seller2": 0
+      }
+    },
+    {
+      "id": "ar7.get.ledger",
+      "lens": "AR7",
+      "title": "buyer GET ledger seller",
+      "ev": {
+        "http": 200,
+        "n": 0,
+        "brief": "200 []"
+      }
+    },
+    {
+      "id": "ar7.get.wallet",
+      "lens": "AR7",
+      "title": "buyer GET wallet seller",
+      "ev": "200 []"
+    },
+    {
+      "id": "ar4.foreign.key",
+      "lens": "AR4",
+      "title": "seller2 key+user_id seller1",
+      "ev": "400 {\"error\":\"Cannot create another user Stripe account.\",\"code\":\"payout_failed\"}"
+    },
+    {
+      "id": "fixture.paid",
+      "lens": "AR7",
+      "title": "setup_paid_order Stripe TEST",
+      "ev": "200 {\n  \"ok\": true,\n  \"order_id\": \"96437f0f-d6ab-4f04-9888-a115ad99d375\",\n  \"product_id\": \"b08b2f15-ae0f-43ec-881d-2b5d25ecc551\",\n  \"payment_intent_id\": \"pi_3UBAKjH7FWYUN3jh0LwGcvA8\",\n  \"pi_status\": \"succeeded\",\n  \"pi_amount_received\": 590,\n  \"…"
+    },
+    {
+      "id": "ar7.race.dev-conc",
+      "lens": "AR7",
+      "title": "devolvida ∥ concluido + release + refund",
+      "ev": {
+        "dev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"order_concluido_immutable_for_seller\"}",
+        "conc": "200 [{\"id\":\"96437f0f-d6ab-4f04-9888-a115ad99d375\",\"created_at\":\"2026-09-02T09:19:53.675759+00:00\",\"product_id\":\"b08b2f15-ae0f-43ec-881d-2b5d25ecc551\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c…",
+        "rel": "200 false",
+        "status": "concluido",
+        "released": "",
+        "rid": "",
+        "refund": "403 {\"ok\":false,\"error\":\"Não é possível anular esta venda neste estado (já enviada ou concluída).\",\"code\":\"order_refund_blocked_shipped\",\"status\":\"concluido\"}",
+        "dSeller": 0.0,
+        "dBuyer": 0.0,
+        "stripe": "200 {\n  \"ok\": true,\n  \"payment_intent\": {\n    \"id\": \"pi_3UBAKjH7FWYUN3jh0LwGcvA8\",\n    \"status\": \"succeeded\",\n    \"amount\": 590,\n    \"amount_received\": 590\n  },\n  \"refunds\": [],\n  \"refund_count\": 0\n}"
+      }
+    },
+    {
+      "id": "fixture.paid",
+      "lens": "AR6",
+      "title": "setup_paid_order Stripe TEST",
+      "ev": "200 {\n  \"ok\": true,\n  \"order_id\": \"c95b40d1-485f-4d1f-bdc1-278121fa100e\",\n  \"product_id\": \"4c77c0c5-1d0b-4d8b-a622-d5a423f35747\",\n  \"payment_intent_id\": \"pi_3UBAKpH7FWYUN3jh07BPD8xf\",\n  \"pi_status\": \"succeeded\",\n  \"pi_amount_received\": 590,\n  \"…"
+    },
+    {
+      "id": "ar6.finalize.forged",
+      "lens": "AR6",
+      "title": "finalize JWT re_ forjado",
+      "ev": {
+        "rpc": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_finalize_stripe_order_refund\"}",
+        "status": "pago",
+        "rid": ""
+      }
+    },
+    {
+      "id": "p3.end",
+      "lens": "AR7",
+      "title": "saldos finais pass3",
+      "ev": {
+        "start": {
+          "buyer": 61.1,
+          "seller": 33.97,
+          "buyer2": 0,
+          "seller2": 0
+        },
+        "end": {
+          "buyer": 61.1,
+          "seller": 33.97,
+          "buyer2": 0,
+          "seller2": 0
+        },
+        "dBuyer": 0.0,
+        "dSeller": 0.0
+      }
+    },
+    {
+      "id": "ar4.orphan.debited",
+      "lens": "AR4",
+      "title": "ledger debited órfão seller",
+      "ev": {
+        "n": 2,
+        "rows": [
+          {
+            "idempotency_key": "p2payout-a-1788096926564-xxxx",
+            "amount_cents": 100,
+            "status": "debited",
+            "stripe_transfer_id": ""
+          },
+          {
+            "idempotency_key": "p2payout-b-1788096926564-yyyy",
+            "amount_cents": 100,
+            "status": "debited",
+            "stripe_transfer_id": ""
+          }
+        ]
+      }
+    }
+  ],
+  "actors": {
+    "buyer": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+    "seller": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+    "buyer2": "5c9a7709-28ff-4539-9bde-fc0f736f7d75",
+    "seller2": "fd4d692d-3256-471d-bc95-486db8a34d0a"
+  },
+  "created": {
+    "orders": [
+      "96437f0f-d6ab-4f04-9888-a115ad99d375",
+      "c95b40d1-485f-4d1f-bdc1-278121fa100e"
+    ],
+    "products": [
+      "b08b2f15-ae0f-43ec-881d-2b5d25ecc551",
+      "4c77c0c5-1d0b-4d8b-a622-d5a423f35747"
+    ]
+  }
+}

@@ -1,0 +1,153 @@
+{
+  "auditor": "REDTEAM_BLIND_BS_CHAT_POS_BLBQ_v1",
+  "pass": 2,
+  "sku": "7be94cea-412e-4ee6-8c54-751f2d27e235",
+  "findings": [
+    {
+      "id": "P2.url-overlong-dot",
+      "lens": "BS4",
+      "severity": "P1",
+      "title": "proof_url %c0%ae (overlong-like dots)",
+      "actor": "buyer JWT",
+      "pre": "pass2",
+      "repro": "POST {\"kind\":\"reservation_payment_submitted\",\"order_id\":\"463c3d0b-e1bf-4dbd-8137-8ee4fddef5bd\",\"notes\":\"ok\",\"proof_url\":\"https://fxdknzrqjenzqcvnwqqq.supabase.co/storage/v1/object/fleaber_private/order_proofs/bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96/463c3d0b-e1bf-4dbd-8137-8ee4fddef5bd/%c0%ae%c0%ae/%c0%ae%c0%ae/order_proofs/bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96/dd7b0688-bbce-4423-ac3c-edf852130079/rtbs_b.png\"}",
+      "expected": "denied",
+      "obtained": "201 [{\"id\":1460,\"created_at\":\"2026-09-06T09:55:22.372253+00:00\",\"chat_id\":\"3f0069dd-14cd-470c-9d34-50e3b17d75f7\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"reservation_payment_subm…",
+      "proven": true,
+      "evidence": {
+        "id": "1460",
+        "payload": {
+          "kind": "reservation_payment_submitted",
+          "order_id": "463c3d0b-e1bf-4dbd-8137-8ee4fddef5bd",
+          "notes": "ok",
+          "proof_url": "https://fxdknzrqjenzqcvnwqqq.supabase.co/storage/v1/object/fleaber_private/order_proofs/bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96/463c3d0b-e1bf-4dbd-8137-8ee4fddef5bd/%c0%ae%c0%ae/%c0%ae%c0%ae/order_proofs/bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96/dd7b0688-bbce-4423-ac3c-edf852130079/rtbs_b.png"
+        }
+      }
+    }
+  ],
+  "blocked": [
+    {
+      "id": "P2.signed-own-other-order",
+      "lens": "BS4",
+      "title": "recusado",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_url_denied\"}"
+    },
+    {
+      "id": "P2.unsigned-own-other-order",
+      "lens": "BS4",
+      "title": "recusado",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_url_denied\"}"
+    },
+    {
+      "id": "P2.auth-own-other-order",
+      "lens": "BS4",
+      "title": "recusado",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_url_denied\"}"
+    },
+    {
+      "id": "P2.get-cross-user",
+      "lens": "BS6",
+      "title": "GET B2 recusado",
+      "ev": "400 {\"statusCode\":\"404\",\"error\":\"not_found\",\"message\":\"Object not found\",\"code\":\"NoSuchKey\"}"
+    },
+    {
+      "id": "P2.upload-cross-user",
+      "lens": "BS6",
+      "title": "upload B2 recusado",
+      "ev": "400 {\"statusCode\":\"403\",\"error\":\"Unauthorized\",\"message\":\"new row violates row-level security policy\",\"code\":\"AccessDenied\"}"
+    },
+    {
+      "id": "P2.list-cross-user",
+      "lens": "BS6",
+      "title": "list B2 vazio/403",
+      "ev": "200 []"
+    },
+    {
+      "id": "P2.unicode-slash-no-dots",
+      "lens": "BS4",
+      "title": "recusado",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_url_denied\"}"
+    }
+  ],
+  "notes": [
+    {
+      "id": "P2.upload-a",
+      "lens": "BS6",
+      "title": "upload PNG A",
+      "ev": "400 {\"statusCode\":\"403\",\"error\":\"Unauthorized\",\"message\":\"new row violates row-level security policy\",\"code\":\"AccessDenied\"}"
+    },
+    {
+      "id": "P2.upload-b",
+      "lens": "BS6",
+      "title": "upload PNG B",
+      "ev": "400 {\"statusCode\":\"403\",\"error\":\"Unauthorized\",\"message\":\"new row violates row-level security policy\",\"code\":\"AccessDenied\"}"
+    },
+    {
+      "id": "P2.sign-b",
+      "lens": "BS4",
+      "title": "signed B",
+      "ev": "200 {\"signedURL\":\"/object/sign/fleaber_private/order_proofs/bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96/dd7b0688-bbce-4423-ac3c-edf852130079/rtbs_b.png?token=eyJraWQiOiI3YmY5ZTQ0Ni1mOTg4LTRlNWEtYjM0Mi0zYTQ1ZTE5NTgzYzkiLCJhbGciOiJIU…"
+    },
+    {
+      "id": "P2.abs-signed",
+      "lens": "BS4",
+      "title": "abs signed B",
+      "ev": "https://fxdknzrqjenzqcvnwqqq.supabase.co/storage/v1/object/sign/fleaber_private/order_proofs/bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96/dd7b0688-bbce-4423-ac3c-edf852130079/rtbs_b.png?token=eyJraWQiOiI3YmY5ZTQ0Ni1mOTg4LTRlNWEtYjM0Mi0zYTQ1ZTE5NTgzYzkiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJmbGVhYmVyX3ByaXZhdGUvb3JkZXJfcHJvb2ZzL2JmY2JlZWVlLTdkYzEtNGNkMS1iMmE3LWQzYTBhNmNmN2M5Ni9kZDdiMDY4OC1iYmNlLTQ0MjMtYWMzYy1lZGY4NTIxMzAwNzkvcnRic19iLnBuZyIsInNjb3BlIjoiZG93bmxvYWQiLCJpYXQiOjE3ODg2ODg1MTcsImV4cCI6MTc4ODY5MjExN30.H7Q0-VD7AKtIgahT_jkZsk7Nx3I_eWatj1RDfz8Y5JM"
+    },
+    {
+      "id": "P2.anon-get-signed-b",
+      "lens": "BS6",
+      "title": "anon GET signed B",
+      "ev": "200 len=10"
+    },
+    {
+      "id": "P2.get-fw-auth",
+      "lens": "BS4",
+      "title": "GET authenticated fullwidth dots",
+      "ev": "400 len=277 {\"statusCode\":\"400\",\"error\":\"InvalidKey\",\"message\":\"Invalid key: order_proofs/bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96/463c3d0b-e1bf-4dbd-8137-8ee4fddef5bd/．．/．．/order_proofs/bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96/dd7b0688-bbce-4423-ac3c-edf852130079/rtbs_b.png\",\"code\":\"InvalidKey\"}"
+    },
+    {
+      "id": "P2.get-fw-abs",
+      "lens": "BS4",
+      "title": "GET abs fullwidth dots",
+      "ev": "400 len=277 {\"statusCode\":\"400\",\"error\":\"InvalidKey\",\"message\":\"Invalid key: order_proofs/bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96/463c3d0b-e1bf-4dbd-8137-8ee4fddef5bd/．．/．．/order_proofs/bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96/dd7b0688-bbce-4423-ac3c-edf852130079/rtbs_b.png\",\"code\":\"InvalidKey\"}"
+    },
+    {
+      "id": "P2.get-honest-b",
+      "lens": "BS6",
+      "title": "GET prova B (mesmo buyer)",
+      "ev": "200 len=10"
+    },
+    {
+      "id": "P2.seller-see-payoneer",
+      "lens": "BS1",
+      "title": "seller GET msg Payoneer",
+      "ev": "200 [{\"id\":1417,\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"reservation_payment_submitted\\\",\\\"order_id\\\":\\\"463c3d0b-e1bf-4dbd-8137-8ee4fddef5bd\\\",\\\"notes\\\":\\\"Payoneer 12,00 €\\\"}\"}]"
+    },
+    {
+      "id": "P2.seller-see-seguro",
+      "lens": "BS1",
+      "title": "seller GET seguro Payoneer",
+      "ev": "200 [{\"id\":1430,\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"seguro_fleaber_paid\\\",\\\"order_id\\\":\\\"c852914d-66d8-4028-8225-b9ae4bcae03c\\\",\\\"total\\\":\\\"5.90\\\",\\\"label\\\":\\\"Payoneer 12,00 €\\\"}\"}, \n {\"id\":1437,\"text\":\"FLEABER_JSON_V1:{\\\"ki…"
+    },
+    {
+      "id": "P2.inbox-now",
+      "lens": "BS5",
+      "title": "last_message actual",
+      "ev": "Payoneer"
+    },
+    {
+      "id": "P2.live-ended",
+      "lens": "BS8",
+      "title": "live já ended",
+      "ev": "200 [{\"id\":\"aebf7c4a-7830-4a5b-b472-d24a713435f9\",\"status\":\"ended\",\"is_active\":false}]"
+    }
+  ],
+  "lenses": [
+    "BS1",
+    "BS4",
+    "BS5",
+    "BS6",
+    "BS8"
+  ]
+}

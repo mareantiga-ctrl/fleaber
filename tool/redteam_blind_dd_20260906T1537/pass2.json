@@ -1,0 +1,174 @@
+{
+  "auditor": "REDTEAM_BLIND_DD_LIVE_POS_CVDA_v1",
+  "prefix": "RTDD-20260906T1537",
+  "findings": [],
+  "blocked": [
+    {
+      "id": "C2.convert.nopi",
+      "lens": "DD5",
+      "title": "convert sem PI recusado (HOLD)",
+      "ev": {
+        "rpc": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_live_reservation_stripe_convert\"}",
+        "status": "accepted"
+      }
+    },
+    {
+      "id": "C2b.convert.pi_alheio",
+      "lens": "DD5",
+      "title": "reconcile PI alheio recusado (HOLD)",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"convert_requires_paid_order\"}"
+    },
+    {
+      "id": "C1.hitch.qty_stock",
+      "lens": "DD4",
+      "title": "2º accept recusado (HOLD hitch)",
+      "ev": {
+        "r1": {
+          "id": "1d5e2621-80de-497d-9bd9-e747536e1001",
+          "status": "accepted",
+          "requested_qty": 1
+        },
+        "r2": {
+          "id": "06d0a666-406e-45a2-ba83-5765403d26cd",
+          "status": "pending",
+          "requested_qty": 1
+        },
+        "a2": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"qty_exceeds_stock\"}"
+      }
+    },
+    {
+      "id": "C3.accept.after.end",
+      "lens": "DD6",
+      "title": "accept pós-end recusado ou já decided",
+      "ev": "200 [{\"id\":\"f9fe0afa-2ff7-4cd7-a049-e710238c87df\",\"live_id\":\"998a8605-8d6b-4f11-96ad-5a2f6dcf01c7\",\"live_item_id\":\"3c8b5a70-3ca8-4b29-aa9b-4654f435c0cc\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"buyer_id\":\"bfcbeeee…"
+    },
+    {
+      "id": "C4.buyer.playback_cols",
+      "lens": "DD7",
+      "title": "buyer não lê playback unpublished (HOLD)",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table lives\"}"
+    },
+    {
+      "id": "C4.realtime.playback",
+      "lens": "DD7",
+      "title": "realtime sem playback no payload (HOLD)",
+      "ev": {
+        "ok": true,
+        "error": null,
+        "n_frames": 2,
+        "joinAck": "{\"ref\":\"1\",\"event\":\"phx_reply\",\"payload\":{\"status\":\"ok\",\"response\":{\"postgres_changes\":[{\"id\":36778537,\"event\":\"*\",\"filter\":\"id=eq.0fea8ded-ea8d-4d86-9431-7df9c0d901bf\",\"schema\":\"public\",\"table\":\"lives\"}]}},\"topic\":\"realtime:public:lives\"}"
+      }
+    }
+  ],
+  "notes": [
+    {
+      "id": "C3.race.accept.won",
+      "lens": "DD6",
+      "title": "accept ganhou a race contra end (anotar; não P0 sem caixa)",
+      "ev": {
+        "id": "f9fe0afa-2ff7-4cd7-a049-e710238c87df",
+        "status": "accepted"
+      }
+    },
+    {
+      "id": "C4.realtime.raw",
+      "lens": "DD7",
+      "title": "realtime frames",
+      "ev": {
+        "ok": true,
+        "n_frames": 2,
+        "frames": [
+          "{\"ref\":\"1\",\"event\":\"phx_reply\",\"payload\":{\"status\":\"ok\",\"response\":{\"postgres_changes\":[{\"id\":36778537,\"event\":\"*\",\"filter\":\"id=eq.0fea8ded-ea8d-4d86-9431-7df9c0d901bf\",\"schema\":\"public\",\"table\":\"lives\"}]}},\"topic\":\"realtime:public:lives\"}",
+          "{\"ref\":null,\"event\":\"system\",\"payload\":{\"message\":\"Unable to subscribe to changes with given parameters. Please check Realtime is enabled for the given connect parameters: [event: *, schema: public, table: lives, filters: [{\\\"id\\\", \\\"eq\\\", \\\"0fea8ded-ea8d-4d86-9431-7df9c0d901bf\\\", false}], select: nil]\",\"status\":\"error\",\"extension\":\"postgres_changes\",\"channel\":\"public:lives\"},\"topic\":\"realtime:public:lives\"}"
+        ],
+        "hits": [],
+        "joinAck": "{\"ref\":\"1\",\"event\":\"phx_reply\",\"payload\":{\"status\":\"ok\",\"response\":{\"postgres_changes\":[{\"id\":36778537,\"event\":\"*\",\"filter\":\"id=eq.0fea8ded-ea8d-4d86-9431-7df9c0d901bf\",\"schema\":\"public\",\"table\":\"lives\"}]}},\"topic\":\"realtime:public:lives\"}"
+      }
+    }
+  ],
+  "probes": [
+    {
+      "id": "C2.convert.nopi",
+      "lens": "DD5",
+      "payload": "stripe_convert accepted sem PI",
+      "http": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_live_reservation_stripe_convert\"}",
+      "verdict": "HOLD",
+      "extra": {
+        "status": "accepted"
+      }
+    },
+    {
+      "id": "C2b.convert.pi_alheio",
+      "lens": "DD5",
+      "payload": "reconcile PI liveA → res liveB",
+      "http": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"convert_requires_paid_order\"}",
+      "verdict": "HOLD"
+    },
+    {
+      "id": "C1.hitch.qty_stock",
+      "lens": "DD4",
+      "payload": "hitch marketplace+live_only qty=1 two accepts",
+      "http": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"qty_exceeds_stock\"}",
+      "verdict": "HOLD",
+      "extra": {
+        "r1": {
+          "id": "1d5e2621-80de-497d-9bd9-e747536e1001",
+          "status": "accepted",
+          "requested_qty": 1
+        },
+        "r2": {
+          "id": "06d0a666-406e-45a2-ba83-5765403d26cd",
+          "status": "pending",
+          "requested_qty": 1
+        }
+      }
+    },
+    {
+      "id": "C3.end_parallel_accept",
+      "lens": "DD6",
+      "payload": "end_live ∥ PATCH accepted",
+      "http": "200 [{\"id\":\"f9fe0afa-2ff7-4cd7-a049-e710238c87df\",\"live_id\":\"998a8605-8d6b-4f11-96ad-5a2f6dcf01c7\",\"live_item_id\":\"3c8b5a70-3ca8-4b29-aa9b-4654f435c0cc\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"buyer_id\":\"bfcbeeee… | 200 [{\"id\":\"998a8605-8d6b-4f11-96ad-5a2f6dcf01c7\",\"created_at\":\"2026-09-06T14:42:23.930984+00:00\",\"vendedor_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"mux_live_id\":null,\"stream_key\":null,\"playback_id\":null,\"is_active\":false… | 200 [{\"id\":\"f9fe0afa-2ff7-4cd7-a049-e710238c87df\",\"live_id\":\"998a8605-8d6b-4f11-96ad-5a2f6dcf01c7\",\"live_item_id\":\"3c8b5a70-3ca8-4b29-aa9b-4654f435c0cc\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"buyer_id\":\"bfcbeeee…",
+      "verdict": "HOLD",
+      "extra": {
+        "ended": true,
+        "accepted": true,
+        "res": {
+          "id": "f9fe0afa-2ff7-4cd7-a049-e710238c87df",
+          "status": "accepted"
+        },
+        "live": {
+          "id": "998a8605-8d6b-4f11-96ad-5a2f6dcf01c7",
+          "status": "ended",
+          "is_active": false
+        }
+      }
+    },
+    {
+      "id": "C3.accept.after.end",
+      "lens": "DD6",
+      "payload": "PATCH accepted após live ended",
+      "http": "200 [{\"id\":\"f9fe0afa-2ff7-4cd7-a049-e710238c87df\",\"live_id\":\"998a8605-8d6b-4f11-96ad-5a2f6dcf01c7\",\"live_item_id\":\"3c8b5a70-3ca8-4b29-aa9b-4654f435c0cc\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"buyer_id\":\"bfcbeeee…",
+      "verdict": "HOLD"
+    },
+    {
+      "id": "C4.buyer.playback_cols",
+      "lens": "DD7",
+      "payload": "GET lives playback/mux/livekit unpublished",
+      "http": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table lives\"}",
+      "verdict": "HOLD"
+    },
+    {
+      "id": "C4.realtime.playback",
+      "lens": "DD7",
+      "payload": "ws postgres_changes lives unpublished PATCH playback",
+      "http": "ws frames=2 join={\"ref\":\"1\",\"event\":\"phx_reply\",\"payload\":{\"status\":\"ok\",\"response\":{\"postgres_changes\":[{\"id\":36778537,\"event\":\"*\",\"filter\":\"id=eq.0fea8ded-ea8d-4d86-9431-7df9c0d901bf\",\"schema\":\"public\",\"table\":\"lives\"}]}},\"topic\":\"realtime:public:lives\"} err=null",
+      "verdict": "HOLD"
+    }
+  ],
+  "lenses": [
+    "DD4",
+    "DD5",
+    "DD6",
+    "DD7"
+  ]
+}

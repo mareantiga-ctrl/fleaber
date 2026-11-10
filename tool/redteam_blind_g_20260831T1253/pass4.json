@@ -1,0 +1,196 @@
+{
+  "pass": 4,
+  "prefix": "RTG-20260831T1253",
+  "order_after_conc": {
+    "id": "d9c93bea-272f-4d7d-9d1c-a95b15ba90c0",
+    "status": "concluido",
+    "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+    "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+    "product_id": "c322e456-0917-4e9b-a216-3ba1a598d88f",
+    "quantity": 1,
+    "price_total": 5.9,
+    "amount_paid_cents": 590,
+    "payment_method": "Pagamento na app",
+    "shipping_method": null,
+    "stripe_payment_intent_id": "pi_3UAU1cH7FWYUN3jh0uz3Nwso",
+    "stripe_checkout_session_id": null,
+    "stripe_refund_id": null,
+    "wallet_release_processed_at": null,
+    "wallet_refund_processed_at": null,
+    "stock_units_applied": 1,
+    "completed_at": "2026-08-31T12:09:23.113871+00:00",
+    "auto_feedback_processed_at": null,
+    "bundle_id": null
+  },
+  "wallets_after_review": {
+    "buyer": 22.75,
+    "seller": 239.6,
+    "buyer2": 0,
+    "seller2": 0
+  },
+  "order_after_review": {
+    "id": "d9c93bea-272f-4d7d-9d1c-a95b15ba90c0",
+    "status": "concluido",
+    "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+    "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+    "product_id": "c322e456-0917-4e9b-a216-3ba1a598d88f",
+    "quantity": 1,
+    "price_total": 5.9,
+    "amount_paid_cents": 590,
+    "payment_method": "Pagamento na app",
+    "shipping_method": null,
+    "stripe_payment_intent_id": "pi_3UAU1cH7FWYUN3jh0uz3Nwso",
+    "stripe_checkout_session_id": null,
+    "stripe_refund_id": null,
+    "wallet_release_processed_at": "2026-08-31T12:09:23.73152+00:00",
+    "wallet_refund_processed_at": null,
+    "stock_units_applied": 1,
+    "completed_at": "2026-08-29T11:09:23.434294+00:00",
+    "auto_feedback_processed_at": "2026-08-31T12:09:23.629294+00:00",
+    "bundle_id": null
+  },
+  "checkout_url_present": false,
+  "findings": [
+    {
+      "id": "RTG-G8-003",
+      "lens": "G8",
+      "severity": "P2",
+      "title": "Review humana e auto-feedback no mesmo order em paralelo",
+      "actor": "buyer INSERT reviews ∥ cron",
+      "pre": "concluido + completed_at -49h",
+      "repro": "Future.wait POST reviews ∥ batata_generate_auto_feedback",
+      "expected": "1 review comprador",
+      "obtained": [
+        {
+          "id": "16914d69-ee22-4080-ab91-8c421cfae41c",
+          "stars": 5,
+          "author_role": "vendedor",
+          "comment": "Avaliação automática: encomenda concluída sem feedback no prazo.",
+          "created_at": "2026-08-31T12:09:23.73152+00:00"
+        },
+        {
+          "id": "b56b198d-7a17-4eaa-98c8-4ae652147311",
+          "stars": 5,
+          "author_role": "comprador",
+          "comment": "Avaliação automática: venda concluída sem feedback no prazo.",
+          "created_at": "2026-08-31T12:09:23.73152+00:00"
+        }
+      ],
+      "proven": true,
+      "evidence": {}
+    }
+  ],
+  "notes": [
+    {
+      "id": "p4.g5.live_item",
+      "lens": "G5",
+      "title": "live_items insert",
+      "ev": "400 {\"code\":\"23514\",\"details\":\"Failing row contains (98776f1b-aa70-416c-86db-024ec0feb376, 57e0aef1-db5b-4f98-a5dc-2085d1b77f6c, 980f4fa1-0004-42f9-abca-69f1a9c29588, RTG4, rtg ttl, nu…"
+    },
+    {
+      "id": "p4.fixture",
+      "lens": "G8",
+      "title": "setup_paid_order",
+      "ev": "200 {\n  \"ok\": true,\n  \"order_id\": \"d9c93bea-272f-4d7d-9d1c-a95b15ba90c0\",\n  \"product_id\": \"c322e456-0917-4e9b-a216-3ba1a598d88f\",\n  \"payment_intent_id\": \"pi_3UAU1cH7FWYUN3jh0uz3Nwso\",\n…"
+    },
+    {
+      "id": "p4.ship",
+      "lens": "G8",
+      "title": "seller enviado",
+      "ev": "200 [{\"id\":\"d9c93bea-272f-4d7d-9d1c-a95b15ba90c0\",\"created_at\":\"2026-08-31T12:09:20.090284+00:00\",\"product_id\":\"c322e456-0917-4e9b-a216-3ba1a598d88f\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a…"
+    },
+    {
+      "id": "p4.conc",
+      "lens": "G8",
+      "title": "buyer concluido",
+      "ev": "200 [{\"id\":\"d9c93bea-272f-4d7d-9d1c-a95b15ba90c0\",\"created_at\":\"2026-08-31T12:09:20.090284+00:00\",\"product_id\":\"c322e456-0917-4e9b-a216-3ba1a598d88f\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a…"
+    },
+    {
+      "id": "p4.g8.review_cron",
+      "lens": "G8",
+      "title": "human review ∥ auto-feedback",
+      "ev": {
+        "human": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"order_wallet_release_flag_immutable\"}",
+        "cron": "200 2",
+        "reviews": 2
+      }
+    },
+    {
+      "id": "p4.g7.seller_pays_buyer_order",
+      "lens": "G7",
+      "title": "seller JWT checkout order buyer",
+      "ev": "400 {\"error\":\"Invalid checkout user.\"}"
+    },
+    {
+      "id": "p4.g6.foreign_patch",
+      "lens": "G6",
+      "title": "buyer2 PATCH order alheia",
+      "ev": "200 []"
+    },
+    {
+      "id": "p4.g9.compose",
+      "lens": "G9",
+      "title": "2× checkout ∥ unlist após price bump",
+      "ev": {
+        "pay1": "400 {\"error\":\"Checkout blocked: product is not listed.\"}",
+        "pay2": "400 {\"error\":\"Checkout blocked: product is not listed.\"}",
+        "unlist": "200 [{\"id\":\"b44953e9-bb69-4b60-8478-53e50d1cfb54\",\"created_at\":\"2026-08-31T12:09:26.57331+00:00\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"title\":\"RTG-20260831T1253 g9-compos…",
+        "product": {
+          "id": "b44953e9-bb69-4b60-8478-53e50d1cfb54",
+          "title": "RTG-20260831T1253 g9-compose",
+          "price": 50.0,
+          "quantity": 1,
+          "is_sold": false,
+          "list_on_marketplace": false,
+          "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588"
+        },
+        "order": {
+          "id": "42a50683-cc54-41b4-8fd2-c59010e5649a",
+          "status": "reserva_pendente",
+          "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+          "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+          "product_id": "b44953e9-bb69-4b60-8478-53e50d1cfb54",
+          "quantity": 1,
+          "price_total": 5.0,
+          "amount_paid_cents": null,
+          "payment_method": "Pagamento na app",
+          "shipping_method": "entrega em mão",
+          "stripe_payment_intent_id": null,
+          "stripe_checkout_session_id": null,
+          "stripe_refund_id": null,
+          "wallet_release_processed_at": null,
+          "wallet_refund_processed_at": null,
+          "stock_units_applied": null,
+          "completed_at": null,
+          "auto_feedback_processed_at": null,
+          "bundle_id": null
+        }
+      }
+    },
+    {
+      "id": "p4.g3.events_insert",
+      "lens": "G3",
+      "title": "JWT INSERT stripe_checkout_events",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table stripe_checkout_events\"}"
+    }
+  ],
+  "wallets": {
+    "buyer": 22.75,
+    "seller": 239.6,
+    "buyer2": 0,
+    "seller2": 0
+  },
+  "created": {
+    "products": [
+      "b3799a5b-c523-4f34-8f0c-515cd70df667",
+      "c322e456-0917-4e9b-a216-3ba1a598d88f",
+      "832537f6-ce15-47e9-be5b-2efd5387ec86",
+      "b44953e9-bb69-4b60-8478-53e50d1cfb54"
+    ],
+    "orders": [
+      "d9c93bea-272f-4d7d-9d1c-a95b15ba90c0",
+      "f6cbe6e0-a826-4e36-80e3-adb15344abf1",
+      "42a50683-cc54-41b4-8fd2-c59010e5649a"
+    ]
+  }
+}

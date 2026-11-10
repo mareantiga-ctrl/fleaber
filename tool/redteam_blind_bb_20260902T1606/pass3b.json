@@ -1,0 +1,85 @@
+{
+  "stamp": "20260902T1606",
+  "prefix": "RTBB2-20260902T1606",
+  "lenses": [
+    "BB1"
+  ],
+  "findings": [
+    {
+      "id": "BB1-14",
+      "lens": "BB1",
+      "severity": "P3",
+      "title": "reconcile aguarda_confirmacao devolve ok/direct_insert mas só cria pending (não converted)",
+      "actor": "buyer JWT",
+      "pre": "force_pending no INSERT converted",
+      "repro": "rpc batata_live_reconcile_stripe_order",
+      "expected": "order_not_paid sem INSERT",
+      "obtained": "200 {\"ok\": true, \"live_item_id\": \"6a1e1f3e-5fbe-49c3-8803-cc3bd586ae34\", \"direct_insert\": true}",
+      "proven": true,
+      "evidence": {
+        "reservations": [
+          {
+            "id": "ff6a1009-9941-4e72-b66c-ed1e01e33c6d",
+            "status": "pending",
+            "source": "fleaber_live",
+            "notes": "stripe_paid_direct:aa239768-6ce6-4136-82fd-ee5e15e04222",
+            "requested_qty": 1,
+            "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96"
+          }
+        ],
+        "item": {
+          "id": "6a1e1f3e-5fbe-49c3-8803-cc3bd586ae34",
+          "live_id": "f2d07dd4-79f6-447b-a22c-20c0600003dc",
+          "status": "available",
+          "quantity": "",
+          "is_active": true,
+          "item_kind": "marketplace_product",
+          "product_id": "b64b6166-f417-4018-9202-33b92b39c8d0",
+          "checkout_product_id": "",
+          "price": 12.0,
+          "title": "RTBB2-20260902T1606 p3b mp"
+        },
+        "order": {
+          "id": "aa239768-6ce6-4136-82fd-ee5e15e04222",
+          "status": "aguarda_confirmacao",
+          "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+          "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+          "product_id": "b64b6166-f417-4018-9202-33b92b39c8d0",
+          "quantity": 1,
+          "price_total": 12,
+          "amount_paid_cents": "",
+          "stripe_payment_intent_id": "",
+          "live_item_id": "6a1e1f3e-5fbe-49c3-8803-cc3bd586ae34",
+          "live_id": "f2d07dd4-79f6-447b-a22c-20c0600003dc",
+          "stock_units_applied": ""
+        }
+      }
+    }
+  ],
+  "blocked": [],
+  "skipped": [],
+  "notes": [],
+  "actors": {
+    "buyer": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+    "seller": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+    "buyer2": null,
+    "seller2": null,
+    "helper": null
+  },
+  "created": {
+    "lives": [
+      "f2d07dd4-79f6-447b-a22c-20c0600003dc"
+    ],
+    "items": [
+      "6a1e1f3e-5fbe-49c3-8803-cc3bd586ae34"
+    ],
+    "orders": [
+      "aa239768-6ce6-4136-82fd-ee5e15e04222"
+    ],
+    "products": [
+      "b64b6166-f417-4018-9202-33b92b39c8d0"
+    ],
+    "reservations": [],
+    "helpers": []
+  }
+}

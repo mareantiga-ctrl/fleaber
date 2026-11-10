@@ -1,0 +1,513 @@
+{
+  "stamp": "20260902T1612",
+  "prefix": "RTAX-20260902T1612",
+  "lentes": [
+    "AX1",
+    "AX2",
+    "AX7"
+  ],
+  "findings": [
+    {
+      "id": "AX1-amount-true",
+      "lens": "AX1",
+      "severity": "P3",
+      "title": "amount:true (boolean) criou Transfer 1¢",
+      "actor": "seller JWT",
+      "pre": "Number(true)===1",
+      "repro": "POST amount=true",
+      "expected": "400 valor inválido",
+      "obtained": "200 {\"success\":true,\"transferId\":\"tr_1UBFuzH7FWYUN3jhp1bhkpl1\",\"balance\":18.99}",
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "AX1-amount-hex",
+      "lens": "AX1",
+      "severity": "P3",
+      "title": "amount:\"0x64\" criou Transfer (coerção hex)",
+      "actor": "seller JWT",
+      "pre": "Number(\"0x64\")===100 — variante nova vs 1e2 AL",
+      "repro": "POST amount=\"0x64\"",
+      "expected": "400 / cêntimos inteiros decimais",
+      "obtained": "200 {\"success\":true,\"transferId\":\"tr_1UBFv2H7FWYUN3jhg8fizMAG\",\"balance\":17.99}",
+      "proven": true,
+      "evidence": {}
+    }
+  ],
+  "blocked": [
+    {
+      "id": "AX1.batata_wallet_payout_debit",
+      "lens": "AX1",
+      "title": "JWT batata_wallet_payout_debit",
+      "ev": {
+        "buyer": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_wallet_payout_debit\"}",
+        "seller": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_wallet_payout_debit\"}"
+      }
+    },
+    {
+      "id": "AX1.batata_wallet_payout_finish",
+      "lens": "AX1",
+      "title": "JWT batata_wallet_payout_finish",
+      "ev": {
+        "buyer": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_wallet_payout_finish\"}",
+        "seller": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_wallet_payout_finish\"}"
+      }
+    },
+    {
+      "id": "AX1.batata_credit_wallet_once",
+      "lens": "AX1",
+      "title": "JWT batata_credit_wallet_once",
+      "ev": {
+        "buyer": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_credit_wallet_once\"}",
+        "seller": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_credit_wallet_once\"}"
+      }
+    },
+    {
+      "id": "AX1.batata_finalize_stripe_order_refund",
+      "lens": "AX1",
+      "title": "JWT batata_finalize_stripe_order_refund",
+      "ev": {
+        "buyer": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_finalize_stripe_order_refund\"}",
+        "seller": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_finalize_stripe_order_refund\"}"
+      }
+    },
+    {
+      "id": "AX1.batata_generate_auto_feedback",
+      "lens": "AX1",
+      "title": "JWT batata_generate_auto_feedback",
+      "ev": {
+        "buyer": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_generate_auto_feedback\"}",
+        "seller": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_generate_auto_feedback\"}"
+      }
+    },
+    {
+      "id": "AX1.delta",
+      "lens": "AX1",
+      "title": "sweep JWT Δwallet 0",
+      "ev": {
+        "dBuyer": 0.0,
+        "dSeller": 0.0
+      }
+    },
+    {
+      "id": "AX1.key-short7",
+      "lens": "AX1",
+      "title": "key short7 recusada",
+      "ev": "400 {\"error\":\"idempotency_key em falta. Reinicia o levantamento na app.\",\"code\":\"payout_failed\"}"
+    },
+    {
+      "id": "AX1.key-ws",
+      "lens": "AX1",
+      "title": "key ws recusada",
+      "ev": "400 {\"error\":\"idempotency_key em falta. Reinicia o levantamento na app.\",\"code\":\"payout_failed\"}"
+    },
+    {
+      "id": "AX1.key-empty",
+      "lens": "AX1",
+      "title": "key empty recusada",
+      "ev": "400 {\"error\":\"idempotency_key em falta. Reinicia o levantamento na app.\",\"code\":\"payout_failed\"}"
+    },
+    {
+      "id": "AX1.key-num",
+      "lens": "AX1",
+      "title": "key num recusada",
+      "ev": "400 {\"error\":\"idempotency_key em falta. Reinicia o levantamento na app.\",\"code\":\"payout_failed\"}"
+    },
+    {
+      "id": "AX1.key-arr",
+      "lens": "AX1",
+      "title": "key arr recusada",
+      "ev": "400 {\"error\":\"idempotency_key em falta. Reinicia o levantamento na app.\",\"code\":\"payout_failed\"}"
+    },
+    {
+      "id": "AX1.hash-prefix64",
+      "lens": "AX1",
+      "title": "hash separa prefixo 64",
+      "ev": {
+        "a": "tr_1UBFujH7FWYUN3jhiZGCveEk",
+        "b": "tr_1UBFulH7FWYUN3jh7kUVYIe7"
+      }
+    },
+    {
+      "id": "AX1.replay-same",
+      "lens": "AX1",
+      "title": "3× mesma key → 1 Transfer",
+      "ev": [
+        "tr_1UBFuoH7FWYUN3jh7fZL5TIT"
+      ]
+    },
+    {
+      "id": "AX1.two-users",
+      "lens": "AX1",
+      "title": "2 users mesma key não herda Transfer",
+      "ev": {
+        "s1": 200,
+        "s2": 400,
+        "b1": 400
+      }
+    },
+    {
+      "id": "AX1.jwt-hashed",
+      "lens": "AX1",
+      "title": "JWT hashed debit 403",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_wallet_payout_debit\"}"
+    },
+    {
+      "id": "AX1.insert-txn",
+      "lens": "AX1",
+      "title": "INSERT txn",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"new row violates row-level security policy for table \\\"wallet_transactions\\\"\"}"
+    },
+    {
+      "id": "AX2.get-open-redirect-next",
+      "lens": "AX2",
+      "title": "origem open-redirect-next",
+      "ev": 303
+    },
+    {
+      "id": "AX2.get-punycode",
+      "lens": "AX2",
+      "title": "origem punycode",
+      "ev": 200
+    },
+    {
+      "id": "AX2.get-backslash",
+      "lens": "AX2",
+      "title": "origem backslash",
+      "ev": 303
+    },
+    {
+      "id": "AX2.get-port-evil",
+      "lens": "AX2",
+      "title": "origem port-evil",
+      "ev": 200
+    },
+    {
+      "id": "AX2.get-origin-hdr",
+      "lens": "AX2",
+      "title": "origem origin-hdr",
+      "ev": 303
+    },
+    {
+      "id": "AX2.post-urls",
+      "lens": "AX2",
+      "title": "return_url ignorado",
+      "ev": 200
+    }
+  ],
+  "skipped": [],
+  "notes": [
+    {
+      "id": "fixture.balance",
+      "lens": "AX1",
+      "title": "service_role top-up seller ≥20€ (saldo estava 0)",
+      "ev": "200 [{\"id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"stripe_account_id\":\"acct_1U5mYbQeUNx8ar08\",\"balance\":20.00,\"updated_at\":\"2026-09-02T15:17:13.091285+00:00\"}]"
+    },
+    {
+      "id": "snap.wallets",
+      "lens": "AX7",
+      "title": "saldos iniciais",
+      "ev": {
+        "buyer": 61.1,
+        "seller": 20.0,
+        "buyer2": 0,
+        "seller2": 0
+      }
+    },
+    {
+      "id": "snap.seller.acct",
+      "lens": "AX2",
+      "title": "Connect seller",
+      "ev": "acct_1U5mYbQeUNx8ar08"
+    },
+    {
+      "id": "rpc.batata_wallet_payout_debit",
+      "lens": "AX1",
+      "title": "JWT sweep",
+      "ev": {
+        "buyer": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_wallet_payout_debit\"}",
+        "seller": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_wallet_payout_debit\"}"
+      }
+    },
+    {
+      "id": "rpc.batata_wallet_payout_finish",
+      "lens": "AX1",
+      "title": "JWT sweep",
+      "ev": {
+        "buyer": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_wallet_payout_finish\"}",
+        "seller": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_wallet_payout_finish\"}"
+      }
+    },
+    {
+      "id": "rpc.batata_clawback_seller_wallet_for_order",
+      "lens": "AX1",
+      "title": "JWT sweep",
+      "ev": {
+        "buyer": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_clawback_seller_wallet_for_order\"}",
+        "seller": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_clawback_seller_wallet_for_order\"}"
+      }
+    },
+    {
+      "id": "rpc.batata_credit_wallet_once",
+      "lens": "AX1",
+      "title": "JWT sweep",
+      "ev": {
+        "buyer": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_credit_wallet_once\"}",
+        "seller": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_credit_wallet_once\"}"
+      }
+    },
+    {
+      "id": "rpc.batata_refund_buyer_wallet_for_order",
+      "lens": "AX1",
+      "title": "JWT sweep",
+      "ev": {
+        "buyer": "200 false",
+        "seller": "200 false"
+      }
+    },
+    {
+      "id": "rpc.batata_finalize_stripe_order_refund",
+      "lens": "AX1",
+      "title": "JWT sweep",
+      "ev": {
+        "buyer": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_finalize_stripe_order_refund\"}",
+        "seller": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_finalize_stripe_order_refund\"}"
+      }
+    },
+    {
+      "id": "rpc.batata_process_partial_refund_dispute",
+      "lens": "AX1",
+      "title": "JWT sweep",
+      "ev": {
+        "buyer": "200 false",
+        "seller": "200 false"
+      }
+    },
+    {
+      "id": "rpc.batata_ensure_wallet",
+      "lens": "AX1",
+      "title": "JWT sweep",
+      "ev": {
+        "buyer": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_ensure_wallet\"}",
+        "seller": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_ensure_wallet\"}"
+      }
+    },
+    {
+      "id": "rpc.batata_generate_auto_feedback",
+      "lens": "AX1",
+      "title": "JWT sweep",
+      "ev": {
+        "buyer": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_generate_auto_feedback\"}",
+        "seller": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_generate_auto_feedback\"}"
+      }
+    },
+    {
+      "id": "ax1.graphql",
+      "lens": "AX1",
+      "title": "GraphQL update wallets",
+      "ev": "200 {\"errors\": [{\"message\": \"pg_graphql extension is not enabled.\"}]}"
+    },
+    {
+      "id": "ax1.short7",
+      "lens": "AX1",
+      "title": "key 7 chars",
+      "ev": "400 {\"error\":\"idempotency_key em falta. Reinicia o levantamento na app.\",\"code\":\"payout_failed\"}"
+    },
+    {
+      "id": "ax1.short.ws",
+      "lens": "AX1",
+      "title": "key whitespace",
+      "ev": "400 {\"error\":\"idempotency_key em falta. Reinicia o levantamento na app.\",\"code\":\"payout_failed\"}"
+    },
+    {
+      "id": "ax1.short.empty",
+      "lens": "AX1",
+      "title": "key empty",
+      "ev": "400 {\"error\":\"idempotency_key em falta. Reinicia o levantamento na app.\",\"code\":\"payout_failed\"}"
+    },
+    {
+      "id": "ax1.key.num",
+      "lens": "AX1",
+      "title": "key number",
+      "ev": "400 {\"error\":\"idempotency_key em falta. Reinicia o levantamento na app.\",\"code\":\"payout_failed\"}"
+    },
+    {
+      "id": "ax1.key.arr",
+      "lens": "AX1",
+      "title": "key array",
+      "ev": "400 {\"error\":\"idempotency_key em falta. Reinicia o levantamento na app.\",\"code\":\"payout_failed\"}"
+    },
+    {
+      "id": "ax1.unicode",
+      "lens": "AX1",
+      "title": "NFC vs NFD",
+      "ev": {
+        "nfc": "200 {\"success\":true,\"transferId\":\"tr_1UBFudH7FWYUN3jhaOl4nnf7\",\"balance\":19}",
+        "nfd": "200 {\"success\":true,\"transferId\":\"tr_1UBFugH7FWYUN3jhPyDOOtFX\",\"balance\":18}",
+        "sameTid": false
+      }
+    },
+    {
+      "id": "ax1.hash.prefix64",
+      "lens": "AX1",
+      "title": "keys que colidiam no slice 64",
+      "ev": {
+        "same64raw": true,
+        "a": "200 {\"success\":true,\"transferId\":\"tr_1UBFujH7FWYUN3jhiZGCveEk\",\"balance\":17}",
+        "b": "200 {\"success\":true,\"transferId\":\"tr_1UBFulH7FWYUN3jh7kUVYIe7\",\"balance\":16}",
+        "sameTid": false
+      }
+    },
+    {
+      "id": "ax1.replay.same",
+      "lens": "AX1",
+      "title": "3× mesma key hash",
+      "ev": {
+        "hits": [
+          "200 {\"success\":true,\"transferId\":\"tr_1UBFuoH7FWYUN3jh7fZL5TIT\",\"balance\":15}",
+          "200 {\"success\":true,\"transferId\":\"tr_1UBFuoH7FWYUN3jh7fZL5TIT\",\"balance\":15}",
+          "200 {\"success\":true,\"transferId\":\"tr_1UBFuoH7FWYUN3jh7fZL5TIT\",\"balance\":15}"
+        ],
+        "uniqueTids": [
+          "tr_1UBFuoH7FWYUN3jh7fZL5TIT"
+        ]
+      }
+    },
+    {
+      "id": "ax1.two-users",
+      "lens": "AX1",
+      "title": "mesma raw key S1/S2/B",
+      "ev": {
+        "s1": "200 {\"success\":true,\"transferId\":\"tr_1UBFuqH7FWYUN3jh2iziKBlG\",\"balance\":14}",
+        "s2": "400 {\"error\":\"Falta associar a conta bancária no Stripe. Abre outra vez Configurar conta bancária e adiciona o IBAN de teste.\",\"code\":\"payout_failed\"}",
+        "b1": "400 {\"error\":\"Falta associar a conta bancária no Stripe. Abre outra vez Configurar conta bancária e adiciona o IBAN de teste.\",\"code\":\"payout_failed\"}",
+        "sameTid": false
+      }
+    },
+    {
+      "id": "ax1.amount.true",
+      "lens": "AX1",
+      "title": "amount:true",
+      "ev": "200 {\"success\":true,\"transferId\":\"tr_1UBFuzH7FWYUN3jhp1bhkpl1\",\"balance\":18.99}"
+    },
+    {
+      "id": "ax1.amount.hex",
+      "lens": "AX1",
+      "title": "amount:0x64",
+      "ev": "200 {\"success\":true,\"transferId\":\"tr_1UBFv2H7FWYUN3jhg8fizMAG\",\"balance\":17.99}"
+    },
+    {
+      "id": "ax1.jwt.hashed-key",
+      "lens": "AX1",
+      "title": "JWT debit key p_hex",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_wallet_payout_debit\"}"
+    },
+    {
+      "id": "ax1.patch.balance",
+      "lens": "AX1",
+      "title": "PATCH wallets.balance",
+      "ev": "200 []"
+    },
+    {
+      "id": "ax1.insert.txn",
+      "lens": "AX1",
+      "title": "INSERT txn",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"new row violates row-level security policy for table \\\"wallet_transactions\\\"\"}"
+    },
+    {
+      "id": "ax2.get.open-redirect-next",
+      "lens": "AX2",
+      "title": "GET Connect open-redirect-next",
+      "ev": {
+        "status": 303,
+        "location": "https://fleaber.pt/wallet",
+        "hasEvil": false,
+        "snippet": ""
+      }
+    },
+    {
+      "id": "ax2.get.punycode",
+      "lens": "AX2",
+      "title": "GET Connect punycode",
+      "ev": {
+        "status": 200,
+        "location": "",
+        "hasEvil": false,
+        "snippet": "<!DOCTYPE html><html lang=\"pt\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Fleabe…"
+      }
+    },
+    {
+      "id": "ax2.get.backslash",
+      "lens": "AX2",
+      "title": "GET Connect backslash",
+      "ev": {
+        "status": 303,
+        "location": "https://fleaber.pt/wallet",
+        "hasEvil": false,
+        "snippet": ""
+      }
+    },
+    {
+      "id": "ax2.get.port-evil",
+      "lens": "AX2",
+      "title": "GET Connect port-evil",
+      "ev": {
+        "status": 200,
+        "location": "",
+        "hasEvil": false,
+        "snippet": "<!DOCTYPE html><html lang=\"pt\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Fleabe…"
+      }
+    },
+    {
+      "id": "ax2.get.origin-hdr",
+      "lens": "AX2",
+      "title": "GET Connect origin-hdr",
+      "ev": {
+        "status": 303,
+        "location": "https://fleaber.pt/wallet",
+        "hasEvil": false,
+        "snippet": ""
+      }
+    },
+    {
+      "id": "ax2.post.urls",
+      "lens": "AX2",
+      "title": "POST return_url evil",
+      "ev": {
+        "brief": "200 {\"stripeAccountId\":\"acct_1U5mYbQeUNx8ar08\",\"url\":\"https://connect.stripe.com/setup/e/acct_1U5mYbQeUNx8ar08/xlkWLUQNqB8k\"}",
+        "hasEvil": false
+      }
+    },
+    {
+      "id": "snap.wallets.end1",
+      "lens": "AX7",
+      "title": "saldos fim pass1",
+      "ev": {
+        "w0": {
+          "buyer": 61.1,
+          "seller": 20.0,
+          "buyer2": 0,
+          "seller2": 0
+        },
+        "w1": {
+          "buyer": 61.1,
+          "seller": 17.99,
+          "buyer2": 0,
+          "seller2": 0.0
+        },
+        "dBuyer": 0.0,
+        "dSeller": -2.0100000000000016
+      }
+    }
+  ],
+  "actors": {
+    "buyer": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+    "seller": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+    "buyer2": "92535f34-6edd-43ee-87e5-78e8a8ff3c0e",
+    "seller2": "d5e59f63-ba22-4a82-b136-ed44985e3bef"
+  },
+  "created": {
+    "orders": [],
+    "products": []
+  }
+}

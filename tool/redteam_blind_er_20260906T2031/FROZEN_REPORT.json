@@ -1,0 +1,61 @@
+{
+  "auditor": "REDTEAM_BLIND_ER_BAG_SINGLE_RETEST_v1",
+  "frozen_at": "2026-09-06T20:40:16+01:00",
+  "production_touched": false,
+  "fase4": false,
+  "corrections_applied": false,
+  "prefix": "RTER-20260906T2031",
+  "staging": "fxdknzrqjenzqcvnwqqq",
+  "probes_na_tabela": 14,
+  "classes_novas": 5,
+  "races_bag_single": 6,
+  "stripe_test_pago": true,
+  "dual_cs_fresh_buyer": true,
+  "veredicto": "FAIL_P1",
+  "contagem": {
+    "P0": 0,
+    "P1": 1,
+    "P2": 0,
+    "P3": 0,
+    "P4": 0,
+    "TOTAL_P0_P3": 1
+  },
+  "resumo_numerico": "P0=0 P1=1 P2=0 P3=0 TOTAL=1",
+  "findings": [
+    {
+      "id": "P1-1",
+      "severity": "P1",
+      "title": "Saco e artigo avulso ao mesmo tempo: dois links no primeiro checkout",
+      "probes": ["A1", "A2", "fresh_buyer4"],
+      "gate": "dual cs_ HTTP 200 reused=false no comprador sem claim; ledger aponta ao saco; órfã settle 402; burst 0/8 no mesmo comprador depois do claim"
+    }
+  ],
+  "closed_regression": {
+    "B1_6x4": "400 overlapping + 200; 1 cs_",
+    "B2_expand": "200 + 400 overlapping; nunca 2.ª cs_",
+    "B3_identico": "1 cs_ reused",
+    "B4_shrink": "400 + 200; 1 cs_"
+  },
+  "closed_after_claim": {
+    "A3": "single first → bag reused 1 cs_",
+    "A4": "bag∥single∥bag 1 cs_",
+    "A5": "ABC∥B com claim 1 cs_",
+    "A6": "bag2 → 200ms → single 1 cs_",
+    "burst_same_buyer": "0/8 dual"
+  },
+  "pago": {
+    "order_id": "a64530c3-da9a-43b6-acf5-6146131ae706",
+    "pi": "pi_3UClqqH7FWYUN3jh0WUH9Q1D",
+    "cents": 590,
+    "stock_applied": 1
+  },
+  "hold_ratio": "2/14=14%",
+  "fresh_buyer4": {
+    "id": "1dcf7c4f-d876-4d4d-b1ed-8938d912264c",
+    "dual": true,
+    "sids": [
+      "cs_test_a1LGgPFmbDvYWHr0B9cpaG1XhTqgqMl0aAjBjVkY1BSOtZP262Ikawm7uz",
+      "cs_test_a1z70B0QfyfS7bm9sPGArqJjcw190Kqs9jaJFsBg1BLUY92tVTfF0vGFYs"
+    ]
+  }
+}

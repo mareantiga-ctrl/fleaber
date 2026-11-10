@@ -1,0 +1,301 @@
+{
+  "stamp": "20260902T1905",
+  "prefix": "RTBO-20260902T1905",
+  "auditor": "REDTEAM_BLIND_BO_HUB_EDGE_POS_BFBK_v1",
+  "lenses": [
+    "BO1",
+    "BO2",
+    "BO7"
+  ],
+  "findings": [
+    {
+      "id": "p2.jwt.vod.sched",
+      "lens": "BO7",
+      "severity": "P2",
+      "title": "buyer JWT lê mux_vod_playback_id em sched; Hub/discovery anulam; CDN serve HLS",
+      "actor": "buyer JWT",
+      "pre": "GRANT colunas seguras lives; RLS status scheduled|live|ended",
+      "repro": "GET lives?id=eq.12bb4eec-e2e7-4f3f-8191-d2db98a9edbc&select=id,status,mux_vod_playback_id (sem stream_key)",
+      "expected": "mesmo filtro que hub_lives_public (VOD só ended publicado)",
+      "obtained": "jwt=200 [{\"id\":\"12bb4eec-e2e7-4f3f-8191-d2db98a9edbc\",\"status\":\"scheduled\",\"is_active\":false,\"mux_vod_playback_id\":\"8cje21NKdUUro21jGdEv2UlfmWLD7TAMIWi2W01H5Gb8\",\"mux_playback_id\":\"play-p2-sched\",\"playback_id\":\"play-p2-sched\"}] loc=\"\" acao=null disc=200 [{\"id\":\"12bb4eec-e2e7-4f3f-8191-d2db98a9edbc\",\"status\":\"scheduled\",\"mux_vod_playback_id\":null,\"mux_playback_id\":null}] loc=\"\" acao=null pub=200 [{\"id\":\"12bb4eec-e2e7-4f3f-8191-d2db98a9edbc\",\"status\":\"scheduled\",\"mux_vod_playback_id\":null,\"mux_playback_id\":null}] loc=\"\" acao=null cdn=200",
+      "proven": true,
+      "count": true,
+      "evidence": {
+        "watches": true,
+        "jwt_vod": "8cje21NKdUUro21jGdEv2UlfmWLD7TAMIWi2W01H5Gb8",
+        "disc_vod": "",
+        "pub_vod": ""
+      }
+    },
+    {
+      "id": "p2.jwt.vod.ended_unpub",
+      "lens": "BO7",
+      "severity": "P2",
+      "title": "buyer JWT lê mux_vod_playback_id em ended_unpub; Hub/discovery anulam; CDN serve HLS",
+      "actor": "buyer JWT",
+      "pre": "GRANT colunas seguras lives; RLS status scheduled|live|ended",
+      "repro": "GET lives?id=eq.9c524cc3-3bd0-4192-8aef-502d6af211dd&select=id,status,mux_vod_playback_id (sem stream_key)",
+      "expected": "mesmo filtro que hub_lives_public (VOD só ended publicado)",
+      "obtained": "jwt=200 [{\"id\":\"9c524cc3-3bd0-4192-8aef-502d6af211dd\",\"status\":\"ended\",\"is_active\":false,\"mux_vod_playback_id\":\"8cje21NKdUUro21jGdEv2UlfmWLD7TAMIWi2W01H5Gb8\",\"mux_playback_id\":\"play-p2-unpub\",\"playback_id\":\"play-p2-unpub\"}] loc=\"\" acao=null disc=200 [] loc=\"\" acao=null pub=200 [] loc=\"\" acao=null cdn=200",
+      "proven": true,
+      "count": true,
+      "evidence": {
+        "watches": true,
+        "jwt_vod": "8cje21NKdUUro21jGdEv2UlfmWLD7TAMIWi2W01H5Gb8",
+        "disc_vod": "",
+        "pub_vod": ""
+      }
+    },
+    {
+      "id": "p2.jwt.vod.air",
+      "lens": "BO7",
+      "severity": "P2",
+      "title": "buyer JWT lê mux_vod_playback_id em air; Hub/discovery anulam; CDN serve HLS",
+      "actor": "buyer JWT",
+      "pre": "GRANT colunas seguras lives; RLS status scheduled|live|ended",
+      "repro": "GET lives?id=eq.d3fa4549-d4c9-482b-8a9e-031f75644e77&select=id,status,mux_vod_playback_id (sem stream_key)",
+      "expected": "mesmo filtro que hub_lives_public (VOD só ended publicado)",
+      "obtained": "jwt=200 [{\"id\":\"d3fa4549-d4c9-482b-8a9e-031f75644e77\",\"status\":\"live\",\"is_active\":true,\"mux_vod_playback_id\":\"8cje21NKdUUro21jGdEv2UlfmWLD7TAMIWi2W01H5Gb8\",\"mux_playback_id\":\"play-p2-air\",\"playback_id\":\"play-p2-air\"}] loc=\"\" acao=null disc=200 [{\"id\":\"d3fa4549-d4c9-482b-8a9e-031f75644e77\",\"status\":\"live\",\"mux_vod_playback_id\":null,\"mux_playback_id\":\"play-p2-air\"}] loc=\"\" acao=null pub=200 [{\"id\":\"d3fa4549-d4c9-482b-8a9e-031f75644e77\",\"status\":\"live\",\"mux_vod_playback_id\":null,\"mux_playback_id\":\"play-p2-air\"}] loc=\"\" acao=null cdn=200",
+      "proven": true,
+      "count": true,
+      "evidence": {
+        "watches": true,
+        "jwt_vod": "8cje21NKdUUro21jGdEv2UlfmWLD7TAMIWi2W01H5Gb8",
+        "disc_vod": "",
+        "pub_vod": ""
+      }
+    },
+    {
+      "id": "p2.jwt.vod.inactive",
+      "lens": "BO7",
+      "severity": "P2",
+      "title": "buyer JWT lê mux_vod_playback_id em inactive; Hub/discovery anulam; CDN serve HLS",
+      "actor": "buyer JWT",
+      "pre": "GRANT colunas seguras lives; RLS status scheduled|live|ended",
+      "repro": "GET lives?id=eq.c4c2e9be-7ebc-481f-9d6d-8926a831c01b&select=id,status,mux_vod_playback_id (sem stream_key)",
+      "expected": "mesmo filtro que hub_lives_public (VOD só ended publicado)",
+      "obtained": "jwt=200 [{\"id\":\"c4c2e9be-7ebc-481f-9d6d-8926a831c01b\",\"status\":\"live\",\"is_active\":false,\"mux_vod_playback_id\":\"8cje21NKdUUro21jGdEv2UlfmWLD7TAMIWi2W01H5Gb8\",\"mux_playback_id\":\"play-p2-inact\",\"playback_id\":\"play-p2-inact\"}] loc=\"\" acao=null disc=200 [] loc=\"\" acao=null pub=200 [{\"id\":\"c4c2e9be-7ebc-481f-9d6d-8926a831c01b\",\"status\":\"live\",\"mux_vod_playback_id\":null,\"mux_playback_id\":null}] loc=\"\" acao=null cdn=200",
+      "proven": true,
+      "count": true,
+      "evidence": {
+        "watches": true,
+        "jwt_vod": "8cje21NKdUUro21jGdEv2UlfmWLD7TAMIWi2W01H5Gb8",
+        "disc_vod": "",
+        "pub_vod": ""
+      }
+    },
+    {
+      "id": "p2.hub.items.401",
+      "lens": "BO1",
+      "severity": "P2",
+      "title": "hub_live_items_public 401 anon: view chama batata_live_is_broadcasting após revoke BFBK",
+      "actor": "anon",
+      "pre": "revoke execute broadcasting from anon; view security_barrier invoker",
+      "repro": "GET hub_live_items_public",
+      "expected": "200 catálogo (função corre como owner) ou view sem EXECUTE anon",
+      "obtained": "401 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_live_is_broadcasting\"} loc=\"\" acao=null",
+      "proven": true,
+      "count": true,
+      "evidence": {}
+    },
+    {
+      "id": "p2.hub.items.disc.401",
+      "lens": "BO1",
+      "severity": "P2",
+      "title": "hub_live_items_discovery_public 401 anon (mesmo revoke)",
+      "actor": "anon",
+      "pre": "view discovery items",
+      "repro": "GET hub_live_items_discovery_public",
+      "expected": "200 ou vazio, não 401 função",
+      "obtained": "401 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_live_is_broadcasting\"} loc=\"\" acao=null",
+      "proven": true,
+      "count": true,
+      "evidence": {}
+    }
+  ],
+  "blocked": [
+    {
+      "id": "p2.reopen.jwt",
+      "lens": "BO7",
+      "title": "seller não PATCH lives",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table lives\"} loc=\"\" acao=null"
+    },
+    {
+      "id": "p2.bcast.buyer",
+      "lens": "BO1",
+      "title": "authenticated broadcasting (GRANT esperado)",
+      "ev": "200 true loc=\"\" acao=null"
+    },
+    {
+      "id": "p2.cors.secret.headers",
+      "lens": "BO2",
+      "title": "ACAH sem secret names",
+      "ev": ""
+    }
+  ],
+  "skipped": [],
+  "notes": [
+    {
+      "id": "plant.vod",
+      "lens": "BO1",
+      "title": "playback plantado",
+      "ev": "8cje21NKdUUro21jGdEv2UlfmWLD7TAMIWi2W01H5Gb8"
+    },
+    {
+      "id": "p2.jwt.sched",
+      "lens": "BO7",
+      "title": "buyer safe-cols",
+      "ev": "200 [{\"id\":\"12bb4eec-e2e7-4f3f-8191-d2db98a9edbc\",\"status\":\"scheduled\",\"is_active\":false,\"mux_vod_playback_id\":\"8cje21NKdUUro21jGdEv2UlfmWLD7TAMIWi2W01H5Gb8\",\"mux_playback_id\":\"play-p2-sched\",\"playback_id\":\"play-p2-sched\"}] loc=\"\" acao=null"
+    },
+    {
+      "id": "p2.anon.sched",
+      "lens": "BO7",
+      "title": "anon lives safe-cols",
+      "ev": "200 [{\"id\":\"12bb4eec-e2e7-4f3f-8191-d2db98a9edbc\",\"status\":\"scheduled\",\"mux_vod_playback_id\":\"8cje21NKdUUro21jGdEv2UlfmWLD7TAMIWi2W01H5Gb8\"}] loc=\"\" acao=null"
+    },
+    {
+      "id": "p2.disc.sched",
+      "lens": "BO1",
+      "title": "discovery",
+      "ev": "200 [{\"id\":\"12bb4eec-e2e7-4f3f-8191-d2db98a9edbc\",\"status\":\"scheduled\",\"mux_vod_playback_id\":null,\"mux_playback_id\":null}] loc=\"\" acao=null"
+    },
+    {
+      "id": "p2.pub.sched",
+      "lens": "BO1",
+      "title": "hub_lives_public",
+      "ev": "200 [{\"id\":\"12bb4eec-e2e7-4f3f-8191-d2db98a9edbc\",\"status\":\"scheduled\",\"mux_vod_playback_id\":null,\"mux_playback_id\":null}] loc=\"\" acao=null"
+    },
+    {
+      "id": "p2.jwt.ended_unpub",
+      "lens": "BO7",
+      "title": "buyer safe-cols",
+      "ev": "200 [{\"id\":\"9c524cc3-3bd0-4192-8aef-502d6af211dd\",\"status\":\"ended\",\"is_active\":false,\"mux_vod_playback_id\":\"8cje21NKdUUro21jGdEv2UlfmWLD7TAMIWi2W01H5Gb8\",\"mux_playback_id\":\"play-p2-unpub\",\"playback_id\":\"play-p2-unpub\"}] loc=\"\" acao=null"
+    },
+    {
+      "id": "p2.anon.ended_unpub",
+      "lens": "BO7",
+      "title": "anon lives safe-cols",
+      "ev": "200 [{\"id\":\"9c524cc3-3bd0-4192-8aef-502d6af211dd\",\"status\":\"ended\",\"mux_vod_playback_id\":\"8cje21NKdUUro21jGdEv2UlfmWLD7TAMIWi2W01H5Gb8\"}] loc=\"\" acao=null"
+    },
+    {
+      "id": "p2.disc.ended_unpub",
+      "lens": "BO1",
+      "title": "discovery",
+      "ev": "200 [] loc=\"\" acao=null"
+    },
+    {
+      "id": "p2.pub.ended_unpub",
+      "lens": "BO1",
+      "title": "hub_lives_public",
+      "ev": "200 [] loc=\"\" acao=null"
+    },
+    {
+      "id": "p2.jwt.air",
+      "lens": "BO7",
+      "title": "buyer safe-cols",
+      "ev": "200 [{\"id\":\"d3fa4549-d4c9-482b-8a9e-031f75644e77\",\"status\":\"live\",\"is_active\":true,\"mux_vod_playback_id\":\"8cje21NKdUUro21jGdEv2UlfmWLD7TAMIWi2W01H5Gb8\",\"mux_playback_id\":\"play-p2-air\",\"playback_id\":\"play-p2-air\"}] loc=\"\" acao=null"
+    },
+    {
+      "id": "p2.anon.air",
+      "lens": "BO7",
+      "title": "anon lives safe-cols",
+      "ev": "200 [{\"id\":\"d3fa4549-d4c9-482b-8a9e-031f75644e77\",\"status\":\"live\",\"mux_vod_playback_id\":\"8cje21NKdUUro21jGdEv2UlfmWLD7TAMIWi2W01H5Gb8\"}] loc=\"\" acao=null"
+    },
+    {
+      "id": "p2.disc.air",
+      "lens": "BO1",
+      "title": "discovery",
+      "ev": "200 [{\"id\":\"d3fa4549-d4c9-482b-8a9e-031f75644e77\",\"status\":\"live\",\"mux_vod_playback_id\":null,\"mux_playback_id\":\"play-p2-air\"}] loc=\"\" acao=null"
+    },
+    {
+      "id": "p2.pub.air",
+      "lens": "BO1",
+      "title": "hub_lives_public",
+      "ev": "200 [{\"id\":\"d3fa4549-d4c9-482b-8a9e-031f75644e77\",\"status\":\"live\",\"mux_vod_playback_id\":null,\"mux_playback_id\":\"play-p2-air\"}] loc=\"\" acao=null"
+    },
+    {
+      "id": "p2.jwt.inactive",
+      "lens": "BO7",
+      "title": "buyer safe-cols",
+      "ev": "200 [{\"id\":\"c4c2e9be-7ebc-481f-9d6d-8926a831c01b\",\"status\":\"live\",\"is_active\":false,\"mux_vod_playback_id\":\"8cje21NKdUUro21jGdEv2UlfmWLD7TAMIWi2W01H5Gb8\",\"mux_playback_id\":\"play-p2-inact\",\"playback_id\":\"play-p2-inact\"}] loc=\"\" acao=null"
+    },
+    {
+      "id": "p2.anon.inactive",
+      "lens": "BO7",
+      "title": "anon lives safe-cols",
+      "ev": "200 [{\"id\":\"c4c2e9be-7ebc-481f-9d6d-8926a831c01b\",\"status\":\"live\",\"mux_vod_playback_id\":\"8cje21NKdUUro21jGdEv2UlfmWLD7TAMIWi2W01H5Gb8\"}] loc=\"\" acao=null"
+    },
+    {
+      "id": "p2.disc.inactive",
+      "lens": "BO1",
+      "title": "discovery",
+      "ev": "200 [] loc=\"\" acao=null"
+    },
+    {
+      "id": "p2.pub.inactive",
+      "lens": "BO1",
+      "title": "hub_lives_public",
+      "ev": "200 [{\"id\":\"c4c2e9be-7ebc-481f-9d6d-8926a831c01b\",\"status\":\"live\",\"mux_vod_playback_id\":null,\"mux_playback_id\":null}] loc=\"\" acao=null"
+    },
+    {
+      "id": "p2.patch.s2",
+      "lens": "BO7",
+      "title": "seller2 PATCH ended→scheduled",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table lives\"} loc=\"\" acao=null"
+    },
+    {
+      "id": "p2.items.anon",
+      "lens": "BO1",
+      "title": "hub_live_items_public anon",
+      "ev": "401 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_live_is_broadcasting\"} loc=\"\" acao=null"
+    },
+    {
+      "id": "p2.items.buyer",
+      "lens": "BO1",
+      "title": "hub_live_items_public buyer",
+      "ev": "200 [{\"id\":\"65170c9b-33b9-4c80-98fb-436a59514412\",\"live_id\":\"eac946ec-e07e-406f-b6d6-9415098f3b62\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"seller_handle\":\"fleahub-demo-ux\",\"ref_code\":\"RTAEAFAG-1788289206936\",\"title\":\"item 1788289206… loc=\"\" acao=null"
+    },
+    {
+      "id": "p2.items.disc.anon",
+      "lens": "BO1",
+      "title": "discovery items anon",
+      "ev": "401 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_live_is_broadcasting\"} loc=\"\" acao=null"
+    },
+    {
+      "id": "p2.bcast.buyer",
+      "lens": "BO1",
+      "title": "buyer broadcasting oracle",
+      "ev": "200 true loc=\"\" acao=null"
+    },
+    {
+      "id": "p2.cors.webhook",
+      "lens": "BO2",
+      "title": "OPTIONS stripe-webhook",
+      "ev": {
+        "acao": "*",
+        "acah": "",
+        "status": 200
+      }
+    }
+  ],
+  "actors": {
+    "buyer": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+    "seller": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+    "buyer2": "4bf7a472-4aca-48db-ad14-addb35453d99",
+    "seller2": "d15e351f-b4f2-4719-a645-575711f47f22"
+  },
+  "created": {
+    "lives": [
+      "12bb4eec-e2e7-4f3f-8191-d2db98a9edbc",
+      "9c524cc3-3bd0-4192-8aef-502d6af211dd",
+      "d3fa4549-d4c9-482b-8a9e-031f75644e77",
+      "c4c2e9be-7ebc-481f-9d6d-8926a831c01b"
+    ],
+    "items": [
+      "3c9cbef6-6408-4bca-884d-c05d73689854"
+    ],
+    "tips": [],
+    "products": []
+  },
+  "plantedPlaybackId": "8cje21NKdUUro21jGdEv2UlfmWLD7TAMIWi2W01H5Gb8"
+}

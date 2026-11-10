@@ -1,0 +1,47 @@
+{
+  "auditor": "REDTEAM_BLIND_BT_LIVE_POS_BLBQ_v1",
+  "frozen_at": "2026-09-06T10:05:00Z",
+  "production_touched": false,
+  "fase4": false,
+  "corrections_applied": false,
+  "prefix": "RTBT-20260906T1048",
+  "staging": "fxdknzrqjenzqcvnwqqq",
+  "veredicto": "FAIL_P2",
+  "contagem": {
+    "p0_aberto": false,
+    "p0": 0,
+    "p1_aberto": false,
+    "p1": 0,
+    "p2_aberto": true,
+    "p2": 3,
+    "p3_aberto": false,
+    "p3": 0,
+    "p4_aberto": false,
+    "p4": 0,
+    "total_p0_p3": 3
+  },
+  "lentes": ["BT1", "BT2", "BT3", "BT4", "BT5", "BT6", "BT7", "BT8"],
+  "findings_open": [
+    {
+      "id": "BT-P2-01",
+      "severity": "P2",
+      "lens": "BT2",
+      "title": "FOMO sinónimos novos (gone / it's mine / esgotado) persistem via system_message",
+      "proof": "pass1.json p1.fomo.* ; pass3b.json p3b.fomo.buyer.sees"
+    },
+    {
+      "id": "BT-P2-02",
+      "severity": "P2",
+      "lens": "BT5",
+      "title": "Item paused: Hub vazio, buyer pending + seller accept",
+      "proof": "pass2.json p2.paused.still.accepts"
+    },
+    {
+      "id": "BT-P2-03",
+      "severity": "P2",
+      "lens": "BT7",
+      "title": "JWT autenticado lê mux_vod_playback_id e mux_asset_id de live alheia",
+      "proof": "pass3b.json p3b.buyer/s2 mux_vod + mux_asset"
+    }
+  ]
+}

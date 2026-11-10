@@ -1,0 +1,157 @@
+{
+  "lenses": [
+    "CM2",
+    "CM3",
+    "CM4",
+    "CM5"
+  ],
+  "probes": [
+    {
+      "probe_id": "C2",
+      "poco": "CM-C",
+      "payload": "complete-mux B2/anon/S2 vs live S1 + livekit token B2",
+      "http": "{\"cmB2\":\"403 acao=* 482ms {\\\"error\\\":\\\"Sem permissão para esta live.\\\",\\\"step\\\":\\\"auth\\\"}\",\"cmAnon\":\"401 acao=* 346ms {\\\"error\\\":\\\"invalid claim: missing sub claim\\\",\\\"step\\\":\\\"auth\\\"}\",\"cmS2\":\"403 acao=* 546ms {\\\"error\\\":\\\"Sem permissão para esta live.\\\",\\\"step\\\":\\\"auth\\\"}\",\"lkB…",
+      "bd": "",
+      "result": "HOLD",
+      "lens": "CM4",
+      "residual": false,
+      "count_finding": false
+    },
+    {
+      "probe_id": "C3",
+      "poco": "CM-C",
+      "payload": "OPTIONS/POST resolve-mux Origin null/evil/ext/sub",
+      "http": "{\"opt.null\":\"200 acao=https://fleaber.pt 250ms ok\",\"post.null\":\"200 acao=https://fleaber.pt 544ms {\\\"playback_id\\\":\\\"00ErJWBwqaXL00hlMxr015H4o00prdwhoNeSwu1959nO59c\\\",\\\"playback_url\\\":\\\"https://stream.mux.com/00ErJWBwqaXL00hlMxr015H4o00prdwhoNeSwu1959nO59c.m3u8?reduced_latency=tr…",
+      "bd": "",
+      "result": "HOLD",
+      "lens": "CM2",
+      "residual": false,
+      "count_finding": false
+    },
+    {
+      "probe_id": "C4",
+      "poco": "CM-C",
+      "payload": "resolve-mux unpublished anon/B1/dono S2",
+      "http": "{\"anon\":\"404 acao=* 531ms {\\\"error\\\":\\\"live_not_public\\\"}\",\"b1\":\"404 acao=* 473ms {\\\"error\\\":\\\"live_not_public\\\"}\",\"owner\":\"200 acao=* 492ms {\\\"playback_id\\\":\\\"00ErJWBwqaXL00hlMxr015H4o00prdwhoNeSwu1959nO59c\\\",\\\"playback_url\\\":\\\"https://stream.mux.com/00ErJWBwqaXL00hlMxr015H4o00p…",
+      "bd": "",
+      "result": "HOLD",
+      "lens": "CM5",
+      "residual": false,
+      "count_finding": false
+    },
+    {
+      "probe_id": "B1",
+      "poco": "CM-B",
+      "payload": "FALLBACK S1: Session published → unpublish S1 → GET unpaid → restore S1",
+      "http": "{\"s2hubBeforeTip\":false,\"s2create\":\"400 acao=* 726ms {\\\"error\\\":\\\"Tips only allowed for published hub sellers.\\\"}\",\"s2get\":null,\"s1create\":\"200 acao=* 1236ms {\\\"checkoutUrl\\\":\\\"https://checkout.stripe.com/c/pay/cs_test_a1iEFSofb4cIXQHIYl2Bt2eGScj9YKdQqlc3yrcdJGjqsyUno6uNA4usBF#fi…",
+      "bd": "{\"st\":\"\",\"stS1\":\"pending\",\"b2type\":\"vendedor\"}",
+      "result": "HOLD",
+      "lens": "CM3",
+      "residual": false,
+      "count_finding": false
+    },
+    {
+      "probe_id": "B2",
+      "poco": "CM-B",
+      "payload": "tip bind S1 live → end live → GET settle unpaid",
+      "http": "{\"create\":\"200 acao=* 1170ms {\\\"checkoutUrl\\\":\\\"https://checkout.stripe.com/c/pay/cs_test_a1uZJ9DE7XwF1QzvYwpDEERpMeqw90PjcDjulh1fyoO4vmuDMRxPcKCKhL#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDR…\",\"get\":\"200 acao=* 784ms P…",
+      "bd": "{\"status\":\"pending\",\"live\":\"3e208b20-ebff-4ecc-ac83-e05d35b85ae9\"}",
+      "result": "HOLD",
+      "lens": "CM3",
+      "residual": false,
+      "count_finding": false
+    },
+    {
+      "probe_id": "B5",
+      "poco": "CM-B",
+      "payload": "stripe-webhook assinatura forjada sobre tip session",
+      "http": "400 423ms {\"ok\":false,\"error\":\"invalid_signature\"}",
+      "bd": "",
+      "result": "HOLD",
+      "lens": "CM3",
+      "residual": false,
+      "count_finding": false
+    }
+  ],
+  "findings": [],
+  "notes": [
+    {
+      "id": "b2.profile",
+      "lens": "CM4",
+      "title": "B2 type",
+      "ev": {
+        "id": "29a701c1-a9fc-47ff-8d6c-051a023c7b64",
+        "handle": null,
+        "handle_suggested": null,
+        "hub_published": false,
+        "user_type": "vendedor",
+        "full_name": "rtcm-20260906t1318-b2",
+        "is_live": false,
+        "photo_url": null
+      }
+    },
+    {
+      "id": "s2.profile",
+      "lens": "CM4",
+      "title": "S2 type",
+      "ev": {
+        "id": "9e6cd535-3b19-4e59-a9ee-2f35fb23c749",
+        "handle": null,
+        "handle_suggested": null,
+        "hub_published": false,
+        "user_type": "vendedor",
+        "full_name": "rtcm-20260906t1318-s2",
+        "is_live": false,
+        "photo_url": null
+      }
+    },
+    {
+      "id": "leftover.lives",
+      "lens": "CM4",
+      "title": "RTCM lives",
+      "ev": "200 350ms [{\"id\":\"e7c6be06-2237-4e72-b056-2cb3f338bc9f\",\"title\":\"RTCM-20260906T1318 s2-for-s1\",\"status\":\"ended\",\"is_active\":false,\"seller_id\":\"9e6cd535-3b19-4e59-a9ee-2f35fb23c749\",\"vendedor_id\":\"9e6cd535-3b19-4e59-a9ee-2f35fb23c7…"
+    },
+    {
+      "id": "b1.retry.profile",
+      "lens": "CM3",
+      "title": "S2 after publish",
+      "ev": {
+        "id": "9e6cd535-3b19-4e59-a9ee-2f35fb23c749",
+        "handle": null,
+        "handle_suggested": null,
+        "hub_published": false,
+        "user_type": "vendedor",
+        "full_name": "rtcm-20260906t1318-s2",
+        "is_live": false,
+        "photo_url": null
+      }
+    },
+    {
+      "id": "b1.retry.create",
+      "lens": "CM3",
+      "title": "tip after verified publish",
+      "ev": "400 acao=* 726ms {\"error\":\"Tips only allowed for published hub sellers.\"}"
+    }
+  ],
+  "skipped": [],
+  "b2profile": {
+    "id": "29a701c1-a9fc-47ff-8d6c-051a023c7b64",
+    "handle": null,
+    "handle_suggested": null,
+    "hub_published": false,
+    "user_type": "vendedor",
+    "full_name": "rtcm-20260906t1318-b2",
+    "is_live": false,
+    "photo_url": null
+  },
+  "s2profileAtTip": {
+    "id": "9e6cd535-3b19-4e59-a9ee-2f35fb23c749",
+    "handle": null,
+    "handle_suggested": null,
+    "hub_published": false,
+    "user_type": "vendedor",
+    "full_name": "rtcm-20260906t1318-s2",
+    "is_live": false,
+    "photo_url": null
+  }
+}

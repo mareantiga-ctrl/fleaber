@@ -1,0 +1,312 @@
+{
+  "auditor": "REDTEAM_BLIND_CF_LIVE_POS_BXCC_v1",
+  "prefix": "RTCF-20260906T1228",
+  "findings": [
+    {
+      "id": "p3.mux.buyer.playback_id.unpub",
+      "lens": "CF7",
+      "severity": "P2",
+      "title": "buyer JWT lê playback_id de live alheia",
+      "actor": "buyer JWT",
+      "pre": "BXCC revoke mux_playback_id; outras cols?",
+      "repro": "GET lives?id=eq.a3ae1404-fdc9-4906-867a-1ac5248bef18&select=playback_id",
+      "expected": "vazio / 403 coluna",
+      "obtained": "200 [{\"id\":\"a3ae1404-fdc9-4906-867a-1ac5248bef18\",\"playback_id\":\"CFPLAINPB1228fake0001\"}]",
+      "proven": true,
+      "evidence": {
+        "col": "playback_id",
+        "val": "CFPLAINPB1228fake0001",
+        "live": "a3ae1404-fdc9-4906-867a-1ac5248bef18"
+      }
+    },
+    {
+      "id": "p3.mux.buyer.livekit_room_name.unpub",
+      "lens": "CF7",
+      "severity": "P2",
+      "title": "buyer JWT lê livekit_room_name de live alheia",
+      "actor": "buyer JWT",
+      "pre": "BXCC revoke mux_playback_id; outras cols?",
+      "repro": "GET lives?id=eq.a3ae1404-fdc9-4906-867a-1ac5248bef18&select=livekit_room_name",
+      "expected": "vazio / 403 coluna",
+      "obtained": "200 [{\"id\":\"a3ae1404-fdc9-4906-867a-1ac5248bef18\",\"livekit_room_name\":\"CFROOM1228livekit\"}]",
+      "proven": true,
+      "evidence": {
+        "col": "livekit_room_name",
+        "val": "CFROOM1228livekit",
+        "live": "a3ae1404-fdc9-4906-867a-1ac5248bef18"
+      }
+    }
+  ],
+  "blocked": [
+    {
+      "id": "p3.pending.after.end",
+      "lens": "CF6",
+      "title": "pending pós-end recusado",
+      "ev": "no row"
+    },
+    {
+      "id": "p3.accept.after.end",
+      "lens": "CF6",
+      "title": "accept pós-end recusado",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"live_ended\"}"
+    },
+    {
+      "id": "p3.race.hitch.dual_accept",
+      "lens": "CF4",
+      "title": "race hitch só 1 accepted",
+      "ev": {
+        "nAcc": 0,
+        "a": {
+          "id": "41b5c616-5ffd-4592-8be4-96b3be3d04c6",
+          "status": "pending"
+        },
+        "b": {
+          "id": "2024585e-dc06-4c14-9f6d-1ee653992b4b",
+          "status": "pending"
+        }
+      }
+    },
+    {
+      "id": "p3.mux.buyer.mux_playback.unpub",
+      "lens": "CF7",
+      "title": "buyer JWT não lê mux_playback_id",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table lives\"}"
+    },
+    {
+      "id": "p3.mux.buyer.mux_playback.sched",
+      "lens": "CF7",
+      "title": "buyer JWT não lê mux_playback_id",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table lives\"}"
+    },
+    {
+      "id": "p3.mux.anon.mux_playback.unpub",
+      "lens": "CF7",
+      "title": "anon não lê mux_playback_id",
+      "ev": "401 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table profiles\"}"
+    },
+    {
+      "id": "p3.mux.buyer.mux_stream_key.unpub",
+      "lens": "CF7",
+      "title": "buyer JWT não lê mux_stream_key",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table lives\"}"
+    },
+    {
+      "id": "p3.mux.buyer.stream_key.unpub",
+      "lens": "CF7",
+      "title": "buyer JWT não lê stream_key",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table lives\"}"
+    },
+    {
+      "id": "p3.mux.buyer.mux_live_id.unpub",
+      "lens": "CF7",
+      "title": "buyer JWT não lê mux_live_id",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table lives\"}"
+    },
+    {
+      "id": "p3.mux.buyer.mux_vod_playback_id.unpub",
+      "lens": "CF7",
+      "title": "buyer JWT não lê mux_vod_playback_id",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table lives\"}"
+    },
+    {
+      "id": "p3.mux.buyer.mux_asset_id.unpub",
+      "lens": "CF7",
+      "title": "buyer JWT não lê mux_asset_id",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table lives\"}"
+    },
+    {
+      "id": "p3.mux.owner.playback.unpub",
+      "lens": "CF7",
+      "title": "owner seller2 não lê mux_playback_id",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table lives\"}"
+    },
+    {
+      "id": "p3.resolve.buyer.unpub",
+      "lens": "CF7",
+      "title": "resolve recusado/vazio (buyer JWT)",
+      "ev": "404 {\"error\":\"live_not_public\"}"
+    },
+    {
+      "id": "p3.resolve.anon.unpub",
+      "lens": "CF7",
+      "title": "resolve recusado/vazio (anon)",
+      "ev": "404 {\"error\":\"live_not_public\"}"
+    },
+    {
+      "id": "p3.resolve.buyer.ended_unpub",
+      "lens": "CF7",
+      "title": "resolve recusado/vazio (buyer JWT)",
+      "ev": "404 {\"error\":\"live_not_public\"}"
+    },
+    {
+      "id": "p3.edge.complete-mux-live.buyer",
+      "lens": "CF7",
+      "title": "complete-mux-live alheio recusado",
+      "ev": "403 {\"error\":\"Sem permissão para esta live.\",\"step\":\"auth\"}"
+    },
+    {
+      "id": "p3.edge.livekit-mux-publish.buyer",
+      "lens": "CF7",
+      "title": "livekit-mux-publish alheio recusado",
+      "ev": "403 {\"error\":\"Sem permissão para esta live.\",\"step\":\"auth\"}"
+    },
+    {
+      "id": "p3.mux.wildcard.leak",
+      "lens": "CF7",
+      "title": "wildcard sem mux/stream",
+      "ev": [
+        "code",
+        "details",
+        "hint",
+        "message"
+      ]
+    },
+    {
+      "id": "p3.caixa.fomo_to_pago",
+      "lens": "CF8",
+      "title": "cadeia não chegou a pago/converted",
+      "ev": {
+        "converted": false,
+        "paid": false,
+        "rec": null,
+        "order": null
+      }
+    }
+  ],
+  "notes": [
+    {
+      "id": "p3.race.raw",
+      "lens": "CF6",
+      "title": "end∥accept hits",
+      "ev": {
+        "accept1": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"live_ended\"}",
+        "end": "200 [{\"id\":\"1997bdd5-23df-4ede-83f2-b6dbccb951ef\",\"created_at\":\"2026-09-06T11:37:14.715047+00:00\",\"vendedor_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"mux_live_id\":null,\"stream_key\":null,\"playback_id\":null,\"is_active\":false…",
+        "accept2": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"live_ended\"}",
+        "res": {
+          "id": "4a4b4f6b-99a8-4760-b1cb-731169e5f58c",
+          "status": "pending",
+          "updated_at": "2026-09-06T11:37:15.399966+00:00"
+        },
+        "live": {
+          "id": "1997bdd5-23df-4ede-83f2-b6dbccb951ef",
+          "status": "ended",
+          "is_active": false
+        }
+      }
+    },
+    {
+      "id": "res.fail",
+      "title": "insertReservation 403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"live_ended\"}",
+      "ev": {
+        "live": "1997bdd5-23df-4ede-83f2-b6dbccb951ef",
+        "item": "fd12ceae-7f75-4d48-98e5-dae83c8bcd7d",
+        "status": "pending",
+        "source": "fleaber_live",
+        "qty": 1
+      }
+    },
+    {
+      "id": "p3.mux.plant.key",
+      "lens": "CF7",
+      "title": "plant stream_key",
+      "ev": "200 [{\"id\":\"a3ae1404-fdc9-4906-867a-1ac5248bef18\",\"created_at\":\"2026-09-06T11:37:18.840114+00:00\",\"vendedor_id\":\"6c9febff-91da-475e-9629-c6cb1720661f\",\"mux_live_id\":null,\"stream_key\":\"CFSTREAMKEY1228secret\",\"playback_id\":\"CF…"
+    },
+    {
+      "id": "p3.hub.unpub",
+      "lens": "CF7",
+      "title": "Hub/discovery",
+      "ev": {
+        "hub": "200 []",
+        "disc": "200 []"
+      }
+    },
+    {
+      "id": "p3.hub.sched",
+      "lens": "CF7",
+      "title": "Hub/discovery",
+      "ev": {
+        "hub": "200 []",
+        "disc": "200 []"
+      }
+    },
+    {
+      "id": "p3.hub.ended",
+      "lens": "CF7",
+      "title": "Hub/discovery",
+      "ev": {
+        "hub": "200 []",
+        "disc": "200 []"
+      }
+    },
+    {
+      "id": "p3.hub.pub",
+      "lens": "CF7",
+      "title": "Hub/discovery",
+      "ev": {
+        "hub": "200 [{\"id\":\"6df87413-31da-484d-965f-bc43b19f8d4e\",\"mux_playback_id\":\"CFPUB1228fake0001xxxx\",\"mux_vod_playback_id\":null,\"status\":\"live\"}]",
+        "disc": "200 [{\"id\":\"6df87413-31da-484d-965f-bc43b19f8d4e\",\"mux_playback_id\":\"CFPUB1228fake0001xxxx\",\"status\":\"live\"}]"
+      }
+    },
+    {
+      "id": "p3.resolve.owner.unpub",
+      "lens": "CF7",
+      "title": "resolve OK esperado",
+      "ev": "200 {\"playback_id\":\"CFPLAYBACK1228fake0001\",\"playback_url\":\"https://stream.mux.com/CFPLAYBACK1228fake0001.m3u8?reduced_latency=true\",\"source\":\"live_active\",\"is_live\":true}"
+    },
+    {
+      "id": "p3.resolve.buyer.pub",
+      "lens": "CF7",
+      "title": "resolve OK esperado",
+      "ev": "200 {\"playback_id\":\"CFPUB1228fake0001xxxx\",\"playback_url\":\"https://stream.mux.com/CFPUB1228fake0001xxxx.m3u8?reduced_latency=true\",\"source\":\"live_active\",\"is_live\":true}"
+    },
+    {
+      "id": "p3.mux.wildcard.keys",
+      "lens": "CF7",
+      "title": "SELECT * keys",
+      "ev": [
+        "code",
+        "details",
+        "hint",
+        "message"
+      ]
+    },
+    {
+      "id": "p3.caixa.chain",
+      "lens": "CF8",
+      "title": "FOMO→accept→order pendente→reconcile",
+      "ev": {
+        "fomo": "200 {\"ok\": true}",
+        "order": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"order_live_item_exhausted\"}",
+        "rec": null,
+        "res": {
+          "id": "106c1892-cf63-476a-b05c-08d595a18edd",
+          "status": "accepted"
+        },
+        "order_row": null,
+        "stock": {
+          "ok": true,
+          "price": 9.0,
+          "live_id": "0e89df0d-e76d-460e-80c3-83842d2e5e68",
+          "ref_code": "RTCF-CX",
+          "item_kind": "live_only",
+          "total_qty": 1,
+          "product_id": null,
+          "blocked_qty": 0,
+          "live_status": "live",
+          "live_item_id": "ed9af0f7-841a-49af-ae0f-b19e7e673b08",
+          "available_qty": 0,
+          "pending_bag_qty": 0,
+          "sold_converted_qty": 0,
+          "checkout_product_id": "2da05341-ebef-4109-8818-861943546a4a",
+          "reserved_accepted_qty": 1
+        }
+      }
+    }
+  ],
+  "lenses": [
+    "CF4",
+    "CF6",
+    "CF7",
+    "CF8"
+  ]
+}

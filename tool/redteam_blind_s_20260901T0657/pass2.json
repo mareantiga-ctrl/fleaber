@@ -1,0 +1,484 @@
+{
+  "auditor": "REDTEAM_BLIND_S_IDENTIDADE_STAFF_v1",
+  "stamp": "20260901T0657",
+  "pass": 2,
+  "production_touched": false,
+  "fase4": false,
+  "findings": [
+    {
+      "id": "RTS-S7-012",
+      "lens": "S7",
+      "severity": "P1",
+      "title": "Helper só-analytics lê encomendas (PII compradores) da loja",
+      "actor": "buyer2 JWT staff analytics",
+      "pre": "orders RLS parties; sem permissão de encomendas",
+      "repro": "GET orders?seller_id=eq.980f4fa1-0004-42f9-abca-69f1a9c29588",
+      "expected": "[] (não é seller nem buyer)",
+      "obtained": "n=1 200 [{\"id\":\"8352836c-2200-4ad5-894a-8e90b28a20f4\",\"buyer_id\":\"28b2cffd-5075-415e-9c29-dfe965663c9f\",\"status\":\"reserva_pendente\",\"price_total\":5.00}]",
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "RTS-S5-010",
+      "lens": "S5",
+      "severity": "P0",
+      "title": "PATCH reviews_public_ratings altera estrelas alheias",
+      "actor": "buyer2 JWT",
+      "pre": "view security_invoker=false GRANT SELECT",
+      "repro": "PATCH reviews_public_ratings?id=eq.d962c010-60ee-45b6-8a3e-2711323bbae2",
+      "expected": "401/403",
+      "obtained": "200 [{\"id\":\"d962c010-60ee-45b6-8a3e-2711323bbae2\",\"created_at\":\"2026-08-29T07:12:00.069786+00:00\",\"target_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"stars\":5,\"comment\":\"Avaliação automática: venda concluída sem feedback no …",
+      "proven": true,
+      "evidence": {}
+    }
+  ],
+  "notes": [
+    {
+      "id": "p2.tok.b2",
+      "lens": "S6",
+      "title": "buyer2 device token",
+      "ev": true
+    },
+    {
+      "id": "p2.tok.comprador",
+      "lens": "S6",
+      "title": "buyer comprador mint token",
+      "ev": "200 {\"ok\": false, \"error\": \"not_seller\"}"
+    },
+    {
+      "id": "p2.s1.own",
+      "lens": "S1",
+      "title": "próprio perfil (sem email)",
+      "ev": {
+        "http": 200,
+        "user_type": "comprador",
+        "pii": "phone=null,legal_full_name=null,iban=null,mb_way=null"
+      }
+    },
+    {
+      "id": "p2.s1.other",
+      "lens": "S1",
+      "title": "buyer GET PII seller",
+      "ev": {
+        "http": 200,
+        "n": 0,
+        "body": "200 []"
+      }
+    },
+    {
+      "id": "p2.s1.dump",
+      "lens": "S1",
+      "title": "GET profiles sem filtro",
+      "ev": {
+        "http": 200,
+        "n": 1
+      }
+    },
+    {
+      "id": "p2.s1.dir.star",
+      "lens": "S1",
+      "title": "directory select * seller",
+      "ev": {
+        "http": 200,
+        "keys": [
+          "id",
+          "created_at",
+          "full_name",
+          "photo_url",
+          "location",
+          "is_live",
+          "next_live",
+          "last_live",
+          "total_lives",
+          "user_type",
+          "handle",
+          "vacation_mode",
+          "external_payments_enabled",
+          "phone_verified"
+        ],
+        "has_phone": false,
+        "has_iban": false
+      }
+    },
+    {
+      "id": "p2.s1.gql",
+      "lens": "S1",
+      "title": "GraphQL profiles seller",
+      "ev": "200 {\"errors\": [{\"message\": \"pg_graphql extension is not enabled.\"}]}"
+    },
+    {
+      "id": "p2.s1.payout",
+      "lens": "S1",
+      "title": "get_my_payout_details buyer2",
+      "ev": "200 [{\"mb_way\":null,\"iban\":null,\"external_payments_enabled\":false}]"
+    },
+    {
+      "id": "p2.s3.list.buyer2",
+      "lens": "S3",
+      "title": "chat_media prefix=\"product_photos/\"",
+      "ev": {
+        "http": 200,
+        "n": 0,
+        "snip": "[]"
+      }
+    },
+    {
+      "id": "p2.s3.list.buyer2",
+      "lens": "S3",
+      "title": "chat_media prefix=\"product_photos/980f4fa1-0004-42f9-abca-69f1a9c29588/\"",
+      "ev": {
+        "http": 200,
+        "n": 0,
+        "snip": "[]"
+      }
+    },
+    {
+      "id": "p2.s3.list.buyer2",
+      "lens": "S3",
+      "title": "chat_media prefix=\"profile_photos/\"",
+      "ev": {
+        "http": 200,
+        "n": 0,
+        "snip": "[]"
+      }
+    },
+    {
+      "id": "p2.s3.list.anon",
+      "lens": "S3",
+      "title": "chat_media prefix=\"profile_photos/980f4fa1-0004-42f9-abca-69f1a9c29588/\"",
+      "ev": {
+        "http": 200,
+        "n": 0,
+        "snip": "[]"
+      }
+    },
+    {
+      "id": "p2.s3.list.buyer2",
+      "lens": "S3",
+      "title": "fleaber_private prefix=\"chat_uploads/\"",
+      "ev": {
+        "http": 200,
+        "n": 0,
+        "snip": "[]"
+      }
+    },
+    {
+      "id": "p2.s3.list.buyer2",
+      "lens": "S3",
+      "title": "fleaber_private prefix=\"chat_uploads/980f4fa1-0004-42f9-abca-69f1a9c29588/\"",
+      "ev": {
+        "http": 200,
+        "n": 0,
+        "snip": "[]"
+      }
+    },
+    {
+      "id": "p2.s3.list.buyer2",
+      "lens": "S3",
+      "title": "fleaber_private prefix=\"order_proofs/\"",
+      "ev": {
+        "http": 200,
+        "n": 0,
+        "snip": "[]"
+      }
+    },
+    {
+      "id": "p2.s3.list.buyer2",
+      "lens": "S3",
+      "title": "fleaber_private prefix=\"order_disputes/\"",
+      "ev": {
+        "http": 200,
+        "n": 0,
+        "snip": "[]"
+      }
+    },
+    {
+      "id": "p2.s3.up.seller",
+      "lens": "S3",
+      "title": "seller JPEG fleaber_private",
+      "ev": "200 {\"Key\":\"fleaber_private/chat_uploads/980f4fa1-0004-42f9-abca-69f1a9c29588/RTS-20260901T0657-s3.jpg\",\"Id\":\"94928ec9-3891-4f15-9b0a-3118509a287e\"}"
+    },
+    {
+      "id": "p2.s3.read",
+      "lens": "S3",
+      "title": "ler JPEG seller como outros",
+      "ev": {
+        "up": 200,
+        "owner": 200,
+        "b2": "400 {\"statusCode\":\"404\",\"error\":\"not_found\",\"message\":\"Object not found\",\"code\":\"NoSuchKey\"}",
+        "anon": "400 {\"statusCode\":\"404\",\"error\":\"not_found\",\"message\":\"Object not found\",\"code\":\"NoSuchKey\"}",
+        "public": "400 {\"statusCode\":\"404\",\"error\":\"Bucket not found\",\"message\":\"Bucket not found\",\"code\":\"NoSuchBucket\"}",
+        "sign": "400 {\"statusCode\":\"404\",\"error\":\"not_found\",\"message\":\"Object not found\",\"code\":\"NoSuchKey\"}"
+      }
+    },
+    {
+      "id": "p2.s3.up.alien",
+      "lens": "S3",
+      "title": "buyer2 JPEG no prefixo seller",
+      "ev": "400 {\"statusCode\":\"403\",\"error\":\"Unauthorized\",\"message\":\"new row violates row-level security policy\",\"code\":\"AccessDenied\"}"
+    },
+    {
+      "id": "p2.s3.up.cat",
+      "lens": "S3",
+      "title": "buyer2 upload catálogo seller",
+      "ev": "400 {\"statusCode\":\"403\",\"error\":\"Unauthorized\",\"message\":\"new row violates row-level security policy\",\"code\":\"AccessDenied\"}"
+    },
+    {
+      "id": "p2.s3.chat.create",
+      "lens": "S3",
+      "title": "buyer2 abre chat com seller",
+      "ev": "201 [{\"id\":\"49d36f3d-d4b8-4c9a-8073-189da8f46051\",\"created_at\":\"2026-09-01T06:12:46.285818+00:00\",\"user_a\":\"28b2cffd-5075-415e-9c29-dfe965663c9f\",\"user_b\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"last_message\":null,\"last_mess…"
+    },
+    {
+      "id": "p2.s3.chat.list",
+      "lens": "S3",
+      "title": "após abrir chat, list chat_uploads/seller",
+      "ev": {
+        "http": 200,
+        "n": 0,
+        "snip": "[]"
+      }
+    },
+    {
+      "id": "p2.s3.chat.get",
+      "lens": "S3",
+      "title": "ler ficheiro seller após ser counterparty",
+      "ev": "400 {\"statusCode\":\"404\",\"error\":\"not_found\",\"message\":\"Object not found\",\"code\":\"NoSuchKey\"}"
+    },
+    {
+      "id": "p2.s3.disp.svc",
+      "lens": "S3",
+      "title": "disputas (observação)",
+      "ev": {
+        "n": 5,
+        "snip": "[{\"id\":\"ae86f5b5-46eb-4af8-bad4-3ac9246973fb\",\"order_id\":\"944ed28a-23b9-42f4-8a94-fda58f528c54\",\"proof_photos\":[\"https://fxdknzrqjenzqcvnwqqq.supabase.co/storag…"
+      }
+    },
+    {
+      "id": "p2.s3.proof.url",
+      "lens": "S3",
+      "title": "buyer2 GET proof_photos URL",
+      "ev": {
+        "http": 400,
+        "len": 88
+      }
+    },
+    {
+      "id": "p2.s6.lives",
+      "lens": "S6",
+      "title": "lives do seller",
+      "ev": {
+        "n": 5,
+        "snip": "[{\"id\":\"0ec77b29-dc50-4951-86fe-6b0ef1f4fd47\",\"status\":\"ended\",\"is_active\":false,\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\"}, \n {\"id\":\"27230440-5a0e-4c7b-bfa4-0c8f6c577e9a\"…"
+      }
+    },
+    {
+      "id": "p2.s6.ingest",
+      "lens": "S6",
+      "title": "OCR com token buyer2 na live do seller",
+      "ev": "400 {\"ok\":false,\"error\":\"not_allowed\"}"
+    },
+    {
+      "id": "p2.s6.ingest.hold",
+      "lens": "S6",
+      "title": "recusa OCR cruzado",
+      "ev": "not_allowed"
+    },
+    {
+      "id": "p2.s6.pair",
+      "lens": "S6",
+      "title": "helper analytics cria pairing",
+      "ev": "200 {\"ok\": false, \"error\": \"not_allowed\"}"
+    },
+    {
+      "id": "p2.s6.tok.tbl",
+      "lens": "S6",
+      "title": "buyer2 lê tokens do seller",
+      "ev": {
+        "http": 200,
+        "n": 0
+      }
+    },
+    {
+      "id": "p2.s6.tok.star",
+      "lens": "S6",
+      "title": "buyer2 GET seller_device_tokens *",
+      "ev": {
+        "http": 200,
+        "n": 1
+      }
+    },
+    {
+      "id": "p2.s6.binario",
+      "lens": "S6",
+      "title": "tokens no binário Flutter",
+      "ev": "anon key staging em lib/backend/supabase/supabase.dart; sem service_role; device_token não hardcoded"
+    },
+    {
+      "id": "p2.s7.msgs",
+      "lens": "S7",
+      "title": "buyer2 msgs cols=id,sender_id,body,created_at",
+      "ev": {
+        "http": 400,
+        "n": 0,
+        "snip": "{\"code\":\"42703\",\"details\":null,\"hint\":null,\"message\":\"column chat_messages.body does not exist\"}"
+      }
+    },
+    {
+      "id": "p2.s7.msgs",
+      "lens": "S7",
+      "title": "buyer2 msgs cols=id,user_id,text,created_at",
+      "ev": {
+        "http": 400,
+        "n": 0,
+        "snip": "{\"code\":\"42703\",\"details\":null,\"hint\":null,\"message\":\"column chat_messages.user_id does not exist\"}"
+      }
+    },
+    {
+      "id": "p2.s7.msgs",
+      "lens": "S7",
+      "title": "buyer2 msgs cols=id,author_id,message,created_at",
+      "ev": {
+        "http": 400,
+        "n": 0,
+        "snip": "{\"code\":\"42703\",\"details\":null,\"hint\":null,\"message\":\"column chat_messages.author_id does not exist\"}"
+      }
+    },
+    {
+      "id": "p2.s7.msgs",
+      "lens": "S7",
+      "title": "buyer2 msgs cols=id,content,created_at",
+      "ev": {
+        "http": 400,
+        "n": 0,
+        "snip": "{\"code\":\"42703\",\"details\":null,\"hint\":null,\"message\":\"column chat_messages.content does not exist\"}"
+      }
+    },
+    {
+      "id": "p2.s7.gql.orders",
+      "lens": "S7",
+      "title": "GraphQL orders do buyer1",
+      "ev": "200 {\"errors\": [{\"message\": \"pg_graphql extension is not enabled.\"}]}"
+    },
+    {
+      "id": "p2.s7.staff.orders",
+      "lens": "S7",
+      "title": "helper analytics GET orders da loja",
+      "ev": {
+        "http": 200,
+        "n": 1
+      }
+    },
+    {
+      "id": "p2.s5.pub",
+      "lens": "S5",
+      "title": "reviews_public_ratings",
+      "ev": {
+        "http": 200,
+        "n": 5
+      }
+    },
+    {
+      "id": "p2.s5.patch.view",
+      "lens": "S5",
+      "title": "PATCH view ratings",
+      "ev": "200 [{\"id\":\"d962c010-60ee-45b6-8a3e-2711323bbae2\",\"created_at\":\"2026-08-29T07:12:00.069786+00:00\",\"target_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"stars\":5,\"comment\":\"Avaliação automática: venda concluída sem feedback no …"
+    },
+    {
+      "id": "p2.s5.del.view",
+      "lens": "S5",
+      "title": "DELETE view ratings",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"review_delete_forbidden\"}"
+    },
+    {
+      "id": "p2.s5.e2e",
+      "lens": "S5",
+      "title": "setup_paid_order",
+      "ev": "200 {\n  \"ok\": true,\n  \"order_id\": \"39ffbfa1-2e8c-4ebb-bd6b-25d18961514f\",\n  \"product_id\": \"50b73e58-30c7-4094-ac3e-00af8d75887d\",\n  \"payment_intent_id\": \"pi_3UAkwAH7FWYUN3jh1zA1uW4m\",\n  \"pi_status\": \"succeeded\",\n  \"pi_amount…"
+    },
+    {
+      "id": "p2.s5.conc",
+      "lens": "S5",
+      "title": "concluido",
+      "ev": "200 [{\"id\":\"39ffbfa1-2e8c-4ebb-bd6b-25d18961514f\",\"created_at\":\"2026-09-01T06:12:49.747283+00:00\",\"product_id\":\"50b73e58-30c7-4094-ac3e-00af8d75887d\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-00…"
+    },
+    {
+      "id": "p2.s5.ins1",
+      "lens": "S5",
+      "title": "buyer review 1★",
+      "ev": "201 [{\"id\":\"5436100f-d0b0-4a39-9ac7-e65b522999fc\",\"created_at\":\"2026-09-01T06:12:52.212141+00:00\",\"target_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"stars\":1,\"comment\":\"RTS-…"
+    },
+    {
+      "id": "p2.s5.del.own",
+      "lens": "S5",
+      "title": "buyer DELETE própria review",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"review_delete_forbidden\"}"
+    },
+    {
+      "id": "p2.s5.del.blocked",
+      "lens": "S5",
+      "title": "DELETE próprio bloqueado",
+      "ev": {
+        "del": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"review_delete_forbidden\"}",
+        "still": "200 [{\"id\":\"5436100f-d0b0-4a39-9ac7-e65b522999fc\",\"stars\":1}]"
+      }
+    },
+    {
+      "id": "p2.s4.e2e",
+      "lens": "S4",
+      "title": "setup_paid_order buyer2→seller",
+      "ev": "200 {\n  \"ok\": true,\n  \"order_id\": \"2b7c289d-a6f6-4fee-9bcf-f190c18262fa\",\n  \"product_id\": \"4d32b38c-b8b8-437c-9c71-455569144a08\",\n  \"payment_intent_id\": \"pi_3UAkwDH7FWYUN3jh0uO3GtDG\",\n  \"pi_status\": \"succeeded\",\n  \"pi_amount…"
+    },
+    {
+      "id": "p2.s4.rev",
+      "lens": "S4",
+      "title": "alt-account 5★ no seller",
+      "ev": "201 [{\"id\":\"f74fef8b-ffab-4cc7-bf29-d699a89eb02c\",\"created_at\":\"2026-09-01T06:12:55.262607+00:00\",\"target_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"buyer_id\":\"28b2cffd-5075-415e-9c29-dfe965663c9f\",\"stars\":5,\"comment\":\"RTS-…"
+    },
+    {
+      "id": "p2.s4.rev.arch",
+      "lens": "S4",
+      "title": "sem ligação de contas: 2 UUIDs podem 5★ após compra real (arquitectura, não RLS)",
+      "ev": "f74fef8b-ffab-4cc7-bf29-d699a89eb02c"
+    },
+    {
+      "id": "p2.s4.disp",
+      "lens": "S4",
+      "title": "alt-account abre disputa",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"new row violates row-level security policy for table \\\"order_disputes\\\"\"}"
+    },
+    {
+      "id": "p2.s2.type.flip",
+      "lens": "S2",
+      "title": "comprador tenta vendedor",
+      "ev": {
+        "patch": "200 [{\"created_at\":\"2026-08-26T11:42:16.950611+00:00\",\"full_name\":\"Maestro Buyer\",\"user_type\":\"comprador\",\"phone\":null,\"id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"photo_url\":null,\"is_live\":false,\"next_live\":null,\"last_live\"…",
+        "after": "comprador"
+      }
+    },
+    {
+      "id": "p2.s8.batata_credit_wallet_once",
+      "lens": "S8",
+      "title": "JWT wallet rpc",
+      "ev": "404 {\"code\":\"PGRST202\",\"details\":\"Searched for the function public.batata_credit_wallet_once with parameter p_order_id or with a single unnamed json/jsonb parameter, but no matches were found in the schema cache.\",\"hint\":nul…"
+    },
+    {
+      "id": "p2.s8.batata_debit_wallet_once",
+      "lens": "S8",
+      "title": "JWT wallet rpc",
+      "ev": "404 {\"code\":\"PGRST202\",\"details\":\"Searched for the function public.batata_debit_wallet_once with parameter p_order_id or with a single unnamed json/jsonb parameter, but no matches were found in the schema cache.\",\"hint\":null…"
+    },
+    {
+      "id": "p2.s8.batata_refund_buyer_wallet_for_order",
+      "lens": "S8",
+      "title": "JWT wallet rpc",
+      "ev": "200 false"
+    },
+    {
+      "id": "p2.s8.batata_release_seller_wallet_for_order",
+      "lens": "S8",
+      "title": "JWT wallet rpc",
+      "ev": "200 false"
+    }
+  ]
+}

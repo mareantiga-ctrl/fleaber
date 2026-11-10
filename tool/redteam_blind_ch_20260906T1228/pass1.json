@@ -1,0 +1,2022 @@
+{
+  "stamp": "20260906T1228",
+  "prefix": "RTCH-20260906T1228",
+  "auditor": "REDTEAM_BLIND_CH_PAYOUT_POS_BXCC_v1",
+  "lenses": [
+    "CH1",
+    "CH4",
+    "CH5",
+    "CH6",
+    "CH7"
+  ],
+  "findings": [
+    {
+      "id": "CH-P0-WALLET-PATCH-OTHER",
+      "lens": "CH6",
+      "severity": "P0",
+      "title": "JWT PATCH balance da carteira alheia",
+      "actor": "seller JWT",
+      "pre": "RLS select/update own only",
+      "repro": "PATCH wallets?id=eq.buyer {balance:66666}",
+      "expected": "denied",
+      "obtained": "200 [] loc=\"\"",
+      "proven": true,
+      "count": true,
+      "evidence": {}
+    },
+    {
+      "id": "CH-P2-ARMENIAN-OH",
+      "lens": "CH1",
+      "severity": "P2",
+      "title": "homóglifo arménio օ vs o → 2 Transfers",
+      "actor": "seller JWT",
+      "pre": "fold sem Armenian; catch-all apaga օ ≠ o",
+      "repro": "rtchoARMN88 vs rtchօARMN88 (U+0585)",
+      "expected": "1 Transfer (fold/NFKC/strip) OU desenho documentado",
+      "obtained": {
+        "keyA": "rtchoARMN88",
+        "keyB": "rtchօARMN88",
+        "keyA_units": [
+          114,
+          116,
+          99,
+          104,
+          111,
+          65,
+          82,
+          77,
+          78,
+          56,
+          56
+        ],
+        "keyB_units": [
+          114,
+          116,
+          99,
+          104,
+          1413,
+          65,
+          82,
+          77,
+          78,
+          56,
+          56
+        ],
+        "hitA": "200 {\"success\":true,\"transferId\":\"tr_1UCeO6H7FWYUN3jh708yyQsT\",\"balance\":61.33} loc=\"\"",
+        "hitB": "200 {\"success\":true,\"transferId\":\"tr_1UCeO8H7FWYUN3jhNR7Xkiwh\",\"balance\":60.33} loc=\"\"",
+        "tidA": "tr_1UCeO6H7FWYUN3jh708yyQsT",
+        "tidB": "tr_1UCeO8H7FWYUN3jhNR7Xkiwh",
+        "new_transfer_ids": [
+          "tr_1UCeO8H7FWYUN3jhNR7Xkiwh",
+          "tr_1UCeO6H7FWYUN3jh708yyQsT"
+        ],
+        "new_transfer_count": 2,
+        "wallet_before": 62.33,
+        "wallet_after": 60.33,
+        "delta_eur": -2.0,
+        "payoutOkA": true,
+        "payoutOkB": true,
+        "idempotentB": false
+      },
+      "proven": true,
+      "count": true,
+      "evidence": {}
+    },
+    {
+      "id": "CH-P2-GEORGIAN-ON",
+      "lens": "CH1",
+      "severity": "P2",
+      "title": "homóglifo georgiano ო vs o → 2 Transfers",
+      "actor": "seller JWT",
+      "pre": "fold sem Georgian; strip ≠ confusable",
+      "repro": "rtchoGEOR88 vs rtchოGEOR88 (U+10DD)",
+      "expected": "1 Transfer (fold/NFKC/strip) OU desenho documentado",
+      "obtained": {
+        "keyA": "rtchoGEOR88",
+        "keyB": "rtchოGEOR88",
+        "keyA_units": [
+          114,
+          116,
+          99,
+          104,
+          111,
+          71,
+          69,
+          79,
+          82,
+          56,
+          56
+        ],
+        "keyB_units": [
+          114,
+          116,
+          99,
+          104,
+          4317,
+          71,
+          69,
+          79,
+          82,
+          56,
+          56
+        ],
+        "hitA": "200 {\"success\":true,\"transferId\":\"tr_1UCeODH7FWYUN3jhc63B8iPd\",\"balance\":59.33} loc=\"\"",
+        "hitB": "200 {\"success\":true,\"transferId\":\"tr_1UCeOFH7FWYUN3jhduY0gkpI\",\"balance\":58.33} loc=\"\"",
+        "tidA": "tr_1UCeODH7FWYUN3jhc63B8iPd",
+        "tidB": "tr_1UCeOFH7FWYUN3jhduY0gkpI",
+        "new_transfer_ids": [
+          "tr_1UCeOFH7FWYUN3jhduY0gkpI",
+          "tr_1UCeODH7FWYUN3jhc63B8iPd"
+        ],
+        "new_transfer_count": 2,
+        "wallet_before": 60.33,
+        "wallet_after": 58.33,
+        "delta_eur": -2.0,
+        "payoutOkA": true,
+        "payoutOkB": true,
+        "idempotentB": false
+      },
+      "proven": true,
+      "count": true,
+      "evidence": {}
+    },
+    {
+      "id": "CH-P2-COMBINING-ACUTE",
+      "lens": "CH1",
+      "severity": "P2",
+      "title": "o + combining acute vs o → 2 Transfers",
+      "actor": "seller JWT",
+      "pre": "NFKC pode compor ó depois strip; o latino fica",
+      "repro": "rtchoCOMB88 vs rtcho\\u0301COMB88",
+      "expected": "1 Transfer (fold/NFKC/strip) OU desenho documentado",
+      "obtained": {
+        "keyA": "rtchoCOMB88",
+        "keyB": "rtchóCOMB88",
+        "keyA_units": [
+          114,
+          116,
+          99,
+          104,
+          111,
+          67,
+          79,
+          77,
+          66,
+          56,
+          56
+        ],
+        "keyB_units": [
+          114,
+          116,
+          99,
+          104,
+          111,
+          769,
+          67,
+          79,
+          77,
+          66,
+          56,
+          56
+        ],
+        "hitA": "200 {\"success\":true,\"transferId\":\"tr_1UCeOXH7FWYUN3jhlsxON2XQ\",\"balance\":54.33} loc=\"\"",
+        "hitB": "200 {\"success\":true,\"transferId\":\"tr_1UCeOaH7FWYUN3jhAObZD3N9\",\"balance\":53.33} loc=\"\"",
+        "tidA": "tr_1UCeOXH7FWYUN3jhlsxON2XQ",
+        "tidB": "tr_1UCeOaH7FWYUN3jhAObZD3N9",
+        "new_transfer_ids": [
+          "tr_1UCeOaH7FWYUN3jhAObZD3N9",
+          "tr_1UCeOXH7FWYUN3jhlsxON2XQ"
+        ],
+        "new_transfer_count": 2,
+        "wallet_before": 55.33,
+        "wallet_after": 53.33,
+        "delta_eur": -2.0,
+        "payoutOkA": true,
+        "payoutOkB": true,
+        "idempotentB": false
+      },
+      "proven": true,
+      "count": true,
+      "evidence": {}
+    },
+    {
+      "id": "CH-P2-TURKISH-I",
+      "lens": "CH1",
+      "severity": "P2",
+      "title": "İ (U+0130) vs I na key → 2 Transfers",
+      "actor": "seller JWT",
+      "pre": "sem toLowerCase; İ non-ASCII é stripped ≠ I",
+      "repro": "rtchIkeyx88 vs rtchİkeyx88",
+      "expected": "1 Transfer (fold/NFKC/strip) OU desenho documentado",
+      "obtained": {
+        "keyA": "rtchIkeyx88",
+        "keyB": "rtchİkeyx88",
+        "keyA_units": [
+          114,
+          116,
+          99,
+          104,
+          73,
+          107,
+          101,
+          121,
+          120,
+          56,
+          56
+        ],
+        "keyB_units": [
+          114,
+          116,
+          99,
+          104,
+          304,
+          107,
+          101,
+          121,
+          120,
+          56,
+          56
+        ],
+        "hitA": "200 {\"success\":true,\"transferId\":\"tr_1UCeOiH7FWYUN3jhU0JBFQyc\",\"balance\":51.33} loc=\"\"",
+        "hitB": "200 {\"success\":true,\"transferId\":\"tr_1UCeOkH7FWYUN3jh728jsIgU\",\"balance\":50.33} loc=\"\"",
+        "tidA": "tr_1UCeOiH7FWYUN3jhU0JBFQyc",
+        "tidB": "tr_1UCeOkH7FWYUN3jh728jsIgU",
+        "new_transfer_ids": [
+          "tr_1UCeOkH7FWYUN3jh728jsIgU",
+          "tr_1UCeOiH7FWYUN3jhU0JBFQyc"
+        ],
+        "new_transfer_count": 2,
+        "wallet_before": 52.33,
+        "wallet_after": 50.33,
+        "delta_eur": -2.0,
+        "payoutOkA": true,
+        "payoutOkB": true,
+        "idempotentB": false
+      },
+      "proven": true,
+      "count": true,
+      "evidence": {}
+    },
+    {
+      "id": "CH-P2-GREEK-UPSILON",
+      "lens": "CH1",
+      "severity": "P2",
+      "title": "homóglifo grego υ vs u (fora do fold α/ο/ρ) → 2 Transfers",
+      "actor": "seller JWT",
+      "pre": "BXCC fold só α/ο/ρ (+lista); υ não mapeia para u",
+      "repro": "rtchuUPSL88 vs υ (U+03C5)",
+      "expected": "1 Transfer (fold/NFKC/strip) OU desenho documentado",
+      "obtained": {
+        "keyA": "rtchuUPSL88",
+        "keyB": "rtchυUPSL88",
+        "keyA_units": [
+          114,
+          116,
+          99,
+          104,
+          117,
+          85,
+          80,
+          83,
+          76,
+          56,
+          56
+        ],
+        "keyB_units": [
+          114,
+          116,
+          99,
+          104,
+          965,
+          85,
+          80,
+          83,
+          76,
+          56,
+          56
+        ],
+        "hitA": "200 {\"success\":true,\"transferId\":\"tr_1UCeOoH7FWYUN3jhGFJGJy9F\",\"balance\":49.33} loc=\"\"",
+        "hitB": "200 {\"success\":true,\"transferId\":\"tr_1UCeOqH7FWYUN3jh8cuRtLe2\",\"balance\":48.33} loc=\"\"",
+        "tidA": "tr_1UCeOoH7FWYUN3jhGFJGJy9F",
+        "tidB": "tr_1UCeOqH7FWYUN3jh8cuRtLe2",
+        "new_transfer_ids": [
+          "tr_1UCeOqH7FWYUN3jh8cuRtLe2",
+          "tr_1UCeOoH7FWYUN3jhGFJGJy9F"
+        ],
+        "new_transfer_count": 2,
+        "wallet_before": 50.33,
+        "wallet_after": 48.33,
+        "delta_eur": -2.0,
+        "payoutOkA": true,
+        "payoutOkB": true,
+        "idempotentB": false
+      },
+      "proven": true,
+      "count": true,
+      "evidence": {}
+    },
+    {
+      "id": "CH-P2-CASEFOLD-Ii",
+      "lens": "CH1",
+      "severity": "P2",
+      "title": "casefold I vs i → 2 Transfers",
+      "actor": "seller JWT",
+      "pre": "payoutIdempotencyKey sem toLowerCase; app wd_uuid ASCII",
+      "repro": "rtchIcase88 vs rtchicase88",
+      "expected": "1 Transfer (fold/NFKC/strip) OU desenho documentado",
+      "obtained": {
+        "keyA": "rtchIcase88",
+        "keyB": "rtchicase88",
+        "keyA_units": [
+          114,
+          116,
+          99,
+          104,
+          73,
+          99,
+          97,
+          115,
+          101,
+          56,
+          56
+        ],
+        "keyB_units": [
+          114,
+          116,
+          99,
+          104,
+          105,
+          99,
+          97,
+          115,
+          101,
+          56,
+          56
+        ],
+        "hitA": "200 {\"success\":true,\"transferId\":\"tr_1UCeOuH7FWYUN3jhM461YZGk\",\"balance\":47.33} loc=\"\"",
+        "hitB": "200 {\"success\":true,\"transferId\":\"tr_1UCeOwH7FWYUN3jhxnGYEoBn\",\"balance\":46.33} loc=\"\"",
+        "tidA": "tr_1UCeOuH7FWYUN3jhM461YZGk",
+        "tidB": "tr_1UCeOwH7FWYUN3jhxnGYEoBn",
+        "new_transfer_ids": [
+          "tr_1UCeOwH7FWYUN3jhxnGYEoBn",
+          "tr_1UCeOuH7FWYUN3jhM461YZGk"
+        ],
+        "new_transfer_count": 2,
+        "wallet_before": 48.33,
+        "wallet_after": 46.33,
+        "delta_eur": -2.0,
+        "payoutOkA": true,
+        "payoutOkB": true,
+        "idempotentB": false
+      },
+      "proven": true,
+      "count": true,
+      "evidence": {}
+    },
+    {
+      "id": "CH-P2-STRIP-EMPTY",
+      "lens": "CH1",
+      "severity": "P2",
+      "title": "8 marks combining (fold vazio) vs ASCII mínima → 2 Transfers",
+      "actor": "seller JWT",
+      "pre": "length check no RAW (≥8); fold apaga marks → hash userId+vazio",
+      "repro": "rtchempty8 vs 8× U+0301",
+      "expected": "1 Transfer (fold/NFKC/strip) OU desenho documentado",
+      "obtained": {
+        "keyA": "rtchempty8",
+        "keyB": "́́́́́́́́",
+        "keyA_units": [
+          114,
+          116,
+          99,
+          104,
+          101,
+          109,
+          112,
+          116,
+          121,
+          56
+        ],
+        "keyB_units": [
+          769,
+          769,
+          769,
+          769,
+          769,
+          769,
+          769,
+          769
+        ],
+        "hitA": "200 {\"success\":true,\"transferId\":\"tr_1UCeP0H7FWYUN3jhNVrMjgGu\",\"balance\":45.33} loc=\"\"",
+        "hitB": "200 {\"success\":true,\"transferId\":\"tr_1UCeP2H7FWYUN3jhv3iqLRAW\",\"balance\":44.33} loc=\"\"",
+        "tidA": "tr_1UCeP0H7FWYUN3jhNVrMjgGu",
+        "tidB": "tr_1UCeP2H7FWYUN3jhv3iqLRAW",
+        "new_transfer_ids": [
+          "tr_1UCeP2H7FWYUN3jhv3iqLRAW",
+          "tr_1UCeP0H7FWYUN3jhNVrMjgGu"
+        ],
+        "new_transfer_count": 2,
+        "wallet_before": 46.33,
+        "wallet_after": 44.33,
+        "delta_eur": -2.0,
+        "payoutOkA": true,
+        "payoutOkB": true,
+        "idempotentB": false
+      },
+      "proven": true,
+      "count": true,
+      "evidence": {}
+    },
+    {
+      "id": "CH-P2-RACE-ARMENIAN",
+      "lens": "CH1",
+      "severity": "P2",
+      "title": "Future.wait o vs օ criou 2 Transfers",
+      "actor": "seller JWT paralelo",
+      "pre": "mesma classe Armenian; prova race",
+      "repro": "Future.wait latin o + Armenian օ",
+      "expected": "1 Transfer se fold confusable",
+      "obtained": {
+        "tids": [
+          "tr_1UCeP8H7FWYUN3jhoD9Fqj0m",
+          "tr_1UCeP8H7FWYUN3jhC1eXaZcC"
+        ],
+        "hits": [
+          "200 {\"success\":true,\"transferId\":\"tr_1UCeP8H7FWYUN3jhoD9Fqj0m\",\"balance\":42.33} loc=\"\"",
+          "200 {\"success\":true,\"transferId\":\"tr_1UCeP8H7FWYUN3jhC1eXaZcC\",\"balance\":41.33} loc=\"\""
+        ]
+      },
+      "proven": true,
+      "count": true,
+      "evidence": {}
+    }
+  ],
+  "blocked": [
+    {
+      "id": "CH-P0-WALLET-INS-OWN",
+      "lens": "CH5",
+      "title": "JWT INSERT wallets própria com saldo 99999",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table wallets\"} loc=\"\""
+    },
+    {
+      "id": "CH-P0-WALLET-INS-OTHER",
+      "lens": "CH5",
+      "title": "JWT INSERT wallets do comprador",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table wallets\"} loc=\"\""
+    },
+    {
+      "id": "rls.patch.bal",
+      "lens": "CH5",
+      "title": "JWT PATCH balance recusado ou Δ=0",
+      "ev": "200 [] loc=\"\""
+    },
+    {
+      "id": "rls.patch.dest",
+      "lens": "CH4",
+      "title": "JWT não alterou stripe_account_id",
+      "ev": {
+        "hit": "200 [] loc=\"\"",
+        "now": "acct_1U5mYbQeUNx8ar08"
+      }
+    },
+    {
+      "id": "CH-P0-LEDGER-INS",
+      "lens": "CH5",
+      "title": "JWT INSERT wallet_payout_ledger transferred",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"new row violates row-level security policy for table \\\"wallet_payout_ledger\\\"\"} loc=\"\""
+    },
+    {
+      "id": "dest.body",
+      "lens": "CH4",
+      "title": "Transfer própria; dest/currency body ignorados",
+      "ev": {
+        "hit": "200 {\"success\":true,\"transferId\":\"tr_1UCeNUH7FWYUN3jh49F5nRek\",\"balance\":69.33} loc=\"\"",
+        "tid": "tr_1UCeNUH7FWYUN3jh49F5nRek",
+        "other": "acct_1UB7nWHKe5ETfHI5",
+        "own": "acct_1U5mYbQeUNx8ar08"
+      }
+    },
+    {
+      "id": "mint.huge",
+      "lens": "CH7",
+      "title": "payout>balance recusado Δ≈0",
+      "ev": "400 {\"error\":\"Saldo disponível insuficiente para este levantamento.\",\"code\":\"payout_failed\"} loc=\"\""
+    },
+    {
+      "id": "ch4.amt.arr",
+      "lens": "CH4",
+      "title": "amount=[100] criou Transfer",
+      "ev": "400 {\"error\":\"Valor de levantamento inválido.\",\"code\":\"payout_failed\"} loc=\"\""
+    },
+    {
+      "id": "ch4.amt.neg",
+      "lens": "CH4",
+      "title": "amount=-100 criou Transfer",
+      "ev": "400 {\"error\":\"Valor de levantamento inválido.\",\"code\":\"payout_failed\"} loc=\"\""
+    },
+    {
+      "id": "ch4.amt.flt",
+      "lens": "CH4",
+      "title": "amount=100.5 criou Transfer",
+      "ev": "400 {\"error\":\"O valor do levantamento tem de ser em cêntimos.\",\"code\":\"payout_failed\"} loc=\"\""
+    },
+    {
+      "id": "ch4.amt.fltstr",
+      "lens": "CH4",
+      "title": "amount=100.5 criou Transfer",
+      "ev": "400 {\"error\":\"O valor do levantamento tem de ser em cêntimos.\",\"code\":\"payout_failed\"} loc=\"\""
+    },
+    {
+      "id": "ch4.amt.hex",
+      "lens": "CH4",
+      "title": "amount=0x64 criou Transfer",
+      "ev": "400 {\"error\":\"Valor de levantamento inválido.\",\"code\":\"payout_failed\"} loc=\"\""
+    },
+    {
+      "id": "ch4.amt.obj",
+      "lens": "CH4",
+      "title": "amount={cents: 100, currency: eur} criou Transfer",
+      "ev": "400 {\"error\":\"Valor de levantamento inválido.\",\"code\":\"payout_failed\"} loc=\"\""
+    },
+    {
+      "id": "amt.str100",
+      "lens": "CH4",
+      "title": "amount \"100\" aceite como 100c (desenho)",
+      "ev": "200 {\"success\":true,\"transferId\":\"tr_1UCeNcH7FWYUN3jhcS4XsArR\",\"balance\":68.33} loc=\"\""
+    },
+    {
+      "id": "crash.nosec",
+      "lens": "CH4",
+      "title": "crash_inject ignorado sem secret",
+      "ev": "200 {\"success\":true,\"transferId\":\"tr_1UCeNeH7FWYUN3jhPwMk3YEP\",\"balance\":67.33} loc=\"\""
+    },
+    {
+      "id": "crash.after_debit_before_stripe",
+      "lens": "CH4",
+      "title": "retry após after_debit_before_stripe não duplicou",
+      "ev": {
+        "crash": "500 {\"success\":false,\"error\":\"crash_inject:after_debit_before_stripe\",\"code\":\"payout_pending_reconcile\",\"needs_reconcile\":true,\"idempotency_key\":\"p_3bebc6e7ff63723f0cab97d18fb4bda78741c8957952a3482da2598bf64861\",\"crash_injec… loc=\"\"",
+        "retry": "200 {\"success\":true,\"transferId\":\"tr_1UCeNiH7FWYUN3jh1qXT7Bs6\",\"balance\":66.33} loc=\"\"",
+        "tids": [
+          "tr_1UCeNiH7FWYUN3jh1qXT7Bs6"
+        ]
+      }
+    },
+    {
+      "id": "crash.after_stripe_before_finish",
+      "lens": "CH4",
+      "title": "retry após after_stripe_before_finish não duplicou",
+      "ev": {
+        "crash": "500 {\"success\":false,\"error\":\"crash_inject:after_stripe_before_finish\",\"code\":\"payout_pending_reconcile\",\"needs_reconcile\":true,\"transferId\":\"tr_1UCeNlH7FWYUN3jhhEHmUi2R\",\"idempotency_key\":\"p_a3b742b91aaac2384badc22b62f0b02f… loc=\"\"",
+        "retry": "200 {\"success\":true,\"transferId\":\"tr_1UCeNlH7FWYUN3jhhEHmUi2R\",\"balance\":65.33} loc=\"\"",
+        "tids": [
+          "tr_1UCeNlH7FWYUN3jhhEHmUi2R"
+        ]
+      }
+    },
+    {
+      "id": "wh.nosig",
+      "lens": "CH4",
+      "title": "webhook recusou replay sem assinatura",
+      "ev": "400 {\"ok\":false,\"error\":\"missing_signature\"} loc=\"\""
+    },
+    {
+      "id": "wh.oldsig",
+      "lens": "CH4",
+      "title": "evento antigo + sig inválida recusado",
+      "ev": "400 {\"ok\":false,\"error\":\"invalid_signature\"} loc=\"\""
+    },
+    {
+      "id": "CH-HOLD-GREEK-ALPHA",
+      "lens": "CH1",
+      "title": "exacto grego α→a (não contar BXCC) — não gerou 2 Transfers",
+      "ev": {
+        "keyA": "rtchGREEKa1",
+        "keyB": "rtchGREEKα1",
+        "keyA_units": [
+          114,
+          116,
+          99,
+          104,
+          71,
+          82,
+          69,
+          69,
+          75,
+          97,
+          49
+        ],
+        "keyB_units": [
+          114,
+          116,
+          99,
+          104,
+          71,
+          82,
+          69,
+          69,
+          75,
+          945,
+          49
+        ],
+        "hitA": "200 {\"success\":true,\"transferId\":\"tr_1UCeNqH7FWYUN3jhke7KVvKK\",\"balance\":64.33} loc=\"\"",
+        "hitB": "200 {\"success\":true,\"transferId\":\"tr_1UCeNqH7FWYUN3jhke7KVvKK\",\"balance\":64.33,\"idempotent\":true} loc=\"\"",
+        "tidA": "tr_1UCeNqH7FWYUN3jhke7KVvKK",
+        "tidB": "tr_1UCeNqH7FWYUN3jhke7KVvKK",
+        "new_transfer_ids": [
+          "tr_1UCeNqH7FWYUN3jhke7KVvKK"
+        ],
+        "new_transfer_count": 1,
+        "wallet_before": 65.33,
+        "wallet_after": 64.33,
+        "delta_eur": -1.0,
+        "payoutOkA": true,
+        "payoutOkB": true,
+        "idempotentB": true
+      }
+    },
+    {
+      "id": "CH-HOLD-CYR",
+      "lens": "CH1",
+      "title": "exacto cirílico а→a (não contar) — não gerou 2 Transfers",
+      "ev": {
+        "keyA": "rtchlatinx1",
+        "keyB": "rtchlаtinx1",
+        "keyA_units": [
+          114,
+          116,
+          99,
+          104,
+          108,
+          97,
+          116,
+          105,
+          110,
+          120,
+          49
+        ],
+        "keyB_units": [
+          114,
+          116,
+          99,
+          104,
+          108,
+          1072,
+          116,
+          105,
+          110,
+          120,
+          49
+        ],
+        "hitA": "200 {\"success\":true,\"transferId\":\"tr_1UCeNwH7FWYUN3jhx1PXpptr\",\"balance\":63.33} loc=\"\"",
+        "hitB": "200 {\"success\":true,\"transferId\":\"tr_1UCeNwH7FWYUN3jhx1PXpptr\",\"balance\":63.33,\"idempotent\":true} loc=\"\"",
+        "tidA": "tr_1UCeNwH7FWYUN3jhx1PXpptr",
+        "tidB": "tr_1UCeNwH7FWYUN3jhx1PXpptr",
+        "new_transfer_ids": [
+          "tr_1UCeNwH7FWYUN3jhx1PXpptr"
+        ],
+        "new_transfer_count": 1,
+        "wallet_before": 64.33,
+        "wallet_after": 63.33,
+        "delta_eur": -1.0,
+        "payoutOkA": true,
+        "payoutOkB": true,
+        "idempotentB": true
+      }
+    },
+    {
+      "id": "CH-HOLD-NBSP",
+      "lens": "CH1",
+      "title": "exacto NBSP mid-key (não contar) — não gerou 2 Transfers",
+      "ev": {
+        "keyA": "rtchnbsp88x",
+        "keyB": "rtch nbsp88x",
+        "keyA_units": [
+          114,
+          116,
+          99,
+          104,
+          110,
+          98,
+          115,
+          112,
+          56,
+          56,
+          120
+        ],
+        "keyB_units": [
+          114,
+          116,
+          99,
+          104,
+          160,
+          110,
+          98,
+          115,
+          112,
+          56,
+          56,
+          120
+        ],
+        "hitA": "200 {\"success\":true,\"transferId\":\"tr_1UCeO1H7FWYUN3jhjwgjad9I\",\"balance\":62.33} loc=\"\"",
+        "hitB": "200 {\"success\":true,\"transferId\":\"tr_1UCeO1H7FWYUN3jhjwgjad9I\",\"balance\":62.33,\"idempotent\":true} loc=\"\"",
+        "tidA": "tr_1UCeO1H7FWYUN3jhjwgjad9I",
+        "tidB": "tr_1UCeO1H7FWYUN3jhjwgjad9I",
+        "new_transfer_ids": [
+          "tr_1UCeO1H7FWYUN3jhjwgjad9I"
+        ],
+        "new_transfer_count": 1,
+        "wallet_before": 63.33,
+        "wallet_after": 62.33,
+        "delta_eur": -1.0,
+        "payoutOkA": true,
+        "payoutOkB": true,
+        "idempotentB": true
+      }
+    },
+    {
+      "id": "CH-P2-MATH-BOLD-O",
+      "lens": "CH1",
+      "title": "Mathematical bold 𝐨 vs o → 2 Transfers — não gerou 2 Transfers",
+      "ev": {
+        "keyA": "rtchoMATH88",
+        "keyB": "rtch𝐨MATH88",
+        "keyA_units": [
+          114,
+          116,
+          99,
+          104,
+          111,
+          77,
+          65,
+          84,
+          72,
+          56,
+          56
+        ],
+        "keyB_units": [
+          114,
+          116,
+          99,
+          104,
+          55349,
+          56360,
+          77,
+          65,
+          84,
+          72,
+          56,
+          56
+        ],
+        "hitA": "200 {\"success\":true,\"transferId\":\"tr_1UCeOIH7FWYUN3jh63HGYNXX\",\"balance\":57.33} loc=\"\"",
+        "hitB": "200 {\"success\":true,\"transferId\":\"tr_1UCeOIH7FWYUN3jh63HGYNXX\",\"balance\":57.33,\"idempotent\":true} loc=\"\"",
+        "tidA": "tr_1UCeOIH7FWYUN3jh63HGYNXX",
+        "tidB": "tr_1UCeOIH7FWYUN3jh63HGYNXX",
+        "new_transfer_ids": [
+          "tr_1UCeOIH7FWYUN3jh63HGYNXX"
+        ],
+        "new_transfer_count": 1,
+        "wallet_before": 58.33,
+        "wallet_after": 57.33,
+        "delta_eur": -1.0,
+        "payoutOkA": true,
+        "payoutOkB": true,
+        "idempotentB": true
+      }
+    },
+    {
+      "id": "CH-P2-MATH-MONO-A",
+      "lens": "CH1",
+      "title": "Mathematical monospace 𝚊 vs a → 2 Transfers — não gerou 2 Transfers",
+      "ev": {
+        "keyA": "rtchaMONO88",
+        "keyB": "rtch𝚊MONO88",
+        "keyA_units": [
+          114,
+          116,
+          99,
+          104,
+          97,
+          77,
+          79,
+          78,
+          79,
+          56,
+          56
+        ],
+        "keyB_units": [
+          114,
+          116,
+          99,
+          104,
+          55349,
+          56970,
+          77,
+          79,
+          78,
+          79,
+          56,
+          56
+        ],
+        "hitA": "200 {\"success\":true,\"transferId\":\"tr_1UCeOOH7FWYUN3jhiP7tb7VE\",\"balance\":56.33} loc=\"\"",
+        "hitB": "200 {\"success\":true,\"transferId\":\"tr_1UCeOOH7FWYUN3jhiP7tb7VE\",\"balance\":56.33,\"idempotent\":true} loc=\"\"",
+        "tidA": "tr_1UCeOOH7FWYUN3jhiP7tb7VE",
+        "tidB": "tr_1UCeOOH7FWYUN3jhiP7tb7VE",
+        "new_transfer_ids": [
+          "tr_1UCeOOH7FWYUN3jhiP7tb7VE"
+        ],
+        "new_transfer_count": 1,
+        "wallet_before": 57.33,
+        "wallet_after": 56.33,
+        "delta_eur": -1.0,
+        "payoutOkA": true,
+        "payoutOkB": true,
+        "idempotentB": true
+      }
+    },
+    {
+      "id": "CH-P2-FULLWIDTH-O",
+      "lens": "CH1",
+      "title": "fullwidth ｏ vs o → 2 Transfers — não gerou 2 Transfers",
+      "ev": {
+        "keyA": "rtchoFULL88",
+        "keyB": "rtchｏFULL88",
+        "keyA_units": [
+          114,
+          116,
+          99,
+          104,
+          111,
+          70,
+          85,
+          76,
+          76,
+          56,
+          56
+        ],
+        "keyB_units": [
+          114,
+          116,
+          99,
+          104,
+          65359,
+          70,
+          85,
+          76,
+          76,
+          56,
+          56
+        ],
+        "hitA": "200 {\"success\":true,\"transferId\":\"tr_1UCeOTH7FWYUN3jhEikoaL2A\",\"balance\":55.33} loc=\"\"",
+        "hitB": "200 {\"success\":true,\"transferId\":\"tr_1UCeOTH7FWYUN3jhEikoaL2A\",\"balance\":55.33,\"idempotent\":true} loc=\"\"",
+        "tidA": "tr_1UCeOTH7FWYUN3jhEikoaL2A",
+        "tidB": "tr_1UCeOTH7FWYUN3jhEikoaL2A",
+        "new_transfer_ids": [
+          "tr_1UCeOTH7FWYUN3jhEikoaL2A"
+        ],
+        "new_transfer_count": 1,
+        "wallet_before": 56.33,
+        "wallet_after": 55.33,
+        "delta_eur": -1.0,
+        "payoutOkA": true,
+        "payoutOkB": true,
+        "idempotentB": true
+      }
+    },
+    {
+      "id": "CH-P2-CGJ",
+      "lens": "CH1",
+      "title": "CGJ U+034F no meio da key → 2 Transfers — não gerou 2 Transfers",
+      "ev": {
+        "keyA": "rtchcgjkey8",
+        "keyB": "rtch͏cgjkey8",
+        "keyA_units": [
+          114,
+          116,
+          99,
+          104,
+          99,
+          103,
+          106,
+          107,
+          101,
+          121,
+          56
+        ],
+        "keyB_units": [
+          114,
+          116,
+          99,
+          104,
+          847,
+          99,
+          103,
+          106,
+          107,
+          101,
+          121,
+          56
+        ],
+        "hitA": "200 {\"success\":true,\"transferId\":\"tr_1UCeOdH7FWYUN3jhWKVWX81o\",\"balance\":52.33} loc=\"\"",
+        "hitB": "200 {\"success\":true,\"transferId\":\"tr_1UCeOdH7FWYUN3jhWKVWX81o\",\"balance\":52.33,\"idempotent\":true} loc=\"\"",
+        "tidA": "tr_1UCeOdH7FWYUN3jhWKVWX81o",
+        "tidB": "tr_1UCeOdH7FWYUN3jhWKVWX81o",
+        "new_transfer_ids": [
+          "tr_1UCeOdH7FWYUN3jhWKVWX81o"
+        ],
+        "new_transfer_count": 1,
+        "wallet_before": 53.33,
+        "wallet_after": 52.33,
+        "delta_eur": -1.0,
+        "payoutOkA": true,
+        "payoutOkB": true,
+        "idempotentB": true
+      }
+    },
+    {
+      "id": "key.len7",
+      "lens": "CH1",
+      "title": "key 7 chars recusada",
+      "ev": "400 {\"error\":\"idempotency_key em falta. Reinicia o levantamento na app.\",\"code\":\"payout_failed\"} loc=\"\""
+    },
+    {
+      "id": "race.same",
+      "lens": "CH1",
+      "title": "race mesma key ≤1 Transfer",
+      "ev": {
+        "tids": [
+          "tr_1UCeP5H7FWYUN3jhA6eWd1Zx"
+        ],
+        "hits": [
+          "200 {\"success\":true,\"transferId\":\"tr_1UCeP5H7FWYUN3jhA6eWd1Zx\",\"balance\":43.33} loc=\"\"",
+          "200 {\"success\":true,\"transferId\":\"tr_1UCeP5H7FWYUN3jhA6eWd1Zx\",\"balance\":43.33} loc=\"\"",
+          "200 {\"success\":true,\"transferId\":\"tr_1UCeP5H7FWYUN3jhA6eWd1Zx\",\"balance\":43.33} loc=\"\""
+        ]
+      }
+    }
+  ],
+  "skipped": [],
+  "notes": [
+    {
+      "id": "wallet0",
+      "lens": "CH7",
+      "title": "seller wallet before",
+      "ev": {
+        "id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+        "balance": 70.33,
+        "stripe_account_id": "acct_1U5mYbQeUNx8ar08",
+        "updated_at": "2026-09-06T11:14:08.019636+00:00"
+      }
+    },
+    {
+      "id": "wallet.funded",
+      "lens": "CH7",
+      "title": "seller after fixture",
+      "ev": {
+        "id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+        "balance": 70.33,
+        "stripe_account_id": "acct_1U5mYbQeUNx8ar08",
+        "updated_at": "2026-09-06T11:14:08.019636+00:00"
+      }
+    },
+    {
+      "id": "dest.others",
+      "lens": "CH4",
+      "title": "outras contas Connect na BD",
+      "ev": [
+        {
+          "id": "5e73d7d6-1ef7-49da-9eb6-c9af7ade1a4d",
+          "stripe_account_id": "acct_1UB7nWHKe5ETfHI5",
+          "balance": 0.0
+        },
+        {
+          "id": "fa58848b-e162-44ea-a30f-2def5dc4232a",
+          "stripe_account_id": "acct_1UAOwtH17a42yGGt",
+          "balance": 0.0
+        },
+        {
+          "id": "a4d4733b-8ce3-4cfc-b5c8-00e35a0e6fe1",
+          "stripe_account_id": "acct_1UA7LFQcPjx6VmjJ",
+          "balance": 0.0
+        },
+        {
+          "id": "4449ca94-ea14-4a8e-949a-b20ef6a1f44e",
+          "stripe_account_id": "acct_1UAXuBHqvLlXvegU",
+          "balance": 0.0
+        },
+        {
+          "id": "f54fd65e-de27-4eb0-92f5-2dabd71c6d63",
+          "stripe_account_id": "acct_1UAksGHuOIuiqZfv",
+          "balance": 0.0
+        },
+        {
+          "id": "d5e59f63-ba22-4a82-b136-ed44985e3bef",
+          "stripe_account_id": "acct_1UBFutQZ7WEeImMX",
+          "balance": 0.0
+        },
+        {
+          "id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+          "stripe_account_id": "acct_1U8gAFQglI7kZRfq",
+          "balance": 61.1
+        }
+      ]
+    },
+    {
+      "id": "rls.patch.bal",
+      "lens": "CH5",
+      "title": "JWT PATCH balance",
+      "ev": {
+        "hit": "200 [] loc=\"\"",
+        "before": 70.33,
+        "after": 70.33
+      }
+    },
+    {
+      "id": "rls.patch.dest",
+      "lens": "CH4",
+      "title": "JWT PATCH stripe_account_id",
+      "ev": {
+        "hit": "200 [] loc=\"\"",
+        "wanted": "acct_1UB7nWHKe5ETfHI5",
+        "now": "acct_1U5mYbQeUNx8ar08"
+      }
+    },
+    {
+      "id": "dest.body",
+      "lens": "CH4",
+      "title": "body destination=acct outro + currency usd",
+      "ev": "200 {\"success\":true,\"transferId\":\"tr_1UCeNUH7FWYUN3jh49F5nRek\",\"balance\":69.33} loc=\"\""
+    },
+    {
+      "id": "dest.body.logs",
+      "lens": "CH4",
+      "title": "app_logs pós dest spoof",
+      "ev": [
+        {
+          "error_message": "{\"step\":\"payout_ok\",\"userId\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"transferId\":\"tr_1UCeNUH7FWYUN3jh49F5nRek\",\"balance\":69.33}",
+          "device_info": {
+            "step": "payout_ok",
+            "source": "create-connect-account",
+            "userId": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+            "balance": 69.33,
+            "transferId": "tr_1UCeNUH7FWYUN3jh49F5nRek"
+          },
+          "created_at": "2026-09-06T11:36:53.446548+00:00"
+        },
+        {
+          "error_message": "{\"step\":\"transfer_ok\",\"userId\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"amount\":100,\"transferId\":\"tr_1UCeNUH7FWYUN3jh49F5nRek\",\"idempotencyKey\":\"p_a12a6fc440df486d17e0c9f29ef55c1c4abd5b32a953115d627c458105108a\"}",
+          "device_info": {
+            "step": "transfer_ok",
+            "amount": 100,
+            "source": "create-connect-account",
+            "userId": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+            "transferId": "tr_1UCeNUH7FWYUN3jh49F5nRek",
+            "idempotencyKey": "p_a12a6fc440df486d17e0c9f29ef55c1c4abd5b32a953115d627c458105108a"
+          },
+          "created_at": "2026-09-06T11:36:53.335514+00:00"
+        },
+        {
+          "error_message": "{\"step\":\"payout_start\",\"userId\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"amount\":100,\"destination\":\"acct_1U5mYbQeUNx8ar08\",\"idempotencyKey\":\"p_a12a6fc440df486d17e0c9f29ef55c1c4abd5b32a953115d627c458105108a\"}",
+          "device_info": {
+            "step": "payout_start",
+            "amount": 100,
+            "source": "create-connect-account",
+            "userId": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+            "destination": "acct_1U5mYbQeUNx8ar08",
+            "idempotencyKey": "p_a12a6fc440df486d17e0c9f29ef55c1c4abd5b32a953115d627c458105108a"
+          },
+          "created_at": "2026-09-06T11:36:52.502162+00:00"
+        },
+        {
+          "error_message": "{\"step\":\"payout_ok\",\"userId\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"transferId\":\"tr_1UCe1UH7FWYUN3jhROgOWgen\",\"balance\":70.33}",
+          "device_info": {
+            "step": "payout_ok",
+            "source": "create-connect-account",
+            "userId": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+            "balance": 70.33,
+            "transferId": "tr_1UCe1UH7FWYUN3jhROgOWgen"
+          },
+          "created_at": "2026-09-06T11:14:08.999501+00:00"
+        },
+        {
+          "error_message": "{\"step\":\"transfer_ok\",\"userId\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"amount\":100,\"transferId\":\"tr_1UCe1UH7FWYUN3jhROgOWgen\",\"idempotencyKey\":\"p_e058bcf02928a9cb3ea0a24a6eae2423b028a6d209203d68c32ccd5373230f\"}",
+          "device_info": {
+            "step": "transfer_ok",
+            "amount": 100,
+            "source": "create-connect-account",
+            "userId": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+            "transferId": "tr_1UCe1UH7FWYUN3jhROgOWgen",
+            "idempotencyKey": "p_e058bcf02928a9cb3ea0a24a6eae2423b028a6d209203d68c32ccd5373230f"
+          },
+          "created_at": "2026-09-06T11:14:08.855761+00:00"
+        },
+        {
+          "error_message": "{\"step\":\"payout_start\",\"userId\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"amount\":100,\"destination\":\"acct_1U5mYbQeUNx8ar08\",\"idempotencyKey\":\"p_e058bcf02928a9cb3ea0a24a6eae2423b028a6d209203d68c32ccd5373230f\"}",
+          "device_info": {
+            "step": "payout_start",
+            "amount": 100,
+            "source": "create-connect-account",
+            "userId": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+            "destination": "acct_1U5mYbQeUNx8ar08",
+            "idempotencyKey": "p_e058bcf02928a9cb3ea0a24a6eae2423b028a6d209203d68c32ccd5373230f"
+          },
+          "created_at": "2026-09-06T11:14:08.13078+00:00"
+        }
+      ]
+    },
+    {
+      "id": "mint.huge",
+      "lens": "CH7",
+      "title": "payout 99999999c vs saldo 69.33",
+      "ev": {
+        "hit": "400 {\"error\":\"Saldo disponível insuficiente para este levantamento.\",\"code\":\"payout_failed\"} loc=\"\"",
+        "dBal": 0.0
+      }
+    },
+    {
+      "id": "amt.arr",
+      "lens": "CH4",
+      "title": "amount=[100]",
+      "ev": "400 {\"error\":\"Valor de levantamento inválido.\",\"code\":\"payout_failed\"} loc=\"\""
+    },
+    {
+      "id": "amt.neg",
+      "lens": "CH4",
+      "title": "amount=-100",
+      "ev": "400 {\"error\":\"Valor de levantamento inválido.\",\"code\":\"payout_failed\"} loc=\"\""
+    },
+    {
+      "id": "amt.flt",
+      "lens": "CH4",
+      "title": "amount=100.5",
+      "ev": "400 {\"error\":\"O valor do levantamento tem de ser em cêntimos.\",\"code\":\"payout_failed\"} loc=\"\""
+    },
+    {
+      "id": "amt.fltstr",
+      "lens": "CH4",
+      "title": "amount=100.5",
+      "ev": "400 {\"error\":\"O valor do levantamento tem de ser em cêntimos.\",\"code\":\"payout_failed\"} loc=\"\""
+    },
+    {
+      "id": "amt.hex",
+      "lens": "CH4",
+      "title": "amount=0x64",
+      "ev": "400 {\"error\":\"Valor de levantamento inválido.\",\"code\":\"payout_failed\"} loc=\"\""
+    },
+    {
+      "id": "amt.obj",
+      "lens": "CH4",
+      "title": "amount={cents: 100, currency: eur}",
+      "ev": "400 {\"error\":\"Valor de levantamento inválido.\",\"code\":\"payout_failed\"} loc=\"\""
+    },
+    {
+      "id": "amt.str100",
+      "lens": "CH4",
+      "title": "amount=\"100\" desenho JS",
+      "ev": "200 {\"success\":true,\"transferId\":\"tr_1UCeNcH7FWYUN3jhcS4XsArR\",\"balance\":68.33} loc=\"\""
+    },
+    {
+      "id": "crash.nosec",
+      "lens": "CH4",
+      "title": "crash_inject sem secret",
+      "ev": "200 {\"success\":true,\"transferId\":\"tr_1UCeNeH7FWYUN3jhPwMk3YEP\",\"balance\":67.33} loc=\"\""
+    },
+    {
+      "id": "crash.after_debit_before_stripe",
+      "lens": "CH4",
+      "title": "crash_inject after_debit_before_stripe",
+      "ev": "500 {\"success\":false,\"error\":\"crash_inject:after_debit_before_stripe\",\"code\":\"payout_pending_reconcile\",\"needs_reconcile\":true,\"idempotency_key\":\"p_3bebc6e7ff63723f0cab97d18fb4bda78741c8957952a3482da2598bf64861\",\"crash_injec… loc=\"\""
+    },
+    {
+      "id": "crash.after_debit_before_stripe.retry",
+      "lens": "CH4",
+      "title": "retry mesma key",
+      "ev": "200 {\"success\":true,\"transferId\":\"tr_1UCeNiH7FWYUN3jh1qXT7Bs6\",\"balance\":66.33} loc=\"\""
+    },
+    {
+      "id": "crash.after_stripe_before_finish",
+      "lens": "CH4",
+      "title": "crash_inject after_stripe_before_finish",
+      "ev": "500 {\"success\":false,\"error\":\"crash_inject:after_stripe_before_finish\",\"code\":\"payout_pending_reconcile\",\"needs_reconcile\":true,\"transferId\":\"tr_1UCeNlH7FWYUN3jhhEHmUi2R\",\"idempotency_key\":\"p_a3b742b91aaac2384badc22b62f0b02f… loc=\"\""
+    },
+    {
+      "id": "crash.after_stripe_before_finish.retry",
+      "lens": "CH4",
+      "title": "retry mesma key",
+      "ev": "200 {\"success\":true,\"transferId\":\"tr_1UCeNlH7FWYUN3jhhEHmUi2R\",\"balance\":65.33} loc=\"\""
+    },
+    {
+      "id": "wh.nosig",
+      "lens": "CH4",
+      "title": "transfer.created antigo sem sig",
+      "ev": "400 {\"ok\":false,\"error\":\"missing_signature\"} loc=\"\""
+    },
+    {
+      "id": "wh.oldsig",
+      "lens": "CH4",
+      "title": "evento antigo + sig lixo",
+      "ev": "400 {\"ok\":false,\"error\":\"invalid_signature\"} loc=\"\""
+    },
+    {
+      "id": "pair.CH-HOLD-GREEK-ALPHA",
+      "lens": "CH1",
+      "title": "pair CH-HOLD-GREEK-ALPHA",
+      "ev": {
+        "keyA": "rtchGREEKa1",
+        "keyB": "rtchGREEKα1",
+        "keyA_units": [
+          114,
+          116,
+          99,
+          104,
+          71,
+          82,
+          69,
+          69,
+          75,
+          97,
+          49
+        ],
+        "keyB_units": [
+          114,
+          116,
+          99,
+          104,
+          71,
+          82,
+          69,
+          69,
+          75,
+          945,
+          49
+        ],
+        "hitA": "200 {\"success\":true,\"transferId\":\"tr_1UCeNqH7FWYUN3jhke7KVvKK\",\"balance\":64.33} loc=\"\"",
+        "hitB": "200 {\"success\":true,\"transferId\":\"tr_1UCeNqH7FWYUN3jhke7KVvKK\",\"balance\":64.33,\"idempotent\":true} loc=\"\"",
+        "tidA": "tr_1UCeNqH7FWYUN3jhke7KVvKK",
+        "tidB": "tr_1UCeNqH7FWYUN3jhke7KVvKK",
+        "new_transfer_ids": [
+          "tr_1UCeNqH7FWYUN3jhke7KVvKK"
+        ],
+        "new_transfer_count": 1,
+        "wallet_before": 65.33,
+        "wallet_after": 64.33,
+        "delta_eur": -1.0,
+        "payoutOkA": true,
+        "payoutOkB": true,
+        "idempotentB": true
+      }
+    },
+    {
+      "id": "pair.CH-HOLD-CYR",
+      "lens": "CH1",
+      "title": "pair CH-HOLD-CYR",
+      "ev": {
+        "keyA": "rtchlatinx1",
+        "keyB": "rtchlаtinx1",
+        "keyA_units": [
+          114,
+          116,
+          99,
+          104,
+          108,
+          97,
+          116,
+          105,
+          110,
+          120,
+          49
+        ],
+        "keyB_units": [
+          114,
+          116,
+          99,
+          104,
+          108,
+          1072,
+          116,
+          105,
+          110,
+          120,
+          49
+        ],
+        "hitA": "200 {\"success\":true,\"transferId\":\"tr_1UCeNwH7FWYUN3jhx1PXpptr\",\"balance\":63.33} loc=\"\"",
+        "hitB": "200 {\"success\":true,\"transferId\":\"tr_1UCeNwH7FWYUN3jhx1PXpptr\",\"balance\":63.33,\"idempotent\":true} loc=\"\"",
+        "tidA": "tr_1UCeNwH7FWYUN3jhx1PXpptr",
+        "tidB": "tr_1UCeNwH7FWYUN3jhx1PXpptr",
+        "new_transfer_ids": [
+          "tr_1UCeNwH7FWYUN3jhx1PXpptr"
+        ],
+        "new_transfer_count": 1,
+        "wallet_before": 64.33,
+        "wallet_after": 63.33,
+        "delta_eur": -1.0,
+        "payoutOkA": true,
+        "payoutOkB": true,
+        "idempotentB": true
+      }
+    },
+    {
+      "id": "pair.CH-HOLD-NBSP",
+      "lens": "CH1",
+      "title": "pair CH-HOLD-NBSP",
+      "ev": {
+        "keyA": "rtchnbsp88x",
+        "keyB": "rtch nbsp88x",
+        "keyA_units": [
+          114,
+          116,
+          99,
+          104,
+          110,
+          98,
+          115,
+          112,
+          56,
+          56,
+          120
+        ],
+        "keyB_units": [
+          114,
+          116,
+          99,
+          104,
+          160,
+          110,
+          98,
+          115,
+          112,
+          56,
+          56,
+          120
+        ],
+        "hitA": "200 {\"success\":true,\"transferId\":\"tr_1UCeO1H7FWYUN3jhjwgjad9I\",\"balance\":62.33} loc=\"\"",
+        "hitB": "200 {\"success\":true,\"transferId\":\"tr_1UCeO1H7FWYUN3jhjwgjad9I\",\"balance\":62.33,\"idempotent\":true} loc=\"\"",
+        "tidA": "tr_1UCeO1H7FWYUN3jhjwgjad9I",
+        "tidB": "tr_1UCeO1H7FWYUN3jhjwgjad9I",
+        "new_transfer_ids": [
+          "tr_1UCeO1H7FWYUN3jhjwgjad9I"
+        ],
+        "new_transfer_count": 1,
+        "wallet_before": 63.33,
+        "wallet_after": 62.33,
+        "delta_eur": -1.0,
+        "payoutOkA": true,
+        "payoutOkB": true,
+        "idempotentB": true
+      }
+    },
+    {
+      "id": "pair.CH-P2-ARMENIAN-OH",
+      "lens": "CH1",
+      "title": "pair CH-P2-ARMENIAN-OH",
+      "ev": {
+        "keyA": "rtchoARMN88",
+        "keyB": "rtchօARMN88",
+        "keyA_units": [
+          114,
+          116,
+          99,
+          104,
+          111,
+          65,
+          82,
+          77,
+          78,
+          56,
+          56
+        ],
+        "keyB_units": [
+          114,
+          116,
+          99,
+          104,
+          1413,
+          65,
+          82,
+          77,
+          78,
+          56,
+          56
+        ],
+        "hitA": "200 {\"success\":true,\"transferId\":\"tr_1UCeO6H7FWYUN3jh708yyQsT\",\"balance\":61.33} loc=\"\"",
+        "hitB": "200 {\"success\":true,\"transferId\":\"tr_1UCeO8H7FWYUN3jhNR7Xkiwh\",\"balance\":60.33} loc=\"\"",
+        "tidA": "tr_1UCeO6H7FWYUN3jh708yyQsT",
+        "tidB": "tr_1UCeO8H7FWYUN3jhNR7Xkiwh",
+        "new_transfer_ids": [
+          "tr_1UCeO8H7FWYUN3jhNR7Xkiwh",
+          "tr_1UCeO6H7FWYUN3jh708yyQsT"
+        ],
+        "new_transfer_count": 2,
+        "wallet_before": 62.33,
+        "wallet_after": 60.33,
+        "delta_eur": -2.0,
+        "payoutOkA": true,
+        "payoutOkB": true,
+        "idempotentB": false
+      }
+    },
+    {
+      "id": "pair.CH-P2-GEORGIAN-ON",
+      "lens": "CH1",
+      "title": "pair CH-P2-GEORGIAN-ON",
+      "ev": {
+        "keyA": "rtchoGEOR88",
+        "keyB": "rtchოGEOR88",
+        "keyA_units": [
+          114,
+          116,
+          99,
+          104,
+          111,
+          71,
+          69,
+          79,
+          82,
+          56,
+          56
+        ],
+        "keyB_units": [
+          114,
+          116,
+          99,
+          104,
+          4317,
+          71,
+          69,
+          79,
+          82,
+          56,
+          56
+        ],
+        "hitA": "200 {\"success\":true,\"transferId\":\"tr_1UCeODH7FWYUN3jhc63B8iPd\",\"balance\":59.33} loc=\"\"",
+        "hitB": "200 {\"success\":true,\"transferId\":\"tr_1UCeOFH7FWYUN3jhduY0gkpI\",\"balance\":58.33} loc=\"\"",
+        "tidA": "tr_1UCeODH7FWYUN3jhc63B8iPd",
+        "tidB": "tr_1UCeOFH7FWYUN3jhduY0gkpI",
+        "new_transfer_ids": [
+          "tr_1UCeOFH7FWYUN3jhduY0gkpI",
+          "tr_1UCeODH7FWYUN3jhc63B8iPd"
+        ],
+        "new_transfer_count": 2,
+        "wallet_before": 60.33,
+        "wallet_after": 58.33,
+        "delta_eur": -2.0,
+        "payoutOkA": true,
+        "payoutOkB": true,
+        "idempotentB": false
+      }
+    },
+    {
+      "id": "pair.CH-P2-MATH-BOLD-O",
+      "lens": "CH1",
+      "title": "pair CH-P2-MATH-BOLD-O",
+      "ev": {
+        "keyA": "rtchoMATH88",
+        "keyB": "rtch𝐨MATH88",
+        "keyA_units": [
+          114,
+          116,
+          99,
+          104,
+          111,
+          77,
+          65,
+          84,
+          72,
+          56,
+          56
+        ],
+        "keyB_units": [
+          114,
+          116,
+          99,
+          104,
+          55349,
+          56360,
+          77,
+          65,
+          84,
+          72,
+          56,
+          56
+        ],
+        "hitA": "200 {\"success\":true,\"transferId\":\"tr_1UCeOIH7FWYUN3jh63HGYNXX\",\"balance\":57.33} loc=\"\"",
+        "hitB": "200 {\"success\":true,\"transferId\":\"tr_1UCeOIH7FWYUN3jh63HGYNXX\",\"balance\":57.33,\"idempotent\":true} loc=\"\"",
+        "tidA": "tr_1UCeOIH7FWYUN3jh63HGYNXX",
+        "tidB": "tr_1UCeOIH7FWYUN3jh63HGYNXX",
+        "new_transfer_ids": [
+          "tr_1UCeOIH7FWYUN3jh63HGYNXX"
+        ],
+        "new_transfer_count": 1,
+        "wallet_before": 58.33,
+        "wallet_after": 57.33,
+        "delta_eur": -1.0,
+        "payoutOkA": true,
+        "payoutOkB": true,
+        "idempotentB": true
+      }
+    },
+    {
+      "id": "pair.CH-P2-MATH-MONO-A",
+      "lens": "CH1",
+      "title": "pair CH-P2-MATH-MONO-A",
+      "ev": {
+        "keyA": "rtchaMONO88",
+        "keyB": "rtch𝚊MONO88",
+        "keyA_units": [
+          114,
+          116,
+          99,
+          104,
+          97,
+          77,
+          79,
+          78,
+          79,
+          56,
+          56
+        ],
+        "keyB_units": [
+          114,
+          116,
+          99,
+          104,
+          55349,
+          56970,
+          77,
+          79,
+          78,
+          79,
+          56,
+          56
+        ],
+        "hitA": "200 {\"success\":true,\"transferId\":\"tr_1UCeOOH7FWYUN3jhiP7tb7VE\",\"balance\":56.33} loc=\"\"",
+        "hitB": "200 {\"success\":true,\"transferId\":\"tr_1UCeOOH7FWYUN3jhiP7tb7VE\",\"balance\":56.33,\"idempotent\":true} loc=\"\"",
+        "tidA": "tr_1UCeOOH7FWYUN3jhiP7tb7VE",
+        "tidB": "tr_1UCeOOH7FWYUN3jhiP7tb7VE",
+        "new_transfer_ids": [
+          "tr_1UCeOOH7FWYUN3jhiP7tb7VE"
+        ],
+        "new_transfer_count": 1,
+        "wallet_before": 57.33,
+        "wallet_after": 56.33,
+        "delta_eur": -1.0,
+        "payoutOkA": true,
+        "payoutOkB": true,
+        "idempotentB": true
+      }
+    },
+    {
+      "id": "pair.CH-P2-FULLWIDTH-O",
+      "lens": "CH1",
+      "title": "pair CH-P2-FULLWIDTH-O",
+      "ev": {
+        "keyA": "rtchoFULL88",
+        "keyB": "rtchｏFULL88",
+        "keyA_units": [
+          114,
+          116,
+          99,
+          104,
+          111,
+          70,
+          85,
+          76,
+          76,
+          56,
+          56
+        ],
+        "keyB_units": [
+          114,
+          116,
+          99,
+          104,
+          65359,
+          70,
+          85,
+          76,
+          76,
+          56,
+          56
+        ],
+        "hitA": "200 {\"success\":true,\"transferId\":\"tr_1UCeOTH7FWYUN3jhEikoaL2A\",\"balance\":55.33} loc=\"\"",
+        "hitB": "200 {\"success\":true,\"transferId\":\"tr_1UCeOTH7FWYUN3jhEikoaL2A\",\"balance\":55.33,\"idempotent\":true} loc=\"\"",
+        "tidA": "tr_1UCeOTH7FWYUN3jhEikoaL2A",
+        "tidB": "tr_1UCeOTH7FWYUN3jhEikoaL2A",
+        "new_transfer_ids": [
+          "tr_1UCeOTH7FWYUN3jhEikoaL2A"
+        ],
+        "new_transfer_count": 1,
+        "wallet_before": 56.33,
+        "wallet_after": 55.33,
+        "delta_eur": -1.0,
+        "payoutOkA": true,
+        "payoutOkB": true,
+        "idempotentB": true
+      }
+    },
+    {
+      "id": "pair.CH-P2-COMBINING-ACUTE",
+      "lens": "CH1",
+      "title": "pair CH-P2-COMBINING-ACUTE",
+      "ev": {
+        "keyA": "rtchoCOMB88",
+        "keyB": "rtchóCOMB88",
+        "keyA_units": [
+          114,
+          116,
+          99,
+          104,
+          111,
+          67,
+          79,
+          77,
+          66,
+          56,
+          56
+        ],
+        "keyB_units": [
+          114,
+          116,
+          99,
+          104,
+          111,
+          769,
+          67,
+          79,
+          77,
+          66,
+          56,
+          56
+        ],
+        "hitA": "200 {\"success\":true,\"transferId\":\"tr_1UCeOXH7FWYUN3jhlsxON2XQ\",\"balance\":54.33} loc=\"\"",
+        "hitB": "200 {\"success\":true,\"transferId\":\"tr_1UCeOaH7FWYUN3jhAObZD3N9\",\"balance\":53.33} loc=\"\"",
+        "tidA": "tr_1UCeOXH7FWYUN3jhlsxON2XQ",
+        "tidB": "tr_1UCeOaH7FWYUN3jhAObZD3N9",
+        "new_transfer_ids": [
+          "tr_1UCeOaH7FWYUN3jhAObZD3N9",
+          "tr_1UCeOXH7FWYUN3jhlsxON2XQ"
+        ],
+        "new_transfer_count": 2,
+        "wallet_before": 55.33,
+        "wallet_after": 53.33,
+        "delta_eur": -2.0,
+        "payoutOkA": true,
+        "payoutOkB": true,
+        "idempotentB": false
+      }
+    },
+    {
+      "id": "pair.CH-P2-CGJ",
+      "lens": "CH1",
+      "title": "pair CH-P2-CGJ",
+      "ev": {
+        "keyA": "rtchcgjkey8",
+        "keyB": "rtch͏cgjkey8",
+        "keyA_units": [
+          114,
+          116,
+          99,
+          104,
+          99,
+          103,
+          106,
+          107,
+          101,
+          121,
+          56
+        ],
+        "keyB_units": [
+          114,
+          116,
+          99,
+          104,
+          847,
+          99,
+          103,
+          106,
+          107,
+          101,
+          121,
+          56
+        ],
+        "hitA": "200 {\"success\":true,\"transferId\":\"tr_1UCeOdH7FWYUN3jhWKVWX81o\",\"balance\":52.33} loc=\"\"",
+        "hitB": "200 {\"success\":true,\"transferId\":\"tr_1UCeOdH7FWYUN3jhWKVWX81o\",\"balance\":52.33,\"idempotent\":true} loc=\"\"",
+        "tidA": "tr_1UCeOdH7FWYUN3jhWKVWX81o",
+        "tidB": "tr_1UCeOdH7FWYUN3jhWKVWX81o",
+        "new_transfer_ids": [
+          "tr_1UCeOdH7FWYUN3jhWKVWX81o"
+        ],
+        "new_transfer_count": 1,
+        "wallet_before": 53.33,
+        "wallet_after": 52.33,
+        "delta_eur": -1.0,
+        "payoutOkA": true,
+        "payoutOkB": true,
+        "idempotentB": true
+      }
+    },
+    {
+      "id": "pair.CH-P2-TURKISH-I",
+      "lens": "CH1",
+      "title": "pair CH-P2-TURKISH-I",
+      "ev": {
+        "keyA": "rtchIkeyx88",
+        "keyB": "rtchİkeyx88",
+        "keyA_units": [
+          114,
+          116,
+          99,
+          104,
+          73,
+          107,
+          101,
+          121,
+          120,
+          56,
+          56
+        ],
+        "keyB_units": [
+          114,
+          116,
+          99,
+          104,
+          304,
+          107,
+          101,
+          121,
+          120,
+          56,
+          56
+        ],
+        "hitA": "200 {\"success\":true,\"transferId\":\"tr_1UCeOiH7FWYUN3jhU0JBFQyc\",\"balance\":51.33} loc=\"\"",
+        "hitB": "200 {\"success\":true,\"transferId\":\"tr_1UCeOkH7FWYUN3jh728jsIgU\",\"balance\":50.33} loc=\"\"",
+        "tidA": "tr_1UCeOiH7FWYUN3jhU0JBFQyc",
+        "tidB": "tr_1UCeOkH7FWYUN3jh728jsIgU",
+        "new_transfer_ids": [
+          "tr_1UCeOkH7FWYUN3jh728jsIgU",
+          "tr_1UCeOiH7FWYUN3jhU0JBFQyc"
+        ],
+        "new_transfer_count": 2,
+        "wallet_before": 52.33,
+        "wallet_after": 50.33,
+        "delta_eur": -2.0,
+        "payoutOkA": true,
+        "payoutOkB": true,
+        "idempotentB": false
+      }
+    },
+    {
+      "id": "pair.CH-P2-GREEK-UPSILON",
+      "lens": "CH1",
+      "title": "pair CH-P2-GREEK-UPSILON",
+      "ev": {
+        "keyA": "rtchuUPSL88",
+        "keyB": "rtchυUPSL88",
+        "keyA_units": [
+          114,
+          116,
+          99,
+          104,
+          117,
+          85,
+          80,
+          83,
+          76,
+          56,
+          56
+        ],
+        "keyB_units": [
+          114,
+          116,
+          99,
+          104,
+          965,
+          85,
+          80,
+          83,
+          76,
+          56,
+          56
+        ],
+        "hitA": "200 {\"success\":true,\"transferId\":\"tr_1UCeOoH7FWYUN3jhGFJGJy9F\",\"balance\":49.33} loc=\"\"",
+        "hitB": "200 {\"success\":true,\"transferId\":\"tr_1UCeOqH7FWYUN3jh8cuRtLe2\",\"balance\":48.33} loc=\"\"",
+        "tidA": "tr_1UCeOoH7FWYUN3jhGFJGJy9F",
+        "tidB": "tr_1UCeOqH7FWYUN3jh8cuRtLe2",
+        "new_transfer_ids": [
+          "tr_1UCeOqH7FWYUN3jh8cuRtLe2",
+          "tr_1UCeOoH7FWYUN3jhGFJGJy9F"
+        ],
+        "new_transfer_count": 2,
+        "wallet_before": 50.33,
+        "wallet_after": 48.33,
+        "delta_eur": -2.0,
+        "payoutOkA": true,
+        "payoutOkB": true,
+        "idempotentB": false
+      }
+    },
+    {
+      "id": "pair.CH-P2-CASEFOLD-Ii",
+      "lens": "CH1",
+      "title": "pair CH-P2-CASEFOLD-Ii",
+      "ev": {
+        "keyA": "rtchIcase88",
+        "keyB": "rtchicase88",
+        "keyA_units": [
+          114,
+          116,
+          99,
+          104,
+          73,
+          99,
+          97,
+          115,
+          101,
+          56,
+          56
+        ],
+        "keyB_units": [
+          114,
+          116,
+          99,
+          104,
+          105,
+          99,
+          97,
+          115,
+          101,
+          56,
+          56
+        ],
+        "hitA": "200 {\"success\":true,\"transferId\":\"tr_1UCeOuH7FWYUN3jhM461YZGk\",\"balance\":47.33} loc=\"\"",
+        "hitB": "200 {\"success\":true,\"transferId\":\"tr_1UCeOwH7FWYUN3jhxnGYEoBn\",\"balance\":46.33} loc=\"\"",
+        "tidA": "tr_1UCeOuH7FWYUN3jhM461YZGk",
+        "tidB": "tr_1UCeOwH7FWYUN3jhxnGYEoBn",
+        "new_transfer_ids": [
+          "tr_1UCeOwH7FWYUN3jhxnGYEoBn",
+          "tr_1UCeOuH7FWYUN3jhM461YZGk"
+        ],
+        "new_transfer_count": 2,
+        "wallet_before": 48.33,
+        "wallet_after": 46.33,
+        "delta_eur": -2.0,
+        "payoutOkA": true,
+        "payoutOkB": true,
+        "idempotentB": false
+      }
+    },
+    {
+      "id": "CH-P2-CASEFOLD-Ii.design",
+      "lens": "CH1",
+      "title": "2 Transfers = gap case-sensitive; contar por pedido CH",
+      "ev": {
+        "keyA": "rtchIcase88",
+        "keyB": "rtchicase88",
+        "keyA_units": [
+          114,
+          116,
+          99,
+          104,
+          73,
+          99,
+          97,
+          115,
+          101,
+          56,
+          56
+        ],
+        "keyB_units": [
+          114,
+          116,
+          99,
+          104,
+          105,
+          99,
+          97,
+          115,
+          101,
+          56,
+          56
+        ],
+        "hitA": "200 {\"success\":true,\"transferId\":\"tr_1UCeOuH7FWYUN3jhM461YZGk\",\"balance\":47.33} loc=\"\"",
+        "hitB": "200 {\"success\":true,\"transferId\":\"tr_1UCeOwH7FWYUN3jhxnGYEoBn\",\"balance\":46.33} loc=\"\"",
+        "tidA": "tr_1UCeOuH7FWYUN3jhM461YZGk",
+        "tidB": "tr_1UCeOwH7FWYUN3jhxnGYEoBn",
+        "new_transfer_ids": [
+          "tr_1UCeOwH7FWYUN3jhxnGYEoBn",
+          "tr_1UCeOuH7FWYUN3jhM461YZGk"
+        ],
+        "new_transfer_count": 2,
+        "wallet_before": 48.33,
+        "wallet_after": 46.33,
+        "delta_eur": -2.0,
+        "payoutOkA": true,
+        "payoutOkB": true,
+        "idempotentB": false
+      }
+    },
+    {
+      "id": "key.len7",
+      "lens": "CH1",
+      "title": "key 7 chars",
+      "ev": "400 {\"error\":\"idempotency_key em falta. Reinicia o levantamento na app.\",\"code\":\"payout_failed\"} loc=\"\""
+    },
+    {
+      "id": "pair.CH-P2-STRIP-EMPTY",
+      "lens": "CH1",
+      "title": "pair CH-P2-STRIP-EMPTY",
+      "ev": {
+        "keyA": "rtchempty8",
+        "keyB": "́́́́́́́́",
+        "keyA_units": [
+          114,
+          116,
+          99,
+          104,
+          101,
+          109,
+          112,
+          116,
+          121,
+          56
+        ],
+        "keyB_units": [
+          769,
+          769,
+          769,
+          769,
+          769,
+          769,
+          769,
+          769
+        ],
+        "hitA": "200 {\"success\":true,\"transferId\":\"tr_1UCeP0H7FWYUN3jhNVrMjgGu\",\"balance\":45.33} loc=\"\"",
+        "hitB": "200 {\"success\":true,\"transferId\":\"tr_1UCeP2H7FWYUN3jhv3iqLRAW\",\"balance\":44.33} loc=\"\"",
+        "tidA": "tr_1UCeP0H7FWYUN3jhNVrMjgGu",
+        "tidB": "tr_1UCeP2H7FWYUN3jhv3iqLRAW",
+        "new_transfer_ids": [
+          "tr_1UCeP2H7FWYUN3jhv3iqLRAW",
+          "tr_1UCeP0H7FWYUN3jhNVrMjgGu"
+        ],
+        "new_transfer_count": 2,
+        "wallet_before": 46.33,
+        "wallet_after": 44.33,
+        "delta_eur": -2.0,
+        "payoutOkA": true,
+        "payoutOkB": true,
+        "idempotentB": false
+      }
+    },
+    {
+      "id": "race.same",
+      "lens": "CH1",
+      "title": "3x mesma key",
+      "ev": {
+        "hits": [
+          "200 {\"success\":true,\"transferId\":\"tr_1UCeP5H7FWYUN3jhA6eWd1Zx\",\"balance\":43.33} loc=\"\"",
+          "200 {\"success\":true,\"transferId\":\"tr_1UCeP5H7FWYUN3jhA6eWd1Zx\",\"balance\":43.33} loc=\"\"",
+          "200 {\"success\":true,\"transferId\":\"tr_1UCeP5H7FWYUN3jhA6eWd1Zx\",\"balance\":43.33} loc=\"\""
+        ],
+        "tids": [
+          "tr_1UCeP5H7FWYUN3jhA6eWd1Zx"
+        ]
+      }
+    },
+    {
+      "id": "race.armenian",
+      "lens": "CH1",
+      "title": "parallel o vs օ",
+      "ev": {
+        "hits": [
+          "200 {\"success\":true,\"transferId\":\"tr_1UCeP8H7FWYUN3jhoD9Fqj0m\",\"balance\":42.33} loc=\"\"",
+          "200 {\"success\":true,\"transferId\":\"tr_1UCeP8H7FWYUN3jhC1eXaZcC\",\"balance\":41.33} loc=\"\""
+        ],
+        "tids": [
+          "tr_1UCeP8H7FWYUN3jhoD9Fqj0m",
+          "tr_1UCeP8H7FWYUN3jhC1eXaZcC"
+        ]
+      }
+    },
+    {
+      "id": "wallet.end.p1",
+      "lens": "CH7",
+      "title": "seller wallet end pass1",
+      "ev": {
+        "id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+        "balance": 41.33,
+        "stripe_account_id": "acct_1U5mYbQeUNx8ar08",
+        "updated_at": "2026-09-06T11:38:34.021119+00:00"
+      }
+    }
+  ],
+  "actors": {
+    "buyer": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+    "seller": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+    "buyer2": "03ee8b80-fc44-4e42-8dc8-7378706d654b",
+    "seller2": "b621b93b-3a23-484f-a7a0-826fa4e5f5c1"
+  },
+  "created": {
+    "orders": [],
+    "products": []
+  }
+}

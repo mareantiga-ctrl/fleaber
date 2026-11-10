@@ -1,0 +1,171 @@
+{
+  "stamp": "20260902T1606",
+  "prefix": "RTBB2-20260902T1606",
+  "lenses": [
+    "BB1",
+    "BB2",
+    "BB5",
+    "BB6",
+    "BB7",
+    "BB8"
+  ],
+  "findings": [
+    {
+      "id": "BB1-04",
+      "lens": "BB2",
+      "severity": "P3",
+      "title": "Helper can_manage_chat publica kind=system «comprou» sem order paga (visível a outros buyers)",
+      "actor": "helper JWT; leitura buyer2",
+      "pre": "ANAS exige PI em purchase_broadcast; system_message só cheque staff chat",
+      "repro": "rpc batata_live_system_message body ✅ comprou",
+      "expected": "anúncio de compra só com PI; ou kind≠system",
+      "obtained": {
+        "rpc": "200 {\"ok\": true}",
+        "msg": {
+          "id": "1e8a3d1b-ecd0-43cd-ad21-bfcaf2e9cb69",
+          "kind": "system",
+          "body": "✅ Comprador fantasma comprou RTBB2-P2-HELPER-LIE-BB867744",
+          "user_id": "a988bd86-6ec9-4343-a284-18ed80aa682e",
+          "sender_label": "Sistema",
+          "channel": "fleaber",
+          "created_at": "2026-09-02T15:18:05.880231+00:00"
+        }
+      },
+      "proven": true,
+      "evidence": {
+        "visible_b2": true
+      }
+    }
+  ],
+  "blocked": [
+    {
+      "id": "BB8-03",
+      "lens": "BB8",
+      "title": "PATCH wallet 200 sem persistir",
+      "ev": {
+        "hit": "200 []",
+        "w0": 61.1,
+        "w1": 61.1
+      }
+    },
+    {
+      "id": "BB1-04b",
+      "lens": "BB7",
+      "title": "Helper da loja A system_message na live do seller2",
+      "ev": "200 {\"ok\": false, \"error\": \"not_allowed\"}"
+    },
+    {
+      "id": "BB1-04c",
+      "lens": "BB2",
+      "title": "Helper sem can_manage_chat ainda injeta system",
+      "ev": "200 {\"ok\": false, \"error\": \"not_allowed\"}"
+    },
+    {
+      "id": "BB1-12",
+      "lens": "BB1",
+      "title": "convert facebook_manual sem PI",
+      "ev": "200 {\"ok\": false, \"error\": \"convert_requires_paid_order\"}"
+    },
+    {
+      "id": "BB1-14",
+      "lens": "BB1",
+      "title": "reconcile com order aguarda_confirmacao (sem captura) converte fila",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"order_live_item_product_missing\"}"
+    },
+    {
+      "id": "BB1-17",
+      "lens": "BB1",
+      "title": "Broadcast item A usando order paga do item A2",
+      "ev": "200 false"
+    },
+    {
+      "id": "BB5-05",
+      "lens": "BB5",
+      "title": "requested_qty=50 persiste acima do stock",
+      "ev": "201 [{\"id\":\"60b2c6a0-22f5-4eff-b906-a061f8b5c88c\",\"live_id\":\"c52e5f22-8437-4ef1-9ca8-3f9d0d88c94c\",\"live_item_id\":\"50e28693-de36-46ca-b44d-dc431794988a\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"buyer_id\":\"10177905-724e-41c4-b98a-4e6c…"
+    },
+    {
+      "id": "BB6-03",
+      "lens": "BB6",
+      "title": "Dois accepted em item qty=1",
+      "ev": "200 {\"ok\": false, \"error\": \"qty_exceeds_stock\", \"requested\": 1, \"available_qty\": 0}"
+    },
+    {
+      "id": "BB7-10",
+      "lens": "BB7",
+      "title": "resolve-mux-playback devolve stream_key da live alheia",
+      "ev": "400 {\"error\":\"mux_live_id em falta.\"}"
+    }
+  ],
+  "skipped": [],
+  "notes": [
+    {
+      "id": "BB1-03.hold",
+      "lens": "BB1",
+      "title": "seller system_message próprio canal",
+      "ev": "200 {\"ok\": true}"
+    },
+    {
+      "id": "BB7-10",
+      "lens": "BB7",
+      "title": "resolve-mux-playback live alheia",
+      "ev": "400 {\"error\":\"mux_live_id em falta.\"}"
+    },
+    {
+      "id": "BB1.happy",
+      "lens": "BB1",
+      "title": "broadcast com order paga",
+      "ev": {
+        "order": "25e371a0-6e1d-426b-9103-1e35f3f5d580",
+        "bc": "200 true"
+      }
+    },
+    {
+      "id": "wallets.p2",
+      "lens": "BB8",
+      "title": "saldos",
+      "ev": {
+        "buyer": 61.1,
+        "seller": 17.99,
+        "buyer2": 0,
+        "seller2": 0
+      }
+    }
+  ],
+  "actors": {
+    "buyer": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+    "seller": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+    "buyer2": "10177905-724e-41c4-b98a-4e6c58a6cc19",
+    "seller2": "9efcde56-1e1c-4395-ab3b-581f0d35a93e",
+    "helper": "a988bd86-6ec9-4343-a284-18ed80aa682e"
+  },
+  "created": {
+    "lives": [
+      "c52e5f22-8437-4ef1-9ca8-3f9d0d88c94c",
+      "4268b780-4f24-44a6-97ac-4f485452bd41",
+      "5903a9df-bedd-4910-84c0-d4bb5b0298b9"
+    ],
+    "items": [
+      "50e28693-de36-46ca-b44d-dc431794988a",
+      "94d10611-d944-4745-8644-3cc747fd38fe",
+      "80c4d8a3-45c1-4bfa-bb83-4488d6395a47",
+      "47307653-4745-432e-ab5f-d7930b14993a"
+    ],
+    "orders": [
+      "f1955d05-04f3-4d57-8721-cf22a8c59020",
+      "25e371a0-6e1d-426b-9103-1e35f3f5d580"
+    ],
+    "products": [
+      "cc9425ef-bc6f-40e8-ac1a-5ea979a7e42b"
+    ],
+    "reservations": [
+      "d3ea3806-3620-49f8-90c4-82bc3eb8540f",
+      "60b2c6a0-22f5-4eff-b906-a061f8b5c88c",
+      "dd2aa469-6295-4783-94dc-ff65fef4c0c3",
+      "2ae55c0c-1a31-4274-9c55-63c279924d75"
+    ],
+    "helpers": [
+      "0b624d8b-54b1-4849-a7a4-4586c06ec09b"
+    ]
+  }
+}

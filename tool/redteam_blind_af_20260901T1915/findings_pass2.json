@@ -1,0 +1,208 @@
+{
+  "stamp": "20260901T1915",
+  "prefix": "RTAF-20260901T1915",
+  "lenses": [
+    "AF1",
+    "AF2",
+    "AF4",
+    "AF5",
+    "AF7"
+  ],
+  "findings": [
+    {
+      "id": "AF5.MUTATE.FF-BUNDLE",
+      "lens": "AF5",
+      "severity": "P1",
+      "title": "Card bundle_proposal FF (JSON cru) é mutável via PATCH — total 6543.21 → 1.00",
+      "actor": "buyer JWT",
+      "pre": "guard_update só imutabiliza prefixo FLEABER_JSON_V1",
+      "repro": "PATCH chat_messages?id=eq.1027 text=<FF>{kind:bundle_proposal,total_eur:1}",
+      "expected": "chat_system_card_immutable",
+      "obtained": {
+        "http": 200,
+        "after_parses": true,
+        "after_clip": "\f{\"kind\":\"bundle_proposal\",\"total_eur\":1.0,\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\"}"
+      },
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "AF5.DEL.FF-BUNDLE",
+      "lens": "AF5",
+      "severity": "P1",
+      "title": "Card bundle_proposal VT (JSON cru parseado pelo Flutter) apagável — prova de pagamento/proposta some",
+      "actor": "buyer JWT",
+      "pre": "DELETE imutável só FLEABER_JSON_V1 ou btrim `{`",
+      "repro": "DELETE chat_messages?id=eq.1028",
+      "expected": "chat_system_card_immutable",
+      "obtained": {
+        "http": 200,
+        "deleted_id": "1028",
+        "still": null
+      },
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "AF5.INBOX.PATCH.TRANSFER",
+      "lens": "AF5",
+      "severity": "P2",
+      "title": "PATCH last_message «Transferência confirmada 4321,00 €» na thread existente",
+      "actor": "buyer JWT",
+      "pre": "regex só Seguro Fleaber|Compra paga|MB WAY|PIX",
+      "repro": "PATCH chats last_message=Transferência confirmada 4321,00 €",
+      "expected": "forbidden",
+      "obtained": {
+        "http": 200,
+        "stored": "Transferência confirmada 4321,00 €"
+      },
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "AF4.ORDER.PROOF.FLEABER-APP",
+      "lens": "AF4",
+      "severity": "P2",
+      "title": "orders.proof_url aceita https://fleaber.app/favicon.ico (mesma allowlist larga)",
+      "actor": "buyer JWT",
+      "pre": "batata_orders_guard_proof_url",
+      "repro": "PATCH orders.proof_url=https://fleaber.app/favicon.ico",
+      "expected": "order_proof_url_denied ou path de storage",
+      "obtained": {
+        "http": 200,
+        "proof_url": "https://fleaber.app/favicon.ico"
+      },
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "AF2.KIND.UNICODE-ESCAPE",
+      "lens": "AF2",
+      "severity": "P2",
+      "title": "kind via \\u escape aceite",
+      "actor": "buyer JWT",
+      "pre": "jsonb unescapes then lower(kind)",
+      "repro": "kind seguro\\u005ffleaber\\u005fpaid",
+      "expected": "se total bate, card pago (controlo de parser)",
+      "obtained": "201 [{\"id\":1074,\"created_at\":\"2026-09-01T18:26:43.959672+00:00\",\"chat_id\":\"b3188bdd-c957-46c1-8f0f-db55ba442605\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"seguro\\\\u005ffleaber\\\\u005fpaid\\\",\\\"order_id…",
+      "proven": true,
+      "evidence": {}
+    }
+  ],
+  "blocked": [
+    {
+      "id": "AF5.DEL.JSONV1-REAL",
+      "lens": "AF5",
+      "title": "JSON V1 sobrevive",
+      "ev": "403 42501 chat_system_card_immutable still=true"
+    },
+    {
+      "id": "AF1.ROLE.SELLER-AS-BUYER",
+      "lens": "AF1",
+      "title": "seller-as-buyer recusado",
+      "ev": "42501 chat_system_card_buyer_only"
+    },
+    {
+      "id": "AF7.STORAGE.B2-READ",
+      "lens": "AF7",
+      "title": "B2 não lê storage alheio",
+      "ev": "400 {\"statusCode\":\"404\",\"error\":\"not_found\",\"message\":\"Object not found\",\"code\":\"NoSuchKey\"}"
+    }
+  ],
+  "skipped": [],
+  "notes": [
+    {
+      "id": "p2.ff.stored",
+      "lens": "AF2",
+      "title": "msg 1027",
+      "ev": {
+        "http": 200,
+        "len": 286,
+        "cp0": 12,
+        "parses": true,
+        "has_total": true
+      }
+    },
+    {
+      "id": "p2.json.list",
+      "lens": "AF5",
+      "title": "FLEABER cards",
+      "ev": [
+        {
+          "id": 1071,
+          "sender": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96"
+        },
+        {
+          "id": 1068,
+          "sender": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96"
+        },
+        {
+          "id": 1063,
+          "sender": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96"
+        },
+        {
+          "id": 1062,
+          "sender": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96"
+        },
+        {
+          "id": 1061,
+          "sender": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96"
+        },
+        {
+          "id": 1060,
+          "sender": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96"
+        },
+        {
+          "id": 1059,
+          "sender": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96"
+        },
+        {
+          "id": 1058,
+          "sender": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96"
+        }
+      ]
+    },
+    {
+      "id": "p2.url.err",
+      "lens": "AF4",
+      "title": "https://fleaber.app/favicon.ico",
+      "ev": "SocketException: Failed host lookup: 'fleaber.app' (OS Error: Este anfitrião não é conhecido, errno = 11001)"
+    },
+    {
+      "id": "p2.url.https://www.fleaber.pt/robots.txt",
+      "lens": "AF4",
+      "title": "GET",
+      "ev": {
+        "status": 200,
+        "loc": "",
+        "evil": false
+      }
+    },
+    {
+      "id": "p2.url.err",
+      "lens": "AF4",
+      "title": "https://fleaber.app/l?next=//evil.example/receipt.png",
+      "ev": "SocketException: Failed host lookup: 'fleaber.app' (OS Error: Este anfitrião não é conhecido, errno = 11001)"
+    },
+    {
+      "id": "p2.url.err",
+      "lens": "AF4",
+      "title": "https://fleaber.app/l?u=evil.example/receipt.png",
+      "ev": "SocketException: Failed host lookup: 'fleaber.app' (OS Error: Este anfitrião não é conhecido, errno = 11001)"
+    }
+  ],
+  "actors": {
+    "buyer": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+    "seller": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+    "buyer2": "214dea53-5b2c-49ad-ae4d-d12e3f1315b6"
+  },
+  "created": {
+    "orders": [],
+    "products": [],
+    "chats": [],
+    "msgs": [
+      "1074"
+    ],
+    "offers": []
+  }
+}

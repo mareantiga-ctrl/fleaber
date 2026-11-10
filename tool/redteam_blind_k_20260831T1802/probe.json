@@ -1,0 +1,1061 @@
+{
+  "AUDITOR": "REDTEAM_BLIND_K_POS_HIJ_v1",
+  "FROZEN_AT": "2026-08-31T17:10:13.776301Z",
+  "production_touched": false,
+  "fase4": false,
+  "corrections_applied": false,
+  "prefix": "RTK-20260831T1802",
+  "actors": {
+    "buyer": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+    "seller": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+    "buyer2": "b35da5dc-5fb6-47d7-a0d6-055a8fd51440",
+    "seller2": "52aaa7e5-5945-4567-a043-4491c5ddaab3"
+  },
+  "findings": [
+    {
+      "id": "K4-INS-order_paid",
+      "lente": "K4",
+      "actor": "buyer JWT",
+      "title": "INSERT kind servidor order_paid",
+      "passos": [
+        "POST chat_messages FLEABER_JSON_V1 kind=order_paid order unpaid"
+      ],
+      "esperado": "HTTP ≥400 / chat_system_card_server_only",
+      "obtido": "HTTP 403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_server_only\"}",
+      "severidade": "INFO",
+      "prova": {
+        "http": 403,
+        "body": {
+          "code": "42501",
+          "details": null,
+          "hint": null,
+          "message": "chat_system_card_server_only"
+        }
+      }
+    },
+    {
+      "id": "K4-INS-marketplace_bag_paid",
+      "lente": "K4",
+      "actor": "buyer JWT",
+      "title": "INSERT kind servidor marketplace_bag_paid",
+      "passos": [
+        "POST chat_messages FLEABER_JSON_V1 kind=marketplace_bag_paid order unpaid"
+      ],
+      "esperado": "HTTP ≥400 / chat_system_card_server_only",
+      "obtido": "HTTP 403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_server_only\"}",
+      "severidade": "INFO",
+      "prova": {
+        "http": 403,
+        "body": {
+          "code": "42501",
+          "details": null,
+          "hint": null,
+          "message": "chat_system_card_server_only"
+        }
+      }
+    },
+    {
+      "id": "K4-INS-auto_feedback_generated",
+      "lente": "K4",
+      "actor": "buyer JWT",
+      "title": "INSERT kind servidor auto_feedback_generated",
+      "passos": [
+        "POST chat_messages FLEABER_JSON_V1 kind=auto_feedback_generated order unpaid"
+      ],
+      "esperado": "HTTP ≥400 / chat_system_card_server_only",
+      "obtido": "HTTP 403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_server_only\"}",
+      "severidade": "INFO",
+      "prova": {
+        "http": 403,
+        "body": {
+          "code": "42501",
+          "details": null,
+          "hint": null,
+          "message": "chat_system_card_server_only"
+        }
+      }
+    },
+    {
+      "id": "K4-INS-raffle_prize",
+      "lente": "K4",
+      "actor": "buyer JWT",
+      "title": "INSERT kind servidor raffle_prize",
+      "passos": [
+        "POST chat_messages FLEABER_JSON_V1 kind=raffle_prize order unpaid"
+      ],
+      "esperado": "HTTP ≥400 / chat_system_card_server_only",
+      "obtido": "HTTP 403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_server_only\"}",
+      "severidade": "INFO",
+      "prova": {
+        "http": 403,
+        "body": {
+          "code": "42501",
+          "details": null,
+          "hint": null,
+          "message": "chat_system_card_server_only"
+        }
+      }
+    },
+    {
+      "id": "K4-INS-premio_rifa",
+      "lente": "K4",
+      "actor": "buyer JWT",
+      "title": "INSERT kind servidor premio_rifa",
+      "passos": [
+        "POST chat_messages FLEABER_JSON_V1 kind=premio_rifa order unpaid"
+      ],
+      "esperado": "HTTP ≥400 / chat_system_card_server_only",
+      "obtido": "HTTP 403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_server_only\"}",
+      "severidade": "INFO",
+      "prova": {
+        "http": 403,
+        "body": {
+          "code": "42501",
+          "details": null,
+          "hint": null,
+          "message": "chat_system_card_server_only"
+        }
+      }
+    },
+    {
+      "id": "K4-INS-seguro-unpaid",
+      "lente": "K4",
+      "actor": "buyer JWT",
+      "title": "INSERT seguro_fleaber_paid em hold não pago",
+      "passos": [
+        "JWT buyer INSERT card seguro_fleaber_paid na encomenda reserva_pendente sem PI"
+      ],
+      "esperado": "HTTP ≥400 chat_system_card_order_not_paid",
+      "obtido": "HTTP 400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_order_not_paid\"}",
+      "severidade": "INFO",
+      "prova": {
+        "http": 400,
+        "body": {
+          "code": "23514",
+          "details": null,
+          "hint": null,
+          "message": "chat_system_card_order_not_paid"
+        },
+        "order": "a093d3ef-9ff6-4336-8f96-cccbaeaa9187"
+      }
+    },
+    {
+      "id": "K4-INS-seguro-seller",
+      "lente": "K4",
+      "actor": "seller JWT",
+      "title": "Vendedor INSERT seguro_fleaber_paid (buyer-only)",
+      "passos": [
+        "POST chat_messages JWT seller kind=seguro_fleaber_paid"
+      ],
+      "esperado": "HTTP ≥400",
+      "obtido": "HTTP 400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_order_not_paid\"}",
+      "severidade": "INFO",
+      "prova": {
+        "http": 400,
+        "body": {
+          "code": "23514",
+          "details": null,
+          "hint": null,
+          "message": "chat_system_card_order_not_paid"
+        }
+      }
+    },
+    {
+      "id": "K4-INS-b2-cross",
+      "lente": "K4",
+      "actor": "2.º buyer JWT",
+      "title": "buyer2 INSERT no chat alheio",
+      "passos": [
+        "POST chat_messages chat de B1/S1 com JWT B2"
+      ],
+      "esperado": "HTTP ≥400 RLS",
+      "obtido": "HTTP 403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_not_participant\"}",
+      "severidade": "INFO",
+      "prova": {
+        "http": 403,
+        "body": {
+          "code": "42501",
+          "details": null,
+          "hint": null,
+          "message": "chat_system_card_not_participant"
+        }
+      }
+    },
+    {
+      "id": "K4-INS-anon",
+      "lente": "K4",
+      "actor": "anon",
+      "title": "anon INSERT chat_messages",
+      "passos": [
+        "POST chat_messages Authorization=anon"
+      ],
+      "esperado": "HTTP ≥400",
+      "obtido": "HTTP 401",
+      "severidade": "INFO",
+      "prova": {
+        "http": 401,
+        "body": {
+          "code": "42501",
+          "details": null,
+          "hint": null,
+          "message": "permission denied for function batata_chat_is_participant"
+        }
+      }
+    },
+    {
+      "id": "K4-UPD-plain-to-server-kind",
+      "lente": "K4",
+      "actor": "buyer JWT",
+      "title": "UPDATE plain → JSON kind servidor",
+      "passos": [
+        "INSERT texto simples",
+        "PATCH text=FLEABER_JSON_V1 marketplace_bag_paid"
+      ],
+      "esperado": "HTTP ≥400 mesmas regras INSERT",
+      "obtido": "HTTP 403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_server_only\"}",
+      "severidade": "INFO",
+      "prova": {
+        "msg": "891",
+        "http": 403,
+        "body": {
+          "code": "42501",
+          "details": null,
+          "hint": null,
+          "message": "chat_system_card_server_only"
+        }
+      }
+    },
+    {
+      "id": "K4-UPD-plain-to-seguro-unpaid",
+      "lente": "K4",
+      "actor": "buyer JWT",
+      "title": "UPDATE plain → seguro_fleaber_paid unpaid",
+      "passos": [
+        "PATCH da mensagem plain para card seguro em hold não pago"
+      ],
+      "esperado": "HTTP ≥400 order_not_paid",
+      "obtido": "HTTP 400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_order_not_paid\"}",
+      "severidade": "INFO",
+      "prova": {
+        "http": 400,
+        "body": {
+          "code": "23514",
+          "details": null,
+          "hint": null,
+          "message": "chat_system_card_order_not_paid"
+        }
+      }
+    },
+    {
+      "id": "K5-UPD-json-immutable",
+      "lente": "K5",
+      "actor": "buyer JWT",
+      "title": "UPDATE JSON já gravado",
+      "passos": [
+        "INSERT JSON price_offer (allowlist)",
+        "PATCH para seguro_fleaber_paid"
+      ],
+      "esperado": "HTTP ≥400 chat_system_card_immutable",
+      "obtido": "HTTP 403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_immutable\"}",
+      "severidade": "INFO",
+      "prova": {
+        "http": 403,
+        "body": {
+          "code": "42501",
+          "details": null,
+          "hint": null,
+          "message": "chat_system_card_immutable"
+        },
+        "msg": "892"
+      }
+    },
+    {
+      "id": "K5-UPD-json-by-counterparty",
+      "lente": "K5",
+      "actor": "seller JWT",
+      "title": "Contraparte tenta alterar JSON do comprador",
+      "passos": [
+        "PATCH mensagem JSON alheia text=hijack"
+      ],
+      "esperado": "texto inalterado",
+      "obtido": "HTTP 200 still_json=true text=FLEABER_JSON_V1:{\"kind\":\"price_offer\",\"order_id\":\"a093d3ef-9ff6-4336-8f96-cccbaeaa9187\",\"amount\":1.0}",
+      "severidade": "INFO",
+      "prova": {
+        "http": 200,
+        "row": {
+          "id": 892,
+          "text": "FLEABER_JSON_V1:{\"kind\":\"price_offer\",\"order_id\":\"a093d3ef-9ff6-4336-8f96-cccbaeaa9187\",\"amount\":1.0}",
+          "sender_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96"
+        },
+        "patch_body": [
+          {
+            "id": 892,
+            "created_at": "2026-08-31T17:09:45.580208+00:00",
+            "chat_id": "2852d2af-4f03-4d84-a0b2-fd472f0bf0cd",
+            "sender_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+            "text": "FLEABER_JSON_V1:{\"kind\":\"price_offer\",\"order_id\":\"a093d3ef-9ff6-4336-8f96-cccbaeaa9187\",\"amount\":1.0}",
+            "is_reservation": false,
+            "is_read": false,
+            "receiver_id": null
+          }
+        ]
+      }
+    },
+    {
+      "id": "K6-INS-seguro-on-mao-pago",
+      "lente": "K6",
+      "actor": "buyer JWT",
+      "title": "Recibo Seguro Fleaber em encomenda MB WAY marcada pago sem captura",
+      "passos": [
+        "Hold MB WAY / mão",
+        "Seller PATCH status=pago (off-platform, sem PI)",
+        "Buyer INSERT seguro_fleaber_paid"
+      ],
+      "esperado": "Card seguro recusado (não é pagamento plataforma) OU status não chega a pago",
+      "obtido": "pago_http=200 status=pago seguro_http=201 [{\"id\":895,\"created_at\":\"2026-08-31T17:09:47.589303+00:00\",\"chat_id\":\"2852d2af-4f03-4d84-a0b2-fd472f0bf0cd\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"seguro_fleaber_paid\\\",\\\"order_id\\\":\\\"916b1667-fb33-4216-a640-dda3dc22c861\\\",\\\"total\\\":3.5}\",\"is_reservation\":false,\"is_read\":false,\"receiver_id\":null}]",
+      "severidade": "P1",
+      "prova": {
+        "pago_http": 200,
+        "order": {
+          "id": "916b1667-fb33-4216-a640-dda3dc22c861",
+          "status": "pago",
+          "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+          "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+          "product_id": "cb4df8c1-3155-4d9f-8208-44e1a38c67dd",
+          "quantity": 1,
+          "price_total": 3.5,
+          "amount_paid_cents": null,
+          "payment_method": "MB WAY",
+          "shipping_method": "mao",
+          "stripe_payment_intent_id": null,
+          "stripe_refund_id": null,
+          "wallet_release_processed_at": null,
+          "wallet_refund_processed_at": null,
+          "stock_units_applied": 1
+        },
+        "seguro_http": 201,
+        "seguro_body": [
+          {
+            "id": 895,
+            "created_at": "2026-08-31T17:09:47.589303+00:00",
+            "chat_id": "2852d2af-4f03-4d84-a0b2-fd472f0bf0cd",
+            "sender_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+            "text": "FLEABER_JSON_V1:{\"kind\":\"seguro_fleaber_paid\",\"order_id\":\"916b1667-fb33-4216-a640-dda3dc22c861\",\"total\":3.5}",
+            "is_reservation": false,
+            "is_read": false,
+            "receiver_id": null
+          }
+        ],
+        "msg_id": "895"
+      }
+    },
+    {
+      "id": "K3-refund-while-pago",
+      "lente": "K3",
+      "actor": "seller JWT",
+      "title": "refund-order Stripe TEST ainda em pago (anti-regressão)",
+      "passos": [
+        "setup_paid_order Stripe TEST 5,90 €",
+        "POST refund-order JWT vendedor enquanto status=pago"
+      ],
+      "esperado": "ok=true + stripe_refund_id gravado",
+      "obtido": "HTTP 200 ok=true refund_id=re_3UAYiOH7FWYUN3jh1jKq1yZt status=cancelado",
+      "severidade": "INFO",
+      "prova": {
+        "order": "82a75d45-15e0-434a-9a45-3bb02a1e1b9e",
+        "before": {
+          "id": "82a75d45-15e0-434a-9a45-3bb02a1e1b9e",
+          "status": "pago",
+          "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+          "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+          "product_id": "0c611fa6-4c27-424f-b0f4-c5588247b877",
+          "quantity": 1,
+          "price_total": 5.9,
+          "amount_paid_cents": 590,
+          "payment_method": "Pagamento na app",
+          "shipping_method": null,
+          "stripe_payment_intent_id": "pi_3UAYiOH7FWYUN3jh1E8O9TDL",
+          "stripe_refund_id": null,
+          "wallet_release_processed_at": null,
+          "wallet_refund_processed_at": null,
+          "stock_units_applied": 1
+        },
+        "edge": {
+          "ok": true,
+          "already_refunded": true,
+          "idempotent": true,
+          "refund_id": "re_3UAYiOH7FWYUN3jh1jKq1yZt",
+          "status": "cancelado",
+          "stock_units_applied": null,
+          "amount_cents": 590,
+          "payment_intent": "pi_3UAYiOH7FWYUN3jh1E8O9TDL",
+          "status_stripe": "succeeded"
+        },
+        "after": {
+          "id": "82a75d45-15e0-434a-9a45-3bb02a1e1b9e",
+          "status": "cancelado",
+          "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+          "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+          "product_id": "0c611fa6-4c27-424f-b0f4-c5588247b877",
+          "quantity": 1,
+          "price_total": 5.9,
+          "amount_paid_cents": 590,
+          "payment_method": "Pagamento na app",
+          "shipping_method": null,
+          "stripe_payment_intent_id": "pi_3UAYiOH7FWYUN3jh1E8O9TDL",
+          "stripe_refund_id": "re_3UAYiOH7FWYUN3jh1jKq1yZt",
+          "wallet_release_processed_at": "2026-08-31T17:09:54.087479+00:00",
+          "wallet_refund_processed_at": "2026-08-31T17:09:54.087479+00:00",
+          "stock_units_applied": null
+        }
+      }
+    },
+    {
+      "id": "K3-refund-buyer-forbidden",
+      "lente": "K3",
+      "actor": "buyer JWT",
+      "title": "Comprador chama refund-order",
+      "passos": [
+        "POST refund-order JWT buyer"
+      ],
+      "esperado": "403 Sem permissão",
+      "obtido": "HTTP 403 {\"ok\":false,\"error\":\"Sem permissão.\"}",
+      "severidade": "INFO",
+      "prova": {
+        "http": 403,
+        "body": {
+          "ok": false,
+          "error": "Sem permissão."
+        }
+      }
+    },
+    {
+      "id": "K3-refund-s2-forbidden",
+      "lente": "K3",
+      "actor": "2.º seller JWT",
+      "title": "seller2 refund-order da encomenda de S1",
+      "passos": [
+        "POST refund-order JWT seller2"
+      ],
+      "esperado": "403",
+      "obtido": "HTTP 403 {\"ok\":false,\"error\":\"Sem permissão.\"}",
+      "severidade": "INFO",
+      "prova": {
+        "http": 403,
+        "body": {
+          "ok": false,
+          "error": "Sem permissão."
+        }
+      }
+    },
+    {
+      "id": "K3-refund-after-release-concluido",
+      "lente": "K3",
+      "actor": "seller JWT",
+      "title": "refund-order após concluido/release",
+      "passos": [
+        "pago→enviado→concluido→release",
+        "POST refund-order"
+      ],
+      "esperado": "403 order_refund_blocked_status (D0733) — recuperação via devolvida+Stripe, não anular envio",
+      "obtido": "HTTP 403 {\"ok\":false,\"error\":\"Não é possível anular esta venda neste estado (já enviada ou concluída).\",\"code\":\"order_refund_blocked_status\",\"status\":\"concluido\"}",
+      "severidade": "INFO",
+      "prova": {
+        "http": 403,
+        "body": {
+          "ok": false,
+          "error": "Não é possível anular esta venda neste estado (já enviada ou concluída).",
+          "code": "order_refund_blocked_status",
+          "status": "concluido"
+        },
+        "row": {
+          "id": "e4ef5d03-ba15-4749-92c7-d6a994f8d877",
+          "status": "concluido",
+          "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+          "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+          "product_id": "e9ca9509-ce09-4b2e-9066-494c7249cddc",
+          "quantity": 1,
+          "price_total": 5.9,
+          "amount_paid_cents": 590,
+          "payment_method": "Pagamento na app",
+          "shipping_method": null,
+          "stripe_payment_intent_id": "pi_3UAYiWH7FWYUN3jh0YjkrwP2",
+          "stripe_refund_id": null,
+          "wallet_release_processed_at": "2026-08-31T17:10:00.012295+00:00",
+          "wallet_refund_processed_at": null,
+          "stock_units_applied": 1
+        }
+      }
+    },
+    {
+      "id": "K1-jwt-cannot-devolvida-after-concluido",
+      "lente": "K1",
+      "actor": "seller JWT + buyer JWT",
+      "title": "JWT não passa concluido → devolvida",
+      "passos": [
+        "Após release, PATCH status=devolvida seller e buyer",
+        "RPC batata_refund_buyer_wallet_for_order JWT buyer"
+      ],
+      "esperado": "status permanece concluido; RPC false/erro",
+      "obtido": "seller_http=403 buyer_http=200 rpc=false status=concluido",
+      "severidade": "INFO",
+      "prova": {
+        "seller_patch": {
+          "code": "42501",
+          "details": null,
+          "hint": null,
+          "message": "order_concluido_immutable_for_seller"
+        },
+        "buyer_patch": [
+          {
+            "id": "e4ef5d03-ba15-4749-92c7-d6a994f8d877",
+            "created_at": "2026-08-31T17:09:56.159433+00:00",
+            "product_id": "e9ca9509-ce09-4b2e-9066-494c7249cddc",
+            "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+            "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+            "price_total": 5.9,
+            "shipping_method": null,
+            "payment_method": "Pagamento na app",
+            "proof_url": null,
+            "status": "concluido",
+            "reservation_expires_at": null,
+            "is_reservation": false,
+            "completed_at": "2026-08-31T17:09:59.027321+00:00",
+            "auto_feedback_processed_at": null,
+            "returned_at": null,
+            "wallet_release_processed_at": "2026-08-31T17:10:00.012295+00:00",
+            "wallet_refund_processed_at": null,
+            "bundle_id": null,
+            "quantity": 1,
+            "live_id": null,
+            "live_item_id": null,
+            "live_raffle_id": null,
+            "stripe_checkout_session_id": null,
+            "stripe_payment_intent_id": "pi_3UAYiWH7FWYUN3jh0YjkrwP2",
+            "stripe_refund_id": null,
+            "stripe_refunded_at": null,
+            "stock_units_applied": 1,
+            "amount_paid_cents": 590,
+            "contract_unit_cents": 590,
+            "contract_qty": 1,
+            "product_offer_id": null
+          }
+        ],
+        "rpc": false,
+        "row": {
+          "id": "e4ef5d03-ba15-4749-92c7-d6a994f8d877",
+          "status": "concluido",
+          "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+          "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+          "product_id": "e9ca9509-ce09-4b2e-9066-494c7249cddc",
+          "quantity": 1,
+          "price_total": 5.9,
+          "amount_paid_cents": 590,
+          "payment_method": "Pagamento na app",
+          "shipping_method": null,
+          "stripe_payment_intent_id": "pi_3UAYiWH7FWYUN3jh0YjkrwP2",
+          "stripe_refund_id": null,
+          "wallet_release_processed_at": "2026-08-31T17:10:00.012295+00:00",
+          "wallet_refund_processed_at": null,
+          "stock_units_applied": 1
+        }
+      }
+    },
+    {
+      "id": "K1-devolvida-after-drain-no-mint",
+      "lente": "K1",
+      "actor": "service_role fixture PATCH devolvida (JWT bloqueado)",
+      "title": "Após levantamento/drain, devolvida minta carteira do comprador?",
+      "passos": [
+        "Stripe TEST pago 5,90 €",
+        "Seller enviado + buyer concluido + release wallet",
+        "Payout/drain seller balance=0",
+        "service_role status=devolvida (JWT não consegue)"
+      ],
+      "esperado": "Δbuyer=0, sem tx reembolso, sem stripe_refund_id (buyer recupera via refund-order)",
+      "obtido": "Δbuyer=0.0 reemb=0 estorno=0 refund_id=null processed=null status=devolvida",
+      "severidade": "INFO",
+      "prova": {
+        "order": "e4ef5d03-ba15-4749-92c7-d6a994f8d877",
+        "credited_on_release": 5.0,
+        "drained_via": "connect",
+        "payout_http": 200,
+        "seller_pre_rel": 0.0,
+        "seller_post_rel": 5.0,
+        "seller_pre_dev": 0.0,
+        "seller_post_dev": 0.0,
+        "buyer_pre_rel": 40.45,
+        "buyer_pre_dev": 40.45,
+        "buyer_post_dev": 40.45,
+        "delta_buyer": 0.0,
+        "delta_seller": 0.0,
+        "devolvida_http": 200,
+        "row": {
+          "id": "e4ef5d03-ba15-4749-92c7-d6a994f8d877",
+          "status": "devolvida",
+          "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+          "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+          "product_id": "e9ca9509-ce09-4b2e-9066-494c7249cddc",
+          "quantity": 1,
+          "price_total": 5.9,
+          "amount_paid_cents": 590,
+          "payment_method": "Pagamento na app",
+          "shipping_method": null,
+          "stripe_payment_intent_id": "pi_3UAYiWH7FWYUN3jh0YjkrwP2",
+          "stripe_refund_id": null,
+          "wallet_release_processed_at": "2026-08-31T17:10:00.012295+00:00",
+          "wallet_refund_processed_at": null,
+          "stock_units_applied": null
+        },
+        "reemb_n": 0,
+        "estorno_n": 0,
+        "txs_pre": [
+          {
+            "id": "360707a3-b264-42a2-9d3c-42dd9bedc58a",
+            "wallet_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+            "amount": 5.0,
+            "type": "venda",
+            "description": "Venda de Refund crash E2E 1788196195966"
+          }
+        ],
+        "txs_post": [
+          {
+            "id": "360707a3-b264-42a2-9d3c-42dd9bedc58a",
+            "wallet_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+            "amount": 5.0,
+            "type": "venda",
+            "description": "Venda de Refund crash E2E 1788196195966"
+          }
+        ],
+        "pi": "pi_3UAYiWH7FWYUN3jh0YjkrwP2",
+        "stripe_refund_id": null,
+        "wallet_refund_processed_at": null
+      }
+    },
+    {
+      "id": "K2-clawback-no-phantom-estorno",
+      "lente": "K2",
+      "actor": "trigger devolvida + clawback",
+      "title": "Estorno no livro sem Δbalance (saldo 0)",
+      "passos": [
+        "Seller balance=0",
+        "Trigger refund_buyer_wallet em devolvida"
+      ],
+      "esperado": "sem linha estorno se o débito fail-closed; Δseller=0",
+      "obtido": "estorno_n=0 Δseller=0.0 txs=[]",
+      "severidade": "INFO",
+      "prova": {
+        "estorno": [],
+        "delta_seller": 0.0,
+        "seller_pre": 0.0,
+        "seller_post": 0.0
+      }
+    },
+    {
+      "id": "K7-stripe-refund-after-devolvida-drained",
+      "lente": "K7",
+      "actor": "seller JWT",
+      "title": "Composição: drain + devolvida + refund-order Stripe",
+      "passos": [
+        "Estado: PI capturado, seller já levantou, devolvida sem mint",
+        "POST refund-order JWT seller"
+      ],
+      "esperado": "Stripe refund do cartão (único caminho de recuperação do comprador)",
+      "obtido": "HTTP 200 ok=true stripe_refund=re_3UAYiWH7FWYUN3jh0apy8awO skipped=null {\"ok\":true,\"already_refunded\":true,\"idempotent\":true,\"refund_id\":\"re_3UAYiWH7FWYUN3jh0apy8awO\",\"status\":\"cancelado\",\"stock_units_applied\":null,\"amount_cents\":590,\"payment_intent\":\"pi_3UAYiWH7FWYUN3jh0YjkrwP2\",\"status_stripe\":\"succeeded\"}",
+      "severidade": "INFO",
+      "prova": {
+        "edge": {
+          "ok": true,
+          "already_refunded": true,
+          "idempotent": true,
+          "refund_id": "re_3UAYiWH7FWYUN3jh0apy8awO",
+          "status": "cancelado",
+          "stock_units_applied": null,
+          "amount_cents": 590,
+          "payment_intent": "pi_3UAYiWH7FWYUN3jh0YjkrwP2",
+          "status_stripe": "succeeded"
+        },
+        "http": 200,
+        "row": {
+          "id": "e4ef5d03-ba15-4749-92c7-d6a994f8d877",
+          "status": "cancelado",
+          "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+          "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+          "product_id": "e9ca9509-ce09-4b2e-9066-494c7249cddc",
+          "quantity": 1,
+          "price_total": 5.9,
+          "amount_paid_cents": 590,
+          "payment_method": "Pagamento na app",
+          "shipping_method": null,
+          "stripe_payment_intent_id": "pi_3UAYiWH7FWYUN3jh0YjkrwP2",
+          "stripe_refund_id": "re_3UAYiWH7FWYUN3jh0apy8awO",
+          "wallet_release_processed_at": "2026-08-31T17:10:00.012295+00:00",
+          "wallet_refund_processed_at": "2026-08-31T17:10:11.294+00:00",
+          "stock_units_applied": null
+        },
+        "buyer_wallet": 40.45,
+        "seller_wallet": 0.0
+      }
+    },
+    {
+      "id": "K7-credit-wallet-jwt",
+      "lente": "K7",
+      "actor": "buyer JWT",
+      "title": "RPC batata_credit_wallet_once directo",
+      "passos": [
+        "POST rpc credit 50 € na própria wallet"
+      ],
+      "esperado": "403 / GRANT só service_role",
+      "obtido": "HTTP 403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_credit_wallet_once\"}",
+      "severidade": "INFO",
+      "prova": {
+        "http": 403,
+        "body": {
+          "code": "42501",
+          "details": null,
+          "hint": null,
+          "message": "permission denied for function batata_credit_wallet_once"
+        }
+      }
+    },
+    {
+      "id": "K6-mao-concluido-still-works",
+      "lente": "K6",
+      "actor": "buyer JWT",
+      "title": "mão/MB WAY pago → concluido (anti-quebra)",
+      "passos": [
+        "PATCH concluido em encomenda off-platform paga"
+      ],
+      "esperado": "status=concluido",
+      "obtido": "HTTP 200 status=concluido",
+      "severidade": "INFO",
+      "prova": {
+        "http": 200,
+        "body": [
+          {
+            "id": "916b1667-fb33-4216-a640-dda3dc22c861",
+            "created_at": "2026-08-31T17:09:46.954498+00:00",
+            "product_id": "cb4df8c1-3155-4d9f-8208-44e1a38c67dd",
+            "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+            "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+            "price_total": 3.5,
+            "shipping_method": "mao",
+            "payment_method": "MB WAY",
+            "proof_url": null,
+            "status": "concluido",
+            "reservation_expires_at": null,
+            "is_reservation": false,
+            "completed_at": "2026-08-31T17:10:12.629763+00:00",
+            "auto_feedback_processed_at": null,
+            "returned_at": null,
+            "wallet_release_processed_at": null,
+            "wallet_refund_processed_at": null,
+            "bundle_id": null,
+            "quantity": 1,
+            "live_id": null,
+            "live_item_id": null,
+            "live_raffle_id": null,
+            "stripe_checkout_session_id": null,
+            "stripe_payment_intent_id": null,
+            "stripe_refund_id": null,
+            "stripe_refunded_at": null,
+            "stock_units_applied": 1,
+            "amount_paid_cents": null,
+            "contract_unit_cents": 350,
+            "contract_qty": 1,
+            "product_offer_id": null
+          }
+        ],
+        "row": {
+          "id": "916b1667-fb33-4216-a640-dda3dc22c861",
+          "status": "concluido",
+          "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+          "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+          "product_id": "cb4df8c1-3155-4d9f-8208-44e1a38c67dd",
+          "quantity": 1,
+          "price_total": 3.5,
+          "amount_paid_cents": null,
+          "payment_method": "MB WAY",
+          "shipping_method": "mao",
+          "stripe_payment_intent_id": null,
+          "stripe_refund_id": null,
+          "wallet_release_processed_at": null,
+          "wallet_refund_processed_at": null,
+          "stock_units_applied": 1
+        }
+      }
+    },
+    {
+      "id": "K7-payment-method-immutable",
+      "lente": "K7",
+      "actor": "buyer JWT",
+      "title": "JWT altera payment_method (plataforma → MB WAY)",
+      "passos": [
+        "PATCH payment_method na encomenda já capturada"
+      ],
+      "esperado": "order_money_fields_immutable",
+      "obtido": "HTTP 403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"order_money_fields_immutable\"}",
+      "severidade": "INFO",
+      "prova": {
+        "http": 403,
+        "body": {
+          "code": "42501",
+          "details": null,
+          "hint": null,
+          "message": "order_money_fields_immutable"
+        }
+      }
+    },
+    {
+      "id": "K7-stripe-refund-id-immutable",
+      "lente": "K7",
+      "actor": "seller JWT",
+      "title": "JWT grava stripe_refund_id falso",
+      "passos": [
+        "PATCH stripe_refund_id=re_fake"
+      ],
+      "esperado": "imutável",
+      "obtido": "HTTP 403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"order_money_fields_immutable\"}",
+      "severidade": "INFO",
+      "prova": {
+        "http": 403,
+        "body": {
+          "code": "42501",
+          "details": null,
+          "hint": null,
+          "message": "order_money_fields_immutable"
+        }
+      }
+    }
+  ],
+  "notes": {
+    "hold_order": {
+      "id": "a093d3ef-9ff6-4336-8f96-cccbaeaa9187",
+      "http_insert": {
+        "id": "a093d3ef-9ff6-4336-8f96-cccbaeaa9187",
+        "created_at": "2026-08-31T17:09:42.466858+00:00",
+        "product_id": "503160de-d47d-447b-af19-c5c84bcd1015",
+        "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+        "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+        "price_total": 4.2,
+        "shipping_method": null,
+        "payment_method": "Pagamento na app",
+        "proof_url": null,
+        "status": "reserva_pendente",
+        "reservation_expires_at": null,
+        "is_reservation": false,
+        "completed_at": null,
+        "auto_feedback_processed_at": null,
+        "returned_at": null,
+        "wallet_release_processed_at": null,
+        "wallet_refund_processed_at": null,
+        "bundle_id": null,
+        "quantity": 1,
+        "live_id": null,
+        "live_item_id": null,
+        "live_raffle_id": null,
+        "stripe_checkout_session_id": null,
+        "stripe_payment_intent_id": null,
+        "stripe_refund_id": null,
+        "stripe_refunded_at": null,
+        "stock_units_applied": null,
+        "amount_paid_cents": null,
+        "contract_unit_cents": 420,
+        "contract_qty": 1,
+        "product_offer_id": null
+      }
+    },
+    "chat_id": "2852d2af-4f03-4d84-a0b2-fd472f0bf0cd",
+    "plain_msg": {
+      "id": "891",
+      "http": 201
+    },
+    "json_msg": {
+      "id": "892",
+      "http": 201,
+      "body": [
+        {
+          "id": 892,
+          "created_at": "2026-08-31T17:09:45.580208+00:00",
+          "chat_id": "2852d2af-4f03-4d84-a0b2-fd472f0bf0cd",
+          "sender_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+          "text": "FLEABER_JSON_V1:{\"kind\":\"price_offer\",\"order_id\":\"a093d3ef-9ff6-4336-8f96-cccbaeaa9187\",\"amount\":1.0}",
+          "is_reservation": false,
+          "is_read": false,
+          "receiver_id": null
+        }
+      ]
+    },
+    "bom_insert": {
+      "http": 201,
+      "id": "893"
+    },
+    "lower_prefix": {
+      "http": 201,
+      "id": "894"
+    },
+    "mao_order": {
+      "id": "916b1667-fb33-4216-a640-dda3dc22c861",
+      "insert": {
+        "id": "916b1667-fb33-4216-a640-dda3dc22c861",
+        "created_at": "2026-08-31T17:09:46.954498+00:00",
+        "product_id": "cb4df8c1-3155-4d9f-8208-44e1a38c67dd",
+        "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+        "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+        "price_total": 3.5,
+        "shipping_method": "mao",
+        "payment_method": "MB WAY",
+        "proof_url": null,
+        "status": "reserva_pendente",
+        "reservation_expires_at": null,
+        "is_reservation": false,
+        "completed_at": null,
+        "auto_feedback_processed_at": null,
+        "returned_at": null,
+        "wallet_release_processed_at": null,
+        "wallet_refund_processed_at": null,
+        "bundle_id": null,
+        "quantity": 1,
+        "live_id": null,
+        "live_item_id": null,
+        "live_raffle_id": null,
+        "stripe_checkout_session_id": null,
+        "stripe_payment_intent_id": null,
+        "stripe_refund_id": null,
+        "stripe_refunded_at": null,
+        "stock_units_applied": null,
+        "amount_paid_cents": null,
+        "contract_unit_cents": 350,
+        "contract_qty": 1,
+        "product_offer_id": null
+      }
+    },
+    "mao_pago": {
+      "patch": 200,
+      "row": {
+        "id": "916b1667-fb33-4216-a640-dda3dc22c861",
+        "status": "pago",
+        "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+        "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+        "product_id": "cb4df8c1-3155-4d9f-8208-44e1a38c67dd",
+        "quantity": 1,
+        "price_total": 3.5,
+        "amount_paid_cents": null,
+        "payment_method": "MB WAY",
+        "shipping_method": "mao",
+        "stripe_payment_intent_id": null,
+        "stripe_refund_id": null,
+        "wallet_release_processed_at": null,
+        "wallet_refund_processed_at": null,
+        "stock_units_applied": 1
+      }
+    },
+    "paid_k3_pago": {
+      "http": 200,
+      "body_clip": "{\n  \"ok\": true,\n  \"order_id\": \"82a75d45-15e0-434a-9a45-3bb02a1e1b9e\",\n  \"product_id\": \"0c611fa6-4c27-424f-b0f4-c5588247b877\",\n  \"payment_intent_id\": \"pi_3UAYiOH7FWYUN3jh1E8O9TDL\",\n  \"pi_status\": \"succeeded\",\n  \"pi_amount_received\": 590,\n  \"initial_qty\": 2,\n  \"settle_http\": 200,\n  \"settle_body\": {\n    \"ok\": true,\n    \"settleResult\": \"paid\",\n    \"order\": {\n      \"id\": \"82a75d45-15e0-434a-9a45-3bb02a1e1b9e\",\n      \"status\": \"pago\",\n      \"stock_units_applied\": 1,\n      \"stripe_refund_id\": null,\n   "
+    },
+    "paid_k1_release": {
+      "http": 200,
+      "body_clip": "{\n  \"ok\": true,\n  \"order_id\": \"e4ef5d03-ba15-4749-92c7-d6a994f8d877\",\n  \"product_id\": \"e9ca9509-ce09-4b2e-9066-494c7249cddc\",\n  \"payment_intent_id\": \"pi_3UAYiWH7FWYUN3jh0YjkrwP2\",\n  \"pi_status\": \"succeeded\",\n  \"pi_amount_received\": 590,\n  \"initial_qty\": 2,\n  \"settle_http\": 200,\n  \"settle_body\": {\n    \"ok\": true,\n    \"settleResult\": \"paid\",\n    \"order\": {\n      \"id\": \"e4ef5d03-ba15-4749-92c7-d6a994f8d877\",\n      \"status\": \"pago\",\n      \"stock_units_applied\": 1,\n      \"stripe_refund_id\": null,\n   "
+    },
+    "k1_status": {
+      "envio": 200,
+      "envio_body": [
+        {
+          "id": "e4ef5d03-ba15-4749-92c7-d6a994f8d877",
+          "created_at": "2026-08-31T17:09:56.159433+00:00",
+          "product_id": "e9ca9509-ce09-4b2e-9066-494c7249cddc",
+          "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+          "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+          "price_total": 5.9,
+          "shipping_method": null,
+          "payment_method": "Pagamento na app",
+          "proof_url": null,
+          "status": "enviado",
+          "reservation_expires_at": null,
+          "is_reservation": false,
+          "completed_at": null,
+          "auto_feedback_processed_at": null,
+          "returned_at": null,
+          "wallet_release_processed_at": null,
+          "wallet_refund_processed_at": null,
+          "bundle_id": null,
+          "quantity": 1,
+          "live_id": null,
+          "live_item_id": null,
+          "live_raffle_id": null,
+          "stripe_checkout_session_id": null,
+          "stripe_payment_intent_id": "pi_3UAYiWH7FWYUN3jh0YjkrwP2",
+          "stripe_refund_id": null,
+          "stripe_refunded_at": null,
+          "stock_units_applied": 1,
+          "amount_paid_cents": 590,
+          "contract_unit_cents": 590,
+          "contract_qty": 1,
+          "product_offer_id": null
+        }
+      ],
+      "concluido": 200,
+      "concluido_body": [
+        {
+          "id": "e4ef5d03-ba15-4749-92c7-d6a994f8d877",
+          "created_at": "2026-08-31T17:09:56.159433+00:00",
+          "product_id": "e9ca9509-ce09-4b2e-9066-494c7249cddc",
+          "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+          "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+          "price_total": 5.9,
+          "shipping_method": null,
+          "payment_method": "Pagamento na app",
+          "proof_url": null,
+          "status": "concluido",
+          "reservation_expires_at": null,
+          "is_reservation": false,
+          "completed_at": "2026-08-31T17:09:59.027321+00:00",
+          "auto_feedback_processed_at": null,
+          "returned_at": null,
+          "wallet_release_processed_at": null,
+          "wallet_refund_processed_at": null,
+          "bundle_id": null,
+          "quantity": 1,
+          "live_id": null,
+          "live_item_id": null,
+          "live_raffle_id": null,
+          "stripe_checkout_session_id": null,
+          "stripe_payment_intent_id": "pi_3UAYiWH7FWYUN3jh0YjkrwP2",
+          "stripe_refund_id": null,
+          "stripe_refunded_at": null,
+          "stock_units_applied": 1,
+          "amount_paid_cents": 590,
+          "contract_unit_cents": 590,
+          "contract_qty": 1,
+          "product_offer_id": null
+        }
+      ],
+      "row": {
+        "id": "e4ef5d03-ba15-4749-92c7-d6a994f8d877",
+        "status": "concluido",
+        "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+        "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+        "product_id": "e9ca9509-ce09-4b2e-9066-494c7249cddc",
+        "quantity": 1,
+        "price_total": 5.9,
+        "amount_paid_cents": 590,
+        "payment_method": "Pagamento na app",
+        "shipping_method": null,
+        "stripe_payment_intent_id": "pi_3UAYiWH7FWYUN3jh0YjkrwP2",
+        "stripe_refund_id": null,
+        "wallet_release_processed_at": null,
+        "wallet_refund_processed_at": null,
+        "stock_units_applied": 1
+      }
+    },
+    "payout": {
+      "http": 200,
+      "body": {
+        "success": true,
+        "transferId": "tr_1UAYifH7FWYUN3jhIHGnI8Tf",
+        "balance": 0
+      }
+    }
+  }
+}

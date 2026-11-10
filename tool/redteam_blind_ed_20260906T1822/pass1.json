@@ -1,0 +1,456 @@
+{
+  "stamp": "20260906T1822",
+  "prefix": "RTED-20260906T1822",
+  "auditor": "REDTEAM_BLIND_ED_EDGE_POS_DTDY_v1",
+  "lenses": [
+    "ED1",
+    "ED2",
+    "ED3",
+    "ED4",
+    "ED5",
+    "ED6",
+    "ED7"
+  ],
+  "probes": [
+    {
+      "probe_id": "A3",
+      "edge_rpc": "create-payment-intent POST bag_checkout",
+      "payload": "B2 bag line_total_cents=1 qty=99 currency=usd amount=1 vs SKU 12,00€",
+      "http": "400 acao=* {\"error\":\"Checkout blocked: only EUR is supported.\"} loc=\"\"",
+      "stripe_bd": "{\"sid\":\"\",\"server_amount_cents\":\"\",\"amount_total\":\"\",\"price_total\":12.0}",
+      "result": "HOLD",
+      "lens": "ED1",
+      "count_finding": false,
+      "classe_nova": true,
+      "race": false
+    },
+    {
+      "probe_id": "A1",
+      "edge_rpc": "create-payment-intent POST?qs settle + GET fake",
+      "payload": "POST checkout_return=success&session_id unpaid + GET unpaid + GET cs_inexistente + whitespace sid",
+      "http": "{\"post\":\"400 acao=* {\\\"error\\\":\\\"Missing payment metadata.\\\"} loc=\\\"\\\"\",\"get\":\"402 acao=* Pagamento ainda não confirmado. Se já pagaste, aguarda alguns segundos e volta à app Fleaber. loc=\\\"\\\"\",\"fake\":\"400 acao=* Pagamento ainda não confirmado. Se já pagaste, aguarda alguns segundos e volta à app Fleaber. loc=\\\"\\\"\",\"ws\":\"400 acao=* Pagamento ainda não confir…",
+      "stripe_bd": "{\"status\":\"reserva_pendente\",\"amount_paid_cents\":\"\"}",
+      "result": "HOLD",
+      "lens": "ED1",
+      "count_finding": false,
+      "classe_nova": true,
+      "race": false
+    },
+    {
+      "probe_id": "A2",
+      "edge_rpc": "create-payment-intent GET session alheio",
+      "payload": "GET CPI settle cs_tip + GET CPI settle pi_ (PI 4242) order_id=oidB",
+      "http": "{\"tip_create\":\"200 acao=* {\\\"checkoutUrl\\\":\\\"https://checkout.stripe.com/c/pay/cs_test_a1Vhzi0w61DqImORwh7fnxNj2zYfX00aQHwyDLbe1AOttczNEoPM9n9oJH#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gf… loc=\\\"\\\"\",\"tip_on_cpi\":\"402 acao=* Pagamento ainda não confirmado. Se já pagaste, aguarda alguns segundos e volta à app Fleaber. …",
+      "stripe_bd": "{\"oidB\":\"reserva_pendente\",\"paid_oid\":\"pago\",\"sidTip\":\"cs_test_a1Vhzi0w61DqImORwh7fnxNj2zYfX00aQHwyDLbe1AOttczNEoPM9n9oJH\",\"pi\":\"pi_3UCjsXH7FWYUN3jh1Zj0zON3\"}",
+      "result": "HOLD",
+      "lens": "ED1",
+      "count_finding": false,
+      "classe_nova": true,
+      "race": false
+    },
+    {
+      "probe_id": "A4",
+      "edge_rpc": "GET cancel + POST reuse + fase2_e2e_settle JWT buyer",
+      "payload": "GET checkout_return=cancel sidA; 2.º POST mesma order; POST ?fase2_e2e_settle=1 JWT B2 no oidB+PI alheio",
+      "http": "{\"cancel\":\"402 acao=* Pagamento ainda não confirmado. Se já pagaste, aguarda alguns segundos e volta à app Fleaber. loc=\\\"\\\"\",\"reuse\":\"200 acao=* {\\\"checkoutUrl\\\":\\\"https://checkout.stripe.com/c/pay/cs_test_a1oiy9l2jdHlTsQluY7QLiWhBVc9kG3AHFBg1OB03Fvn0gcpFEscAEOYQT#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gf… loc=\\\"\\\"\"…",
+      "stripe_bd": "{\"sidA\":\"cs_test_a1oiy9l2jdHlTsQluY7QLiWhBVc9kG3AHFBg1OB03Fvn0gcpFEscAEOYQT\",\"reuseSid\":\"cs_test_a1oiy9l2jdHlTsQluY7QLiWhBVc9kG3AHFBg1OB03Fvn0gcpFEscAEOYQT\",\"oidA\":\"reserva_pendente\",\"oidB\":\"reserva_pendente\"}",
+      "result": "HOLD",
+      "lens": "ED1",
+      "count_finding": false,
+      "classe_nova": true,
+      "race": false
+    },
+    {
+      "probe_id": "A5",
+      "edge_rpc": "create-payment-intent GET ∥ POST settle",
+      "payload": "Future.wait GET settle sidA ∥ POST ?checkout_return=success sidA",
+      "http": "{\"get\":\"402 acao=* Pagamento ainda não confirmado. Se já pagaste, aguarda alguns segundos e volta à app Fleaber. loc=\\\"\\\"\",\"post\":\"400 acao=* {\\\"error\\\":\\\"Missing payment metadata.\\\"} loc=\\\"\\\"\"}",
+      "stripe_bd": "{\"status\":\"reserva_pendente\",\"amount_paid_cents\":\"\"}",
+      "result": "HOLD",
+      "lens": "ED6",
+      "count_finding": false,
+      "classe_nova": true,
+      "race": true
+    },
+    {
+      "probe_id": "B1",
+      "edge_rpc": "create-live-tip-checkout POST + RPC settle JWT",
+      "payload": "amount 0/-1/\"2,00\"/0.5/501/\"1e6\" + playback_id + tip_id + live fake + batata_settle_live_tip JWT B2",
+      "http": "{\"0\":\"400 acao=* {\\\"error\\\":\\\"Invalid tip amount.\\\"} loc=\\\"\\\"\",\"-1\":\"400 acao=* {\\\"error\\\":\\\"Invalid tip amount.\\\"} loc=\\\"\\\"\",\"2,00\":\"400 acao=* {\\\"error\\\":\\\"Invalid tip amount.\\\"} loc=\\\"\\\"\",\"0.5\":\"400 acao=* {\\\"error\\\":\\\"Invalid tip amount.\\\"} loc=\\\"\\\"\",\"501\":\"400 acao=* {\\\"error\\\":\\\"Tip amount too high.\\\"} loc=\\\"\\\"\",\"1e6\":\"400 acao=* {\\\"error\\\":\\\"Tip amoun…",
+      "stripe_bd": "{\"rpc_json\":{\"code\":\"42501\",\"details\":\"\",\"hint\":\"\",\"message\":\"permission denied for function batata_settle_live_tip_from_stripe\"},\"rpc_status\":403}",
+      "result": "HOLD",
+      "lens": "ED2",
+      "count_finding": false,
+      "classe_nova": true,
+      "race": false
+    },
+    {
+      "probe_id": "B2",
+      "edge_rpc": "tip GET settle ∥ end_live/unpublish",
+      "payload": "Session tip unpaid já criada; Future.wait GET settle ∥ PATCH ended ∥ hub unpublish",
+      "http": "{\"create\":\"200 acao=* {\\\"checkoutUrl\\\":\\\"https://checkout.stripe.com/c/pay/cs_test_a1TtIRZ37TH0WEP8vt01Y9krVBr725YQZyJqd8Y1v7MMGW4SBEXnJggFnv#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gf… loc=\\\"\\\"\",\"settle\":\"200 acao=* Pagamento ainda não confirmado. Se já pagaste, aguarda alguns segundos e volta à app Fleaber. loc=\\\"\\\"…",
+      "stripe_bd": "{\"tip_id\":\"dd2b3cfc-46e4-4a3b-9e67-8259a3ac8379\",\"tip_status\":\"pending\",\"delta_wallet\":0.0}",
+      "result": "HOLD",
+      "lens": "ED6",
+      "count_finding": false,
+      "classe_nova": true,
+      "race": true
+    },
+    {
+      "probe_id": "B3",
+      "edge_rpc": "create-live-tip-checkout POST",
+      "payload": "seller_id S2 na live S1; seller_id S1 na live S2",
+      "http": "{\"s2_on_s1\":\"400 acao=* {\\\"error\\\":\\\"Tip seller does not own this live.\\\"} loc=\\\"\\\"\",\"s1_on_s2\":\"400 acao=* {\\\"error\\\":\\\"Tip seller does not own this live.\\\"} loc=\\\"\\\"\"}",
+      "stripe_bd": "",
+      "result": "HOLD",
+      "lens": "ED2",
+      "count_finding": false,
+      "classe_nova": false,
+      "race": false
+    },
+    {
+      "probe_id": "B4",
+      "edge_rpc": "tip POST ∥ CPI bag/checkout + GET unpaid",
+      "payload": "Future.wait tip Session ∥ create-payment-intent mesma B2; GET tip unpaid",
+      "http": "{\"tip\":\"200 acao=* {\\\"checkoutUrl\\\":\\\"https://checkout.stripe.com/c/pay/cs_test_a1F2IaGnwcBNKH6ZMZEoLDkTmB47lSR8KgXuJeVNL3eAmS6btzq6VojpYs#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gf… loc=\\\"\\\"\",\"cpi\":\"200 acao=* {\\\"checkoutUrl\\\":\\\"https://checkout.stripe.com/c/pay/cs_test_a1OP7IL5xen2X7fYz7Mqk6rd1gEmPggunOQpi78TZo8om7d…",
+      "stripe_bd": "{\"tip_status\":\"pending\",\"cpi_status\":\"reserva_pendente\",\"delta_wallet\":0.0,\"sid_tip\":\"cs_test_a1F2IaGnwcBNKH6ZMZEoLDkTmB47lSR8KgXuJeVNL3eAmS6btzq6VojpYs\",\"sid_cpi\":\"cs_test_a1OP7IL5xen2X7fYz7Mqk6rd1gEmPggunOQpi78TZo8om7d7WUmq1zG9tE\"}",
+      "result": "HOLD",
+      "lens": "ED6",
+      "count_finding": false,
+      "classe_nova": true,
+      "race": true
+    },
+    {
+      "probe_id": "C1",
+      "edge_rpc": "stripe-webhook POST forge + replay",
+      "payload": "POST sem sig + 2× mesmo body checkout.session.completed paid v1=deadbeef Origin null",
+      "http": "{\"no_sig\":\"400 acao=\\\"\\\" {\\\"ok\\\":false,\\\"error\\\":\\\"missing_signature\\\"} loc=\\\"\\\"\",\"r1\":\"400 acao=\\\"\\\" {\\\"ok\\\":false,\\\"error\\\":\\\"invalid_signature\\\"} loc=\\\"\\\"\",\"r2\":\"400 acao=\\\"\\\" {\\\"ok\\\":false,\\\"error\\\":\\\"invalid_signature\\\"} loc=\\\"\\\"\",\"get\":\"405 acao=\\\"\\\" {\\\"ok\\\":false,\\\"error\\\":\\\"method_not_allowed\\\"} loc=\\\"\\\"\"}",
+      "stripe_bd": "{\"no_sig_acao\":\"\",\"r1_acao\":\"\"}",
+      "result": "HOLD",
+      "lens": "ED3",
+      "count_finding": false,
+      "classe_nova": true,
+      "race": false
+    },
+    {
+      "probe_id": "C2",
+      "edge_rpc": "CORS OPTIONS/GET Origin null / evil / chrome-extension",
+      "payload": "Origin: null + https://evil.com + chrome-extension:// em CPI/tip/refund/webhook",
+      "http": "{\"opt_null_cpi\":\"200 acao=https://fleaber.pt ok loc=\\\"\\\"\",\"post_null_tip\":\"200 acao=https://fleaber.pt ok loc=\\\"\\\"\",\"opt_null_refund\":\"200 acao=https://fleaber.pt ok loc=\\\"\\\"\",\"get_null\":\"400 acao=https://fleaber.pt Pagamento ainda não confirmado. Se já pagaste, aguarda alguns segundos e volta à app Fleaber. loc=\\\"\\\"\",\"opt_evil\":\"200 acao=https://fleaber.pt …",
+      "stripe_bd": "{\"acao_opt_null_cpi\":\"https://fleaber.pt\",\"acao_post_null_tip\":\"https://fleaber.pt\",\"acao_opt_null_refund\":\"https://fleaber.pt\",\"acao_get_null\":\"https://fleaber.pt\",\"acao_opt_evil\":\"https://fleaber.pt\",\"acao_opt_ext\":\"https://fleaber.pt\",\"acao_opt_wh_null\":\"*\"}",
+      "result": "HOLD",
+      "lens": "ED4",
+      "count_finding": false,
+      "classe_nova": true,
+      "race": false
+    },
+    {
+      "probe_id": "C3",
+      "edge_rpc": "refund-order buyer + seller ×2",
+      "payload": "JWT comprador 0e4819ba-4df6-4ee2-b4fd-c7bd227a4b48; seller refund 2× fae7ade0-b01d-441c-8165-abf2bab3dc60",
+      "http": "{\"buyer\":\"403 acao=* {\\\"ok\\\":false,\\\"error\\\":\\\"Sem permissão.\\\"} loc=\\\"\\\"\",\"r1\":\"200 acao=* {\\\"ok\\\":true,\\\"already_refunded\\\":true,\\\"idempotent\\\":true,\\\"refund_id\\\":\\\"re_3UCjswH7FWYUN3jh0SukLkfs\\\",\\\"status\\\":\\\"cancelado\\\",\\\"stock_units_applied\\\":null,\\\"amount_cents\\\":590,\\\"payment_intent\\\":\\\"pi_3UCjswH7FWYUN3jh0… loc=\\\"\\\"\",\"r2\":\"200 acao=* {\\\"ok\\\":true,\\\"alr…",
+      "stripe_bd": "{\"buyer_refund_id\":\"\",\"buyer_status\":\"pago\",\"deltaSeller\":0.0,\"refund1\":\"re_3UCjswH7FWYUN3jh0SukLkfs\",\"refund2\":\"re_3UCjswH7FWYUN3jh0SukLkfs\",\"pi_buyer\":\"pi_3UCjssH7FWYUN3jh003IolGy\",\"pi_seller\":\"pi_3UCjswH7FWYUN3jh0L4nyi4o\"}",
+      "result": "HOLD",
+      "lens": "ED5",
+      "count_finding": false,
+      "classe_nova": false,
+      "race": false
+    },
+    {
+      "probe_id": "C4",
+      "edge_rpc": "refund-order ∥ batata_release_seller_wallet_for_order",
+      "payload": "Future.wait refund seller + release buyer/seller no pago",
+      "http": "[\"200 acao=* {\\\"ok\\\":true,\\\"already_refunded\\\":true,\\\"idempotent\\\":true,\\\"refund_id\\\":\\\"re_3UCjt2H7FWYUN3jh1MVXfprJ\\\",\\\"status\\\":\\\"cancelado\\\",\\\"stock_units_applied\\\":null,\\\"amount_cents\\\":590,\\\"payment_intent\\\":\\\"pi_3UCjt2H7FWYUN3jh1… loc=\\\"\\\"\",\"200 acao=\\\"\\\" false loc=\\\"\\\"\",\"200 acao=\\\"\\\" false loc=\\\"\\\"\"]",
+      "stripe_bd": "{\"refunded\":true,\"released\":false,\"delta\":0.0,\"pi\":\"pi_3UCjt2H7FWYUN3jh1ZVERhG1\"}",
+      "result": "HOLD",
+      "lens": "ED6",
+      "count_finding": false,
+      "classe_nova": false,
+      "race": true
+    },
+    {
+      "probe_id": "D1",
+      "edge_rpc": "e2e settle_get_replay + GET settle extra",
+      "payload": "PI 4242 + Checkout Session paga + GET settle 2× e2e + 3.º GET auditor",
+      "http": "{\"e2e\":\"500 acao=* {\\n  \\\"ok\\\": false,\\n  \\\"error\\\": \\\"session missing payment_intent\\\",\\n  \\\"session_id\\\": \\\"cs_test_a1b6QBmLXzpDnH5rCRNcNYaIIZOWDjsrYvZUiW1SIm1lqM7WKN3arthQGh\\\",\\n  \\\"session_status\\\": \\\"open\\\",\\n  \\\"session_payment_statu… loc=\\\"\\\"\",\"extra\":\"402 acao=* Pagamento ainda não confirmado. Se já pagaste, aguarda alguns segundos e volta à app Flea…",
+      "stripe_bd": "{\"oid\":\"\",\"sid\":\"cs_test_a1b6QBmLXzpDnH5rCRNcNYaIIZOWDjsrYvZUiW1SIm1lqM7WKN3arthQGh\",\"pi\":\"\",\"status\":\"\",\"amount_paid_cents\":\"\",\"refund_id\":\"\",\"delta_wallet\":0.0,\"settle1\":\"\",\"settle2\":\"\"}",
+      "result": "SKIP",
+      "lens": "ED7",
+      "count_finding": false,
+      "classe_nova": true,
+      "race": false
+    },
+    {
+      "probe_id": "D2",
+      "edge_rpc": "create-live-tip-checkout Session + RPC buyer + GET unpaid",
+      "payload": "POST tip 2€ Session TEST; JWT B2 RPC settle paid_cents=200; GET unpaid",
+      "http": "{\"create\":\"200 acao=* {\\\"checkoutUrl\\\":\\\"https://checkout.stripe.com/c/pay/cs_test_a1V0SkdYklX1A5mDKpFlPmjuBDHsKJOG7z2ZnG9JDN33VWTmFOG8ziim8w#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gf… loc=\\\"\\\"\",\"rpc\":\"403 acao=\\\"\\\" {\\\"code\\\":\\\"42501\\\",\\\"details\\\":null,\\\"hint\\\":null,\\\"message\\\":\\\"permission denied for function batata…",
+      "stripe_bd": "{\"sid\":\"cs_test_a1V0SkdYklX1A5mDKpFlPmjuBDHsKJOG7z2ZnG9JDN33VWTmFOG8ziim8w\",\"tip_id\":\"e59c8c44-51ea-4985-be38-cb76d8bfe395\",\"tip_status\":\"pending\",\"delta_wallet\":0.0,\"rpc_json\":{\"code\":\"42501\",\"details\":\"\",\"hint\":\"\",\"message\":\"permission denied for function batata_settle_live_tip_from_stripe\"}}",
+      "result": "HOLD",
+      "lens": "ED7",
+      "count_finding": false,
+      "classe_nova": true,
+      "race": false
+    },
+    {
+      "probe_id": "D3",
+      "edge_rpc": "create-payment-intent POST amount hostil + GET settle amount qs",
+      "payload": "body amount/total/amount_total=1 vs SKU 12€; GET settle &amount=1 unpaid",
+      "http": "{\"ck\":\"200 acao=* {\\\"checkoutUrl\\\":\\\"https://checkout.stripe.com/c/pay/cs_test_a1UVSkcUq4oDAz3YJOQUBvxdRFmhA4uIFceRaMlusf3C99o3K80W3NnTXR#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gf… loc=\\\"\\\"\",\"settle\":\"402 acao=* Pagamento ainda não confirmado. Se já pagaste, aguarda alguns segundos e volta à app Fleaber. loc=\\\"\\\"\"}",
+      "stripe_bd": "{\"server_amount_cents\":1325,\"amount_total\":1325,\"status\":\"reserva_pendente\",\"sid\":\"cs_test_a1UVSkcUq4oDAz3YJOQUBvxdRFmhA4uIFceRaMlusf3C99o3K80W3NnTXR\"}",
+      "result": "HOLD",
+      "lens": "ED7",
+      "count_finding": false,
+      "classe_nova": true,
+      "race": false
+    }
+  ],
+  "findings": [],
+  "blocked": [
+    {
+      "id": "A3.bag",
+      "lens": "ED1",
+      "title": "bag quote servidor; line_total cliente ignorado",
+      "ev": {
+        "quoted": "",
+        "amount_total": "",
+        "status": 400
+      }
+    },
+    {
+      "id": "A1.post",
+      "lens": "ED1",
+      "title": "POST qs settle unpaid sem crédito / sem oráculo",
+      "ev": {
+        "post": 400,
+        "get": 402,
+        "fake": 400,
+        "status": "reserva_pendente"
+      }
+    },
+    {
+      "id": "A2.alheio",
+      "lens": "ED1",
+      "title": "cs_tip/pi_ não liquidam oidB",
+      "ev": {
+        "oidB": "reserva_pendente",
+        "tip": 402,
+        "pi": 400
+      }
+    },
+    {
+      "id": "A4.reuse",
+      "lens": "ED1",
+      "title": "cancel/reuse sem captura; fase2 JWT recusado",
+      "ev": {
+        "reuseSid": "cs_test_a1oiy9l2jdHlTsQluY7QLiWhBVc9kG3AHFBg1OB03Fvn0gcpFEscAEOYQT",
+        "fase2": 401,
+        "oidA": "reserva_pendente",
+        "oidB": "reserva_pendente"
+      }
+    },
+    {
+      "id": "A5.race",
+      "lens": "ED6",
+      "title": "GET∥POST unpaid sem crédito",
+      "ev": {
+        "get": 402,
+        "post": 400,
+        "status": "reserva_pendente"
+      }
+    },
+    {
+      "id": "B1.hostil",
+      "lens": "ED2",
+      "title": "amount/tip_id/live/RPC buyer recusados",
+      "ev": {
+        "0": "400 acao=* {\"error\":\"Invalid tip amount.\"} loc=\"\"",
+        "-1": "400 acao=* {\"error\":\"Invalid tip amount.\"} loc=\"\"",
+        "2,00": "400 acao=* {\"error\":\"Invalid tip amount.\"} loc=\"\"",
+        "0.5": "400 acao=* {\"error\":\"Invalid tip amount.\"} loc=\"\"",
+        "501": "400 acao=* {\"error\":\"Tip amount too high.\"} loc=\"\"",
+        "1e6": "400 acao=* {\"error\":\"Tip amount too high.\"} loc=\"\"",
+        "null+playback": "400 acao=* {\"error\":\"Invalid tip amount.\"} loc=\"\"",
+        "tip_id": "400 acao=* {\"error\":\"Client tip_id is not allowed.\"} loc=\"\"",
+        "live_fake": "400 acao=* {\"error\":\"Live not found for tip.\"} loc=\"\"",
+        "rpc_buyer": "403 acao=\"\" {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_settle_live_tip_from_stripe\"} loc=\"\""
+      }
+    },
+    {
+      "id": "B2.race",
+      "lens": "ED6",
+      "title": "GET settle∥end unpaid sem crédito",
+      "ev": {
+        "settle": 200,
+        "status": "pending",
+        "delta": 0.0
+      }
+    },
+    {
+      "id": "B3.owner",
+      "lens": "ED2",
+      "title": "seller≠owner 400 (residual clássico)",
+      "ev": {
+        "wrong": "400 acao=* {\"error\":\"Tip seller does not own this live.\"} loc=\"\"",
+        "s2own": "400 acao=* {\"error\":\"Tip seller does not own this live.\"} loc=\"\""
+      }
+    },
+    {
+      "id": "B4.race",
+      "lens": "ED6",
+      "title": "tip∥CPI unpaid sem crédito",
+      "ev": {
+        "tip": "pending",
+        "cpi": "reserva_pendente",
+        "delta": 0.0
+      }
+    },
+    {
+      "id": "C1.replay",
+      "lens": "ED3",
+      "title": "webhook recusa forge e replay (400)",
+      "ev": {
+        "no_sig": 400,
+        "r1": 400,
+        "r2": 400,
+        "get": 405
+      }
+    },
+    {
+      "id": "C2.cors",
+      "lens": "ED4",
+      "title": "Origin null/evil/ext não ecoado",
+      "ev": {
+        "opt_null_cpi": "https://fleaber.pt",
+        "post_null_tip": "https://fleaber.pt",
+        "opt_null_refund": "https://fleaber.pt",
+        "get_null": "https://fleaber.pt",
+        "opt_evil": "https://fleaber.pt",
+        "opt_ext": "https://fleaber.pt",
+        "opt_wh_null": "*"
+      }
+    },
+    {
+      "id": "C3.refund",
+      "lens": "ED5",
+      "title": "buyer 403; seller 2.º idempotente",
+      "ev": {
+        "buyer": 403,
+        "r1": "200 acao=* {\"ok\":true,\"already_refunded\":true,\"idempotent\":true,\"refund_id\":\"re_3UCjswH7FWYUN3jh0SukLkfs\",\"status\":\"cancelado\",\"stock_units_applied\":null,\"amount_cents\":590,\"payment_intent\":\"pi_3UCjswH7FWYUN3jh0… loc=\"\"",
+        "r2": "200 acao=* {\"ok\":true,\"already_refunded\":true,\"idempotent\":true,\"refund_id\":\"re_3UCjswH7FWYUN3jh0SukLkfs\",\"status\":\"cancelado\",\"stock_units_applied\":null,\"amount_cents\":590,\"payment_intent\":\"pi_3UCjswH7FWYUN3jh0… loc=\"\"",
+        "id1": "re_3UCjswH7FWYUN3jh0SukLkfs",
+        "id2": "re_3UCjswH7FWYUN3jh0SukLkfs"
+      }
+    },
+    {
+      "id": "C4.race",
+      "lens": "ED6",
+      "title": "race pago sem crédito+refund simultâneo",
+      "ev": {
+        "refunded": true,
+        "released": false,
+        "delta": 0.0
+      }
+    },
+    {
+      "id": "D2.unpaid",
+      "lens": "ED7",
+      "title": "tip Session TEST unpaid Δwallet 0; RPC buyer recusado",
+      "ev": {
+        "status": "pending",
+        "delta": 0.0,
+        "rpc": 403,
+        "sid": "cs_test_a1V0SkdYklX1A5mDKpFlPmjuBDHsKJOG7z2ZnG9JDN33VWTmFOG8ziim8w"
+      }
+    },
+    {
+      "id": "D3.server",
+      "lens": "ED7",
+      "title": "servidor ganha amount; GET qs amount inerte",
+      "ev": {
+        "quoted": 1325,
+        "amount_total": 1325,
+        "settle": 402,
+        "status": "reserva_pendente"
+      }
+    }
+  ],
+  "skipped": [
+    {
+      "id": "D1",
+      "lens": "ED7",
+      "title": "settle_get_replay não liquidou",
+      "ev": "500 acao=* {\n  \"ok\": false,\n  \"error\": \"session missing payment_intent\",\n  \"session_id\": \"cs_test_a1b6QBmLXzpDnH5rCRNcNYaIIZOWDjsrYvZUiW1SIm1lqM7WKN3arthQGh\",\n  \"session_status\": \"open\",\n  \"session_payment_statu… loc=\"\""
+    }
+  ],
+  "notes": [
+    {
+      "id": "fixture.paid",
+      "lens": "ED1",
+      "title": "setup_paid_order Stripe TEST",
+      "ev": "200 acao=* {\n  \"ok\": true,\n  \"order_id\": \"ebe08ada-f298-4f89-be5b-c8f03b2bfe73\",\n  \"product_id\": \"cbb2e16c-d5cb-4a9a-9d7e-c12fb43cc666\",\n  \"payment_intent_id\": \"pi_3UCjsXH7FWYUN3jh1Zj0zON3\",\n  \"pi_status\": \"succ… loc=\"\""
+    },
+    {
+      "id": "fixture.paid",
+      "lens": "ED5",
+      "title": "setup_paid_order Stripe TEST",
+      "ev": "200 acao=* {\n  \"ok\": true,\n  \"order_id\": \"0e4819ba-4df6-4ee2-b4fd-c7bd227a4b48\",\n  \"product_id\": \"4a98d3c9-4950-4fc6-9106-9dbb3c0c7104\",\n  \"payment_intent_id\": \"pi_3UCjssH7FWYUN3jh003IolGy\",\n  \"pi_status\": \"succ… loc=\"\""
+    },
+    {
+      "id": "fixture.paid",
+      "lens": "ED5",
+      "title": "setup_paid_order Stripe TEST",
+      "ev": "200 acao=* {\n  \"ok\": true,\n  \"order_id\": \"fae7ade0-b01d-441c-8165-abf2bab3dc60\",\n  \"product_id\": \"815033e6-2685-4e57-948b-ec826d1b3905\",\n  \"payment_intent_id\": \"pi_3UCjswH7FWYUN3jh0L4nyi4o\",\n  \"pi_status\": \"succ… loc=\"\""
+    },
+    {
+      "id": "fixture.paid",
+      "lens": "ED6",
+      "title": "setup_paid_order Stripe TEST",
+      "ev": "200 acao=* {\n  \"ok\": true,\n  \"order_id\": \"327ec38b-7013-4566-ba67-b5d4298ef835\",\n  \"product_id\": \"4b212c1e-ee07-4d92-b4ed-82a4dfdcd58a\",\n  \"payment_intent_id\": \"pi_3UCjt2H7FWYUN3jh1ZVERhG1\",\n  \"pi_status\": \"succ… loc=\"\""
+    }
+  ],
+  "actors": {
+    "buyer": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+    "seller": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+    "buyer2": "7e0529b9-be58-4024-a3d0-d4a59ae98e7b",
+    "seller2": "cea10e24-2bd5-499f-860a-af4e62292030"
+  },
+  "created": {
+    "orders": [
+      "9a6945b1-5267-4f84-b176-1e90e74131da",
+      "abbfde6b-9501-4bdb-aaba-0017bcc4ad6d",
+      "46d55bb7-cf1c-4f9d-8ea4-40df90370f7b",
+      "ebe08ada-f298-4f89-be5b-c8f03b2bfe73",
+      "cc04f03c-2cef-4baa-adb2-8de43c5015f6",
+      "0e4819ba-4df6-4ee2-b4fd-c7bd227a4b48",
+      "fae7ade0-b01d-441c-8165-abf2bab3dc60",
+      "327ec38b-7013-4566-ba67-b5d4298ef835",
+      "0e20e031-6f42-4fa4-9ac6-2a31cfe7106c"
+    ],
+    "products": [
+      "606d07a9-487a-4546-b523-996cd14f4a4c",
+      "4af276e1-7cdd-4762-9cc0-d1c3f35b74bb",
+      "ce57f68f-752f-4809-8ed2-e020f6b3613d",
+      "cbb2e16c-d5cb-4a9a-9d7e-c12fb43cc666",
+      "d9821e5a-2992-4644-a454-ca9b8b898973",
+      "4a98d3c9-4950-4fc6-9106-9dbb3c0c7104",
+      "815033e6-2685-4e57-948b-ec826d1b3905",
+      "4b212c1e-ee07-4d92-b4ed-82a4dfdcd58a",
+      "5862c47c-a352-4c48-a0d6-602c1d4dbed0"
+    ],
+    "lives": [
+      "51ed36b0-c8e1-46a1-a491-9ac296577d13",
+      "b34180fd-8da4-43ef-90f4-a5ce68c79c00",
+      "10163f3d-0440-4665-b2e5-db8e498e9649",
+      "30d447d0-0685-47e4-9785-182b2b25d1a8",
+      "f84a92b8-c627-48a3-9ac9-9243f24e65a3",
+      "00ddfece-4307-4e30-aaca-568c7eb02a57"
+    ],
+    "tips": [
+      "1ba3bd49-5e6e-4096-b2b7-d4462d383064",
+      "dd2b3cfc-46e4-4a3b-9e67-8259a3ac8379",
+      "baca49a2-8c8c-4e25-a9ce-397b4977891d",
+      "e59c8c44-51ea-4985-be38-cb76d8bfe395"
+    ]
+  }
+}

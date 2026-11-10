@@ -1,0 +1,451 @@
+{
+  "stamp": "20260906T1708",
+  "prefix": "RTDP-20260906T1708",
+  "auditor": "REDTEAM_BLIND_DP_WALLET_PAYOUT_POS_DHDM_v1",
+  "lenses": [
+    "DP1",
+    "DP2",
+    "DP3",
+    "DP4",
+    "DP5",
+    "DP6",
+    "DP7"
+  ],
+  "classe_nova": [
+    "A2",
+    "A3",
+    "A4",
+    "A4b",
+    "A5",
+    "B3",
+    "B5",
+    "C2",
+    "C3b",
+    "C4",
+    "C5"
+  ],
+  "probes": [
+    {
+      "probe_id": "A1",
+      "edge_rpc": "POST wallet_transactions JWT",
+      "payload": "buyer+seller INSERT credit 50/80 type=venda",
+      "http": "B 403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"new row violates row-level security policy for table \\\"wallet_transactions\\\"\"} loc=\"\" | S 403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"new row violates row-level security policy for table \\\"wallet_transactions\\\"\"} loc=\"\"",
+      "stripe_bd": "ΔB=0.0 ΔS=0.0",
+      "result": "HOLD",
+      "lens": "DP1",
+      "classe_nova": false,
+      "count_finding": false
+    },
+    {
+      "probe_id": "A2",
+      "edge_rpc": "rpc credit/debit/tip/ensure JWT",
+      "payload": "credit_wallet_once + payout_debit + apply_tip_once + ensure_wallet alheio",
+      "http": "credit 403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_credit_wallet_once\"} loc=\"\" | debit 403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_wallet_payout_debit\"} loc=\"\" | tip 403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function b…",
+      "stripe_bd": "ΔS=0.0",
+      "result": "HOLD",
+      "lens": "DP1",
+      "classe_nova": true,
+      "count_finding": false
+    },
+    {
+      "probe_id": "A3",
+      "edge_rpc": "PATCH wallets JWT",
+      "payload": "balance=9999.99 + available=9999 + stripe_account_id=acct_1UChokHMTQUwRF3q",
+      "http": "bal 200 [] loc=\"\" | avail 400 {\"code\":\"PGRST204\",\"details\":null,\"hint\":null,\"message\":\"Could not find the 'available' column of 'wallets' in the schema cache\"} loc=\"\" | dest 200 [] loc=\"\"",
+      "stripe_bd": "ΔS=0.0 dest_before=acct_1U5mYbQeUNx8ar08 dest_after=acct_1U5mYbQeUNx8ar08 hijack=false",
+      "result": "HOLD",
+      "lens": "DP1",
+      "classe_nova": true,
+      "count_finding": false
+    },
+    {
+      "probe_id": "A4",
+      "edge_rpc": "create-live-tip-checkout POST+GET unpaid",
+      "payload": "live a23a69ec-820e-47b0-8040-06cda63af840 amount_eur=2 sem pagar Session",
+      "http": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1ZEzzclyHeQ1dz26X29S3xP5FarC6K58xErWCbMeZpJs2aQaP3zmWdcy8#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21… loc=\"\" settle=200 Pagamento ainda não confirmado. Se já pagaste, aguarda alguns segundos e volta à app Fleaber. lo…",
+      "stripe_bd": "sid=cs_test_a1ZEzzclyHeQ1dz26X29S3xP5FarC6K58xErWCbMeZpJs2aQaP3zmWdcy8 tip=c93887b0-3a70-45e7-94d3-748d3e978330 status=pending ΔS=0.0",
+      "result": "HOLD",
+      "lens": "DP7",
+      "classe_nova": true,
+      "count_finding": false
+    },
+    {
+      "probe_id": "A4b",
+      "edge_rpc": "rpc batata_send_live_tip_from_wallet",
+      "payload": "buyer amount=99999 (overbalance) · seller self-tip 2€",
+      "http": "over 403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"not_allowed\"} loc=\"\" | self 400 {\"code\":\"P0001\",\"details\":null,\"hint\":null,\"message\":\"Vendedor inválido para gorjeta.\"} loc=\"\"",
+      "stripe_bd": "ΔS=0.0",
+      "result": "HOLD",
+      "lens": "DP1",
+      "classe_nova": true,
+      "count_finding": false
+    },
+    {
+      "probe_id": "A5",
+      "edge_rpc": "POST wallet_payout_ledger JWT",
+      "payload": "seller INSERT ledger transferred tr_fake",
+      "http": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"new row violates row-level security policy for table \\\"wallet_payout_ledger\\\"\"} loc=\"\"",
+      "stripe_bd": "",
+      "result": "HOLD",
+      "lens": "DP1",
+      "classe_nova": true,
+      "count_finding": false
+    },
+    {
+      "probe_id": "D1",
+      "edge_rpc": "e2e setup_paid_order (4242 / pm_card_visa)",
+      "payload": "PI TEST confirm order=87bdfdef-790e-4c6c-ac07-7f0a39ff331a",
+      "http": "status=pago pi=pi_3UCiauH7FWYUN3jh1xBciTsL paid_cents=590",
+      "stripe_bd": "ΔS=0.0 ΔB=0.0 release_at=null",
+      "result": "HOLD",
+      "lens": "DP7",
+      "classe_nova": false,
+      "count_finding": false
+    },
+    {
+      "probe_id": "B1",
+      "edge_rpc": "batata_release_seller_wallet_for_order",
+      "payload": "release em status=pago sem receção / sem concluido",
+      "http": "buyer 200 false loc=\"\" | seller 200 false loc=\"\"",
+      "stripe_bd": "ΔS=0.0 status=pago",
+      "result": "HOLD",
+      "lens": "DP2",
+      "classe_nova": false,
+      "count_finding": false
+    },
+    {
+      "probe_id": "B3",
+      "edge_rpc": "batata_release_seller_wallet_for_order JWT seller2",
+      "payload": "seller2 release order S1/B1 87bdfdef-790e-4c6c-ac07-7f0a39ff331a",
+      "http": "200 false loc=\"\"",
+      "stripe_bd": "ΔS=0.0",
+      "result": "HOLD",
+      "lens": "DP5",
+      "classe_nova": true,
+      "count_finding": false
+    },
+    {
+      "probe_id": "B4",
+      "edge_rpc": "release ×2 JWT buyer (concluido+mão fixture)",
+      "payload": "order aa2e4acc-7ce5-433f-9177-c4b773a33f44 2× batata_release",
+      "http": "1 200 true loc=\"\" | 2 200 false loc=\"\"",
+      "stripe_bd": "Δ1=5.0 Δ2=0.0",
+      "result": "HOLD",
+      "lens": "DP6",
+      "classe_nova": false,
+      "count_finding": false
+    },
+    {
+      "probe_id": "B5",
+      "edge_rpc": "PATCH orders.status JWT seller + release",
+      "payload": "seller força concluido na order paga 8bdc2c4e-f7f7-4f14-af6a-7e4fa07dfc38",
+      "http": "patch 403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"order_seller_cannot_mark_concluido\"} loc=\"\" | rel 200 false loc=\"\"",
+      "stripe_bd": "status=pago",
+      "result": "HOLD",
+      "lens": "DP2",
+      "classe_nova": true,
+      "count_finding": false
+    },
+    {
+      "probe_id": "D2",
+      "edge_rpc": "refund-order seller 1×",
+      "payload": "seller JWT order pago cb791d52-cdbb-4823-b271-9cf66cb40e6f",
+      "http": "200 {\"ok\":true,\"already_refunded\":true,\"idempotent\":true,\"refund_id\":\"re_3UCib8H7FWYUN3jh0MBf6GB9\",\"status\":\"cancelado\",\"stock_units_applied\":null,\"amount_cents\":590,\"payment_intent\":\"pi_3UCib8H7FWYUN3jh0rbJY6cw\",\"status_stripe\":\"succeeded\"} loc=\"\"",
+      "stripe_bd": "refund_id=re_3UCib8H7FWYUN3jh0MBf6GB9 status=cancelado qty 1→2 ΔS=0.0 stock_ok=true",
+      "result": "HOLD",
+      "lens": "DP7",
+      "classe_nova": false,
+      "count_finding": false
+    },
+    {
+      "probe_id": "B2",
+      "edge_rpc": "refund-order ∥ release",
+      "payload": "Future.wait seller refund + buyer/seller release 928baff5-095d-4a0f-8ee5-643ae0cf1e91",
+      "http": "[\"200 {\\\"ok\\\":true,\\\"already_refunded\\\":true,\\\"idempotent\\\":true,\\\"refund_id\\\":\\\"re_3UCibEH7FWYUN3jh1Pxx5LWD\\\",\\\"status\\\":\\\"cancelado\\\",\\\"stock_units_applied\\\":null,\\\"amount_cents\\\":590,\\\"payment_intent\\\":\\\"pi_3UCibEH7FWYUN3jh1PgsoI5x\\\",\\\"status_stripe\\\":\\\"succeeded\\\"} loc=\\\"\\\"\",\"200 false loc=\\\"\\\"\",\"200 false loc=\\\"\\\"\"]",
+      "stripe_bd": "refunded=true released=false Δ=0.0 refund_id=re_3UCibEH7FWYUN3jh1Pxx5LWD",
+      "result": "HOLD",
+      "lens": "DP3",
+      "classe_nova": false,
+      "count_finding": false
+    },
+    {
+      "probe_id": "C1",
+      "edge_rpc": "create-connect-account amount>available",
+      "payload": "amount=99999999 vs saldo 40.0",
+      "http": "400 {\"error\":\"Saldo disponível insuficiente para este levantamento.\",\"code\":\"payout_failed\"} loc=\"\"",
+      "stripe_bd": "Δ=0.0 new_tr=[]",
+      "result": "HOLD",
+      "lens": "DP4",
+      "classe_nova": false,
+      "count_finding": false
+    },
+    {
+      "probe_id": "C2",
+      "edge_rpc": "create-connect-account dest/metadata hostil",
+      "payload": "dest=acct_1UChokHMTQUwRF3q user_id=688f4969-f412-45e6-a172-05d819c25917 currency=usd amount=100",
+      "http": "400 {\"error\":\"Cannot create another user Stripe account.\",\"code\":\"payout_failed\"} loc=\"\"",
+      "stripe_bd": "Δ=0.0 new_tr=[] own_acct=acct_1U5mYbQeUNx8ar08",
+      "result": "HOLD",
+      "lens": "DP4",
+      "classe_nova": true,
+      "count_finding": false
+    },
+    {
+      "probe_id": "C3",
+      "edge_rpc": "create-connect-account ∥ mesma idempotency_key",
+      "payload": "Future.wait amount=100 key=rtdpParallelSame1708k",
+      "http": "[\"200 {\\\"success\\\":true,\\\"transferId\\\":\\\"tr_1UCibQH7FWYUN3jhU2rbDt6I\\\",\\\"balance\\\":39} loc=\\\"\\\"\",\"400 {\\\"error\\\":\\\"[object Object]\\\",\\\"code\\\":\\\"23505\\\"} loc=\\\"\\\"\"]",
+      "stripe_bd": "Δ=-1.0 new_tr=[tr_1UCibQH7FWYUN3jhU2rbDt6I] n=1",
+      "result": "HOLD",
+      "lens": "DP3",
+      "classe_nova": false,
+      "count_finding": false
+    },
+    {
+      "probe_id": "C3b",
+      "edge_rpc": "payout∥ keys distintas saldo=1,00",
+      "payload": "Future.wait 100¢ keyA vs keyB com available=1€",
+      "http": "[\"200 {\\\"success\\\":true,\\\"transferId\\\":\\\"tr_1UCibTH7FWYUN3jhB70JyWuz\\\",\\\"balance\\\":0} loc=\\\"\\\"\",\"400 {\\\"error\\\":\\\"Saldo disponível insuficiente para este levantamento.\\\",\\\"code\\\":\\\"payout_failed\\\"} loc=\\\"\\\"\"]",
+      "stripe_bd": "bal 1.0→0.0 new_tr=[tr_1UCibTH7FWYUN3jhB70JyWuz] n=1",
+      "result": "HOLD",
+      "lens": "DP3",
+      "classe_nova": true,
+      "count_finding": false
+    },
+    {
+      "probe_id": "C4",
+      "edge_rpc": "create-connect-account onboarding",
+      "payload": "POST {} ×2 · GET url Stripe · buyer POST {} · anon · GET wallet_return · S2 reuse url/acct",
+      "http": "onb1 200 {\"stripeAccountId\":\"acct_1U5mYbQeUNx8ar08\",\"url\":\"https://connect.stripe.com/setup/e/acct_1U5mYbQeUNx8ar08/EpevXR5xkkLP\"} loc=\"\" | onb2 200 {\"stripeAccountId\":\"acct_1U5mYbQeUNx8ar08\",\"url\":\"https://connect.stripe.com/setup/e/acct_1U5mYbQeUNx8ar08/T6LLIcwTrBaP\"} loc=\"\" | getUrl 200 <!DOCTYPE html>\n<html lang=\"\" class=\"\">\n  <head>\n    <meta charset=\"u…",
+      "stripe_bd": "acct1=acct_1U5mYbQeUNx8ar08 url1==url2=false ΔS_end=0.0 vs par1=39.0",
+      "result": "HOLD",
+      "lens": "DP4",
+      "classe_nova": true,
+      "count_finding": false
+    },
+    {
+      "probe_id": "C5",
+      "edge_rpc": "create-connect-account amount=100 anon",
+      "payload": "sem Authorization, amount=100",
+      "http": "400 {\"error\":\"Missing authorization.\",\"code\":\"payout_failed\"} loc=\"\"",
+      "stripe_bd": "",
+      "result": "HOLD",
+      "lens": "DP5",
+      "classe_nova": true,
+      "count_finding": false
+    }
+  ],
+  "findings": [],
+  "blocked": [
+    {
+      "id": "A1-buyer-insert",
+      "lens": "DP1",
+      "title": "Buyer JWT INSERT wallet_transactions",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"new row violates row-level security policy for table \\\"wallet_transactions\\\"\"} loc=\"\""
+    },
+    {
+      "id": "A1-seller-insert",
+      "lens": "DP1",
+      "title": "Seller JWT INSERT wallet_transactions",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"new row violates row-level security policy for table \\\"wallet_transactions\\\"\"} loc=\"\""
+    },
+    {
+      "id": "A2-credit",
+      "lens": "DP1",
+      "title": "JWT batata_credit_wallet_once",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_credit_wallet_once\"} loc=\"\""
+    },
+    {
+      "id": "A2-payout-debit",
+      "lens": "DP1",
+      "title": "JWT batata_wallet_payout_debit",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_wallet_payout_debit\"} loc=\"\""
+    },
+    {
+      "id": "A3-patch",
+      "lens": "DP1",
+      "title": "PATCH wallets recusado",
+      "ev": "200 [] loc=\"\""
+    },
+    {
+      "id": "A4-unpaid",
+      "lens": "DP7",
+      "title": "tip unpaid Δ=0",
+      "ev": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1ZEzzclyHeQ1dz26X29S3xP5FarC6K58xErWCbMeZpJs2aQaP3zmWdcy8#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21… loc=\"\""
+    },
+    {
+      "id": "A4b-over",
+      "lens": "DP1",
+      "title": "wallet tip amount > saldo",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"not_allowed\"} loc=\"\""
+    },
+    {
+      "id": "A5-ledger-insert",
+      "lens": "DP1",
+      "title": "JWT INSERT wallet_payout_ledger",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"new row violates row-level security policy for table \\\"wallet_payout_ledger\\\"\"} loc=\"\""
+    },
+    {
+      "id": "D1-pago",
+      "lens": "DP7",
+      "title": "pago Δwallet 0 até release",
+      "ev": {
+        "id": "87bdfdef-790e-4c6c-ac07-7f0a39ff331a",
+        "status": "pago",
+        "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+        "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+        "product_id": "1104c514-abbf-4122-81ac-dbf4dcd8362d",
+        "quantity": 1,
+        "price_total": 5.9,
+        "amount_paid_cents": 590,
+        "payment_method": "Pagamento na app",
+        "shipping_method": "",
+        "shipped_at": "",
+        "stripe_payment_intent_id": "pi_3UCiauH7FWYUN3jh1xBciTsL",
+        "stripe_checkout_session_id": "",
+        "stripe_refund_id": "",
+        "wallet_release_processed_at": "",
+        "wallet_refund_processed_at": "",
+        "stock_units_applied": 1,
+        "completed_at": ""
+      }
+    },
+    {
+      "id": "B1-early",
+      "lens": "DP2",
+      "title": "release pago recusado",
+      "ev": "200 false loc=\"\""
+    },
+    {
+      "id": "B3-seller2",
+      "lens": "DP5",
+      "title": "seller2 release order alheia",
+      "ev": "200 false loc=\"\""
+    },
+    {
+      "id": "B4-idem",
+      "lens": "DP6",
+      "title": "2.º release sem crédito",
+      "ev": "200 false loc=\"\""
+    },
+    {
+      "id": "B5-fsm",
+      "lens": "DP2",
+      "title": "seller não força concluido",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"order_seller_cannot_mark_concluido\"} loc=\"\""
+    },
+    {
+      "id": "D2-refund",
+      "lens": "DP7",
+      "title": "refund 1× coerente",
+      "ev": {
+        "refund_id": "re_3UCib8H7FWYUN3jh0MBf6GB9",
+        "qty": "1→2",
+        "delta": 0.0
+      }
+    },
+    {
+      "id": "B2-race",
+      "lens": "DP3",
+      "title": "race sem double credit",
+      "ev": "200 {\"ok\":true,\"already_refunded\":true,\"idempotent\":true,\"refund_id\":\"re_3UCibEH7FWYUN3jh1Pxx5LWD\",\"status\":\"cancelado\",\"stock_units_applied\":null,\"amount_cents\":590,\"payment_intent\":\"pi_3UCibEH7FWYUN3jh1PgsoI5x\",\"status_stripe\":\"succeeded\"} loc=\"\""
+    },
+    {
+      "id": "C1-over",
+      "lens": "DP4",
+      "title": "payout > saldo recusado",
+      "ev": "400 {\"error\":\"Saldo disponível insuficiente para este levantamento.\",\"code\":\"payout_failed\"} loc=\"\""
+    },
+    {
+      "id": "C2-dest",
+      "lens": "DP4",
+      "title": "dest hostil",
+      "ev": "400 {\"error\":\"Cannot create another user Stripe account.\",\"code\":\"payout_failed\"} loc=\"\""
+    },
+    {
+      "id": "C3-idem",
+      "lens": "DP6",
+      "title": "payout∥ mesma key ≤1 tr_",
+      "ev": "200 {\"success\":true,\"transferId\":\"tr_1UCibQH7FWYUN3jhU2rbDt6I\",\"balance\":39} loc=\"\""
+    },
+    {
+      "id": "C3b-over-race",
+      "lens": "DP3",
+      "title": "2 keys ≤1 tr_ saldo≥0",
+      "ev": "200 {\"success\":true,\"transferId\":\"tr_1UCibTH7FWYUN3jhB70JyWuz\",\"balance\":0} loc=\"\""
+    },
+    {
+      "id": "C4-onboard",
+      "lens": "DP4",
+      "title": "onboarding preso ao JWT; GET sem payout",
+      "ev": "200 {\"stripeAccountId\":\"acct_1U5mYbQeUNx8ar08\",\"url\":\"https://connect.stripe.com/setup/e/acct_1U5mYbQeUNx8ar08/EpevXR5xkkLP\"} loc=\"\""
+    },
+    {
+      "id": "C5-anon-payout",
+      "lens": "DP5",
+      "title": "Anon payout 100¢",
+      "ev": "400 {\"error\":\"Missing authorization.\",\"code\":\"payout_failed\"} loc=\"\""
+    }
+  ],
+  "skipped": [],
+  "notes": [
+    {
+      "id": "fixture.paid",
+      "lens": "DP7",
+      "title": "setup_paid_order Stripe TEST 4242",
+      "ev": "200 {\n  \"ok\": true,\n  \"order_id\": \"87bdfdef-790e-4c6c-ac07-7f0a39ff331a\",\n  \"product_id\": \"1104c514-abbf-4122-81ac-dbf4dcd8362d\",\n  \"payment_intent_id\": \"pi_3UCiauH7FWYUN3jh1xBciTsL\",\n  \"pi_status\": \"succeeded\",\n  \"pi_amount_received\": 590,\n  \"… loc=\"\""
+    },
+    {
+      "id": "fixture.paid",
+      "lens": "DP6",
+      "title": "setup_paid_order Stripe TEST 4242",
+      "ev": "200 {\n  \"ok\": true,\n  \"order_id\": \"aa2e4acc-7ce5-433f-9177-c4b773a33f44\",\n  \"product_id\": \"d19588c7-4d6f-4f83-a8e5-029c78d57c45\",\n  \"payment_intent_id\": \"pi_3UCiazH7FWYUN3jh1NGBFEva\",\n  \"pi_status\": \"succeeded\",\n  \"pi_amount_received\": 590,\n  \"… loc=\"\""
+    },
+    {
+      "id": "fixture.paid",
+      "lens": "DP2",
+      "title": "setup_paid_order Stripe TEST 4242",
+      "ev": "200 {\n  \"ok\": true,\n  \"order_id\": \"8bdc2c4e-f7f7-4f14-af6a-7e4fa07dfc38\",\n  \"product_id\": \"c91b9331-11b9-4f7f-89d5-69b66e0d0960\",\n  \"payment_intent_id\": \"pi_3UCib4H7FWYUN3jh14Ue8gqR\",\n  \"pi_status\": \"succeeded\",\n  \"pi_amount_received\": 590,\n  \"… loc=\"\""
+    },
+    {
+      "id": "fixture.paid",
+      "lens": "DP7",
+      "title": "setup_paid_order Stripe TEST 4242",
+      "ev": "200 {\n  \"ok\": true,\n  \"order_id\": \"cb791d52-cdbb-4823-b271-9cf66cb40e6f\",\n  \"product_id\": \"0e391c44-e6a2-4a27-9eb9-12bd608ca33a\",\n  \"payment_intent_id\": \"pi_3UCib8H7FWYUN3jh0rbJY6cw\",\n  \"pi_status\": \"succeeded\",\n  \"pi_amount_received\": 590,\n  \"… loc=\"\""
+    },
+    {
+      "id": "fixture.paid",
+      "lens": "DP3",
+      "title": "setup_paid_order Stripe TEST 4242",
+      "ev": "200 {\n  \"ok\": true,\n  \"order_id\": \"928baff5-095d-4a0f-8ee5-643ae0cf1e91\",\n  \"product_id\": \"76250f89-b6ba-4028-818b-958909e1310a\",\n  \"payment_intent_id\": \"pi_3UCibEH7FWYUN3jh1PgsoI5x\",\n  \"pi_status\": \"succeeded\",\n  \"pi_amount_received\": 590,\n  \"… loc=\"\""
+    }
+  ],
+  "actors": {
+    "buyer": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+    "seller": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+    "buyer2": "56176edb-8aa3-4e4d-9bd7-041640b92235",
+    "seller2": "688f4969-f412-45e6-a172-05d819c25917"
+  },
+  "created": {
+    "orders": [
+      "87bdfdef-790e-4c6c-ac07-7f0a39ff331a",
+      "aa2e4acc-7ce5-433f-9177-c4b773a33f44",
+      "8bdc2c4e-f7f7-4f14-af6a-7e4fa07dfc38",
+      "cb791d52-cdbb-4823-b271-9cf66cb40e6f",
+      "928baff5-095d-4a0f-8ee5-643ae0cf1e91"
+    ],
+    "products": [
+      "1104c514-abbf-4122-81ac-dbf4dcd8362d",
+      "d19588c7-4d6f-4f83-a8e5-029c78d57c45",
+      "c91b9331-11b9-4f7f-89d5-69b66e0d0960",
+      "0e391c44-e6a2-4a27-9eb9-12bd608ca33a",
+      "76250f89-b6ba-4028-818b-958909e1310a"
+    ],
+    "lives": [
+      "a23a69ec-820e-47b0-8040-06cda63af840"
+    ],
+    "tips": [
+      "c93887b0-3a70-45e7-94d3-748d3e978330"
+    ]
+  }
+}

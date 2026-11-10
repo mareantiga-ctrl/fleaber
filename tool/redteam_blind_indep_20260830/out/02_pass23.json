@@ -1,0 +1,322 @@
+{
+  "wallets": {
+    "buyer0": [
+      {
+        "balance": 66.36
+      }
+    ],
+    "buyer1": [
+      {
+        "balance": 66.36
+      }
+    ],
+    "seller0": [
+      {
+        "balance": 0.26
+      }
+    ],
+    "seller1": [
+      {
+        "balance": 0.26
+      }
+    ]
+  },
+  "mb_way_order": {
+    "id": "b31c1686-e3cc-4234-ac34-992c730c51dd",
+    "status": "pago",
+    "amount_paid_cents": null,
+    "wallet_release_processed_at": null,
+    "stock_units_applied": 1,
+    "payment_method": "mb way"
+  },
+  "race_product": "e6fe3e79-2c9e-4fbf-8b75-7e4f3498b64e",
+  "matrix": [
+    {
+      "surface": "rpc/batata_seller_direct_payment_details",
+      "attack": "buyer vs OTHER seller",
+      "identity": "buyer",
+      "result": 200,
+      "body": "[]"
+    },
+    {
+      "surface": "live_messages",
+      "attack": "SELECT kind=user other lives",
+      "identity": "buyer",
+      "result": 200,
+      "body": "[]"
+    },
+    {
+      "surface": "live_raffles",
+      "attack": "SELECT draw_seed other seller",
+      "identity": "buyer",
+      "result": 200,
+      "body": "[{\"id\":\"2e71ebba-3f7b-420f-a5fb-bea2e4fc59a4\",\"status\":\"drawn\",\"draw_seed\":\"64af22f0202db27c1169aada412bb2dd2f74e3d7773b6b86f5367c53a361bfcb\",\"title\":\"Puzzle\"}, \n {\"id\":\"276ed98e-83ec-4dd5-bc97-da75b8d8ace3\",\"status\":\"active\",\"draw_seed\":null,\"title\":\"Calças Nike Azul M\"}, \n {\"id\":\"c54e3007-8ccb-4afc-98f3-0c61823b7348\",\"status\":\"active\",\"draw_seed\":null,\"title\":\"Calças Nike Azul M\"}, \n {\"id\":\"b1d362e2-8313-4e02-9e92-d6c4a3a2e8a8\",\"status\":\"active\",\"draw_seed\":null,\"title\":\"Calças Nike Azul M\"}, \n {\"id\":\"7d3ae2b5-1147-440f-bfaf-950a5e120091\",\"status\":\"active\",\"draw_seed\":null,\"title\":\"Calças Nike Azul M\"}]"
+    },
+    {
+      "surface": "stripe_checkout_events",
+      "attack": "SELECT buyer_id neq self",
+      "identity": "buyer",
+      "result": 200,
+      "body": "[]"
+    },
+    {
+      "surface": "chats",
+      "attack": "GET third-party chat",
+      "identity": "buyer",
+      "result": 200,
+      "body": "[]"
+    },
+    {
+      "surface": "chat_messages",
+      "attack": "GET third-party chat messages",
+      "identity": "buyer",
+      "result": 200,
+      "body": "[]"
+    },
+    {
+      "surface": "reviews",
+      "attack": "INSERT without order",
+      "identity": "buyer",
+      "result": 400,
+      "body": "{\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"review_order_required\"}"
+    },
+    {
+      "surface": "reviews",
+      "attack": "INSERT with pending order",
+      "identity": "buyer",
+      "result": 400,
+      "body": "{\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"review_order_invalid_status\"}"
+    },
+    {
+      "surface": "reviews",
+      "attack": "INSERT duplicate on paid order as seller role",
+      "identity": "buyer",
+      "result": 400,
+      "body": "{\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"review_order_invalid_status\"}"
+    },
+    {
+      "surface": "live_reservation_requests",
+      "attack": "PATCH pending → accepted as buyer",
+      "identity": "buyer",
+      "result": 200,
+      "body": "[]"
+    },
+    {
+      "surface": "product_offers",
+      "attack": "INSERT amount 0.01 on seller product",
+      "identity": "buyer",
+      "result": 403,
+      "body": "{\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"new row violates row-level security policy for table \\\"product_offers\\\"\"}"
+    },
+    {
+      "surface": "orders",
+      "attack": "PATCH sealed hand → carrier",
+      "identity": "buyer",
+      "result": 200,
+      "body": "[{\"id\":\"1eee5383-20e0-4e8e-b34f-0f915c48cb65\",\"created_at\":\"2026-08-30T10:24:01.01662+00:00\",\"product_id\":\"a9e932d2-af0e-4452-8389-4d538455bf62\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"price_total\":19.55,\"shipping_method\":\"hand\",\"payment_method\":\"Pagamento na app\",\"proof_url\":null,\"status\":\"reserva_pendente\",\"reservation_expires_at\":null,\"is_reservation\":false,\"completed_at\":null,\"auto_feedback_processed_at\":null,\"returned_at\":null,\"wallet_release_processed_at\":null,\"wallet_refund_processed_at\":null,\"bundle_id\":null,\"quantity\":1,\"live_id\":null,\"live_item_id\":null,\"live_raffle_id\":null,\"stripe_checkout_session_id\":null,\"stripe_payment_intent_id\":null,\"stripe_refund_id\":null,\"stripe_refunded_at\":null,\"stock_units_applied\":null,\"amount_paid_cents\":null,\"contract_unit_cents\":1800,\"contract_qty\":1,\"product_offer_id\":null}]"
+    },
+    {
+      "surface": "orders",
+      "attack": "PATCH sealed hand → carrier as seller",
+      "identity": "seller",
+      "result": 200,
+      "body": "[{\"id\":\"1eee5383-20e0-4e8e-b34f-0f915c48cb65\",\"created_at\":\"2026-08-30T10:24:01.01662+00:00\",\"product_id\":\"a9e932d2-af0e-4452-8389-4d538455bf62\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"price_total\":19.55,\"shipping_method\":\"hand\",\"payment_method\":\"Pagamento na app\",\"proof_url\":null,\"status\":\"reserva_pendente\",\"reservation_expires_at\":null,\"is_reservation\":false,\"completed_at\":null,\"auto_feedback_processed_at\":null,\"returned_at\":null,\"wallet_release_processed_at\":null,\"wallet_refund_processed_at\":null,\"bundle_id\":null,\"quantity\":1,\"live_id\":null,\"live_item_id\":null,\"live_raffle_id\":null,\"stripe_checkout_session_id\":null,\"stripe_payment_intent_id\":null,\"stripe_refund_id\":null,\"stripe_refunded_at\":null,\"stock_units_applied\":null,\"amount_paid_cents\":null,\"contract_unit_cents\":1800,\"contract_qty\":1,\"product_offer_id\":null}]"
+    },
+    {
+      "surface": "orders",
+      "attack": "INSERT mb way pending",
+      "identity": "buyer",
+      "result": 201,
+      "body": "[{\"id\":\"b31c1686-e3cc-4234-ac34-992c730c51dd\",\"created_at\":\"2026-08-30T10:27:17.643423+00:00\",\"product_id\":\"f85ded7d-c00a-4e70-8931-77a81d309bd7\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"price_total\":10.0000000000000000,\"shipping_method\":\"hand\",\"payment_method\":\"mb way\",\"proof_url\":null,\"status\":\"reserva_pendente\",\"reservation_expires_at\":null,\"is_reservation\":false,\"completed_at\":null,\"auto_feedback_processed_at\":null,\"returned_at\":null,\"wallet_release_processed_at\":null,\"wallet_refund_processed_at\":null,\"bundle_id\":null,\"quantity\":1,\"live_id\":null,\"live_item_id\":null,\"live_raffle_id\":null,\"stripe_checkout_session_id\":null,\"stripe_payment_intent_id\":null,\"stripe_refund_id\":null,\"stripe_refunded_at\":null,\"stock_units_applied\":null,\"amount_paid_cents\":null,\"contract_unit_cents\":1000,\"contract_qty\":1,\"product_offer_id\":null}]"
+    },
+    {
+      "surface": "orders",
+      "attack": "seller PATCH mb way → reservado",
+      "identity": "seller",
+      "result": 200,
+      "body": "[{\"id\":\"b31c1686-e3cc-4234-ac34-992c730c51dd\",\"created_at\":\"2026-08-30T10:27:17.643423+00:00\",\"product_id\":\"f85ded7d-c00a-4e70-8931-77a81d309bd7\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"price_total\":10.0000000000000000,\"shipping_method\":\"hand\",\"payment_method\":\"mb way\",\"proof_url\":null,\"status\":\"reservado\",\"reservation_expires_at\":null,\"is_reservation\":false,\"completed_at\":null,\"auto_feedback_processed_at\":null,\"returned_at\":null,\"wallet_release_processed_at\":null,\"wallet_refund_processed_at\":null,\"bundle_id\":null,\"quantity\":1,\"live_id\":null,\"live_item_id\":null,\"live_raffle_id\":null,\"stripe_checkout_session_id\":null,\"stripe_payment_intent_id\":null,\"stripe_refund_id\":null,\"stripe_refunded_at\":null,\"stock_units_applied\":null,\"amount_paid_cents\":null,\"contract_unit_cents\":1000,\"contract_qty\":1,\"product_offer_id\":null}]"
+    },
+    {
+      "surface": "orders",
+      "attack": "seller PATCH mb way reservado → pago",
+      "identity": "seller",
+      "result": 200,
+      "body": "[{\"id\":\"b31c1686-e3cc-4234-ac34-992c730c51dd\",\"created_at\":\"2026-08-30T10:27:17.643423+00:00\",\"product_id\":\"f85ded7d-c00a-4e70-8931-77a81d309bd7\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"price_total\":10.0000000000000000,\"shipping_method\":\"hand\",\"payment_method\":\"mb way\",\"proof_url\":null,\"status\":\"pago\",\"reservation_expires_at\":null,\"is_reservation\":false,\"completed_at\":null,\"auto_feedback_processed_at\":null,\"returned_at\":null,\"wallet_release_processed_at\":null,\"wallet_refund_processed_at\":null,\"bundle_id\":null,\"quantity\":1,\"live_id\":null,\"live_item_id\":null,\"live_raffle_id\":null,\"stripe_checkout_session_id\":null,\"stripe_payment_intent_id\":null,\"stripe_refund_id\":null,\"stripe_refunded_at\":null,\"stock_units_applied\":null,\"amount_paid_cents\":null,\"contract_unit_cents\":1000,\"contract_qty\":1,\"product_offer_id\":null}]"
+    },
+    {
+      "surface": "rpc/batata_release_seller_wallet_for_order",
+      "attack": "seller release after fake mb way pago",
+      "identity": "seller",
+      "result": 200,
+      "body": "false"
+    },
+    {
+      "surface": "edge/create-payment-intent",
+      "attack": "checkout sealed 10€ order after catalog drop attempt amount=50",
+      "identity": "buyer",
+      "result": 200,
+      "body": "{\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1t3116PFSCNcKFHbMDD6RssOqXtM0O1Ij7acKPvH4I4wiywDYpLz3ar41#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21oYWlsUnxrVkRhQUQyNlJjSWBCN3BXNXVvVT1hamlcf3Fjd1dRMGJmREk9Yz09PH1CMzVTY0pBXD1kMU5HZl1da05gf0s1XGQ1NWA3bVFBNzNMJyknY3dqaFZgd3Ngdyc%2FcXdwYCknZ2RmbmJ3anBrYUZqaWp3Jz8nJmNjY2NjYycpJ2lkfGpwcVF8dWAnPyd2bGtiaWBabHFgaCcpJ2BrZGdpYFVpZGZgbWppYWB3dic%2FcXdwYHgl\",\"checkoutSessionId\":\"cs_test_a1t3116PFSCNcKFHbMDD6RssOqXtM0O1Ij7acKPvH4I4wiywDYpLz3ar41\",\"paidChatId\":\"9acd9c6e-6d87-4617-86b6-fee04c8ba033\",\"server_amount_cents\":1115,\"amount_total\":1115}"
+    },
+    {
+      "surface": "edge/create-payment-intent",
+      "attack": "prize_shipping on normal pending",
+      "identity": "buyer",
+      "result": 400,
+      "body": "{\"error\":\"Checkout blocked: order is not a raffle prize.\"}"
+    },
+    {
+      "surface": "edge/create-payment-intent",
+      "attack": "pending order amount=1 shipping carrier vs sealed hand",
+      "identity": "buyer",
+      "result": 200,
+      "body": "{\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1A8dP59VFy3WX9gn9CEvzzzYqGCVnbgB2Aqd0JvRg0j820C3oHYqNLKkg#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21oYWlsUnxrVkRhQUQyNlJjSWBCN3BXNXVvVT1hamlcf3Fjd1dRMGJmREk9Yz09PH1CMzVTY0pBXD1kMU5HZl1da05gf0s1XGQ1NWA3bVFBNzNMJyknY3dqaFZgd3Ngdyc%2FcXdwYCknZ2RmbmJ3anBrYUZqaWp3Jz8nJmNjY2NjYycpJ2lkfGpwcVF8dWAnPyd2bGtiaWBabHFgaCcpJ2BrZGdpYFVpZGZgbWppYWB3dic%2FcXdwYHgl\",\"checkoutSessionId\":\"cs_test_a1A8dP59VFy3WX9gn9CEvzzzYqGCVnbgB2Aqd0JvRg0j820C3oHYqNLKkg\",\"paidChatId\":\"9d26dbdf-92a7-4193-82a4-d4a183e0a19d\",\"server_amount_cents\":1955,\"amount_total\":1955}"
+    },
+    {
+      "surface": "edge/create-live-tip-checkout",
+      "attack": "amount_eur=1",
+      "identity": "buyer",
+      "result": 200,
+      "body": "{\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1F4gimWMzf1zeHjkq2oe5xYIEIfw7Oi0eN8irsqghWxMcuBcVce2gdbP1#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21oYWlsUnxrVkRhQUQyNlJjSWBCN3BXNXVvVT1hamlcf3Fjd1dRMGJmREk9Yz09PH1CMzVTY0pBXD1kMU5HZl1da05gf0s1XGQ1NWA3bVFBNzNMJyknY3dqaFZgd3Ngdyc%2FcXdwYCknZ2RmbmJ3anBrYUZqaWp3Jz8nJmNjY2NjYycpJ2lkfGpwcVF8dWAnPyd2bGtiaWBabHFgaCcpJ2BrZGdpYFVpZGZgbWppYWB3dic%2FcXdwYHgl\",\"checkoutSessionId\":\"cs_test_a1F4gimWMzf1zeHjkq2oe5xYIEIfw7Oi0eN8irsqghWxMcuBcVce2gdbP1\",\"tipId\":\"13955566-ad63-42d0-9685-720cdaace2f0\"}"
+    },
+    {
+      "surface": "edge/create-connect-account",
+      "attack": "dual payout key A",
+      "identity": "buyer",
+      "result": 400,
+      "body": "{\"error\":\"Falta associar a conta bancária no Stripe. Abre outra vez Configurar conta bancária e adiciona o IBAN de teste.\",\"code\":\"payout_failed\"}"
+    },
+    {
+      "surface": "edge/create-connect-account",
+      "attack": "dual payout key B",
+      "identity": "buyer",
+      "result": 400,
+      "body": "{\"error\":\"Falta associar a conta bancária no Stripe. Abre outra vez Configurar conta bancária e adiciona o IBAN de teste.\",\"code\":\"payout_failed\"}"
+    },
+    {
+      "surface": "edge/create-connect-account",
+      "attack": "retry same key A",
+      "identity": "buyer",
+      "result": 400,
+      "body": "{\"error\":\"Falta associar a conta bancária no Stripe. Abre outra vez Configurar conta bancária e adiciona o IBAN de teste.\",\"code\":\"payout_failed\"}"
+    },
+    {
+      "surface": "orders",
+      "attack": "race insert 0 stock=1",
+      "identity": "buyer",
+      "result": 400,
+      "body": "{\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"order_hold_exceeds_stock\"}"
+    },
+    {
+      "surface": "orders",
+      "attack": "race insert 1 stock=1",
+      "identity": "buyer",
+      "result": 201,
+      "body": "[{\"id\":\"2c711645-b8ed-4256-b3a5-3cf1989970e4\",\"created_at\":\"2026-08-30T10:27:24.657141+00:00\",\"product_id\":\"e6fe3e79-2c9e-4fbf-8b75-7e4f3498b64e\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"price_total\":5.0000000000000000,\"shipping_method\":\"hand\",\"payment_method\":\"Pagamento na app\",\"proof_url\":null,\"status\":\"reserva_pendente\",\"reservation_expires_at\":null,\"is_reservation\":false,\"completed_at\":null,\"auto_feedback_processed_at\":null,\"returned_at\":null,\"wallet_release_processed_at\":null,\"wallet_refund_processed_at\":null,\"bundle_id\":null,\"quantity\":1,\"live_id\":null,\"live_item_id\":null,\"live_raffle_id\":null,\"stripe_checkout_session_id\":null,\"stripe_payment_intent_id\":null,\"stripe_refund_id\":null,\"stripe_refunded_at\":null,\"stock_units_applied\":null,\"amount_paid_cents\":null,\"contract_unit_cents\":500,\"contract_qty\":1,\"product_offer_id\":null}]"
+    },
+    {
+      "surface": "orders",
+      "attack": "race insert 2 stock=1",
+      "identity": "buyer",
+      "result": 400,
+      "body": "{\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"order_hold_exceeds_stock\"}"
+    },
+    {
+      "surface": "orders",
+      "attack": "race insert 3 stock=1",
+      "identity": "buyer",
+      "result": 400,
+      "body": "{\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"order_hold_exceeds_stock\"}"
+    },
+    {
+      "surface": "orders",
+      "attack": "race insert 4 stock=1",
+      "identity": "buyer",
+      "result": 400,
+      "body": "{\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"order_hold_exceeds_stock\"}"
+    },
+    {
+      "surface": "orders",
+      "attack": "race insert 5 stock=1",
+      "identity": "buyer",
+      "result": 400,
+      "body": "{\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"order_hold_exceeds_stock\"}"
+    },
+    {
+      "surface": "orders",
+      "attack": "race insert 6 stock=1",
+      "identity": "buyer",
+      "result": 400,
+      "body": "{\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"order_hold_exceeds_stock\"}"
+    },
+    {
+      "surface": "orders",
+      "attack": "race insert 7 stock=1",
+      "identity": "buyer",
+      "result": 400,
+      "body": "{\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"order_hold_exceeds_stock\"}"
+    },
+    {
+      "surface": "orders",
+      "attack": "race insert 8 stock=1",
+      "identity": "buyer",
+      "result": 400,
+      "body": "{\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"order_hold_exceeds_stock\"}"
+    },
+    {
+      "surface": "orders",
+      "attack": "race insert 9 stock=1",
+      "identity": "buyer",
+      "result": 400,
+      "body": "{\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"order_hold_exceeds_stock\"}"
+    },
+    {
+      "surface": "rpc/batata_product_held_qty",
+      "attack": "after race inserts",
+      "identity": "buyer",
+      "result": 200,
+      "body": "1"
+    },
+    {
+      "surface": "products",
+      "attack": "observe stock after race",
+      "identity": "service_observe",
+      "result": 200,
+      "body": "[{\"id\":\"e6fe3e79-2c9e-4fbf-8b75-7e4f3498b64e\",\"quantity\":1,\"is_sold\":false,\"price\":5.0}]"
+    },
+    {
+      "surface": "storage",
+      "attack": "list chat_media root",
+      "identity": "buyer",
+      "result": 200,
+      "body": "[{\"name\":\"live_item_photos\",\"id\":null,\"updated_at\":null,\"created_at\":null,\"last_accessed_at\":null,\"metadata\":null},{\"name\":\"live_raffle_prize\",\"id\":null,\"updated_at\":null,\"created_at\":null,\"last_accessed_at\":null,\"metadata\":null},{\"name\":\"product_photos\",\"id\":null,\"updated_at\":null,\"created_at\":null,\"last_accessed_at\":null,\"metadata\":null},{\"name\":\"profile_photos\",\"id\":null,\"updated_at\":null,\"created_at\":null,\"last_accessed_at\":null,\"metadata\":null}]"
+    },
+    {
+      "surface": "storage",
+      "attack": "list chat_media other seller prefix",
+      "identity": "buyer",
+      "result": 200,
+      "body": "[{\"name\":\"1778588031250_0_scaled_1000000018.jpg\",\"id\":\"66f77dcc-1fbf-41ac-9f77-2e64392d930a\",\"updated_at\":\"2026-05-12T12:13:59.306Z\",\"created_at\":\"2026-05-12T12:13:59.306Z\",\"last_accessed_at\":\"2026-05-12T12:13:59.306Z\",\"metadata\":{\"eTag\":\"\\\"d91730a4e60c8ca1a6a91d806250c164\\\"\",\"size\":1543080,\"mimetype\":\"image/jpeg\",\"cacheControl\":\"max-age=3600\",\"lastModified\":\"2026-05-12T12:14:00.000Z\",\"contentLength\":1543080,\"httpStatusCode\":200}},{\"name\":\"1778588246639_0_scaled_1000000018.jpg\",\"id\":\"66cd6e4d-9377-4f91-9616-94a95def48d8\",\"updated_at\":\"2026-05-12T12:17:40.863Z\",\"created_at\":\"2026-05-12T12:17:40.863Z\",\"last_accessed_at\":\"2026-05-12T12:17:40.863Z\",\"metadata\":{\"eTag\":\"\\\"d91730a4e60c8ca1a6a91d806250c164\\\"\",\"size\":1543080,\"mimetype\":\"image/jpeg\",\"cacheControl\":\"max-age=3600\",\"lastModified\":\"2026-05-12T12:17:41.000Z\",\"contentLength\":1543080,\"httpStatusCode\":200}},{\"name\":\"1778588366689_0_scaled_1000000018.jpg\",\"id\":\"39a348b5-3f1c-4673-b5fa-3fdf944d2bb7\",\"updated_at\":\"2026-05-12T12:19:36.039Z\",\"created_at\":\"2026-05-12T12:19:36.039Z\",\"last_accessed_at\":\"2026-05-12T12:19:36.039Z\",\"metadata\":{\"eTag\":\"\\\"d91730a4e60c8ca1a6a91d806250c164\\\"\",\"size\":1543080,\"mimetype\":\"image/jpeg\",\"cacheControl\":\"max-age=3600\",\"lastModified\":\"2026-05-12T12:19:36.000Z\",\"contentLength\":1543080,\"httpStatusCode\":200}},{\"name\":\"1778588392803_0_scaled_1000000018.jpg\",\"id\":\"0e5cbfbe-2237-4c93-b137-f138e5d10be1\",\"updated_at\":\"2026-05-12T12:20:03.100Z\",\"created_at\":\"2026-05-12T12:20:03.100Z\",\"last_accessed_at\":\"2026-…"
+    },
+    {
+      "surface": "storage",
+      "attack": "list product_photos",
+      "identity": "anon",
+      "result": 200,
+      "body": "[]"
+    },
+    {
+      "surface": "edge/create-payment-intent",
+      "attack": "GET settle known cs_test from own events",
+      "identity": "anon",
+      "result": 200,
+      "body": "Pagamento ainda não confirmado. Se já pagaste, aguarda alguns segundos e volta à app Fleaber."
+    },
+    {
+      "surface": "order_disputes",
+      "attack": "INSERT dispute on third-party order",
+      "identity": "buyer",
+      "result": 403,
+      "body": "{\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"new row violates row-level security policy for table \\\"order_disputes\\\"\"}"
+    }
+  ]
+}

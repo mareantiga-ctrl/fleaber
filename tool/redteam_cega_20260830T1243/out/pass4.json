@@ -1,0 +1,57 @@
+{
+  "pass": 4,
+  "matrix": [
+    {
+      "surface": "SETTLE",
+      "attack": "GET return unpaid session",
+      "identity": "anon",
+      "result": "200 Pagamento ainda não confirmado. Se já pagaste, aguarda alguns segundos e volta à app Fleaber."
+    },
+    {
+      "surface": "SETTLE",
+      "attack": "GET return unpaid session",
+      "identity": "buyer",
+      "result": "200 Pagamento ainda não confirmado. Se já pagaste, aguarda alguns segundos e volta à app Fleaber."
+    },
+    {
+      "surface": "SETTLE",
+      "attack": "GET fake session",
+      "identity": "anon",
+      "result": "400 Pagamento ainda não confirmado. Se já pagaste, aguarda alguns segundos e volta à app Fleaber."
+    },
+    {
+      "surface": "SETTLE",
+      "attack": "order after unpaid settle GET",
+      "identity": "service",
+      "result": "200 [{\"id\":\"3c9d060b-fa04-4e4c-926a-0e61f138306e\",\"status\":\"reserva_pendente\",\"amount_paid_cents\":null,\"stripe_payment_intent_id\":null}]"
+    },
+    {
+      "surface": "OFFERS",
+      "attack": "product",
+      "identity": "seller",
+      "result": "201 [{\"id\":\"60f98651-700a-4540-b0bb-3b09d01cbf37\",\"created_at\":\"2026-08-30T12:01:33.499883+00:00\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"title\":\"CEGA1243 offer 1788091294385\",\"price\":30.0,\"ref_code\":null,\"category\":null,\"clothing_size\":null,\"gender\":null,\"description\":nu…"
+    },
+    {
+      "surface": "OFFERS",
+      "attack": "buyer insert pending 0.01",
+      "identity": "buyer",
+      "result": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"new row violates row-level security policy for table \\\"product_offers\\\"\"}"
+    },
+    {
+      "surface": "BAG",
+      "attack": "buyer PATCH converted qty99",
+      "identity": "buyer",
+      "result": "200 []"
+    },
+    {
+      "surface": "OpenAPI",
+      "attack": "GET rest root",
+      "identity": "anon",
+      "result": "401 {\"message\":\"Invalid API key\",\"hint\":\"Only the `service_role` API key can be used for this endpoint.\"}"
+    }
+  ],
+  "frozen_at": "2026-08-30T12:01:34.731015Z",
+  "project": "fxdknzrqjenzqcvnwqqq",
+  "production_touched": false,
+  "fase4_started": false
+}

@@ -1,0 +1,690 @@
+{
+  "stamp": "20260906T1045",
+  "prefix": "RTBR-20260906T1045",
+  "lenses": [
+    "BR1",
+    "BR2",
+    "BR3",
+    "BR4",
+    "BR5",
+    "BR6",
+    "BR7",
+    "BR8"
+  ],
+  "findings": [
+    {
+      "id": "BR2-SESSION-REOPEN-AFTER-EXPIRE",
+      "lens": "BR2",
+      "severity": "P1",
+      "title": "Checkout reutilizou Session já expirada",
+      "actor": "buyer JWT",
+      "pre": "cs_ open → Stripe expire",
+      "repro": "POST CPI de novo",
+      "expected": "nova cs_ ou 400; reused=false",
+      "obtained": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1GFWbtEmenBvYzxh1U3AXJTgI47IZzYWEcQ5hqFb2PNB9RGBdUecQ3UHH#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21…",
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "BR6-TRIPLE-BAG-RACE",
+      "lens": "BR6",
+      "severity": "P1",
+      "title": "Corrida 3 sacos A∩B∩C deixou >1 Session Stripe aberta",
+      "actor": "buyer JWT",
+      "pre": "3 orders; bags AB∥BC∥CA",
+      "repro": "Future.wait 3× bag_checkout",
+      "expected": "≤1 cs_ open (overlap expire + claim)",
+      "obtained": {
+        "open": 3,
+        "sids": [
+          "cs_test_a1RIIJ93CBhpzA9KUNeAANnWeaSBkwQ5j6EVCyyiWAIZvBmwm2Rc37HRf0",
+          "cs_test_a14Uma4JuirQhCxGeBDe7eNTMVo4g7Y9oSkpXqhcNYrRlwWCP5T25zieqQ",
+          "cs_test_a1mAogeewd7x19z06kPEEyuXbOliwA5cmKCMOeNlHbjM5AxJqu8AoFgPgo"
+        ]
+      },
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "BR7-ANON-CHECKOUT",
+      "lens": "BR7",
+      "severity": "P1",
+      "title": "Anon criou Checkout Session",
+      "actor": "anon",
+      "pre": "order buyer",
+      "repro": "POST CPI sem JWT (só apikey)",
+      "expected": "401/403",
+      "obtained": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1MT60QkylbrYPZmTNZJvoIDDFL6UihEoyWhCxKlcubJyFR82BYvsxNIyN#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21…",
+      "proven": true,
+      "evidence": {}
+    }
+  ],
+  "blocked": [
+    {
+      "id": "BR1-CURRENCY-EUR_SPACE",
+      "lens": "BR1",
+      "title": "EUR Session ao contrato (trim/allow)",
+      "ev": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1Pj308sPpCFSyaxZ0h0EN4w5RIlN5fRCJwGkDaQKFvgInOOr2vFCU3rGc#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21…"
+    },
+    {
+      "id": "BR1-CURRENCY-NBSP",
+      "lens": "BR1",
+      "title": "EUR Session ao contrato (trim/allow)",
+      "ev": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1Pj308sPpCFSyaxZ0h0EN4w5RIlN5fRCJwGkDaQKFvgInOOr2vFCU3rGc#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21…"
+    },
+    {
+      "id": "BR1-CURRENCY-ZWJ",
+      "lens": "BR1",
+      "title": "bloqueado ou não underpay",
+      "ev": "400 {\"error\":\"Checkout blocked: only EUR is supported.\"}"
+    },
+    {
+      "id": "BR1-CURRENCY-ZWSP",
+      "lens": "BR1",
+      "title": "bloqueado ou não underpay",
+      "ev": "400 {\"error\":\"Checkout blocked: only EUR is supported.\"}"
+    },
+    {
+      "id": "BR1-CURRENCY-NFD",
+      "lens": "BR1",
+      "title": "bloqueado ou não underpay",
+      "ev": "400 {\"error\":\"Checkout blocked: only EUR is supported.\"}"
+    },
+    {
+      "id": "BR1-CURRENCY-FULLWIDTH",
+      "lens": "BR1",
+      "title": "bloqueado ou não underpay",
+      "ev": "400 {\"error\":\"Checkout blocked: only EUR is supported.\"}"
+    },
+    {
+      "id": "BR1-CURRENCY-EUR",
+      "lens": "BR1",
+      "title": "EUR Session ao contrato (trim/allow)",
+      "ev": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1Pj308sPpCFSyaxZ0h0EN4w5RIlN5fRCJwGkDaQKFvgInOOr2vFCU3rGc#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21…"
+    },
+    {
+      "id": "BR1-UNIT-AMOUNT-STRING",
+      "lens": "BR1",
+      "title": "unit_amount extra ignorado",
+      "ev": "amt=1955 expect=1955 200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a13AvvJcSxLNjGzkJiVFzl8GpbReT5rp6sUz5ex72Q3nXt7MFmQ1eEzhFR#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21…"
+    },
+    {
+      "id": "BR1-AMOUNT-STRING",
+      "lens": "BR1",
+      "title": "strings não underpay (ver notes)",
+      "ev": 2375
+    },
+    {
+      "id": "BR2-TRIPLE-BAG-INTERSECT",
+      "lens": "BR2",
+      "title": "≤1 Session aberta após 3 sacos",
+      "ev": "open=[cs_test_a1EwFQ0RTqZc4UElGom7X9y6pwPjYqsCavCASlevUe8mOpCWPNqDmhHI3s] returned=3"
+    },
+    {
+      "id": "BR2-HYPHEN-COMPACT-EXACT",
+      "lens": "BR2",
+      "title": "dedup hífen/compact (exact, n/c)",
+      "ev": "amt=1766 expect2=1955"
+    },
+    {
+      "id": "BR2-AB-AC-EXACT",
+      "lens": "BR2",
+      "title": "exact BFBK AB∥AC — fora da CONTAGEM",
+      "ev": "open=2 sids={cs_test_a1PdNHfTB57EXQhqYbN7MmgzQnLc5CK71TctcTQvpURMGiXmxTiJBAd5ce, cs_test_a1Q5JsQ6v7kkafZrdxZhD6xftJejVHf9CL5fkycTTcK6GcPbyT6ZC2ATTD}"
+    },
+    {
+      "id": "BR2-BAG-INCLUDES-PAGO",
+      "lens": "BR2",
+      "title": "saco recusou linha paga",
+      "ev": "400 {\"error\":\"Checkout blocked: order status 'pago' cannot start payment.\"}"
+    },
+    {
+      "id": "BR2-CLAIM-RPC-JWT",
+      "lens": "BR2",
+      "title": "RPC claim 403 JWT",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_claim_checkout_session_slot\"}"
+    },
+    {
+      "id": "BR2-CLAIM-PATCH-JWT",
+      "lens": "BR2",
+      "title": "PATCH slot bloqueado",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"order_money_fields_immutable\"}"
+    },
+    {
+      "id": "BR2-BAG-PRODUCT-SWAP-REQUEST",
+      "lens": "BR2",
+      "title": "mismatch product_id recusado",
+      "ev": "400 {\"error\":\"Checkout blocked: bag product does not match order.\"}"
+    },
+    {
+      "id": "BR3-BUNDLE-PATCH-TOTAL",
+      "lens": "BR3",
+      "title": "total reescrito / checkout catálogo",
+      "ev": "total=40.0 amt=4265 200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1ytpxLvcLctXfgABuLBeuJ0dYX9xYZRYXMlahqB9fb4gydqvln8QsY9Db#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21…"
+    },
+    {
+      "id": "BR3-OFFER-UNICODE-QTY",
+      "lens": "BR3",
+      "title": "qty unicode não inflou oferta",
+      "ev": "400 {\"code\":\"22P02\",\"details\":null,\"hint\":null,\"message\":\"invalid input syntax for type integer: \\\"９\\\"\"}"
+    },
+    {
+      "id": "BR3-DETACH-EXACT",
+      "lens": "BR3",
+      "title": "exact BFBK detach — fora da CONTAGEM",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"order_product_offer_id_immutable\"}"
+    },
+    {
+      "id": "BR4-CHECKOUT-AFTER-PAGO",
+      "lens": "BR4",
+      "title": "bloqueado pós-captura",
+      "ev": "400 {\"error\":\"Checkout blocked: order status 'pago' cannot start payment.\"}"
+    },
+    {
+      "id": "BR5-STOCK1-TWO-ORDERS",
+      "lens": "BR5",
+      "title": "2.ª order no SKU stock=1 recusada",
+      "ev": "oA=14b5df4d-57ae-49ae-a675-ba0fc6b4a304"
+    },
+    {
+      "id": "BR5-QTY-UNICODE",
+      "lens": "BR5",
+      "title": "INSERT qty fullwidth recusado",
+      "ev": "400 {\"code\":\"22P02\",\"details\":null,\"hint\":null,\"message\":\"invalid input syntax for type integer: \\\"２\\\"\"}"
+    },
+    {
+      "id": "BR6-CLAIM-RACE-THREE-OPEN",
+      "lens": "BR6",
+      "title": "claim serializou 3 POSTs",
+      "ev": "open=1 sids={cs_test_a1rugNCpkzVJkomDdLRRHn69AzdTmwtilv9cyuwHEWKzgPMrigSvRZhz8r}"
+    },
+    {
+      "id": "BR7-B2-CHECKOUT-B1-BAG",
+      "lens": "BR7",
+      "title": "B2 recusado no saco B1",
+      "ev": "400 {\"error\":\"Checkout blocked: order does not belong to buyer.\"}"
+    },
+    {
+      "id": "BR7-S2-REFUND-FOREIGN",
+      "lens": "BR7",
+      "title": "S2 refund 403",
+      "ev": "403 {\"ok\":false,\"error\":\"Sem permissão.\"}"
+    },
+    {
+      "id": "BR8-WALLET-DELTA-UNPAID",
+      "lens": "BR8",
+      "title": "wallets inalteradas",
+      "ev": {
+        "buyer": 61.1,
+        "seller": 93.33,
+        "buyer2": 0,
+        "seller2": 0
+      }
+    }
+  ],
+  "skipped": [],
+  "notes": [
+    {
+      "id": "actors",
+      "title": "ids",
+      "ev": {
+        "b": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+        "s": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+        "b2": "76b6d470-2dc3-412f-be96-25773ac092e0",
+        "s2": "7169220a-18dc-4777-a935-117d2ab9d3aa"
+      }
+    },
+    {
+      "id": "BR8.wallet.pre",
+      "lens": "BR8",
+      "title": "baseline",
+      "ev": {
+        "buyer": 61.1,
+        "seller": 93.33,
+        "buyer2": 0,
+        "seller2": 0
+      }
+    },
+    {
+      "id": "BR1.CUR.EUR_space",
+      "lens": "BR1",
+      "title": "currency=EUR_space",
+      "ev": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1Pj308sPpCFSyaxZ0h0EN4w5RIlN5fRCJwGkDaQKFvgInOOr2vFCU3rGc#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21… amt=1325 expect=1325"
+    },
+    {
+      "id": "BR1.CUR.nbsp",
+      "lens": "BR1",
+      "title": "currency=nbsp",
+      "ev": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1Pj308sPpCFSyaxZ0h0EN4w5RIlN5fRCJwGkDaQKFvgInOOr2vFCU3rGc#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21… amt=1325 expect=1325"
+    },
+    {
+      "id": "BR1.CUR.zwj",
+      "lens": "BR1",
+      "title": "currency=zwj",
+      "ev": "400 {\"error\":\"Checkout blocked: only EUR is supported.\"} amt=null expect=1325"
+    },
+    {
+      "id": "BR1.CUR.zwsp",
+      "lens": "BR1",
+      "title": "currency=zwsp",
+      "ev": "400 {\"error\":\"Checkout blocked: only EUR is supported.\"} amt=null expect=1325"
+    },
+    {
+      "id": "BR1.CUR.nfd",
+      "lens": "BR1",
+      "title": "currency=nfd",
+      "ev": "400 {\"error\":\"Checkout blocked: only EUR is supported.\"} amt=null expect=1325"
+    },
+    {
+      "id": "BR1.CUR.fullwidth",
+      "lens": "BR1",
+      "title": "currency=fullwidth",
+      "ev": "400 {\"error\":\"Checkout blocked: only EUR is supported.\"} amt=null expect=1325"
+    },
+    {
+      "id": "BR1.CUR.EUR",
+      "lens": "BR1",
+      "title": "currency=EUR",
+      "ev": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1Pj308sPpCFSyaxZ0h0EN4w5RIlN5fRCJwGkDaQKFvgInOOr2vFCU3rGc#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21… amt=1325 expect=1325"
+    },
+    {
+      "id": "BR1.UA.str",
+      "lens": "BR1",
+      "title": "unit_amount string extra",
+      "ev": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a13AvvJcSxLNjGzkJiVFzl8GpbReT5rp6sUz5ex72Q3nXt7MFmQ1eEzhFR#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21… amt=1955 expect=1955"
+    },
+    {
+      "id": "BR1.AMT.1",
+      "lens": "BR1",
+      "title": "amount string",
+      "ev": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1Kzq0UMnU51Z6B7vztK91uIqEcM7x2piRgMK52LkSHvLUNh5WxdLIzIe0#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21… amt=2375"
+    },
+    {
+      "id": "BR1.AMT.50",
+      "lens": "BR1",
+      "title": "amount string",
+      "ev": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1Kzq0UMnU51Z6B7vztK91uIqEcM7x2piRgMK52LkSHvLUNh5WxdLIzIe0#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21… amt=2375"
+    },
+    {
+      "id": "BR1.AMT.1e1",
+      "lens": "BR1",
+      "title": "amount string",
+      "ev": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1Kzq0UMnU51Z6B7vztK91uIqEcM7x2piRgMK52LkSHvLUNh5WxdLIzIe0#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21… amt=2375"
+    },
+    {
+      "id": "BR1.AMT.0x32",
+      "lens": "BR1",
+      "title": "amount string",
+      "ev": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1Kzq0UMnU51Z6B7vztK91uIqEcM7x2piRgMK52LkSHvLUNh5WxdLIzIe0#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21… amt=2375"
+    },
+    {
+      "id": "BR2.TRIPLE.seq",
+      "lens": "BR2",
+      "title": "AB then BC then CA",
+      "ev": {
+        "ab": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1iWaSiiaxncB5HLwWo274Q4TrYOnGTe3Y7zQN7kccLuRiMY8terHklqsJ#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21…",
+        "bc": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1phLI6hnHgzW4L0ixA7SJ2g3S9pVsaLFvlEpfuSwGJSi1AePcWPJl8GXV#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21…",
+        "ca": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1EwFQ0RTqZc4UElGom7X9y6pwPjYqsCavCASlevUe8mOpCWPNqDmhHI3s#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21…",
+        "unique_sids": [
+          "cs_test_a1iWaSiiaxncB5HLwWo274Q4TrYOnGTe3Y7zQN7kccLuRiMY8terHklqsJ",
+          "cs_test_a1phLI6hnHgzW4L0ixA7SJ2g3S9pVsaLFvlEpfuSwGJSi1AePcWPJl8GXV",
+          "cs_test_a1EwFQ0RTqZc4UElGom7X9y6pwPjYqsCavCASlevUe8mOpCWPNqDmhHI3s"
+        ],
+        "open_on_orders": [
+          "cs_test_a1EwFQ0RTqZc4UElGom7X9y6pwPjYqsCavCASlevUe8mOpCWPNqDmhHI3s"
+        ]
+      }
+    },
+    {
+      "id": "BR2.HYPHEN.exact",
+      "lens": "BR2",
+      "title": "hífen+compact mesma linha (NÃO CONTAR)",
+      "ev": {
+        "ck": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a159WmqSQZwqZHgQ3j8ohC4ZiaYphXL5QXUzt13Y3nFVb2RDfAOs9MCS6C#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21…",
+        "amt": 1766,
+        "expect_bag_2lines": 1955,
+        "expect_if_dup_counted": 2855
+      }
+    },
+    {
+      "id": "BR2.ABAC.exact",
+      "lens": "BR2",
+      "title": "AB∥AC dual (NÃO CONTAR)",
+      "ev": {
+        "h0": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1PdNHfTB57EXQhqYbN7MmgzQnLc5CK71TctcTQvpURMGiXmxTiJBAd5ce#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21…",
+        "h1": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1Q5JsQ6v7kkafZrdxZhD6xftJejVHf9CL5fkycTTcK6GcPbyT6ZC2ATTD#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21…",
+        "sids": [
+          "cs_test_a1PdNHfTB57EXQhqYbN7MmgzQnLc5CK71TctcTQvpURMGiXmxTiJBAd5ce",
+          "cs_test_a1Q5JsQ6v7kkafZrdxZhD6xftJejVHf9CL5fkycTTcK6GcPbyT6ZC2ATTD"
+        ],
+        "open": 2
+      }
+    },
+    {
+      "id": "BR2.PAGO.fixture",
+      "lens": "BR2",
+      "title": "service_role marcou pago (sem captura real)",
+      "ev": "9d903e39-b882-406a-a6b0-00cc85c74a25"
+    },
+    {
+      "id": "BR2.PAGO.bag",
+      "lens": "BR2",
+      "title": "bag inclui pago",
+      "ev": {
+        "paid_status": "pago",
+        "pi": "pi_RTBR_fixture_pago",
+        "bag": "400 {\"error\":\"Checkout blocked: order status 'pago' cannot start payment.\"}",
+        "sid": ""
+      }
+    },
+    {
+      "id": "BR2.CLAIM.rpc.jwt",
+      "lens": "BR2",
+      "title": "JWT RPC claim",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_claim_checkout_session_slot\"}"
+    },
+    {
+      "id": "BR2.CLAIM.patch",
+      "lens": "BR2",
+      "title": "JWT PATCH claiming:",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"order_money_fields_immutable\"}"
+    },
+    {
+      "id": "BR2.META.swap.req",
+      "lens": "BR2",
+      "title": "bag_lines product_ids trocados",
+      "ev": "400 {\"error\":\"Checkout blocked: bag product does not match order.\"}"
+    },
+    {
+      "id": "BR2.META.stripe.skip",
+      "lens": "BR2",
+      "title": "sem Session/sk para reorder metadata",
+      "ev": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1iMPdt3Zs0HOgvnLFAwU6PxByyd2dm89GfqWIdwODtPeu0dL70GlSX1Vb#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21…"
+    },
+    {
+      "id": "BR2.EXP.ck2",
+      "lens": "BR2",
+      "title": "checkout após expire",
+      "ev": {
+        "sid1": "cs_test_a1GFWbtEmenBvYzxh1U3AXJTgI47IZzYWEcQ5hqFb2PNB9RGBdUecQ3UHH",
+        "ck2": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1GFWbtEmenBvYzxh1U3AXJTgI47IZzYWEcQ5hqFb2PNB9RGBdUecQ3UHH#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21…",
+        "sid2": "cs_test_a1GFWbtEmenBvYzxh1U3AXJTgI47IZzYWEcQ5hqFb2PNB9RGBdUecQ3UHH",
+        "reused": true
+      }
+    },
+    {
+      "id": "BR2.EXP.settle_old",
+      "lens": "BR2",
+      "title": "settle da Session expirada",
+      "ev": {
+        "settle": "402 Pagamento ainda não confirmado. Se já pagaste, aguarda alguns segundos e volta à app Fleaber.",
+        "status": "reserva_pendente"
+      }
+    },
+    {
+      "id": "BR3.BUN.ins",
+      "lens": "BR3",
+      "title": "INSERT bundle total 0.50",
+      "ev": "201 [{\"id\":\"74be986a-7086-40cc-87be-d926b11da30f\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"chat_id\":null,\"product_ids\":[\"4299adea-fa7a-4687-a60b-b211134e469c\",\"898b30d4-e366-4566-a3be…"
+    },
+    {
+      "id": "BR3.BUN.acc",
+      "lens": "BR3",
+      "title": "seller accept",
+      "ev": "200 [{\"id\":\"74be986a-7086-40cc-87be-d926b11da30f\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"chat_id\":null,\"product_ids\":[\"4299adea-fa7a-4687-a60b-b211134e469c\",\"898b30d4-e366-4566-a3be…"
+    },
+    {
+      "id": "BR3.BUN.patch",
+      "lens": "BR3",
+      "title": "PATCH total 0.50",
+      "ev": {
+        "buyer": "200 [{\"id\":\"74be986a-7086-40cc-87be-d926b11da30f\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"chat_id\":null,\"product_ids\":[\"4299adea-fa7a-4687-a60b-b211134e469c\",\"898b30d4-e366-4566-a3be…",
+        "seller": "200 [{\"id\":\"74be986a-7086-40cc-87be-d926b11da30f\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"chat_id\":null,\"product_ids\":[\"4299adea-fa7a-4687-a60b-b211134e469c\",\"898b30d4-e366-4566-a3be…"
+      }
+    },
+    {
+      "id": "BR3.BUN.ck",
+      "lens": "BR3",
+      "title": "checkout conjunto após PATCH",
+      "ev": {
+        "row": {
+          "id": "74be986a-7086-40cc-87be-d926b11da30f",
+          "status": "accepted",
+          "total_eur": 40.0,
+          "discount_pct": 0.0,
+          "subtotal_eur": 40.0
+        },
+        "ck": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1ytpxLvcLctXfgABuLBeuJ0dYX9xYZRYXMlahqB9fb4gydqvln8QsY9Db#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21…",
+        "amt": 4265
+      }
+    },
+    {
+      "id": "BR3.OFF.ins",
+      "lens": "BR3",
+      "title": "offer + quantity fullwidth",
+      "ev": "400 {\"code\":\"PGRST204\",\"details\":null,\"hint\":null,\"message\":\"Could not find the 'quantity' column of 'product_offers' in the schema cache\"}"
+    },
+    {
+      "id": "BR3.OFF.amt.fw",
+      "lens": "BR3",
+      "title": "amount fullwidth",
+      "ev": "400 {\"code\":\"22P02\",\"details\":null,\"hint\":null,\"message\":\"invalid input syntax for type numeric: \\\"０．５０\\\"\"}"
+    },
+    {
+      "id": "BR3.OFF.ord",
+      "lens": "BR3",
+      "title": "order qty unicode / offer",
+      "ev": {
+        "ordU": "201 [{\"id\":\"397d26e0-f917-4447-a6d8-4f347cfee107\",\"created_at\":\"2026-09-06T09:54:18.440754+00:00\",\"product_id\":\"3f8ef589-ecf8-49b3-9324-b703bbd0c8b5\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c…",
+        "ordQty": "400 {\"code\":\"22P02\",\"details\":null,\"hint\":null,\"message\":\"invalid input syntax for type integer: \\\"９\\\"\"}",
+        "contract": 3000,
+        "qtyRow": ""
+      }
+    },
+    {
+      "id": "BR3.OFF.ck",
+      "lens": "BR3",
+      "title": "checkout oferta",
+      "ev": {
+        "sealed": 3000,
+        "amt": 3215,
+        "expectOffer": 590,
+        "expectCat": 3215
+      }
+    },
+    {
+      "id": "BR3.DETACH.exact",
+      "lens": "BR3",
+      "title": "detach offer (NÃO CONTAR)",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"order_product_offer_id_immutable\"}"
+    },
+    {
+      "id": "BR4.ORPH.fake",
+      "lens": "BR4",
+      "title": "settle SID inventado",
+      "ev": "400 Pagamento ainda não confirmado. Se já pagaste, aguarda alguns segundos e volta à app Fleaber."
+    },
+    {
+      "id": "BR4.CAP.ck",
+      "lens": "BR4",
+      "title": "checkout após pago fixture",
+      "ev": "400 {\"error\":\"Checkout blocked: order status 'pago' cannot start payment.\"}"
+    },
+    {
+      "id": "BR5.STOCK.ordB",
+      "lens": "BR5",
+      "title": "2.ª order mesmo SKU stock=1",
+      "ev": {
+        "oA": "14b5df4d-57ae-49ae-a675-ba0fc6b4a304",
+        "oB": "blocked"
+      }
+    },
+    {
+      "id": "BR5.QTY.fw",
+      "lens": "BR5",
+      "title": "order quantity fullwidth ２",
+      "ev": "400 {\"code\":\"22P02\",\"details\":null,\"hint\":null,\"message\":\"invalid input syntax for type integer: \\\"２\\\"\"}"
+    },
+    {
+      "id": "BR6.PAR.single",
+      "lens": "BR6",
+      "title": "3× CPI paralelo mesma order",
+      "ev": {
+        "briefs": [
+          "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1rugNCpkzVJkomDdLRRHn69AzdTmwtilv9cyuwHEWKzgPMrigSvRZhz8r#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21…",
+          "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1rugNCpkzVJkomDdLRRHn69AzdTmwtilv9cyuwHEWKzgPMrigSvRZhz8r#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21…",
+          "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1rugNCpkzVJkomDdLRRHn69AzdTmwtilv9cyuwHEWKzgPMrigSvRZhz8r#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21…"
+        ],
+        "sids": [
+          "cs_test_a1rugNCpkzVJkomDdLRRHn69AzdTmwtilv9cyuwHEWKzgPMrigSvRZhz8r"
+        ],
+        "open": 1
+      }
+    },
+    {
+      "id": "BR6.PAR.triple",
+      "lens": "BR6",
+      "title": "3 sacos A∩B∩C em paralelo",
+      "ev": {
+        "briefs": [
+          "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1RIIJ93CBhpzA9KUNeAANnWeaSBkwQ5j6EVCyyiWAIZvBmwm2Rc37HRf0#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21…",
+          "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a14Uma4JuirQhCxGeBDe7eNTMVo4g7Y9oSkpXqhcNYrRlwWCP5T25zieqQ#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21…",
+          "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1mAogeewd7x19z06kPEEyuXbOliwA5cmKCMOeNlHbjM5AxJqu8AoFgPgo#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21…"
+        ],
+        "sids": [
+          "cs_test_a1RIIJ93CBhpzA9KUNeAANnWeaSBkwQ5j6EVCyyiWAIZvBmwm2Rc37HRf0",
+          "cs_test_a14Uma4JuirQhCxGeBDe7eNTMVo4g7Y9oSkpXqhcNYrRlwWCP5T25zieqQ",
+          "cs_test_a1mAogeewd7x19z06kPEEyuXbOliwA5cmKCMOeNlHbjM5AxJqu8AoFgPgo"
+        ],
+        "open": 3,
+        "on_orders": [
+          "cs_test_a1RIIJ93CBhpzA9KUNeAANnWeaSBkwQ5j6EVCyyiWAIZvBmwm2Rc37HRf0"
+        ]
+      }
+    },
+    {
+      "id": "BR7.B2.bag",
+      "lens": "BR7",
+      "title": "B2 checkout saco de B1",
+      "ev": "400 {\"error\":\"Checkout blocked: order does not belong to buyer.\"}"
+    },
+    {
+      "id": "BR7.S2.refund",
+      "lens": "BR7",
+      "title": "S2 refund order S1",
+      "ev": "403 {\"ok\":false,\"error\":\"Sem permissão.\"}"
+    },
+    {
+      "id": "BR7.ANON",
+      "lens": "BR7",
+      "title": "anon CPI",
+      "ev": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1MT60QkylbrYPZmTNZJvoIDDFL6UihEoyWhCxKlcubJyFR82BYvsxNIyN#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21…"
+    },
+    {
+      "id": "BR8.wallet.post",
+      "lens": "BR8",
+      "title": "após probes (sem captura TEST nesta pass se unpaid)",
+      "ev": {
+        "pre": {
+          "buyer": 61.1,
+          "seller": 93.33,
+          "buyer2": 0,
+          "seller2": 0
+        },
+        "post": {
+          "buyer": 61.1,
+          "seller": 93.33,
+          "buyer2": 0,
+          "seller2": 0
+        }
+      }
+    }
+  ],
+  "actors": {
+    "buyer": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+    "seller": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+    "buyer2": "76b6d470-2dc3-412f-be96-25773ac092e0",
+    "seller2": "7169220a-18dc-4777-a935-117d2ab9d3aa"
+  },
+  "created": {
+    "lives": [],
+    "items": [],
+    "orders": [
+      "19b65836-32bd-4e80-bfec-b5acebd94b1f",
+      "68eb561d-e503-43ae-a2e4-a288c0cbfd95",
+      "964643e7-0ce3-4c76-838a-44f73fc22c6b",
+      "1582b4cb-b58d-4ad5-a66c-d66fbb9f480f",
+      "dae3a2b3-7239-4051-8618-dc4a48c2c601",
+      "a7e86186-4670-4656-8cf1-702bda850783",
+      "c5001847-46fc-4788-8c3b-819792935095",
+      "3a49006f-5be3-4c6d-8b8f-951acf164d92",
+      "afad9307-0c78-4f8a-8f4f-79a56792d9a4",
+      "3dee39ef-a21d-46af-8a52-4db636d96aa2",
+      "2ce209a6-e8f7-43d7-a927-431d602a66b1",
+      "9d903e39-b882-406a-a6b0-00cc85c74a25",
+      "694b2624-6bb9-4340-a388-2b91eb36ae50",
+      "fc6cc262-3bd4-4a3d-adcf-9302a0c02339",
+      "e0ef77c7-a8e4-4465-9315-953de593ed55",
+      "fc7c09bd-f72d-4a46-be7e-05b1bd80ce1d",
+      "b78ef36b-d263-4238-b2c2-c94c9a32dbd7",
+      "78647eb8-c5ac-40e5-b47f-f83950f706c7",
+      "74f74837-7dfa-4f34-b2b4-364ff85e2513",
+      "397d26e0-f917-4447-a6d8-4f347cfee107",
+      "733153ff-807c-4f00-a812-073663e6503f",
+      "b2a901a7-1ac8-4218-9e8f-a84f72a3368c",
+      "6e009a48-4ecb-44ba-a112-322f09c9d6b1",
+      "14b5df4d-57ae-49ae-a675-ba0fc6b4a304",
+      "8ec3b796-6493-45df-a5ee-0e93de41c2c3",
+      "c31b4098-a2dc-4d8e-8e5b-c50f59fb2332",
+      "e3330e36-5306-4319-86a7-60a364b719ab",
+      "bea6880f-956a-4dd4-bdc4-f3eafcf7deb4",
+      "bbd9a424-5358-4971-856a-cf54c2db2a64",
+      "0104f462-7ce7-4785-86cd-0152f5b8befb",
+      "96fc4a46-1aa7-4412-a859-2c251cdfdbb9",
+      "7ce22778-17be-4c7e-b87b-ca4178bb560f",
+      "d53923eb-5029-4da0-8106-116a42585309"
+    ],
+    "products": [
+      "da0ccb01-8c82-4303-968f-9ab323082dde",
+      "75f09b04-4254-4532-9f2e-3c0f42a968b7",
+      "7229fc8b-64cb-46b0-bec8-7f001263c914",
+      "7c94cbab-ac46-4ccf-b815-0f70181d5488",
+      "c1c1e328-05e0-4985-96c9-d9e33bc7c281",
+      "0207dde9-f1e8-4f6a-bd28-36c6c0ecb015",
+      "f6515e48-15c2-495f-a298-3fae5a2d012d",
+      "c612d345-0251-41da-aa8c-f2baec583217",
+      "22349ca6-e68e-422a-a61e-eeaec14aa8c7",
+      "aa09ad9d-ca64-4118-a9dc-7d23687ae203",
+      "6e1a58dc-c323-4c14-9787-a42de45c3bc0",
+      "b0b40c50-fd54-49d6-95cb-2cb3ea897fde",
+      "6028f2ef-4d74-4812-b32b-a913f887589b",
+      "3f2be6e9-45e8-4366-9b5c-dc757bf09d39",
+      "e2168bbb-da7b-4206-bd35-7475c3cec349",
+      "42da7c7c-7827-4d6f-af85-3992154f9a3b",
+      "633e774e-5c43-48ac-99ad-5c06d1258f35",
+      "4299adea-fa7a-4687-a60b-b211134e469c",
+      "898b30d4-e366-4566-a3be-70e1bf1f0034",
+      "3f8ef589-ecf8-49b3-9324-b703bbd0c8b5",
+      "8a67a8fe-6724-4314-847f-41a8b7d326ec",
+      "66add847-9487-435f-8afd-ee9084dd11b7",
+      "589320a3-9aea-47af-a91c-1898f57af247",
+      "138ba27d-adcb-4392-9a29-88eb28039179",
+      "d3d608c4-8a8c-4642-9ac6-60ef5b26ecbe",
+      "d1131be8-02c1-4108-8dae-38de43159860",
+      "66ab9b24-fa62-4209-b7dc-2f6acc68522c",
+      "0c8efe9d-0057-4c9d-a2fa-ccb62aa9f5f1",
+      "5cdac474-edcd-4345-8697-e13eacc3ad2c",
+      "74c7ba59-46f6-4231-b3df-ce2f45a417d8",
+      "d02f0795-5e12-47fe-b649-651ce8657798",
+      "be1e21bd-3c34-40df-b0b7-121a39bedafc",
+      "80abb044-970e-45d2-bbce-326074a9563e",
+      "f5449968-53e5-4c04-a72c-84ed6ad8f74b"
+    ],
+    "bundles": [
+      "74be986a-7086-40cc-87be-d926b11da30f"
+    ],
+    "offers": [
+      "2a4a7aa6-12b6-4977-ae0c-cb57986877c8"
+    ]
+  }
+}

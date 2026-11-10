@@ -1,0 +1,417 @@
+{
+  "stamp": "20260902T1822",
+  "prefix": "RTBJ-20260902T1822",
+  "auditor": "REDTEAM_BLIND_BJ_PAYOUT_POS_ATBE_v1",
+  "lenses": [
+    "BJ3",
+    "BJ5",
+    "BJ6",
+    "BJ7"
+  ],
+  "findings": [
+    {
+      "id": "BJ5-01-morada-is-hand",
+      "lens": "BJ5",
+      "severity": "P1",
+      "title": "\"entrega em morada\" classificada como entrega em mão",
+      "actor": "buyer JWT rpc",
+      "pre": "LIKE entrega em m% cobre morada/mail/MRW",
+      "repro": "rpc batata_shipping_method_is_hand(\"entrega em morada\")",
+      "expected": "false (carrier)",
+      "obtained": "200 true",
+      "proven": true,
+      "evidence": {
+        "order_id": "b28bcbd0-4066-4ff4-ab3c-57089e24e60a",
+        "cpi": "400 {\"error\":\"Checkout blocked: portes da encomenda inválidos.\"}",
+        "shipping": "entrega em morada"
+      }
+    },
+    {
+      "id": "BJ5-02-hand-like-mao CTT Expresso",
+      "lens": "BJ5",
+      "severity": "P1",
+      "title": "shipping \"mao CTT Expresso\" classificado como mão",
+      "actor": "buyer JWT",
+      "pre": "prefix LIKE mao%/hand%/entrega em m%",
+      "repro": "rpc batata_shipping_method_is_hand(\"mao CTT Expresso\")",
+      "expected": "false",
+      "obtained": "200 true",
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "BJ5-02-hand-like-hand-ctt",
+      "lens": "BJ5",
+      "severity": "P1",
+      "title": "shipping \"hand-ctt\" classificado como mão",
+      "actor": "buyer JWT",
+      "pre": "prefix LIKE mao%/hand%/entrega em m%",
+      "repro": "rpc batata_shipping_method_is_hand(\"hand-ctt\")",
+      "expected": "false",
+      "obtained": "200 true",
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "BJ5-02-hand-like-entrega em mota",
+      "lens": "BJ5",
+      "severity": "P1",
+      "title": "shipping \"entrega em mota\" classificado como mão",
+      "actor": "buyer JWT",
+      "pre": "prefix LIKE mao%/hand%/entrega em m%",
+      "repro": "rpc batata_shipping_method_is_hand(\"entrega em mota\")",
+      "expected": "false",
+      "obtained": "200 true",
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "BJ5-02-hand-like-ENTREGA EM MORADA",
+      "lens": "BJ5",
+      "severity": "P1",
+      "title": "shipping \"ENTREGA EM MORADA\" classificado como mão",
+      "actor": "buyer JWT",
+      "pre": "prefix LIKE mao%/hand%/entrega em m%",
+      "repro": "rpc batata_shipping_method_is_hand(\"ENTREGA EM MORADA\")",
+      "expected": "false",
+      "obtained": "200 true",
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "BJ5-05-unship-jwt",
+      "lens": "BJ5",
+      "severity": "P1",
+      "title": "Seller JWT apagou shipped_at / reverteu para pago",
+      "actor": "seller JWT",
+      "pre": "shipped_at imutável ATBE",
+      "repro": "PATCH shipped_at=null status=pago",
+      "expected": "42501",
+      "obtained": "200 [{\"id\":\"65bfdec3-4d90-483f-8a3c-3aa0095f89c7\",\"created_at\":\"2026-09-02T17:32:15.675932+00:00\",\"product_id\":\"4e52d447-748d-4810-8711-46b5eec06bb1\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c…",
+      "proven": true,
+      "evidence": {}
+    }
+  ],
+  "blocked": [
+    {
+      "id": "BJ5-03-ship-after-pay",
+      "lens": "BJ5",
+      "title": "Buyer muda shipping para morada após pago",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"order_shipping_frozen_after_payment\"}"
+    },
+    {
+      "id": "BJ3-01-release-while-pago",
+      "lens": "BJ3",
+      "title": "release em pago",
+      "ev": "200 false"
+    },
+    {
+      "id": "BJ5-04-concluido-sem-mao",
+      "lens": "BJ5",
+      "title": "Buyer marca concluido a partir de pago sem mão/envio",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"order_concluido_requires_shipped\"}"
+    },
+    {
+      "id": "BJ6-01-buyer-refund",
+      "lens": "BJ6",
+      "title": "Buyer disparou refund-order",
+      "ev": "403 {\"ok\":false,\"error\":\"Sem permissão.\"}"
+    },
+    {
+      "id": "BJ6-02-b2-refund",
+      "lens": "BJ6",
+      "title": "B2 refund-order da venda B1",
+      "ev": "403 {\"ok\":false,\"error\":\"Sem permissão.\"}"
+    },
+    {
+      "id": "BJ6-03-s2-refund",
+      "lens": "BJ6",
+      "title": "S2 refund-order da venda S1",
+      "ev": "403 {\"ok\":false,\"error\":\"Sem permissão.\"}"
+    },
+    {
+      "id": "BJ3-03-jwt-clawback",
+      "lens": "BJ3",
+      "title": "JWT clawback",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_clawback_seller_wallet_for_order\"}"
+    },
+    {
+      "id": "BJ3-04-seller-self-release",
+      "lens": "BJ3",
+      "title": "seller self-release",
+      "ev": "200 false"
+    },
+    {
+      "id": "BJ6-04-b2-release",
+      "lens": "BJ6",
+      "title": "B2 release",
+      "ev": "200 false"
+    },
+    {
+      "id": "BJ3-05-release-refund-net",
+      "lens": "BJ3",
+      "title": "net seller pós refund",
+      "ev": {
+        "delta": 0.0,
+        "refund": "403 {\"ok\":false,\"error\":\"Não é possível anular esta venda neste estado (já enviada ou concluída).\",\"code\":\"order_refund_blocked_shipped\",\"status\":\"concluido\"}"
+      }
+    },
+    {
+      "id": "BJ6-05-buyer-read-payout-ledger",
+      "lens": "BJ6",
+      "title": "buyer ledger seller",
+      "ev": "200 []"
+    }
+  ],
+  "skipped": [],
+  "notes": [
+    {
+      "id": "p2.start",
+      "lens": "BJ7",
+      "title": "saldos",
+      "ev": {
+        "buyer": 61.1,
+        "seller": 21.0,
+        "buyer2": 0,
+        "seller2": 0
+      }
+    },
+    {
+      "id": "p2.morada.insert",
+      "lens": "BJ5",
+      "title": "order shipping=entrega em morada",
+      "ev": "b28bcbd0-4066-4ff4-ab3c-57089e24e60a"
+    },
+    {
+      "id": "p2.morada.row",
+      "lens": "BJ5",
+      "title": "row após INSERT",
+      "ev": {
+        "id": "b28bcbd0-4066-4ff4-ab3c-57089e24e60a",
+        "status": "reserva_pendente",
+        "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+        "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+        "product_id": "a0812674-b643-4b9b-b750-c282ead5aadb",
+        "quantity": 1,
+        "price_total": 6.5,
+        "amount_paid_cents": "",
+        "payment_method": "Pagamento na app",
+        "shipping_method": "entrega em morada",
+        "shipped_at": "",
+        "stripe_payment_intent_id": "",
+        "stripe_checkout_session_id": "",
+        "stripe_refund_id": "",
+        "wallet_release_processed_at": "",
+        "wallet_refund_processed_at": "",
+        "stock_units_applied": ""
+      }
+    },
+    {
+      "id": "p2.morada.cpi",
+      "lens": "BJ5",
+      "title": "CPI com entrega em morada",
+      "ev": "400 {\"error\":\"Checkout blocked: portes da encomenda inválidos.\"}"
+    },
+    {
+      "id": "p2.morada.is_hand",
+      "lens": "BJ5",
+      "title": "rpc is_hand(entrega em morada)",
+      "ev": "200 true"
+    },
+    {
+      "id": "p2.hand.mao CTT Expresso",
+      "lens": "BJ5",
+      "title": "is_hand(mao CTT Expresso)",
+      "ev": "200 true"
+    },
+    {
+      "id": "p2.hand.hand-ctt",
+      "lens": "BJ5",
+      "title": "is_hand(hand-ctt)",
+      "ev": "200 true"
+    },
+    {
+      "id": "p2.hand.entrega em mota",
+      "lens": "BJ5",
+      "title": "is_hand(entrega em mota)",
+      "ev": "200 true"
+    },
+    {
+      "id": "p2.hand.ENTREGA EM MORADA",
+      "lens": "BJ5",
+      "title": "is_hand(ENTREGA EM MORADA)",
+      "ev": "200 true"
+    },
+    {
+      "id": "fixture.paid",
+      "lens": "BJ3",
+      "title": "setup_paid_order",
+      "ev": "200 {\n  \"ok\": true,\n  \"order_id\": \"65bfdec3-4d90-483f-8a3c-3aa0095f89c7\",\n  \"product_id\": \"4e52d447-748d-4810-8711-46b5eec06bb1\",\n  \"payment_intent_id\": \"pi_3UBI1EH7FWYUN3jh0jNEmALk\",\n  \"pi_status\": \"succeeded\",\n  \"pi_amount_received\": 590,\n  \"…"
+    },
+    {
+      "id": "p2.paid",
+      "lens": "BJ3",
+      "title": "order pago",
+      "ev": {
+        "id": "65bfdec3-4d90-483f-8a3c-3aa0095f89c7",
+        "status": "pago",
+        "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+        "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+        "product_id": "4e52d447-748d-4810-8711-46b5eec06bb1",
+        "quantity": 1,
+        "price_total": 5.9,
+        "amount_paid_cents": 590,
+        "payment_method": "Pagamento na app",
+        "shipping_method": "",
+        "shipped_at": "",
+        "stripe_payment_intent_id": "pi_3UBI1EH7FWYUN3jh0jNEmALk",
+        "stripe_checkout_session_id": "",
+        "stripe_refund_id": "",
+        "wallet_release_processed_at": "",
+        "wallet_refund_processed_at": "",
+        "stock_units_applied": 1
+      }
+    },
+    {
+      "id": "p2.release.pago",
+      "lens": "BJ3",
+      "title": "release em pago sem shipped",
+      "ev": "200 false"
+    },
+    {
+      "id": "p2.unship.jwt",
+      "lens": "BJ5",
+      "title": "seller unship JWT",
+      "ev": "200 [{\"id\":\"65bfdec3-4d90-483f-8a3c-3aa0095f89c7\",\"created_at\":\"2026-09-02T17:32:15.675932+00:00\",\"product_id\":\"4e52d447-748d-4810-8711-46b5eec06bb1\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c…"
+    },
+    {
+      "id": "p2.refund.body-amount",
+      "lens": "BJ3",
+      "title": "refund-order amount=999999 no body",
+      "ev": "200 {\"ok\":true,\"already_refunded\":true,\"idempotent\":true,\"refund_id\":\"re_3UBI1EH7FWYUN3jh0igQZX1W\",\"status\":\"cancelado\",\"stock_units_applied\":null,\"amount_cents\":590,\"payment_intent\":\"pi_3UBI1EH7FWYUN3jh0jNEmALk\",\"status_stripe\":\"succeeded\"}"
+    },
+    {
+      "id": "p2.refund.pago.ok",
+      "lens": "BJ3",
+      "title": "seller refund em pago (legítimo)",
+      "ev": "200 {\"ok\":true,\"already_refunded\":true,\"idempotent\":true,\"refund_id\":\"re_3UBI1EH7FWYUN3jh0igQZX1W\",\"status\":\"cancelado\",\"stock_units_applied\":null,\"amount_cents\":590,\"payment_intent\":\"pi_3UBI1EH7FWYUN3jh0jNEmALk\",\"status_stripe\":\"succeeded\"}"
+    },
+    {
+      "id": "p2.claw.jwt",
+      "lens": "BJ3",
+      "title": "buyer JWT clawback",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_clawback_seller_wallet_for_order\"}"
+    },
+    {
+      "id": "fixture.paid",
+      "lens": "BJ3",
+      "title": "setup_paid_order",
+      "ev": "200 {\n  \"ok\": true,\n  \"order_id\": \"600ec1af-3ef5-4b1b-a668-73c90725477c\",\n  \"product_id\": \"d51cb1a9-206a-4a6d-bc11-dbca470b987a\",\n  \"payment_intent_id\": \"pi_3UBI1MH7FWYUN3jh0seYCtOR\",\n  \"pi_status\": \"succeeded\",\n  \"pi_amount_received\": 590,\n  \"…"
+    },
+    {
+      "id": "p2.oid2.enviado",
+      "lens": "BJ5",
+      "title": "seller marca enviado",
+      "ev": "200 [{\"id\":\"600ec1af-3ef5-4b1b-a668-73c90725477c\",\"created_at\":\"2026-09-02T17:32:23.823329+00:00\",\"product_id\":\"d51cb1a9-206a-4a6d-bc11-dbca470b987a\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c…"
+    },
+    {
+      "id": "p2.oid2.shipped_at",
+      "lens": "BJ5",
+      "title": "shipped_at após enviado",
+      "ev": "2026-09-02T17:32:26.006642+00:00"
+    },
+    {
+      "id": "p2.oid2.release_seller",
+      "lens": "BJ3",
+      "title": "seller self-release em enviado",
+      "ev": "200 false"
+    },
+    {
+      "id": "p2.oid2.concluido",
+      "lens": "BJ5",
+      "title": "buyer concluido após enviado",
+      "ev": "200 [{\"id\":\"600ec1af-3ef5-4b1b-a668-73c90725477c\",\"created_at\":\"2026-09-02T17:32:23.823329+00:00\",\"product_id\":\"d51cb1a9-206a-4a6d-bc11-dbca470b987a\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c…"
+    },
+    {
+      "id": "p2.oid2.release_buyer",
+      "lens": "BJ3",
+      "title": "buyer release",
+      "ev": "200 true"
+    },
+    {
+      "id": "p2.oid2.delta",
+      "lens": "BJ7",
+      "title": "Δ seller wallet após release",
+      "ev": {
+        "before": 21.0,
+        "after": 26.0,
+        "delta": 5.0,
+        "released": true
+      }
+    },
+    {
+      "id": "p2.oid2.refund_after_release",
+      "lens": "BJ3",
+      "title": "refund-order pós-release",
+      "ev": "403 {\"ok\":false,\"error\":\"Não é possível anular esta venda neste estado (já enviada ou concluída).\",\"code\":\"order_refund_blocked_shipped\",\"status\":\"concluido\"}"
+    },
+    {
+      "id": "p2.oid2.claw_svc",
+      "lens": "BJ3",
+      "title": "clawback service_role (observação)",
+      "ev": "200 5.00"
+    },
+    {
+      "id": "p2.oid2.net",
+      "lens": "BJ7",
+      "title": "seller após refund+clawback",
+      "ev": {
+        "after_release": 26.0,
+        "after_refund_edge": 26.0,
+        "after_claw_svc": 21.0,
+        "delta_vs_before_release": 0.0
+      }
+    },
+    {
+      "id": "p2.exacto.hop",
+      "lens": "BJ5",
+      "title": "ATBE exacto hop enviado pós-refund",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"order_shipped_at_immutable\"}"
+    },
+    {
+      "id": "p2.ledger.buyer",
+      "lens": "BJ6",
+      "title": "buyer GET ledger seller",
+      "ev": "200 []"
+    },
+    {
+      "id": "p2.end",
+      "lens": "BJ7",
+      "title": "saldos fim",
+      "ev": {
+        "buyer": 61.1,
+        "seller": 21.0,
+        "buyer2": 0,
+        "seller2": 0
+      }
+    }
+  ],
+  "actors": {
+    "buyer": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+    "seller": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+    "buyer2": "90b11020-869a-4a2c-8181-57e62ece8ced",
+    "seller2": "13b56f86-a7cb-418a-90d9-045066d04fa2"
+  },
+  "created": {
+    "orders": [
+      "b28bcbd0-4066-4ff4-ab3c-57089e24e60a",
+      "65bfdec3-4d90-483f-8a3c-3aa0095f89c7",
+      "600ec1af-3ef5-4b1b-a668-73c90725477c"
+    ],
+    "products": [
+      "a0812674-b643-4b9b-b750-c282ead5aadb",
+      "4e52d447-748d-4810-8711-46b5eec06bb1",
+      "d51cb1a9-206a-4a6d-bc11-dbca470b987a"
+    ]
+  }
+}

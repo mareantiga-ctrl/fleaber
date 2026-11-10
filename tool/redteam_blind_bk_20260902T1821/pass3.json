@@ -1,0 +1,284 @@
+{
+  "stamp": "20260902T1821",
+  "prefix": "RTBK-20260902T1821",
+  "auditor": "REDTEAM_BLIND_BK_DISPUTA_POS_ATBE_v1",
+  "production_touched": false,
+  "fase4": false,
+  "corrections_applied": false,
+  "lenses": [
+    "BK2",
+    "BK3",
+    "BK4",
+    "BK7"
+  ],
+  "findings": [
+    {
+      "id": "BK3.wrap_bind_substring",
+      "lens": "BK3",
+      "severity": "P2",
+      "title": "Bind proof/label é substring: URL de outra order persiste (ficheiro 404)",
+      "actor": "buyer JWT",
+      "pre": "duas disputas B1-S1",
+      "repro": "PATCH return_label_url+proof_photos wrap path B?q=needle A",
+      "expected": "position(needle) no path do object, não na query",
+      "obtained": {
+        "url": "https://fxdknzrqjenzqcvnwqqq.supabase.co/storage/v1/object/authenticated/fleaber_private/order_disputes/bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96/1146fbe1-3b10-4758-bd8a-5648fbfe9613/secret.png?q=order_disputes/bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96/ef2e4ecf-ffd1-4ac8-93e6-95470596f191",
+        "patch": "200 [{\"id\":\"768f72d1-210d-405e-88d2-6479d624452f\",\"order_id\":\"ef2e4ecf-ffd1-4ac8-93e6-95470596f191\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"reason\":\"danificado\",\"description\":\"\",\"proof_photos\":[\"https://fxdknzrqjenzqcvnwqqq.supabase.…",
+        "getSeller": 400,
+        "getBuyer": 400,
+        "row": {
+          "id": "768f72d1-210d-405e-88d2-6479d624452f",
+          "order_id": "ef2e4ecf-ffd1-4ac8-93e6-95470596f191",
+          "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+          "status": "aberta",
+          "proof_photos": [
+            "https://fxdknzrqjenzqcvnwqqq.supabase.co/storage/v1/object/authenticated/fleaber_private/order_disputes/bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96/1146fbe1-3b10-4758-bd8a-5648fbfe9613/secret.png?q=order_disputes/bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96/ef2e4ecf-ffd1-4ac8-93e6-95470596f191"
+          ],
+          "return_label_url": "https://fxdknzrqjenzqcvnwqqq.supabase.co/storage/v1/object/authenticated/fleaber_private/order_disputes/bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96/1146fbe1-3b10-4758-bd8a-5648fbfe9613/secret.png?q=order_disputes/bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96/ef2e4ecf-ffd1-4ac8-93e6-95470596f191",
+          "seller_refund_percent": "",
+          "seller_offer_type": "",
+          "seller_offer_set_by": "",
+          "seller_offer_set_at": "",
+          "buyer_decision": "",
+          "current_turn": "vendedor",
+          "created_at": "2026-09-02T17:33:33.559117+00:00"
+        }
+      },
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "BK3.unicode_dotdot",
+      "lens": "BK3",
+      "severity": "P2",
+      "title": "return_label variante dotdot persistiu",
+      "actor": "buyer JWT",
+      "pre": "disputa aberta",
+      "repro": "PATCH return_label_url=https://fxdknzrqjenzqcvnwqqq.supabase.co/storage/v1/object/authenticated/fleaber_private/order_disputes/../order_disputes/bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96/4b89d061-f869-46ed-9cb0-4301f2bad267/x.png",
+      "expected": "recusado",
+      "obtained": {
+        "patch": "200 [{\"id\":\"26b53ca9-a427-4d2d-ad12-3a9484022440\",\"order_id\":\"4b89d061-f869-46ed-9cb0-4301f2bad267\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"reason\":\"danificado\",\"description\":\"\",\"proof_photos\":[],\"status\":\"aberta\",\"created_at\":\"2026-…",
+        "url": "https://fxdknzrqjenzqcvnwqqq.supabase.co/storage/v1/object/authenticated/fleaber_private/order_disputes/../order_disputes/bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96/4b89d061-f869-46ed-9cb0-4301f2bad267/x.png"
+      },
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "BK3.unicode_fleaber_open_redirect",
+      "lens": "BK3",
+      "severity": "P2",
+      "title": "return_label variante fleaber_open_redirect persistiu",
+      "actor": "buyer JWT",
+      "pre": "disputa aberta",
+      "repro": "PATCH return_label_url=https://fleaber.app/order_disputes/bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96/4b89d061-f869-46ed-9cb0-4301f2bad267",
+      "expected": "recusado",
+      "obtained": {
+        "patch": "200 [{\"id\":\"26b53ca9-a427-4d2d-ad12-3a9484022440\",\"order_id\":\"4b89d061-f869-46ed-9cb0-4301f2bad267\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"reason\":\"danificado\",\"description\":\"\",\"proof_photos\":[],\"status\":\"aberta\",\"created_at\":\"2026-…",
+        "url": "https://fleaber.app/order_disputes/bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96/4b89d061-f869-46ed-9cb0-4301f2bad267"
+      },
+      "proven": true,
+      "evidence": {}
+    }
+  ],
+  "blocked": [
+    {
+      "id": "BK2.buyer_concluido_mid_return",
+      "lens": "BK2",
+      "title": "concluido mid-return (disputa aberta)",
+      "ev": {
+        "patch": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"order_concluido_denied_during_return\"}",
+        "status": "pedido_devolucao"
+      }
+    },
+    {
+      "id": "BK4.edge_status_matches_bd",
+      "lens": "BK4",
+      "title": "Edge status = BD",
+      "ev": {
+        "status": "cancelado"
+      }
+    },
+    {
+      "id": "BK7.race_two_disputes",
+      "lens": "BK7",
+      "title": "race 2 disputas",
+      "ev": {
+        "n": 1,
+        "a": 409,
+        "b": 201
+      }
+    },
+    {
+      "id": "BK3.unicode_encoded_slash",
+      "lens": "BK3",
+      "title": "encoded_slash",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"order_dispute_label_url_denied\"}"
+    }
+  ],
+  "skipped": [],
+  "residuals_ay_be": [],
+  "notes": [
+    {
+      "id": "w0",
+      "title": "pass3 wallets",
+      "ev": {
+        "buyer": 61.1,
+        "seller": 21.0,
+        "buyer2": "",
+        "seller2": ""
+      }
+    },
+    {
+      "id": "setup_paid",
+      "title": "setup_paid_order",
+      "ev": "200 {\n  \"ok\": true,\n  \"order_id\": \"ce736082-53d9-4635-8ac4-f99404aa1841\",\n  \"product_id\": \"721e22a7-c512-400b-8511-a28e65a3c657\",\n  \"payment_intent_id\": \"pi_3UBI2LH7FWYUN3jh1mDurcXK\",\n  \"pi_status\": \"succeeded\",\n  \"pi_amount_received\": 590,\n  \"…"
+    },
+    {
+      "id": "toConcluido",
+      "title": "ce736082-53d9-4635-8ac4-f99404aa1841",
+      "ev": {
+        "patch": "200 [{\"id\":\"ce736082-53d9-4635-8ac4-f99404aa1841\",\"created_at\":\"2026-09-02T17:33:24.640941+00:00\",\"product_id\":\"721e22a7-c512-400b-8511-a28e65a3c657\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c…",
+        "status": "concluido"
+      }
+    },
+    {
+      "id": "BK2.mid.pedido",
+      "lens": "BK2",
+      "title": "após PATCH pedido",
+      "ev": {
+        "patch": "200 [{\"id\":\"ce736082-53d9-4635-8ac4-f99404aa1841\",\"created_at\":\"2026-09-02T17:33:24.640941+00:00\",\"product_id\":\"721e22a7-c512-400b-8511-a28e65a3c657\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c…",
+        "status": "pedido_devolucao"
+      }
+    },
+    {
+      "id": "setup_paid",
+      "title": "setup_paid_order",
+      "ev": "200 {\n  \"ok\": true,\n  \"order_id\": \"ef2e4ecf-ffd1-4ac8-93e6-95470596f191\",\n  \"product_id\": \"197b92cd-067c-4c52-af08-e4534c260fea\",\n  \"payment_intent_id\": \"pi_3UBI2OH7FWYUN3jh06LeWsQX\",\n  \"pi_status\": \"succeeded\",\n  \"pi_amount_received\": 590,\n  \"…"
+    },
+    {
+      "id": "setup_paid",
+      "title": "setup_paid_order",
+      "ev": "200 {\n  \"ok\": true,\n  \"order_id\": \"1146fbe1-3b10-4758-bd8a-5648fbfe9613\",\n  \"product_id\": \"da73fea7-17fa-41f2-bb62-49c04ab2bc0d\",\n  \"payment_intent_id\": \"pi_3UBI2QH7FWYUN3jh0DyHZrn8\",\n  \"pi_status\": \"succeeded\",\n  \"pi_amount_received\": 590,\n  \"…"
+    },
+    {
+      "id": "toConcluido",
+      "title": "ef2e4ecf-ffd1-4ac8-93e6-95470596f191",
+      "ev": {
+        "patch": "200 [{\"id\":\"ef2e4ecf-ffd1-4ac8-93e6-95470596f191\",\"created_at\":\"2026-09-02T17:33:28.069773+00:00\",\"product_id\":\"197b92cd-067c-4c52-af08-e4534c260fea\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c…",
+        "status": "concluido"
+      }
+    },
+    {
+      "id": "toConcluido",
+      "title": "1146fbe1-3b10-4758-bd8a-5648fbfe9613",
+      "ev": {
+        "patch": "200 [{\"id\":\"1146fbe1-3b10-4758-bd8a-5648fbfe9613\",\"created_at\":\"2026-09-02T17:33:30.608111+00:00\",\"product_id\":\"da73fea7-17fa-41f2-bb62-49c04ab2bc0d\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c…",
+        "status": "concluido"
+      }
+    },
+    {
+      "id": "BK3.wrap_real",
+      "lens": "BK3",
+      "title": "wrap A←B",
+      "ev": {
+        "wrap": "https://fxdknzrqjenzqcvnwqqq.supabase.co/storage/v1/object/authenticated/fleaber_private/order_disputes/bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96/1146fbe1-3b10-4758-bd8a-5648fbfe9613/secret.png?q=order_disputes/bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96/ef2e4ecf-ffd1-4ac8-93e6-95470596f191",
+        "patch": "200 [{\"id\":\"768f72d1-210d-405e-88d2-6479d624452f\",\"order_id\":\"ef2e4ecf-ffd1-4ac8-93e6-95470596f191\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"reason\":\"danificado\",\"description\":\"\",\"proof_photos\":[\"https://fxdknzrqjenzqcvnwqqq.supabase.…",
+        "stored": true,
+        "getSeller": "400 {\"statusCode\":\"404\",\"error\":\"not_found\",\"message\":\"Object not found\",\"code\":\"NoSuchKey\"}",
+        "getBuyer": "400 {\"statusCode\":\"404\",\"error\":\"not_found\",\"message\":\"Object not found\",\"code\":\"NoSuchKey\"}",
+        "listB": "200 []",
+        "label": "https://fxdknzrqjenzqcvnwqqq.supabase.co/storage/v1/object/authenticated/fleaber_private/order_disputes/bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96/1146fbe1-3b10-4758-bd8a-5648fbfe9613/secret.png?q=order_disputes/bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96/ef2e4ecf-ffd1-4ac8-93e6-95470596f191",
+        "photos": [
+          "https://fxdknzrqjenzqcvnwqqq.supabase.co/storage/v1/object/authenticated/fleaber_private/order_disputes/bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96/1146fbe1-3b10-4758-bd8a-5648fbfe9613/secret.png?q=order_disputes/bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96/ef2e4ecf-ffd1-4ac8-93e6-95470596f191"
+        ]
+      }
+    },
+    {
+      "id": "setup_paid",
+      "title": "setup_paid_order",
+      "ev": "200 {\n  \"ok\": true,\n  \"order_id\": \"ae1844b9-54bc-4686-9385-717bd6e9f273\",\n  \"product_id\": \"5a539b9b-ae0a-463a-bef4-05d3ba23568b\",\n  \"payment_intent_id\": \"pi_3UBI2WH7FWYUN3jh1hHz5stk\",\n  \"pi_status\": \"succeeded\",\n  \"pi_amount_received\": 590,\n  \"…"
+    },
+    {
+      "id": "BK4.edge_vs_bd",
+      "lens": "BK4",
+      "title": "refund-order vs BD",
+      "ev": {
+        "edge": "200 {\"ok\":true,\"already_refunded\":true,\"idempotent\":true,\"refund_id\":\"re_3UBI2WH7FWYUN3jh1yILMnn5\",\"status\":\"cancelado\",\"stock_units_applied\":null,\"amount_cents\":590,\"payment_intent\":\"pi_3UBI2WH7FWYUN3jh1hHz5stk\",\"status_stripe\":\"succeeded\"}",
+        "edgeStatus": "cancelado",
+        "bdStatus": "cancelado",
+        "refund": "re_3UBI2WH7FWYUN3jh1yILMnn5",
+        "units": ""
+      }
+    },
+    {
+      "id": "setup_paid",
+      "title": "setup_paid_order",
+      "ev": "200 {\n  \"ok\": true,\n  \"order_id\": \"de28aacd-c433-4a18-b25b-d006d9a4c3c7\",\n  \"product_id\": \"2baf7408-5baf-47de-892b-399c8740cccd\",\n  \"payment_intent_id\": \"pi_3UBI2aH7FWYUN3jh0QslF5w5\",\n  \"pi_status\": \"succeeded\",\n  \"pi_amount_received\": 590,\n  \"…"
+    },
+    {
+      "id": "BK2.race_ship_conc",
+      "lens": "BK2",
+      "title": "enviado∥concluido",
+      "ev": {
+        "seller": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"order_concluido_immutable_for_seller\"}",
+        "buyer": "200 [{\"id\":\"de28aacd-c433-4a18-b25b-d006d9a4c3c7\",\"created_at\":\"2026-09-02T17:33:40.689885+00:00\",\"product_id\":\"2baf7408-5baf-47de-892b-399c8740cccd\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c…",
+        "status": "concluido",
+        "shipped_at": ""
+      }
+    },
+    {
+      "id": "BK7.race_2disp",
+      "lens": "BK7",
+      "title": "2× INSERT disputa",
+      "ev": {
+        "a": "409 {\"code\":\"23505\",\"details\":null,\"hint\":null,\"message\":\"duplicate key value violates unique constraint \\\"order_disputes_order_open_uidx\\\"\"}",
+        "b": "201 [{\"id\":\"de3ce10e-c800-4c5f-9d70-acca914d3f99\",\"order_id\":\"de28aacd-c433-4a18-b25b-d006d9a4c3c7\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"reason\":\"danificado\",\"description\":\"\",\"proof_photos\":[],\"status\":\"aberta\",\"created_at\":\"2026-…",
+        "n": 1
+      }
+    },
+    {
+      "id": "setup_paid",
+      "title": "setup_paid_order",
+      "ev": "200 {\n  \"ok\": true,\n  \"order_id\": \"4b89d061-f869-46ed-9cb0-4301f2bad267\",\n  \"product_id\": \"b76a675a-a533-43df-a7bb-468e41eb9e4e\",\n  \"payment_intent_id\": \"pi_3UBI2eH7FWYUN3jh1G6bYovI\",\n  \"pi_status\": \"succeeded\",\n  \"pi_amount_received\": 590,\n  \"…"
+    },
+    {
+      "id": "toConcluido",
+      "title": "4b89d061-f869-46ed-9cb0-4301f2bad267",
+      "ev": {
+        "patch": "200 [{\"id\":\"4b89d061-f869-46ed-9cb0-4301f2bad267\",\"created_at\":\"2026-09-02T17:33:43.808772+00:00\",\"product_id\":\"b76a675a-a533-43df-a7bb-468e41eb9e4e\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c…",
+        "status": "concluido"
+      }
+    }
+  ],
+  "actors": {
+    "buyer": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+    "seller": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+    "buyer2": "7062d01e-8a3f-400e-bb9a-7347602e421d",
+    "seller2": null
+  },
+  "created": {
+    "orders": [
+      "ce736082-53d9-4635-8ac4-f99404aa1841",
+      "ef2e4ecf-ffd1-4ac8-93e6-95470596f191",
+      "1146fbe1-3b10-4758-bd8a-5648fbfe9613",
+      "ae1844b9-54bc-4686-9385-717bd6e9f273",
+      "de28aacd-c433-4a18-b25b-d006d9a4c3c7",
+      "4b89d061-f869-46ed-9cb0-4301f2bad267"
+    ],
+    "products": [
+      "721e22a7-c512-400b-8511-a28e65a3c657",
+      "197b92cd-067c-4c52-af08-e4534c260fea",
+      "da73fea7-17fa-41f2-bb62-49c04ab2bc0d",
+      "5a539b9b-ae0a-463a-bef4-05d3ba23568b",
+      "2baf7408-5baf-47de-892b-399c8740cccd",
+      "b76a675a-a533-43df-a7bb-468e41eb9e4e"
+    ],
+    "disputes": [
+      "9870a725-7364-43b3-88fd-dafb52acbe57",
+      "768f72d1-210d-405e-88d2-6479d624452f",
+      "0f2cba2b-c0b3-4bfb-a4bf-1b086badc4e2",
+      "de3ce10e-c800-4c5f-9d70-acca914d3f99",
+      "26b53ca9-a427-4d2d-ad12-3a9484022440"
+    ]
+  }
+}

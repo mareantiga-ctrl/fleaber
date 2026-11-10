@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="utf-8" />
+  <title>Fleaber PS</title>
+  <style>
+    body { font-family: system-ui, sans-serif; width: 340px; margin: 12px; background: #101518; color: #e8eef0; }
+    h1 { font-size: 14px; margin: 0 0 10px; color: #00A3AD; }
+    label { display: block; font-size: 11px; margin-top: 8px; color: #98a1aa; }
+    input[type="text"], input[type="number"] {
+      width: 100%; box-sizing: border-box; padding: 8px; border-radius: 8px;
+      border: 1px solid #333; background: #1a2228; color: #fff;
+    }
+    button { margin-top: 12px; width: 100%; padding: 10px; border: none; border-radius: 10px; background: #007782; color: #fff; font-weight: 700; cursor: pointer; }
+    button.secondary { background: #333; margin-top: 6px; }
+    #status { font-size: 12px; margin-top: 10px; min-height: 40px; }
+    #diag { font-size: 11px; margin-top: 10px; padding: 10px; background: #1a2228; border-radius: 10px; color: #98a1aa; line-height: 1.45; }
+    .ok { color: #6dd4a8; }
+    .err { color: #ff8a80; }
+    .warn { color: #ffb74d; }
+    .hint { font-size: 11px; color: #98a1aa; margin: 0 0 8px; line-height: 1.4; }
+    .row { display: flex; align-items: center; gap: 8px; margin-top: 10px; font-size: 12px; }
+    .row input { width: auto; }
+  </style>
+</head>
+<body>
+  <h1>Fleaber PS — interface clássica</h1>
+  <p class="hint">
+    Fallback / QA. No uso diário preferir o <b>Seller Studio</b> (ícone da extensão).
+  </p>
+  <button id="openStudio" type="button">Abrir Seller Studio</button>
+  <p class="hint">
+    1) Emparelha · 2) Separador do directo Face · 3) <b>Activar nesta página Face</b>
+    · 4) Aparece um <b>painel flutuante</b> no Face (arrasta pelo título; histórico com scroll)
+  </p>
+  <label>Código 6 dígitos (Studio)</label>
+  <input id="code" type="text" maxlength="6" inputmode="numeric" placeholder="123456" />
+  <button id="pair">Emparelhar</button>
+  <button id="inject" class="secondary">Activar nesta página Face</button>
+  <button id="toggle" class="secondary">Activar / pausar leitura</button>
+  <div class="row">
+    <input id="strictRef" type="checkbox" checked />
+    <label for="strictRef" style="margin:0;color:#e8eef0">REF rígido: só com palavra REF (ex. «quero 1 REF AM4» / «cancela REF AM4»)</label>
+  </div>
+  <div class="row">
+    <input id="ollama" type="checkbox" />
+    <label for="ollama" style="margin:0;color:#e8eef0">IA local (Ollama)</label>
+  </div>
+  <label for="aiTier">Perfil IA</label>
+  <select id="aiTier" style="width:100%;padding:8px;border-radius:8px;border:1px solid #333;background:#1a2228;color:#fff;margin-top:4px">
+    <option value="auto">Auto (recomendado)</option>
+    <option value="lite">Lite — PCs modestos</option>
+    <option value="pro">Pro — PCs melhores</option>
+  </select>
+  <div id="ollamaStatus" class="hint" style="margin-top:4px">IA: …</div>
+  <button id="clear" class="secondary">Desemparelhar</button>
+  <button id="resetRun" class="secondary">Limpar estado da corrida</button>
+  <button id="probeIdentity" class="secondary">Sondar identidade autores</button>
+  <button id="exportIdentity" class="secondary">Exportar sonda identidade</button>
+  <button id="exportJournal" class="secondary">Exportar journal passos</button>
+  <button id="clearJournal" class="secondary">Limpar journal passos</button>
+  <div id="status"></div>
+  <div id="diag">Diagnóstico: à espera…</div>
+  <script src="popup.js"></script>
+</body>
+</html>

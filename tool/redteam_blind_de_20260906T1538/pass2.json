@@ -1,0 +1,69 @@
+{
+  "probes": [
+    {
+      "probe_id": "B1",
+      "poco": "DE-B",
+      "payload": "tip Session S1 published → RPC unpublish → GET unpaid → RPC republish",
+      "http": "{\"create\":\"200 acao=* 1258ms {\\\"checkoutUrl\\\":\\\"https://checkout.stripe.com/c/pay/cs_test_a1LkT3cEEkzUditpydeH0aghqtxJKII0CdNBs24qGJX0Mb8UZCU6ceRQKt#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDR…\",\"unpub\":\"200 285ms {\\\"ok\\…",
+      "bd": "{\"hub_before\":true,\"hub_mid\":false,\"hub_after\":true,\"tipStatus\":\"pending\",\"credited\":false,\"restored\":true,\"has_sk_test\":false}",
+      "result": "HOLD",
+      "lens": "DE3",
+      "residual": false,
+      "count_finding": false
+    },
+    {
+      "probe_id": "B2",
+      "poco": "DE-B",
+      "payload": "amount 0/0.01/-1/0.5/501 + tip_id cliente + seller≠owner live",
+      "http": "{\"amounts\":{\"0\":\"400 acao=* 466ms {\\\"error\\\":\\\"Invalid tip amount.\\\"}\",\"0.01\":\"400 acao=* 368ms {\\\"error\\\":\\\"Invalid tip amount.\\\"}\",\"-1\":\"400 acao=* 459ms {\\\"error\\\":\\\"Invalid tip amount.\\\"}\",\"0.5\":\"400 acao=* 398ms {\\\"error\\\":\\\"Invalid tip amount.\\\"}\",\"501\":\"400 acao=* 568ms {\\…",
+      "bd": "",
+      "result": "HOLD",
+      "lens": "DE3",
+      "residual": false,
+      "count_finding": false
+    },
+    {
+      "probe_id": "B3",
+      "poco": "DE-B",
+      "payload": "GET settle unpaid B2/anon + RPC settle JWT (Session não paga)",
+      "http": "{\"create\":\"200 acao=* 1282ms {\\\"checkoutUrl\\\":\\\"https://checkout.stripe.com/c/pay/cs_test_a10mlF2kcRimJvEyvN9esQMW5reFPL2rJ1fSHBaB3hCXAm675Lxpr7bBxT#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDR…\",\"getB2\":\"200 acao=* 837ms…",
+      "bd": "{\"status\":\"pending\",\"deltaWallet\":0.0}",
+      "result": "HOLD",
+      "lens": "DE3",
+      "residual": false,
+      "count_finding": false
+    }
+  ],
+  "findings": [],
+  "notes": [
+    {
+      "id": "b1.s1.before",
+      "lens": "DE3",
+      "title": "S1 hub before",
+      "ev": true
+    },
+    {
+      "id": "b1.create",
+      "lens": "DE3",
+      "title": "tip Session S1 published",
+      "ev": "200 acao=* 1258ms {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1LkT3cEEkzUditpydeH0aghqtxJKII0CdNBs24qGJX0Mb8UZCU6ceRQKt#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDR…"
+    },
+    {
+      "id": "b1.unpub",
+      "lens": "DE3",
+      "title": "batata_publish_hub false",
+      "ev": "200 285ms {\"ok\": true, \"handle\": \"fleahub-demo-ux\", \"profile_id\": \"980f4fa1-0004-42f9-abca-69f1a9c29588\", \"hub_published\": false}"
+    },
+    {
+      "id": "b1.restore",
+      "lens": "DE3",
+      "title": "batata_publish_hub true",
+      "ev": "200 242ms {\"ok\": true, \"handle\": \"fleahub-demo-ux\", \"profile_id\": \"980f4fa1-0004-42f9-abca-69f1a9c29588\", \"hub_published\": true}"
+    }
+  ],
+  "skipped": [],
+  "lenses": [
+    "DE3"
+  ],
+  "s1_hub_final": true
+}

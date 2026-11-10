@@ -1,0 +1,212 @@
+{
+  "auditor": "REDTEAM_BLIND_E_ORBITA_v1",
+  "project": "fxdknzrqjenzqcvnwqqq",
+  "prefix": "RTE-20260830T1810",
+  "pass": 2,
+  "production_touched": false,
+  "fase4": false,
+  "corrections_applied": false,
+  "matrix": [
+    {
+      "lens": "E6",
+      "surface": "products",
+      "attack": "fixture_dead",
+      "identity": "service_role_setup",
+      "result": "201 [{\"id\":\"47ca5092-438b-4764-8eed-8830be0b1c33\",\"created_at\":\"2026-08-30T17:13:46.712398+00:00\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"title\":\"RTE-20…",
+      "impact": "",
+      "severity": "",
+      "evidence": null
+    },
+    {
+      "lens": "E6",
+      "surface": "products",
+      "attack": "buyer2_read_unlisted_never_met",
+      "identity": "buyer2",
+      "result": "200 [{\"id\":\"47ca5092-438b-4764-8eed-8830be0b1c33\",\"title\":\"RTE-20260830T1810-dead-pay\",\"is_sold\":true,\"list_on_marketplace\":false,\"quantity\":2,\"price\":8.0}]",
+      "impact": "",
+      "severity": "",
+      "evidence": null
+    },
+    {
+      "lens": "E6",
+      "surface": "orders",
+      "attack": "hold_dead_product",
+      "identity": "buyer",
+      "result": "201 [{\"id\":\"a1852f3f-6497-442c-8430-405a71268a88\",\"created_at\":\"2026-08-30T17:13:47.389749+00:00\",\"product_id\":\"47ca5092-438b-4764-8eed-8830be0b1c33\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"price_total\":8.00,\"shipping_method\":\"Entrega em Mão (€0.00)\",\"payment_me…",
+      "impact": "",
+      "severity": "",
+      "evidence": null
+    },
+    {
+      "lens": "E6",
+      "surface": "orders",
+      "attack": "hold_dead_status",
+      "identity": "buyer",
+      "result": "status=reserva_pendente qty=1 total=8.0",
+      "impact": "",
+      "severity": "",
+      "evidence": {
+        "order_id": "a1852f3f-6497-442c-8430-405a71268a88",
+        "status": "reserva_pendente",
+        "contract_unit_cents": 800,
+        "contract_qty": 1
+      }
+    },
+    {
+      "lens": "E6",
+      "surface": "products",
+      "attack": "stock_after_dead_hold",
+      "identity": "service_role_observe",
+      "result": "before=200 [{\"id\":\"47ca5092-438b-4764-8eed-8830be0b1c33\",\"quantity\":2,\"is_sold\":true,\"list_on_marketplace\":false}] after=200 [{\"id\":\"47ca5092-438b-4764-8eed-8830be0b1c33\",\"quantity\":2,\"is_sold\":true,\"list_on_marketplace\":false}]",
+      "impact": "",
+      "severity": "",
+      "evidence": null
+    },
+    {
+      "lens": "E6",
+      "surface": "create-payment-intent",
+      "attack": "checkout_dead_sold_unlisted",
+      "identity": "buyer",
+      "result": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1PWLSC6dqrrubH7neu0Kzattl7cv8XyBEv1nYfOzbyFry7Wn6Sos3PfRU#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21oYWlsUnxrVkRhQUQyNlJjSWBCN3BXNXVvVT1hamlcf3Fjd1dRMGJmREk9Yz09PH1CMzVTY0pBXD1kMU5HZl1da05gf0s1XGQ1NWA3bVFBNzNMJyknY3dqaFZgd3Ngdyc%2FcXdwYCknZ2RmbmJ3anBrYUZqaWp3Jz8nJmNjY2NjYycpJ2lkfGpwcVF8dWAnPyd2bGtiaWBabHFgaCc…",
+      "impact": "",
+      "severity": "",
+      "evidence": null
+    },
+    {
+      "lens": "E10",
+      "surface": "batata_seller_direct_payment_details",
+      "attack": "iban_after_dead_hold",
+      "identity": "buyer",
+      "result": "200 [{\"mb_way\":\"910000000\",\"iban\":\"PT50000201231234567890154\"}]",
+      "impact": "",
+      "severity": "",
+      "evidence": null
+    },
+    {
+      "lens": "E4",
+      "surface": "product_bundles",
+      "attack": "repro_self_accept",
+      "identity": "buyer",
+      "result": "200 [{\"id\":\"c019eaff-7325-445a-941d-60e0c19f01d6\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"chat_id\":null,\"product_ids\":[\"b860cd49-4f14-4aef-bc14-8f2a03baaf20\",\"7bea4060-e99e-4c92-93cc-23879e920302\"],\"subtotal_eur\":24.00,\"di…",
+      "impact": "",
+      "severity": "",
+      "evidence": null
+    },
+    {
+      "lens": "E4",
+      "surface": "orders",
+      "attack": "hold_line_b860cd49-4f14-4aef-bc14-8f2a03baaf20",
+      "identity": "buyer",
+      "result": "201 [{\"id\":\"95385f51-94f5-486b-9417-a0831fb82cde\",\"created_at\":\"2026-08-30T17:13:50.162701+00:00\",\"product_id\":\"b860cd49-4f14-4aef-bc14-8f2a03baaf20\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"price_total\":11.00,\"shipping_met…",
+      "impact": "",
+      "severity": "",
+      "evidence": null
+    },
+    {
+      "lens": "E4",
+      "surface": "orders",
+      "attack": "hold_line_7bea4060-e99e-4c92-93cc-23879e920302",
+      "identity": "buyer",
+      "result": "201 [{\"id\":\"b8b32b59-0f9d-49c5-9e0e-3bb22806223e\",\"created_at\":\"2026-08-30T17:13:50.280839+00:00\",\"product_id\":\"7bea4060-e99e-4c92-93cc-23879e920302\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"price_total\":13.00,\"shipping_met…",
+      "impact": "",
+      "severity": "",
+      "evidence": null
+    },
+    {
+      "lens": "E4",
+      "surface": "orders",
+      "attack": "holds_created",
+      "identity": "buyer",
+      "result": "n=2",
+      "impact": "",
+      "severity": "",
+      "evidence": [
+        "95385f51-94f5-486b-9417-a0831fb82cde",
+        "b8b32b59-0f9d-49c5-9e0e-3bb22806223e"
+      ]
+    },
+    {
+      "lens": "E4",
+      "surface": "create-payment-intent",
+      "attack": "bag_checkout_self_accepted_hostile_total",
+      "identity": "buyer",
+      "result": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1prvZ01oC231X3zTK6ngbQBrfHtXEYG747JHoLqohciG1Cpa7jtmjwOgv#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21oYWlsUnxrVkRhQUQyNlJjSWBCN3BXNXVvVT1hamlcf3Fjd1dRMGJmREk9Yz09PH1CMzVTY0pBXD1kMU5HZl1da05gf0s1XGQ1NWA3bVFBNzNMJyknY3dqaFZgd3Ngdyc%2FcXdwYCknZ2RmbmJ3anBrYUZqaWp3Jz8nJmNjY2NjYycpJ2lkfGpwcVF8dWAnPyd2bGtiaWBabHFgaCcpJ2BrZGdpYFVpZGZgbWppYWB3dic%2FcXdwYHgl\",\"checkout…",
+      "impact": "",
+      "severity": "",
+      "evidence": null
+    },
+    {
+      "lens": "E5",
+      "surface": "create-connect-account",
+      "attack": "subdomain_allowlist_note",
+      "identity": "anon",
+      "result": "303 Location=https://evil.fleaber.pt/wallet (pass1). Impacto depende de DNS wildcard / takeover.",
+      "impact": "",
+      "severity": "",
+      "evidence": null
+    },
+    {
+      "lens": "E2",
+      "surface": "batata_release_seller_wallet_for_order",
+      "attack": "fire_on_reserva_not_concluido",
+      "identity": "buyer",
+      "result": "200 false",
+      "impact": "",
+      "severity": "",
+      "evidence": null
+    }
+  ],
+  "findings": [
+    {
+      "id": "E6-AUTH-READ-UNLISTED",
+      "severity": "P2",
+      "title": "JWT estranho le produto unlisted+sold (nao marketplace, nao dono)",
+      "actor": "buyer2",
+      "pre": "RLS list_on_marketplace OR own",
+      "repro": "GET products id=eq.dead as buyer2",
+      "impact": "Catalogo morto visivel a qualquer autenticado",
+      "estado": "ABERTO",
+      "evidence": "200 [{\"id\":\"47ca5092-438b-4764-8eed-8830be0b1c33\",\"title\":\"RTE-20260830T1810-dead-pay\",\"is_sold\":true,\"list_on_marketplace\":false,\"quantity\":2,\"price\":8.0}]"
+    },
+    {
+      "id": "E6-DEAD-CHECKOUT-SESSION",
+      "severity": "P1",
+      "title": "create-payment-intent emite Session Stripe para produto is_sold+unlisted",
+      "actor": "buyer",
+      "pre": "produto morto com qty>0",
+      "repro": "PATCH is_sold=true list_on_marketplace=false; POST order reserva_pendente; POST create-payment-intent",
+      "impact": "Mortos que vendem: captura TEST possivel em artigo despublicado/vendido",
+      "estado": "ABERTO",
+      "evidence": {
+        "order_id": "a1852f3f-6497-442c-8430-405a71268a88",
+        "product_id": "47ca5092-438b-4764-8eed-8830be0b1c33",
+        "has_checkout_url": false,
+        "amount_hint": "",
+        "http": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1PWLSC6dqrrubH7neu0Kzattl7cv8XyBEv1nYfOzbyFry7Wn6Sos3PfRU#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21oYWlsUnxrVkRhQUQyNlJjSWBCN3BXNXVvVT1hamlcf3Fjd1dRMGJmREk9Yz09PH1CMzVTY0pBXD1kMU5HZl1da05gf0s1XGQ1NWA3bVFBNzNMJyknY3dqaFZgd3Ngdyc%2FcXdwYCknZ2RmbmJ3anBrYUZqaWp3Jz8nJmNjY2NjYycpJ2lkfGpwcVF8dWAnPyd2bGtiaWBabHFgaCcpJ2BrZGdpYFVpZGZgbWppYWB3dic%2FcXdwYHgl\",\"checkoutSessionId\":\"cs_test_a1PWLSC6dqrrubH7neu0Kzattl7cv8XyBEv1nYfOzbyFry7Wn6Sos3PfRU\",\"paidChatId\":\"859a71…"
+      }
+    },
+    {
+      "id": "E4-BAG-SESSION-AFTER-FORGE-ACCEPT",
+      "severity": "P1",
+      "title": "Bag Checkout Session apos buyer forjar accepted no conjunto",
+      "actor": "buyer",
+      "pre": "PATCH product_bundles status=accepted (buyer); 2 holds",
+      "repro": "POST create-payment-intent bag_checkout 2 orders",
+      "impact": "Seller nao aceitou; stock em hold; Session Stripe (preco server-side a verificar vs 0.50 hostil)",
+      "estado": "ABERTO",
+      "evidence": {
+        "keys": [
+          "checkoutUrl",
+          "checkoutSessionId",
+          "paidChatId",
+          "server_amount_cents",
+          "amount_total"
+        ],
+        "amount": null,
+        "url_present": false,
+        "body": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1prvZ01oC231X3zTK6ngbQBrfHtXEYG747JHoLqohciG1Cpa7jtmjwOgv#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21oYWlsUnxrVkRhQUQyNlJjSWBCN3BXNXVvVT1hamlcf3Fjd1dRMGJmREk9Yz09PH1CMzVTY0pBXD1kMU5HZl1da05gf0s1XGQ1NWA3bVFBNzNMJyknY3dqaFZgd3Ngdyc%2FcXdwYCknZ2RmbmJ3anBrYUZqaWp3Jz8nJmNjY2NjYycpJ2lkfGpwcVF8dWAnPyd2bGtiaWBabHFgaCcpJ2BrZGdpYFVpZGZgbWppYWB3dic%2FcXdwYHgl\",\"checkoutSessionId\":\"cs_test_a1prvZ01oC231X3zTK6ngbQBrfHtXEYG747JHoLqohciG1Cpa7jtmjwOgv\",\"paidChatId\":null,\"server_amount_cents\":2333,\"amount_total\":2333}"
+      }
+    }
+  ],
+  "gaps": []
+}

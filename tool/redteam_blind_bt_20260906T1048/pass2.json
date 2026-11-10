@@ -1,0 +1,322 @@
+{
+  "prefix": "RTBT-20260906T1048",
+  "findings": [
+    {
+      "id": "p2.hitch.product_vs_checkout_coalesce",
+      "lens": "BT4",
+      "severity": "P1",
+      "title": "Accept duplo: product_id=A/checkout=B vs product_id=B/checkout=A",
+      "actor": "seller JWT",
+      "pre": "coalesce(product,checkout) não cruza; logical null; refs distintas",
+      "repro": "accept ambos marketplace_product cruzados",
+      "expected": "2º accept recusado se o SKU real é o mesmo pool",
+      "obtained": {
+        "x1": {
+          "id": "03a6c9c7-7958-4b1d-abb4-fcba8ee2738f",
+          "status": "accepted"
+        },
+        "x2": {
+          "id": "4a8ee218-b429-46d9-b15c-5b45f16f73d7",
+          "status": "accepted"
+        },
+        "stock1": {
+          "ok": true,
+          "price": 9.0,
+          "live_id": "a6c0df4b-e38d-441c-b575-a104aa5d23ab",
+          "ref_code": "RTBT-CX1",
+          "item_kind": "marketplace_product",
+          "total_qty": 1,
+          "product_id": "b9279df7-ec49-4e49-9400-d0cb9b5d155d",
+          "blocked_qty": 0,
+          "live_status": "live",
+          "live_item_id": "468e1356-2fbf-4bd0-a3ea-7f9fb6990771",
+          "available_qty": 1,
+          "pending_bag_qty": 0,
+          "sold_converted_qty": 0,
+          "checkout_product_id": "ea0f5de7-2cf8-4010-aefe-e462d65590a6",
+          "reserved_accepted_qty": 0
+        },
+        "stock2": {
+          "ok": true,
+          "price": 9.0,
+          "live_id": "a6c0df4b-e38d-441c-b575-a104aa5d23ab",
+          "ref_code": "RTBT-CX2",
+          "item_kind": "marketplace_product",
+          "total_qty": 1,
+          "product_id": "ea0f5de7-2cf8-4010-aefe-e462d65590a6",
+          "blocked_qty": 0,
+          "live_status": "live",
+          "live_item_id": "ae5eecf2-f59c-4649-8421-de4f78b65d9d",
+          "available_qty": 1,
+          "pending_bag_qty": 0,
+          "sold_converted_qty": 0,
+          "checkout_product_id": "b9279df7-ec49-4e49-9400-d0cb9b5d155d",
+          "reserved_accepted_qty": 0
+        },
+        "accept2": "200 [{\"id\":\"4a8ee218-b429-46d9-b15c-5b45f16f73d7\",\"live_id\":\"a6c0df4b-e38d-441c-b575-a104aa5d23ab\",\"live_item_id\":\"ae5eecf2-f59c-4649-8421-de4f78b65d9d\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"buyer_id\":\"37402d37…"
+      },
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "p2.paused.still.accepts",
+      "lens": "BT5",
+      "severity": "P2",
+      "title": "Item paused: buyer entra na fila e seller aceita",
+      "actor": "buyer JWT + seller JWT",
+      "pre": "live_items.status=paused; Hub não lista o card",
+      "repro": "PATCH status=paused; POST pending; PATCH accepted",
+      "expected": "pending/accept recusados (item não está à venda)",
+      "obtained": {
+        "pause": "200 [{\"id\":\"84779803-17a5-4840-8239-e528264502fc\",\"live_id\":\"9fc11456-7269-4f20-96fe-7597122b4480\",\"seller_id\":null,\"ref_code\":\"RTBT-PA\",\"title\":\"RTBT-20260906T1048 paused item\",\"description\":null,\"price\":9.0,\"image_url\":nul…",
+        "hub": "200 []",
+        "row": {
+          "id": "dddd36ff-1d86-409b-8ce2-45782a0e55d9",
+          "status": "accepted"
+        },
+        "accept": "200 [{\"id\":\"dddd36ff-1d86-409b-8ce2-45782a0e55d9\",\"live_id\":\"9fc11456-7269-4f20-96fe-7597122b4480\",\"live_item_id\":\"84779803-17a5-4840-8239-e528264502fc\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"buyer_id\":\"bfcbeeee…"
+      },
+      "proven": true,
+      "evidence": {}
+    }
+  ],
+  "blocked": [
+    {
+      "id": "p2.hitch.checkout_product_id",
+      "lens": "BT4",
+      "title": "2º accept bloqueado ou stock 0",
+      "ev": {
+        "row1": {
+          "id": "dfcde9b7-c439-4878-99ef-2cf0b1a2bb5e",
+          "status": "accepted",
+          "requested_qty": 1,
+          "live_item_id": "f7728fa7-8467-408b-ad12-3e1ab1e3643b"
+        },
+        "row2": {
+          "id": "bb858623-47c8-4396-9575-54c4ca5b79d3",
+          "status": "pending",
+          "requested_qty": 1,
+          "live_item_id": "319b6bcf-5498-44e7-81cb-2dc13d82faad"
+        },
+        "avail2": 0,
+        "accept2": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"qty_exceeds_stock\"}"
+      }
+    },
+    {
+      "id": "p2.patch.item.qty.after_accept",
+      "lens": "BT5",
+      "title": "aumento qty item recusado",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"live_item_qty_increase_not_allowed\"}"
+    },
+    {
+      "id": "p2.patch.res.qty.after_accept",
+      "lens": "BT5",
+      "title": "aumento requested_qty recusado",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"qty_exceeds_stock\"}"
+    },
+    {
+      "id": "p2.patch.res.qty.buyer",
+      "lens": "BT5",
+      "title": "buyer qty recusado/revert",
+      "ev": {
+        "patch": "200 []",
+        "qty": 1
+      }
+    },
+    {
+      "id": "p2.inactive.still.accepts",
+      "lens": "BT5",
+      "title": "inactive não aceitou",
+      "ev": null
+    },
+    {
+      "id": "p2.live_id.swap.accept",
+      "lens": "BT5",
+      "title": "swap live_id recusado",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"live_item_live_mismatch\"}"
+    },
+    {
+      "id": "p2.accept_broadcast.live_id.swap",
+      "lens": "BT1",
+      "title": "broadcast live mismatch recusado",
+      "ev": "200 false"
+    }
+  ],
+  "notes": [
+    {
+      "id": "p2.hitch.stock.before",
+      "lens": "BT4",
+      "title": "stock antes",
+      "ev": {
+        "a": {
+          "ok": true,
+          "price": 9.0,
+          "live_id": "a6c0df4b-e38d-441c-b575-a104aa5d23ab",
+          "ref_code": "RTBT-HA",
+          "item_kind": "live_only",
+          "total_qty": 1,
+          "product_id": null,
+          "blocked_qty": 0,
+          "live_status": "live",
+          "live_item_id": "f7728fa7-8467-408b-ad12-3e1ab1e3643b",
+          "available_qty": 1,
+          "pending_bag_qty": 0,
+          "sold_converted_qty": 0,
+          "checkout_product_id": "ea6af8bf-7fa7-46a0-8286-7873f14ce14e",
+          "reserved_accepted_qty": 0
+        },
+        "b": {
+          "ok": true,
+          "price": 9.0,
+          "live_id": "a6c0df4b-e38d-441c-b575-a104aa5d23ab",
+          "ref_code": "RTBT-HB",
+          "item_kind": "live_only",
+          "total_qty": 1,
+          "product_id": null,
+          "blocked_qty": 0,
+          "live_status": "live",
+          "live_item_id": "319b6bcf-5498-44e7-81cb-2dc13d82faad",
+          "available_qty": 1,
+          "pending_bag_qty": 0,
+          "sold_converted_qty": 0,
+          "checkout_product_id": "ea6af8bf-7fa7-46a0-8286-7873f14ce14e",
+          "reserved_accepted_qty": 0
+        }
+      }
+    },
+    {
+      "id": "p2.hitch.accept1",
+      "lens": "BT4",
+      "title": "accept LI1",
+      "ev": "200 [{\"id\":\"dfcde9b7-c439-4878-99ef-2cf0b1a2bb5e\",\"live_id\":\"a6c0df4b-e38d-441c-b575-a104aa5d23ab\",\"live_item_id\":\"f7728fa7-8467-408b-ad12-3e1ab1e3643b\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"buyer_id\":\"bfcbeeee…"
+    },
+    {
+      "id": "p2.hitch.stock.after1",
+      "lens": "BT4",
+      "title": "stock LI2 após accept LI1",
+      "ev": {
+        "ok": true,
+        "price": 9.0,
+        "live_id": "a6c0df4b-e38d-441c-b575-a104aa5d23ab",
+        "ref_code": "RTBT-HB",
+        "item_kind": "live_only",
+        "total_qty": 1,
+        "product_id": null,
+        "blocked_qty": 1,
+        "live_status": "live",
+        "live_item_id": "319b6bcf-5498-44e7-81cb-2dc13d82faad",
+        "available_qty": 0,
+        "pending_bag_qty": 0,
+        "sold_converted_qty": 0,
+        "checkout_product_id": "ea6af8bf-7fa7-46a0-8286-7873f14ce14e",
+        "reserved_accepted_qty": 0
+      }
+    },
+    {
+      "id": "p2.hitch.accept2",
+      "lens": "BT4",
+      "title": "accept LI2",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"qty_exceeds_stock\"}"
+    },
+    {
+      "id": "p2.cross.stock",
+      "lens": "BT4",
+      "title": "coalesce mismatch stock",
+      "ev": {
+        "x1": {
+          "ok": true,
+          "price": 9.0,
+          "live_id": "a6c0df4b-e38d-441c-b575-a104aa5d23ab",
+          "ref_code": "RTBT-CX1",
+          "item_kind": "marketplace_product",
+          "total_qty": 1,
+          "product_id": "b9279df7-ec49-4e49-9400-d0cb9b5d155d",
+          "blocked_qty": 0,
+          "live_status": "live",
+          "live_item_id": "468e1356-2fbf-4bd0-a3ea-7f9fb6990771",
+          "available_qty": 1,
+          "pending_bag_qty": 0,
+          "sold_converted_qty": 0,
+          "checkout_product_id": "ea0f5de7-2cf8-4010-aefe-e462d65590a6",
+          "reserved_accepted_qty": 0
+        },
+        "x2": {
+          "ok": true,
+          "price": 9.0,
+          "live_id": "a6c0df4b-e38d-441c-b575-a104aa5d23ab",
+          "ref_code": "RTBT-CX2",
+          "item_kind": "marketplace_product",
+          "total_qty": 1,
+          "product_id": "ea0f5de7-2cf8-4010-aefe-e462d65590a6",
+          "blocked_qty": 0,
+          "live_status": "live",
+          "live_item_id": "ae5eecf2-f59c-4649-8421-de4f78b65d9d",
+          "available_qty": 1,
+          "pending_bag_qty": 0,
+          "sold_converted_qty": 0,
+          "checkout_product_id": "b9279df7-ec49-4e49-9400-d0cb9b5d155d",
+          "reserved_accepted_qty": 0
+        }
+      }
+    },
+    {
+      "id": "p2.phantom.stock",
+      "lens": "BT3",
+      "title": "stock live C com pending ended B",
+      "ev": {
+        "stockC": {
+          "ok": true,
+          "price": 9.0,
+          "live_id": "a1fee2f6-3a0c-4745-987b-9bf04ff5f40b",
+          "ref_code": "RTBT-PHC",
+          "item_kind": "live_only",
+          "total_qty": 1,
+          "product_id": null,
+          "blocked_qty": 1,
+          "live_status": "live",
+          "live_item_id": "b65c1655-e9bf-424b-81d6-379cd9f30741",
+          "available_qty": 0,
+          "pending_bag_qty": 0,
+          "sold_converted_qty": 0,
+          "checkout_product_id": "4eed3347-3cec-428a-80c3-b91d5669d6a8",
+          "reserved_accepted_qty": 0
+        },
+        "pendingB": {
+          "id": "7d0cded5-3292-4e9a-9247-569653e4d99a",
+          "status": "pending",
+          "live_id": "a3707706-a06e-4619-b991-52e02a633b4e"
+        }
+      }
+    },
+    {
+      "id": "p2.phantom.pending.blocks",
+      "lens": "BT3",
+      "title": "pending ended ainda congela stock da live nova (não oversell)",
+      "ev": {
+        "availC": 0,
+        "pendingB": {
+          "id": "7d0cded5-3292-4e9a-9247-569653e4d99a",
+          "status": "pending",
+          "live_id": "a3707706-a06e-4619-b991-52e02a633b4e"
+        }
+      }
+    },
+    {
+      "id": "p2.pause.patch",
+      "lens": "BT5",
+      "title": "item paused",
+      "ev": "200 [{\"id\":\"84779803-17a5-4840-8239-e528264502fc\",\"live_id\":\"9fc11456-7269-4f20-96fe-7597122b4480\",\"seller_id\":null,\"ref_code\":\"RTBT-PA\",\"title\":\"RTBT-20260906T1048 paused item\",\"description\":null,\"price\":9.0,\"image_url\":nul…"
+    },
+    {
+      "id": "item.fail",
+      "title": "createLiveItem live_only",
+      "ev": "400 {\"code\":\"23514\",\"details\":\"Failing row contains (a9906d80-4310-4482-b8c5-bda939ee8d70, 9fc11456-7269-4f20-96fe-7597122b4480, null, RTBT-IN, RTBT-20260906T1048 inactive item, null, 9.0, null, null, null, t, 0, inactive, 2…"
+    }
+  ],
+  "lenses": [
+    "BT1",
+    "BT3",
+    "BT4",
+    "BT5"
+  ]
+}

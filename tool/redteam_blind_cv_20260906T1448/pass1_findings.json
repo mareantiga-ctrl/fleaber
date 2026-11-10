@@ -1,0 +1,1724 @@
+{
+  "stamp": "20260906T1448",
+  "prefix": "RTCV-20260906T1448",
+  "lenses": [
+    "CV1",
+    "CV2",
+    "CV3",
+    "CV4",
+    "CV5",
+    "CV6",
+    "CV7"
+  ],
+  "wells": [
+    "CV-A",
+    "CV-B",
+    "CV-C"
+  ],
+  "findings": [
+    {
+      "id": "P1-B1",
+      "lens": "CV3",
+      "severity": "P1",
+      "title": "Overlap 4∥2: 2 Sessions úteis",
+      "actor": "buyer JWT",
+      "pre": "4 SKUs; bag ABCD ∥ bag CD",
+      "repro": "Future.wait bag 4-line ∥ bag 2-line",
+      "expected": "≤1 cs_ útil ou 2.º blocked/contention",
+      "obtained": {
+        "sids": [
+          "cs_test_a1sCy5SYclzKOPobBOMyu9k3RVhMYqHawxUz0ji59kL1MguQNN9UvLBIjm",
+          "cs_test_a1lThkRTEGzLcLxAIEoB9vD9YJTvgQmehDgUKMI1lB208Jkyff315Qcve7"
+        ],
+        "payable": 2,
+        "stored": [
+          "cs_test_a1sCy5SYclzKOPobBOMyu9k3RVhMYqHawxUz0ji59kL1MguQNN9UvLBIjm",
+          "cs_test_a1sCy5SYclzKOPobBOMyu9k3RVhMYqHawxUz0ji59kL1MguQNN9UvLBIjm",
+          "cs_test_a1sCy5SYclzKOPobBOMyu9k3RVhMYqHawxUz0ji59kL1MguQNN9UvLBIjm",
+          "cs_test_a1sCy5SYclzKOPobBOMyu9k3RVhMYqHawxUz0ji59kL1MguQNN9UvLBIjm"
+        ],
+        "secondBlocked": false,
+        "peeks": [
+          {
+            "sid": "cs_test_a1sCy5SYclzKOPobBOMy",
+            "settle": "402 Pagamento ainda não confirmado. Se já pagaste, aguarda alguns segundos e volta à app Fleaber.",
+            "page_http": 200,
+            "expired_hint": true,
+            "pay_hint": false
+          },
+          {
+            "sid": "cs_test_a1lThkRTEGzLcLxAIEoB",
+            "settle": "402 Pagamento ainda não confirmado. Se já pagaste, aguarda alguns segundos e volta à app Fleaber.",
+            "page_http": 200,
+            "expired_hint": true,
+            "pay_hint": false
+          }
+        ]
+      },
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "P1-B4",
+      "lens": "CV3",
+      "severity": "P1",
+      "title": "Overlap 3∥1: 2 Sessions úteis",
+      "actor": "buyer JWT",
+      "pre": "3 SKUs + SKU seller2",
+      "repro": "Future.wait bag 3∥1; bag 2 sellers",
+      "expected": "≤1 cs_ no overlap; 400 one seller no cross",
+      "obtained": {
+        "sids": [
+          "cs_test_a1hrOa1lGeKxEHuP8sTNm2hN5QUWm5LjBhFyxlFYBbe1xjJdGTfXSyNQu8",
+          "cs_test_a1PLQtn5qI1JUwuDG2EYibLBEYqshRgchQloUZWuBdY8YZhchycGQAOFcY"
+        ],
+        "payable": 2,
+        "cross": "400 {\"error\":\"Checkout blocked: bag lines must share one seller. Pay each seller separately.\"}"
+      },
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "P1-C2",
+      "lens": "CV4",
+      "severity": "P1",
+      "title": "off-platform encode novo abriu Stripe: C2-TAGS,C2-MU,C2-WE,C2-SC,C2-NFD",
+      "actor": "buyer JWT",
+      "pre": "payment_method encodes novos (RLO/SHY/TAG/NFKC/homoglyph)",
+      "repro": "CPI por encode",
+      "expected": "400 off-platform em todos",
+      "obtained": {
+        "opened": [
+          "C2-TAGS",
+          "C2-MU",
+          "C2-WE",
+          "C2-SC",
+          "C2-NFD"
+        ],
+        "C2-TAGS": {
+          "tag": "c2-c2-tags",
+          "sql": false,
+          "sql_true": false,
+          "cpi": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1FRra86zzpV78YfxbtecJxrUKthoqiKsZdyy9mOnT0P27ik3eLp4IyNO4#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21oYWlsUnxrVkRhQUQyNlJjSWBCN3BXNXVvVT1haml…",
+          "opened": true,
+          "denied": false,
+          "sid": "cs_test_a1FRra86zzpV78YfxbtecJxrUKthoqiKsZdyy9mOnT0P27ik3eLp4IyNO4",
+          "pm_len": 10,
+          "pm_codes": [
+            "e006d",
+            "e0062",
+            "e0077",
+            "e0061",
+            "e0079"
+          ],
+          "status": "reserva_pendente"
+        },
+        "C2-MU": {
+          "tag": "c2-c2-mu",
+          "sql": false,
+          "sql_true": false,
+          "cpi": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a15AoFlG2HKRSPaoczpsfBxz4SWHtPN0rHnA4HnSzyRrqFbZIPmxOgA52x#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21oYWlsUnxrVkRhQUQyNlJjSWBCN3BXNXVvVT1haml…",
+          "opened": true,
+          "denied": false,
+          "sid": "cs_test_a15AoFlG2HKRSPaoczpsfBxz4SWHtPN0rHnA4HnSzyRrqFbZIPmxOgA52x",
+          "pm_len": 5,
+          "pm_codes": [
+            "3bc",
+            "62",
+            "77",
+            "61",
+            "79"
+          ],
+          "status": "reserva_pendente"
+        },
+        "C2-WE": {
+          "tag": "c2-c2-we",
+          "sql": false,
+          "sql_true": false,
+          "cpi": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1WqytkUHduxxYmZtF9nOE2IRjVfm5oVEh8bIpZ5zJaNiqbuHHkB9qifma#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21oYWlsUnxrVkRhQUQyNlJjSWBCN3BXNXVvVT1haml…",
+          "opened": true,
+          "denied": false,
+          "sid": "cs_test_a1WqytkUHduxxYmZtF9nOE2IRjVfm5oVEh8bIpZ5zJaNiqbuHHkB9qifma",
+          "pm_len": 5,
+          "pm_codes": [
+            "6d",
+            "62",
+            "51d",
+            "61",
+            "79"
+          ],
+          "status": "reserva_pendente"
+        },
+        "C2-SC": {
+          "tag": "c2-c2-sc",
+          "sql": false,
+          "sql_true": false,
+          "cpi": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1Flfqkj05CALbjOU1HyRnIVCPdA7gaTzaF5DJg0qIX2oiHzuFJQ4CRjVh#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21oYWlsUnxrVkRhQUQyNlJjSWBCN3BXNXVvVT1haml…",
+          "opened": true,
+          "denied": false,
+          "sid": "cs_test_a1Flfqkj05CALbjOU1HyRnIVCPdA7gaTzaF5DJg0qIX2oiHzuFJQ4CRjVh",
+          "pm_len": 5,
+          "pm_codes": [
+            "1d0d",
+            "299",
+            "1d21",
+            "1d00",
+            "28f"
+          ],
+          "status": "reserva_pendente"
+        },
+        "C2-NFD": {
+          "tag": "c2-c2-nfd",
+          "sql": false,
+          "sql_true": false,
+          "cpi": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1MxNu2bRqmTsG5VGDWfrsLqdWJ33MD90e0Jvny3Q9gYUJPFK0muKvOENi#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21oYWlsUnxrVkRhQUQyNlJjSWBCN3BXNXVvVT1haml…",
+          "opened": true,
+          "denied": false,
+          "sid": "cs_test_a1MxNu2bRqmTsG5VGDWfrsLqdWJ33MD90e0Jvny3Q9gYUJPFK0muKvOENi",
+          "pm_len": 6,
+          "pm_codes": [
+            "6d",
+            "62",
+            "77",
+            "61",
+            "301",
+            "79"
+          ],
+          "status": "reserva_pendente"
+        }
+      },
+      "proven": true,
+      "evidence": {}
+    }
+  ],
+  "blocked": [
+    {
+      "id": "A1-DEAD-CS",
+      "lens": "CV1",
+      "title": "cs_ morta reclaim OK / 2.º actor negado",
+      "ev": {
+        "actor2": "400 {\"error\":\"Checkout blocked: order does not belong to buyer.\"}",
+        "retry": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1JLBxGue62NNlzTmUU5LgxKsnlRLgOe5XjDtHqyEVO7xrdJkf8pXXAOTk#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21oYWlsUnxrVkRhQUQyNlJjSWBCN3BXNXVvVT1haml…",
+        "stored": "cs_test_a1JLBxGue62NNlzTmUU5LgxKsnlRLgOe5XjDtHqyEVO7xrdJkf8pXXAOTk",
+        "jwtPlant": 403
+      }
+    },
+    {
+      "id": "A2-FUTURE",
+      "lens": "CV2",
+      "title": "claiming futuro reclaim/create coerente",
+      "ev": {
+        "hit": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1ARK1vP8l5t4igWy8pBsvnt2xC1NSwa42N9949XKD7tTj4m7oF8UWnOsq#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21oYWlsUnxrVkRhQUQyNlJjSWBCN3BXNXVvVT1haml…",
+        "stored": "cs_test_a1ARK1vP8l5t4igWy8pBsvnt2xC1NSwa42N9949XKD7tTj4m7oF8UWnOsq",
+        "rpcJwt": 403
+      }
+    },
+    {
+      "id": "A3-MALFORM",
+      "lens": "CV2",
+      "title": "malform/TTL/passado extremo reclaim",
+      "ev": {
+        "briefs": [
+          "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1pbsHvmI59t8qspMxjmPh2G1vDOpM2ne9pN0blbDZE4Phdfk5iZI9WBaP#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21oYWlsUnxrVkRhQUQyNlJjSWBCN3BXNXVvVT1haml…",
+          "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1CAgBzVSl3trfsXrxtmQBOW67k5DfnzQMZRuo1PpYOUJIqAqW3qbGXpP8#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21oYWlsUnxrVkRhQUQyNlJjSWBCN3BXNXVvVT1haml…",
+          "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1emcToG8B5SVu58QOBmpQ4qlGkSk3Z6HkDzSRCO2cqCLsVKKFND3Zllek#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21oYWlsUnxrVkRhQUQyNlJjSWBCN3BXNXVvVT1haml…"
+        ],
+        "stored": [
+          "cs_test_a1pbsHvmI59t8qspMxjmPh2G1vDOpM2ne9pN0blbDZE4Phdfk5iZI9WBaP",
+          "cs_test_a1CAgBzVSl3trfsXrxtmQBOW67k5DfnzQMZRuo1PpYOUJIqAqW3qbGXpP8",
+          "cs_test_a1emcToG8B5SVu58QOBmpQ4qlGkSk3Z6HkDzSRCO2cqCLsVKKFND3Zllek"
+        ],
+        "anyCs": 3
+      }
+    },
+    {
+      "id": "A4-TIMEOUT",
+      "lens": "CV6",
+      "title": "timeout∥retry ≤1 Session útil",
+      "ev": {
+        "sids": [
+          "cs_test_a1PaT4o45P5z9vdxgvhOKGYIZhx9jsVilT1HkaieFjBfKXifUeaJgLrpVg"
+        ],
+        "stored": [
+          "cs_test_a1PaT4o45P5z9vdxgvhOKGYIZhx9jsVilT1HkaieFjBfKXifUeaJgLrpVg",
+          "cs_test_a1PaT4o45P5z9vdxgvhOKGYIZhx9jsVilT1HkaieFjBfKXifUeaJgLrpVg"
+        ],
+        "payable": 1
+      }
+    },
+    {
+      "id": "B3-UNLIST",
+      "lens": "CV6",
+      "title": "unlist∥checkout sem Session+qty0 simultâneos",
+      "ev": {
+        "ck": "400 {\"error\":\"Checkout blocked: product is not listed.\"}",
+        "listed": false,
+        "qty": 0
+      }
+    },
+    {
+      "id": "C1-MBWAY",
+      "lens": "CV4",
+      "title": "mb way exact 400 off-platform",
+      "ev": {
+        "tag": "c1-mbway",
+        "sql": true,
+        "sql_true": true,
+        "cpi": "400 {\"error\":\"Checkout blocked: order is off-platform payment (no Stripe Session).\"}",
+        "opened": false,
+        "denied": true,
+        "sid": "",
+        "pm_len": 6,
+        "pm_codes": [
+          "6d",
+          "62",
+          "20",
+          "77",
+          "61",
+          "79"
+        ],
+        "status": "reserva_pendente"
+      }
+    },
+    {
+      "id": "C3-UNDERPAY",
+      "lens": "CV5",
+      "title": "total_eur ignorado; CTT selado; homoglyph/€3.5 400",
+      "ev": {
+        "cttAmt": 2323,
+        "homo": "400 {\"error\":\"Checkout blocked: portes da encomenda inválidos.\"}",
+        "miss": "400 {\"error\":\"Checkout blocked: portes da encomenda inválidos.\"}"
+      }
+    },
+    {
+      "id": "C4-PAID",
+      "lens": "CV7",
+      "title": "pago + caixa coerente",
+      "ev": {
+        "oid": "992fd031-bbed-483c-8ed4-3655158f20ec",
+        "pi": "pi_3UCgWHH7FWYUN3jh07teWTMh",
+        "cents": 590,
+        "qty": 1
+      }
+    },
+    {
+      "id": "CTRL-ZWSP-BLOCK",
+      "lens": "CV4",
+      "title": "CTRL-ZWSP sem Stripe (ou rails residual)",
+      "ev": {
+        "tag": "ctrl-ctrl-zwsp",
+        "sql": true,
+        "sql_true": true,
+        "cpi": "400 {\"error\":\"Checkout blocked: order is off-platform payment (no Stripe Session).\"}",
+        "opened": false,
+        "denied": true,
+        "sid": "",
+        "pm_len": 6,
+        "pm_codes": [
+          "6d",
+          "62",
+          "77",
+          "61",
+          "79",
+          "200b"
+        ],
+        "status": "reserva_pendente"
+      }
+    },
+    {
+      "id": "CTRL-FW-BLOCK",
+      "lens": "CV4",
+      "title": "CTRL-FW sem Stripe (ou rails residual)",
+      "ev": {
+        "tag": "ctrl-ctrl-fw",
+        "sql": true,
+        "sql_true": true,
+        "cpi": "400 {\"error\":\"Checkout blocked: order is off-platform payment (no Stripe Session).\"}",
+        "opened": false,
+        "denied": true,
+        "sid": "",
+        "pm_len": 5,
+        "pm_codes": [
+          "ff4d",
+          "ff42",
+          "ff57",
+          "ff41",
+          "ff59"
+        ],
+        "status": "reserva_pendente"
+      }
+    },
+    {
+      "id": "CTRL-CYR-BLOCK",
+      "lens": "CV4",
+      "title": "CTRL-CYR sem Stripe (ou rails residual)",
+      "ev": {
+        "tag": "ctrl-ctrl-cyr",
+        "sql": true,
+        "sql_true": true,
+        "cpi": "400 {\"error\":\"Checkout blocked: order is off-platform payment (no Stripe Session).\"}",
+        "opened": false,
+        "denied": true,
+        "sid": "",
+        "pm_len": 5,
+        "pm_codes": [
+          "43c",
+          "62",
+          "77",
+          "61",
+          "79"
+        ],
+        "status": "reserva_pendente"
+      }
+    },
+    {
+      "id": "CTRL-PAYSAFE-BLOCK",
+      "lens": "CV4",
+      "title": "CTRL-PAYSAFE sem Stripe (ou rails residual)",
+      "ev": {
+        "tag": "ctrl-ctrl-paysafe",
+        "sql": false,
+        "sql_true": false,
+        "cpi": "429 {\"error\":\"Demasiados checkouts. Tenta daqui a pouco.\"}",
+        "opened": false,
+        "denied": false,
+        "sid": "",
+        "pm_len": 11,
+        "pm_codes": [
+          "50",
+          "61",
+          "79",
+          "73",
+          "61",
+          "66",
+          "65",
+          "43",
+          "61",
+          "73",
+          "68"
+        ],
+        "status": "reserva_pendente"
+      }
+    },
+    {
+      "id": "CTRL-PICPAY-BLOCK",
+      "lens": "CV4",
+      "title": "CTRL-PICPAY sem Stripe (ou rails residual)",
+      "ev": {
+        "tag": "ctrl-ctrl-picpay",
+        "sql": false,
+        "sql_true": false,
+        "cpi": "429 {\"error\":\"Demasiados checkouts. Tenta daqui a pouco.\"}",
+        "opened": false,
+        "denied": false,
+        "sid": "",
+        "pm_len": 6,
+        "pm_codes": [
+          "50",
+          "69",
+          "63",
+          "50",
+          "61",
+          "79"
+        ],
+        "status": "reserva_pendente"
+      }
+    }
+  ],
+  "skipped": [],
+  "probes": [
+    {
+      "probe_id": "A1",
+      "poco": "CV-A",
+      "payload": "plant cs_test_dead; buyer2 CPI; owner retry",
+      "http_rpc": {
+        "jwtPlant": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"order_money_fields_immutable\"}",
+        "actor2": "400 {\"error\":\"Checkout blocked: order does not belong to buyer.\"}",
+        "retry": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1JLBxGue62NNlzTmUU5LgxKsnlRLgOe5XjDtHqyEVO7xrdJkf8pXXAOTk#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21oYWlsUnxrVkRhQUQyNlJjSWBCN3BXNXVvVT1haml…"
+      },
+      "bd_stripe": "cs_test_a1JLBxGue62NNlzTmUU5LgxKsnlRLgOe5XjDtHqyEVO7xrdJkf8pXXAOTk",
+      "verdict": "FAIL",
+      "lens": "CV1"
+    },
+    {
+      "probe_id": "A2",
+      "poco": "CV-A",
+      "payload": "claiming:<now+1y>:futuretoken12ab + CPI",
+      "http_rpc": {
+        "rpcJwt": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_bag_checkout_claim\"}",
+        "cpi": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1ARK1vP8l5t4igWy8pBsvnt2xC1NSwa42N9949XKD7tTj4m7oF8UWnOsq#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21oYWlsUnxrVkRhQUQyNlJjSWBCN3BXNXVvVT1haml…"
+      },
+      "bd_stripe": "cs_test_a1ARK1vP8l5t4igWy8pBsvnt2xC1NSwa42N9949XKD7tTj4m7oF8UWnOsq",
+      "verdict": "FAIL",
+      "lens": "CV2"
+    },
+    {
+      "probe_id": "A3",
+      "poco": "CV-A",
+      "payload": "claiming:malformed | claiming: | claiming:1000:extremepast",
+      "http_rpc": [
+        "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1pbsHvmI59t8qspMxjmPh2G1vDOpM2ne9pN0blbDZE4Phdfk5iZI9WBaP#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21oYWlsUnxrVkRhQUQyNlJjSWBCN3BXNXVvVT1haml…",
+        "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1CAgBzVSl3trfsXrxtmQBOW67k5DfnzQMZRuo1PpYOUJIqAqW3qbGXpP8#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21oYWlsUnxrVkRhQUQyNlJjSWBCN3BXNXVvVT1haml…",
+        "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1emcToG8B5SVu58QOBmpQ4qlGkSk3Z6HkDzSRCO2cqCLsVKKFND3Zllek#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21oYWlsUnxrVkRhQUQyNlJjSWBCN3BXNXVvVT1haml…"
+      ],
+      "bd_stripe": [
+        "cs_test_a1pbsHvmI59t8qspMxjmPh2G1vDOpM2ne9pN0blbDZE4Phdfk5iZI9WBaP",
+        "cs_test_a1CAgBzVSl3trfsXrxtmQBOW67k5DfnzQMZRuo1PpYOUJIqAqW3qbGXpP8",
+        "cs_test_a1emcToG8B5SVu58QOBmpQ4qlGkSk3Z6HkDzSRCO2cqCLsVKKFND3Zllek"
+      ],
+      "verdict": "FAIL",
+      "lens": "CV2"
+    },
+    {
+      "probe_id": "A4",
+      "poco": "CV-A",
+      "payload": "Future.wait bag timeout 250ms ∥ retry",
+      "http_rpc": [
+        "598 client_timeout",
+        "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1PaT4o45P5z9vdxgvhOKGYIZhx9jsVilT1HkaieFjBfKXifUeaJgLrpVg#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21oYWlsUnxrVkRhQUQyNlJjSWBCN3BXNXVvVT1haml…"
+      ],
+      "bd_stripe": {
+        "stored": [
+          "cs_test_a1PaT4o45P5z9vdxgvhOKGYIZhx9jsVilT1HkaieFjBfKXifUeaJgLrpVg",
+          "cs_test_a1PaT4o45P5z9vdxgvhOKGYIZhx9jsVilT1HkaieFjBfKXifUeaJgLrpVg"
+        ],
+        "payable": 1,
+        "sids": [
+          "cs_test_a1PaT4o45P5z9vdxgvhOKGYIZhx9jsVilT1HkaieFjBfKXifUeaJgLrpVg"
+        ]
+      },
+      "verdict": "FAIL",
+      "lens": "CV6"
+    },
+    {
+      "probe_id": "B1",
+      "poco": "CV-B",
+      "payload": "Future.wait bag 4-line ∥ bag 2-line overlap CD",
+      "http_rpc": [
+        "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1sCy5SYclzKOPobBOMyu9k3RVhMYqHawxUz0ji59kL1MguQNN9UvLBIjm#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21oYWlsUnxrVkRhQUQyNlJjSWBCN3BXNXVvVT1haml…",
+        "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1lThkRTEGzLcLxAIEoB9vD9YJTvgQmehDgUKMI1lB208Jkyff315Qcve7#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21oYWlsUnxrVkRhQUQyNlJjSWBCN3BXNXVvVT1haml…"
+      ],
+      "bd_stripe": {
+        "sids": [
+          "cs_test_a1sCy5SYclzKOPobBOMyu9k3RVhMYqHawxUz0ji59kL1MguQNN9UvLBIjm",
+          "cs_test_a1lThkRTEGzLcLxAIEoB9vD9YJTvgQmehDgUKMI1lB208Jkyff315Qcve7"
+        ],
+        "stored": [
+          "cs_test_a1sCy5SYclzKOPobBOMyu9k3RVhMYqHawxUz0ji59kL1MguQNN9UvLBIjm",
+          "cs_test_a1sCy5SYclzKOPobBOMyu9k3RVhMYqHawxUz0ji59kL1MguQNN9UvLBIjm",
+          "cs_test_a1sCy5SYclzKOPobBOMyu9k3RVhMYqHawxUz0ji59kL1MguQNN9UvLBIjm",
+          "cs_test_a1sCy5SYclzKOPobBOMyu9k3RVhMYqHawxUz0ji59kL1MguQNN9UvLBIjm"
+        ],
+        "payable": 2,
+        "peeks": [
+          {
+            "sid": "cs_test_a1sCy5SYclzKOPobBOMy",
+            "settle": "402 Pagamento ainda não confirmado. Se já pagaste, aguarda alguns segundos e volta à app Fleaber.",
+            "page_http": 200,
+            "expired_hint": true,
+            "pay_hint": false
+          },
+          {
+            "sid": "cs_test_a1lThkRTEGzLcLxAIEoB",
+            "settle": "402 Pagamento ainda não confirmado. Se já pagaste, aguarda alguns segundos e volta à app Fleaber.",
+            "page_http": 200,
+            "expired_hint": true,
+            "pay_hint": false
+          }
+        ]
+      },
+      "verdict": "HOLD",
+      "lens": "CV3"
+    },
+    {
+      "probe_id": "B3",
+      "poco": "CV-B",
+      "payload": "Future.wait CPI ∥ unlist+qty=0",
+      "http_rpc": {
+        "ck": "400 {\"error\":\"Checkout blocked: product is not listed.\"}",
+        "patch": "200 [{\"id\":\"54461dca-084d-4caf-b8a4-50262b438901\",\"created_at\":\"2026-09-06T13:53:30.838515+00:00\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"title\":\"RTCV-20260906T1448-b3-unlist-0\",\"price\":13.0,\"ref_code\":null,\"category\":null,\"clothing_size\":null,\"gender\":null,\"description\":…"
+      },
+      "bd_stripe": {
+        "id": "54461dca-084d-4caf-b8a4-50262b438901",
+        "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+        "title": "RTCV-20260906T1448-b3-unlist-0",
+        "price": 13.0,
+        "quantity": 0,
+        "is_sold": false,
+        "list_on_marketplace": false,
+        "available_for_live": true
+      },
+      "verdict": "FAIL",
+      "lens": "CV6"
+    },
+    {
+      "probe_id": "B4",
+      "poco": "CV-B",
+      "payload": "Future.wait bag 3-line ∥ 1-line overlap + cross-seller",
+      "http_rpc": {
+        "overlap": [
+          "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1hrOa1lGeKxEHuP8sTNm2hN5QUWm5LjBhFyxlFYBbe1xjJdGTfXSyNQu8#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21oYWlsUnxrVkRhQUQyNlJjSWBCN3BXNXVvVT1haml…",
+          "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1PLQtn5qI1JUwuDG2EYibLBEYqshRgchQloUZWuBdY8YZhchycGQAOFcY#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21oYWlsUnxrVkRhQUQyNlJjSWBCN3BXNXVvVT1haml…"
+        ],
+        "cross": "400 {\"error\":\"Checkout blocked: bag lines must share one seller. Pay each seller separately.\"}"
+      },
+      "bd_stripe": {
+        "sids": [
+          "cs_test_a1hrOa1lGeKxEHuP8sTNm2hN5QUWm5LjBhFyxlFYBbe1xjJdGTfXSyNQu8",
+          "cs_test_a1PLQtn5qI1JUwuDG2EYibLBEYqshRgchQloUZWuBdY8YZhchycGQAOFcY"
+        ],
+        "payable": 2,
+        "stored": [
+          "cs_test_a1hrOa1lGeKxEHuP8sTNm2hN5QUWm5LjBhFyxlFYBbe1xjJdGTfXSyNQu8",
+          "cs_test_a1hrOa1lGeKxEHuP8sTNm2hN5QUWm5LjBhFyxlFYBbe1xjJdGTfXSyNQu8",
+          "cs_test_a1hrOa1lGeKxEHuP8sTNm2hN5QUWm5LjBhFyxlFYBbe1xjJdGTfXSyNQu8"
+        ],
+        "crossOk": false
+      },
+      "verdict": "HOLD",
+      "lens": "CV3"
+    },
+    {
+      "probe_id": "C1",
+      "poco": "CV-C",
+      "payload": "mb way exact → esperado 400 off-platform",
+      "http_rpc": "400 {\"error\":\"Checkout blocked: order is off-platform payment (no Stripe Session).\"}",
+      "bd_stripe": {
+        "tag": "c1-mbway",
+        "sql": true,
+        "sql_true": true,
+        "cpi": "400 {\"error\":\"Checkout blocked: order is off-platform payment (no Stripe Session).\"}",
+        "opened": false,
+        "denied": true,
+        "sid": "",
+        "pm_len": 6,
+        "pm_codes": [
+          "6d",
+          "62",
+          "20",
+          "77",
+          "61",
+          "79"
+        ],
+        "status": "reserva_pendente"
+      },
+      "verdict": "FAIL",
+      "lens": "CV4"
+    },
+    {
+      "probe_id": "C2-RLO",
+      "poco": "CV-C",
+      "payload": "novo encode C2-RLO codes=[6d, 62, 202e, 77, 61, 79]",
+      "http_rpc": "400 {\"error\":\"Checkout blocked: order is off-platform payment (no Stripe Session).\"}",
+      "bd_stripe": {
+        "tag": "c2-c2-rlo",
+        "sql": true,
+        "sql_true": true,
+        "cpi": "400 {\"error\":\"Checkout blocked: order is off-platform payment (no Stripe Session).\"}",
+        "opened": false,
+        "denied": true,
+        "sid": "",
+        "pm_len": 6,
+        "pm_codes": [
+          "6d",
+          "62",
+          "202e",
+          "77",
+          "61",
+          "79"
+        ],
+        "status": "reserva_pendente"
+      },
+      "verdict": "FAIL",
+      "lens": "CV4"
+    },
+    {
+      "probe_id": "C2-SHY",
+      "poco": "CV-C",
+      "payload": "novo encode C2-SHY codes=[6d, 62, ad, 77, 61, 79]",
+      "http_rpc": "400 {\"error\":\"Checkout blocked: order is off-platform payment (no Stripe Session).\"}",
+      "bd_stripe": {
+        "tag": "c2-c2-shy",
+        "sql": true,
+        "sql_true": true,
+        "cpi": "400 {\"error\":\"Checkout blocked: order is off-platform payment (no Stripe Session).\"}",
+        "opened": false,
+        "denied": true,
+        "sid": "",
+        "pm_len": 6,
+        "pm_codes": [
+          "6d",
+          "62",
+          "ad",
+          "77",
+          "61",
+          "79"
+        ],
+        "status": "reserva_pendente"
+      },
+      "verdict": "FAIL",
+      "lens": "CV4"
+    },
+    {
+      "probe_id": "C2-TAG",
+      "poco": "CV-C",
+      "payload": "novo encode C2-TAG codes=[6d, 62, e0062, 77, 61, 79]",
+      "http_rpc": "400 {\"error\":\"Checkout blocked: order is off-platform payment (no Stripe Session).\"}",
+      "bd_stripe": {
+        "tag": "c2-c2-tag",
+        "sql": true,
+        "sql_true": true,
+        "cpi": "400 {\"error\":\"Checkout blocked: order is off-platform payment (no Stripe Session).\"}",
+        "opened": false,
+        "denied": true,
+        "sid": "",
+        "pm_len": 7,
+        "pm_codes": [
+          "6d",
+          "62",
+          "e0062",
+          "77",
+          "61",
+          "79"
+        ],
+        "status": "reserva_pendente"
+      },
+      "verdict": "FAIL",
+      "lens": "CV4"
+    },
+    {
+      "probe_id": "C2-TAGS",
+      "poco": "CV-C",
+      "payload": "novo encode C2-TAGS codes=[e006d, e0062, e0077, e0061, e0079]",
+      "http_rpc": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1FRra86zzpV78YfxbtecJxrUKthoqiKsZdyy9mOnT0P27ik3eLp4IyNO4#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21oYWlsUnxrVkRhQUQyNlJjSWBCN3BXNXVvVT1haml…",
+      "bd_stripe": {
+        "tag": "c2-c2-tags",
+        "sql": false,
+        "sql_true": false,
+        "cpi": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1FRra86zzpV78YfxbtecJxrUKthoqiKsZdyy9mOnT0P27ik3eLp4IyNO4#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21oYWlsUnxrVkRhQUQyNlJjSWBCN3BXNXVvVT1haml…",
+        "opened": true,
+        "denied": false,
+        "sid": "cs_test_a1FRra86zzpV78YfxbtecJxrUKthoqiKsZdyy9mOnT0P27ik3eLp4IyNO4",
+        "pm_len": 10,
+        "pm_codes": [
+          "e006d",
+          "e0062",
+          "e0077",
+          "e0061",
+          "e0079"
+        ],
+        "status": "reserva_pendente"
+      },
+      "verdict": "HOLD",
+      "lens": "CV4"
+    },
+    {
+      "probe_id": "C2-NFKC",
+      "poco": "CV-C",
+      "payload": "novo encode C2-NFKC codes=[3386, 77, 61, 79]",
+      "http_rpc": "400 {\"error\":\"Checkout blocked: order is off-platform payment (no Stripe Session).\"}",
+      "bd_stripe": {
+        "tag": "c2-c2-nfkc",
+        "sql": true,
+        "sql_true": true,
+        "cpi": "400 {\"error\":\"Checkout blocked: order is off-platform payment (no Stripe Session).\"}",
+        "opened": false,
+        "denied": true,
+        "sid": "",
+        "pm_len": 4,
+        "pm_codes": [
+          "3386",
+          "77",
+          "61",
+          "79"
+        ],
+        "status": "reserva_pendente"
+      },
+      "verdict": "FAIL",
+      "lens": "CV4"
+    },
+    {
+      "probe_id": "C2-WJ",
+      "poco": "CV-C",
+      "payload": "novo encode C2-WJ codes=[6d, 62, 2060, 77, 61, 79]",
+      "http_rpc": "400 {\"error\":\"Checkout blocked: order is off-platform payment (no Stripe Session).\"}",
+      "bd_stripe": {
+        "tag": "c2-c2-wj",
+        "sql": true,
+        "sql_true": true,
+        "cpi": "400 {\"error\":\"Checkout blocked: order is off-platform payment (no Stripe Session).\"}",
+        "opened": false,
+        "denied": true,
+        "sid": "",
+        "pm_len": 6,
+        "pm_codes": [
+          "6d",
+          "62",
+          "2060",
+          "77",
+          "61",
+          "79"
+        ],
+        "status": "reserva_pendente"
+      },
+      "verdict": "FAIL",
+      "lens": "CV4"
+    },
+    {
+      "probe_id": "C2-MU",
+      "poco": "CV-C",
+      "payload": "novo encode C2-MU codes=[3bc, 62, 77, 61, 79]",
+      "http_rpc": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a15AoFlG2HKRSPaoczpsfBxz4SWHtPN0rHnA4HnSzyRrqFbZIPmxOgA52x#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21oYWlsUnxrVkRhQUQyNlJjSWBCN3BXNXVvVT1haml…",
+      "bd_stripe": {
+        "tag": "c2-c2-mu",
+        "sql": false,
+        "sql_true": false,
+        "cpi": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a15AoFlG2HKRSPaoczpsfBxz4SWHtPN0rHnA4HnSzyRrqFbZIPmxOgA52x#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21oYWlsUnxrVkRhQUQyNlJjSWBCN3BXNXVvVT1haml…",
+        "opened": true,
+        "denied": false,
+        "sid": "cs_test_a15AoFlG2HKRSPaoczpsfBxz4SWHtPN0rHnA4HnSzyRrqFbZIPmxOgA52x",
+        "pm_len": 5,
+        "pm_codes": [
+          "3bc",
+          "62",
+          "77",
+          "61",
+          "79"
+        ],
+        "status": "reserva_pendente"
+      },
+      "verdict": "HOLD",
+      "lens": "CV4"
+    },
+    {
+      "probe_id": "C2-WE",
+      "poco": "CV-C",
+      "payload": "novo encode C2-WE codes=[6d, 62, 51d, 61, 79]",
+      "http_rpc": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1WqytkUHduxxYmZtF9nOE2IRjVfm5oVEh8bIpZ5zJaNiqbuHHkB9qifma#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21oYWlsUnxrVkRhQUQyNlJjSWBCN3BXNXVvVT1haml…",
+      "bd_stripe": {
+        "tag": "c2-c2-we",
+        "sql": false,
+        "sql_true": false,
+        "cpi": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1WqytkUHduxxYmZtF9nOE2IRjVfm5oVEh8bIpZ5zJaNiqbuHHkB9qifma#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21oYWlsUnxrVkRhQUQyNlJjSWBCN3BXNXVvVT1haml…",
+        "opened": true,
+        "denied": false,
+        "sid": "cs_test_a1WqytkUHduxxYmZtF9nOE2IRjVfm5oVEh8bIpZ5zJaNiqbuHHkB9qifma",
+        "pm_len": 5,
+        "pm_codes": [
+          "6d",
+          "62",
+          "51d",
+          "61",
+          "79"
+        ],
+        "status": "reserva_pendente"
+      },
+      "verdict": "HOLD",
+      "lens": "CV4"
+    },
+    {
+      "probe_id": "C2-SC",
+      "poco": "CV-C",
+      "payload": "novo encode C2-SC codes=[1d0d, 299, 1d21, 1d00, 28f]",
+      "http_rpc": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1Flfqkj05CALbjOU1HyRnIVCPdA7gaTzaF5DJg0qIX2oiHzuFJQ4CRjVh#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21oYWlsUnxrVkRhQUQyNlJjSWBCN3BXNXVvVT1haml…",
+      "bd_stripe": {
+        "tag": "c2-c2-sc",
+        "sql": false,
+        "sql_true": false,
+        "cpi": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1Flfqkj05CALbjOU1HyRnIVCPdA7gaTzaF5DJg0qIX2oiHzuFJQ4CRjVh#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21oYWlsUnxrVkRhQUQyNlJjSWBCN3BXNXVvVT1haml…",
+        "opened": true,
+        "denied": false,
+        "sid": "cs_test_a1Flfqkj05CALbjOU1HyRnIVCPdA7gaTzaF5DJg0qIX2oiHzuFJQ4CRjVh",
+        "pm_len": 5,
+        "pm_codes": [
+          "1d0d",
+          "299",
+          "1d21",
+          "1d00",
+          "28f"
+        ],
+        "status": "reserva_pendente"
+      },
+      "verdict": "HOLD",
+      "lens": "CV4"
+    },
+    {
+      "probe_id": "C2-HF",
+      "poco": "CV-C",
+      "payload": "novo encode C2-HF codes=[6d, 62, 3164, 77, 61, 79]",
+      "http_rpc": "400 {\"error\":\"Checkout blocked: order is off-platform payment (no Stripe Session).\"}",
+      "bd_stripe": {
+        "tag": "c2-c2-hf",
+        "sql": true,
+        "sql_true": true,
+        "cpi": "400 {\"error\":\"Checkout blocked: order is off-platform payment (no Stripe Session).\"}",
+        "opened": false,
+        "denied": true,
+        "sid": "",
+        "pm_len": 6,
+        "pm_codes": [
+          "6d",
+          "62",
+          "3164",
+          "77",
+          "61",
+          "79"
+        ],
+        "status": "reserva_pendente"
+      },
+      "verdict": "FAIL",
+      "lens": "CV4"
+    },
+    {
+      "probe_id": "C2-NFD",
+      "poco": "CV-C",
+      "payload": "novo encode C2-NFD codes=[6d, 62, 77, 61, 301, 79]",
+      "http_rpc": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1MxNu2bRqmTsG5VGDWfrsLqdWJ33MD90e0Jvny3Q9gYUJPFK0muKvOENi#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21oYWlsUnxrVkRhQUQyNlJjSWBCN3BXNXVvVT1haml…",
+      "bd_stripe": {
+        "tag": "c2-c2-nfd",
+        "sql": false,
+        "sql_true": false,
+        "cpi": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1MxNu2bRqmTsG5VGDWfrsLqdWJ33MD90e0Jvny3Q9gYUJPFK0muKvOENi#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21oYWlsUnxrVkRhQUQyNlJjSWBCN3BXNXVvVT1haml…",
+        "opened": true,
+        "denied": false,
+        "sid": "cs_test_a1MxNu2bRqmTsG5VGDWfrsLqdWJ33MD90e0Jvny3Q9gYUJPFK0muKvOENi",
+        "pm_len": 6,
+        "pm_codes": [
+          "6d",
+          "62",
+          "77",
+          "61",
+          "301",
+          "79"
+        ],
+        "status": "reserva_pendente"
+      },
+      "verdict": "HOLD",
+      "lens": "CV4"
+    },
+    {
+      "probe_id": "C3",
+      "poco": "CV-C",
+      "payload": "body total_eur=0 item_price=0.01; homoglyph portes; €3.5",
+      "http_rpc": {
+        "ctt": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1gakuwN1R6dWMupDGCQQs6Qj5shpkzFanuKoANPEzh4WJapP4SPpl0CXo#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21oYWlsUnxrVkRhQUQyNlJjSWBCN3BXNXVvVT1haml…",
+        "homo": "400 {\"error\":\"Checkout blocked: portes da encomenda inválidos.\"}",
+        "miss": "400 {\"error\":\"Checkout blocked: portes da encomenda inválidos.\"}"
+      },
+      "bd_stripe": {
+        "cttAmt": 2323,
+        "homoAmt": "",
+        "missAmt": ""
+      },
+      "verdict": "FAIL",
+      "lens": "CV5"
+    },
+    {
+      "probe_id": "C4",
+      "poco": "CV-C",
+      "payload": "Stripe TEST pago 4242 + contabilidade order",
+      "http_rpc": {
+        "oid": "992fd031-bbed-483c-8ed4-3655158f20ec",
+        "pi": "pi_3UCgWHH7FWYUN3jh07teWTMh"
+      },
+      "bd_stripe": {
+        "status": "pago",
+        "cents": 590,
+        "applied": 1,
+        "qty": 1,
+        "wallets0": {
+          "buyer": 61.1,
+          "seller": 56.0,
+          "buyer2": 0,
+          "seller2": 0
+        },
+        "wallets1": {
+          "buyer": 61.1,
+          "seller": 51.0,
+          "buyer2": 0,
+          "seller2": 0
+        }
+      },
+      "verdict": "FAIL",
+      "lens": "CV7"
+    },
+    {
+      "probe_id": "CTRL-ZWSP",
+      "poco": "CV-C",
+      "payload": "anti-atrofia CTRL-ZWSP",
+      "http_rpc": "400 {\"error\":\"Checkout blocked: order is off-platform payment (no Stripe Session).\"}",
+      "bd_stripe": {
+        "tag": "ctrl-ctrl-zwsp",
+        "sql": true,
+        "sql_true": true,
+        "cpi": "400 {\"error\":\"Checkout blocked: order is off-platform payment (no Stripe Session).\"}",
+        "opened": false,
+        "denied": true,
+        "sid": "",
+        "pm_len": 6,
+        "pm_codes": [
+          "6d",
+          "62",
+          "77",
+          "61",
+          "79",
+          "200b"
+        ],
+        "status": "reserva_pendente"
+      },
+      "verdict": "FAIL",
+      "lens": "CV4"
+    },
+    {
+      "probe_id": "CTRL-FW",
+      "poco": "CV-C",
+      "payload": "anti-atrofia CTRL-FW",
+      "http_rpc": "400 {\"error\":\"Checkout blocked: order is off-platform payment (no Stripe Session).\"}",
+      "bd_stripe": {
+        "tag": "ctrl-ctrl-fw",
+        "sql": true,
+        "sql_true": true,
+        "cpi": "400 {\"error\":\"Checkout blocked: order is off-platform payment (no Stripe Session).\"}",
+        "opened": false,
+        "denied": true,
+        "sid": "",
+        "pm_len": 5,
+        "pm_codes": [
+          "ff4d",
+          "ff42",
+          "ff57",
+          "ff41",
+          "ff59"
+        ],
+        "status": "reserva_pendente"
+      },
+      "verdict": "FAIL",
+      "lens": "CV4"
+    },
+    {
+      "probe_id": "CTRL-CYR",
+      "poco": "CV-C",
+      "payload": "anti-atrofia CTRL-CYR",
+      "http_rpc": "400 {\"error\":\"Checkout blocked: order is off-platform payment (no Stripe Session).\"}",
+      "bd_stripe": {
+        "tag": "ctrl-ctrl-cyr",
+        "sql": true,
+        "sql_true": true,
+        "cpi": "400 {\"error\":\"Checkout blocked: order is off-platform payment (no Stripe Session).\"}",
+        "opened": false,
+        "denied": true,
+        "sid": "",
+        "pm_len": 5,
+        "pm_codes": [
+          "43c",
+          "62",
+          "77",
+          "61",
+          "79"
+        ],
+        "status": "reserva_pendente"
+      },
+      "verdict": "FAIL",
+      "lens": "CV4"
+    },
+    {
+      "probe_id": "CTRL-PAYSAFE",
+      "poco": "CV-C",
+      "payload": "anti-atrofia CTRL-PAYSAFE",
+      "http_rpc": "429 {\"error\":\"Demasiados checkouts. Tenta daqui a pouco.\"}",
+      "bd_stripe": {
+        "tag": "ctrl-ctrl-paysafe",
+        "sql": false,
+        "sql_true": false,
+        "cpi": "429 {\"error\":\"Demasiados checkouts. Tenta daqui a pouco.\"}",
+        "opened": false,
+        "denied": false,
+        "sid": "",
+        "pm_len": 11,
+        "pm_codes": [
+          "50",
+          "61",
+          "79",
+          "73",
+          "61",
+          "66",
+          "65",
+          "43",
+          "61",
+          "73",
+          "68"
+        ],
+        "status": "reserva_pendente"
+      },
+      "verdict": "FAIL",
+      "lens": "CV4"
+    },
+    {
+      "probe_id": "CTRL-PICPAY",
+      "poco": "CV-C",
+      "payload": "anti-atrofia CTRL-PICPAY",
+      "http_rpc": "429 {\"error\":\"Demasiados checkouts. Tenta daqui a pouco.\"}",
+      "bd_stripe": {
+        "tag": "ctrl-ctrl-picpay",
+        "sql": false,
+        "sql_true": false,
+        "cpi": "429 {\"error\":\"Demasiados checkouts. Tenta daqui a pouco.\"}",
+        "opened": false,
+        "denied": false,
+        "sid": "",
+        "pm_len": 6,
+        "pm_codes": [
+          "50",
+          "69",
+          "63",
+          "50",
+          "61",
+          "79"
+        ],
+        "status": "reserva_pendente"
+      },
+      "verdict": "FAIL",
+      "lens": "CV4"
+    }
+  ],
+  "notes": [
+    {
+      "id": "actors",
+      "title": "ids",
+      "ev": {
+        "b": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+        "s": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+        "b2": "b95b5123-a5e9-45c8-ba39-c670509b1d29",
+        "s2": "c5ddb570-5fe6-4116-b0c7-02cff162188a"
+      }
+    },
+    {
+      "id": "CV7.wallet.pre",
+      "lens": "CV7",
+      "well": "CV-C",
+      "title": "baseline",
+      "ev": {
+        "buyer": 61.1,
+        "seller": 56.0,
+        "buyer2": 0,
+        "seller2": 0
+      }
+    },
+    {
+      "id": "A1.dead",
+      "lens": "CV1",
+      "well": "CV-A",
+      "title": "cs_ morta reclaim",
+      "ev": {
+        "first": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1Bwqv1qSh1YJlFUXOGFYgZni8ao0Wp5Du5as4BFUJAlDJqfl2VboPfxJy#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21oYWlsUnxrVkRhQUQyNlJjSWBCN3BXNXVvVT1haml…",
+        "plant": "200 [{\"id\":\"b0fd6f73-3161-4934-b399-a4982ae5ced5\",\"created_at\":\"2026-09-06T13:52:56.863973+00:00\",\"product_id\":\"0bc34bb0-8fe6-4470-8030-877ada1d9960\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"price_total\":13.25,\"shipping_met…",
+        "jwtPlant": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"order_money_fields_immutable\"}",
+        "actor2": "400 {\"error\":\"Checkout blocked: order does not belong to buyer.\"}",
+        "retry": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1JLBxGue62NNlzTmUU5LgxKsnlRLgOe5XjDtHqyEVO7xrdJkf8pXXAOTk#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21oYWlsUnxrVkRhQUQyNlJjSWBCN3BXNXVvVT1haml…",
+        "stored": "cs_test_a1JLBxGue62NNlzTmUU5LgxKsnlRLgOe5XjDtHqyEVO7xrdJkf8pXXAOTk"
+      }
+    },
+    {
+      "id": "A2.future",
+      "lens": "CV2",
+      "well": "CV-A",
+      "title": "claiming futuro",
+      "ev": {
+        "tok": "claiming:1820238783972:futuretoken12ab",
+        "rpcJwt": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_bag_checkout_claim\"}",
+        "hit": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1ARK1vP8l5t4igWy8pBsvnt2xC1NSwa42N9949XKD7tTj4m7oF8UWnOsq#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21oYWlsUnxrVkRhQUQyNlJjSWBCN3BXNXVvVT1haml…",
+        "stored": "cs_test_a1ARK1vP8l5t4igWy8pBsvnt2xC1NSwa42N9949XKD7tTj4m7oF8UWnOsq"
+      }
+    },
+    {
+      "id": "A3.malform",
+      "lens": "CV2",
+      "well": "CV-A",
+      "title": "claiming malform/TTL/passado extremo",
+      "ev": {
+        "toks": [
+          "claiming:malformedtoken12",
+          "claiming:",
+          "claiming:1000:extremepast12ab"
+        ],
+        "briefs": [
+          "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1pbsHvmI59t8qspMxjmPh2G1vDOpM2ne9pN0blbDZE4Phdfk5iZI9WBaP#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21oYWlsUnxrVkRhQUQyNlJjSWBCN3BXNXVvVT1haml…",
+          "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1CAgBzVSl3trfsXrxtmQBOW67k5DfnzQMZRuo1PpYOUJIqAqW3qbGXpP8#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21oYWlsUnxrVkRhQUQyNlJjSWBCN3BXNXVvVT1haml…",
+          "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1emcToG8B5SVu58QOBmpQ4qlGkSk3Z6HkDzSRCO2cqCLsVKKFND3Zllek#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21oYWlsUnxrVkRhQUQyNlJjSWBCN3BXNXVvVT1haml…"
+        ],
+        "stored": [
+          "cs_test_a1pbsHvmI59t8qspMxjmPh2G1vDOpM2ne9pN0blbDZE4Phdfk5iZI9WBaP",
+          "cs_test_a1CAgBzVSl3trfsXrxtmQBOW67k5DfnzQMZRuo1PpYOUJIqAqW3qbGXpP8",
+          "cs_test_a1emcToG8B5SVu58QOBmpQ4qlGkSk3Z6HkDzSRCO2cqCLsVKKFND3Zllek"
+        ]
+      }
+    },
+    {
+      "id": "A4.timeout",
+      "lens": "CV6",
+      "well": "CV-A",
+      "title": "timeout 250ms ∥ retry",
+      "ev": {
+        "briefs": [
+          "598 client_timeout",
+          "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1PaT4o45P5z9vdxgvhOKGYIZhx9jsVilT1HkaieFjBfKXifUeaJgLrpVg#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21oYWlsUnxrVkRhQUQyNlJjSWBCN3BXNXVvVT1haml…"
+        ],
+        "stored": [
+          "cs_test_a1PaT4o45P5z9vdxgvhOKGYIZhx9jsVilT1HkaieFjBfKXifUeaJgLrpVg",
+          "cs_test_a1PaT4o45P5z9vdxgvhOKGYIZhx9jsVilT1HkaieFjBfKXifUeaJgLrpVg"
+        ],
+        "payable": 1
+      }
+    },
+    {
+      "id": "B1.4x2",
+      "lens": "CV3",
+      "well": "CV-B",
+      "title": "bag 4-line ∥ 2-line overlap",
+      "ev": {
+        "sids": [
+          "cs_test_a1sCy5SYclzKOPobBOMyu9k3RVhMYqHawxUz0ji59kL1MguQNN9UvLBIjm",
+          "cs_test_a1lThkRTEGzLcLxAIEoB9vD9YJTvgQmehDgUKMI1lB208Jkyff315Qcve7"
+        ],
+        "payable": 2,
+        "briefs": [
+          "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1sCy5SYclzKOPobBOMyu9k3RVhMYqHawxUz0ji59kL1MguQNN9UvLBIjm#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21oYWlsUnxrVkRhQUQyNlJjSWBCN3BXNXVvVT1haml…",
+          "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1lThkRTEGzLcLxAIEoB9vD9YJTvgQmehDgUKMI1lB208Jkyff315Qcve7#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21oYWlsUnxrVkRhQUQyNlJjSWBCN3BXNXVvVT1haml…"
+        ],
+        "stored": [
+          "cs_test_a1sCy5SYclzKOPobBOMyu9k3RVhMYqHawxUz0ji59kL1MguQNN9UvLBIjm",
+          "cs_test_a1sCy5SYclzKOPobBOMyu9k3RVhMYqHawxUz0ji59kL1MguQNN9UvLBIjm",
+          "cs_test_a1sCy5SYclzKOPobBOMyu9k3RVhMYqHawxUz0ji59kL1MguQNN9UvLBIjm",
+          "cs_test_a1sCy5SYclzKOPobBOMyu9k3RVhMYqHawxUz0ji59kL1MguQNN9UvLBIjm"
+        ],
+        "secondBlocked": false,
+        "peeks": [
+          {
+            "sid": "cs_test_a1sCy5SYclzKOPobBOMy",
+            "settle": "402 Pagamento ainda não confirmado. Se já pagaste, aguarda alguns segundos e volta à app Fleaber.",
+            "page_http": 200,
+            "expired_hint": true,
+            "pay_hint": false
+          },
+          {
+            "sid": "cs_test_a1lThkRTEGzLcLxAIEoB",
+            "settle": "402 Pagamento ainda não confirmado. Se já pagaste, aguarda alguns segundos e volta à app Fleaber.",
+            "page_http": 200,
+            "expired_hint": true,
+            "pay_hint": false
+          }
+        ]
+      }
+    },
+    {
+      "id": "order.fail",
+      "title": "insertOrder",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"order_hold_exceeds_stock\"}"
+    },
+    {
+      "id": "B3.unlist",
+      "lens": "CV6",
+      "well": "CV-B",
+      "title": "checkout ∥ unlist+qty0",
+      "ev": {
+        "ck": "400 {\"error\":\"Checkout blocked: product is not listed.\"}",
+        "patch": "200 [{\"id\":\"54461dca-084d-4caf-b8a4-50262b438901\",\"created_at\":\"2026-09-06T13:53:30.838515+00:00\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"title\":\"RTCV-20260906T1448-b3-unlist-0\",\"price\":13.0,\"ref_code\":null,\"category\":null,\"clothing_size\":null,\"gender\":null,\"description\":…",
+        "listed": false,
+        "qty": 0
+      }
+    },
+    {
+      "id": "B4.3x1-cross",
+      "lens": "CV3",
+      "well": "CV-B",
+      "title": "bag 3∥1 + cross-seller",
+      "ev": {
+        "briefs": [
+          "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1hrOa1lGeKxEHuP8sTNm2hN5QUWm5LjBhFyxlFYBbe1xjJdGTfXSyNQu8#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21oYWlsUnxrVkRhQUQyNlJjSWBCN3BXNXVvVT1haml…",
+          "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1PLQtn5qI1JUwuDG2EYibLBEYqshRgchQloUZWuBdY8YZhchycGQAOFcY#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21oYWlsUnxrVkRhQUQyNlJjSWBCN3BXNXVvVT1haml…"
+        ],
+        "sids": [
+          "cs_test_a1hrOa1lGeKxEHuP8sTNm2hN5QUWm5LjBhFyxlFYBbe1xjJdGTfXSyNQu8",
+          "cs_test_a1PLQtn5qI1JUwuDG2EYibLBEYqshRgchQloUZWuBdY8YZhchycGQAOFcY"
+        ],
+        "payable": 2,
+        "stored": [
+          "cs_test_a1hrOa1lGeKxEHuP8sTNm2hN5QUWm5LjBhFyxlFYBbe1xjJdGTfXSyNQu8",
+          "cs_test_a1hrOa1lGeKxEHuP8sTNm2hN5QUWm5LjBhFyxlFYBbe1xjJdGTfXSyNQu8",
+          "cs_test_a1hrOa1lGeKxEHuP8sTNm2hN5QUWm5LjBhFyxlFYBbe1xjJdGTfXSyNQu8"
+        ],
+        "cross": "400 {\"error\":\"Checkout blocked: bag lines must share one seller. Pay each seller separately.\"}"
+      }
+    },
+    {
+      "id": "C1.control",
+      "lens": "CV4",
+      "well": "CV-C",
+      "title": "mb way exact",
+      "ev": {
+        "tag": "c1-mbway",
+        "sql": true,
+        "sql_true": true,
+        "cpi": "400 {\"error\":\"Checkout blocked: order is off-platform payment (no Stripe Session).\"}",
+        "opened": false,
+        "denied": true,
+        "sid": "",
+        "pm_len": 6,
+        "pm_codes": [
+          "6d",
+          "62",
+          "20",
+          "77",
+          "61",
+          "79"
+        ],
+        "status": "reserva_pendente"
+      }
+    },
+    {
+      "id": "C2-RLO",
+      "lens": "CV4",
+      "well": "CV-C",
+      "title": "encode C2-RLO",
+      "ev": {
+        "tag": "c2-c2-rlo",
+        "sql": true,
+        "sql_true": true,
+        "cpi": "400 {\"error\":\"Checkout blocked: order is off-platform payment (no Stripe Session).\"}",
+        "opened": false,
+        "denied": true,
+        "sid": "",
+        "pm_len": 6,
+        "pm_codes": [
+          "6d",
+          "62",
+          "202e",
+          "77",
+          "61",
+          "79"
+        ],
+        "status": "reserva_pendente"
+      }
+    },
+    {
+      "id": "C2-SHY",
+      "lens": "CV4",
+      "well": "CV-C",
+      "title": "encode C2-SHY",
+      "ev": {
+        "tag": "c2-c2-shy",
+        "sql": true,
+        "sql_true": true,
+        "cpi": "400 {\"error\":\"Checkout blocked: order is off-platform payment (no Stripe Session).\"}",
+        "opened": false,
+        "denied": true,
+        "sid": "",
+        "pm_len": 6,
+        "pm_codes": [
+          "6d",
+          "62",
+          "ad",
+          "77",
+          "61",
+          "79"
+        ],
+        "status": "reserva_pendente"
+      }
+    },
+    {
+      "id": "C2-TAG",
+      "lens": "CV4",
+      "well": "CV-C",
+      "title": "encode C2-TAG",
+      "ev": {
+        "tag": "c2-c2-tag",
+        "sql": true,
+        "sql_true": true,
+        "cpi": "400 {\"error\":\"Checkout blocked: order is off-platform payment (no Stripe Session).\"}",
+        "opened": false,
+        "denied": true,
+        "sid": "",
+        "pm_len": 7,
+        "pm_codes": [
+          "6d",
+          "62",
+          "e0062",
+          "77",
+          "61",
+          "79"
+        ],
+        "status": "reserva_pendente"
+      }
+    },
+    {
+      "id": "C2-TAGS",
+      "lens": "CV4",
+      "well": "CV-C",
+      "title": "encode C2-TAGS",
+      "ev": {
+        "tag": "c2-c2-tags",
+        "sql": false,
+        "sql_true": false,
+        "cpi": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1FRra86zzpV78YfxbtecJxrUKthoqiKsZdyy9mOnT0P27ik3eLp4IyNO4#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21oYWlsUnxrVkRhQUQyNlJjSWBCN3BXNXVvVT1haml…",
+        "opened": true,
+        "denied": false,
+        "sid": "cs_test_a1FRra86zzpV78YfxbtecJxrUKthoqiKsZdyy9mOnT0P27ik3eLp4IyNO4",
+        "pm_len": 10,
+        "pm_codes": [
+          "e006d",
+          "e0062",
+          "e0077",
+          "e0061",
+          "e0079"
+        ],
+        "status": "reserva_pendente"
+      }
+    },
+    {
+      "id": "C2-NFKC",
+      "lens": "CV4",
+      "well": "CV-C",
+      "title": "encode C2-NFKC",
+      "ev": {
+        "tag": "c2-c2-nfkc",
+        "sql": true,
+        "sql_true": true,
+        "cpi": "400 {\"error\":\"Checkout blocked: order is off-platform payment (no Stripe Session).\"}",
+        "opened": false,
+        "denied": true,
+        "sid": "",
+        "pm_len": 4,
+        "pm_codes": [
+          "3386",
+          "77",
+          "61",
+          "79"
+        ],
+        "status": "reserva_pendente"
+      }
+    },
+    {
+      "id": "C2-WJ",
+      "lens": "CV4",
+      "well": "CV-C",
+      "title": "encode C2-WJ",
+      "ev": {
+        "tag": "c2-c2-wj",
+        "sql": true,
+        "sql_true": true,
+        "cpi": "400 {\"error\":\"Checkout blocked: order is off-platform payment (no Stripe Session).\"}",
+        "opened": false,
+        "denied": true,
+        "sid": "",
+        "pm_len": 6,
+        "pm_codes": [
+          "6d",
+          "62",
+          "2060",
+          "77",
+          "61",
+          "79"
+        ],
+        "status": "reserva_pendente"
+      }
+    },
+    {
+      "id": "C2-MU",
+      "lens": "CV4",
+      "well": "CV-C",
+      "title": "encode C2-MU",
+      "ev": {
+        "tag": "c2-c2-mu",
+        "sql": false,
+        "sql_true": false,
+        "cpi": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a15AoFlG2HKRSPaoczpsfBxz4SWHtPN0rHnA4HnSzyRrqFbZIPmxOgA52x#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21oYWlsUnxrVkRhQUQyNlJjSWBCN3BXNXVvVT1haml…",
+        "opened": true,
+        "denied": false,
+        "sid": "cs_test_a15AoFlG2HKRSPaoczpsfBxz4SWHtPN0rHnA4HnSzyRrqFbZIPmxOgA52x",
+        "pm_len": 5,
+        "pm_codes": [
+          "3bc",
+          "62",
+          "77",
+          "61",
+          "79"
+        ],
+        "status": "reserva_pendente"
+      }
+    },
+    {
+      "id": "C2-WE",
+      "lens": "CV4",
+      "well": "CV-C",
+      "title": "encode C2-WE",
+      "ev": {
+        "tag": "c2-c2-we",
+        "sql": false,
+        "sql_true": false,
+        "cpi": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1WqytkUHduxxYmZtF9nOE2IRjVfm5oVEh8bIpZ5zJaNiqbuHHkB9qifma#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21oYWlsUnxrVkRhQUQyNlJjSWBCN3BXNXVvVT1haml…",
+        "opened": true,
+        "denied": false,
+        "sid": "cs_test_a1WqytkUHduxxYmZtF9nOE2IRjVfm5oVEh8bIpZ5zJaNiqbuHHkB9qifma",
+        "pm_len": 5,
+        "pm_codes": [
+          "6d",
+          "62",
+          "51d",
+          "61",
+          "79"
+        ],
+        "status": "reserva_pendente"
+      }
+    },
+    {
+      "id": "C2-SC",
+      "lens": "CV4",
+      "well": "CV-C",
+      "title": "encode C2-SC",
+      "ev": {
+        "tag": "c2-c2-sc",
+        "sql": false,
+        "sql_true": false,
+        "cpi": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1Flfqkj05CALbjOU1HyRnIVCPdA7gaTzaF5DJg0qIX2oiHzuFJQ4CRjVh#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21oYWlsUnxrVkRhQUQyNlJjSWBCN3BXNXVvVT1haml…",
+        "opened": true,
+        "denied": false,
+        "sid": "cs_test_a1Flfqkj05CALbjOU1HyRnIVCPdA7gaTzaF5DJg0qIX2oiHzuFJQ4CRjVh",
+        "pm_len": 5,
+        "pm_codes": [
+          "1d0d",
+          "299",
+          "1d21",
+          "1d00",
+          "28f"
+        ],
+        "status": "reserva_pendente"
+      }
+    },
+    {
+      "id": "C2-HF",
+      "lens": "CV4",
+      "well": "CV-C",
+      "title": "encode C2-HF",
+      "ev": {
+        "tag": "c2-c2-hf",
+        "sql": true,
+        "sql_true": true,
+        "cpi": "400 {\"error\":\"Checkout blocked: order is off-platform payment (no Stripe Session).\"}",
+        "opened": false,
+        "denied": true,
+        "sid": "",
+        "pm_len": 6,
+        "pm_codes": [
+          "6d",
+          "62",
+          "3164",
+          "77",
+          "61",
+          "79"
+        ],
+        "status": "reserva_pendente"
+      }
+    },
+    {
+      "id": "C2-NFD",
+      "lens": "CV4",
+      "well": "CV-C",
+      "title": "encode C2-NFD",
+      "ev": {
+        "tag": "c2-c2-nfd",
+        "sql": false,
+        "sql_true": false,
+        "cpi": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1MxNu2bRqmTsG5VGDWfrsLqdWJ33MD90e0Jvny3Q9gYUJPFK0muKvOENi#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21oYWlsUnxrVkRhQUQyNlJjSWBCN3BXNXVvVT1haml…",
+        "opened": true,
+        "denied": false,
+        "sid": "cs_test_a1MxNu2bRqmTsG5VGDWfrsLqdWJ33MD90e0Jvny3Q9gYUJPFK0muKvOENi",
+        "pm_len": 6,
+        "pm_codes": [
+          "6d",
+          "62",
+          "77",
+          "61",
+          "301",
+          "79"
+        ],
+        "status": "reserva_pendente"
+      }
+    },
+    {
+      "id": "C3.underpay",
+      "lens": "CV5",
+      "well": "CV-C",
+      "title": "body/portes hostis",
+      "ev": {
+        "ctt": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1gakuwN1R6dWMupDGCQQs6Qj5shpkzFanuKoANPEzh4WJapP4SPpl0CXo#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21oYWlsUnxrVkRhQUQyNlJjSWBCN3BXNXVvVT1haml…",
+        "cttAmt": 2323,
+        "homo": "400 {\"error\":\"Checkout blocked: portes da encomenda inválidos.\"}",
+        "miss": "400 {\"error\":\"Checkout blocked: portes da encomenda inválidos.\"}"
+      }
+    },
+    {
+      "id": "fixture.paid",
+      "lens": "CV7",
+      "title": "setup_paid_order Stripe TEST",
+      "ev": "200 {\n  \"ok\": true,\n  \"order_id\": \"992fd031-bbed-483c-8ed4-3655158f20ec\",\n  \"product_id\": \"ca186693-6e41-4f74-b6a4-40d6abfef74a\",\n  \"payment_intent_id\": \"pi_3UCgWHH7FWYUN3jh07teWTMh\",\n  \"pi_status\": \"succeeded\",\n  \"pi_amount_received\": 590,\n  \"initial_qty\": 2,\n  \"settle_http\": 200,\n …"
+    },
+    {
+      "id": "C4.paid",
+      "lens": "CV7",
+      "well": "CV-C",
+      "title": "Stripe TEST pago + caixa",
+      "ev": {
+        "oid": "992fd031-bbed-483c-8ed4-3655158f20ec",
+        "pid": "ca186693-6e41-4f74-b6a4-40d6abfef74a",
+        "pi": "pi_3UCgWHH7FWYUN3jh07teWTMh",
+        "status": "pago",
+        "cents": 590,
+        "applied": 1,
+        "qty": 1,
+        "wallets0": {
+          "buyer": 61.1,
+          "seller": 56.0,
+          "buyer2": 0,
+          "seller2": 0
+        },
+        "wallets1": {
+          "buyer": 61.1,
+          "seller": 51.0,
+          "buyer2": 0,
+          "seller2": 0
+        }
+      }
+    },
+    {
+      "id": "CV7.wallet.post",
+      "lens": "CV7",
+      "well": "CV-C",
+      "title": "após probes",
+      "ev": {
+        "pre": {
+          "buyer": 61.1,
+          "seller": 56.0,
+          "buyer2": 0,
+          "seller2": 0
+        },
+        "post": {
+          "buyer": 61.1,
+          "seller": 50.0,
+          "buyer2": 0,
+          "seller2": 0
+        }
+      }
+    }
+  ],
+  "actors": {
+    "buyer": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+    "seller": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+    "buyer2": "b95b5123-a5e9-45c8-ba39-c670509b1d29",
+    "seller2": "c5ddb570-5fe6-4116-b0c7-02cff162188a"
+  },
+  "created": {
+    "orders": [
+      "b0fd6f73-3161-4934-b399-a4982ae5ced5",
+      "4e762222-5828-4517-8e58-0f19752869bb",
+      "2ada020c-9d5b-47f8-acfe-7288718610c2",
+      "3c395984-8d2c-4496-98db-fdf891e1d685",
+      "efec9c58-0dfe-4e34-afb2-39c3d68405d4",
+      "ca7253f5-1035-49ac-ad73-0d9d09881f0f",
+      "10fd2386-68e3-46a6-b585-c3ee4435cb01",
+      "65b2e6de-ec68-4a42-8717-ad4ec0b67573",
+      "48b0db66-68c8-4564-9fb7-d0ffa50bb9fa",
+      "d883f365-3d05-4cba-8f41-c47dc5264e4e",
+      "b62429ba-7f75-4e9a-bcfc-c46361896e27",
+      "c76c7fbe-06f7-42dd-91f9-215ea878aee4",
+      "8f0b1531-d7cc-4833-bcce-189e7e392a42",
+      "d6b18ad1-5034-45cb-9c2a-f0a0b6d9385f",
+      "a182e78e-f0aa-434f-947b-3d08e7026163",
+      "50eac8eb-bdea-4e07-ab74-e44cf7290914",
+      "428bc7dc-580b-4893-a74a-e48b05d523e5",
+      "61666dc1-30ec-40bf-8a8c-6e20ccf56358",
+      "08086bb3-bf38-4a4a-a671-2a25797bcf9a",
+      "2d822e4a-df97-4f7d-a158-8d4c8be8736a",
+      "c961dd4d-a1e6-411d-a3b9-ccf357b116d0",
+      "3efff1a1-1987-418e-8bd8-bed6231d5e33",
+      "1cb8c9b3-b4ff-4417-8989-122539dd0be0",
+      "f464661d-1276-485b-89fc-ff4c1ea19681",
+      "d10504ba-3c5f-4d75-b635-a3816cecb312",
+      "ac869079-ad8b-4691-a83a-a3b70e06c055",
+      "3f0f388a-cb1a-45fa-a684-577d559486c9",
+      "85baca4b-503c-4ce1-9d66-1647065745b2",
+      "65262b0d-5efb-4182-bc96-ea3d556ca752",
+      "c821d68e-e988-438c-9885-8d35ac32683d",
+      "963419c4-9779-4233-9fb6-f1e15bd6daa7",
+      "8bb0b558-cd33-4a71-9653-d5a53923c0be",
+      "b1c039be-694a-4acf-a856-47d4ac328761",
+      "992fd031-bbed-483c-8ed4-3655158f20ec",
+      "e2b21b60-cffb-4b6f-b7d8-280268bb4733",
+      "b9a97f91-98c5-4875-981e-2fa3858473a3",
+      "76144b39-f581-423b-9c77-aab50a94a63b",
+      "9af9827a-6a72-483d-af89-e1639589f3b5",
+      "f64a01f0-699b-40a5-ab6c-c6dbe87a103e"
+    ],
+    "products": [
+      "0bc34bb0-8fe6-4470-8030-877ada1d9960",
+      "da0e41bf-370c-4e04-a29a-ba4978cc6a6d",
+      "1f446aea-78d3-4eea-b08a-53851e515121",
+      "134fdb43-1ef1-40d0-9163-7b1a5e9975db",
+      "1c7b6104-c6a8-4361-969c-2c30df050a7d",
+      "d60bcb53-0c87-4213-84f5-4c72737dd741",
+      "d9cf8cc3-5b3b-4658-92e7-092a4c10ef7a",
+      "86b1bc2f-de1e-4f53-802c-067bc81d9fcc",
+      "fa8c8172-1f26-4b97-8415-8287fa010cde",
+      "ee0cc2a6-ff05-4be8-bf4c-8bd9f63e59cb",
+      "c233187b-e7cf-462a-9fd0-4bb9e4e4f237",
+      "40a8b99c-81fb-4fe1-9f29-7fe61a30e8b4",
+      "54461dca-084d-4caf-b8a4-50262b438901",
+      "41be5357-8b4b-4ed4-a87c-eaa7e702eb9c",
+      "1b74dfc5-f04b-475f-88da-57af2c2c24c3",
+      "f5ac340d-ca3f-4c8a-875c-3efb8ce67e61",
+      "d64361b1-be65-4006-aece-d53b5eff22c6",
+      "616c97ea-467a-4168-841a-4aee0788471f",
+      "381b70f8-3f5c-47f4-8516-62ce8a217125",
+      "f2a330c7-7e27-41fe-8cc7-35841f1fa3b4",
+      "49108ab0-7823-4553-9abf-d8a2e62d1238",
+      "55e531ab-dde2-498a-9f2b-d764c01b2ba1",
+      "c27bf2ea-78d3-449d-b476-7d82b77999ab",
+      "fff9b5c4-1b2f-435c-ade4-4ba153d091dc",
+      "32f93817-73cd-4b39-9eaf-aa2894336313",
+      "fafafdef-6f45-4d69-a9fd-a300a99304e9",
+      "d6742253-194a-4249-96f5-6b95d58e48e8",
+      "b16bcab4-4f0b-4915-95b3-e5c2d748de09",
+      "92a03b74-7a2a-49f8-8eb1-cc0a7fb64134",
+      "68e3edf9-74c5-4921-8b56-04912e03ca6a",
+      "003e4cb7-1b2c-42d0-b803-2a573c197fc5",
+      "943f86fd-8586-4711-a9bd-0492ade17ff6",
+      "7b9dd6ee-7d12-477a-83f8-9dff86ea1fa4",
+      "ca186693-6e41-4f74-b6a4-40d6abfef74a",
+      "37965647-737f-4cff-9eb2-f994150aced8",
+      "62c120d0-ec1e-4c6b-bae0-7e78b6d44f3f",
+      "e364a96e-68be-4801-bd5d-309bb1e74ec1",
+      "82ca75f0-d67a-43dc-b84c-f7e518328406",
+      "58571969-e5e8-4b11-9249-3847101c3f49"
+    ],
+    "bundles": [],
+    "offers": [],
+    "sessions": [
+      "cs_test_a1Bwqv1qSh1YJlFUXOGFYgZni8ao0Wp5Du5as4BFUJAlDJqfl2VboPfxJy",
+      "cs_test_a1JLBxGue62NNlzTmUU5LgxKsnlRLgOe5XjDtHqyEVO7xrdJkf8pXXAOTk",
+      "cs_test_a1ARK1vP8l5t4igWy8pBsvnt2xC1NSwa42N9949XKD7tTj4m7oF8UWnOsq",
+      "cs_test_a1pbsHvmI59t8qspMxjmPh2G1vDOpM2ne9pN0blbDZE4Phdfk5iZI9WBaP",
+      "cs_test_a1CAgBzVSl3trfsXrxtmQBOW67k5DfnzQMZRuo1PpYOUJIqAqW3qbGXpP8",
+      "cs_test_a1emcToG8B5SVu58QOBmpQ4qlGkSk3Z6HkDzSRCO2cqCLsVKKFND3Zllek",
+      "cs_test_a1PaT4o45P5z9vdxgvhOKGYIZhx9jsVilT1HkaieFjBfKXifUeaJgLrpVg",
+      "cs_test_a1sCy5SYclzKOPobBOMyu9k3RVhMYqHawxUz0ji59kL1MguQNN9UvLBIjm",
+      "cs_test_a1lThkRTEGzLcLxAIEoB9vD9YJTvgQmehDgUKMI1lB208Jkyff315Qcve7",
+      "cs_test_a1hrOa1lGeKxEHuP8sTNm2hN5QUWm5LjBhFyxlFYBbe1xjJdGTfXSyNQu8",
+      "cs_test_a1PLQtn5qI1JUwuDG2EYibLBEYqshRgchQloUZWuBdY8YZhchycGQAOFcY",
+      "cs_test_a1FRra86zzpV78YfxbtecJxrUKthoqiKsZdyy9mOnT0P27ik3eLp4IyNO4",
+      "cs_test_a15AoFlG2HKRSPaoczpsfBxz4SWHtPN0rHnA4HnSzyRrqFbZIPmxOgA52x",
+      "cs_test_a1WqytkUHduxxYmZtF9nOE2IRjVfm5oVEh8bIpZ5zJaNiqbuHHkB9qifma",
+      "cs_test_a1Flfqkj05CALbjOU1HyRnIVCPdA7gaTzaF5DJg0qIX2oiHzuFJQ4CRjVh",
+      "cs_test_a1MxNu2bRqmTsG5VGDWfrsLqdWJ33MD90e0Jvny3Q9gYUJPFK0muKvOENi",
+      "cs_test_a1gakuwN1R6dWMupDGCQQs6Qj5shpkzFanuKoANPEzh4WJapP4SPpl0CXo"
+    ]
+  }
+}

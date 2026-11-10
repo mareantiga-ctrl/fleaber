@@ -1,0 +1,2071 @@
+{
+  "pass": 1,
+  "project": "fxdknzrqjenzqcvnwqqq",
+  "started": "2026-08-29T15:35:30.886861Z",
+  "tables": 0,
+  "rpcs": 0,
+  "matrix_n": 227,
+  "findings": [],
+  "notes": [
+    "tables=0 rpcs=0"
+  ],
+  "cleanup": {
+    "order_ids": [
+      "678eff47-82ff-4c87-ab5b-9499a2ec2006",
+      "be98836e-17a9-451a-b819-deaaa552bcbc"
+    ],
+    "product_ids": [
+      "29dbf0f8-0206-4634-bfd2-6df722ebf8fd"
+    ],
+    "user_ids": [
+      "2f967a2c-fa3c-4667-9cc5-51de12fd74b6"
+    ]
+  },
+  "rpc_inventory": [],
+  "table_inventory": [],
+  "matrix": [
+    {
+      "surface": "AUTH",
+      "attack": "password grant lab accounts",
+      "identity": "buyer/seller/fresh",
+      "result": "OK",
+      "impact": "lab identities ready",
+      "severity": "info",
+      "evidence": "buyer=bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96 seller=980f4fa1-0004-42f9-abca-69f1a9c29588 fresh=2f967a2c-fa3c-4667-9cc5-51de12fd74b6"
+    },
+    {
+      "surface": "POSTGREST",
+      "attack": "OpenAPI dump anon",
+      "identity": "anon",
+      "result": "401 bytes=101",
+      "impact": "openapi blocked",
+      "severity": "info",
+      "evidence": "{\"message\":\"Invalid API key\",\"hint\":\"Only the `service_role` API key can be used for this endpoint.\"}"
+    },
+    {
+      "surface": "RLS/orders",
+      "attack": "SELECT * limit 5",
+      "identity": "anon",
+      "result": "200 n=0 []",
+      "impact": "blocked_or_empty",
+      "severity": "info",
+      "evidence": "[]"
+    },
+    {
+      "surface": "RLS/orders",
+      "attack": "SELECT * limit 5",
+      "identity": "buyer",
+      "result": "200 n=5 [{\"id\":\"f2662148-80bd-41d3-8ef1-ff98161a27e6\",\"created_at\":\"2026-08-27T13:10:21.538586+00:00\",\"product_id\":\"cd4adf71-cf8…",
+      "impact": "rows visible",
+      "severity": "info",
+      "evidence": "[{\"id\":\"f2662148-80bd-41d3-8ef1-ff98161a27e6\",\"created_at\":\"2026-08-27T13:10:21.538586+00:00\",\"product_id\":\"cd4adf71-cf84-4e02-ae9c-f7e710d55cbe\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"price_total\":48.9,\"shipping_method\":null,\"payment_me…"
+    },
+    {
+      "surface": "RLS/orders",
+      "attack": "SELECT * limit 5",
+      "identity": "seller",
+      "result": "200 n=5 [{\"id\":\"f2662148-80bd-41d3-8ef1-ff98161a27e6\",\"created_at\":\"2026-08-27T13:10:21.538586+00:00\",\"product_id\":\"cd4adf71-cf8…",
+      "impact": "rows visible",
+      "severity": "info",
+      "evidence": "[{\"id\":\"f2662148-80bd-41d3-8ef1-ff98161a27e6\",\"created_at\":\"2026-08-27T13:10:21.538586+00:00\",\"product_id\":\"cd4adf71-cf84-4e02-ae9c-f7e710d55cbe\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"price_total\":48.9,\"shipping_method\":null,\"payment_me…"
+    },
+    {
+      "surface": "RLS/orders",
+      "attack": "SELECT * limit 5",
+      "identity": "fresh",
+      "result": "200 n=0 []",
+      "impact": "blocked_or_empty",
+      "severity": "info",
+      "evidence": "[]"
+    },
+    {
+      "surface": "RLS/products",
+      "attack": "SELECT * limit 5",
+      "identity": "anon",
+      "result": "401 n=0 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table products\"}",
+      "impact": "blocked_or_empty",
+      "severity": "info",
+      "evidence": "{\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table products\"}"
+    },
+    {
+      "surface": "RLS/products",
+      "attack": "SELECT * limit 5",
+      "identity": "buyer",
+      "result": "200 n=5 [{\"id\":\"de18c023-1e76-4c1e-9507-3d971ede542f\",\"created_at\":\"2026-08-09T13:37:27.665665+00:00\",\"seller_id\":\"69104e91-6a00…",
+      "impact": "rows visible",
+      "severity": "info",
+      "evidence": "[{\"id\":\"de18c023-1e76-4c1e-9507-3d971ede542f\",\"created_at\":\"2026-08-09T13:37:27.665665+00:00\",\"seller_id\":\"69104e91-6a00-40d9-a7c9-b1571422ae43\",\"title\":\"Ref QQQ3\",\"price\":0,\"ref_code\":\"#QQQ3\",\"category\":null,\"clothing_size\":null,\"gender\":null,\"description\":null,\"state\":null,\"image_urls\":[],\"list_on…"
+    },
+    {
+      "surface": "RLS/products",
+      "attack": "SELECT * limit 5",
+      "identity": "seller",
+      "result": "200 n=5 [{\"id\":\"de18c023-1e76-4c1e-9507-3d971ede542f\",\"created_at\":\"2026-08-09T13:37:27.665665+00:00\",\"seller_id\":\"69104e91-6a00…",
+      "impact": "rows visible",
+      "severity": "info",
+      "evidence": "[{\"id\":\"de18c023-1e76-4c1e-9507-3d971ede542f\",\"created_at\":\"2026-08-09T13:37:27.665665+00:00\",\"seller_id\":\"69104e91-6a00-40d9-a7c9-b1571422ae43\",\"title\":\"Ref QQQ3\",\"price\":0,\"ref_code\":\"#QQQ3\",\"category\":null,\"clothing_size\":null,\"gender\":null,\"description\":null,\"state\":null,\"image_urls\":[],\"list_on…"
+    },
+    {
+      "surface": "RLS/products",
+      "attack": "SELECT * limit 5",
+      "identity": "fresh",
+      "result": "200 n=5 [{\"id\":\"de18c023-1e76-4c1e-9507-3d971ede542f\",\"created_at\":\"2026-08-09T13:37:27.665665+00:00\",\"seller_id\":\"69104e91-6a00…",
+      "impact": "rows visible",
+      "severity": "info",
+      "evidence": "[{\"id\":\"de18c023-1e76-4c1e-9507-3d971ede542f\",\"created_at\":\"2026-08-09T13:37:27.665665+00:00\",\"seller_id\":\"69104e91-6a00-40d9-a7c9-b1571422ae43\",\"title\":\"Ref QQQ3\",\"price\":0,\"ref_code\":\"#QQQ3\",\"category\":null,\"clothing_size\":null,\"gender\":null,\"description\":null,\"state\":null,\"image_urls\":[],\"list_on…"
+    },
+    {
+      "surface": "RLS/wallets",
+      "attack": "SELECT * limit 5",
+      "identity": "anon",
+      "result": "200 n=0 []",
+      "impact": "blocked_or_empty",
+      "severity": "info",
+      "evidence": "[]"
+    },
+    {
+      "surface": "RLS/wallets",
+      "attack": "SELECT * limit 5",
+      "identity": "buyer",
+      "result": "200 n=1 [{\"id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"stripe_account_id\":\"acct_1U8gAFQglI7kZRfq\",\"balance\":39.81,\"updated_at\":\"…",
+      "impact": "rows visible",
+      "severity": "info",
+      "evidence": "[{\"id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"stripe_account_id\":\"acct_1U8gAFQglI7kZRfq\",\"balance\":39.81,\"updated_at\":\"2026-08-29T14:00:15.854576+00:00\"}]"
+    },
+    {
+      "surface": "RLS/wallets",
+      "attack": "SELECT * limit 5",
+      "identity": "seller",
+      "result": "200 n=1 [{\"id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"stripe_account_id\":\"acct_1U5mYbQeUNx8ar08\",\"balance\":6.41,\"updated_at\":\"2…",
+      "impact": "rows visible",
+      "severity": "info",
+      "evidence": "[{\"id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"stripe_account_id\":\"acct_1U5mYbQeUNx8ar08\",\"balance\":6.41,\"updated_at\":\"2026-08-29T14:25:37.994649+00:00\"}]"
+    },
+    {
+      "surface": "RLS/wallets",
+      "attack": "SELECT * limit 5",
+      "identity": "fresh",
+      "result": "200 n=0 []",
+      "impact": "blocked_or_empty",
+      "severity": "info",
+      "evidence": "[]"
+    },
+    {
+      "surface": "RLS/wallet_transactions",
+      "attack": "SELECT * limit 5",
+      "identity": "anon",
+      "result": "200 n=0 []",
+      "impact": "blocked_or_empty",
+      "severity": "info",
+      "evidence": "[]"
+    },
+    {
+      "surface": "RLS/wallet_transactions",
+      "attack": "SELECT * limit 5",
+      "identity": "buyer",
+      "result": "200 n=5 [{\"id\":\"21005c61-03d7-49f8-96ee-ea3e3fafa9bf\",\"wallet_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"amount\":-9.58,\"type\":\"…",
+      "impact": "rows visible",
+      "severity": "info",
+      "evidence": "[{\"id\":\"21005c61-03d7-49f8-96ee-ea3e3fafa9bf\",\"wallet_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"amount\":-9.58,\"type\":\"compra\",\"description\":\"co-pago 1787750897113910\",\"created_at\":\"2026-08-26T13:28:17.256506+00:00\",\"order_id\":\"418ae815-6d5b-4d8f-ab55-b080ddd76301\",\"tip_id\":null}, \n {\"id\":\"a57aceed…"
+    },
+    {
+      "surface": "RLS/wallet_transactions",
+      "attack": "SELECT * limit 5",
+      "identity": "seller",
+      "result": "200 n=5 [{\"id\":\"81444ed0-a7ee-495f-a26f-5be2978dd5e1\",\"wallet_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"amount\":-0.01,\"type\":\"…",
+      "impact": "rows visible",
+      "severity": "info",
+      "evidence": "[{\"id\":\"81444ed0-a7ee-495f-a26f-5be2978dd5e1\",\"wallet_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"amount\":-0.01,\"type\":\"levantamento\",\"description\":\"Levantamento pendente wd_3b_980f4fa1-0004-42f9-abca-69f1a9c29588_test_1787744582043\",\"created_at\":\"2026-08-26T11:43:02.170874+00:00\",\"order_id\":null,\"t…"
+    },
+    {
+      "surface": "RLS/wallet_transactions",
+      "attack": "SELECT * limit 5",
+      "identity": "fresh",
+      "result": "200 n=0 []",
+      "impact": "blocked_or_empty",
+      "severity": "info",
+      "evidence": "[]"
+    },
+    {
+      "surface": "RLS/wallet_ledger",
+      "attack": "SELECT * limit 5",
+      "identity": "anon",
+      "result": "404 n=0 {\"code\":\"PGRST205\",\"details\":null,\"hint\":\"Perhaps you meant the table 'public.wallet_payout_ledger'\",\"message\":\"Could no…",
+      "impact": "blocked_or_empty",
+      "severity": "info",
+      "evidence": "{\"code\":\"PGRST205\",\"details\":null,\"hint\":\"Perhaps you meant the table 'public.wallet_payout_ledger'\",\"message\":\"Could not find the table 'public.wallet_ledger' in the schema cache\"}"
+    },
+    {
+      "surface": "RLS/wallet_ledger",
+      "attack": "SELECT * limit 5",
+      "identity": "buyer",
+      "result": "404 n=0 {\"code\":\"PGRST205\",\"details\":null,\"hint\":\"Perhaps you meant the table 'public.wallet_payout_ledger'\",\"message\":\"Could no…",
+      "impact": "blocked_or_empty",
+      "severity": "info",
+      "evidence": "{\"code\":\"PGRST205\",\"details\":null,\"hint\":\"Perhaps you meant the table 'public.wallet_payout_ledger'\",\"message\":\"Could not find the table 'public.wallet_ledger' in the schema cache\"}"
+    },
+    {
+      "surface": "RLS/wallet_ledger",
+      "attack": "SELECT * limit 5",
+      "identity": "seller",
+      "result": "404 n=0 {\"code\":\"PGRST205\",\"details\":null,\"hint\":\"Perhaps you meant the table 'public.wallet_payout_ledger'\",\"message\":\"Could no…",
+      "impact": "blocked_or_empty",
+      "severity": "info",
+      "evidence": "{\"code\":\"PGRST205\",\"details\":null,\"hint\":\"Perhaps you meant the table 'public.wallet_payout_ledger'\",\"message\":\"Could not find the table 'public.wallet_ledger' in the schema cache\"}"
+    },
+    {
+      "surface": "RLS/wallet_ledger",
+      "attack": "SELECT * limit 5",
+      "identity": "fresh",
+      "result": "404 n=0 {\"code\":\"PGRST205\",\"details\":null,\"hint\":\"Perhaps you meant the table 'public.wallet_payout_ledger'\",\"message\":\"Could no…",
+      "impact": "blocked_or_empty",
+      "severity": "info",
+      "evidence": "{\"code\":\"PGRST205\",\"details\":null,\"hint\":\"Perhaps you meant the table 'public.wallet_payout_ledger'\",\"message\":\"Could not find the table 'public.wallet_ledger' in the schema cache\"}"
+    },
+    {
+      "surface": "RLS/wallet_payout_ledger",
+      "attack": "SELECT * limit 5",
+      "identity": "anon",
+      "result": "200 n=0 []",
+      "impact": "blocked_or_empty",
+      "severity": "info",
+      "evidence": "[]"
+    },
+    {
+      "surface": "RLS/wallet_payout_ledger",
+      "attack": "SELECT * limit 5",
+      "identity": "buyer",
+      "result": "200 n=0 []",
+      "impact": "blocked_or_empty",
+      "severity": "info",
+      "evidence": "[]"
+    },
+    {
+      "surface": "RLS/wallet_payout_ledger",
+      "attack": "SELECT * limit 5",
+      "identity": "seller",
+      "result": "200 n=5 [{\"idempotency_key\":\"fase1_race_1787728750827590_a\",\"user_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"amount_cents\":100,…",
+      "impact": "rows visible",
+      "severity": "info",
+      "evidence": "[{\"idempotency_key\":\"fase1_race_1787728750827590_a\",\"user_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"amount_cents\":100,\"amount_eur\":1.00,\"status\":\"failed\",\"stripe_transfer_id\":null,\"balance_after\":0.00,\"created_at\":\"2026-08-26T07:19:08.544305+00:00\",\"updated_at\":\"2026-08-26T07:19:08.918783+00:00\"},…"
+    },
+    {
+      "surface": "RLS/wallet_payout_ledger",
+      "attack": "SELECT * limit 5",
+      "identity": "fresh",
+      "result": "200 n=0 []",
+      "impact": "blocked_or_empty",
+      "severity": "info",
+      "evidence": "[]"
+    },
+    {
+      "surface": "RLS/fleaber_commissions",
+      "attack": "SELECT * limit 5",
+      "identity": "anon",
+      "result": "200 n=0 []",
+      "impact": "blocked_or_empty",
+      "severity": "info",
+      "evidence": "[]"
+    },
+    {
+      "surface": "RLS/fleaber_commissions",
+      "attack": "SELECT * limit 5",
+      "identity": "buyer",
+      "result": "200 n=0 []",
+      "impact": "blocked_or_empty",
+      "severity": "info",
+      "evidence": "[]"
+    },
+    {
+      "surface": "RLS/fleaber_commissions",
+      "attack": "SELECT * limit 5",
+      "identity": "seller",
+      "result": "200 n=0 []",
+      "impact": "blocked_or_empty",
+      "severity": "info",
+      "evidence": "[]"
+    },
+    {
+      "surface": "RLS/fleaber_commissions",
+      "attack": "SELECT * limit 5",
+      "identity": "fresh",
+      "result": "200 n=0 []",
+      "impact": "blocked_or_empty",
+      "severity": "info",
+      "evidence": "[]"
+    },
+    {
+      "surface": "RLS/reviews",
+      "attack": "SELECT * limit 5",
+      "identity": "anon",
+      "result": "200 n=0 []",
+      "impact": "blocked_or_empty",
+      "severity": "info",
+      "evidence": "[]"
+    },
+    {
+      "surface": "RLS/reviews",
+      "attack": "SELECT * limit 5",
+      "identity": "buyer",
+      "result": "200 n=5 [{\"id\":\"aa90960c-d519-455d-8d48-d3dd675ab67e\",\"created_at\":\"2026-08-29T09:24:26.231187+00:00\",\"target_id\":\"980f4fa1-0004…",
+      "impact": "rows visible",
+      "severity": "info",
+      "evidence": "[{\"id\":\"aa90960c-d519-455d-8d48-d3dd675ab67e\",\"created_at\":\"2026-08-29T09:24:26.231187+00:00\",\"target_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"stars\":5,\"comment\":\"rtb collusion\",\"is_automatic\":false,\"target_type\":\"seller\",\"author_role\":\"comprador\"…"
+    },
+    {
+      "surface": "RLS/reviews",
+      "attack": "SELECT * limit 5",
+      "identity": "seller",
+      "result": "200 n=5 [{\"id\":\"aa90960c-d519-455d-8d48-d3dd675ab67e\",\"created_at\":\"2026-08-29T09:24:26.231187+00:00\",\"target_id\":\"980f4fa1-0004…",
+      "impact": "rows visible",
+      "severity": "info",
+      "evidence": "[{\"id\":\"aa90960c-d519-455d-8d48-d3dd675ab67e\",\"created_at\":\"2026-08-29T09:24:26.231187+00:00\",\"target_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"stars\":5,\"comment\":\"rtb collusion\",\"is_automatic\":false,\"target_type\":\"seller\",\"author_role\":\"comprador\"…"
+    },
+    {
+      "surface": "RLS/reviews",
+      "attack": "SELECT * limit 5",
+      "identity": "fresh",
+      "result": "200 n=0 []",
+      "impact": "blocked_or_empty",
+      "severity": "info",
+      "evidence": "[]"
+    },
+    {
+      "surface": "RLS/order_disputes",
+      "attack": "SELECT * limit 5",
+      "identity": "anon",
+      "result": "200 n=0 []",
+      "impact": "blocked_or_empty",
+      "severity": "info",
+      "evidence": "[]"
+    },
+    {
+      "surface": "RLS/order_disputes",
+      "attack": "SELECT * limit 5",
+      "identity": "buyer",
+      "result": "200 n=5 [{\"id\":\"e027d167-1df1-478b-a3fe-24c96dfb58c4\",\"order_id\":\"3691260e-15c9-47bc-af7f-4b3d2d77a669\",\"buyer_id\":\"bfcbeeee-7dc…",
+      "impact": "rows visible",
+      "severity": "info",
+      "evidence": "[{\"id\":\"e027d167-1df1-478b-a3fe-24c96dfb58c4\",\"order_id\":\"3691260e-15c9-47bc-af7f-4b3d2d77a669\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"reason\":\"outro\",\"description\":\"audit-dispute\",\"proof_photos\":[],\"status\":\"resolvida\",\"created_at\":\"2026-08-27T06:10:48.812303+00:00\",\"current_turn\":\"admi…"
+    },
+    {
+      "surface": "RLS/order_disputes",
+      "attack": "SELECT * limit 5",
+      "identity": "seller",
+      "result": "200 n=5 [{\"id\":\"e027d167-1df1-478b-a3fe-24c96dfb58c4\",\"order_id\":\"3691260e-15c9-47bc-af7f-4b3d2d77a669\",\"buyer_id\":\"bfcbeeee-7dc…",
+      "impact": "rows visible",
+      "severity": "info",
+      "evidence": "[{\"id\":\"e027d167-1df1-478b-a3fe-24c96dfb58c4\",\"order_id\":\"3691260e-15c9-47bc-af7f-4b3d2d77a669\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"reason\":\"outro\",\"description\":\"audit-dispute\",\"proof_photos\":[],\"status\":\"resolvida\",\"created_at\":\"2026-08-27T06:10:48.812303+00:00\",\"current_turn\":\"admi…"
+    },
+    {
+      "surface": "RLS/order_disputes",
+      "attack": "SELECT * limit 5",
+      "identity": "fresh",
+      "result": "200 n=0 []",
+      "impact": "blocked_or_empty",
+      "severity": "info",
+      "evidence": "[]"
+    },
+    {
+      "surface": "RLS/dispute_messages",
+      "attack": "SELECT * limit 5",
+      "identity": "anon",
+      "result": "404 n=0 {\"code\":\"PGRST205\",\"details\":null,\"hint\":\"Perhaps you meant the table 'public.live_messages'\",\"message\":\"Could not find …",
+      "impact": "blocked_or_empty",
+      "severity": "info",
+      "evidence": "{\"code\":\"PGRST205\",\"details\":null,\"hint\":\"Perhaps you meant the table 'public.live_messages'\",\"message\":\"Could not find the table 'public.dispute_messages' in the schema cache\"}"
+    },
+    {
+      "surface": "RLS/dispute_messages",
+      "attack": "SELECT * limit 5",
+      "identity": "buyer",
+      "result": "404 n=0 {\"code\":\"PGRST205\",\"details\":null,\"hint\":\"Perhaps you meant the table 'public.live_messages'\",\"message\":\"Could not find …",
+      "impact": "blocked_or_empty",
+      "severity": "info",
+      "evidence": "{\"code\":\"PGRST205\",\"details\":null,\"hint\":\"Perhaps you meant the table 'public.live_messages'\",\"message\":\"Could not find the table 'public.dispute_messages' in the schema cache\"}"
+    },
+    {
+      "surface": "RLS/dispute_messages",
+      "attack": "SELECT * limit 5",
+      "identity": "seller",
+      "result": "404 n=0 {\"code\":\"PGRST205\",\"details\":null,\"hint\":\"Perhaps you meant the table 'public.live_messages'\",\"message\":\"Could not find …",
+      "impact": "blocked_or_empty",
+      "severity": "info",
+      "evidence": "{\"code\":\"PGRST205\",\"details\":null,\"hint\":\"Perhaps you meant the table 'public.live_messages'\",\"message\":\"Could not find the table 'public.dispute_messages' in the schema cache\"}"
+    },
+    {
+      "surface": "RLS/dispute_messages",
+      "attack": "SELECT * limit 5",
+      "identity": "fresh",
+      "result": "404 n=0 {\"code\":\"PGRST205\",\"details\":null,\"hint\":\"Perhaps you meant the table 'public.live_messages'\",\"message\":\"Could not find …",
+      "impact": "blocked_or_empty",
+      "severity": "info",
+      "evidence": "{\"code\":\"PGRST205\",\"details\":null,\"hint\":\"Perhaps you meant the table 'public.live_messages'\",\"message\":\"Could not find the table 'public.dispute_messages' in the schema cache\"}"
+    },
+    {
+      "surface": "RLS/dispute_evidence",
+      "attack": "SELECT * limit 5",
+      "identity": "anon",
+      "result": "404 n=0 {\"code\":\"PGRST205\",\"details\":null,\"hint\":\"Perhaps you meant the table 'public.order_dispute_replies'\",\"message\":\"Could n…",
+      "impact": "blocked_or_empty",
+      "severity": "info",
+      "evidence": "{\"code\":\"PGRST205\",\"details\":null,\"hint\":\"Perhaps you meant the table 'public.order_dispute_replies'\",\"message\":\"Could not find the table 'public.dispute_evidence' in the schema cache\"}"
+    },
+    {
+      "surface": "RLS/dispute_evidence",
+      "attack": "SELECT * limit 5",
+      "identity": "buyer",
+      "result": "404 n=0 {\"code\":\"PGRST205\",\"details\":null,\"hint\":\"Perhaps you meant the table 'public.order_dispute_replies'\",\"message\":\"Could n…",
+      "impact": "blocked_or_empty",
+      "severity": "info",
+      "evidence": "{\"code\":\"PGRST205\",\"details\":null,\"hint\":\"Perhaps you meant the table 'public.order_dispute_replies'\",\"message\":\"Could not find the table 'public.dispute_evidence' in the schema cache\"}"
+    },
+    {
+      "surface": "RLS/dispute_evidence",
+      "attack": "SELECT * limit 5",
+      "identity": "seller",
+      "result": "404 n=0 {\"code\":\"PGRST205\",\"details\":null,\"hint\":\"Perhaps you meant the table 'public.order_dispute_replies'\",\"message\":\"Could n…",
+      "impact": "blocked_or_empty",
+      "severity": "info",
+      "evidence": "{\"code\":\"PGRST205\",\"details\":null,\"hint\":\"Perhaps you meant the table 'public.order_dispute_replies'\",\"message\":\"Could not find the table 'public.dispute_evidence' in the schema cache\"}"
+    },
+    {
+      "surface": "RLS/dispute_evidence",
+      "attack": "SELECT * limit 5",
+      "identity": "fresh",
+      "result": "404 n=0 {\"code\":\"PGRST205\",\"details\":null,\"hint\":\"Perhaps you meant the table 'public.order_dispute_replies'\",\"message\":\"Could n…",
+      "impact": "blocked_or_empty",
+      "severity": "info",
+      "evidence": "{\"code\":\"PGRST205\",\"details\":null,\"hint\":\"Perhaps you meant the table 'public.order_dispute_replies'\",\"message\":\"Could not find the table 'public.dispute_evidence' in the schema cache\"}"
+    },
+    {
+      "surface": "RLS/chats",
+      "attack": "SELECT * limit 5",
+      "identity": "anon",
+      "result": "200 n=0 []",
+      "impact": "blocked_or_empty",
+      "severity": "info",
+      "evidence": "[]"
+    },
+    {
+      "surface": "RLS/chats",
+      "attack": "SELECT * limit 5",
+      "identity": "buyer",
+      "result": "200 n=5 [{\"id\":\"ac2902d3-a3ca-4f82-b7de-2532db9cafba\",\"created_at\":\"2026-08-27T06:37:32.277448+00:00\",\"user_a\":\"bfcbeeee-7dc1-4c…",
+      "impact": "rows visible",
+      "severity": "info",
+      "evidence": "[{\"id\":\"ac2902d3-a3ca-4f82-b7de-2532db9cafba\",\"created_at\":\"2026-08-27T06:37:32.277448+00:00\",\"user_a\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"user_b\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"last_message\":\"CEGA-PRIO ping 1787850032788\",\"last_message_time\":\"2026-08-27T06:37:32.277448+00:00\",\"product_…"
+    },
+    {
+      "surface": "RLS/chats",
+      "attack": "SELECT * limit 5",
+      "identity": "seller",
+      "result": "200 n=5 [{\"id\":\"ac2902d3-a3ca-4f82-b7de-2532db9cafba\",\"created_at\":\"2026-08-27T06:37:32.277448+00:00\",\"user_a\":\"bfcbeeee-7dc1-4c…",
+      "impact": "rows visible",
+      "severity": "info",
+      "evidence": "[{\"id\":\"ac2902d3-a3ca-4f82-b7de-2532db9cafba\",\"created_at\":\"2026-08-27T06:37:32.277448+00:00\",\"user_a\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"user_b\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"last_message\":\"CEGA-PRIO ping 1787850032788\",\"last_message_time\":\"2026-08-27T06:37:32.277448+00:00\",\"product_…"
+    },
+    {
+      "surface": "RLS/chats",
+      "attack": "SELECT * limit 5",
+      "identity": "fresh",
+      "result": "200 n=0 []",
+      "impact": "blocked_or_empty",
+      "severity": "info",
+      "evidence": "[]"
+    },
+    {
+      "surface": "RLS/chat_messages",
+      "attack": "SELECT * limit 5",
+      "identity": "anon",
+      "result": "401 n=0 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_chat_is_participant\"}",
+      "impact": "blocked_or_empty",
+      "severity": "info",
+      "evidence": "{\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_chat_is_participant\"}"
+    },
+    {
+      "surface": "RLS/chat_messages",
+      "attack": "SELECT * limit 5",
+      "identity": "buyer",
+      "result": "200 n=3 [{\"id\":792,\"created_at\":\"2026-08-29T13:18:00.022662+00:00\",\"chat_id\":\"e083fd44-f8e0-4c9d-a64d-71f96fcef4cf\",\"sender_id\":…",
+      "impact": "rows visible",
+      "severity": "info",
+      "evidence": "[{\"id\":792,\"created_at\":\"2026-08-29T13:18:00.022662+00:00\",\"chat_id\":\"e083fd44-f8e0-4c9d-a64d-71f96fcef4cf\",\"sender_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"text\":\"FLEABER_JSON_V1:{\\\"v\\\": 1, \\\"kind\\\": \\\"auto_feedback_generated\\\", \\\"message\\\": \\\"O sistema gerou automaticamente avaliações de 5 estr…"
+    },
+    {
+      "surface": "RLS/chat_messages",
+      "attack": "SELECT * limit 5",
+      "identity": "seller",
+      "result": "200 n=5 [{\"id\":691,\"created_at\":\"2026-08-24T16:13:14.303655+00:00\",\"chat_id\":\"1f12a423-ae18-4570-a7db-cdaf95c1e275\",\"sender_id\":…",
+      "impact": "rows visible",
+      "severity": "info",
+      "evidence": "[{\"id\":691,\"created_at\":\"2026-08-24T16:13:14.303655+00:00\",\"chat_id\":\"1f12a423-ae18-4570-a7db-cdaf95c1e275\",\"sender_id\":\"69104e91-6a00-40d9-a7c9-b1571422ae43\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"seguro_fleaber_paid\\\",\\\"order_id\\\":\\\"15c2abf9-c250-43aa-8086-6816ee0f6be3\\\",\\\"total\\\":13.77,\\\"v\\\":1}\",\"is…"
+    },
+    {
+      "surface": "RLS/chat_messages",
+      "attack": "SELECT * limit 5",
+      "identity": "fresh",
+      "result": "200 n=0 []",
+      "impact": "blocked_or_empty",
+      "severity": "info",
+      "evidence": "[]"
+    },
+    {
+      "surface": "RLS/lives",
+      "attack": "SELECT * limit 5",
+      "identity": "anon",
+      "result": "401 n=0 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table lives\"}",
+      "impact": "blocked_or_empty",
+      "severity": "info",
+      "evidence": "{\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table lives\"}"
+    },
+    {
+      "surface": "RLS/lives",
+      "attack": "SELECT * limit 5",
+      "identity": "buyer",
+      "result": "403 n=0 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table lives\"}",
+      "impact": "blocked_or_empty",
+      "severity": "info",
+      "evidence": "{\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table lives\"}"
+    },
+    {
+      "surface": "RLS/lives",
+      "attack": "SELECT * limit 5",
+      "identity": "seller",
+      "result": "403 n=0 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table lives\"}",
+      "impact": "blocked_or_empty",
+      "severity": "info",
+      "evidence": "{\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table lives\"}"
+    },
+    {
+      "surface": "RLS/lives",
+      "attack": "SELECT * limit 5",
+      "identity": "fresh",
+      "result": "403 n=0 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table lives\"}",
+      "impact": "blocked_or_empty",
+      "severity": "info",
+      "evidence": "{\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table lives\"}"
+    },
+    {
+      "surface": "RLS/live_items",
+      "attack": "SELECT * limit 5",
+      "identity": "anon",
+      "result": "401 n=0 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table live_items\"}",
+      "impact": "blocked_or_empty",
+      "severity": "info",
+      "evidence": "{\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table live_items\"}"
+    },
+    {
+      "surface": "RLS/live_items",
+      "attack": "SELECT * limit 5",
+      "identity": "buyer",
+      "result": "200 n=5 [{\"id\":\"ffb7b7e5-3007-44c7-b59d-44f99f36cb7f\",\"live_id\":\"d43f048f-fd95-4fec-ac7a-4bea85cadeec\",\"seller_id\":null,\"ref_cod…",
+      "impact": "rows visible",
+      "severity": "info",
+      "evidence": "[{\"id\":\"ffb7b7e5-3007-44c7-b59d-44f99f36cb7f\",\"live_id\":\"d43f048f-fd95-4fec-ac7a-4bea85cadeec\",\"seller_id\":null,\"ref_code\":\"REF-92ac8b04-f196-41de-85a0-c6ccbcc9eacd/13\",\"title\":\"Puzzle\",\"description\":null,\"price\":10.0,\"image_url\":null,\"size\":null,\"color\":null,\"is_active\":false,\"order_index\":0,\"statu…"
+    },
+    {
+      "surface": "RLS/live_items",
+      "attack": "SELECT * limit 5",
+      "identity": "seller",
+      "result": "200 n=5 [{\"id\":\"ffb7b7e5-3007-44c7-b59d-44f99f36cb7f\",\"live_id\":\"d43f048f-fd95-4fec-ac7a-4bea85cadeec\",\"seller_id\":null,\"ref_cod…",
+      "impact": "rows visible",
+      "severity": "info",
+      "evidence": "[{\"id\":\"ffb7b7e5-3007-44c7-b59d-44f99f36cb7f\",\"live_id\":\"d43f048f-fd95-4fec-ac7a-4bea85cadeec\",\"seller_id\":null,\"ref_code\":\"REF-92ac8b04-f196-41de-85a0-c6ccbcc9eacd/13\",\"title\":\"Puzzle\",\"description\":null,\"price\":10.0,\"image_url\":null,\"size\":null,\"color\":null,\"is_active\":false,\"order_index\":0,\"statu…"
+    },
+    {
+      "surface": "RLS/live_items",
+      "attack": "SELECT * limit 5",
+      "identity": "fresh",
+      "result": "200 n=5 [{\"id\":\"ffb7b7e5-3007-44c7-b59d-44f99f36cb7f\",\"live_id\":\"d43f048f-fd95-4fec-ac7a-4bea85cadeec\",\"seller_id\":null,\"ref_cod…",
+      "impact": "rows visible",
+      "severity": "info",
+      "evidence": "[{\"id\":\"ffb7b7e5-3007-44c7-b59d-44f99f36cb7f\",\"live_id\":\"d43f048f-fd95-4fec-ac7a-4bea85cadeec\",\"seller_id\":null,\"ref_code\":\"REF-92ac8b04-f196-41de-85a0-c6ccbcc9eacd/13\",\"title\":\"Puzzle\",\"description\":null,\"price\":10.0,\"image_url\":null,\"size\":null,\"color\":null,\"is_active\":false,\"order_index\":0,\"statu…"
+    },
+    {
+      "surface": "RLS/live_tips",
+      "attack": "SELECT * limit 5",
+      "identity": "anon",
+      "result": "200 n=0 []",
+      "impact": "blocked_or_empty",
+      "severity": "info",
+      "evidence": "[]"
+    },
+    {
+      "surface": "RLS/live_tips",
+      "attack": "SELECT * limit 5",
+      "identity": "buyer",
+      "result": "200 n=5 [{\"id\":\"6f279c54-3327-4eec-a7c8-18e605e15a44\",\"live_id\":null,\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_i…",
+      "impact": "rows visible",
+      "severity": "info",
+      "evidence": "[{\"id\":\"6f279c54-3327-4eec-a7c8-18e605e15a44\",\"live_id\":null,\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"amount\":50.00,\"processing_fee\":1.85,\"seller_amount\":48.15,\"message\":\"3b-t1\",\"payment_source\":\"stripe\",\"status\":\"pending\",\"stripe_session_…"
+    },
+    {
+      "surface": "RLS/live_tips",
+      "attack": "SELECT * limit 5",
+      "identity": "seller",
+      "result": "200 n=5 [{\"id\":\"6f279c54-3327-4eec-a7c8-18e605e15a44\",\"live_id\":null,\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_i…",
+      "impact": "rows visible",
+      "severity": "info",
+      "evidence": "[{\"id\":\"6f279c54-3327-4eec-a7c8-18e605e15a44\",\"live_id\":null,\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"amount\":50.00,\"processing_fee\":1.85,\"seller_amount\":48.15,\"message\":\"3b-t1\",\"payment_source\":\"stripe\",\"status\":\"pending\",\"stripe_session_…"
+    },
+    {
+      "surface": "RLS/live_tips",
+      "attack": "SELECT * limit 5",
+      "identity": "fresh",
+      "result": "200 n=0 []",
+      "impact": "blocked_or_empty",
+      "severity": "info",
+      "evidence": "[]"
+    },
+    {
+      "surface": "RLS/live_raffles",
+      "attack": "SELECT * limit 5",
+      "identity": "anon",
+      "result": "200 n=0 []",
+      "impact": "blocked_or_empty",
+      "severity": "info",
+      "evidence": "[]"
+    },
+    {
+      "surface": "RLS/live_raffles",
+      "attack": "SELECT * limit 5",
+      "identity": "buyer",
+      "result": "200 n=5 [{\"id\":\"2e71ebba-3f7b-420f-a5fb-bea2e4fc59a4\",\"live_id\":\"5989c33a-d823-47f8-bb60-f81ab2ac99ab\",\"seller_id\":\"69104e91-6a0…",
+      "impact": "rows visible",
+      "severity": "info",
+      "evidence": "[{\"id\":\"2e71ebba-3f7b-420f-a5fb-bea2e4fc59a4\",\"live_id\":\"5989c33a-d823-47f8-bb60-f81ab2ac99ab\",\"seller_id\":\"69104e91-6a00-40d9-a7c9-b1571422ae43\",\"title\":\"Puzzle\",\"description\":null,\"photo_url\":\"https://fxdknzrqjenzqcvnwqqq.supabase.co/storage/v1/object/public/chat_media/product_photos/69104e91-6a00…"
+    },
+    {
+      "surface": "RLS/live_raffles",
+      "attack": "SELECT * limit 5",
+      "identity": "seller",
+      "result": "200 n=5 [{\"id\":\"2e71ebba-3f7b-420f-a5fb-bea2e4fc59a4\",\"live_id\":\"5989c33a-d823-47f8-bb60-f81ab2ac99ab\",\"seller_id\":\"69104e91-6a0…",
+      "impact": "rows visible",
+      "severity": "info",
+      "evidence": "[{\"id\":\"2e71ebba-3f7b-420f-a5fb-bea2e4fc59a4\",\"live_id\":\"5989c33a-d823-47f8-bb60-f81ab2ac99ab\",\"seller_id\":\"69104e91-6a00-40d9-a7c9-b1571422ae43\",\"title\":\"Puzzle\",\"description\":null,\"photo_url\":\"https://fxdknzrqjenzqcvnwqqq.supabase.co/storage/v1/object/public/chat_media/product_photos/69104e91-6a00…"
+    },
+    {
+      "surface": "RLS/live_raffles",
+      "attack": "SELECT * limit 5",
+      "identity": "fresh",
+      "result": "200 n=5 [{\"id\":\"2e71ebba-3f7b-420f-a5fb-bea2e4fc59a4\",\"live_id\":\"5989c33a-d823-47f8-bb60-f81ab2ac99ab\",\"seller_id\":\"69104e91-6a0…",
+      "impact": "rows visible",
+      "severity": "info",
+      "evidence": "[{\"id\":\"2e71ebba-3f7b-420f-a5fb-bea2e4fc59a4\",\"live_id\":\"5989c33a-d823-47f8-bb60-f81ab2ac99ab\",\"seller_id\":\"69104e91-6a00-40d9-a7c9-b1571422ae43\",\"title\":\"Puzzle\",\"description\":null,\"photo_url\":\"https://fxdknzrqjenzqcvnwqqq.supabase.co/storage/v1/object/public/chat_media/product_photos/69104e91-6a00…"
+    },
+    {
+      "surface": "RLS/live_raffle_winners",
+      "attack": "SELECT * limit 5",
+      "identity": "anon",
+      "result": "200 n=0 []",
+      "impact": "blocked_or_empty",
+      "severity": "info",
+      "evidence": "[]"
+    },
+    {
+      "surface": "RLS/live_raffle_winners",
+      "attack": "SELECT * limit 5",
+      "identity": "buyer",
+      "result": "200 n=5 [{\"id\":\"ad5191aa-15e7-45b8-8893-4c347b19a9e4\",\"raffle_id\":\"2e71ebba-3f7b-420f-a5fb-bea2e4fc59a4\",\"user_id\":\"97f3089e-6a8…",
+      "impact": "rows visible",
+      "severity": "info",
+      "evidence": "[{\"id\":\"ad5191aa-15e7-45b8-8893-4c347b19a9e4\",\"raffle_id\":\"2e71ebba-3f7b-420f-a5fb-bea2e4fc59a4\",\"user_id\":\"97f3089e-6a84-4f9e-9d4a-4d68b2894fd6\",\"entry_id\":\"5286fa77-88a1-425d-9a27-87796908f96e\",\"rank\":1,\"tickets_at_draw\":1,\"draw_proof\":{\"pick\": 1, \"rank\": 1, \"seed\": \"64af22f0202db27c1169aada412bb2…"
+    },
+    {
+      "surface": "RLS/live_raffle_winners",
+      "attack": "SELECT * limit 5",
+      "identity": "seller",
+      "result": "200 n=5 [{\"id\":\"ad5191aa-15e7-45b8-8893-4c347b19a9e4\",\"raffle_id\":\"2e71ebba-3f7b-420f-a5fb-bea2e4fc59a4\",\"user_id\":\"97f3089e-6a8…",
+      "impact": "rows visible",
+      "severity": "info",
+      "evidence": "[{\"id\":\"ad5191aa-15e7-45b8-8893-4c347b19a9e4\",\"raffle_id\":\"2e71ebba-3f7b-420f-a5fb-bea2e4fc59a4\",\"user_id\":\"97f3089e-6a84-4f9e-9d4a-4d68b2894fd6\",\"entry_id\":\"5286fa77-88a1-425d-9a27-87796908f96e\",\"rank\":1,\"tickets_at_draw\":1,\"draw_proof\":{\"pick\": 1, \"rank\": 1, \"seed\": \"64af22f0202db27c1169aada412bb2…"
+    },
+    {
+      "surface": "RLS/live_raffle_winners",
+      "attack": "SELECT * limit 5",
+      "identity": "fresh",
+      "result": "200 n=5 [{\"id\":\"ad5191aa-15e7-45b8-8893-4c347b19a9e4\",\"raffle_id\":\"2e71ebba-3f7b-420f-a5fb-bea2e4fc59a4\",\"user_id\":\"97f3089e-6a8…",
+      "impact": "rows visible",
+      "severity": "info",
+      "evidence": "[{\"id\":\"ad5191aa-15e7-45b8-8893-4c347b19a9e4\",\"raffle_id\":\"2e71ebba-3f7b-420f-a5fb-bea2e4fc59a4\",\"user_id\":\"97f3089e-6a84-4f9e-9d4a-4d68b2894fd6\",\"entry_id\":\"5286fa77-88a1-425d-9a27-87796908f96e\",\"rank\":1,\"tickets_at_draw\":1,\"draw_proof\":{\"pick\": 1, \"rank\": 1, \"seed\": \"64af22f0202db27c1169aada412bb2…"
+    },
+    {
+      "surface": "RLS/live_reservation_requests",
+      "attack": "SELECT * limit 5",
+      "identity": "anon",
+      "result": "200 n=0 []",
+      "impact": "blocked_or_empty",
+      "severity": "info",
+      "evidence": "[]"
+    },
+    {
+      "surface": "RLS/live_reservation_requests",
+      "attack": "SELECT * limit 5",
+      "identity": "buyer",
+      "result": "200 n=5 [{\"id\":\"d5c84b3c-17e4-412d-9d8a-ef3fc022703f\",\"live_id\":\"527da95c-2206-49e2-ab00-810052ae7b9e\",\"live_item_id\":\"1bc68a89-…",
+      "impact": "rows visible",
+      "severity": "info",
+      "evidence": "[{\"id\":\"d5c84b3c-17e4-412d-9d8a-ef3fc022703f\",\"live_id\":\"527da95c-2206-49e2-ab00-810052ae7b9e\",\"live_item_id\":\"1bc68a89-9209-46d9-9a61-646a895271ae\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"requested_qty\":9,\"queue_position\":1,\"source\":\"fle…"
+    },
+    {
+      "surface": "RLS/live_reservation_requests",
+      "attack": "SELECT * limit 5",
+      "identity": "seller",
+      "result": "200 n=5 [{\"id\":\"d5c84b3c-17e4-412d-9d8a-ef3fc022703f\",\"live_id\":\"527da95c-2206-49e2-ab00-810052ae7b9e\",\"live_item_id\":\"1bc68a89-…",
+      "impact": "rows visible",
+      "severity": "info",
+      "evidence": "[{\"id\":\"d5c84b3c-17e4-412d-9d8a-ef3fc022703f\",\"live_id\":\"527da95c-2206-49e2-ab00-810052ae7b9e\",\"live_item_id\":\"1bc68a89-9209-46d9-9a61-646a895271ae\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"requested_qty\":9,\"queue_position\":1,\"source\":\"fle…"
+    },
+    {
+      "surface": "RLS/live_reservation_requests",
+      "attack": "SELECT * limit 5",
+      "identity": "fresh",
+      "result": "200 n=0 []",
+      "impact": "blocked_or_empty",
+      "severity": "info",
+      "evidence": "[]"
+    },
+    {
+      "surface": "RLS/profiles",
+      "attack": "SELECT * limit 5",
+      "identity": "anon",
+      "result": "401 n=0 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table profiles\"}",
+      "impact": "blocked_or_empty",
+      "severity": "info",
+      "evidence": "{\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table profiles\"}"
+    },
+    {
+      "surface": "RLS/profiles",
+      "attack": "SELECT * limit 5",
+      "identity": "buyer",
+      "result": "200 n=1 [{\"created_at\":\"2026-08-26T11:42:16.950611+00:00\",\"full_name\":\"Maestro Buyer\",\"user_type\":\"comprador\",\"phone\":null,\"id\":…",
+      "impact": "rows visible",
+      "severity": "info",
+      "evidence": "[{\"created_at\":\"2026-08-26T11:42:16.950611+00:00\",\"full_name\":\"Maestro Buyer\",\"user_type\":\"comprador\",\"phone\":null,\"id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"photo_url\":null,\"is_live\":false,\"next_live\":null,\"last_live\":null,\"location\":\"Portugal\",\"total_lives\":4,\"phone_verified_at\":null,\"vacation_m…"
+    },
+    {
+      "surface": "RLS/profiles",
+      "attack": "SELECT * limit 5",
+      "identity": "seller",
+      "result": "200 n=1 [{\"created_at\":\"2026-06-04T05:09:48.457604+00:00\",\"full_name\":\"Maria Demo FleaHub\",\"user_type\":\"vendedor\",\"phone\":null,\"…",
+      "impact": "rows visible",
+      "severity": "info",
+      "evidence": "[{\"created_at\":\"2026-06-04T05:09:48.457604+00:00\",\"full_name\":\"Maria Demo FleaHub\",\"user_type\":\"vendedor\",\"phone\":null,\"id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"photo_url\":\"https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=800&auto=format&fit=crop\",\"is_live\":true,\"next_live\":null,\"la…"
+    },
+    {
+      "surface": "RLS/profiles",
+      "attack": "SELECT * limit 5",
+      "identity": "fresh",
+      "result": "200 n=1 [{\"created_at\":\"2026-08-29T15:34:33.008077+00:00\",\"full_name\":\"rtf.blind.1788017673584\",\"user_type\":\"vendedor\",\"phone\":n…",
+      "impact": "rows visible",
+      "severity": "info",
+      "evidence": "[{\"created_at\":\"2026-08-29T15:34:33.008077+00:00\",\"full_name\":\"rtf.blind.1788017673584\",\"user_type\":\"vendedor\",\"phone\":null,\"id\":\"2f967a2c-fa3c-4667-9cc5-51de12fd74b6\",\"photo_url\":null,\"is_live\":false,\"next_live\":null,\"last_live\":null,\"location\":\"Portugal\",\"total_lives\":0,\"phone_verified_at\":null,\"v…"
+    },
+    {
+      "surface": "RLS/product_offers",
+      "attack": "SELECT * limit 5",
+      "identity": "anon",
+      "result": "200 n=0 []",
+      "impact": "blocked_or_empty",
+      "severity": "info",
+      "evidence": "[]"
+    },
+    {
+      "surface": "RLS/product_offers",
+      "attack": "SELECT * limit 5",
+      "identity": "buyer",
+      "result": "200 n=3 [{\"id\":\"9cd6bc49-1a38-4db7-8b45-5417c7871fda\",\"product_id\":\"208fc3eb-88dc-4f5d-9293-4aec9ab1addb\",\"chat_id\":null,\"buyer_…",
+      "impact": "rows visible",
+      "severity": "info",
+      "evidence": "[{\"id\":\"9cd6bc49-1a38-4db7-8b45-5417c7871fda\",\"product_id\":\"208fc3eb-88dc-4f5d-9293-4aec9ab1addb\",\"chat_id\":null,\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"amount\":0.50,\"list_price\":null,\"offered_by\":\"buyer\",\"status\":\"pending\",\"parent_offer_…"
+    },
+    {
+      "surface": "RLS/product_offers",
+      "attack": "SELECT * limit 5",
+      "identity": "seller",
+      "result": "200 n=4 [{\"id\":\"8cc702c1-1384-48b8-b2f0-a1a0588caefc\",\"product_id\":\"a78edff3-f27b-45d8-bbdc-2223d38bfb15\",\"chat_id\":\"a2725916-76…",
+      "impact": "rows visible",
+      "severity": "info",
+      "evidence": "[{\"id\":\"8cc702c1-1384-48b8-b2f0-a1a0588caefc\",\"product_id\":\"a78edff3-f27b-45d8-bbdc-2223d38bfb15\",\"chat_id\":\"a2725916-7669-4762-a86c-346edc01ee84\",\"buyer_id\":\"69104e91-6a00-40d9-a7c9-b1571422ae43\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"amount\":8.00,\"list_price\":9.00,\"offered_by\":\"buyer\"…"
+    },
+    {
+      "surface": "RLS/product_offers",
+      "attack": "SELECT * limit 5",
+      "identity": "fresh",
+      "result": "200 n=0 []",
+      "impact": "blocked_or_empty",
+      "severity": "info",
+      "evidence": "[]"
+    },
+    {
+      "surface": "RLS/seller_bundle_discounts",
+      "attack": "SELECT * limit 5",
+      "identity": "anon",
+      "result": "401 n=0 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table seller_bundle_discounts\"}",
+      "impact": "blocked_or_empty",
+      "severity": "info",
+      "evidence": "{\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table seller_bundle_discounts\"}"
+    },
+    {
+      "surface": "RLS/seller_bundle_discounts",
+      "attack": "SELECT * limit 5",
+      "identity": "buyer",
+      "result": "200 n=2 [{\"seller_id\":\"69104e91-6a00-40d9-a7c9-b1571422ae43\",\"enabled\":true,\"tier_2_pct\":null,\"tier_3_pct\":null,\"tier_5_pct\":nul…",
+      "impact": "rows visible",
+      "severity": "info",
+      "evidence": "[{\"seller_id\":\"69104e91-6a00-40d9-a7c9-b1571422ae43\",\"enabled\":true,\"tier_2_pct\":null,\"tier_3_pct\":null,\"tier_5_pct\":null,\"updated_at\":\"2026-05-26T17:26:43.315444+00:00\",\"custom_tiers\":[{\"pct\": 50.0, \"min_items\": 50}]}, \n {\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"enabled\":true,\"tier_2_pct…"
+    },
+    {
+      "surface": "RLS/seller_bundle_discounts",
+      "attack": "SELECT * limit 5",
+      "identity": "seller",
+      "result": "200 n=2 [{\"seller_id\":\"69104e91-6a00-40d9-a7c9-b1571422ae43\",\"enabled\":true,\"tier_2_pct\":null,\"tier_3_pct\":null,\"tier_5_pct\":nul…",
+      "impact": "rows visible",
+      "severity": "info",
+      "evidence": "[{\"seller_id\":\"69104e91-6a00-40d9-a7c9-b1571422ae43\",\"enabled\":true,\"tier_2_pct\":null,\"tier_3_pct\":null,\"tier_5_pct\":null,\"updated_at\":\"2026-05-26T17:26:43.315444+00:00\",\"custom_tiers\":[{\"pct\": 50.0, \"min_items\": 50}]}, \n {\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"enabled\":true,\"tier_2_pct…"
+    },
+    {
+      "surface": "RLS/seller_bundle_discounts",
+      "attack": "SELECT * limit 5",
+      "identity": "fresh",
+      "result": "200 n=2 [{\"seller_id\":\"69104e91-6a00-40d9-a7c9-b1571422ae43\",\"enabled\":true,\"tier_2_pct\":null,\"tier_3_pct\":null,\"tier_5_pct\":nul…",
+      "impact": "rows visible",
+      "severity": "info",
+      "evidence": "[{\"seller_id\":\"69104e91-6a00-40d9-a7c9-b1571422ae43\",\"enabled\":true,\"tier_2_pct\":null,\"tier_3_pct\":null,\"tier_5_pct\":null,\"updated_at\":\"2026-05-26T17:26:43.315444+00:00\",\"custom_tiers\":[{\"pct\": 50.0, \"min_items\": 50}]}, \n {\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"enabled\":true,\"tier_2_pct…"
+    },
+    {
+      "surface": "RLS/stripe_checkout_events",
+      "attack": "SELECT * limit 5",
+      "identity": "anon",
+      "result": "200 n=0 []",
+      "impact": "blocked_or_empty",
+      "severity": "info",
+      "evidence": "[]"
+    },
+    {
+      "surface": "RLS/stripe_checkout_events",
+      "attack": "SELECT * limit 5",
+      "identity": "buyer",
+      "result": "200 n=5 [{\"id\":\"1acee782-49d0-4ecd-a101-eb26816de64e\",\"created_at\":\"2026-08-26T11:51:41.621115+00:00\",\"session_id\":null,\"order_i…",
+      "impact": "rows visible",
+      "severity": "info",
+      "evidence": "[{\"id\":\"1acee782-49d0-4ecd-a101-eb26816de64e\",\"created_at\":\"2026-08-26T11:51:41.621115+00:00\",\"session_id\":null,\"order_id\":\"dce8ec48-c70c-488d-9e6b-ec61e2305a2d\",\"product_id\":\"0c71ab09-ae7a-4116-a279-ab2cd8dc81c7\",\"live_id\":null,\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"event\":\"checkout_req…"
+    },
+    {
+      "surface": "RLS/stripe_checkout_events",
+      "attack": "SELECT * limit 5",
+      "identity": "seller",
+      "result": "200 n=5 [{\"id\":\"ad100d86-6901-4cbb-bd20-dad04b03d7e1\",\"created_at\":\"2026-08-26T08:52:07.120212+00:00\",\"session_id\":null,\"order_i…",
+      "impact": "rows visible",
+      "severity": "info",
+      "evidence": "[{\"id\":\"ad100d86-6901-4cbb-bd20-dad04b03d7e1\",\"created_at\":\"2026-08-26T08:52:07.120212+00:00\",\"session_id\":null,\"order_id\":null,\"product_id\":null,\"live_id\":null,\"buyer_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"event\":\"checkout_request\",\"detail\":{\"amount\": 50, \"live_id\": null, \"buyer_id\": \"980f4fa1…"
+    },
+    {
+      "surface": "RLS/stripe_checkout_events",
+      "attack": "SELECT * limit 5",
+      "identity": "fresh",
+      "result": "200 n=0 []",
+      "impact": "blocked_or_empty",
+      "severity": "info",
+      "evidence": "[]"
+    },
+    {
+      "surface": "RLS/app_logs",
+      "attack": "SELECT * limit 5",
+      "identity": "anon",
+      "result": "200 n=0 []",
+      "impact": "blocked_or_empty",
+      "severity": "info",
+      "evidence": "[]"
+    },
+    {
+      "surface": "RLS/app_logs",
+      "attack": "SELECT * limit 5",
+      "identity": "buyer",
+      "result": "500 n=0 {\"code\":\"57014\",\"details\":null,\"hint\":null,\"message\":\"canceling statement due to statement timeout\"}",
+      "impact": "blocked_or_empty",
+      "severity": "info",
+      "evidence": "{\"code\":\"57014\",\"details\":null,\"hint\":null,\"message\":\"canceling statement due to statement timeout\"}"
+    },
+    {
+      "surface": "RLS/app_logs",
+      "attack": "SELECT * limit 5",
+      "identity": "seller",
+      "result": "200 n=0 []",
+      "impact": "blocked_or_empty",
+      "severity": "info",
+      "evidence": "[]"
+    },
+    {
+      "surface": "RLS/app_logs",
+      "attack": "SELECT * limit 5",
+      "identity": "fresh",
+      "result": "200 n=0 []",
+      "impact": "blocked_or_empty",
+      "severity": "info",
+      "evidence": "[]"
+    },
+    {
+      "surface": "RLS/ps_ingest_audit",
+      "attack": "SELECT * limit 5",
+      "identity": "anon",
+      "result": "200 n=0 []",
+      "impact": "blocked_or_empty",
+      "severity": "info",
+      "evidence": "[]"
+    },
+    {
+      "surface": "RLS/ps_ingest_audit",
+      "attack": "SELECT * limit 5",
+      "identity": "buyer",
+      "result": "200 n=0 []",
+      "impact": "blocked_or_empty",
+      "severity": "info",
+      "evidence": "[]"
+    },
+    {
+      "surface": "RLS/ps_ingest_audit",
+      "attack": "SELECT * limit 5",
+      "identity": "seller",
+      "result": "200 n=3 [{\"id\":\"e3184e9a-90bc-4e5c-aa59-5367eb8d0adc\",\"live_id\":\"5dd5cfd2-63b1-4cd8-82b1-c888e9dc5234\",\"seller_id\":null,\"chat_se…",
+      "impact": "rows visible",
+      "severity": "info",
+      "evidence": "[{\"id\":\"e3184e9a-90bc-4e5c-aa59-5367eb8d0adc\",\"live_id\":\"5dd5cfd2-63b1-4cd8-82b1-c888e9dc5234\",\"seller_id\":null,\"chat_sequence\":null,\"ocr_line_hash\":\"12345678\",\"ocr_raw_line\":null,\"external_display_name\":null,\"external_buyer_ref\":null,\"parser_intent\":null,\"requested_qty\":99,\"ref_slug_in\":null,\"publi…"
+    },
+    {
+      "surface": "RLS/ps_ingest_audit",
+      "attack": "SELECT * limit 5",
+      "identity": "fresh",
+      "result": "200 n=0 []",
+      "impact": "blocked_or_empty",
+      "severity": "info",
+      "evidence": "[]"
+    },
+    {
+      "surface": "RLS/ps_pairing_sessions",
+      "attack": "SELECT * limit 5",
+      "identity": "anon",
+      "result": "200 n=0 []",
+      "impact": "blocked_or_empty",
+      "severity": "info",
+      "evidence": "[]"
+    },
+    {
+      "surface": "RLS/ps_pairing_sessions",
+      "attack": "SELECT * limit 5",
+      "identity": "buyer",
+      "result": "200 n=0 []",
+      "impact": "blocked_or_empty",
+      "severity": "info",
+      "evidence": "[]"
+    },
+    {
+      "surface": "RLS/ps_pairing_sessions",
+      "attack": "SELECT * limit 5",
+      "identity": "seller",
+      "result": "200 n=0 []",
+      "impact": "blocked_or_empty",
+      "severity": "info",
+      "evidence": "[]"
+    },
+    {
+      "surface": "RLS/ps_pairing_sessions",
+      "attack": "SELECT * limit 5",
+      "identity": "fresh",
+      "result": "200 n=0 []",
+      "impact": "blocked_or_empty",
+      "severity": "info",
+      "evidence": "[]"
+    },
+    {
+      "surface": "RLS/ps_devices",
+      "attack": "SELECT * limit 5",
+      "identity": "anon",
+      "result": "404 n=0 {\"code\":\"PGRST205\",\"details\":null,\"hint\":\"Perhaps you meant the table 'public.seller_device_tokens'\",\"message\":\"Could no…",
+      "impact": "blocked_or_empty",
+      "severity": "info",
+      "evidence": "{\"code\":\"PGRST205\",\"details\":null,\"hint\":\"Perhaps you meant the table 'public.seller_device_tokens'\",\"message\":\"Could not find the table 'public.ps_devices' in the schema cache\"}"
+    },
+    {
+      "surface": "RLS/ps_devices",
+      "attack": "SELECT * limit 5",
+      "identity": "buyer",
+      "result": "404 n=0 {\"code\":\"PGRST205\",\"details\":null,\"hint\":\"Perhaps you meant the table 'public.seller_device_tokens'\",\"message\":\"Could no…",
+      "impact": "blocked_or_empty",
+      "severity": "info",
+      "evidence": "{\"code\":\"PGRST205\",\"details\":null,\"hint\":\"Perhaps you meant the table 'public.seller_device_tokens'\",\"message\":\"Could not find the table 'public.ps_devices' in the schema cache\"}"
+    },
+    {
+      "surface": "RLS/ps_devices",
+      "attack": "SELECT * limit 5",
+      "identity": "seller",
+      "result": "404 n=0 {\"code\":\"PGRST205\",\"details\":null,\"hint\":\"Perhaps you meant the table 'public.seller_device_tokens'\",\"message\":\"Could no…",
+      "impact": "blocked_or_empty",
+      "severity": "info",
+      "evidence": "{\"code\":\"PGRST205\",\"details\":null,\"hint\":\"Perhaps you meant the table 'public.seller_device_tokens'\",\"message\":\"Could not find the table 'public.ps_devices' in the schema cache\"}"
+    },
+    {
+      "surface": "RLS/ps_devices",
+      "attack": "SELECT * limit 5",
+      "identity": "fresh",
+      "result": "404 n=0 {\"code\":\"PGRST205\",\"details\":null,\"hint\":\"Perhaps you meant the table 'public.seller_device_tokens'\",\"message\":\"Could no…",
+      "impact": "blocked_or_empty",
+      "severity": "info",
+      "evidence": "{\"code\":\"PGRST205\",\"details\":null,\"hint\":\"Perhaps you meant the table 'public.seller_device_tokens'\",\"message\":\"Could not find the table 'public.ps_devices' in the schema cache\"}"
+    },
+    {
+      "surface": "RLS/seller_payout_details",
+      "attack": "SELECT * limit 5",
+      "identity": "anon",
+      "result": "404 n=0 {\"code\":\"PGRST205\",\"details\":null,\"hint\":\"Perhaps you meant the table 'public.wallet_payout_ledger'\",\"message\":\"Could no…",
+      "impact": "blocked_or_empty",
+      "severity": "info",
+      "evidence": "{\"code\":\"PGRST205\",\"details\":null,\"hint\":\"Perhaps you meant the table 'public.wallet_payout_ledger'\",\"message\":\"Could not find the table 'public.seller_payout_details' in the schema cache\"}"
+    },
+    {
+      "surface": "RLS/seller_payout_details",
+      "attack": "SELECT * limit 5",
+      "identity": "buyer",
+      "result": "404 n=0 {\"code\":\"PGRST205\",\"details\":null,\"hint\":\"Perhaps you meant the table 'public.wallet_payout_ledger'\",\"message\":\"Could no…",
+      "impact": "blocked_or_empty",
+      "severity": "info",
+      "evidence": "{\"code\":\"PGRST205\",\"details\":null,\"hint\":\"Perhaps you meant the table 'public.wallet_payout_ledger'\",\"message\":\"Could not find the table 'public.seller_payout_details' in the schema cache\"}"
+    },
+    {
+      "surface": "RLS/seller_payout_details",
+      "attack": "SELECT * limit 5",
+      "identity": "seller",
+      "result": "404 n=0 {\"code\":\"PGRST205\",\"details\":null,\"hint\":\"Perhaps you meant the table 'public.wallet_payout_ledger'\",\"message\":\"Could no…",
+      "impact": "blocked_or_empty",
+      "severity": "info",
+      "evidence": "{\"code\":\"PGRST205\",\"details\":null,\"hint\":\"Perhaps you meant the table 'public.wallet_payout_ledger'\",\"message\":\"Could not find the table 'public.seller_payout_details' in the schema cache\"}"
+    },
+    {
+      "surface": "RLS/seller_payout_details",
+      "attack": "SELECT * limit 5",
+      "identity": "fresh",
+      "result": "404 n=0 {\"code\":\"PGRST205\",\"details\":null,\"hint\":\"Perhaps you meant the table 'public.wallet_payout_ledger'\",\"message\":\"Could no…",
+      "impact": "blocked_or_empty",
+      "severity": "info",
+      "evidence": "{\"code\":\"PGRST205\",\"details\":null,\"hint\":\"Perhaps you meant the table 'public.wallet_payout_ledger'\",\"message\":\"Could not find the table 'public.seller_payout_details' in the schema cache\"}"
+    },
+    {
+      "surface": "RLS/banking_details",
+      "attack": "SELECT * limit 5",
+      "identity": "anon",
+      "result": "404 n=0 {\"code\":\"PGRST205\",\"details\":null,\"hint\":\"Perhaps you meant the table 'public.ps_pairing_sessions'\",\"message\":\"Could not…",
+      "impact": "blocked_or_empty",
+      "severity": "info",
+      "evidence": "{\"code\":\"PGRST205\",\"details\":null,\"hint\":\"Perhaps you meant the table 'public.ps_pairing_sessions'\",\"message\":\"Could not find the table 'public.banking_details' in the schema cache\"}"
+    },
+    {
+      "surface": "RLS/banking_details",
+      "attack": "SELECT * limit 5",
+      "identity": "buyer",
+      "result": "404 n=0 {\"code\":\"PGRST205\",\"details\":null,\"hint\":\"Perhaps you meant the table 'public.ps_pairing_sessions'\",\"message\":\"Could not…",
+      "impact": "blocked_or_empty",
+      "severity": "info",
+      "evidence": "{\"code\":\"PGRST205\",\"details\":null,\"hint\":\"Perhaps you meant the table 'public.ps_pairing_sessions'\",\"message\":\"Could not find the table 'public.banking_details' in the schema cache\"}"
+    },
+    {
+      "surface": "RLS/banking_details",
+      "attack": "SELECT * limit 5",
+      "identity": "seller",
+      "result": "404 n=0 {\"code\":\"PGRST205\",\"details\":null,\"hint\":\"Perhaps you meant the table 'public.ps_pairing_sessions'\",\"message\":\"Could not…",
+      "impact": "blocked_or_empty",
+      "severity": "info",
+      "evidence": "{\"code\":\"PGRST205\",\"details\":null,\"hint\":\"Perhaps you meant the table 'public.ps_pairing_sessions'\",\"message\":\"Could not find the table 'public.banking_details' in the schema cache\"}"
+    },
+    {
+      "surface": "RLS/banking_details",
+      "attack": "SELECT * limit 5",
+      "identity": "fresh",
+      "result": "404 n=0 {\"code\":\"PGRST205\",\"details\":null,\"hint\":\"Perhaps you meant the table 'public.ps_pairing_sessions'\",\"message\":\"Could not…",
+      "impact": "blocked_or_empty",
+      "severity": "info",
+      "evidence": "{\"code\":\"PGRST205\",\"details\":null,\"hint\":\"Perhaps you meant the table 'public.ps_pairing_sessions'\",\"message\":\"Could not find the table 'public.banking_details' in the schema cache\"}"
+    },
+    {
+      "surface": "RLS/user_banking_details",
+      "attack": "SELECT * limit 5",
+      "identity": "anon",
+      "result": "404 n=0 {\"code\":\"PGRST205\",\"details\":null,\"hint\":\"Perhaps you meant the table 'public.ps_pairing_sessions'\",\"message\":\"Could not…",
+      "impact": "blocked_or_empty",
+      "severity": "info",
+      "evidence": "{\"code\":\"PGRST205\",\"details\":null,\"hint\":\"Perhaps you meant the table 'public.ps_pairing_sessions'\",\"message\":\"Could not find the table 'public.user_banking_details' in the schema cache\"}"
+    },
+    {
+      "surface": "RLS/user_banking_details",
+      "attack": "SELECT * limit 5",
+      "identity": "buyer",
+      "result": "404 n=0 {\"code\":\"PGRST205\",\"details\":null,\"hint\":\"Perhaps you meant the table 'public.ps_pairing_sessions'\",\"message\":\"Could not…",
+      "impact": "blocked_or_empty",
+      "severity": "info",
+      "evidence": "{\"code\":\"PGRST205\",\"details\":null,\"hint\":\"Perhaps you meant the table 'public.ps_pairing_sessions'\",\"message\":\"Could not find the table 'public.user_banking_details' in the schema cache\"}"
+    },
+    {
+      "surface": "RLS/user_banking_details",
+      "attack": "SELECT * limit 5",
+      "identity": "seller",
+      "result": "404 n=0 {\"code\":\"PGRST205\",\"details\":null,\"hint\":\"Perhaps you meant the table 'public.ps_pairing_sessions'\",\"message\":\"Could not…",
+      "impact": "blocked_or_empty",
+      "severity": "info",
+      "evidence": "{\"code\":\"PGRST205\",\"details\":null,\"hint\":\"Perhaps you meant the table 'public.ps_pairing_sessions'\",\"message\":\"Could not find the table 'public.user_banking_details' in the schema cache\"}"
+    },
+    {
+      "surface": "RLS/user_banking_details",
+      "attack": "SELECT * limit 5",
+      "identity": "fresh",
+      "result": "404 n=0 {\"code\":\"PGRST205\",\"details\":null,\"hint\":\"Perhaps you meant the table 'public.ps_pairing_sessions'\",\"message\":\"Could not…",
+      "impact": "blocked_or_empty",
+      "severity": "info",
+      "evidence": "{\"code\":\"PGRST205\",\"details\":null,\"hint\":\"Perhaps you meant the table 'public.ps_pairing_sessions'\",\"message\":\"Could not find the table 'public.user_banking_details' in the schema cache\"}"
+    },
+    {
+      "surface": "RLS/payout_details",
+      "attack": "SELECT * limit 5",
+      "identity": "anon",
+      "result": "404 n=0 {\"code\":\"PGRST205\",\"details\":null,\"hint\":\"Perhaps you meant the table 'public.wallet_payout_ledger'\",\"message\":\"Could no…",
+      "impact": "blocked_or_empty",
+      "severity": "info",
+      "evidence": "{\"code\":\"PGRST205\",\"details\":null,\"hint\":\"Perhaps you meant the table 'public.wallet_payout_ledger'\",\"message\":\"Could not find the table 'public.payout_details' in the schema cache\"}"
+    },
+    {
+      "surface": "RLS/payout_details",
+      "attack": "SELECT * limit 5",
+      "identity": "buyer",
+      "result": "404 n=0 {\"code\":\"PGRST205\",\"details\":null,\"hint\":\"Perhaps you meant the table 'public.wallet_payout_ledger'\",\"message\":\"Could no…",
+      "impact": "blocked_or_empty",
+      "severity": "info",
+      "evidence": "{\"code\":\"PGRST205\",\"details\":null,\"hint\":\"Perhaps you meant the table 'public.wallet_payout_ledger'\",\"message\":\"Could not find the table 'public.payout_details' in the schema cache\"}"
+    },
+    {
+      "surface": "RLS/payout_details",
+      "attack": "SELECT * limit 5",
+      "identity": "seller",
+      "result": "404 n=0 {\"code\":\"PGRST205\",\"details\":null,\"hint\":\"Perhaps you meant the table 'public.wallet_payout_ledger'\",\"message\":\"Could no…",
+      "impact": "blocked_or_empty",
+      "severity": "info",
+      "evidence": "{\"code\":\"PGRST205\",\"details\":null,\"hint\":\"Perhaps you meant the table 'public.wallet_payout_ledger'\",\"message\":\"Could not find the table 'public.payout_details' in the schema cache\"}"
+    },
+    {
+      "surface": "RLS/payout_details",
+      "attack": "SELECT * limit 5",
+      "identity": "fresh",
+      "result": "404 n=0 {\"code\":\"PGRST205\",\"details\":null,\"hint\":\"Perhaps you meant the table 'public.wallet_payout_ledger'\",\"message\":\"Could no…",
+      "impact": "blocked_or_empty",
+      "severity": "info",
+      "evidence": "{\"code\":\"PGRST205\",\"details\":null,\"hint\":\"Perhaps you meant the table 'public.wallet_payout_ledger'\",\"message\":\"Could not find the table 'public.payout_details' in the schema cache\"}"
+    },
+    {
+      "surface": "RLS/complete",
+      "attack": "SELECT * limit 5",
+      "identity": "anon",
+      "result": "404 n=0 {\"code\":\"PGRST205\",\"details\":null,\"hint\":\"Perhaps you meant the table 'public.wallets'\",\"message\":\"Could not find the ta…",
+      "impact": "blocked_or_empty",
+      "severity": "info",
+      "evidence": "{\"code\":\"PGRST205\",\"details\":null,\"hint\":\"Perhaps you meant the table 'public.wallets'\",\"message\":\"Could not find the table 'public.complete' in the schema cache\"}"
+    },
+    {
+      "surface": "RLS/complete",
+      "attack": "SELECT * limit 5",
+      "identity": "buyer",
+      "result": "404 n=0 {\"code\":\"PGRST205\",\"details\":null,\"hint\":\"Perhaps you meant the table 'public.wallets'\",\"message\":\"Could not find the ta…",
+      "impact": "blocked_or_empty",
+      "severity": "info",
+      "evidence": "{\"code\":\"PGRST205\",\"details\":null,\"hint\":\"Perhaps you meant the table 'public.wallets'\",\"message\":\"Could not find the table 'public.complete' in the schema cache\"}"
+    },
+    {
+      "surface": "RLS/complete",
+      "attack": "SELECT * limit 5",
+      "identity": "seller",
+      "result": "404 n=0 {\"code\":\"PGRST205\",\"details\":null,\"hint\":\"Perhaps you meant the table 'public.wallets'\",\"message\":\"Could not find the ta…",
+      "impact": "blocked_or_empty",
+      "severity": "info",
+      "evidence": "{\"code\":\"PGRST205\",\"details\":null,\"hint\":\"Perhaps you meant the table 'public.wallets'\",\"message\":\"Could not find the table 'public.complete' in the schema cache\"}"
+    },
+    {
+      "surface": "RLS/complete",
+      "attack": "SELECT * limit 5",
+      "identity": "fresh",
+      "result": "404 n=0 {\"code\":\"PGRST205\",\"details\":null,\"hint\":\"Perhaps you meant the table 'public.wallets'\",\"message\":\"Could not find the ta…",
+      "impact": "blocked_or_empty",
+      "severity": "info",
+      "evidence": "{\"code\":\"PGRST205\",\"details\":null,\"hint\":\"Perhaps you meant the table 'public.wallets'\",\"message\":\"Could not find the table 'public.complete' in the schema cache\"}"
+    },
+    {
+      "surface": "ORDERS",
+      "attack": "SELECT orders where buyer_id != self",
+      "identity": "buyer",
+      "result": "200 n=0",
+      "impact": "no foreign buyer rows",
+      "severity": "info",
+      "evidence": "[]"
+    },
+    {
+      "surface": "MUX/LIVE",
+      "attack": "SELECT stream keys",
+      "identity": "anon",
+      "result": "401 leaked=false n=0",
+      "impact": "keys hidden or empty",
+      "severity": "info",
+      "evidence": "{\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table lives\"}"
+    },
+    {
+      "surface": "MUX/LIVE",
+      "attack": "SELECT stream keys",
+      "identity": "buyer",
+      "result": "403 leaked=false n=0",
+      "impact": "keys hidden or empty",
+      "severity": "info",
+      "evidence": "{\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table lives\"}"
+    },
+    {
+      "surface": "MUX/LIVE",
+      "attack": "SELECT stream keys",
+      "identity": "seller",
+      "result": "403 leaked=false n=0",
+      "impact": "keys hidden or empty",
+      "severity": "info",
+      "evidence": "{\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table lives\"}"
+    },
+    {
+      "surface": "WALLET",
+      "attack": "SELECT own wallet",
+      "identity": "buyer",
+      "result": "200 [{\"id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"balance\":39.81,\"stripe_account_id\":\"acct_1U8gAFQglI7kZRfq\"}]",
+      "impact": "read own wallet",
+      "severity": "info",
+      "evidence": "[{\"id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"balance\":39.81,\"stripe_account_id\":\"acct_1U8gAFQglI7kZRfq\"}]"
+    },
+    {
+      "surface": "WALLET",
+      "attack": "PATCH own balance=99999",
+      "identity": "buyer",
+      "result": "200 []",
+      "impact": "blocked or unchanged",
+      "severity": "info",
+      "evidence": "[]"
+    },
+    {
+      "surface": "WALLET",
+      "attack": "observe balance after JWT PATCH (service observe)",
+      "identity": "service_observe",
+      "result": "39.81",
+      "impact": "not persisted",
+      "severity": "info",
+      "evidence": "[{\"id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"balance\":39.81}]"
+    },
+    {
+      "surface": "WALLET",
+      "attack": "INSERT wallet balance=5000",
+      "identity": "fresh",
+      "result": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table wallets\"}",
+      "impact": "blocked",
+      "severity": "info",
+      "evidence": "{\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table wallets\"}"
+    },
+    {
+      "surface": "WALLET",
+      "attack": "PATCH seller wallet as buyer",
+      "identity": "buyer",
+      "result": "200 []",
+      "impact": "blocked",
+      "severity": "info",
+      "evidence": "[]"
+    },
+    {
+      "surface": "PRODUCTS",
+      "attack": "INSERT product qty=1 price=25",
+      "identity": "seller",
+      "result": "201 [{\"id\":\"29dbf0f8-0206-4634-bfd2-6df722ebf8fd\",\"created_at\":\"2026-08-29T15:35:12.2577+00:00\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"title\":\"RTF-BLIND-1788017673584\",\"price\":25.0,\"ref_code\"…",
+      "impact": "fixture product created via JWT",
+      "severity": "info",
+      "evidence": "[{\"id\":\"29dbf0f8-0206-4634-bfd2-6df722ebf8fd\",\"created_at\":\"2026-08-29T15:35:12.2577+00:00\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"title\":\"RTF-BLIND-1788017673584\",\"price\":25.0,\"ref_code\":null,\"category\":null,\"clothing_size\":null,\"gender\":null,\"description\":null,\"state\":null,\"image_urls\":null,\"list_on_marketplace\":true,\"available_for_live\":false,\"is_sold\":false,\"favorites_count\":0,\"quantity\":1}]"
+    },
+    {
+      "surface": "ORDERS",
+      "attack": "INSERT status=pago amount_paid huge fake PI",
+      "identity": "buyer",
+      "result": "201 [{\"id\":\"678eff47-82ff-4c87-ab5b-9499a2ec2006\",\"created_at\":\"2026-08-29T15:35:12.430514+00:00\",\"product_id\":\"29dbf0f8-0206-4634-bfd2-6df722ebf8fd\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"pr…",
+      "impact": "INSERT accepted — inspect row",
+      "severity": "info",
+      "evidence": "[{\"id\":\"678eff47-82ff-4c87-ab5b-9499a2ec2006\",\"created_at\":\"2026-08-29T15:35:12.430514+00:00\",\"product_id\":\"29dbf0f8-0206-4634-bfd2-6df722ebf8fd\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"price_total\":0.01,\"shipping_method\":\"hand\",\"payment_method\":\"Seguro Fleaber\",\"proof_url\":null,\"status\":\"reserva_pendente\",\"reservation_expires_at\":null,\"is_reservation\":false,\"completed_at\":null,\"auto_feedback_processed_at\":null,\"returned_at\":null,\"wallet_release_processed_at\":null,\"wallet_refund_processed_at\":null,\"bundle_id\":null,\"quantity\":1,\"live_id\":null,\"live_item_id\":null,\"live_raffle_id\":null,\"stripe_checkout_session_id\":null,\"stripe_payment_intent_id\":null,\"stripe_refund_id\":null,\"stripe_refunded_at\":null,\"stock_units_applied\":null,\"amou…"
+    },
+    {
+      "surface": "ORDERS",
+      "attack": "observe hostile INSERT row",
+      "identity": "service_observe",
+      "result": "[{\"id\":\"678eff47-82ff-4c87-ab5b-9499a2ec2006\",\"status\":\"reserva_pendente\",\"price_total\":0.01,\"amount_paid_cents\":null,\"stripe_payment_intent_id\":null,\"stock_units_applied\":null,\"quantity\":1}]",
+      "impact": "final row after triggers",
+      "severity": "info",
+      "evidence": "[{\"id\":\"678eff47-82ff-4c87-ab5b-9499a2ec2006\",\"status\":\"reserva_pendente\",\"price_total\":0.01,\"amount_paid_cents\":null,\"stripe_payment_intent_id\":null,\"stock_units_applied\":null,\"quantity\":1}]"
+    },
+    {
+      "surface": "ORDERS",
+      "attack": "INSERT reserva_pendente",
+      "identity": "buyer",
+      "result": "201 [{\"id\":\"be98836e-17a9-451a-b819-deaaa552bcbc\",\"created_at\":\"2026-08-29T15:35:12.73012+00:00\",\"product_id\":\"29dbf0f8-0206-4634-bfd2-6df722ebf8fd\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"sell…",
+      "impact": "pending created",
+      "severity": "info",
+      "evidence": "[{\"id\":\"be98836e-17a9-451a-b819-deaaa552bcbc\",\"created_at\":\"2026-08-29T15:35:12.73012+00:00\",\"product_id\":\"29dbf0f8-0206-4634-bfd2-6df722ebf8fd\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"price_total\":1.0,\"shipping_method\":\"hand\",\"payment_method\":\"Seguro Fleaber\",\"proof_url\":null,\"status\":\"reserva_pendente\",\"reservation_expires_at\":null,\"is_reservation\":true,\"completed_at\":null,\"auto_feedback_processed_at\":null,\"returned_at\":null,\"wallet_release_processed_at\":null,\"wallet_refund_processed_at\":null,\"bundle_id\":null,\"quantity\":1,\"live_id\":null,\"live_item_id\":null,\"live_raffle_id\":null,\"stripe_checkout_session_id\":null,\"stripe_payment_intent_id\":null,\"stripe_refund_id\":null,\"stripe_refunded_at\":null,\"stock_units_applied\":null,\"amount_…"
+    },
+    {
+      "surface": "ORDER FSM",
+      "attack": "buyer PATCH {status: pago}",
+      "identity": "buyer",
+      "result": "200 [{\"id\":\"be98836e-17a9-451a-b819-deaaa552bcbc\",\"created_at\":\"2026-08-29T15:35:12.73012+00:00\",\"product_id\":\"29dbf0f8-0206-4634-bfd2-6df722ebf8fd\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7…",
+      "impact": "PATCH persisted",
+      "severity": "info",
+      "evidence": "[{\"id\":\"be98836e-17a9-451a-b819-deaaa552bcbc\",\"created_at\":\"2026-08-29T15:35:12.73012+00:00\",\"product_id\":\"29dbf0f8-0206-4634-bfd2-6df722ebf8fd\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"price_total\":1.0,\"shipping_method\":\"hand\",\"payment_method\":\"Seguro Fleaber\",\"proof_url\":null,\"status\":\"reserva_pendente\",\"reservation_expires_at\":null,\"is_reservation\":true,\"completed_at\":null,\"auto_feedback_processed_at\":null,\"returned_at\":null,\"wallet_release_processed_at\":null,\"wallet_refund_processed_at\":null,\"bundle_id\":null,\"quantity\":1,\"live_id\":null,\"live_item_id\":null,\"live_raffle_id\":null,\"stripe_checkout_session_id\":null,\"stripe_payment_intent_id\":null,\"stripe_refund_id\":null,\"stripe_refunded_at\":null,\"stock_units_applied\":null,\"amount_…"
+    },
+    {
+      "surface": "ORDER FSM",
+      "attack": "buyer PATCH {status: concluido}",
+      "identity": "buyer",
+      "result": "200 [{\"id\":\"be98836e-17a9-451a-b819-deaaa552bcbc\",\"created_at\":\"2026-08-29T15:35:12.73012+00:00\",\"product_id\":\"29dbf0f8-0206-4634-bfd2-6df722ebf8fd\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7…",
+      "impact": "PATCH persisted",
+      "severity": "info",
+      "evidence": "[{\"id\":\"be98836e-17a9-451a-b819-deaaa552bcbc\",\"created_at\":\"2026-08-29T15:35:12.73012+00:00\",\"product_id\":\"29dbf0f8-0206-4634-bfd2-6df722ebf8fd\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"price_total\":1.0,\"shipping_method\":\"hand\",\"payment_method\":\"Seguro Fleaber\",\"proof_url\":null,\"status\":\"reserva_pendente\",\"reservation_expires_at\":null,\"is_reservation\":true,\"completed_at\":\"2026-08-29T15:35:12.952303+00:00\",\"auto_feedback_processed_at\":null,\"returned_at\":null,\"wallet_release_processed_at\":null,\"wallet_refund_processed_at\":null,\"bundle_id\":null,\"quantity\":1,\"live_id\":null,\"live_item_id\":null,\"live_raffle_id\":null,\"stripe_checkout_session_id\":null,\"stripe_payment_intent_id\":null,\"stripe_refund_id\":null,\"stripe_refunded_at\":null,\"stoc…"
+    },
+    {
+      "surface": "ORDER FSM",
+      "attack": "buyer PATCH {status: enviado}",
+      "identity": "buyer",
+      "result": "200 [{\"id\":\"be98836e-17a9-451a-b819-deaaa552bcbc\",\"created_at\":\"2026-08-29T15:35:12.73012+00:00\",\"product_id\":\"29dbf0f8-0206-4634-bfd2-6df722ebf8fd\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7…",
+      "impact": "PATCH persisted",
+      "severity": "info",
+      "evidence": "[{\"id\":\"be98836e-17a9-451a-b819-deaaa552bcbc\",\"created_at\":\"2026-08-29T15:35:12.73012+00:00\",\"product_id\":\"29dbf0f8-0206-4634-bfd2-6df722ebf8fd\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"price_total\":1.0,\"shipping_method\":\"hand\",\"payment_method\":\"Seguro Fleaber\",\"proof_url\":null,\"status\":\"reserva_pendente\",\"reservation_expires_at\":null,\"is_reservation\":true,\"completed_at\":\"2026-08-29T15:35:12.952303+00:00\",\"auto_feedback_processed_at\":null,\"returned_at\":null,\"wallet_release_processed_at\":null,\"wallet_refund_processed_at\":null,\"bundle_id\":null,\"quantity\":1,\"live_id\":null,\"live_item_id\":null,\"live_raffle_id\":null,\"stripe_checkout_session_id\":null,\"stripe_payment_intent_id\":null,\"stripe_refund_id\":null,\"stripe_refunded_at\":null,\"stoc…"
+    },
+    {
+      "surface": "ORDER FSM",
+      "attack": "buyer PATCH {price_total: 0.5}",
+      "identity": "buyer",
+      "result": "200 [{\"id\":\"be98836e-17a9-451a-b819-deaaa552bcbc\",\"created_at\":\"2026-08-29T15:35:12.73012+00:00\",\"product_id\":\"29dbf0f8-0206-4634-bfd2-6df722ebf8fd\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7…",
+      "impact": "PATCH persisted",
+      "severity": "info",
+      "evidence": "[{\"id\":\"be98836e-17a9-451a-b819-deaaa552bcbc\",\"created_at\":\"2026-08-29T15:35:12.73012+00:00\",\"product_id\":\"29dbf0f8-0206-4634-bfd2-6df722ebf8fd\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"price_total\":1.0,\"shipping_method\":\"hand\",\"payment_method\":\"Seguro Fleaber\",\"proof_url\":null,\"status\":\"reserva_pendente\",\"reservation_expires_at\":null,\"is_reservation\":true,\"completed_at\":\"2026-08-29T15:35:12.952303+00:00\",\"auto_feedback_processed_at\":null,\"returned_at\":null,\"wallet_release_processed_at\":null,\"wallet_refund_processed_at\":null,\"bundle_id\":null,\"quantity\":1,\"live_id\":null,\"live_item_id\":null,\"live_raffle_id\":null,\"stripe_checkout_session_id\":null,\"stripe_payment_intent_id\":null,\"stripe_refund_id\":null,\"stripe_refunded_at\":null,\"stoc…"
+    },
+    {
+      "surface": "ORDER FSM",
+      "attack": "buyer PATCH {quantity: 99}",
+      "identity": "buyer",
+      "result": "200 [{\"id\":\"be98836e-17a9-451a-b819-deaaa552bcbc\",\"created_at\":\"2026-08-29T15:35:12.73012+00:00\",\"product_id\":\"29dbf0f8-0206-4634-bfd2-6df722ebf8fd\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7…",
+      "impact": "PATCH persisted",
+      "severity": "info",
+      "evidence": "[{\"id\":\"be98836e-17a9-451a-b819-deaaa552bcbc\",\"created_at\":\"2026-08-29T15:35:12.73012+00:00\",\"product_id\":\"29dbf0f8-0206-4634-bfd2-6df722ebf8fd\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"price_total\":1.0,\"shipping_method\":\"hand\",\"payment_method\":\"Seguro Fleaber\",\"proof_url\":null,\"status\":\"reserva_pendente\",\"reservation_expires_at\":null,\"is_reservation\":true,\"completed_at\":\"2026-08-29T15:35:12.952303+00:00\",\"auto_feedback_processed_at\":null,\"returned_at\":null,\"wallet_release_processed_at\":null,\"wallet_refund_processed_at\":null,\"bundle_id\":null,\"quantity\":1,\"live_id\":null,\"live_item_id\":null,\"live_raffle_id\":null,\"stripe_checkout_session_id\":null,\"stripe_payment_intent_id\":null,\"stripe_refund_id\":null,\"stripe_refunded_at\":null,\"stoc…"
+    },
+    {
+      "surface": "ORDER FSM",
+      "attack": "buyer PATCH {amount_paid_cents: 12345}",
+      "identity": "buyer",
+      "result": "200 [{\"id\":\"be98836e-17a9-451a-b819-deaaa552bcbc\",\"created_at\":\"2026-08-29T15:35:12.73012+00:00\",\"product_id\":\"29dbf0f8-0206-4634-bfd2-6df722ebf8fd\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7…",
+      "impact": "PATCH persisted",
+      "severity": "info",
+      "evidence": "[{\"id\":\"be98836e-17a9-451a-b819-deaaa552bcbc\",\"created_at\":\"2026-08-29T15:35:12.73012+00:00\",\"product_id\":\"29dbf0f8-0206-4634-bfd2-6df722ebf8fd\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"price_total\":1.0,\"shipping_method\":\"hand\",\"payment_method\":\"Seguro Fleaber\",\"proof_url\":null,\"status\":\"reserva_pendente\",\"reservation_expires_at\":null,\"is_reservation\":true,\"completed_at\":\"2026-08-29T15:35:12.952303+00:00\",\"auto_feedback_processed_at\":null,\"returned_at\":null,\"wallet_release_processed_at\":null,\"wallet_refund_processed_at\":null,\"bundle_id\":null,\"quantity\":1,\"live_id\":null,\"live_item_id\":null,\"live_raffle_id\":null,\"stripe_checkout_session_id\":null,\"stripe_payment_intent_id\":null,\"stripe_refund_id\":null,\"stripe_refunded_at\":null,\"stoc…"
+    },
+    {
+      "surface": "ORDER FSM",
+      "attack": "buyer PATCH {stripe_payment_intent_id: pi_injected}",
+      "identity": "buyer",
+      "result": "200 [{\"id\":\"be98836e-17a9-451a-b819-deaaa552bcbc\",\"created_at\":\"2026-08-29T15:35:12.73012+00:00\",\"product_id\":\"29dbf0f8-0206-4634-bfd2-6df722ebf8fd\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7…",
+      "impact": "PATCH persisted",
+      "severity": "info",
+      "evidence": "[{\"id\":\"be98836e-17a9-451a-b819-deaaa552bcbc\",\"created_at\":\"2026-08-29T15:35:12.73012+00:00\",\"product_id\":\"29dbf0f8-0206-4634-bfd2-6df722ebf8fd\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"price_total\":1.0,\"shipping_method\":\"hand\",\"payment_method\":\"Seguro Fleaber\",\"proof_url\":null,\"status\":\"reserva_pendente\",\"reservation_expires_at\":null,\"is_reservation\":true,\"completed_at\":\"2026-08-29T15:35:12.952303+00:00\",\"auto_feedback_processed_at\":null,\"returned_at\":null,\"wallet_release_processed_at\":null,\"wallet_refund_processed_at\":null,\"bundle_id\":null,\"quantity\":1,\"live_id\":null,\"live_item_id\":null,\"live_raffle_id\":null,\"stripe_checkout_session_id\":null,\"stripe_payment_intent_id\":null,\"stripe_refund_id\":null,\"stripe_refunded_at\":null,\"stoc…"
+    },
+    {
+      "surface": "ORDER FSM",
+      "attack": "buyer PATCH {buyer_id: 980f4fa1-0004-42f9-abca-69f1a9c29588}",
+      "identity": "buyer",
+      "result": "200 [{\"id\":\"be98836e-17a9-451a-b819-deaaa552bcbc\",\"created_at\":\"2026-08-29T15:35:12.73012+00:00\",\"product_id\":\"29dbf0f8-0206-4634-bfd2-6df722ebf8fd\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7…",
+      "impact": "PATCH persisted",
+      "severity": "info",
+      "evidence": "[{\"id\":\"be98836e-17a9-451a-b819-deaaa552bcbc\",\"created_at\":\"2026-08-29T15:35:12.73012+00:00\",\"product_id\":\"29dbf0f8-0206-4634-bfd2-6df722ebf8fd\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"price_total\":1.0,\"shipping_method\":\"hand\",\"payment_method\":\"Seguro Fleaber\",\"proof_url\":null,\"status\":\"reserva_pendente\",\"reservation_expires_at\":null,\"is_reservation\":true,\"completed_at\":\"2026-08-29T15:35:12.952303+00:00\",\"auto_feedback_processed_at\":null,\"returned_at\":null,\"wallet_release_processed_at\":null,\"wallet_refund_processed_at\":null,\"bundle_id\":null,\"quantity\":1,\"live_id\":null,\"live_item_id\":null,\"live_raffle_id\":null,\"stripe_checkout_session_id\":null,\"stripe_payment_intent_id\":null,\"stripe_refund_id\":null,\"stripe_refunded_at\":null,\"stoc…"
+    },
+    {
+      "surface": "ORDER FSM",
+      "attack": "buyer PATCH {seller_id: bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96}",
+      "identity": "buyer",
+      "result": "200 [{\"id\":\"be98836e-17a9-451a-b819-deaaa552bcbc\",\"created_at\":\"2026-08-29T15:35:12.73012+00:00\",\"product_id\":\"29dbf0f8-0206-4634-bfd2-6df722ebf8fd\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7…",
+      "impact": "PATCH persisted",
+      "severity": "info",
+      "evidence": "[{\"id\":\"be98836e-17a9-451a-b819-deaaa552bcbc\",\"created_at\":\"2026-08-29T15:35:12.73012+00:00\",\"product_id\":\"29dbf0f8-0206-4634-bfd2-6df722ebf8fd\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"price_total\":1.0,\"shipping_method\":\"hand\",\"payment_method\":\"Seguro Fleaber\",\"proof_url\":null,\"status\":\"reserva_pendente\",\"reservation_expires_at\":null,\"is_reservation\":true,\"completed_at\":\"2026-08-29T15:35:12.952303+00:00\",\"auto_feedback_processed_at\":null,\"returned_at\":null,\"wallet_release_processed_at\":null,\"wallet_refund_processed_at\":null,\"bundle_id\":null,\"quantity\":1,\"live_id\":null,\"live_item_id\":null,\"live_raffle_id\":null,\"stripe_checkout_session_id\":null,\"stripe_payment_intent_id\":null,\"stripe_refund_id\":null,\"stripe_refunded_at\":null,\"stoc…"
+    },
+    {
+      "surface": "ORDER FSM",
+      "attack": "buyer PATCH {contract_unit_cents: 1}",
+      "identity": "buyer",
+      "result": "200 [{\"id\":\"be98836e-17a9-451a-b819-deaaa552bcbc\",\"created_at\":\"2026-08-29T15:35:12.73012+00:00\",\"product_id\":\"29dbf0f8-0206-4634-bfd2-6df722ebf8fd\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7…",
+      "impact": "PATCH persisted",
+      "severity": "info",
+      "evidence": "[{\"id\":\"be98836e-17a9-451a-b819-deaaa552bcbc\",\"created_at\":\"2026-08-29T15:35:12.73012+00:00\",\"product_id\":\"29dbf0f8-0206-4634-bfd2-6df722ebf8fd\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"price_total\":1.0,\"shipping_method\":\"hand\",\"payment_method\":\"Seguro Fleaber\",\"proof_url\":null,\"status\":\"reserva_pendente\",\"reservation_expires_at\":null,\"is_reservation\":true,\"completed_at\":\"2026-08-29T15:35:12.952303+00:00\",\"auto_feedback_processed_at\":null,\"returned_at\":null,\"wallet_release_processed_at\":null,\"wallet_refund_processed_at\":null,\"bundle_id\":null,\"quantity\":1,\"live_id\":null,\"live_item_id\":null,\"live_raffle_id\":null,\"stripe_checkout_session_id\":null,\"stripe_payment_intent_id\":null,\"stripe_refund_id\":null,\"stripe_refunded_at\":null,\"stoc…"
+    },
+    {
+      "surface": "ORDER FSM",
+      "attack": "buyer PATCH {contract_qty: 99}",
+      "identity": "buyer",
+      "result": "200 [{\"id\":\"be98836e-17a9-451a-b819-deaaa552bcbc\",\"created_at\":\"2026-08-29T15:35:12.73012+00:00\",\"product_id\":\"29dbf0f8-0206-4634-bfd2-6df722ebf8fd\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7…",
+      "impact": "PATCH persisted",
+      "severity": "info",
+      "evidence": "[{\"id\":\"be98836e-17a9-451a-b819-deaaa552bcbc\",\"created_at\":\"2026-08-29T15:35:12.73012+00:00\",\"product_id\":\"29dbf0f8-0206-4634-bfd2-6df722ebf8fd\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"price_total\":1.0,\"shipping_method\":\"hand\",\"payment_method\":\"Seguro Fleaber\",\"proof_url\":null,\"status\":\"reserva_pendente\",\"reservation_expires_at\":null,\"is_reservation\":true,\"completed_at\":\"2026-08-29T15:35:12.952303+00:00\",\"auto_feedback_processed_at\":null,\"returned_at\":null,\"wallet_release_processed_at\":null,\"wallet_refund_processed_at\":null,\"bundle_id\":null,\"quantity\":1,\"live_id\":null,\"live_item_id\":null,\"live_raffle_id\":null,\"stripe_checkout_session_id\":null,\"stripe_payment_intent_id\":null,\"stripe_refund_id\":null,\"stripe_refunded_at\":null,\"stoc…"
+    },
+    {
+      "surface": "ORDER FSM",
+      "attack": "final row after buyer patches",
+      "identity": "service_observe",
+      "result": "[{\"id\":\"be98836e-17a9-451a-b819-deaaa552bcbc\",\"status\":\"reserva_pendente\",\"price_total\":1.0,\"quantity\":1,\"amount_paid_cents\":null,\"stripe_payment_intent_id\":null,\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"contract_unit_cents\":2500,\"contract_qty\":1}]",
+      "impact": "authoritative state",
+      "severity": "info",
+      "evidence": "[{\"id\":\"be98836e-17a9-451a-b819-deaaa552bcbc\",\"status\":\"reserva_pendente\",\"price_total\":1.0,\"quantity\":1,\"amount_paid_cents\":null,\"stripe_payment_intent_id\":null,\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"contract_unit_cents\":2500,\"contract_qty\":1}]"
+    },
+    {
+      "surface": "ORDER FSM",
+      "attack": "seller PATCH {status: pago}",
+      "identity": "seller",
+      "result": "200 [{\"id\":\"be98836e-17a9-451a-b819-deaaa552bcbc\",\"created_at\":\"2026-08-29T15:35:12.73012+00:00\",\"product_id\":\"29dbf0f8-0206-4634-bfd2-6df722ebf8fd\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7…",
+      "impact": "seller write",
+      "severity": "info",
+      "evidence": "[{\"id\":\"be98836e-17a9-451a-b819-deaaa552bcbc\",\"created_at\":\"2026-08-29T15:35:12.73012+00:00\",\"product_id\":\"29dbf0f8-0206-4634-bfd2-6df722ebf8fd\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"price_total\":1.0,\"shipping_method\":\"hand\",\"payment_method\":\"Seguro Fleaber\",\"proof_url\":null,\"status\":\"reserva_pendente\",\"reservation_expires_at\":null,\"is_reservation\":true,\"completed_at\":\"2026-08-29T15:35:12.952303+00:00\",\"auto_feedback_processed_at\":null,\"returned_at\":null,\"wallet_release_processed_at\":null,\"wallet_refund_processed_at\":null,\"bundle_id\":null,\"quantity\":1,\"live_id\":null,\"live_item_id\":null,\"live_raffle_id\":null,\"stripe_checkout_session_id\":null,\"stripe_payment_intent_id\":null,\"stripe_refund_id\":null,\"stripe_refunded_at\":null,\"stoc…"
+    },
+    {
+      "surface": "ORDER FSM",
+      "attack": "seller PATCH {status: cancelado}",
+      "identity": "seller",
+      "result": "200 [{\"id\":\"be98836e-17a9-451a-b819-deaaa552bcbc\",\"created_at\":\"2026-08-29T15:35:12.73012+00:00\",\"product_id\":\"29dbf0f8-0206-4634-bfd2-6df722ebf8fd\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7…",
+      "impact": "seller write",
+      "severity": "info",
+      "evidence": "[{\"id\":\"be98836e-17a9-451a-b819-deaaa552bcbc\",\"created_at\":\"2026-08-29T15:35:12.73012+00:00\",\"product_id\":\"29dbf0f8-0206-4634-bfd2-6df722ebf8fd\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"price_total\":1.0,\"shipping_method\":\"hand\",\"payment_method\":\"Seguro Fleaber\",\"proof_url\":null,\"status\":\"cancelado\",\"reservation_expires_at\":null,\"is_reservation\":true,\"completed_at\":\"2026-08-29T15:35:12.952303+00:00\",\"auto_feedback_processed_at\":null,\"returned_at\":null,\"wallet_release_processed_at\":null,\"wallet_refund_processed_at\":null,\"bundle_id\":null,\"quantity\":1,\"live_id\":null,\"live_item_id\":null,\"live_raffle_id\":null,\"stripe_checkout_session_id\":null,\"stripe_payment_intent_id\":null,\"stripe_refund_id\":null,\"stripe_refunded_at\":null,\"stock_units…"
+    },
+    {
+      "surface": "ORDER FSM",
+      "attack": "seller PATCH {price_total: 0.01}",
+      "identity": "seller",
+      "result": "200 [{\"id\":\"be98836e-17a9-451a-b819-deaaa552bcbc\",\"created_at\":\"2026-08-29T15:35:12.73012+00:00\",\"product_id\":\"29dbf0f8-0206-4634-bfd2-6df722ebf8fd\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7…",
+      "impact": "seller write",
+      "severity": "info",
+      "evidence": "[{\"id\":\"be98836e-17a9-451a-b819-deaaa552bcbc\",\"created_at\":\"2026-08-29T15:35:12.73012+00:00\",\"product_id\":\"29dbf0f8-0206-4634-bfd2-6df722ebf8fd\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"price_total\":1.0,\"shipping_method\":\"hand\",\"payment_method\":\"Seguro Fleaber\",\"proof_url\":null,\"status\":\"cancelado\",\"reservation_expires_at\":null,\"is_reservation\":true,\"completed_at\":\"2026-08-29T15:35:12.952303+00:00\",\"auto_feedback_processed_at\":null,\"returned_at\":null,\"wallet_release_processed_at\":\"2026-08-29T15:35:14.196757+00:00\",\"wallet_refund_processed_at\":\"2026-08-29T15:35:14.196757+00:00\",\"bundle_id\":null,\"quantity\":1,\"live_id\":null,\"live_item_id\":null,\"live_raffle_id\":null,\"stripe_checkout_session_id\":null,\"stripe_payment_intent_id\":null,\"s…"
+    },
+    {
+      "surface": "ORDER FSM",
+      "attack": "seller PATCH {amount_paid_cents: 8888}",
+      "identity": "seller",
+      "result": "200 [{\"id\":\"be98836e-17a9-451a-b819-deaaa552bcbc\",\"created_at\":\"2026-08-29T15:35:12.73012+00:00\",\"product_id\":\"29dbf0f8-0206-4634-bfd2-6df722ebf8fd\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7…",
+      "impact": "seller write",
+      "severity": "info",
+      "evidence": "[{\"id\":\"be98836e-17a9-451a-b819-deaaa552bcbc\",\"created_at\":\"2026-08-29T15:35:12.73012+00:00\",\"product_id\":\"29dbf0f8-0206-4634-bfd2-6df722ebf8fd\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"price_total\":1.0,\"shipping_method\":\"hand\",\"payment_method\":\"Seguro Fleaber\",\"proof_url\":null,\"status\":\"cancelado\",\"reservation_expires_at\":null,\"is_reservation\":true,\"completed_at\":\"2026-08-29T15:35:12.952303+00:00\",\"auto_feedback_processed_at\":null,\"returned_at\":null,\"wallet_release_processed_at\":\"2026-08-29T15:35:14.196757+00:00\",\"wallet_refund_processed_at\":\"2026-08-29T15:35:14.196757+00:00\",\"bundle_id\":null,\"quantity\":1,\"live_id\":null,\"live_item_id\":null,\"live_raffle_id\":null,\"stripe_checkout_session_id\":null,\"stripe_payment_intent_id\":null,\"s…"
+    },
+    {
+      "surface": "CHECKOUT",
+      "attack": "create-payment-intent amount=50c vs product 25€",
+      "identity": "buyer",
+      "result": "400 {\"error\":\"Checkout blocked: order status 'cancelado' cannot start payment.\"}",
+      "impact": "compare server_amount_cents",
+      "severity": "info",
+      "evidence": "{\"error\":\"Checkout blocked: order status 'cancelado' cannot start payment.\"}"
+    },
+    {
+      "surface": "CHECKOUT",
+      "attack": "create-payment-intent qty=99 in body",
+      "identity": "buyer",
+      "result": "400 {\"error\":\"Checkout blocked: order status 'cancelado' cannot start payment.\"}",
+      "impact": "qty from body must not win",
+      "severity": "info",
+      "evidence": "{\"error\":\"Checkout blocked: order status 'cancelado' cannot start payment.\"}"
+    },
+    {
+      "surface": "CHECKOUT",
+      "attack": "prize_shipping=true on non-raffle order",
+      "identity": "buyer",
+      "result": "400 {\"error\":\"Checkout blocked: order status 'cancelado' cannot start payment.\"}",
+      "impact": "blocked",
+      "severity": "info",
+      "evidence": "{\"error\":\"Checkout blocked: order status 'cancelado' cannot start payment.\"}"
+    },
+    {
+      "surface": "CHECKOUT",
+      "attack": "fresh JWT checkout foreign order claiming self as buyer_id",
+      "identity": "fresh",
+      "result": "400 {\"error\":\"Checkout blocked: order does not belong to buyer.\"}",
+      "impact": "blocked",
+      "severity": "info",
+      "evidence": "{\"error\":\"Checkout blocked: order does not belong to buyer.\"}"
+    },
+    {
+      "surface": "CHECKOUT",
+      "attack": "anon create-payment-intent",
+      "identity": "anon",
+      "result": "400 {\"error\":\"Invalid checkout user.\"}",
+      "impact": "blocked",
+      "severity": "info",
+      "evidence": "{\"error\":\"Invalid checkout user.\"}"
+    },
+    {
+      "surface": "CHECKOUT",
+      "attack": "seller JWT pay buyer order as self",
+      "identity": "seller",
+      "result": "400 {\"error\":\"Checkout blocked: order does not belong to buyer.\"}",
+      "impact": "party swap",
+      "severity": "info",
+      "evidence": "{\"error\":\"Checkout blocked: order does not belong to buyer.\"}"
+    },
+    {
+      "surface": "CHECKOUT",
+      "attack": "fase2_e2e_settle as buyer JWT",
+      "identity": "buyer",
+      "result": "401 {\"ok\":false,\"error\":\"service_role required\"}",
+      "impact": "blocked",
+      "severity": "info",
+      "evidence": "{\"ok\":false,\"error\":\"service_role required\"}"
+    },
+    {
+      "surface": "CATALOG",
+      "attack": "seller drop price 25→1 after order",
+      "identity": "seller",
+      "result": "200 [{\"id\":\"29dbf0f8-0206-4634-bfd2-6df722ebf8fd\",\"created_at\":\"2026-08-29T15:35:12.2577+00:00\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"title\":\"RTF-BLIND-1788017673584\",\"pr…",
+      "impact": "catalog change",
+      "severity": "info",
+      "evidence": "[{\"id\":\"29dbf0f8-0206-4634-bfd2-6df722ebf8fd\",\"created_at\":\"2026-08-29T15:35:12.2577+00:00\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"title\":\"RTF-BLIND-1788017673584\",\"price\":1.0,\"ref_code\":null,\"category\":null,\"clothing_size\":null,\"gender\":null,\"description\":null,\"state\":null,\"image_urls\":null,\"list_on_marketplace\":true,\"available_for_live\":false,\"is_sold\":false,\"favorites_count\":0,\"quantity\":1}]"
+    },
+    {
+      "surface": "REVIEWS",
+      "attack": "INSERT review without order_id",
+      "identity": "buyer",
+      "result": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"review_order_required\"}",
+      "impact": "blocked",
+      "severity": "info",
+      "evidence": "{\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"review_order_required\"}"
+    },
+    {
+      "surface": "REVIEWS",
+      "attack": "buyer INSERT as author_role=vendedor buyer_id=seller",
+      "identity": "buyer",
+      "result": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"review_order_required\"}",
+      "impact": "blocked",
+      "severity": "info",
+      "evidence": "{\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"review_order_required\"}"
+    },
+    {
+      "surface": "AUTH/PROFILES",
+      "attack": "PATCH user_type=admin",
+      "identity": "buyer",
+      "result": "400 {\"code\":\"PGRST204\",\"details\":null,\"hint\":null,\"message\":\"Could not find the 'is_admin' column of 'profiles' in the schema cache\"}",
+      "impact": "privilege escalation attempt",
+      "severity": "info",
+      "evidence": "{\"code\":\"PGRST204\",\"details\":null,\"hint\":null,\"message\":\"Could not find the 'is_admin' column of 'profiles' in the schema cache\"}"
+    },
+    {
+      "surface": "RPC",
+      "attack": "batata_admin_list_profiles as buyer",
+      "identity": "buyer",
+      "result": "400 {\"code\":\"P0001\",\"details\":null,\"hint\":null,\"message\":\"Acesso negado.\"}",
+      "impact": "blocked",
+      "severity": "info",
+      "evidence": "{\"code\":\"P0001\",\"details\":null,\"hint\":null,\"message\":\"Acesso negado.\"}"
+    },
+    {
+      "surface": "RPC",
+      "attack": "batata_ensure_wallet {p_user_id: 980f4fa1-0004-42f9-abca-69f1a9c29588}",
+      "identity": "buyer",
+      "result": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_ensure_wallet\"}",
+      "impact": "denied_or_errored",
+      "severity": "info",
+      "evidence": "{\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_ensure_wallet\"}"
+    },
+    {
+      "surface": "RPC",
+      "attack": "batata_release_seller_wallet_for_order {p_order_id: 00000000-0000-0000-0000-000000000001}",
+      "identity": "buyer",
+      "result": "200 false",
+      "impact": "EXECUTE permitted",
+      "severity": "info",
+      "evidence": "false"
+    },
+    {
+      "surface": "RPC",
+      "attack": "batata_refund_buyer_wallet_for_order {p_order_id: 00000000-0000-0000-0000-000000000001}",
+      "identity": "buyer",
+      "result": "200 false",
+      "impact": "EXECUTE permitted",
+      "severity": "info",
+      "evidence": "false"
+    },
+    {
+      "surface": "RPC",
+      "attack": "batata_send_live_tip_from_wallet {p_live_id: null, p_seller_id: 980f4fa1-0004-42f9-abca-69f1a9c29588, p_amount: 1, p_message: rtf}",
+      "identity": "buyer",
+      "result": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"not_allowed\"}",
+      "impact": "denied_or_errored",
+      "severity": "info",
+      "evidence": "{\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"not_allowed\"}"
+    },
+    {
+      "surface": "RPC",
+      "attack": "batata_process_partial_refund_dispute {p_order_id: 00000000-0000-0000-0000-000000000001, p_refund_percent: 100}",
+      "identity": "buyer",
+      "result": "200 false",
+      "impact": "EXECUTE permitted",
+      "severity": "info",
+      "evidence": "false"
+    },
+    {
+      "surface": "RPC",
+      "attack": "batata_wallet_payout_debit {p_user_id: bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96, p_amount_cents: 1, p_idempotency_key: rtf_1788017673584}",
+      "identity": "buyer",
+      "result": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_wallet_payout_debit\"}",
+      "impact": "denied_or_errored",
+      "severity": "info",
+      "evidence": "{\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_wallet_payout_debit\"}"
+    },
+    {
+      "surface": "RPC",
+      "attack": "batata_wallet_payout_finish {p_idempotency_key: rtf_1788017673584, p_stripe_transfer_id: tr_fake, p_failed: false}",
+      "identity": "buyer",
+      "result": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_wallet_payout_finish\"}",
+      "impact": "denied_or_errored",
+      "severity": "info",
+      "evidence": "{\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_wallet_payout_finish\"}"
+    },
+    {
+      "surface": "RPC",
+      "attack": "batata_finalize_stripe_order_refund {p_order_id: 00000000-0000-0000-0000-000000000001, p_refund_id: re_fake, p_payment_intent_id: pi_fake, p_session_id: cs_fake, p_amount_cents: 100}",
+      "identity": "buyer",
+      "result": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_finalize_stripe_order_refund\"}",
+      "impact": "denied_or_errored",
+      "severity": "info",
+      "evidence": "{\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_finalize_stripe_order_refund\"}"
+    },
+    {
+      "surface": "RPC",
+      "attack": "batata_settle_live_tip_from_stripe {p_tip_id: 00000000-0000-0000-0000-000000000001, p_stripe_session_id: cs_test, p_paid_amount_cents: 100}",
+      "identity": "buyer",
+      "result": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_settle_live_tip_from_stripe\"}",
+      "impact": "denied_or_errored",
+      "severity": "info",
+      "evidence": "{\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_settle_live_tip_from_stripe\"}"
+    },
+    {
+      "surface": "RPC",
+      "attack": "batata_create_live_tip_pending {p_live_id: null, p_seller_id: 980f4fa1-0004-42f9-abca-69f1a9c29588, p_amount: 1, p_message: x}",
+      "identity": "buyer",
+      "result": "200 \"9dfd5fea-4cd3-40d8-8ab2-4653b318e759\"",
+      "impact": "EXECUTE permitted",
+      "severity": "info",
+      "evidence": "\"9dfd5fea-4cd3-40d8-8ab2-4653b318e759\""
+    },
+    {
+      "surface": "RPC",
+      "attack": "batata_live_reservation_stripe_convert {p_request_id: 00000000-0000-0000-0000-000000000001, p_order_id: 00000000-0000-0000-0000-000000000001}",
+      "identity": "buyer",
+      "result": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_live_reservation_stripe_convert\"}",
+      "impact": "denied_or_errored",
+      "severity": "info",
+      "evidence": "{\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_live_reservation_stripe_convert\"}"
+    },
+    {
+      "surface": "RPC",
+      "attack": "exec_sql {query: select 1}",
+      "identity": "buyer",
+      "result": "404 {\"code\":\"PGRST202\",\"details\":\"Searched for the function public.exec_sql with parameter query or with a single unnamed json/jsonb parameter, but no matches were found in the schema cache.\",\"hint\":null,\"message\":\"Could not…",
+      "impact": "denied_or_errored",
+      "severity": "info",
+      "evidence": "{\"code\":\"PGRST202\",\"details\":\"Searched for the function public.exec_sql with parameter query or with a single unnamed json/jsonb parameter, but no matches were found in the schema cache.\",\"hint\":null,\"message\":\"Could not find the function public.exec_sql(query) in the schema cache\"}"
+    },
+    {
+      "surface": "RPC",
+      "attack": "sql {q: select 1}",
+      "identity": "buyer",
+      "result": "404 {\"code\":\"PGRST202\",\"details\":\"Searched for the function public.sql with parameter q or with a single unnamed json/jsonb parameter, but no matches were found in the schema cache.\",\"hint\":null,\"message\":\"Could not find the…",
+      "impact": "denied_or_errored",
+      "severity": "info",
+      "evidence": "{\"code\":\"PGRST202\",\"details\":\"Searched for the function public.sql with parameter q or with a single unnamed json/jsonb parameter, but no matches were found in the schema cache.\",\"hint\":null,\"message\":\"Could not find the function public.sql(q) in the schema cache\"}"
+    },
+    {
+      "surface": "EDGE/stripe-webhook",
+      "attack": "POST hostile minimal body",
+      "identity": "buyer",
+      "result": "400 {\"ok\":false,\"error\":\"missing_signature\"}",
+      "impact": "rejected_or_auth",
+      "severity": "info",
+      "evidence": "{\"ok\":false,\"error\":\"missing_signature\"}"
+    },
+    {
+      "surface": "EDGE/refund-order",
+      "attack": "POST hostile minimal body",
+      "identity": "buyer",
+      "result": "404 {\"ok\":false,\"error\":\"Encomenda não encontrada.\"}",
+      "impact": "rejected_or_auth",
+      "severity": "info",
+      "evidence": "{\"ok\":false,\"error\":\"Encomenda não encontrada.\"}"
+    },
+    {
+      "surface": "EDGE/create-live-tip-checkout",
+      "attack": "POST hostile minimal body",
+      "identity": "buyer",
+      "result": "400 {\"error\":\"Missing seller_id.\"}",
+      "impact": "rejected_or_auth",
+      "severity": "info",
+      "evidence": "{\"error\":\"Missing seller_id.\"}"
+    },
+    {
+      "surface": "EDGE/create-connect-account",
+      "attack": "POST hostile minimal body",
+      "identity": "buyer",
+      "result": "400 {\"error\":\"idempotency_key em falta. Reinicia o levantamento na app.\",\"code\":\"payout_failed\"}",
+      "impact": "rejected_or_auth",
+      "severity": "info",
+      "evidence": "{\"error\":\"idempotency_key em falta. Reinicia o levantamento na app.\",\"code\":\"payout_failed\"}"
+    },
+    {
+      "surface": "EDGE/create-mux-live",
+      "attack": "POST hostile minimal body",
+      "identity": "buyer",
+      "result": "400 {\"error\":\"O título do direto é obrigatório.\",\"step\":\"validation\"}",
+      "impact": "rejected_or_auth",
+      "severity": "info",
+      "evidence": "{\"error\":\"O título do direto é obrigatório.\",\"step\":\"validation\"}"
+    },
+    {
+      "surface": "EDGE/complete-mux-live",
+      "attack": "POST hostile minimal body",
+      "identity": "buyer",
+      "result": "400 {\"error\":\"live_id é obrigatório.\",\"step\":\"validation\"}",
+      "impact": "rejected_or_auth",
+      "severity": "info",
+      "evidence": "{\"error\":\"live_id é obrigatório.\",\"step\":\"validation\"}"
+    },
+    {
+      "surface": "EDGE/livekit-mux-publish",
+      "attack": "POST hostile minimal body",
+      "identity": "buyer",
+      "result": "400 {\"error\":\"live_id é obrigatório.\",\"step\":\"validation\"}",
+      "impact": "rejected_or_auth",
+      "severity": "info",
+      "evidence": "{\"error\":\"live_id é obrigatório.\",\"step\":\"validation\"}"
+    },
+    {
+      "surface": "EDGE/livekit-egress-cleanup",
+      "attack": "POST hostile minimal body",
+      "identity": "buyer",
+      "result": "401 {\"error\":\"Unauthorized.\"}",
+      "impact": "rejected_or_auth",
+      "severity": "info",
+      "evidence": "{\"error\":\"Unauthorized.\"}"
+    },
+    {
+      "surface": "EDGE/ingest-ocr-reservation",
+      "attack": "POST hostile minimal body",
+      "identity": "buyer",
+      "result": "401 {\"ok\":false,\"error\":\"missing_device_token\"}",
+      "impact": "rejected_or_auth",
+      "severity": "info",
+      "evidence": "{\"ok\":false,\"error\":\"missing_device_token\"}"
+    },
+    {
+      "surface": "EDGE/ps-pairing-claim",
+      "attack": "POST hostile minimal body",
+      "identity": "buyer",
+      "result": "400 {\"ok\":false,\"error\":\"invalid_code\"}",
+      "impact": "rejected_or_auth",
+      "severity": "info",
+      "evidence": "{\"ok\":false,\"error\":\"invalid_code\"}"
+    },
+    {
+      "surface": "EDGE/ps-heartbeat",
+      "attack": "POST hostile minimal body",
+      "identity": "buyer",
+      "result": "401 {\"ok\":false,\"error\":\"missing_device_token\"}",
+      "impact": "rejected_or_auth",
+      "severity": "info",
+      "evidence": "{\"ok\":false,\"error\":\"missing_device_token\"}"
+    },
+    {
+      "surface": "EDGE/ps-panel-log",
+      "attack": "POST hostile minimal body",
+      "identity": "buyer",
+      "result": "401 {\"ok\":false,\"error\":\"missing_device_token\"}",
+      "impact": "rejected_or_auth",
+      "severity": "info",
+      "evidence": "{\"ok\":false,\"error\":\"missing_device_token\"}"
+    },
+    {
+      "surface": "EDGE/delete-test-account",
+      "attack": "POST hostile minimal body",
+      "identity": "buyer",
+      "result": "403 {\"ok\":false,\"error\":\"Nuke bloqueado: define TEST_NUKE_ALLOWLIST_USER_IDS (UUIDs) no staging.\"}",
+      "impact": "rejected_or_auth",
+      "severity": "info",
+      "evidence": "{\"ok\":false,\"error\":\"Nuke bloqueado: define TEST_NUKE_ALLOWLIST_USER_IDS (UUIDs) no staging.\"}"
+    },
+    {
+      "surface": "EDGE/meta-data-deletion",
+      "attack": "POST hostile minimal body",
+      "identity": "buyer",
+      "result": "400 {\"error\":\"Missing signed_request\"}",
+      "impact": "rejected_or_auth",
+      "severity": "info",
+      "evidence": "{\"error\":\"Missing signed_request\"}"
+    },
+    {
+      "surface": "EDGE/sec-fase2-e2e-oversell",
+      "attack": "POST hostile minimal body",
+      "identity": "buyer",
+      "result": "401 {\n  \"ok\": false,\n  \"error\": \"Só service_role\"\n}",
+      "impact": "rejected_or_auth",
+      "severity": "info",
+      "evidence": "{\n  \"ok\": false,\n  \"error\": \"Só service_role\"\n}"
+    },
+    {
+      "surface": "EDGE/send-sms-bulkgate",
+      "attack": "POST hostile minimal body",
+      "identity": "buyer",
+      "result": "200 {\"error\":{\"http_code\":500,\"message\":\"Hook failed: Missing required headers\"}}",
+      "impact": "accepted",
+      "severity": "info",
+      "evidence": "{\"error\":{\"http_code\":500,\"message\":\"Hook failed: Missing required headers\"}}"
+    },
+    {
+      "surface": "EDGE/resolve-mux-playback",
+      "attack": "POST hostile minimal body",
+      "identity": "buyer",
+      "result": "400 {\"error\":\"live_id obrigatório.\"}",
+      "impact": "rejected_or_auth",
+      "severity": "info",
+      "evidence": "{\"error\":\"live_id obrigatório.\"}"
+    },
+    {
+      "surface": "WEBHOOK",
+      "attack": "POST without stripe-signature",
+      "identity": "anon",
+      "result": "400 {\"ok\":false,\"error\":\"missing_signature\"}",
+      "impact": "blocked",
+      "severity": "info",
+      "evidence": "{\"ok\":false,\"error\":\"missing_signature\"}"
+    },
+    {
+      "surface": "PS/OCR",
+      "attack": "ingest with fake device token",
+      "identity": "anon+header",
+      "result": "401 {\"ok\":false,\"error\":\"invalid_token\"}",
+      "impact": "blocked",
+      "severity": "info",
+      "evidence": "{\"ok\":false,\"error\":\"invalid_token\"}"
+    },
+    {
+      "surface": "PS/OCR",
+      "attack": "claim pairing code 000000",
+      "identity": "anon",
+      "result": "400 {\"ok\":false,\"error\":\"invalid_or_expired_code\"}",
+      "impact": "blocked",
+      "severity": "info",
+      "evidence": "{\"ok\":false,\"error\":\"invalid_or_expired_code\"}"
+    },
+    {
+      "surface": "TIPS",
+      "attack": "client tip_id + amount 1",
+      "identity": "buyer",
+      "result": "400 {\"error\":\"Client tip_id is not allowed.\"}",
+      "impact": "tip_id must be rejected",
+      "severity": "info",
+      "evidence": "{\"error\":\"Client tip_id is not allowed.\"}"
+    },
+    {
+      "surface": "REFUNDS",
+      "attack": "buyer refund-order",
+      "identity": "buyer",
+      "result": "403 {\"ok\":false,\"error\":\"Sem permissão.\"}",
+      "impact": "seller-only expected",
+      "severity": "info",
+      "evidence": "{\"ok\":false,\"error\":\"Sem permissão.\"}"
+    },
+    {
+      "surface": "CHAT",
+      "attack": "SELECT chats",
+      "identity": "buyer",
+      "result": "200 n=20",
+      "impact": "scope of chat list",
+      "severity": "info",
+      "evidence": "[{\"id\":\"ac2902d3-a3ca-4f82-b7de-2532db9cafba\",\"user_a\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"user_b\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"product_id\":\"19a9c25c-4d83-42e1-9451-54eb4c005425\",\"last_message\":\"CEGA-PRIO ping 1787850032788\"}, \n {\"id\":\"401b48f1-7d00-4293-ab98-55fdf2135cf7\",\"user_a\":\"b…"
+    },
+    {
+      "surface": "CHAT",
+      "attack": "filter foreign chats in SELECT result",
+      "identity": "buyer",
+      "result": "foreign=0",
+      "impact": "own only",
+      "severity": "info",
+      "evidence": "[]"
+    },
+    {
+      "surface": "CHAT",
+      "attack": "SELECT chat_messages unlimited",
+      "identity": "buyer",
+      "result": "200 n=3",
+      "impact": "message leakage?",
+      "severity": "info",
+      "evidence": "[{\"id\":792,\"chat_id\":\"e083fd44-f8e0-4c9d-a64d-71f96fcef4cf\",\"sender_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"receiver_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"FLEABER_JSON_V1:{\\\"v\\\": 1, \\\"kind\\\": \\\"auto_feedback_generated\\\", \\\"message\\\":…"
+    },
+    {
+      "surface": "STORAGE",
+      "attack": "list buckets",
+      "identity": "buyer",
+      "result": "200 []",
+      "impact": "bucket inventory",
+      "severity": "info",
+      "evidence": "[]"
+    },
+    {
+      "surface": "STORAGE",
+      "attack": "list chat_media prefix empty",
+      "identity": "buyer",
+      "result": "200 [{\"name\":\"live_item_photos\",\"id\":null,\"updated_at\":null,\"created_at\":null,\"last_accessed_at\":null,\"metadata\":null},{\"name\":\"live_raffle_prize\",\"id\":null,\"updated_at\":null,\"created_at\":null,\"last_acces…",
+      "impact": "listing",
+      "severity": "info",
+      "evidence": "[{\"name\":\"live_item_photos\",\"id\":null,\"updated_at\":null,\"created_at\":null,\"last_accessed_at\":null,\"metadata\":null},{\"name\":\"live_raffle_prize\",\"id\":null,\"updated_at\":null,\"created_at\":null,\"last_accessed_at\":null,\"metadata\":null},{\"name\":\"product_photos\",\"id\":null,\"updated_at\":null,\"created_at\":null,\"last_accessed_at\":null,\"metadata\":null},{\"name\":\"profile_photos\",\"id\":null,\"updated_at\":null,\"created_at\":null,\"last_accessed_at\":null,\"metadata\":null}]"
+    },
+    {
+      "surface": "STORAGE",
+      "attack": "list product_photos prefix empty",
+      "identity": "buyer",
+      "result": "200 []",
+      "impact": "listing",
+      "severity": "info",
+      "evidence": "[]"
+    },
+    {
+      "surface": "STORAGE",
+      "attack": "list avatars prefix empty",
+      "identity": "buyer",
+      "result": "200 []",
+      "impact": "listing",
+      "severity": "info",
+      "evidence": "[]"
+    },
+    {
+      "surface": "STORAGE",
+      "attack": "list proofs prefix empty",
+      "identity": "buyer",
+      "result": "200 []",
+      "impact": "listing",
+      "severity": "info",
+      "evidence": "[]"
+    },
+    {
+      "surface": "STORAGE",
+      "attack": "list disputes prefix empty",
+      "identity": "buyer",
+      "result": "200 []",
+      "impact": "listing",
+      "severity": "info",
+      "evidence": "[]"
+    },
+    {
+      "surface": "DISPUTES",
+      "attack": "INSERT dispute fake order",
+      "identity": "buyer",
+      "result": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"new row violates row-level security policy for table \\\"order_disputes\\\"\"}",
+      "impact": "orphan dispute",
+      "severity": "info",
+      "evidence": "{\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"new row violates row-level security policy for table \\\"order_disputes\\\"\"}"
+    },
+    {
+      "surface": "OFFERS",
+      "attack": "INSERT offer status=accepted price=0.01",
+      "identity": "buyer",
+      "result": "400 {\"code\":\"PGRST204\",\"details\":null,\"hint\":null,\"message\":\"Could not find the 'offered_price' column of 'product_offers' in the schema cache\"}",
+      "impact": "blocked",
+      "severity": "info",
+      "evidence": "{\"code\":\"PGRST204\",\"details\":null,\"hint\":null,\"message\":\"Could not find the 'offered_price' column of 'product_offers' in the schema cache\"}"
+    },
+    {
+      "surface": "BUNDLES",
+      "attack": "buyer INSERT 90% discount on seller",
+      "identity": "buyer",
+      "result": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"new row violates row-level security policy for table \\\"seller_bundle_discounts\\\"\"}",
+      "impact": "blocked",
+      "severity": "info",
+      "evidence": "{\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"new row violates row-level security policy for table \\\"seller_bundle_discounts\\\"\"}"
+    },
+    {
+      "surface": "PAYOUT/BANK",
+      "attack": "SELECT seller_payout_details",
+      "identity": "buyer",
+      "result": "404 {\"code\":\"PGRST205\",\"details\":null,\"hint\":\"Perhaps you meant the table 'public.wallet_payout_ledger'\",\"message\":\"Could not find the table 'public.seller_payout_details' in the schem…",
+      "impact": "empty_or_missing",
+      "severity": "info",
+      "evidence": "{\"code\":\"PGRST205\",\"details\":null,\"hint\":\"Perhaps you meant the table 'public.wallet_payout_ledger'\",\"message\":\"Could not find the table 'public.seller_payout_details' in the schema cache\"}"
+    },
+    {
+      "surface": "PAYOUT/BANK",
+      "attack": "SELECT banking_details",
+      "identity": "buyer",
+      "result": "404 {\"code\":\"PGRST205\",\"details\":null,\"hint\":\"Perhaps you meant the table 'public.ps_pairing_sessions'\",\"message\":\"Could not find the table 'public.banking_details' in the schema cache…",
+      "impact": "empty_or_missing",
+      "severity": "info",
+      "evidence": "{\"code\":\"PGRST205\",\"details\":null,\"hint\":\"Perhaps you meant the table 'public.ps_pairing_sessions'\",\"message\":\"Could not find the table 'public.banking_details' in the schema cache\"}"
+    },
+    {
+      "surface": "PAYOUT/BANK",
+      "attack": "SELECT user_banking_details",
+      "identity": "buyer",
+      "result": "404 {\"code\":\"PGRST205\",\"details\":null,\"hint\":\"Perhaps you meant the table 'public.ps_pairing_sessions'\",\"message\":\"Could not find the table 'public.user_banking_details' in the schema …",
+      "impact": "empty_or_missing",
+      "severity": "info",
+      "evidence": "{\"code\":\"PGRST205\",\"details\":null,\"hint\":\"Perhaps you meant the table 'public.ps_pairing_sessions'\",\"message\":\"Could not find the table 'public.user_banking_details' in the schema cache\"}"
+    },
+    {
+      "surface": "PAYOUT/BANK",
+      "attack": "SELECT payout_details",
+      "identity": "buyer",
+      "result": "404 {\"code\":\"PGRST205\",\"details\":null,\"hint\":\"Perhaps you meant the table 'public.wallet_payout_ledger'\",\"message\":\"Could not find the table 'public.payout_details' in the schema cache…",
+      "impact": "empty_or_missing",
+      "severity": "info",
+      "evidence": "{\"code\":\"PGRST205\",\"details\":null,\"hint\":\"Perhaps you meant the table 'public.wallet_payout_ledger'\",\"message\":\"Could not find the table 'public.payout_details' in the schema cache\"}"
+    },
+    {
+      "surface": "GRAPHQL",
+      "attack": "introspection",
+      "identity": "buyer",
+      "result": "200 {\"errors\": [{\"message\": \"pg_graphql extension is not enabled.\"}]}",
+      "impact": "graphql on",
+      "severity": "info",
+      "evidence": "{\"errors\": [{\"message\": \"pg_graphql extension is not enabled.\"}]}"
+    },
+    {
+      "surface": "LEDGER",
+      "attack": "release wallet on unpaid/hostile order",
+      "identity": "buyer",
+      "result": "200 false",
+      "impact": "no mint or error",
+      "severity": "info",
+      "evidence": "false"
+    },
+    {
+      "surface": "LEDGER",
+      "attack": "refund wallet RPC on lab order",
+      "identity": "buyer",
+      "result": "200 false",
+      "impact": "no mint or error",
+      "severity": "info",
+      "evidence": "false"
+    },
+    {
+      "surface": "REFUNDS",
+      "attack": "partial refund RPC 100% on lab order",
+      "identity": "buyer",
+      "result": "400 {\"code\":\"P0001\",\"details\":null,\"hint\":null,\"message\":\"order_not_paid_for_refund\"}",
+      "impact": "money movement?",
+      "severity": "info",
+      "evidence": "{\"code\":\"P0001\",\"details\":null,\"hint\":null,\"message\":\"order_not_paid_for_refund\"}"
+    },
+    {
+      "surface": "WALLET",
+      "attack": "observe balances after pass1",
+      "identity": "service_observe",
+      "result": "[{\"id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"balance\":39.81}, \n {\"id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"balance\":6.41}]",
+      "impact": "detect mint",
+      "severity": "info",
+      "evidence": "[{\"id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"balance\":39.81}, \n {\"id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"balance\":6.41}]"
+    }
+  ]
+}

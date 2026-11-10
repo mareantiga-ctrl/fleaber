@@ -1,0 +1,704 @@
+{
+  "auditor": "REDTEAM_BLIND_CQ_CHAT_POS_ALLOW_v1",
+  "prefix": "RTCQ-20260906T1412",
+  "probes": [
+    {
+      "probe_id": "CQA.A1-empty",
+      "superfície": "CQ-A notes",
+      "payload": "(vazio)",
+      "http_rpc": "201 id=1639",
+      "bd_inbox": "orders.status=pago · notes persistidas",
+      "verdict": "PASS"
+    },
+    {
+      "probe_id": "CQA.A2-stripe",
+      "superfície": "CQ-A notes",
+      "payload": "stripe_paid_direct",
+      "http_rpc": "201 id=1640",
+      "bd_inbox": "orders.status=pago · notes persistidas",
+      "verdict": "PASS"
+    },
+    {
+      "probe_id": "CQA.A3-obrigado",
+      "superfície": "CQ-A notes",
+      "payload": "obrigado",
+      "http_rpc": "201 id=1641",
+      "bd_inbox": "orders.status=pago · notes persistidas",
+      "verdict": "PASS"
+    },
+    {
+      "probe_id": "CQA.A3b-ja-enviei",
+      "superfície": "CQ-A notes",
+      "payload": "já enviei",
+      "http_rpc": "201 id=1642",
+      "bd_inbox": "orders.status=pago · notes persistidas",
+      "verdict": "PASS"
+    },
+    {
+      "probe_id": "CQB.B1-euro-unicode",
+      "superfície": "CQ-B encoding",
+      "payload": "obrigado €",
+      "http_rpc": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_notes_forbidden\"}",
+      "bd_inbox": "orders.status=pago · recusado",
+      "verdict": "HOLD"
+    },
+    {
+      "probe_id": "CQB.B1b-yen-fullwidth",
+      "superfície": "CQ-B encoding",
+      "payload": "obrigado ￥ 12",
+      "http_rpc": "201 id=1644",
+      "bd_inbox": "orders.status=pago · notes persistidas",
+      "verdict": "FAIL"
+    },
+    {
+      "probe_id": "CQB.B1c-euro-emoji",
+      "superfície": "CQ-B encoding",
+      "payload": "enviado 12 💶",
+      "http_rpc": "201 id=1645",
+      "bd_inbox": "orders.status=pago · notes persistidas",
+      "verdict": "FAIL"
+    },
+    {
+      "probe_id": "CQB.B2-amount-no-rail",
+      "superfície": "CQ-B amount",
+      "payload": "12,00",
+      "http_rpc": "201 id=1646",
+      "bd_inbox": "orders.status=pago · notes persistidas",
+      "verdict": "FAIL"
+    },
+    {
+      "probe_id": "CQB.B2b-dot-eur",
+      "superfície": "CQ-B amount",
+      "payload": "12.00 EUR",
+      "http_rpc": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_notes_forbidden\"}",
+      "bd_inbox": "orders.status=pago · recusado",
+      "verdict": "HOLD"
+    },
+    {
+      "probe_id": "CQB.B2c-doze-euros",
+      "superfície": "CQ-B amount",
+      "payload": "doze euros",
+      "http_rpc": "201 id=1648",
+      "bd_inbox": "orders.status=pago · notes persistidas",
+      "verdict": "FAIL"
+    },
+    {
+      "probe_id": "CQB.B3-zwsp-amount",
+      "superfície": "CQ-B encoding",
+      "payload": "12​,00 €",
+      "http_rpc": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_notes_forbidden\"}",
+      "bd_inbox": "orders.status=pago · recusado",
+      "verdict": "HOLD"
+    },
+    {
+      "probe_id": "CQB.B3b-shy-amount",
+      "superfície": "CQ-B encoding",
+      "payload": "12­,00 EUR",
+      "http_rpc": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_notes_forbidden\"}",
+      "bd_inbox": "orders.status=pago · recusado",
+      "verdict": "HOLD"
+    },
+    {
+      "probe_id": "CQB.B4-homoglyph-eps",
+      "superfície": "CQ-B encoding",
+      "payload": "12,00 ϵ",
+      "http_rpc": "201 id=1651",
+      "bd_inbox": "orders.status=pago · notes persistidas",
+      "verdict": "FAIL"
+    },
+    {
+      "probe_id": "CQB.B4b-euro-currency-sign",
+      "superfície": "CQ-B encoding",
+      "payload": "12 ₠",
+      "http_rpc": "201 id=1652",
+      "bd_inbox": "orders.status=pago · notes persistidas",
+      "verdict": "FAIL"
+    },
+    {
+      "probe_id": "CQB.B4c-fullwidth-eur",
+      "superfície": "CQ-B encoding",
+      "payload": "１２．００ ＥＵＲ",
+      "http_rpc": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_notes_forbidden\"}",
+      "bd_inbox": "orders.status=pago · recusado",
+      "verdict": "HOLD"
+    },
+    {
+      "probe_id": "CQB.B5-digits-comma",
+      "superfície": "CQ-B amount",
+      "payload": "12,50",
+      "http_rpc": "201 id=1654",
+      "bd_inbox": "orders.status=pago · notes persistidas",
+      "verdict": "FAIL"
+    },
+    {
+      "probe_id": "CQB.B6-html-entity",
+      "superfície": "CQ-B encoding",
+      "payload": "paguei &#8364; 12",
+      "http_rpc": "201 id=1655",
+      "bd_inbox": "orders.status=pago · notes persistidas",
+      "verdict": "FAIL"
+    },
+    {
+      "probe_id": "CQB.B6b-amp-euro",
+      "superfície": "CQ-B encoding",
+      "payload": "12 &euro;",
+      "http_rpc": "201 id=1656",
+      "bd_inbox": "orders.status=pago · notes persistidas",
+      "verdict": "FAIL"
+    },
+    {
+      "probe_id": "CQB.B7-json-array",
+      "superfície": "CQ-B json",
+      "payload": "[\"12,00\"]",
+      "http_rpc": "201 id=1657",
+      "bd_inbox": "orders.status=pago · notes persistidas",
+      "verdict": "FAIL"
+    },
+    {
+      "probe_id": "CQB.B7b-json-object",
+      "superfície": "CQ-B json",
+      "payload": "{\"paid\":12.00}",
+      "http_rpc": "201 id=1658",
+      "bd_inbox": "orders.status=pago · notes persistidas",
+      "verdict": "FAIL"
+    },
+    {
+      "probe_id": "CQB.B8-long-mid-amount",
+      "superfície": "CQ-B amount",
+      "payload": "segue o comprovativo em anexo conforme combinado ontem à noite e 12,00 no meio do texto combinado",
+      "http_rpc": "201 id=1659",
+      "bd_inbox": "orders.status=pago · notes persistidas",
+      "verdict": "FAIL"
+    },
+    {
+      "probe_id": "CQB.R-paysafecash",
+      "superfície": "CQ-B residual",
+      "payload": "PaysafeCash 12,00 €",
+      "http_rpc": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_notes_forbidden\"}",
+      "bd_inbox": "orders.status=pago",
+      "verdict": "HOLD",
+      "note": "controlo residual exacto — não contar"
+    },
+    {
+      "probe_id": "CQC.C1-seguro-hostile",
+      "superfície": "CQ-C seguro",
+      "payload": "compra paga 12,00 €",
+      "http_rpc": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_label_mismatch\"}",
+      "bd_inbox": "orders.status=pago · recusado",
+      "verdict": "HOLD"
+    },
+    {
+      "probe_id": "CQC.C1b-paguei-as-label",
+      "superfície": "CQ-C seguro",
+      "payload": "paguei",
+      "http_rpc": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_label_mismatch\"}",
+      "bd_inbox": "orders.status=pago · recusado",
+      "verdict": "HOLD"
+    },
+    {
+      "probe_id": "CQC.C1c-canonical",
+      "superfície": "CQ-C seguro",
+      "payload": "compra paga",
+      "http_rpc": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_total_mismatch\"}",
+      "bd_inbox": "orders.status=pago",
+      "verdict": "FAIL"
+    },
+    {
+      "probe_id": "CQC.C2-inbox-amount",
+      "superfície": "CQ-C inbox",
+      "payload": "12,00",
+      "http_rpc": "200",
+      "bd_inbox": "chats.last_message stored exact",
+      "verdict": "FAIL"
+    },
+    {
+      "probe_id": "CQC.C2b-inbox-entity",
+      "superfície": "CQ-C inbox",
+      "payload": "12 &euro;",
+      "http_rpc": "200",
+      "bd_inbox": "chats.last_message stored exact",
+      "verdict": "FAIL"
+    },
+    {
+      "probe_id": "CQC.C2c-inbox-emoji",
+      "superfície": "CQ-C inbox",
+      "payload": "enviado 12 💶",
+      "http_rpc": "200",
+      "bd_inbox": "chats.last_message stored exact",
+      "verdict": "FAIL"
+    },
+    {
+      "probe_id": "CQC.C2d-inbox-doze",
+      "superfície": "CQ-C inbox",
+      "payload": "doze euros",
+      "http_rpc": "200",
+      "bd_inbox": "chats.last_message stored exact",
+      "verdict": "FAIL"
+    },
+    {
+      "probe_id": "CQC.C3-card-hostile",
+      "superfície": "CQ-C card",
+      "payload": "pago 12 usd",
+      "http_rpc": "201 id=1664",
+      "bd_inbox": "orders.status=pago · notes persistidas",
+      "verdict": "FAIL"
+    },
+    {
+      "probe_id": "CQC.C4-upload-alien",
+      "superfície": "CQ-C storage",
+      "payload": "B1 UPLOAD path B2",
+      "http_rpc": "400 {\"statusCode\":\"403\",\"error\":\"Unauthorized\",\"message\":\"new row violates row-level security policy\",\"code\":\"AccessDenied\"}",
+      "bd_inbox": "sem objecto",
+      "verdict": "HOLD"
+    },
+    {
+      "probe_id": "CQC.C5-compose-pago",
+      "superfície": "CQ-C composição",
+      "payload": "card notes=12,00 + PATCH status=pago",
+      "http_rpc": "card=201 [{\"id\":1665,\"created_at\":\"2026-09-06T13:15:55.700314+00:00\",\"chat_id\":\"8cb954ab-ca90-4c0a-bb2f-5b99de5fc167\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"reservation_payment_subm… patch=403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"order_buyer_cannot_mark_pago\"}",
+      "bd_inbox": "status reserva_pendente → reserva_pendente wallet 61.0 → 61.0",
+      "verdict": "HOLD"
+    },
+    {
+      "probe_id": "CQ7.ocr-notoken",
+      "superfície": "CQ7 Edge",
+      "payload": "OCR sem x-device-token ocr_raw=12,00 confirmado",
+      "http_rpc": "401 {\"ok\":false,\"error\":\"missing_device_token\"}",
+      "bd_inbox": "sem ingest",
+      "verdict": "HOLD"
+    },
+    {
+      "probe_id": "CQB.B7c-notes-number",
+      "superfície": "CQ-B json",
+      "payload": "notes=12.00 (JSON number)",
+      "http_rpc": "201 id=1666",
+      "bd_inbox": "card persistido",
+      "verdict": "FAIL"
+    }
+  ],
+  "findings": [
+    {
+      "id": "CQB.B1b-yen-fullwidth",
+      "lens": "CQ2",
+      "severity": "P1",
+      "title": "notes fora da allowlist persistiram: obrigado ￥ 12",
+      "actor": "buyer JWT",
+      "pre": "batata_chat_client_notes_allowed deve recusar montante/€/encoding",
+      "repro": "POST reservation_payment_submitted notes=\"obrigado ￥ 12\"",
+      "expected": "notes_forbidden / 4xx",
+      "obtained": "201 [{\"id\":1644,\"created_at\":\"2026-09-06T13:15:44.906312+00:00\",\"chat_id\":\"8cb954ab-ca90-4c0a-bb2f-5b99de5fc167\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"reservation_payment_subm…",
+      "proven": true,
+      "evidence": {
+        "id": "1644",
+        "notes": "obrigado ￥ 12",
+        "order_status": "pago"
+      }
+    },
+    {
+      "id": "CQB.B1c-euro-emoji",
+      "lens": "CQ3",
+      "severity": "P1",
+      "title": "notes fora da allowlist persistiram: enviado 12 💶",
+      "actor": "buyer JWT",
+      "pre": "batata_chat_client_notes_allowed deve recusar montante/€/encoding",
+      "repro": "POST reservation_payment_submitted notes=\"enviado 12 💶\"",
+      "expected": "notes_forbidden / 4xx",
+      "obtained": "201 [{\"id\":1645,\"created_at\":\"2026-09-06T13:15:45.321006+00:00\",\"chat_id\":\"8cb954ab-ca90-4c0a-bb2f-5b99de5fc167\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"reservation_payment_subm…",
+      "proven": true,
+      "evidence": {
+        "id": "1645",
+        "notes": "enviado 12 💶",
+        "order_status": "pago"
+      }
+    },
+    {
+      "id": "CQB.B2-amount-no-rail",
+      "lens": "CQ3",
+      "severity": "P1",
+      "title": "notes fora da allowlist persistiram: 12,00",
+      "actor": "buyer JWT",
+      "pre": "batata_chat_client_notes_allowed deve recusar montante/€/encoding",
+      "repro": "POST reservation_payment_submitted notes=\"12,00\"",
+      "expected": "notes_forbidden / 4xx",
+      "obtained": "201 [{\"id\":1646,\"created_at\":\"2026-09-06T13:15:45.784396+00:00\",\"chat_id\":\"8cb954ab-ca90-4c0a-bb2f-5b99de5fc167\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"reservation_payment_subm…",
+      "proven": true,
+      "evidence": {
+        "id": "1646",
+        "notes": "12,00",
+        "order_status": "pago"
+      }
+    },
+    {
+      "id": "CQB.B2c-doze-euros",
+      "lens": "CQ3",
+      "severity": "P1",
+      "title": "notes fora da allowlist persistiram: doze euros",
+      "actor": "buyer JWT",
+      "pre": "batata_chat_client_notes_allowed deve recusar montante/€/encoding",
+      "repro": "POST reservation_payment_submitted notes=\"doze euros\"",
+      "expected": "notes_forbidden / 4xx",
+      "obtained": "201 [{\"id\":1648,\"created_at\":\"2026-09-06T13:15:46.593555+00:00\",\"chat_id\":\"8cb954ab-ca90-4c0a-bb2f-5b99de5fc167\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"reservation_payment_subm…",
+      "proven": true,
+      "evidence": {
+        "id": "1648",
+        "notes": "doze euros",
+        "order_status": "pago"
+      }
+    },
+    {
+      "id": "CQB.B4-homoglyph-eps",
+      "lens": "CQ2",
+      "severity": "P1",
+      "title": "notes fora da allowlist persistiram: 12,00 ϵ",
+      "actor": "buyer JWT",
+      "pre": "batata_chat_client_notes_allowed deve recusar montante/€/encoding",
+      "repro": "POST reservation_payment_submitted notes=\"12,00 ϵ\"",
+      "expected": "notes_forbidden / 4xx",
+      "obtained": "201 [{\"id\":1651,\"created_at\":\"2026-09-06T13:15:47.798295+00:00\",\"chat_id\":\"8cb954ab-ca90-4c0a-bb2f-5b99de5fc167\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"reservation_payment_subm…",
+      "proven": true,
+      "evidence": {
+        "id": "1651",
+        "notes": "12,00 ϵ",
+        "order_status": "pago"
+      }
+    },
+    {
+      "id": "CQB.B4b-euro-currency-sign",
+      "lens": "CQ2",
+      "severity": "P1",
+      "title": "notes fora da allowlist persistiram: 12 ₠",
+      "actor": "buyer JWT",
+      "pre": "batata_chat_client_notes_allowed deve recusar montante/€/encoding",
+      "repro": "POST reservation_payment_submitted notes=\"12 ₠\"",
+      "expected": "notes_forbidden / 4xx",
+      "obtained": "201 [{\"id\":1652,\"created_at\":\"2026-09-06T13:15:48.219807+00:00\",\"chat_id\":\"8cb954ab-ca90-4c0a-bb2f-5b99de5fc167\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"reservation_payment_subm…",
+      "proven": true,
+      "evidence": {
+        "id": "1652",
+        "notes": "12 ₠",
+        "order_status": "pago"
+      }
+    },
+    {
+      "id": "CQB.B5-digits-comma",
+      "lens": "CQ3",
+      "severity": "P1",
+      "title": "notes fora da allowlist persistiram: 12,50",
+      "actor": "buyer JWT",
+      "pre": "batata_chat_client_notes_allowed deve recusar montante/€/encoding",
+      "repro": "POST reservation_payment_submitted notes=\"12,50\"",
+      "expected": "notes_forbidden / 4xx",
+      "obtained": "201 [{\"id\":1654,\"created_at\":\"2026-09-06T13:15:49.073564+00:00\",\"chat_id\":\"8cb954ab-ca90-4c0a-bb2f-5b99de5fc167\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"reservation_payment_subm…",
+      "proven": true,
+      "evidence": {
+        "id": "1654",
+        "notes": "12,50",
+        "order_status": "pago"
+      }
+    },
+    {
+      "id": "CQB.B6-html-entity",
+      "lens": "CQ2",
+      "severity": "P1",
+      "title": "notes fora da allowlist persistiram: paguei &#8364; 12",
+      "actor": "buyer JWT",
+      "pre": "batata_chat_client_notes_allowed deve recusar montante/€/encoding",
+      "repro": "POST reservation_payment_submitted notes=\"paguei &#8364; 12\"",
+      "expected": "notes_forbidden / 4xx",
+      "obtained": "201 [{\"id\":1655,\"created_at\":\"2026-09-06T13:15:49.518366+00:00\",\"chat_id\":\"8cb954ab-ca90-4c0a-bb2f-5b99de5fc167\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"reservation_payment_subm…",
+      "proven": true,
+      "evidence": {
+        "id": "1655",
+        "notes": "paguei &#8364; 12",
+        "order_status": "pago"
+      }
+    },
+    {
+      "id": "CQB.B6b-amp-euro",
+      "lens": "CQ2",
+      "severity": "P1",
+      "title": "notes fora da allowlist persistiram: 12 &euro;",
+      "actor": "buyer JWT",
+      "pre": "batata_chat_client_notes_allowed deve recusar montante/€/encoding",
+      "repro": "POST reservation_payment_submitted notes=\"12 &euro;\"",
+      "expected": "notes_forbidden / 4xx",
+      "obtained": "201 [{\"id\":1656,\"created_at\":\"2026-09-06T13:15:49.936112+00:00\",\"chat_id\":\"8cb954ab-ca90-4c0a-bb2f-5b99de5fc167\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"reservation_payment_subm…",
+      "proven": true,
+      "evidence": {
+        "id": "1656",
+        "notes": "12 &euro;",
+        "order_status": "pago"
+      }
+    },
+    {
+      "id": "CQB.B7-json-array",
+      "lens": "CQ6",
+      "severity": "P1",
+      "title": "notes fora da allowlist persistiram: [\"12,00\"]",
+      "actor": "buyer JWT",
+      "pre": "batata_chat_client_notes_allowed deve recusar montante/€/encoding",
+      "repro": "POST reservation_payment_submitted notes=\"[\\\"12,00\\\"]\"",
+      "expected": "notes_forbidden / 4xx",
+      "obtained": "201 [{\"id\":1657,\"created_at\":\"2026-09-06T13:15:50.340814+00:00\",\"chat_id\":\"8cb954ab-ca90-4c0a-bb2f-5b99de5fc167\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"reservation_payment_subm…",
+      "proven": true,
+      "evidence": {
+        "id": "1657",
+        "notes": "[\"12,00\"]",
+        "order_status": "pago"
+      }
+    },
+    {
+      "id": "CQB.B7b-json-object",
+      "lens": "CQ6",
+      "severity": "P1",
+      "title": "notes fora da allowlist persistiram: {\"paid\":12.00}",
+      "actor": "buyer JWT",
+      "pre": "batata_chat_client_notes_allowed deve recusar montante/€/encoding",
+      "repro": "POST reservation_payment_submitted notes=\"{\\\"paid\\\":12.00}\"",
+      "expected": "notes_forbidden / 4xx",
+      "obtained": "201 [{\"id\":1658,\"created_at\":\"2026-09-06T13:15:50.755698+00:00\",\"chat_id\":\"8cb954ab-ca90-4c0a-bb2f-5b99de5fc167\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"reservation_payment_subm…",
+      "proven": true,
+      "evidence": {
+        "id": "1658",
+        "notes": "{\"paid\":12.00}",
+        "order_status": "pago"
+      }
+    },
+    {
+      "id": "CQB.B8-long-mid-amount",
+      "lens": "CQ3",
+      "severity": "P1",
+      "title": "notes fora da allowlist persistiram: segue o comprovativo em anexo conforme combinado ontem à noite e 12,00 no meio do texto combinado",
+      "actor": "buyer JWT",
+      "pre": "batata_chat_client_notes_allowed deve recusar montante/€/encoding",
+      "repro": "POST reservation_payment_submitted notes=\"segue o comprovativo em anexo conforme combinado ontem à noite e 12,00 no meio do texto combinado\"",
+      "expected": "notes_forbidden / 4xx",
+      "obtained": "201 [{\"id\":1659,\"created_at\":\"2026-09-06T13:15:51.154215+00:00\",\"chat_id\":\"8cb954ab-ca90-4c0a-bb2f-5b99de5fc167\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"reservation_payment_subm…",
+      "proven": true,
+      "evidence": {
+        "id": "1659",
+        "notes": "segue o comprovativo em anexo conforme combinado ontem à noite e 12,00 no meio do texto combinado",
+        "order_status": "pago"
+      }
+    },
+    {
+      "id": "CQC.C1c-canonical",
+      "lens": "CQ4",
+      "severity": "P2",
+      "title": "seguro recusou label canónico: compra paga",
+      "actor": "buyer JWT",
+      "pre": "batata_chat_seguro_label_allowed",
+      "repro": "POST seguro_fleaber_paid label=\"compra paga\"",
+      "expected": "201",
+      "obtained": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_total_mismatch\"}",
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "CQC.C2-inbox-amount",
+      "lens": "CQ5",
+      "severity": "P1",
+      "title": "inbox last_message bypass allowlist: 12,00",
+      "actor": "buyer JWT",
+      "pre": "batata_chat_is_forged_inbox_preview + notes allowlist",
+      "repro": "PATCH chats.last_message=\"12,00\"",
+      "expected": "chat_inbox_preview_forbidden",
+      "obtained": "12,00",
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "CQC.C2b-inbox-entity",
+      "lens": "CQ5",
+      "severity": "P1",
+      "title": "inbox last_message bypass allowlist: 12 &euro;",
+      "actor": "buyer JWT",
+      "pre": "batata_chat_is_forged_inbox_preview + notes allowlist",
+      "repro": "PATCH chats.last_message=\"12 &euro;\"",
+      "expected": "chat_inbox_preview_forbidden",
+      "obtained": "12 &euro;",
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "CQC.C2c-inbox-emoji",
+      "lens": "CQ5",
+      "severity": "P1",
+      "title": "inbox last_message bypass allowlist: enviado 12 💶",
+      "actor": "buyer JWT",
+      "pre": "batata_chat_is_forged_inbox_preview + notes allowlist",
+      "repro": "PATCH chats.last_message=\"enviado 12 💶\"",
+      "expected": "chat_inbox_preview_forbidden",
+      "obtained": "enviado 12 💶",
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "CQC.C2d-inbox-doze",
+      "lens": "CQ5",
+      "severity": "P1",
+      "title": "inbox last_message bypass allowlist: doze euros",
+      "actor": "buyer JWT",
+      "pre": "batata_chat_is_forged_inbox_preview + notes allowlist",
+      "repro": "PATCH chats.last_message=\"doze euros\"",
+      "expected": "chat_inbox_preview_forbidden",
+      "obtained": "doze euros",
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "CQC.C3-card-hostile",
+      "lens": "CQ6",
+      "severity": "P1",
+      "title": "notes fora da allowlist persistiram: pago 12 usd",
+      "actor": "buyer JWT",
+      "pre": "batata_chat_client_notes_allowed deve recusar montante/€/encoding",
+      "repro": "POST reservation_payment_submitted notes=\"pago 12 usd\"",
+      "expected": "notes_forbidden / 4xx",
+      "obtained": "201 [{\"id\":1664,\"created_at\":\"2026-09-06T13:15:54.883858+00:00\",\"chat_id\":\"8cb954ab-ca90-4c0a-bb2f-5b99de5fc167\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"reservation_payment_subm…",
+      "proven": true,
+      "evidence": {
+        "id": "1664",
+        "notes": "pago 12 usd",
+        "order_status": "pago"
+      }
+    },
+    {
+      "id": "CQB.B7c-notes-number",
+      "lens": "CQ6",
+      "severity": "P1",
+      "title": "notes JSON number 12.00 persistiu",
+      "actor": "buyer JWT",
+      "pre": "allowlist trata notes como texto; number não deve passar como montante",
+      "repro": "POST notes: 12.00 (JSON number)",
+      "expected": "notes_forbidden",
+      "obtained": "201 [{\"id\":1666,\"created_at\":\"2026-09-06T13:15:57.038309+00:00\",\"chat_id\":\"8cb954ab-ca90-4c0a-bb2f-5b99de5fc167\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"reservation_payment_subm…",
+      "proven": true,
+      "evidence": {}
+    }
+  ],
+  "blocked": [
+    {
+      "id": "CQA.A1-empty",
+      "lens": "CQ1",
+      "title": "allowlist aceitou texto legítimo",
+      "ev": "201 [{\"id\":1639,\"created_at\":\"2026-09-06T13:15:42.654735+00:00\",\"chat_id\":\"8cb954ab-ca90-4c0a-bb2f-5b99de5fc167\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"reservation_payment_subm…"
+    },
+    {
+      "id": "CQA.A2-stripe",
+      "lens": "CQ1",
+      "title": "allowlist aceitou texto legítimo",
+      "ev": "201 [{\"id\":1640,\"created_at\":\"2026-09-06T13:15:43.10765+00:00\",\"chat_id\":\"8cb954ab-ca90-4c0a-bb2f-5b99de5fc167\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"reservation_payment_submi…"
+    },
+    {
+      "id": "CQA.A3-obrigado",
+      "lens": "CQ1",
+      "title": "allowlist aceitou texto legítimo",
+      "ev": "201 [{\"id\":1641,\"created_at\":\"2026-09-06T13:15:43.511548+00:00\",\"chat_id\":\"8cb954ab-ca90-4c0a-bb2f-5b99de5fc167\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"reservation_payment_subm…"
+    },
+    {
+      "id": "CQA.A3b-ja-enviei",
+      "lens": "CQ1",
+      "title": "allowlist aceitou texto legítimo",
+      "ev": "201 [{\"id\":1642,\"created_at\":\"2026-09-06T13:15:44.061598+00:00\",\"chat_id\":\"8cb954ab-ca90-4c0a-bb2f-5b99de5fc167\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"reservation_payment_subm…"
+    },
+    {
+      "id": "CQB.B1-euro-unicode",
+      "lens": "CQ2",
+      "title": "notes recusadas",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_notes_forbidden\"}"
+    },
+    {
+      "id": "CQB.B2b-dot-eur",
+      "lens": "CQ3",
+      "title": "notes recusadas",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_notes_forbidden\"}"
+    },
+    {
+      "id": "CQB.B3-zwsp-amount",
+      "lens": "CQ2",
+      "title": "notes recusadas",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_notes_forbidden\"}"
+    },
+    {
+      "id": "CQB.B3b-shy-amount",
+      "lens": "CQ2",
+      "title": "notes recusadas",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_notes_forbidden\"}"
+    },
+    {
+      "id": "CQB.B4c-fullwidth-eur",
+      "lens": "CQ2",
+      "title": "notes recusadas",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_notes_forbidden\"}"
+    },
+    {
+      "id": "CQC.C1-seguro-hostile",
+      "lens": "CQ4",
+      "title": "seguro label recusado",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_label_mismatch\"}"
+    },
+    {
+      "id": "CQC.C1b-paguei-as-label",
+      "lens": "CQ4",
+      "title": "seguro label recusado",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_label_mismatch\"}"
+    },
+    {
+      "id": "CQC.C4-upload-alien",
+      "lens": "CQ6",
+      "title": "upload path B2 recusado",
+      "ev": "400 {\"statusCode\":\"403\",\"error\":\"Unauthorized\",\"message\":\"new row violates row-level security policy\",\"code\":\"AccessDenied\"}"
+    },
+    {
+      "id": "CQC.C5-compose-pago",
+      "lens": "CQ6",
+      "title": "FSM pago sem Stripe recusado",
+      "ev": {
+        "card": "201 [{\"id\":1665,\"created_at\":\"2026-09-06T13:15:55.700314+00:00\",\"chat_id\":\"8cb954ab-ca90-4c0a-bb2f-5b99de5fc167\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"reservation_payment_subm…",
+        "before": "reserva_pendente",
+        "after": "reserva_pendente",
+        "http": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"order_buyer_cannot_mark_pago\"}",
+        "wallet_delta": 0.0
+      }
+    },
+    {
+      "id": "CQ7.ocr-notoken",
+      "lens": "CQ7",
+      "title": "OCR sem token recusado",
+      "ev": "401 {\"ok\":false,\"error\":\"missing_device_token\"}"
+    }
+  ],
+  "notes": [
+    {
+      "id": "fixture.paid",
+      "lens": "CQ1",
+      "title": "setup_paid_order Stripe TEST",
+      "ev": "200 {\n  \"ok\": true,\n  \"order_id\": \"38ca021b-9d33-40e0-b27e-d5fa73a76c60\",\n  \"product_id\": \"b8c54cda-8acd-4447-a55d-8d0c89dc084d\",\n  \"payment_intent_id\": \"pi_3UCfv4H7FWYUN3jh0GTLcvfR\",\n  \"pi_status\": \"succeeded\",\n  \"pi_amount…"
+    },
+    {
+      "id": "CQB.R-paysafecash",
+      "lens": "CQ1",
+      "title": "residual exacto",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_notes_forbidden\"}"
+    }
+  ],
+  "lenses": [
+    "CQ1",
+    "CQ2",
+    "CQ3",
+    "CQ4",
+    "CQ5",
+    "CQ6",
+    "CQ7"
+  ],
+  "chat_id": "8cb954ab-ca90-4c0a-bb2f-5b99de5fc167",
+  "order_pending": "15ad8810-1fac-451d-b655-8b9280264e90",
+  "order_paid_a": "38ca021b-9d33-40e0-b27e-d5fa73a76c60",
+  "wallet_before": 61.0,
+  "wallet_after": 61.0,
+  "residual_count": 0,
+  "probes_na_tabela": 34,
+  "atrofia": false,
+  "denied_helper_unused": false
+}

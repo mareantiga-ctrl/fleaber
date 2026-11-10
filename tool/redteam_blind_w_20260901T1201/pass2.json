@@ -1,0 +1,155 @@
+{
+  "findings": [
+    {
+      "id": "W7.P1.ghost_bundle_card",
+      "lens": "W7",
+      "severity": "P1",
+      "title": "INSERT bundle_proposal com bundle_id inexistente e total_eur=8888",
+      "actor": "buyer JWT",
+      "pre": "kind bundle_proposal sem validar bundle/orders",
+      "repro": "POST chat_messages kind=bundle_proposal bundle_id=ghost total_eur=8888",
+      "expected": "bundle_id tem de existir e total = BD",
+      "obtained": "201 [{\"id\":947,\"created_at\":\"2026-09-01T12:14:22.295226+00:00\",\"chat_id\":\"29c061de-a6fa-423e-a0b6-dca8b2e9bd4a\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"bundle_proposal\\\",\\\"bundl…",
+      "proven": true,
+      "evidence": {
+        "msg_id": "947",
+        "flutter": "pending + bundle null → total = payload total_eur (8888)"
+      }
+    },
+    {
+      "id": "W7.P1.accepted_payload_override",
+      "lens": "W7",
+      "severity": "P1",
+      "title": "Card conjunto aceite: total_eur JSON 7777 vs bundle BD 19.2",
+      "actor": "buyer JWT",
+      "pre": "bundle accepted; Flutter frozen lê payload",
+      "repro": "POST bundle_proposal total_eur=7777 bundle_id aceite",
+      "expected": "totais só da BD",
+      "obtained": "201 [{\"id\":948,\"created_at\":\"2026-09-01T12:14:22.710323+00:00\",\"chat_id\":\"29c061de-a6fa-423e-a0b6-dca8b2e9bd4a\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"bundle_proposal\\\",\\\"bundl…",
+      "proven": true,
+      "evidence": {
+        "bundle_total": 19.2,
+        "msg_id": "948"
+      }
+    },
+    {
+      "id": "W1.P1.seguro_json_total",
+      "lens": "W1",
+      "severity": "P1",
+      "title": "INSERT seguro_fleaber_paid com total JSON sem amarrar a price_total/cents",
+      "actor": "buyer JWT",
+      "pre": "order price_total=5.9 amount_paid_cents=590; UI usa payload[total]",
+      "repro": "POST chat_messages kind=seguro_fleaber_paid total=4321 order capturada",
+      "expected": "total do card = amount_paid / price_total da order",
+      "obtained": "201 [{\"id\":950,\"created_at\":\"2026-09-01T12:14:22.91075+00:00\",\"chat_id\":\"f3b6fa36-c761-4d7b-a1dc-119b30d2d0ce\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"seguro_fleaber_paid\\\",\\\"or…",
+      "proven": true,
+      "evidence": {
+        "msg_id": "950",
+        "order_price": 5.9,
+        "paid_cents": 590,
+        "json_total": 4321
+      }
+    },
+    {
+      "id": "W5.P1.ops_cards_without_status",
+      "lens": "W5",
+      "severity": "P1",
+      "title": "Cards shipped/completed/receipt inseríveis com order ainda pago",
+      "actor": "buyer/seller JWT",
+      "pre": "pass1 INSERT 201; BD status permaneceu pago",
+      "repro": "POST reservation_order_shipped | reservation_order_completed | reservation_seller_confirmed_receipt",
+      "expected": "kind operacional só se status BD corresponder",
+      "obtained": "201 + status=pago (probe.json W5.bd.unchanged)",
+      "proven": true,
+      "evidence": {
+        "source": "pass1 notes W5.shipped/completed/receipt"
+      }
+    },
+    {
+      "id": "W1.P2.regex_gap_plain",
+      "lens": "W1",
+      "severity": "P2",
+      "title": "Plain «Compra paga…» com NBSP ou espaço duplo fura o regex SQL",
+      "actor": "buyer JWT",
+      "pre": "batata_chat_is_forged_seguro_plain ^\\s*Compra( em conjunto)? paga",
+      "repro": "POST text=Compra\\u00a0paga… e Compra  paga…",
+      "expected": "mesmo bloqueio que o legado exact",
+      "obtained": "201 msgs 925 e 926 no chat hold",
+      "proven": true,
+      "evidence": {
+        "flutter": "startsWith exact falha — bolha de texto, não card; humano lê recibo"
+      }
+    },
+    {
+      "id": "W7.P2.price_offer_outcome_orphan",
+      "lens": "W7",
+      "severity": "P2",
+      "title": "Seller INSERT price_offer_outcome accepted amount=0.01 sem oferta BD",
+      "actor": "seller JWT",
+      "pre": "kind seller-only + order_id; sem check product_offers",
+      "repro": "POST chat_messages kind=price_offer_outcome outcome=accepted amount=0.01",
+      "expected": "amarrar a product_offers accepted",
+      "obtained": "201 no pass1; product_offers {\"code\":\"42703\",\"details\":null,\"hint\":null,\"message\":\"column product_offers.offer_price does not exist\"}",
+      "proven": true,
+      "evidence": {}
+    }
+  ],
+  "closed": [
+    {
+      "id": "W4.paid_js",
+      "lens": "W4",
+      "title": "paid javascript blocked",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"order_proof_url_denied\"}"
+    }
+  ],
+  "notes": [
+    {
+      "id": "p2.W7.card",
+      "lens": "W7",
+      "title": "bundle_proposal ghost",
+      "ev": "201 [{\"id\":947,\"created_at\":\"2026-09-01T12:14:22.295226+00:00\",\"chat_id\":\"29c061de-a6fa-423e-a0b6-dca8b2e9bd4a\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"bundle_proposal\\\",\\\"bundl…"
+    },
+    {
+      "id": "p2.W7.bun",
+      "lens": "W7",
+      "title": "bundle real",
+      "ev": "201 [{\"id\":\"a95d3f8e-be86-4cb5-8d74-562da3675104\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"chat_id\":\"29c061de-a6fa-423e-a0b6-dca8b2e9bd4a\",\"product_ids\":[\"c13190bc…"
+    },
+    {
+      "id": "p2.W1.seguro.hold",
+      "lens": "W1",
+      "title": "seguro fake total on hold",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_order_not_paid\"}"
+    },
+    {
+      "id": "p2.W1.seguro.paid",
+      "lens": "W1",
+      "title": "seguro fake total on paid/cancelado",
+      "ev": "201 [{\"id\":950,\"created_at\":\"2026-09-01T12:14:22.91075+00:00\",\"chat_id\":\"f3b6fa36-c761-4d7b-a1dc-119b30d2d0ce\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"seguro_fleaber_paid\\\",\\\"or…"
+    },
+    {
+      "id": "p2.W4.paid.js",
+      "lens": "W4",
+      "title": "paid PATCH javascript",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"order_proof_url_denied\"} stored=https://fxdknzrqjenzqcvnwqqq.supabase.co/storage/v1/object/authenticated/fleaber_private/order_proofs/980f4fa1-0004-42f9-abca-69f1a9c29588/not-mine.png"
+    },
+    {
+      "id": "p2.W7.offers",
+      "lens": "W7",
+      "title": "product_offers após outcome fake",
+      "ev": "400 {\"code\":\"42703\",\"details\":null,\"hint\":null,\"message\":\"column product_offers.offer_price does not exist\"}"
+    },
+    {
+      "id": "p2.dispute.status",
+      "lens": "W4",
+      "title": "disputa após PATCH seller",
+      "ev": "200 [{\"id\":\"0b1ad280-7ac7-42fe-b59d-fbecce3b4b29\",\"status\":\"aberta\",\"buyer_decision\":null}]"
+    },
+    {
+      "id": "p2.W4.ocr",
+      "lens": "W4",
+      "title": "OCR sem device token",
+      "ev": "401 {\"ok\":false,\"error\":\"missing_device_token\"}"
+    }
+  ]
+}

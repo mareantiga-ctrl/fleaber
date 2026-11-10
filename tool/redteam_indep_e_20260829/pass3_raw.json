@@ -1,0 +1,363 @@
+{
+  "pass": "3",
+  "frozen_at": "2026-08-29T14:33:17.349833Z",
+  "findings": [],
+  "matrix": [
+    {
+      "surface": "LIVE",
+      "attack": "stock before accept-patch",
+      "identity": "service_observe",
+      "http": 200,
+      "result": "{\"ok\": true, \"price\": 15, \"live_id\": \"4e0d4898-662a-41be-bd2f-f267ab9ddd26\", \"ref_code\": \"P001RLOK-1787824450528424\", \"item_kind\": \"marketplace_product\", \"total_qty\": 5, \"product_id\": \"1d83cde4-ef95-46d9-ba79-687fc321ef5e\", \"blocked_qty\": 0, \"live_status\": \"live\", \"live_item_id\": \"639da624-cc5a-44fe-a821-9f2ae55c6858\", \"available_qty\": 0, \"pending_bag_qty\": 200, \"sold_converted_qty\": 0, \"checkout_product_id\": \"1d83cde4-ef95-46d9-ba79-687fc321ef5e\", \"reserved_accepted_qty\": 0}"
+    },
+    {
+      "surface": "LIVE RESERVATIONS",
+      "attack": "buyer PATCH pending→accepted qty99",
+      "identity": "buyer",
+      "http": 200,
+      "result": "[]"
+    },
+    {
+      "surface": "LIVE RESERVATIONS",
+      "attack": "seller PATCH pending→accepted qty99",
+      "identity": "seller",
+      "http": 400,
+      "result": "{\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"qty_exceeds_stock\"}"
+    },
+    {
+      "surface": "LIVE",
+      "attack": "stock after accept attempts",
+      "identity": "service_observe",
+      "http": 200,
+      "result": "{\"ok\": true, \"price\": 15, \"live_id\": \"4e0d4898-662a-41be-bd2f-f267ab9ddd26\", \"ref_code\": \"P001RLOK-1787824450528424\", \"item_kind\": \"marketplace_product\", \"total_qty\": 5, \"product_id\": \"1d83cde4-ef95-46d9-ba79-687fc321ef5e\", \"blocked_qty\": 0, \"live_status\": \"live\", \"live_item_id\": \"639da624-cc5a-44fe-a821-9f2ae55c6858\", \"available_qty\": 0, \"pending_bag_qty\": 200, \"sold_converted_qty\": 0, \"checkout_product_id\": \"1d83cde4-ef95-46d9-ba79-687fc321ef5e\", \"reserved_accepted_qty\": 0}"
+    },
+    {
+      "surface": "rpc:convert",
+      "attack": "buyer convert qty99",
+      "identity": "buyer",
+      "http": 403,
+      "result": "{\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_live_reservation_stripe_convert\"}"
+    },
+    {
+      "surface": "LIVE RESERVATIONS",
+      "attack": "expire 018e0ead-42b9-49cd-95aa-6ffc2e595ca3",
+      "identity": "service_cleanup",
+      "http": 200,
+      "result": "[{\"id\":\"018e0ead-42b9-49cd-95aa-6ffc2e595ca3\",\"live_id\":\"4e0d4898-662a-41be-bd2f-f267ab9ddd26\",\"live_item_id\":\"639da624-cc5a-44fe-a821-9f2ae55c6858\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"requested_qty\":1,\"queue_position\":3,\"source\":\"fleaber_live\",\"status\":\"expired\",\"notes\":null,\"processed_by_user_id\":null,\"expires_at\":null,\"created_at\":\"2026-08-29T14:30:02.693757+00:00\",\"updated_at\":\"2026-08-29T14:33:06.089888+00:00\",\"effective_at\":\"2026-08-29T14:30:02.693757+00:00\",\"detected_at\":null,\"external_display_name\":null,\"external_buyer_ref\":null,\"chat_sequence\":null,\"avatar_phash\":null,\"ocr_raw_line\":null,\"ingest_channel\":null,\"ingest_…"
+    },
+    {
+      "surface": "LIVE RESERVATIONS",
+      "attack": "expire 18160611-1054-45d9-b703-632114f93088",
+      "identity": "service_cleanup",
+      "http": 200,
+      "result": "[{\"id\":\"18160611-1054-45d9-b703-632114f93088\",\"live_id\":\"4e0d4898-662a-41be-bd2f-f267ab9ddd26\",\"live_item_id\":\"639da624-cc5a-44fe-a821-9f2ae55c6858\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"buyer_id\":\"865dd822-5cc6-4868-9eee-ce46fd45522c\",\"requested_qty\":1,\"queue_position\":3,\"source\":\"fleaber_live\",\"status\":\"expired\",\"notes\":null,\"processed_by_user_id\":null,\"expires_at\":null,\"created_at\":\"2026-08-29T14:30:02.693822+00:00\",\"updated_at\":\"2026-08-29T14:33:06.245873+00:00\",\"effective_at\":\"2026-08-29T14:30:02.693822+00:00\",\"detected_at\":null,\"external_display_name\":null,\"external_buyer_ref\":null,\"chat_sequence\":null,\"avatar_phash\":null,\"ocr_raw_line\":null,\"ingest_channel\":null,\"ingest_…"
+    },
+    {
+      "surface": "LIVE RESERVATIONS",
+      "attack": "expire c61bca30-5a82-4ce3-8e72-37ba9a183420",
+      "identity": "service_cleanup",
+      "http": 200,
+      "result": "[{\"id\":\"c61bca30-5a82-4ce3-8e72-37ba9a183420\",\"live_id\":\"4e0d4898-662a-41be-bd2f-f267ab9ddd26\",\"live_item_id\":\"639da624-cc5a-44fe-a821-9f2ae55c6858\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"requested_qty\":1,\"queue_position\":2,\"source\":\"fleaber_live\",\"status\":\"expired\",\"notes\":null,\"processed_by_user_id\":null,\"expires_at\":\"2026-08-29T15:10:39.506667+00:00\",\"created_at\":\"2026-08-29T14:25:39.506667+00:00\",\"updated_at\":\"2026-08-29T14:33:06.361575+00:00\",\"effective_at\":\"2026-08-29T14:25:39.506667+00:00\",\"detected_at\":null,\"external_display_name\":null,\"external_buyer_ref\":null,\"chat_sequence\":null,\"avatar_phash\":null,\"ocr_raw_line\":null,…"
+    },
+    {
+      "surface": "LIVE RESERVATIONS",
+      "attack": "expire cbfe925f-9c20-451c-a354-3d4a9db007af",
+      "identity": "service_cleanup",
+      "http": 200,
+      "result": "[{\"id\":\"cbfe925f-9c20-451c-a354-3d4a9db007af\",\"live_id\":\"4e0d4898-662a-41be-bd2f-f267ab9ddd26\",\"live_item_id\":\"639da624-cc5a-44fe-a821-9f2ae55c6858\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"buyer_id\":\"f7a45cb2-67b1-4da5-83dd-50a14d8d3b67\",\"requested_qty\":1,\"queue_position\":1,\"source\":\"fleaber_live\",\"status\":\"expired\",\"notes\":null,\"processed_by_user_id\":null,\"expires_at\":\"2026-08-29T15:10:39.48879+00:00\",\"created_at\":\"2026-08-29T14:25:39.48879+00:00\",\"updated_at\":\"2026-08-29T14:33:06.489249+00:00\",\"effective_at\":\"2026-08-29T14:25:39.48879+00:00\",\"detected_at\":null,\"external_display_name\":null,\"external_buyer_ref\":null,\"chat_sequence\":null,\"avatar_phash\":null,\"ocr_raw_line\":null,\"in…"
+    },
+    {
+      "surface": "LIVE",
+      "attack": "stock after expire cleanup",
+      "identity": "service_observe",
+      "http": 200,
+      "result": "{\"ok\": true, \"price\": 15, \"live_id\": \"4e0d4898-662a-41be-bd2f-f267ab9ddd26\", \"ref_code\": \"P001RLOK-1787824450528424\", \"item_kind\": \"marketplace_product\", \"total_qty\": 5, \"product_id\": \"1d83cde4-ef95-46d9-ba79-687fc321ef5e\", \"blocked_qty\": 0, \"live_status\": \"live\", \"live_item_id\": \"639da624-cc5a-44fe-a821-9f2ae55c6858\", \"available_qty\": 5, \"pending_bag_qty\": 0, \"sold_converted_qty\": 0, \"checkout_product_id\": \"1d83cde4-ef95-46d9-ba79-687fc321ef5e\", \"reserved_accepted_qty\": 0}"
+    },
+    {
+      "surface": "products",
+      "attack": "insert",
+      "identity": "seller",
+      "http": 201,
+      "result": "[{\"id\":\"e291a2bc-7c95-42e6-80bc-decb01e9cc8b\",\"created_at\":\"2026-08-29T14:33:06.716932+00:00\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"title\":\"RT-E3 1788013987403\",\"price\":20.0,\"ref_code\":null,\"category\":null,\"clothing_size\":null,\"gender\":null,\"description\":null,\"state\":null,\"image_urls\":[],\"list_on_marketplace\":true,\"available_for_live\":false,\"is_sold\":false,\"favorites_count\":0,\"quantity\":3}]"
+    },
+    {
+      "surface": "orders",
+      "attack": "INSERT qty=1 price=0.5 status=reserva_pendente",
+      "identity": "buyer",
+      "http": 201,
+      "result": "[{\"id\":\"08b73879-6e0b-4479-8c6f-633a2312e42c\",\"created_at\":\"2026-08-29T14:33:06.850673+00:00\",\"product_id\":\"e291a2bc-7c95-42e6-80bc-decb01e9cc8b\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"price_total\":0.5,\"shipping_method\":\"hand\",\"payment_method\":\"Pagamento na App\",\"proof_url\":null,\"status\":\"reserva_pendente\",\"reservation_expires_at\":null,\"is_reservation\":true,\"completed_at\":null,\"auto_feedback_processed_at\":null,\"returned_at\":null,\"wallet_release_processed_at\":null,\"wallet_refund_processed_at\":null,\"bundle_id\":null,\"quantity\":1,\"live_id\":null,\"live_item_id\":null,\"live_raffle_id\":null,\"stripe_checkout_session_id\":null,\"stripe_paymen…"
+    },
+    {
+      "surface": "CHECKOUT",
+      "attack": "client amount=50 item=20",
+      "identity": "buyer",
+      "http": 200,
+      "result": "{\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1vIW1aJRbgaQGjrLpEDotWtd0IhMs1PuGT0YPGVMCdmeVTWgMBapZdHPQ#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21oYWlsUnxrVkRhQUQyNlJjSWBCN3BXNXVvVT1hamlcf3Fjd1dRMGJmREk9Yz09PH1CMzVTY0pBXD1kMU5HZl1da05gf0s1XGQ1NWA3bVFBNzNMJyknY3dqaFZgd3Ngdyc%2FcXdwYCknZ2RmbmJ3anBrYUZqaWp3Jz8nJmNjY2NjYycpJ2lkfGpwcVF8dWAnPyd2bGtiaWBabHFgaCcpJ2BrZGdpYFVpZGZgbWppYWB3dic%2FcXdwYHgl\",\"checkoutSessionId\":\"cs_test_a1vIW1aJRbgaQGjrLpEDotWtd0IhMs1PuGT0YPGVMCdmeVTWgMBapZdHPQ\",\"paidChatId\":\"1f9a767f-7a86-4103-b056-b4efb4d8df33\",\"server_amount_cents\":2165,\"amount_total\":2165}"
+    },
+    {
+      "surface": "CHECKOUT",
+      "attack": "prize_shipping on 20€ item",
+      "identity": "buyer",
+      "http": 400,
+      "result": "{\"error\":\"Checkout blocked: order is not a raffle prize.\"}"
+    },
+    {
+      "surface": "orders",
+      "attack": "PATCH contract+pago",
+      "identity": "buyer",
+      "http": 200,
+      "result": "[{\"id\":\"08b73879-6e0b-4479-8c6f-633a2312e42c\",\"created_at\":\"2026-08-29T14:33:06.850673+00:00\",\"product_id\":\"e291a2bc-7c95-42e6-80bc-decb01e9cc8b\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"price_total\":21.65,\"shipping_method\":\"hand\",\"payment_method\":\"Pagamento na App\",\"proof_url\":null,\"status\":\"reserva_pendente\",\"reservation_expires_at\":null,\"is_reservation\":true,\"completed_at\":null,\"auto_feedback_processed_at\":null,\"returned_at\":null,\"wallet_release_processed_at\":null,\"wallet_refund_processed_at\":null,\"bundle_id\":null,\"quantity\":1,\"live_id\":null,\"live_item_id\":null,\"live_raffle_id\":null,\"stripe_checkout_session_id\":null,\"stripe_paym…"
+    },
+    {
+      "surface": "orders",
+      "attack": "observe patch",
+      "identity": "service_observe",
+      "http": 200,
+      "result": "[{\"id\":\"08b73879-6e0b-4479-8c6f-633a2312e42c\",\"status\":\"reserva_pendente\",\"contract_unit_cents\":2000,\"contract_qty\":1,\"price_total\":21.65,\"amount_paid_cents\":null,\"quantity\":1}]"
+    },
+    {
+      "surface": "CHECKOUT",
+      "attack": "after seller drops catalog to 1€",
+      "identity": "buyer",
+      "http": 200,
+      "result": "{\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1B37sskNtT4Gj3Fnu6jHyb0YIFdtkWiRW7Z5iPiwG4lE6WbQXTI2Vx8sK#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21oYWlsUnxrVkRhQUQyNlJjSWBCN3BXNXVvVT1hamlcf3Fjd1dRMGJmREk9Yz09PH1CMzVTY0pBXD1kMU5HZl1da05gf0s1XGQ1NWA3bVFBNzNMJyknY3dqaFZgd3Ngdyc%2FcXdwYCknZ2RmbmJ3anBrYUZqaWp3Jz8nJmNjY2NjYycpJ2lkfGpwcVF8dWAnPyd2bGtiaWBabHFgaCcpJ2BrZGdpYFVpZGZgbWppYWB3dic%2FcXdwYHgl\",\"checkoutSessionId\":\"cs_test_a1B37sskNtT4Gj3Fnu6jHyb0YIFdtkWiRW7Z5iPiwG4lE6WbQXTI2Vx8sK\",\"paidChatId\":\"df688126-0303-43c9-83c2-a7d60d50293c\",\"server_amount_cents\":2165,\"amount_total\":2165}"
+    },
+    {
+      "surface": "products",
+      "attack": "insert",
+      "identity": "seller",
+      "http": 201,
+      "result": "[{\"id\":\"8905c9c1-7af0-4a38-ac71-8f2968347743\",\"created_at\":\"2026-08-29T14:33:10.432288+00:00\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"title\":\"RT-E3 1788013991113\",\"price\":8.0,\"ref_code\":null,\"category\":null,\"clothing_size\":null,\"gender\":null,\"description\":null,\"state\":null,\"image_urls\":[],\"list_on_marketplace\":true,\"available_for_live\":false,\"is_sold\":false,\"favorites_count\":0,\"quantity\":1}]"
+    },
+    {
+      "surface": "orders",
+      "attack": "INSERT qty=1 price=8 status=reserva_pendente",
+      "identity": "buyer",
+      "http": 201,
+      "result": "[{\"id\":\"f0fd22c3-ff21-40d3-93a6-e3a2910e696c\",\"created_at\":\"2026-08-29T14:33:10.53041+00:00\",\"product_id\":\"8905c9c1-7af0-4a38-ac71-8f2968347743\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"price_total\":8,\"shipping_method\":\"hand\",\"payment_method\":\"Pagamento na App\",\"proof_url\":null,\"status\":\"reserva_pendente\",\"reservation_expires_at\":null,\"is_reservation\":true,\"completed_at\":null,\"auto_feedback_processed_at\":null,\"returned_at\":null,\"wallet_release_processed_at\":null,\"wallet_refund_processed_at\":null,\"bundle_id\":null,\"quantity\":1,\"live_id\":null,\"live_item_id\":null,\"live_raffle_id\":null,\"stripe_checkout_session_id\":null,\"stripe_payment_i…"
+    },
+    {
+      "surface": "orders",
+      "attack": "INSERT qty=1 price=8 status=reserva_pendente",
+      "identity": "fresh",
+      "http": 201,
+      "result": "[{\"id\":\"039f016f-b62a-40d2-95c8-1a17cd6bbc77\",\"created_at\":\"2026-08-29T14:33:10.64587+00:00\",\"product_id\":\"8905c9c1-7af0-4a38-ac71-8f2968347743\",\"buyer_id\":\"5d050f70-02f1-43ef-a727-a7a1d184bf66\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"price_total\":8,\"shipping_method\":\"hand\",\"payment_method\":\"Pagamento na App\",\"proof_url\":null,\"status\":\"reserva_pendente\",\"reservation_expires_at\":null,\"is_reservation\":true,\"completed_at\":null,\"auto_feedback_processed_at\":null,\"returned_at\":null,\"wallet_release_processed_at\":null,\"wallet_refund_processed_at\":null,\"bundle_id\":null,\"quantity\":1,\"live_id\":null,\"live_item_id\":null,\"live_raffle_id\":null,\"stripe_checkout_session_id\":null,\"stripe_payment_i…"
+    },
+    {
+      "surface": "CHECKOUT",
+      "attack": "stock1 session A",
+      "identity": "buyer",
+      "http": 200,
+      "result": "{\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1Eu7w3q5DOanicv1kCMiiu1ybAvlD3As2QqyNfpqPSFP1vSuzjduQ92Ds#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21oYWlsUnxrVkRhQUQyNlJjSWBCN3BXNXVvVT1hamlcf3Fjd1dRMGJmREk9Yz09PH1CMzVTY0pBXD1kMU5HZl1da05gf0s1XGQ1NWA3bVFBNzNMJyknY3dqaFZgd3Ngdyc%2FcXdwYCknZ2RmbmJ3anBrYUZqaWp3Jz8nJmNjY2NjYycpJ2lkfGpwcVF8dWAnPyd2bGtiaWBabHFgaCcpJ2BrZGdpYFVpZGZgbWppYWB3dic%2FcXdwYHgl\",\"checkoutSessionId\":\"cs_test_a1Eu7w3q5DOanicv1kCMiiu1ybAvlD3As2QqyNfpqPSFP1vSuzjduQ92Ds\",\"paidChatId\":\"313f2348-f3f8-4cd2-ac26-96e1fe2be119\",\"server_amount_cents\":905,\"amount_total\":905}"
+    },
+    {
+      "surface": "CHECKOUT",
+      "attack": "stock1 session B",
+      "identity": "fresh",
+      "http": 200,
+      "result": "{\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1nNMGLreGatZ6ZBpKxBgGNviNnY2jZXoGAaFwsHbMYlV7ZTm6CqpRituJ#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21oYWlsUnxrVkRhQUQyNlJjSWBCN3BXNXVvVT1hamlcf3Fjd1dRMGJmREk9Yz09PH1CMzVTY0pBXD1kMU5HZl1da05gf0s1XGQ1NWA3bVFBNzNMJyknY3dqaFZgd3Ngdyc%2FcXdwYCknZ2RmbmJ3anBrYUZqaWp3Jz8nJmNjY2NjYycpJ2lkfGpwcVF8dWAnPyd2bGtiaWBabHFgaCcpJ2BrZGdpYFVpZGZgbWppYWB3dic%2FcXdwYHgl\",\"checkoutSessionId\":\"cs_test_a1nNMGLreGatZ6ZBpKxBgGNviNnY2jZXoGAaFwsHbMYlV7ZTm6CqpRituJ\",\"paidChatId\":\"d7435f6e-4c5c-4fc5-a6fc-8252560bcbae\",\"server_amount_cents\":905,\"amount_total\":905}"
+    },
+    {
+      "surface": "rpc:batata_credit_wallet_once",
+      "attack": "buyer full args",
+      "identity": "buyer",
+      "http": 403,
+      "result": "{\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_credit_wallet_once\"}"
+    },
+    {
+      "surface": "rpc:batata_debit_wallet_once",
+      "attack": "buyer full args",
+      "identity": "buyer",
+      "http": 404,
+      "result": "{\"code\":\"PGRST202\",\"details\":\"Searched for the function public.batata_debit_wallet_once with parameters p_amount, p_description, p_order_id, p_type, p_wallet_id or with a single unnamed json/jsonb parameter, but no matches were found in the schema cache.\",\"hint\":\"Perhaps you meant to call the function public.batata_debit_wallet_once(p_amount, p_description, p_order_id, p_wallet_id)\",\"message\":\"Could not find the function public.batata_debit_wallet_once(p_amount, p_description, p_order_id, p_type, p_wallet_id) in the schema cache\"}"
+    },
+    {
+      "surface": "rpc:batata_release_seller_wallet_for_order",
+      "attack": "buyer full args",
+      "identity": "buyer",
+      "http": 200,
+      "result": "false"
+    },
+    {
+      "surface": "rpc:batata_clawback_seller_wallet_for_order",
+      "attack": "buyer full args",
+      "identity": "buyer",
+      "http": 403,
+      "result": "{\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_clawback_seller_wallet_for_order\"}"
+    },
+    {
+      "surface": "rpc:batata_refund_buyer_wallet_for_order",
+      "attack": "buyer full args",
+      "identity": "buyer",
+      "http": 200,
+      "result": "false"
+    },
+    {
+      "surface": "rpc:batata_process_partial_refund_dispute",
+      "attack": "buyer full args",
+      "identity": "buyer",
+      "http": 404,
+      "result": "{\"code\":\"PGRST202\",\"details\":\"Searched for the function public.batata_process_partial_refund_dispute with parameters p_amount_cents, p_order_id or with a single unnamed json/jsonb parameter, but no matches were found in the schema cache.\",\"hint\":null,\"message\":\"Could not find the function public.batata_process_partial_refund_dispute(p_amount_cents, p_order_id) in the schema cache\"}"
+    },
+    {
+      "surface": "rpc:batata_admin_resolve_dispute",
+      "attack": "buyer full args",
+      "identity": "buyer",
+      "http": 404,
+      "result": "{\"code\":\"PGRST202\",\"details\":\"Searched for the function public.batata_admin_resolve_dispute with parameters p_action, p_dispute_id or with a single unnamed json/jsonb parameter, but no matches were found in the schema cache.\",\"hint\":\"Perhaps you meant to call the function public.batata_admin_resolve_dispute(p_dispute_id, p_note, p_resolution)\",\"message\":\"Could not find the function public.batata_admin_resolve_dispute(p_action, p_dispute_id) in the schema cache\"}"
+    },
+    {
+      "surface": "rpc:batata_wallet_apply_tip_once",
+      "attack": "buyer full args",
+      "identity": "buyer",
+      "http": 404,
+      "result": "{\"code\":\"PGRST202\",\"details\":\"Searched for the function public.batata_wallet_apply_tip_once with parameters p_amount, p_tip_id or with a single unnamed json/jsonb parameter, but no matches were found in the schema cache.\",\"hint\":\"Perhaps you meant to call the function public.batata_wallet_apply_tip_once(p_amount, p_description, p_tip_id, p_type, p_wallet_id)\",\"message\":\"Could not find the function public.batata_wallet_apply_tip_once(p_amount, p_tip_id) in the schema cache\"}"
+    },
+    {
+      "surface": "rpc:staging_restore_stock_before_nuke",
+      "attack": "buyer full args",
+      "identity": "buyer",
+      "http": 404,
+      "result": "{\"code\":\"PGRST202\",\"details\":\"Searched for the function public.staging_restore_stock_before_nuke with parameter p_product_id or with a single unnamed json/jsonb parameter, but no matches were found in the schema cache.\",\"hint\":\"Perhaps you meant to call the function public.staging_restore_stock_before_nuke(p_user_id)\",\"message\":\"Could not find the function public.staging_restore_stock_before_nuke(p_product_id) in the schema cache\"}"
+    },
+    {
+      "surface": "rpc:batata_send_live_tip_from_wallet",
+      "attack": "buyer full args",
+      "identity": "buyer",
+      "http": 403,
+      "result": "{\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"not_allowed\"}"
+    },
+    {
+      "surface": "storage",
+      "attack": "list seller product_photos",
+      "identity": "fresh",
+      "http": 200,
+      "result": "[{\"name\":\"1782914369313_0_scaled_1000003839.jpg\",\"id\":\"d77d664f-c6d4-4ec0-a903-fcfb55de8d74\",\"updated_at\":\"2026-07-01T13:59:31.175Z\",\"created_at\":\"2026-07-01T13:59:31.175Z\",\"last_accessed_at\":\"2026-07-01T13:59:31.175Z\",\"metadata\":{\"eTag\":\"\\\"d994d2fa1ac24f66f0cf9cac5ea16a9e\\\"\",\"size\":2373923,\"mimetype\":\"image/jpeg\",\"cacheControl\":\"max-age=3600\",\"lastModified\":\"2026-07-01T13:59:32.000Z\",\"contentLength\":2373923,\"httpStatusCode\":200}},{\"name\":\"1782914371389_1_scaled_1000003965.jpg\",\"id\":\"98862ac0-cb79-4ccb-9761-acb4d8d48d15\",\"updated_at\":\"2026-07-01T13:59:32.502Z\",\"created_at\":\"2026-07-01T13:59:32.502Z\",\"last_accessed_at\":\"2026-07-01T13:59:32.502Z\",\"metadata\":{\"eTag\":\"\\\"2dfee33f4898a9cdfbcf24065…"
+    },
+    {
+      "surface": "storage",
+      "attack": "GET seller object",
+      "identity": "fresh",
+      "http": 200,
+      "result": "http=200 len=701"
+    },
+    {
+      "surface": "LIVE",
+      "attack": "stock before accept-patch",
+      "identity": "service_observe",
+      "http": 200,
+      "result": "{\"ok\": true, \"price\": 15, \"live_id\": \"4e0d4898-662a-41be-bd2f-f267ab9ddd26\", \"ref_code\": \"P001RLOK-1787824450528424\", \"item_kind\": \"marketplace_product\", \"total_qty\": 5, \"product_id\": \"1d83cde4-ef95-46d9-ba79-687fc321ef5e\", \"blocked_qty\": 0, \"live_status\": \"live\", \"live_item_id\": \"639da624-cc5a-44fe-a821-9f2ae55c6858\", \"available_qty\": 5, \"pending_bag_qty\": 0, \"sold_converted_qty\": 0, \"checkout_product_id\": \"1d83cde4-ef95-46d9-ba79-687fc321ef5e\", \"reserved_accepted_qty\": 0}"
+    },
+    {
+      "surface": "LIVE RESERVATIONS",
+      "attack": "buyer PATCH pending→accepted qty99",
+      "identity": "buyer",
+      "http": 200,
+      "result": "[]"
+    },
+    {
+      "surface": "LIVE RESERVATIONS",
+      "attack": "seller PATCH pending→accepted qty99",
+      "identity": "seller",
+      "http": 200,
+      "result": "[{\"id\":\"018e0ead-42b9-49cd-95aa-6ffc2e595ca3\",\"live_id\":\"4e0d4898-662a-41be-bd2f-f267ab9ddd26\",\"live_item_id\":\"639da624-cc5a-44fe-a821-9f2ae55c6858\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"requested_qty\":1,\"queue_position\":3,\"source\":\"fleaber_live\",\"status\":\"accepted\",\"notes\":null,\"processed_by_user_id\":null,\"expires_at\":null,\"created_at\":\"2026-08-29T14:30:02.693757+00:00\",\"updated_at\":\"2026-08-29T14:33:15.876878+00:00\",\"effective_at\":\"2026-08-29T14:30:02.693757+00:00\",\"detected_at\":null,\"external_display_name\":null,\"external_buyer_ref\":null,\"chat_sequence\":null,\"avatar_phash\":null,\"ocr_raw_line\":null,\"ingest_channel\":null,\"ingest…"
+    },
+    {
+      "surface": "LIVE",
+      "attack": "stock after accept attempts",
+      "identity": "service_observe",
+      "http": 200,
+      "result": "{\"ok\": true, \"price\": 15, \"live_id\": \"4e0d4898-662a-41be-bd2f-f267ab9ddd26\", \"ref_code\": \"P001RLOK-1787824450528424\", \"item_kind\": \"marketplace_product\", \"total_qty\": 5, \"product_id\": \"1d83cde4-ef95-46d9-ba79-687fc321ef5e\", \"blocked_qty\": 0, \"live_status\": \"live\", \"live_item_id\": \"639da624-cc5a-44fe-a821-9f2ae55c6858\", \"available_qty\": 4, \"pending_bag_qty\": 0, \"sold_converted_qty\": 0, \"checkout_product_id\": \"1d83cde4-ef95-46d9-ba79-687fc321ef5e\", \"reserved_accepted_qty\": 1}"
+    },
+    {
+      "surface": "rpc:convert",
+      "attack": "buyer convert qty99",
+      "identity": "buyer",
+      "http": 403,
+      "result": "{\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_live_reservation_stripe_convert\"}"
+    },
+    {
+      "surface": "LIVE RESERVATIONS",
+      "attack": "expire 018e0ead-42b9-49cd-95aa-6ffc2e595ca3",
+      "identity": "service_cleanup",
+      "http": 200,
+      "result": "[{\"id\":\"018e0ead-42b9-49cd-95aa-6ffc2e595ca3\",\"live_id\":\"4e0d4898-662a-41be-bd2f-f267ab9ddd26\",\"live_item_id\":\"639da624-cc5a-44fe-a821-9f2ae55c6858\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"requested_qty\":1,\"queue_position\":3,\"source\":\"fleaber_live\",\"status\":\"expired\",\"notes\":null,\"processed_by_user_id\":null,\"expires_at\":null,\"created_at\":\"2026-08-29T14:30:02.693757+00:00\",\"updated_at\":\"2026-08-29T14:33:16.175619+00:00\",\"effective_at\":\"2026-08-29T14:30:02.693757+00:00\",\"detected_at\":null,\"external_display_name\":null,\"external_buyer_ref\":null,\"chat_sequence\":null,\"avatar_phash\":null,\"ocr_raw_line\":null,\"ingest_channel\":null,\"ingest_…"
+    },
+    {
+      "surface": "LIVE RESERVATIONS",
+      "attack": "expire 18160611-1054-45d9-b703-632114f93088",
+      "identity": "service_cleanup",
+      "http": 200,
+      "result": "[{\"id\":\"18160611-1054-45d9-b703-632114f93088\",\"live_id\":\"4e0d4898-662a-41be-bd2f-f267ab9ddd26\",\"live_item_id\":\"639da624-cc5a-44fe-a821-9f2ae55c6858\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"buyer_id\":\"865dd822-5cc6-4868-9eee-ce46fd45522c\",\"requested_qty\":1,\"queue_position\":3,\"source\":\"fleaber_live\",\"status\":\"expired\",\"notes\":null,\"processed_by_user_id\":null,\"expires_at\":null,\"created_at\":\"2026-08-29T14:30:02.693822+00:00\",\"updated_at\":\"2026-08-29T14:33:16.281998+00:00\",\"effective_at\":\"2026-08-29T14:30:02.693822+00:00\",\"detected_at\":null,\"external_display_name\":null,\"external_buyer_ref\":null,\"chat_sequence\":null,\"avatar_phash\":null,\"ocr_raw_line\":null,\"ingest_channel\":null,\"ingest_…"
+    },
+    {
+      "surface": "LIVE RESERVATIONS",
+      "attack": "expire c61bca30-5a82-4ce3-8e72-37ba9a183420",
+      "identity": "service_cleanup",
+      "http": 200,
+      "result": "[{\"id\":\"c61bca30-5a82-4ce3-8e72-37ba9a183420\",\"live_id\":\"4e0d4898-662a-41be-bd2f-f267ab9ddd26\",\"live_item_id\":\"639da624-cc5a-44fe-a821-9f2ae55c6858\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"requested_qty\":1,\"queue_position\":2,\"source\":\"fleaber_live\",\"status\":\"expired\",\"notes\":null,\"processed_by_user_id\":null,\"expires_at\":\"2026-08-29T15:10:39.506667+00:00\",\"created_at\":\"2026-08-29T14:25:39.506667+00:00\",\"updated_at\":\"2026-08-29T14:33:16.377035+00:00\",\"effective_at\":\"2026-08-29T14:25:39.506667+00:00\",\"detected_at\":null,\"external_display_name\":null,\"external_buyer_ref\":null,\"chat_sequence\":null,\"avatar_phash\":null,\"ocr_raw_line\":null,…"
+    },
+    {
+      "surface": "LIVE RESERVATIONS",
+      "attack": "expire cbfe925f-9c20-451c-a354-3d4a9db007af",
+      "identity": "service_cleanup",
+      "http": 200,
+      "result": "[{\"id\":\"cbfe925f-9c20-451c-a354-3d4a9db007af\",\"live_id\":\"4e0d4898-662a-41be-bd2f-f267ab9ddd26\",\"live_item_id\":\"639da624-cc5a-44fe-a821-9f2ae55c6858\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"buyer_id\":\"f7a45cb2-67b1-4da5-83dd-50a14d8d3b67\",\"requested_qty\":1,\"queue_position\":1,\"source\":\"fleaber_live\",\"status\":\"expired\",\"notes\":null,\"processed_by_user_id\":null,\"expires_at\":\"2026-08-29T15:10:39.48879+00:00\",\"created_at\":\"2026-08-29T14:25:39.48879+00:00\",\"updated_at\":\"2026-08-29T14:33:16.469661+00:00\",\"effective_at\":\"2026-08-29T14:25:39.48879+00:00\",\"detected_at\":null,\"external_display_name\":null,\"external_buyer_ref\":null,\"chat_sequence\":null,\"avatar_phash\":null,\"ocr_raw_line\":null,\"in…"
+    },
+    {
+      "surface": "LIVE",
+      "attack": "stock after expire cleanup",
+      "identity": "service_observe",
+      "http": 200,
+      "result": "{\"ok\": true, \"price\": 15, \"live_id\": \"4e0d4898-662a-41be-bd2f-f267ab9ddd26\", \"ref_code\": \"P001RLOK-1787824450528424\", \"item_kind\": \"marketplace_product\", \"total_qty\": 5, \"product_id\": \"1d83cde4-ef95-46d9-ba79-687fc321ef5e\", \"blocked_qty\": 0, \"live_status\": \"live\", \"live_item_id\": \"639da624-cc5a-44fe-a821-9f2ae55c6858\", \"available_qty\": 5, \"pending_bag_qty\": 0, \"sold_converted_qty\": 0, \"checkout_product_id\": \"1d83cde4-ef95-46d9-ba79-687fc321ef5e\", \"reserved_accepted_qty\": 0}"
+    }
+  ],
+  "stripe": [
+    {
+      "probe": "underpay",
+      "http": 200,
+      "raw": "{\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1vIW1aJRbgaQGjrLpEDotWtd0IhMs1PuGT0YPGVMCdmeVTWgMBapZdHPQ#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21oYWlsUnxrVkRhQUQyNlJjSWBCN3BXNXVvVT1hamlcf3Fjd1dRMGJmREk9Yz09PH1CMzVTY0pBXD1kMU5HZl1da05gf0s1XGQ1NWA3bVFBNzNMJyknY3dqaFZgd3Ngdyc%2FcXdwYCknZ2RmbmJ3anBrYUZqaWp3Jz8nJmNjY2NjYycpJ2lkfGpwcVF8dWAnPyd2bGtiaWBabHFgaCcpJ2BrZGdpYFVpZGZgbWppYWB3dic%2FcXdwYHgl\",\"checkoutSessionId\":\"cs_test_a1vIW1aJRbgaQGjrLpEDotWtd0IhMs1PuGT0YPGVMCdmeVTWgMBapZdHPQ\",\"paidChatId\":\"1f9a767f-7a86-4103-b056-b4efb4d8df33\",\"server_amount_cents\":2165,\"amount_total\":2165}",
+      "amt": 2165
+    },
+    {
+      "probe": "prize",
+      "http": 400,
+      "raw": "{\"error\":\"Checkout blocked: order is not a raffle prize.\"}",
+      "amt": null
+    },
+    {
+      "probe": "catalog_drop",
+      "http": 200,
+      "raw": "{\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1B37sskNtT4Gj3Fnu6jHyb0YIFdtkWiRW7Z5iPiwG4lE6WbQXTI2Vx8sK#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21oYWlsUnxrVkRhQUQyNlJjSWBCN3BXNXVvVT1hamlcf3Fjd1dRMGJmREk9Yz09PH1CMzVTY0pBXD1kMU5HZl1da05gf0s1XGQ1NWA3bVFBNzNMJyknY3dqaFZgd3Ngdyc%2FcXdwYCknZ2RmbmJ3anBrYUZqaWp3Jz8nJmNjY2NjYycpJ2lkfGpwcVF8dWAnPyd2bGtiaWBabHFgaCcpJ2BrZGdpYFVpZGZgbWppYWB3dic%2FcXdwYHgl\",\"checkoutSessionId\":\"cs_test_a1B37sskNtT4Gj3Fnu6jHyb0YIFdtkWiRW7Z5iPiwG4lE6WbQXTI2Vx8sK\",\"paidChatId\":\"df688126-0303-43c9-83c2-a7d60d50293c\",\"server_amount_cents\":2165,\"amount_total\":2165}",
+      "amt": 2165
+    },
+    {
+      "probe": "stock1_A",
+      "http": 200,
+      "raw": "{\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1Eu7w3q5DOanicv1kCMiiu1ybAvlD3As2QqyNfpqPSFP1vSuzjduQ92Ds#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21oYWlsUnxrVkRhQUQyNlJjSWBCN3BXNXVvVT1hamlcf3Fjd1dRMGJmREk9Yz09PH1CMzVTY0pBXD1kMU5HZl1da05gf0s1XGQ1NWA3bVFBNzNMJyknY3dqaFZgd3Ngdyc%2FcXdwYCknZ2RmbmJ3anBrYUZqaWp3Jz8nJmNjY2NjYycpJ2lkfGpwcVF8dWAnPyd2bGtiaWBabHFgaCcpJ2BrZGdpYFVpZGZgbWppYWB3dic%2FcXdwYHgl\",\"checkoutSessionId\":\"cs_test_a1Eu7w3q5DOanicv1kCMiiu1ybAvlD3As2QqyNfpqPSFP1vSuzjduQ92Ds\",\"paidChatId\":\"313f2348-f3f8-4cd2-ac26-96e1fe2be119\",\"server_amount_cents\":905,\"amount_total\":905}",
+      "order_id": "f0fd22c3-ff21-40d3-93a6-e3a2910e696c",
+      "product_id": "8905c9c1-7af0-4a38-ac71-8f2968347743",
+      "amt": 905,
+      "session": "cs_test_a1Eu7w3q5DOanicv1kCMiiu1ybAvlD3As2QqyNfpqPSFP1vSuzjduQ92Ds",
+      "url": "https://checkout.stripe.com/c/pay/cs_test_a1Eu7w3q5DOanicv1kCMiiu1ybAvlD3As2QqyNfpqPSFP1vSuzjduQ92Ds#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21oYWlsUnxrVkRhQUQyNlJjSWBCN3BXNXVvVT1hamlcf3Fjd1dRMGJmREk9Yz09PH1CMzVTY0pBXD1kMU5HZl1da05gf0s1XGQ1NWA3bVFBNzNMJyknY3dqaFZgd3Ngdyc%2FcXdwYCknZ2RmbmJ3anBrYUZqaWp3Jz8nJmNjY2NjYycpJ2lkfGpwcVF8dWAnPyd2bGtiaWBabHFgaCcpJ2BrZGdpYFVpZGZgbWppYWB3dic%2FcXdwYHgl"
+    },
+    {
+      "probe": "stock1_B",
+      "http": 200,
+      "raw": "{\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1nNMGLreGatZ6ZBpKxBgGNviNnY2jZXoGAaFwsHbMYlV7ZTm6CqpRituJ#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21oYWlsUnxrVkRhQUQyNlJjSWBCN3BXNXVvVT1hamlcf3Fjd1dRMGJmREk9Yz09PH1CMzVTY0pBXD1kMU5HZl1da05gf0s1XGQ1NWA3bVFBNzNMJyknY3dqaFZgd3Ngdyc%2FcXdwYCknZ2RmbmJ3anBrYUZqaWp3Jz8nJmNjY2NjYycpJ2lkfGpwcVF8dWAnPyd2bGtiaWBabHFgaCcpJ2BrZGdpYFVpZGZgbWppYWB3dic%2FcXdwYHgl\",\"checkoutSessionId\":\"cs_test_a1nNMGLreGatZ6ZBpKxBgGNviNnY2jZXoGAaFwsHbMYlV7ZTm6CqpRituJ\",\"paidChatId\":\"d7435f6e-4c5c-4fc5-a6fc-8252560bcbae\",\"server_amount_cents\":905,\"amount_total\":905}",
+      "order_id": "039f016f-b62a-40d2-95c8-1a17cd6bbc77",
+      "product_id": "8905c9c1-7af0-4a38-ac71-8f2968347743",
+      "amt": 905,
+      "session": "cs_test_a1nNMGLreGatZ6ZBpKxBgGNviNnY2jZXoGAaFwsHbMYlV7ZTm6CqpRituJ",
+      "url": "https://checkout.stripe.com/c/pay/cs_test_a1nNMGLreGatZ6ZBpKxBgGNviNnY2jZXoGAaFwsHbMYlV7ZTm6CqpRituJ#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21oYWlsUnxrVkRhQUQyNlJjSWBCN3BXNXVvVT1hamlcf3Fjd1dRMGJmREk9Yz09PH1CMzVTY0pBXD1kMU5HZl1da05gf0s1XGQ1NWA3bVFBNzNMJyknY3dqaFZgd3Ngdyc%2FcXdwYCknZ2RmbmJ3anBrYUZqaWp3Jz8nJmNjY2NjYycpJ2lkfGpwcVF8dWAnPyd2bGtiaWBabHFgaCcpJ2BrZGdpYFVpZGZgbWppYWB3dic%2FcXdwYHgl"
+    }
+  ],
+  "notes": [
+    "live_stock_restored={\"ok\": true, \"price\": 15, \"live_id\": \"4e0d4898-662a-41be-bd2f-f267ab9ddd26\", \"ref_code\": \"P001RLOK-1787824450528424\", \"item_kind\": \"marketplace_product\", \"total_qty\": 5, \"product_id\": \"1d83cde4-ef95-46d9-ba79-687fc321ef5e\", \"blocked_qty\": 0, \"live_status\": \"live\", \"live_item_id\": \"639da624-cc5a-44fe-a821-9f2ae55c6858\", \"available_qty\": 5, \"pending_bag_qty\": 0, \"sold_converted_qty\": 0, \"checkout_product_id\": \"1d83cde4-ef95-46d9-ba79-687fc321ef5e\", \"reserved_accepted_qty\": 0}",
+    "underprice_insert status=reserva_pendente qty=1 contract_qty=1 unit=2000 total=0.5",
+    "stock1_orders a=f0fd22c3-ff21-40d3-93a6-e3a2910e696c b=039f016f-b62a-40d2-95c8-1a17cd6bbc77",
+    "RPC_INTERESTING batata_release_seller_wallet_for_order 200 false",
+    "RPC_INTERESTING batata_refund_buyer_wallet_for_order 200 false",
+    "live_stock_restored={\"ok\": true, \"price\": 15, \"live_id\": \"4e0d4898-662a-41be-bd2f-f267ab9ddd26\", \"ref_code\": \"P001RLOK-1787824450528424\", \"item_kind\": \"marketplace_product\", \"total_qty\": 5, \"product_id\": \"1d83cde4-ef95-46d9-ba79-687fc321ef5e\", \"blocked_qty\": 0, \"live_status\": \"live\", \"live_item_id\": \"639da624-cc5a-44fe-a821-9f2ae55c6858\", \"available_qty\": 5, \"pending_bag_qty\": 0, \"sold_converted_qty\": 0, \"checkout_product_id\": \"1d83cde4-ef95-46d9-ba79-687fc321ef5e\", \"reserved_accepted_qty\": 0}"
+  ]
+}

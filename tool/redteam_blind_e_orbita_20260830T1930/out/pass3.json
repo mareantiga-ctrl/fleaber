@@ -1,0 +1,122 @@
+{
+  "stamp": "20260830T1930",
+  "log": {
+    "ck_stamp": {
+      "http": 400,
+      "snip": "{\"error\":\"Portes inválidos.\"}"
+    },
+    "ck_then": {
+      "http": 400,
+      "snip": "{\"error\":\"Portes inválidos.\"}"
+    },
+    "ck_bun": {
+      "http": 400,
+      "snip": "{\"error\":\"Portes inválidos.\"}"
+    },
+    "ck_ok_redir": {
+      "http": 400,
+      "snip": "{\"error\":\"Portes inválidos.\"}"
+    },
+    "buyer_accept": {
+      "http": 403,
+      "snip": "{\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"bundle_accept_seller_only\"}"
+    },
+    "lives_id,status,title": {
+      "http": 200,
+      "snip": "[{\"id\":\"5dd5cfd2-63b1-4cd8-82b1-c888e9dc5234\",\"status\":\"ended\",\"title\":\"O meu direto\"}, \n {\"id\":\"301713b2-49b0-409c-b758-4c2153b2ddd1\",\"status\":\"ended\",\"title\":\"O meu direto\"}]"
+    },
+    "lives_id,mux_playback_id": {
+      "http": 200,
+      "snip": "[{\"id\":\"5dd5cfd2-63b1-4cd8-82b1-c888e9dc5234\",\"mux_playback_id\":\"00ErJWBwqaXL00hlMxr015H4o00prdwhoNeSwu1959nO59c\"}, \n {\"id\":\"301713b2-49b0-409c-b758-4c2153b2ddd1\",\"mux_playback_id\":\"nawV6qIHrJ00FqiFVAte00AMis4yxxXWee9LWoTrOLDc00\"}]"
+    },
+    "lives_id,viewer_count": {
+      "http": 200,
+      "snip": "[{\"id\":\"5dd5cfd2-63b1-4cd8-82b1-c888e9dc5234\",\"viewer_count\":0}, \n {\"id\":\"301713b2-49b0-409c-b758-4c2153b2ddd1\",\"viewer_count\":0}]"
+    },
+    "lives_id,publish_backend": {
+      "http": 200,
+      "snip": "[{\"id\":\"5dd5cfd2-63b1-4cd8-82b1-c888e9dc5234\",\"publish_backend\":\"mux_rtmp\"}, \n {\"id\":\"301713b2-49b0-409c-b758-4c2153b2ddd1\",\"publish_backend\":\"mux_rtmp\"}]"
+    },
+    "hub_unlist": {
+      "http": 200,
+      "snip": "[]"
+    },
+    "unlist_stock": {
+      "http": 200,
+      "snip": "[{\"id\":\"3c58b97d-a083-47c3-9a0f-df8397b58d61\",\"quantity\":1,\"is_sold\":false,\"list_on_marketplace\":false}]"
+    },
+    "held_qty": {
+      "http": 200,
+      "snip": "1"
+    }
+  },
+  "findings": [
+    {
+      "id": "E1930-E6-STAMP-SESSION-41",
+      "lens": "E6",
+      "severity": "P2",
+      "title": "Checkout unlist+stamp: 400 {\"error\":\"Portes inválidos.\"}",
+      "pre": "order c5d6b577-19b9-491e-b286-ea12cebf3c15 product unlisted live_id ended",
+      "repro": "POST create-payment-intent order_id+buyer_id JWT buyer",
+      "proven": true,
+      "evidence": {
+        "http": 400,
+        "snip": "{\"error\":\"Portes inválidos.\"}",
+        "session": false
+      },
+      "note": "hold 201 já provado; este passo é o gate Edge."
+    },
+    {
+      "id": "E1930-E6-THEN-UNLIST-SESSION-42",
+      "lens": "E6",
+      "severity": "INFO",
+      "title": "Edge bloqueia checkout após unlist (sem live_id)",
+      "pre": "order dc3550fd-a813-4c8d-bfe7-208ca7875875",
+      "repro": "POST create-payment-intent after unlist",
+      "proven": false,
+      "evidence": {
+        "http": 400,
+        "snip": "{\"error\":\"Portes inválidos.\"}"
+      }
+    },
+    {
+      "id": "E1930-E4-BUN-SESSION-43",
+      "lens": "E4",
+      "severity": "INFO",
+      "title": "Edge recusa/ajusta bundle pending",
+      "pre": "bundle 86c8e11b-d682-4e6f-8517-516e484fee2e pending total 0.50",
+      "repro": "create-payment-intent order with bundle_id",
+      "proven": false,
+      "evidence": {
+        "http": 400,
+        "snip": "{\"error\":\"Portes inválidos.\"}"
+      }
+    },
+    {
+      "id": "E1930-E7-SESSION-ORIGIN-44",
+      "lens": "E7",
+      "severity": "INFO",
+      "title": "Checkout listed-ok falhou (não testa origin)",
+      "pre": "sanitize endsWith .fleaber.pt",
+      "repro": "create-payment-intent web_return_origin=https://attacker.fleaber.pt",
+      "proven": false,
+      "evidence": {
+        "http": 400,
+        "snip": "{\"error\":\"Portes inválidos.\"}"
+      }
+    },
+    {
+      "id": "E1930-E4-BUYER-ACCEPT-45",
+      "lens": "E4",
+      "severity": "INFO",
+      "title": "Buyer não aceita o próprio bundle",
+      "pre": "guard bundle_accept_seller_only",
+      "repro": "PATCH product_bundles status=accepted JWT buyer",
+      "proven": false,
+      "evidence": {
+        "http": 403,
+        "snip": "{\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"bundle_accept_seller_only\"}"
+      }
+    }
+  ]
+}

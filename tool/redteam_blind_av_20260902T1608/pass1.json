@@ -1,0 +1,426 @@
+{
+  "stamp": "20260902T1608",
+  "prefix": "RTAV-20260902T1608",
+  "lenses": [
+    "AV1",
+    "AV2",
+    "AV3",
+    "AV4",
+    "AV5",
+    "AV6",
+    "AV7",
+    "AV8"
+  ],
+  "findings": [
+    {
+      "id": "AV2-11",
+      "lens": "AV2",
+      "severity": "P2",
+      "title": "Buyer PATCH chat → kind=system",
+      "actor": "buyer JWT",
+      "pre": "mensagem chat própria",
+      "repro": "PATCH live_messages kind=system",
+      "expected": "sem policy UPDATE / 403",
+      "obtained": "200 []",
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "AV6-03",
+      "lens": "AV6",
+      "severity": "P3",
+      "title": "Seller reabre live ended e accept pending antigo",
+      "actor": "seller JWT",
+      "pre": "PATCH lives status=live is_active=true depois ended",
+      "repro": "reopen JWT + rpc accept",
+      "expected": "produto: seller dono pode reabrir; documentar se fila fantasma revive",
+      "obtained": "200 {\"ok\": true, \"item_qty\": 1, \"request_id\": \"7066fd6e-fb10-4c2f-bd9b-947e8bf986cf\", \"item_status\": \"reserved_full\", \"reserved_qty\": 1}",
+      "proven": true,
+      "evidence": {
+        "res": {
+          "id": "7066fd6e-fb10-4c2f-bd9b-947e8bf986cf",
+          "status": "accepted",
+          "requested_qty": 1,
+          "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+          "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+          "live_item_id": "d034f21e-8ec2-497a-9020-159104387dc5",
+          "live_id": "13467efa-6e7f-4dfc-ac34-e28361a5f3cb",
+          "source": "fleaber_live",
+          "processed_by_user_id": "980f4fa1-0004-42f9-abca-69f1a9c29588"
+        }
+      }
+    }
+  ],
+  "blocked": [
+    {
+      "id": "AV1-01",
+      "lens": "AV1",
+      "title": "Buyer INSERT reservation converted (force pending)",
+      "ev": "201 [{\"id\":\"2a726737-b3eb-48ff-a5c4-4e43aa032629\",\"live_id\":\"59b890e3-62eb-4a8d-98d8-1e220a3464d1\",\"live_item_id\":\"8144f7dc-653e-4dda-b3ea-8acd63e31ff8\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0…"
+    },
+    {
+      "id": "AV1-02",
+      "lens": "AV1",
+      "title": "Convert accepted sem order paga",
+      "ev": "200 {\"ok\": false, \"error\": \"convert_requires_paid_order\"}"
+    },
+    {
+      "id": "AV1-03",
+      "lens": "AV1",
+      "title": "Convert com order cancelada mas PI vivo",
+      "ev": "200 {\"ok\": false, \"error\": \"convert_requires_paid_order\"}"
+    },
+    {
+      "id": "AV1-04",
+      "lens": "AV1",
+      "title": "Convert item A com order paga do live_item A2",
+      "ev": "200 {\"ok\": false, \"error\": \"convert_requires_paid_order\"}"
+    },
+    {
+      "id": "AV1-05",
+      "lens": "AV1",
+      "title": "PATCH status=converted sem PI deste item",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"convert_requires_paid_order\"}"
+    },
+    {
+      "id": "AV1-06",
+      "lens": "AV1",
+      "title": "Seller INSERT reservation já converted",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"new row violates row-level security policy for table \\\"live_reservation_requests\\\"\"}"
+    },
+    {
+      "id": "AV1-07",
+      "lens": "AV1",
+      "title": "Broadcast com order cancelada + PI (seller JWT)",
+      "ev": "200 false"
+    },
+    {
+      "id": "AV1-08",
+      "lens": "AV1",
+      "title": "Broadcast noutro live_item sem order paga desse item",
+      "ev": "200 false"
+    },
+    {
+      "id": "AV1-09",
+      "lens": "AV1",
+      "title": "Broadcast live B com item/order da live A",
+      "ev": "200 false"
+    },
+    {
+      "id": "AV1-10",
+      "lens": "AV1",
+      "title": "Buyer1 broadcast a anunciar compra do buyer2",
+      "ev": "200 false"
+    },
+    {
+      "id": "AV2-01",
+      "lens": "AV2",
+      "title": "Helper can_manage_chat only executa mark_sold",
+      "ev": "200 {\"ok\": false, \"error\": \"not_allowed\"}"
+    },
+    {
+      "id": "AV2-02",
+      "lens": "AV2",
+      "title": "Helper can_manage_chat accept reserva",
+      "ev": "200 {\"ok\": false, \"error\": \"not_allowed\"}"
+    },
+    {
+      "id": "AV2-03",
+      "lens": "AV2",
+      "title": "Helper can_manage_chat convert",
+      "ev": "200 {\"ok\": false, \"error\": \"not_allowed\"}"
+    },
+    {
+      "id": "AV2-04",
+      "lens": "AV2",
+      "title": "Helper can_manage_chat broadcast sem order paga do item",
+      "ev": "200 false"
+    },
+    {
+      "id": "AV2-05",
+      "lens": "AV2",
+      "title": "Helper can_manage_chat posta prova social falsa via system_message",
+      "ev": "200 {\"ok\": true}"
+    },
+    {
+      "id": "AV2-06",
+      "lens": "AV2",
+      "title": "Buyer RPC system_message prova social falsa",
+      "ev": "200 {\"ok\": false, \"error\": \"not_allowed\"}"
+    },
+    {
+      "id": "AV2-07",
+      "lens": "AV2",
+      "title": "Seller2 system_message na live A",
+      "ev": "200 {\"ok\": false, \"error\": \"not_allowed\"}"
+    },
+    {
+      "id": "AV2-08",
+      "lens": "AV2",
+      "title": "Helper escalate perms via PATCH próprio seller_helpers",
+      "ev": "200 []"
+    },
+    {
+      "id": "AV2-09",
+      "lens": "AV2",
+      "title": "Buyer INSERT live_messages kind=system directo",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"new row violates row-level security policy for table \\\"live_messages\\\"\"}"
+    },
+    {
+      "id": "AV2-10",
+      "lens": "AV2",
+      "title": "Seller INSERT live_messages kind=system directo",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"new row violates row-level security policy for table \\\"live_messages\\\"\"}"
+    },
+    {
+      "id": "AV3-01",
+      "lens": "AV3",
+      "title": "Item paused visível em Hub/REST buyer/anon stock",
+      "ev": "200 {\"ok\": false, \"error\": \"live_item_not_found\"}"
+    },
+    {
+      "id": "AV3-03",
+      "lens": "AV3",
+      "title": "Stock/Hub de live ended visível a anon",
+      "ev": "200 {\"ok\": false, \"error\": \"live_item_not_found\"}"
+    },
+    {
+      "id": "AV3-04",
+      "lens": "AV3",
+      "title": "INSERT reserva pending em live ended",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"live_ended\"}"
+    },
+    {
+      "id": "AV6-01",
+      "lens": "AV6",
+      "title": "UPDATE pending→accepted após live ended",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"live_ended\"}"
+    },
+    {
+      "id": "AV6-02",
+      "lens": "AV6",
+      "title": "RPC accept após live ended",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"live_ended\"}"
+    },
+    {
+      "id": "AV6-04",
+      "lens": "AV6",
+      "title": "Race micro: end live ∥ accept pending",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"live_ended\"}"
+    },
+    {
+      "id": "AV6-05",
+      "lens": "AV6",
+      "title": "Stock=1 duas accepts paralelas",
+      "ev": "200 {\"ok\": true, \"item_qty\": 1, \"request_id\": \"aab2bd66-c8c8-4091-855b-856d09dd5b5d\", \"item_status\": \"reserved_full\", \"reserved_qty\": 1}"
+    },
+    {
+      "id": "AV4-01",
+      "lens": "AV4",
+      "title": "mark_sold live_only hitch SKU próprio sem PI deslista catálogo",
+      "ev": "200 {\"ok\": true, \"price\": 10.0, \"live_id\": \"59b890e3-62eb-4a8d-98d8-1e220a3464d1\", \"ref_code\": \"AV9324913\", \"item_kind\": \"live_only\", \"total_qty\": 1, \"product_id\": null, \"blocked_qty\": 0, \"live_status\": \"live\", \"live_item_id\": \"3e59b3f6-a8d0-46…"
+    },
+    {
+      "id": "AV4-02",
+      "lens": "AV4",
+      "title": "Hitch checkout_product de seller2 no item da live A",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"live_item_checkout_product_seller_mismatch\"}"
+    },
+    {
+      "id": "AV4-03",
+      "lens": "AV4",
+      "title": "Buyer mark_sold",
+      "ev": "200 {\"ok\": false, \"error\": \"not_allowed\"}"
+    },
+    {
+      "id": "AV4-04",
+      "lens": "AV4",
+      "title": "Seller2 mark_sold na live A",
+      "ev": "200 {\"ok\": false, \"error\": \"not_allowed\"}"
+    },
+    {
+      "id": "AV4-05",
+      "lens": "AV4",
+      "title": "INSERT live_item já status=sold (JWT seller)",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"live_item_status_sold_rpc_only\"}"
+    },
+    {
+      "id": "AV5-01",
+      "lens": "AV5",
+      "title": "Seller infla quantity live_only",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"live_item_qty_increase_not_allowed\"}"
+    },
+    {
+      "id": "AV5-02",
+      "lens": "AV5",
+      "title": "Mover live_item com reservas para live de seller2",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"live_item_not_authorized\"}"
+    },
+    {
+      "id": "AV5-03",
+      "lens": "AV5",
+      "title": "Hitch product_id de seller2",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"live_item_product_seller_mismatch\"}"
+    },
+    {
+      "id": "AV5-04",
+      "lens": "AV5",
+      "title": "Reserva live A apontando a item da live S2",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"live_item_live_mismatch\"}"
+    },
+    {
+      "id": "AV7-01",
+      "lens": "AV7",
+      "title": "Buyer complete-mux-live na live do seller",
+      "ev": "403 {\"error\":\"Sem permissão para esta live.\",\"step\":\"auth\"}"
+    },
+    {
+      "id": "AV7-02",
+      "lens": "AV7",
+      "title": "Seller2 complete-mux-live na live A",
+      "ev": "403 {\"error\":\"Sem permissão para esta live.\",\"step\":\"auth\"}"
+    },
+    {
+      "id": "AV7-03",
+      "lens": "AV7",
+      "title": "Buyer create-mux-live (custo Mux)",
+      "ev": "403 {\"error\":\"Apenas contas de vendedor podem criar directos.\",\"step\":\"authz\"}"
+    },
+    {
+      "id": "AV7-04",
+      "lens": "AV7",
+      "title": "Seller2 pede token LiveKit da live A",
+      "ev": "403 {\"error\":\"Sem permissão para esta live.\",\"step\":\"auth\"}"
+    },
+    {
+      "id": "AV7-05",
+      "lens": "AV7",
+      "title": "Buyer PATCH lives ended (sabotar directo)",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table lives\"}"
+    },
+    {
+      "id": "AV7-06",
+      "lens": "AV7",
+      "title": "Buyer lê mux_stream_key / stream_key",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table lives\"}"
+    },
+    {
+      "id": "AV7-07",
+      "lens": "AV7",
+      "title": "Seller2 toma ownership da live A",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table lives\"}"
+    },
+    {
+      "id": "AV8-01",
+      "lens": "AV8",
+      "title": "Buyer INSERT order já status=pago (fantasma)",
+      "ev": "201 {id: c505a200-fda7-40e1-a203-507e2f4d1a45, status: reserva_pendente, buyer_id: bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96, seller_id: 980f4fa1-0004-42f9-abca-69f1a9c29588, product_id: 8c63909f-3747-4f53-a112-e0b1558bde39, quantity: 1, price_total…"
+    },
+    {
+      "id": "AV8-02",
+      "lens": "AV8",
+      "title": "Buyer PATCH order para pago + PI forjado",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"order_money_fields_immutable\"}"
+    },
+    {
+      "id": "AV8-03",
+      "lens": "AV8",
+      "title": "broadcast forjado N/A (PATCH pago bloqueado)",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"order_money_fields_immutable\"}"
+    },
+    {
+      "id": "AV8-04",
+      "lens": "AV8",
+      "title": "Δ wallet após probes sem Stripe TEST pago",
+      "ev": "200 {buyer: 61.1, seller: 0.0, buyer2: 0, seller2: 0} ΔB=0.0 ΔS=0.0 ΔB2=0 ΔS2=0"
+    }
+  ],
+  "skipped": [],
+  "notes": [
+    {
+      "id": "av.wallets0",
+      "lens": "AV8",
+      "title": "wallet snapshot start",
+      "ev": {
+        "buyer": 61.1,
+        "seller": 0.0,
+        "buyer2": 0,
+        "seller2": 0
+      }
+    },
+    {
+      "id": "av.helper.chat",
+      "lens": "AV2",
+      "title": "helper can_manage_chat only",
+      "ev": "21d7d0a9-b8c6-4789-b514-c9d9c59798fd"
+    },
+    {
+      "id": "av1.accept",
+      "lens": "AV1",
+      "title": "seller accept pending",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"live_item_qty_below_reservations\"}"
+    },
+    {
+      "id": "av1.cancelPi",
+      "lens": "AV1",
+      "title": "order cancelada + PI + cents",
+      "ev": "14cc4fb3-21f1-4590-9ca1-87fe59099fd8"
+    },
+    {
+      "id": "av6.pend",
+      "lens": "AV6",
+      "title": "pending while live",
+      "ev": "201 [{\"id\":\"7066fd6e-fb10-4c2f-bd9b-947e8bf986cf\",\"live_id\":\"13467efa-6e7f-4dfc-ac34-e28361a5f3cb\",\"live_item_id\":\"d034f21e-8ec2-497a-9020-159104387dc5\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0…"
+    }
+  ],
+  "actors": {
+    "buyer": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+    "seller": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+    "buyer2": "a40e5377-925d-45e5-a646-81d2a4d30b42",
+    "seller2": "c37d61fe-94e3-4929-b45f-98e1a324a7bc",
+    "helper": "f072210d-0597-40c4-a107-cddca0f75ee2"
+  },
+  "created": {
+    "lives": [
+      "59b890e3-62eb-4a8d-98d8-1e220a3464d1",
+      "50f8409f-1611-48eb-85fa-09351d8231de",
+      "0053d05a-8821-4154-a81c-781c5968e548",
+      "13467efa-6e7f-4dfc-ac34-e28361a5f3cb",
+      "ea070be5-ff59-4f74-add4-95ff26bb2671",
+      "b389a832-4bca-481b-9684-0ace004fb6ac"
+    ],
+    "items": [
+      "8144f7dc-653e-4dda-b3ea-8acd63e31ff8",
+      "9740ee73-c98b-445c-9194-1df222daf8e1",
+      "00a48a6a-82d5-46f4-9547-17ca494a38c0",
+      "20460d1c-2a21-4a10-a3ac-28927381c50b",
+      "296d66eb-4f44-4d6f-9d22-7b2d930ffb8e",
+      "aa740277-ca73-4060-b865-a6111513b70e",
+      "d034f21e-8ec2-497a-9020-159104387dc5",
+      "c687bf34-0bd0-4de9-a2ce-c4979e9560bb",
+      "f36f9b92-1b02-48ed-a938-8cc4f1282900",
+      "3e59b3f6-a8d0-46d6-bbf4-794655d9be2e"
+    ],
+    "orders": [
+      "14cc4fb3-21f1-4590-9ca1-87fe59099fd8",
+      "77cdf6c9-1554-483e-80cf-94003a1a66f6",
+      "c505a200-fda7-40e1-a203-507e2f4d1a45"
+    ],
+    "products": [
+      "8c63909f-3747-4f53-a112-e0b1558bde39",
+      "2861ea2a-44ad-4a04-835d-b487de633f75",
+      "d16e64e8-2192-46f2-875c-2be2cee1edca",
+      "bd1e7eaf-4794-4317-a69f-9759b031bd9f"
+    ],
+    "reservations": [
+      "2a726737-b3eb-48ff-a5c4-4e43aa032629",
+      "7066fd6e-fb10-4c2f-bd9b-947e8bf986cf",
+      "d60ed25b-7739-4651-97c2-718cb458bc34",
+      "aab2bd66-c8c8-4091-855b-856d09dd5b5d",
+      "5fc32d85-c0bf-49d7-a206-64fcb63878a1"
+    ],
+    "helpers": [
+      "21d7d0a9-b8c6-4789-b514-c9d9c59798fd"
+    ]
+  }
+}

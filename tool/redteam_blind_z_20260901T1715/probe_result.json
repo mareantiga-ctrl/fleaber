@@ -1,0 +1,362 @@
+{
+  "prefix": "RTZ-20260901T1715-",
+  "order_id": "1c12455b-7393-4e9e-86d0-edcd5d75083a",
+  "chat_id": "4aa6e40a-3bd4-468b-b17c-351dce58d4d5",
+  "unpaid_id": "c3cf2791-0baa-47d1-ae78-620cc43caaf9",
+  "buyer": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+  "seller": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+  "b2": "e621595b-80f2-49e7-a7c8-01c8d5268c78",
+  "svc_receipt_id": "953",
+  "paid_cents": 590,
+  "findings": [
+    {
+      "id": "Z1-DIRECT-PAY-AMOUNT-LIE",
+      "sev": "P1",
+      "lens": "Z1",
+      "actor": "seller JWT",
+      "title": "Card order_direct_payment_details aceita amount_eur=1.00 sem cruzar preço da encomenda (12.34)",
+      "repro": "POST chat_messages FLEABER_JSON_V1 kind=order_direct_payment_details amount_eur=1 order reservado 12.34",
+      "expected": "total alinhado à BD (mesmo contrato que seguro_fleaber_paid)",
+      "obtained": {
+        "http": 201,
+        "msg_id": "956",
+        "text": "FLEABER_JSON_V1:{\"kind\":\"order_direct_payment_details\",\"order_id\":\"c3cf2791-0baa-47d1-ae78-620cc43caaf9\",\"amount_eur\":1.0,\"mb_way\":\"910000000\",\"iban\":\"PT50000000000000000000000\"}"
+      },
+      "impact": "UI Flutter mostra «Valor a transferir» a partir do JSON (não da BD). Comprador pode transferir o valor mentido."
+    },
+    {
+      "id": "Z1-PRICE-OFFER-OUTCOME-FAKE",
+      "sev": "P1",
+      "lens": "Z1",
+      "actor": "seller JWT",
+      "title": "price_offer_outcome accepted amount=0.01 sem oferta na BD — Flutter pinta «Proposta aceite — 0,01 €»",
+      "repro": "POST kind=price_offer_outcome outcome=accepted amount=0.01 offer_id fantasma",
+      "expected": "exigir product_offers.status=accepted e amount da BD",
+      "obtained": {
+        "http": 201,
+        "id": "957"
+      }
+    },
+    {
+      "id": "Z1-BUNDLE-RAW-JSON-NO-PREFIX",
+      "sev": "P1",
+      "lens": "Z1",
+      "actor": "buyer JWT",
+      "title": "Mensagem `{kind:bundle_proposal,total_eur:8888}` sem prefixo FLEABER_JSON_V1 — trigger não valida; Flutter parseia e mostra o total",
+      "repro": "POST chat_messages text={\"kind\":\"bundle_proposal\",\"total_eur\":8888,...} (sem FLEABER_JSON_V1)",
+      "expected": "ou recusar kind operacional em JSON cru, ou o Flutter só pintar FLEABER_JSON_V1",
+      "obtained": {
+        "http": 201,
+        "id": "958"
+      },
+      "impact": "tryParseBundleProposalChatPayload aceita text.trim().startsWith(\"{\"). Card usa payload.total_eur se não houver bundle_id."
+    },
+    {
+      "id": "Z1-BUNDLE-NO-ID-TOTAL-FREE",
+      "sev": "P1",
+      "lens": "Z1",
+      "actor": "buyer JWT",
+      "title": "bundle_proposal FLEABER_JSON_V1 sem bundle_id: total_eur=6543.21 aceite (validação só corre se bundle_id presente)",
+      "repro": "POST kind=bundle_proposal total_eur=6543.21 sem bundle_id",
+      "expected": "exigir bundle_id real e total da BD, ou recusar o kind",
+      "obtained": {
+        "http": 201,
+        "id": "959"
+      }
+    },
+    {
+      "id": "Z4-CHAT-IMAGE-ARBITRARY-HTTPS",
+      "sev": "P2",
+      "lens": "Z4",
+      "actor": "buyer JWT",
+      "title": "chat_image URL https://evil.example aceite (guard só bloqueia javascript:/data:/protocol-relative)",
+      "repro": "POST kind=chat_image url=https://evil.example/rtz-phishing.png",
+      "expected": "allowlist storage fleaber_private / domínio próprio",
+      "obtained": {
+        "http": 201,
+        "id": "961"
+      }
+    },
+    {
+      "id": "Z4-CHAT-IMAGE-PATH-TRAVERSAL-STORED",
+      "sev": "P2",
+      "lens": "Z4",
+      "actor": "buyer JWT",
+      "title": "chat_image.path com chat_uploads/../order_proofs/… persistido (Flutter resolveChatImageUrl captura o path e pede signed URL)",
+      "repro": "POST kind=chat_image path=chat_uploads/../order_proofs/{buyer}/{order}/secret.png",
+      "expected": "normalizar/recusar path fora de chat_uploads/{uid}/{chat_id}/",
+      "obtained": {
+        "http": 201,
+        "id": "963"
+      },
+      "impact": "Se createSignedUrl + storage resolverem `..`, pode assinar provas de outro prefixo. Prova de persistência aqui; efeito storage abaixo."
+    },
+    {
+      "id": "Z4-PAYMENT-SUBMITTED-JS-PROOF",
+      "sev": "P1",
+      "lens": "Z4",
+      "actor": "buyer JWT",
+      "title": "reservation_payment_submitted.proof_url=javascript: persistido — não passa pelo guard de chat_image nem de orders.proof_url",
+      "repro": "POST kind=reservation_payment_submitted proof_url=javascript:alert(document.cookie) order reservado",
+      "expected": "mesmo denylist que chat_image / orders.proof_url",
+      "obtained": {
+        "http": 201,
+        "id": "964"
+      },
+      "impact": "Flutter _buildReservationPaymentSubmittedCard usa proof_url no CachedNetworkImage e no dialog, sem allowlist."
+    },
+    {
+      "id": "Z4-PAYMENT-SUBMITTED-EXTERNAL-PROOF",
+      "sev": "P1",
+      "lens": "Z4",
+      "actor": "buyer JWT",
+      "title": "Comprovativo MB WAY no card JSON aponta para https://evil.example (não é orders.proof_url)",
+      "repro": "POST kind=reservation_payment_submitted proof_url=https://evil.example/fake-mbway-receipt.png",
+      "expected": "URL só fleaber_private/order_proofs do pedido",
+      "obtained": {
+        "http": 201,
+        "id": "965"
+      }
+    },
+    {
+      "id": "Z4-PROOF-URL-UNPAID-EXTERNAL",
+      "sev": "P2",
+      "lens": "Z4",
+      "actor": "buyer JWT",
+      "title": "Pedido reservado (não pago) aceita proof_url externo — o trigger só restringe domínio quando v_paid",
+      "repro": "PATCH orders.proof_url=https://evil.example/… status=reservado",
+      "expected": "allowlist sempre, ou null até pagamento",
+      "obtained": {
+        "http": 200,
+        "row": {
+          "id": "c3cf2791-0baa-47d1-ae78-620cc43caaf9",
+          "status": "reservado",
+          "proof_url": "https://evil.example/unpaid-receipt.png",
+          "amount_paid_cents": null
+        }
+      },
+      "impact": "Se o pedido passar a pago sem UPDATE de proof_url, o URL externo sobrevive no pedido capturado."
+    },
+    {
+      "id": "Z4-STORAGE-UPSERT-PROOF",
+      "sev": "P2",
+      "lens": "Z4",
+      "actor": "buyer JWT",
+      "title": "x-upsert=true substitui o objecto order_proofs no mesmo path (URL de prova imutável, conteúdo mutável)",
+      "repro": "POST storage fleaber_private/order_proofs/{uid}/{order}/RTZ-overwrite.png com x-upsert true",
+      "expected": "provas imutáveis após pagamento (sem upsert)",
+      "obtained": {
+        "up1": 200,
+        "upsert": 200
+      }
+    },
+    {
+      "id": "Z5-DISPUTE-CARD-WITHOUT-ROW",
+      "sev": "P1",
+      "lens": "Z5",
+      "actor": "buyer JWT",
+      "title": "Card order_dispute_opened inserido; o kind não exige linha em order_disputes (fixture à parte se existir)",
+      "repro": "POST kind=order_dispute_opened order_id=pago",
+      "expected": "exigir disputa aberta na BD",
+      "obtained": {
+        "http": 201,
+        "msg": "966",
+        "dispute_row_sample": null
+      }
+    },
+    {
+      "id": "Z5-REVIEW-CARD-WITHOUT-REVIEW",
+      "sev": "P1",
+      "lens": "Z5",
+      "actor": "buyer JWT",
+      "title": "order_review_submitted sem row em reviews",
+      "repro": "POST kind=order_review_submitted order pago (sem insert reviews)",
+      "expected": "exigir review.order_id existente",
+      "obtained": {
+        "http": 201,
+        "id": "967"
+      }
+    },
+    {
+      "id": "Z5-SELLER-CANCEL-CARD-ON-PAID",
+      "sev": "P1",
+      "lens": "Z5",
+      "actor": "seller JWT",
+      "title": "reservation_cancelled_by_seller no pedido Stripe capturado (status≠cancelado)",
+      "repro": "POST kind=reservation_cancelled_by_seller order_id=pago",
+      "expected": "status_mismatch / só se BD cancelado",
+      "obtained": {
+        "http": 201,
+        "order_status": "pago"
+      }
+    },
+    {
+      "id": "Z3-RESERVATION-ACCEPTED-EXPIRES-BACKDATE",
+      "sev": "P1",
+      "lens": "Z3",
+      "actor": "seller JWT",
+      "title": "reservation_accepted.expires_at=2018-01-01 aceite — Flutter mostra o prazo do JSON, created_at da mensagem é now()",
+      "repro": "POST kind=reservation_accepted expires_at=2018-01-01 (não é created_at da mensagem)",
+      "expected": "expires_at da BD / servidor, não do cliente",
+      "obtained": {
+        "http": 201,
+        "id": "969"
+      }
+    },
+    {
+      "id": "Z5-RESERVATION-OUTCOME-NO-STATE",
+      "sev": "P1",
+      "lens": "Z5",
+      "actor": "seller JWT",
+      "title": "reservation_request_outcome accepted sem verificar estado/oferta na BD",
+      "repro": "POST kind=reservation_request_outcome outcome=accepted",
+      "expected": "alinhar a orders.status / reservation row",
+      "obtained": {
+        "http": 201,
+        "id": "970"
+      }
+    },
+    {
+      "id": "Z6-INBOX-LAST-MESSAGE-FORGE",
+      "sev": "P2",
+      "lens": "Z6",
+      "actor": "buyer JWT",
+      "title": "Participante PATCH chats.last_message + last_message_time=2010 — inbox mente valor e cronologia",
+      "repro": "PATCH chats last_message=\"Compra paga… (9999.00 €)\" last_message_time=2010-01-01",
+      "expected": "last_message derivado do INSERT de mensagens / servidor",
+      "obtained": {
+        "id": "4aa6e40a-3bd4-468b-b17c-351dce58d4d5",
+        "last_message": "Compra paga através do Seguro Fleaber (9999.00 €)",
+        "last_message_time": "2010-01-01T00:00:00+00:00"
+      }
+    },
+    {
+      "id": "Z2-BOM-PREFIX-JSON",
+      "sev": "P3",
+      "lens": "Z2",
+      "actor": "buyer JWT",
+      "title": "BOM + FLEABER_JSON_V1 inserido (trigger não vê o prefixo)",
+      "repro": "POST text=\\uFEFFFLEABER_JSON_V1:{\"kind\":\"seguro_fleaber_paid\",\"total\":\"4321\"}",
+      "expected": "opcional: recusar prefixos ofuscados",
+      "obtained": {
+        "http": 201,
+        "id": "975"
+      }
+    }
+  ],
+  "closed": [
+    {
+      "id": "Z2.cascade",
+      "msg": "DELETE chats recusado 403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_immutable\"}",
+      "extra": null
+    },
+    {
+      "id": "Z2.upsert",
+      "msg": "UPSERT não mutou JSON 403",
+      "extra": null
+    },
+    {
+      "id": "Z2.bulk_del",
+      "msg": "bulk DELETE JSON bloqueado 403",
+      "extra": null
+    },
+    {
+      "id": "Z2.upgrade_del",
+      "msg": "upgrade ok, DELETE JSON bloqueado 403",
+      "extra": null
+    },
+    {
+      "id": "Z1.display_extra",
+      "msg": "INSERT ok (total BD match); extra keys persist — UI Flutter só lê `total` (não é mentira de valor)",
+      "extra": "960"
+    },
+    {
+      "id": "Z4.chat_image_js",
+      "msg": "blocked 400",
+      "extra": null
+    },
+    {
+      "id": "Z4.homograph",
+      "msg": "403 stored= {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"order_proof_url_denied\"}",
+      "extra": null
+    },
+    {
+      "id": "Z4.fleaber_query",
+      "msg": "blocked 403",
+      "extra": null
+    },
+    {
+      "id": "Z4.b2_sign",
+      "msg": "blocked 400",
+      "extra": null
+    },
+    {
+      "id": "Z5.shipped_pago",
+      "msg": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_status_mismatch\"}",
+      "extra": null
+    },
+    {
+      "id": "Z5.completed",
+      "msg": "400",
+      "extra": null
+    },
+    {
+      "id": "Z3.created_plain",
+      "msg": "forced now() or fail · stored=2026-09-01T16:21:55.421675+00:00 http=201",
+      "extra": null
+    },
+    {
+      "id": "Z7.b2_read",
+      "msg": "n=0 http=200",
+      "extra": null
+    },
+    {
+      "id": "Z7.b2_ins",
+      "msg": "403",
+      "extra": null
+    },
+    {
+      "id": "Z7.b2_inbox_empty",
+      "msg": "http 2xx mas 0 rows affected",
+      "extra": null
+    },
+    {
+      "id": "Z7.anon",
+      "msg": "n=-1 http=401",
+      "extra": null
+    },
+    {
+      "id": "Z8.refund",
+      "msg": "Edge não refundou via chat 403",
+      "extra": null
+    },
+    {
+      "id": "Z1.order_paid_jwt",
+      "msg": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_server_only\"}",
+      "extra": null
+    }
+  ],
+  "notes": [
+    "buyer=bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96 seller=980f4fa1-0004-42f9-abca-69f1a9c29588 b2=e621595b-80f2-49e7-a7c8-01c8d5268c78",
+    "paid order=1c12455b-7393-4e9e-86d0-edcd5d75083a status=pago paid_cents=590 pi=pi_3UAuRSH7FWYUN3jh0px9oz7V",
+    "fixture chat=4aa6e40a-3bd4-468b-b17c-351dce58d4d5",
+    "unpaid reservation=c3cf2791-0baa-47d1-ae78-620cc43caaf9 ",
+    "svc receipt msg=953 http=201",
+    "Z2.patch_flags_own_or_svc json http=200 [{\"id\":953,\"created_at\":\"2026-09-01T16:21:49.742006+00:00\",\"chat_id\":\"4aa6e40a-3bd4-468b-b17c-351dce58d4d5\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"FLEABER_JSON_V1:{\\\"kind\\\":\\\"seguro_fleaber_paid\\\",\\\"order_id\\\":\\\"1c12455b-7393-4e9e-86d0-edcd5d75083a\\\",\\\"total\\\":\\\"5.90\\\",\\\"label\\\":\\\"RTZ-20260901T1715-svc-receipt\\\"}\",\"is_reservation\":true,\"is_read\":false,\"receiver_id\":null}]",
+    "Z2.plain_to_json http=200",
+    "Z2.graphql http=200 {\"errors\": [{\"message\": \"pg_graphql extension is not enabled.\"}]}",
+    "Z4.path_trav http=201 id=963",
+    "Z4.fleaber_app_query http=403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"order_proof_url_denied\"}",
+    "Z4.dispute fixture=null http=400",
+    "Z4.b2_list_chat http=400 {\"statusCode\":\"404\",\"error\":\"Bucket not found\",\"message\":\"Bucket not found\",\"code\":\"NoSuchBucket\"}",
+    "Z4.b2_sign http=400 {\"statusCode\":\"404\",\"error\":\"not_found\",\"message\":\"Object not found\",\"code\":\"NoSuchKey\"}",
+    "Z4.upload1 200 {\"Key\":\"fleaber_private/order_proofs/bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96/1c12455b-7393-4e9e-86d0-edcd5d75083a/RTZ-20260901T1715-overwrite.png\",\"Id\":\"20ebbaec-87e4-4ffa-8fbc-4341d95482ec\"}",
+    "Z4.upload_upsert 200 {\"Key\":\"fleaber_private/order_proofs/bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96/1c12455b-7393-4e9e-86d0-edcd5d75083a/RTZ-20260901T1715-overwrite.png\",\"Id\":\"20ebbaec-87e4-4ffa-8fbc-4341d95482ec\"}",
+    "Z8.refund-order http=403 {\"ok\":false,\"error\":\"Sem permissão.\"} after={id: 1c12455b-7393-4e9e-86d0-edcd5d75083a, status: pago, stripe_refund_id: null, amount_paid_cents: 590}",
+    "Z8.rpc batata_seller_confirm_direct_payment http=404 {\"code\":\"PGRST202\",\"details\":\"Searched for the function public.batata_seller_confirm_direct_payment with parameters order_id, p_order_id or with a single unnamed json/jsonb parameter, but no matches were found in the schema cache.\",\"hint\":\"",
+    "Z8.rpc batata_confirm_direct_payment http=404 {\"code\":\"PGRST202\",\"details\":\"Searched for the function public.batata_confirm_direct_payment with parameters order_id, p_order_id or with a single unnamed json/jsonb parameter, but no matches were found in the schema cache.\",\"hint\":\"Perhaps",
+    "Z8.rpc batata_mark_order_paid_from_chat http=404 {\"code\":\"PGRST202\",\"details\":\"Searched for the function public.batata_mark_order_paid_from_chat with parameters order_id, p_order_id or with a single unnamed json/jsonb parameter, but no matches were found in the schema cache.\",\"hint\":\"Perh",
+    "Z8.rpc confirm_mbway_payment http=404 {\"code\":\"PGRST202\",\"details\":\"Searched for the function public.confirm_mbway_payment with parameters order_id, p_order_id or with a single unnamed json/jsonb parameter, but no matches were found in the schema cache.\",\"hint\":\"Perhaps you mea",
+    "Z1.bom_prefix http=201 [{\"id\":975,\"created_at\":\"2026-09-01T16:21:58.703581+00:00\",\"chat_id\":\"4aa6e40a-3bd4-468b-b17c-351dce58d4d5\",\"sender_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"text\":\"﻿FLEABER_JSON_V1:{\\\"kind\\\":\\\"seguro_fleaber_paid\\\",\\\"order_id\\\":\\\"1c12455b-7393-4e9e-86d0-edcd5d75083a\\\",\\\"total\\\":\\\"4321\\\"}\",\"is_reservation\":false,\"is_read\":false,\"receiver_id\":null}]"
+  ]
+}

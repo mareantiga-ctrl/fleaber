@@ -1,0 +1,99 @@
+{
+  "stamp": "20260906T1612",
+  "prefix": "RTDL-20260906T1612",
+  "auditor": "REDTEAM_BLIND_DL_EDGE_SETTLE_POS_DBDG_v1",
+  "lenses": [
+    "DL1"
+  ],
+  "probes": [
+    {
+      "probe_id": "A3",
+      "edge_rpc": "create-payment-intent POST",
+      "payload": "POST checkout amount=1 total=50 server_amount_cents=50 vs SKU 12,00€",
+      "http": "429 {\"error\":\"Demasiados checkouts. Tenta daqui a pouco.\"} loc=\"\"",
+      "stripe_bd": "{\"sid\":\"\",\"server_amount_cents\":\"\",\"amount_total\":\"\",\"order\":12.0}",
+      "result": "SKIP",
+      "lens": "DL1",
+      "count_finding": false
+    },
+    {
+      "probe_id": "A1",
+      "edge_rpc": "create-payment-intent GET settle",
+      "payload": "GET checkout_return=success Session unpaid null",
+      "http": "429 {\"error\":\"Demasiados checkouts. Tenta daqui a pouco.\"} loc=\"\"",
+      "stripe_bd": "{\"status\":\"\",\"amount_paid_cents\":\"\",\"pi\":\"\"}",
+      "result": "SKIP",
+      "lens": "DL1",
+      "count_finding": false
+    },
+    {
+      "probe_id": "A2",
+      "edge_rpc": "create-payment-intent GET / create-live-tip-checkout GET",
+      "payload": "settle tip-cs_ no endpoint de encomenda; settle order-cs_ no endpoint de tip; B2 GET sidA",
+      "http": "{\"ckB\":\"429 {\\\"error\\\":\\\"Demasiados checkouts. Tenta daqui a pouco.\\\"} loc=\\\"\\\"\",\"tip\":\"400 {\\\"error\\\":\\\"Tips only allowed for published hub sellers.\\\"} loc=\\\"\\\"\",\"b2onA\":\"\",\"tipOnOrder\":\"\",\"orderOnTip\":\"\"}",
+      "stripe_bd": "{\"sidA\":\"\",\"sidB\":\"\",\"tipSid\":\"\",\"statusA\":\"reserva_pendente\",\"statusB\":\"reserva_pendente\",\"tipStatus\":\"\",\"ckB_server_cents\":\"\",\"ckB_amount_total\":\"\"}",
+      "result": "SKIP",
+      "lens": "DL1",
+      "count_finding": false
+    },
+    {
+      "probe_id": "A4",
+      "edge_rpc": "create-payment-intent POST reuse + GET settle dead cs_",
+      "payload": "2.º POST mesma order (reuse Session); GET unpaid; GET cs_test_dead…",
+      "http": "{\"reuse\":\"429 {\\\"error\\\":\\\"Demasiados checkouts. Tenta daqui a pouco.\\\"} loc=\\\"\\\"\",\"getUnpaid\":\"\",\"deadGet\":\"400 Pagamento ainda não confirmado. Se já pagaste, aguarda alguns segundos e volta à app Fleaber. loc=\\\"\\\"\",\"hosted\":\"\"}",
+      "stripe_bd": "{\"sidA\":\"\",\"sidReuse\":\"\",\"reusedSame\":false,\"dualOpen\":false,\"status\":\"reserva_pendente\",\"deadHttp\":400}",
+      "result": "SKIP",
+      "lens": "DL1",
+      "count_finding": false
+    }
+  ],
+  "findings": [],
+  "blocked": [
+    {
+      "id": "A2.alien",
+      "lens": "DL1",
+      "title": "session alheia tip↔order não creditou",
+      "ev": {
+        "statusA": "reserva_pendente",
+        "statusB": "reserva_pendente",
+        "tip": ""
+      }
+    }
+  ],
+  "skipped": [],
+  "notes": [
+    {
+      "id": "p2.ckA",
+      "lens": "DL1",
+      "title": "checkout A amount=1",
+      "ev": "429 {\"error\":\"Demasiados checkouts. Tenta daqui a pouco.\"} loc=\"\""
+    },
+    {
+      "id": "p2.ckB",
+      "lens": "DL1",
+      "title": "checkout B amount=99999",
+      "ev": "429 {\"error\":\"Demasiados checkouts. Tenta daqui a pouco.\"} loc=\"\""
+    }
+  ],
+  "actors": {
+    "buyer": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+    "seller": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+    "buyer2": "f04349ea-ece7-4112-be45-0a8c05ee5216",
+    "seller2": null
+  },
+  "created": {
+    "orders": [
+      "9ecde326-2a3b-4459-a6fe-3e929f827213",
+      "05d62162-8b42-47f0-96ae-168aaf2c847b"
+    ],
+    "products": [
+      "1c2f5c8c-0db4-402d-b623-d5f86ae1189e",
+      "478420a5-9396-41f8-b67f-1baae5ea9a6e"
+    ],
+    "lives": [
+      "ed1423d2-6bfd-48de-9b5a-04dbbdaaa952"
+    ],
+    "tips": []
+  },
+  "has_sk_test": false
+}

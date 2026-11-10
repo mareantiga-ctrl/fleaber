@@ -1,0 +1,284 @@
+{
+  "pass": 1,
+  "findings": [],
+  "blocked": [
+    {
+      "id": "T1-01",
+      "lens": "T1",
+      "title": "null item accepted HTTP fail",
+      "ev": "400 {\"code\":\"23502\",\"details\":null,\"hint\":null,\"message\":\"null value in column \\\"live_item_id\\\" of relation \\\"live_reservation_requests\\\" violates not-null constraint\"}"
+    },
+    {
+      "id": "T1-02",
+      "lens": "T1",
+      "title": "move item after reserve blocked or no orphan",
+      "ev": {
+        "mv": "200 [{\"id\":\"951c0ca0-11cc-43a2-bf69-3090a3128fb6\",\"live_id\":\"aed971d1-4770-4915-94ce-105eb4218dbf\",\"seller_id\":null,\"ref_code\":\"RTT1\",\"title\":\"RTT-20260901T0730 move-item\",\"description\":null,\"price\":12.0,\"image_url\":null,\"si…",
+        "item": {
+          "id": "951c0ca0-11cc-43a2-bf69-3090a3128fb6",
+          "live_id": "aed971d1-4770-4915-94ce-105eb4218dbf",
+          "product_id": null,
+          "seller_id": null,
+          "quantity": 2,
+          "status": "reserved_partial",
+          "item_kind": "live_only",
+          "price": 12.0
+        },
+        "res": {
+          "code": "42703",
+          "details": null,
+          "hint": null,
+          "message": "column live_reservation_requests.product_id does not exist"
+        }
+      }
+    },
+    {
+      "id": "T1-03",
+      "lens": "T1",
+      "title": "helper convert sem PI recusado",
+      "ev": {
+        "acc": "200 {\"ok\": true, \"item_qty\": 1, \"request_id\": \"a283cd5b-05ce-4a5d-b903-80ea9476a16b\", \"item_status\": \"reserved_full\", \"reserved_qty\": 1}",
+        "conv": "200 {\"ok\": true, \"item_qty\": 1, \"request_id\": \"a283cd5b-05ce-4a5d-b903-80ea9476a16b\", \"item_status\": \"sold\", \"reserved_qty\": 1}",
+        "res": {
+          "code": "42703",
+          "details": null,
+          "hint": null,
+          "message": "column live_reservation_requests.product_id does not exist"
+        }
+      }
+    },
+    {
+      "id": "T1-04",
+      "lens": "T6",
+      "title": "qty race capped at 1 accepted",
+      "ev": {
+        "accepted": 0,
+        "r1": {
+          "code": "42703",
+          "details": null,
+          "hint": null,
+          "message": "column live_reservation_requests.product_id does not exist"
+        },
+        "r2": {
+          "code": "42703",
+          "details": null,
+          "hint": null,
+          "message": "column live_reservation_requests.product_id does not exist"
+        }
+      }
+    },
+    {
+      "id": "T1-05",
+      "lens": "T1",
+      "title": "não criou live_item com product S2",
+      "ev": "insert fail"
+    },
+    {
+      "id": "T2-01",
+      "lens": "T2",
+      "title": "seller convert sem PI recusado",
+      "ev": "200 {\"ok\": true, \"item_qty\": 1, \"request_id\": \"ab738b42-f390-4f74-8cb7-8a411b3a4d09\", \"item_status\": \"sold\", \"reserved_qty\": 1}"
+    },
+    {
+      "id": "T2-02",
+      "lens": "T2",
+      "title": "stripe_convert authenticated blocked",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_live_reservation_stripe_convert\"}"
+    },
+    {
+      "id": "T2-03",
+      "lens": "T2",
+      "title": "cross-pool reconcile não converteu",
+      "ev": {
+        "patch": "200 [{\"id\":\"2123e410-8536-4127-94a2-18883fba16f8\",\"created_at\":\"2026-09-01T06:39:54.77561+00:00\",\"product_id\":\"b16a0cae-42ca-4083-810e-77d47cc67cce\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-000…",
+        "recon": "200 {\"ok\": true, \"reconciled\": true, \"request_id\": \"82244edc-074d-41b4-97e1-acb4334767a4\", \"item_status\": \"reserved_full\", \"live_item_id\": \"cbf3ac95-3a68-45d2-9637-5633adb6012a\"}",
+        "res": {
+          "code": "42703",
+          "details": null,
+          "hint": null,
+          "message": "column live_reservation_requests.product_id does not exist"
+        }
+      }
+    },
+    {
+      "id": "T4-02",
+      "lens": "T4",
+      "title": "qty inflate não permitiu 2.º accept",
+      "ev": {
+        "item": {
+          "id": "0446f934-481d-4900-be7e-cb4d0771777d",
+          "live_id": "1c48bb61-9d9a-484a-b60d-173c2e0e2feb",
+          "product_id": null,
+          "seller_id": null,
+          "quantity": 20,
+          "status": "reserved_full",
+          "item_kind": "live_only",
+          "price": 12.0
+        },
+        "b2": {
+          "code": "42703",
+          "details": null,
+          "hint": null,
+          "message": "column live_reservation_requests.product_id does not exist"
+        },
+        "acc2": "200 {\"ok\": true, \"item_qty\": 20, \"request_id\": \"24693288-1b8f-46aa-87a2-66d48aac66d9\", \"item_status\": \"reserved_partial\", \"reserved_qty\": 2}"
+      }
+    },
+    {
+      "id": "T6-01",
+      "lens": "T6",
+      "title": "convert∥expire sem split estado",
+      "ev": {
+        "res": {
+          "code": "42703",
+          "details": null,
+          "hint": null,
+          "message": "column live_reservation_requests.product_id does not exist"
+        },
+        "item": {
+          "id": "a63b6272-0db1-4a1f-8604-564c1a19b1a3",
+          "live_id": "1fcd6a7c-61c5-4b88-a9b9-4ac3e9187358",
+          "product_id": null,
+          "seller_id": null,
+          "quantity": 1,
+          "status": "sold",
+          "item_kind": "live_only",
+          "price": 12.0
+        }
+      }
+    },
+    {
+      "id": "T7-01",
+      "lens": "T7",
+      "title": "B2 não rouba reserva",
+      "ev": "200 []"
+    }
+  ],
+  "notes": [
+    {
+      "id": "T1.null_item",
+      "lens": "T1",
+      "title": "seller facebook_manual accepted sem live_item_id",
+      "ev": "400 {\"code\":\"23502\",\"details\":null,\"hint\":null,\"message\":\"null value in column \\\"live_item_id\\\" of relation \\\"live_reservation_requests\\\" violates not-null constraint\"}"
+    },
+    {
+      "id": "T1.move.accept",
+      "lens": "T1",
+      "title": "accept before move",
+      "ev": "200 {\"ok\": true, \"item_qty\": 2, \"request_id\": \"bd924a82-6adc-492b-8e9e-fa510fe481c8\", \"item_status\": \"reserved_partial\", \"reserved_qty\": 1}"
+    },
+    {
+      "id": "T1.move.item",
+      "lens": "T1",
+      "title": "PATCH live_items.live_id A→B",
+      "ev": "200 [{\"id\":\"951c0ca0-11cc-43a2-bf69-3090a3128fb6\",\"live_id\":\"aed971d1-4770-4915-94ce-105eb4218dbf\",\"seller_id\":null,\"ref_code\":\"RTT1\",\"title\":\"RTT-20260901T0730 move-item\",\"description\":null,\"price\":12.0,\"image_url\":null,\"si…"
+    },
+    {
+      "id": "T1.staff.invite",
+      "lens": "T1",
+      "title": "S2 helper can_manage_reservations",
+      "ev": "81b30fb2-183c-4f4a-8885-04f89fe67034"
+    },
+    {
+      "id": "T1.staff.accept",
+      "lens": "T1",
+      "title": "helper accept",
+      "ev": "200 {\"ok\": true, \"item_qty\": 1, \"request_id\": \"a283cd5b-05ce-4a5d-b903-80ea9476a16b\", \"item_status\": \"reserved_full\", \"reserved_qty\": 1}"
+    },
+    {
+      "id": "T1.staff.convert",
+      "lens": "T1",
+      "title": "helper convert sem PI",
+      "ev": "200 {\"ok\": true, \"item_qty\": 1, \"request_id\": \"a283cd5b-05ce-4a5d-b903-80ea9476a16b\", \"item_status\": \"sold\", \"reserved_qty\": 1}"
+    },
+    {
+      "id": "T1.qty.race",
+      "lens": "T6",
+      "title": "accept∥accept qty=1 item",
+      "ev": {
+        "h1": "200 {\"ok\": false, \"error\": \"qty_exceeds_stock\", \"requested\": 1, \"available_qty\": 0}",
+        "h2": "200 {\"ok\": true, \"item_qty\": 1, \"request_id\": \"f6d85db3-4676-4370-acd2-5ea2d96040d6\", \"item_status\": \"reserved_full\", \"reserved_qty\": 1}",
+        "accepted": 0
+      }
+    },
+    {
+      "id": "T1.cross.item",
+      "lens": "T1",
+      "title": "live_item S1.live + product S2",
+      "ev": null
+    },
+    {
+      "id": "T2.grant.buyer",
+      "lens": "T2",
+      "title": "stripe_convert JWT buyer",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_live_reservation_stripe_convert\"}"
+    },
+    {
+      "id": "T2.grant.anon",
+      "lens": "T2",
+      "title": "stripe_convert anon",
+      "ev": "401 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_live_reservation_stripe_convert\"}"
+    },
+    {
+      "id": "fixture.paid",
+      "lens": "T3",
+      "title": "setup_paid_order Stripe TEST",
+      "ev": "200 {\n  \"ok\": true,\n  \"order_id\": \"2123e410-8536-4127-94a2-18883fba16f8\",\n  \"product_id\": \"b16a0cae-42ca-4083-810e-77d47cc67cce\",\n  \"payment_intent_id\": \"pi_3UAlMNH7FWYUN3jh0WP0SNZY\",\n  \"pi_status\": \"succeeded\",\n  \"pi_amount…"
+    },
+    {
+      "id": "T2.recon.patch",
+      "lens": "T2",
+      "title": "buyer PATCH live_id em order marketplace paga",
+      "ev": "200 [{\"id\":\"2123e410-8536-4127-94a2-18883fba16f8\",\"created_at\":\"2026-09-01T06:39:54.77561+00:00\",\"product_id\":\"b16a0cae-42ca-4083-810e-77d47cc67cce\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-000…"
+    },
+    {
+      "id": "T2.recon.svc_observe",
+      "lens": "T2",
+      "title": "observe-only: JWT patch failed, not used as actor",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"order_live_item_product_missing\"}"
+    },
+    {
+      "id": "T2.recon.rpc",
+      "lens": "T2",
+      "title": "reconcile marketplace PI → reserva live",
+      "ev": "200 {\"ok\": true, \"reconciled\": true, \"request_id\": \"82244edc-074d-41b4-97e1-acb4334767a4\", \"item_status\": \"reserved_full\", \"live_item_id\": \"cbf3ac95-3a68-45d2-9637-5633adb6012a\"}"
+    },
+    {
+      "id": "T4.inflate.li",
+      "lens": "T4",
+      "title": "PATCH live_items.quantity 1→20 com accepted",
+      "ev": "200 [{\"id\":\"0446f934-481d-4900-be7e-cb4d0771777d\",\"live_id\":\"1c48bb61-9d9a-484a-b60d-173c2e0e2feb\",\"seller_id\":null,\"ref_code\":\"RTT7\",\"title\":\"RTT-20260901T0730 li-qty\",\"description\":null,\"price\":12.0,\"image_url\":null,\"size\"…"
+    },
+    {
+      "id": "T6.convert_expire",
+      "lens": "T6",
+      "title": "convert∥expire",
+      "ev": {
+        "c": "200 {\"ok\": true, \"item_qty\": 1, \"request_id\": \"cdc3b3c1-6b9b-447c-b368-55b9028035a0\", \"item_status\": \"sold\", \"reserved_qty\": 1}",
+        "e": "200 {\"ok\": true, \"item_qty\": 1, \"request_id\": \"cdc3b3c1-6b9b-447c-b368-55b9028035a0\", \"item_status\": \"available\", \"reserved_qty\": 0}",
+        "res": {
+          "code": "42703",
+          "details": null,
+          "hint": null,
+          "message": "column live_reservation_requests.product_id does not exist"
+        },
+        "item": {
+          "id": "a63b6272-0db1-4a1f-8604-564c1a19b1a3",
+          "live_id": "1fcd6a7c-61c5-4b88-a9b9-4ac3e9187358",
+          "product_id": null,
+          "seller_id": null,
+          "quantity": 1,
+          "status": "sold",
+          "item_kind": "live_only",
+          "price": 12.0
+        }
+      }
+    },
+    {
+      "id": "T7.steal.res",
+      "lens": "T7",
+      "title": "B2 PATCH reserva B1",
+      "ev": "200 []"
+    }
+  ]
+}

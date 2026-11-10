@@ -1,0 +1,178 @@
+{
+  "stamp": "20260902T1821",
+  "prefix": "RTBH-20260902T1821",
+  "auditor": "REDTEAM_BLIND_BH_LIVE_POS_ATBE_v1",
+  "lenses": [
+    "BH6",
+    "BH7"
+  ],
+  "findings": [
+    {
+      "id": "BH6-03",
+      "lens": "BH6",
+      "severity": "P3",
+      "title": "Após reopen (service) accept produto marketplace — fila revivida",
+      "actor": "seller JWT",
+      "pre": "ended depois service PATCH live+active; item marketplace",
+      "repro": "service reopen + PATCH accepted",
+      "expected": "trade-off: dono pode retomar directo",
+      "obtained": {
+        "accept": "200 [{\"id\":\"7d3a7e70-2abe-40c1-bae8-30d3dba591e5\",\"live_id\":\"6efa3361-c5bd-4589-97ac-701b78fbd87c\",\"live_item_id\":\"204bcf29-f6c2-46c4-b0b3-3607008011b9\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0…",
+        "res": {
+          "id": "7d3a7e70-2abe-40c1-bae8-30d3dba591e5",
+          "status": "accepted",
+          "requested_qty": 1,
+          "source": "fleaber_live",
+          "live_id": "6efa3361-c5bd-4589-97ac-701b78fbd87c",
+          "live_item_id": "204bcf29-f6c2-46c4-b0b3-3607008011b9",
+          "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+          "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+          "notes": ""
+        }
+      },
+      "proven": true,
+      "evidence": {}
+    }
+  ],
+  "blocked": [
+    {
+      "id": "BH6-01",
+      "lens": "BH6",
+      "title": "accept após ended real",
+      "ev": {
+        "patch": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"live_ended\"}",
+        "row": "pending"
+      }
+    },
+    {
+      "id": "BH6-02",
+      "lens": "BH6",
+      "title": "INSERT ended real",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"live_ended\"}"
+    },
+    {
+      "id": "BH6-03j",
+      "lens": "BH6",
+      "title": "seller JWT não reabre",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table lives\"}"
+    },
+    {
+      "id": "BH6-05",
+      "lens": "BH6",
+      "title": "race sem accepted-on-ended",
+      "ev": {
+        "res": "pending",
+        "live": "ended",
+        "active": false
+      }
+    },
+    {
+      "id": "BH6-04",
+      "lens": "BH7",
+      "title": "Seller2 reabre live A",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table lives\"}"
+    }
+  ],
+  "skipped": [],
+  "notes": [
+    {
+      "id": "p2b-pending",
+      "lens": "BH6",
+      "title": "pending before end",
+      "ev": "201 [{\"id\":\"3e090b8c-153d-4966-a6e7-80bbe71748c7\",\"live_id\":\"6efa3361-c5bd-4589-97ac-701b78fbd87c\",\"live_item_id\":\"d6b4da95-a8a8-4f67-94ad-b0058563da3d\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0…"
+    },
+    {
+      "id": "p2b-jwt-end",
+      "lens": "BH6",
+      "title": "seller JWT PATCH ended",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table lives\"}"
+    },
+    {
+      "id": "p2b-svc-end",
+      "lens": "BH6",
+      "title": "service end",
+      "ev": {
+        "patch": "200 [{\"id\":\"6efa3361-c5bd-4589-97ac-701b78fbd87c\",\"created_at\":\"2026-09-02T17:34:21.214133+00:00\",\"vendedor_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"mux_live_id\":null,\"stream_key\":null,\"playback_id\":null,\"is_active\":false,\"title\":\"RTBH-20260…",
+        "status": "ended",
+        "active": false
+      }
+    },
+    {
+      "id": "BH6-03-jwt",
+      "lens": "BH6",
+      "title": "seller JWT reopen",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table lives\"}"
+    },
+    {
+      "id": "BH6-03-svc",
+      "lens": "BH6",
+      "title": "service reopen",
+      "ev": {
+        "patch": "200 [{\"id\":\"6efa3361-c5bd-4589-97ac-701b78fbd87c\",\"created_at\":\"2026-09-02T17:34:21.214133+00:00\",\"vendedor_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"mux_live_id\":null,\"stream_key\":null,\"playback_id\":null,\"is_active\":true,\"title\":\"RTBH-202609…",
+        "row": {
+          "status": "live",
+          "active": true
+        }
+      }
+    },
+    {
+      "id": "BH6-05",
+      "lens": "BH6",
+      "title": "race service-end ∥ accept",
+      "ev": {
+        "hits": [
+          "200 [{\"id\":\"79e3d858-11be-4a14-9d06-7ef1c8a39ef9\",\"created_at\":\"2026-09-02T17:34:23.198525+00:00\",\"vendedor_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"mux_live_id\":null,\"stream_key\":null,\"playback_id\":null,\"is_active\":false,\"title\":\"RTBH-20260…",
+          "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"live_ended\"}",
+          "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"live_ended\"}",
+          "200 [{\"id\":\"79e3d858-11be-4a14-9d06-7ef1c8a39ef9\",\"created_at\":\"2026-09-02T17:34:23.198525+00:00\",\"vendedor_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"mux_live_id\":null,\"stream_key\":null,\"playback_id\":null,\"is_active\":false,\"title\":\"RTBH-20260…"
+        ],
+        "res": {
+          "id": "54d03ed1-f047-4e6c-846c-d696b599bc36",
+          "status": "pending",
+          "requested_qty": 1,
+          "source": "fleaber_live",
+          "live_id": "79e3d858-11be-4a14-9d06-7ef1c8a39ef9",
+          "live_item_id": "ee0b426e-fb7d-461d-ae90-ef68a0090150",
+          "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+          "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+          "notes": ""
+        },
+        "live": {
+          "status": "ended",
+          "active": false
+        }
+      }
+    }
+  ],
+  "actors": {
+    "buyer": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+    "seller": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+    "buyer2": "7d12f556-007f-40fd-9671-c07eb3bd354f",
+    "seller2": "e725febc-f8bb-40a8-812d-bcbf50808ca8",
+    "helperChat": null,
+    "helperMark": null,
+    "helperView": null,
+    "helperRes": null
+  },
+  "created": {
+    "orders": [],
+    "products": [
+      "705dc1ee-8e03-4c40-83b4-12dcbe76148c"
+    ],
+    "lives": [
+      "6efa3361-c5bd-4589-97ac-701b78fbd87c",
+      "79e3d858-11be-4a14-9d06-7ef1c8a39ef9"
+    ],
+    "items": [
+      "d6b4da95-a8a8-4f67-94ad-b0058563da3d",
+      "204bcf29-f6c2-46c4-b0b3-3607008011b9",
+      "ee0b426e-fb7d-461d-ae90-ef68a0090150"
+    ],
+    "reservations": [
+      "3e090b8c-153d-4966-a6e7-80bbe71748c7",
+      "7d3a7e70-2abe-40c1-bae8-30d3dba591e5",
+      "54d03ed1-f047-4e6c-846c-d696b599bc36"
+    ],
+    "helpers": []
+  }
+}

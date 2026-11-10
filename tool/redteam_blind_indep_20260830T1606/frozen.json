@@ -1,0 +1,334 @@
+{
+  "audit_id": "RTI1606",
+  "title": "Fleaber blind independent Red Team — staging",
+  "project_ref": "fxdknzrqjenzqcvnwqqq",
+  "stripe": "TEST",
+  "production_touched": false,
+  "fase4_started": false,
+  "corrections_applied": false,
+  "frozen_at": "2026-08-30T15:32:00Z",
+  "verdict": "D_PASS_CEGO_SATURADO",
+  "saturation": true,
+  "p0_count": 0,
+  "p1_count": 0,
+  "p2_count": 1,
+  "p3_count": 2,
+  "identities": {
+    "anon": true,
+    "buyer_lab": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+    "seller_lab": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+    "helper_fresh": true
+  },
+  "probes": [
+    "tool/redteam_blind_indep_20260830T1606/pass1_discover.dart",
+    "tool/redteam_blind_indep_20260830T1606/pass2_money_races.dart",
+    "tool/redteam_blind_indep_20260830T1606/pass3_compose.dart",
+    "tool/redteam_blind_indep_20260830T1606/pass3b_fresh_sessions.dart",
+    "tool/redteam_blind_indep_20260830T1606/pass3c_refund_race.dart",
+    "tool/redteam_blind_indep_20260830T1606/observe_pay.dart"
+  ],
+  "checklist": {
+    "1_p0_open": false,
+    "2_p0_count": 0,
+    "3_p1_open": false,
+    "4_p1_count": 0,
+    "5_buyer_price_authority": false,
+    "6_buyer_qty_authority": false,
+    "7_seller_fake_platform_payment": false,
+    "8_jwt_mint_balance": false,
+    "9_refund_exceeds_capture": false,
+    "10_release_refund_mints_money": false,
+    "11_payout_duplicate_transfer": false,
+    "12_stock1_two_valid_sales": "NO",
+    "13_stock1_two_net_permanent_captures": "NO",
+    "14_capacity_bypass": false,
+    "15_cross_user_financial": false,
+    "16_cross_user_sensitive": false,
+    "17_buyer_as_seller_admin": false,
+    "18_seller_as_buyer_admin": false,
+    "19_reviews_forged_or_dup": false,
+    "20_dangerous_security_definer": false,
+    "21_critical_rls_broken": false,
+    "22_edge_trusts_client_authority": false,
+    "23_critical_unproven": true,
+    "24_functional_regression": false,
+    "25_last_pass_new_p0_p1_class": false,
+    "26_saturation": true,
+    "27_production_touched": false,
+    "28_fase4_started": false
+  },
+  "invariants": {
+    "A_stripe_charges_server_contract": "HELD",
+    "B_buyer_no_price_qty_authority": "HELD",
+    "C_release_refund_payout_lte_received": "HELD",
+    "D_one_unit_not_two_sales": "HELD",
+    "E_jwt_no_privileged_money_fields": "HELD",
+    "F_offplatform_no_platform_wallet_mint": "HELD",
+    "G_refund_lte_capture": "HELD",
+    "H_parties_coherent": "HELD",
+    "I_one_payout_intent_one_transfer": "HELD",
+    "J_two_intents_two_transfers": "HELD",
+    "K_catalog_not_retroactive": "HELD",
+    "L_offer_authority": "HELD"
+  },
+  "races": [
+    {
+      "name": "stock1_10x_insert",
+      "result": "1_hold",
+      "impact": "none"
+    },
+    {
+      "name": "same_order_8x_checkout_session",
+      "result": "8_distinct_cs_test",
+      "impact": "P2_window"
+    },
+    {
+      "name": "same_order_2x_parallel_checkout",
+      "result": "2_sessions_both_payable",
+      "impact": "P2_second_pi_refunded_on_settle"
+    },
+    {
+      "name": "payout_same_idempotency_key",
+      "result": "same_transfer_id",
+      "impact": "none"
+    },
+    {
+      "name": "payout_different_keys",
+      "result": "two_transfers_two_1eur_debits",
+      "impact": "by_design"
+    },
+    {
+      "name": "6x_parallel_refund_order",
+      "result": "one_stripe_refund_rest_idempotent_or_500_in_progress",
+      "impact": "none_financial"
+    }
+  ],
+  "stripe_test": {
+    "order_id": "e44e602e-ada0-4d64-a13f-f9c7746581cb",
+    "amount_cents": 852,
+    "session_a": "cs_test_a1p9fmV05BefGyqxYwac8BKjMO5s0TPAUxSFwYnvxIJNnEbFIHLcIC2MIV",
+    "session_b": "cs_test_a1HEqpMjpcIAIynBGqDklWHVf2GI1myqDzAAqotpA9XkGF71lnk3GyIJP0",
+    "pi_a": "pi_3UAAcDH7FWYUN3jh1hnfGXPN",
+    "pi_b": "pi_3UAAe6H7FWYUN3jh0f7Ra2QD",
+    "capture_a": "PAID",
+    "capture_b": "PAID_THEN_REFUNDED",
+    "dup_refund_id": "re_3UAAe6H7FWYUN3jh0MQWV7NI",
+    "settle_b_event": "sec_dup_session_pi_refunded",
+    "net_permanent_captures": 1,
+    "seller_order_refund_id": "re_3UAAcDH7FWYUN3jh1HLEPwXo",
+    "order_after_seller_refund": "cancelado"
+  },
+  "findings": [
+    {
+      "id": "RTI1606-P2-01",
+      "severity": "P2",
+      "title": "Parallel Checkout Sessions on the same order can both be paid; second PI is refunded on settle",
+      "actor": "buyer JWT",
+      "preconditions": "order reserva_pendente; concurrent create-payment-intent",
+      "reproduction": "POST create-payment-intent twice in parallel; pay both Stripe TEST Checkouts; observe settle B refunds PI B",
+      "impact": "Temporary dual capture, Stripe refund fees, UX double-pay; not a second valid sale and not a net permanent second capture",
+      "state": "OPEN"
+    },
+    {
+      "id": "RTI1606-P3-01",
+      "severity": "P3",
+      "title": "Authenticated email to UUID oracle via batata_find_user_id_by_email",
+      "actor": "fresh helper JWT",
+      "preconditions": "know a registered email",
+      "reproduction": "RPC batata_find_user_id_by_email with seller lab email returns seller UUID; unknown email returns null",
+      "impact": "Account enumeration; no IBAN dump for unaffiliated helper",
+      "state": "OPEN"
+    },
+    {
+      "id": "RTI1606-P3-02",
+      "severity": "P3",
+      "title": "Financial PATCH returns HTTP 200 representation without persistence",
+      "actor": "buyer or seller JWT",
+      "preconditions": "own or visible order row",
+      "reproduction": "PATCH status/amount_paid_cents/stripe PI; body 200; service_role observe unchanged",
+      "impact": "Client confusion; not a privilege bypass",
+      "state": "OPEN"
+    }
+  ],
+  "rejected_false_positives": [
+    {
+      "claim": "batata_get_my_payout_details is P0 IBAN dump",
+      "reason": "returns own payout details only"
+    },
+    {
+      "claim": "buyer can create PS pairing on seller live",
+      "reason": "lab buyer is seller_helpers with can_manage_reservations; fresh helper got not_allowed"
+    }
+  ],
+  "gaps": [
+    "Not all 176 OpenAPI RPCs invoked with exact signatures",
+    "Mux/LiveKit stream-key path as seller not exhausted",
+    "OCR stolen-token path not applicable to unaffiliated helper",
+    "Multi-seller bag and partial-refund composition not recreated this freeze",
+    "Dual-capture window duration without settle not measured over hours"
+  ],
+  "matrix": [
+    {
+      "surface": "ORDERS RLS PATCH",
+      "attack": "buyer PATCH status=pago, price, amount_paid, PI, qty",
+      "identity": "buyer JWT",
+      "result": "HTTP 200 echo; persist denied",
+      "impact": "none financial",
+      "severity": "P3",
+      "evidence": "pass1_discover.dart"
+    },
+    {
+      "surface": "ORDERS INSERT",
+      "attack": "hostile price 0.50 / contract_unit_cents=1 / qty 99 / alien buyer_id",
+      "identity": "buyer JWT",
+      "result": "sealed to catalog or order_hold_exceeds_stock / order_buyer_attribution_denied",
+      "impact": "none",
+      "severity": "none",
+      "evidence": "pass1 / pass2"
+    },
+    {
+      "surface": "CHECKOUT Edge",
+      "attack": "body amount=50; helper/seller checkout of buyer order",
+      "identity": "buyer / helper / seller JWT",
+      "result": "server amount 2060; alien checkout blocked",
+      "impact": "none",
+      "severity": "none",
+      "evidence": "pass2_money_races.dart"
+    },
+    {
+      "surface": "CHECKOUT × concurrency",
+      "attack": "2 parallel Sessions then pay both TEST",
+      "identity": "buyer JWT + Stripe TEST",
+      "result": "2 captures; PI B refunded on settle; 1 valid sale",
+      "impact": "temporary dual capture / fees",
+      "severity": "P2",
+      "evidence": "pass3b + browser 4242 + observe_pay"
+    },
+    {
+      "surface": "STOCK",
+      "attack": "10 parallel INSERT stock=1",
+      "identity": "buyer + helper JWT",
+      "result": "1 hold",
+      "impact": "none",
+      "severity": "none",
+      "evidence": "pass2"
+    },
+    {
+      "surface": "WALLET",
+      "attack": "INSERT/UPDATE balance; privileged RPCs",
+      "identity": "buyer JWT",
+      "result": "403 / permission denied",
+      "impact": "none",
+      "severity": "none",
+      "evidence": "pass1"
+    },
+    {
+      "surface": "PAYOUT",
+      "attack": "retry same key vs different keys",
+      "identity": "seller JWT",
+      "result": "same Transfer vs two Transfers",
+      "impact": "I/J held",
+      "severity": "none",
+      "evidence": "pass2"
+    },
+    {
+      "surface": "REFUND",
+      "attack": "buyer refund; 6× seller concurrent",
+      "identity": "buyer / seller JWT",
+      "result": "buyer 403; one Stripe refund",
+      "impact": "none extra money",
+      "severity": "none",
+      "evidence": "pass3c_refund_race.dart"
+    },
+    {
+      "surface": "OFFERS",
+      "attack": "self-accept; mutate amount after accept",
+      "identity": "buyer / seller JWT",
+      "result": "self-accept denied; amount not persisted; order sealed 5.00",
+      "impact": "none",
+      "severity": "none",
+      "evidence": "pass2"
+    },
+    {
+      "surface": "REVIEWS",
+      "attack": "no order; alien buyer; duplicate",
+      "identity": "buyer / helper JWT",
+      "result": "review_order_required / not_yours / duplicate 409",
+      "impact": "none",
+      "severity": "none",
+      "evidence": "pass2"
+    },
+    {
+      "surface": "MB WAY FSM",
+      "attack": "seller PATCH pago; buyer PATCH concluido; 5-star review",
+      "identity": "seller then buyer JWT",
+      "result": "status persisted; wallets unchanged; no wallet_release",
+      "impact": "F held",
+      "severity": "none",
+      "evidence": "pass2"
+    },
+    {
+      "surface": "CATALOG × CHECKOUT",
+      "attack": "drop product price after seal",
+      "identity": "seller then buyer JWT",
+      "result": "checkout still ~contract 2165 cents",
+      "impact": "K held",
+      "severity": "none",
+      "evidence": "pass3"
+    },
+    {
+      "surface": "TIPS",
+      "attack": "self/wrong seller; 1€ wallet tip",
+      "identity": "buyer JWT",
+      "result": "self/wrong rejected; 1€ debit/credit with fee",
+      "impact": "none abuse",
+      "severity": "none",
+      "evidence": "pass3"
+    },
+    {
+      "surface": "CHAT / STORAGE",
+      "attack": "helper inject/read; list order_proofs",
+      "identity": "helper JWT",
+      "result": "blocked; prefixes empty or own only",
+      "impact": "none",
+      "severity": "none",
+      "evidence": "pass2 / pass3"
+    },
+    {
+      "surface": "PS pairing",
+      "attack": "create pairing as unaffiliated user",
+      "identity": "fresh helper JWT",
+      "result": "not_allowed",
+      "impact": "none",
+      "severity": "none",
+      "evidence": "pass3"
+    },
+    {
+      "surface": "RPC find_user_id_by_email",
+      "attack": "resolve seller email",
+      "identity": "fresh helper JWT",
+      "result": "seller UUID",
+      "impact": "enumeration",
+      "severity": "P3",
+      "evidence": "pass2"
+    },
+    {
+      "surface": "WEBHOOK / e2e-oversell",
+      "attack": "unsigned webhook; JWT oversell",
+      "identity": "anon / buyer JWT",
+      "result": "400 missing_signature; 401 service_role only",
+      "impact": "none",
+      "severity": "none",
+      "evidence": "pass1"
+    },
+    {
+      "surface": "MUX",
+      "attack": "create live as buyer",
+      "identity": "buyer JWT",
+      "result": "403",
+      "impact": "none",
+      "severity": "none",
+      "evidence": "pass1"
+    }
+  ]
+}

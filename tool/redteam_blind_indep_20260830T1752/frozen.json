@@ -1,0 +1,120 @@
+{
+  "audit": "FLEABER_REDTEAM_BLIND_INDEP",
+  "FROZEN_AT": "2026-08-30T18:08:08+01:00",
+  "project_ref": "fxdknzrqjenzqcvnwqqq",
+  "stripe": "TEST",
+  "production_touched": false,
+  "fase4_started": false,
+  "fixes_implemented": false,
+  "verdict": "PASS_CEGO_SATURADO",
+  "saturation": true,
+  "prefix": "RT1752",
+  "actors": {
+    "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+    "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588"
+  },
+  "checklist": {
+    "p0_open": false,
+    "p0_count": 0,
+    "p1_open": false,
+    "p1_count": 0,
+    "buyer_price_authority": false,
+    "buyer_qty_authority": false,
+    "seller_fake_platform_payment": false,
+    "jwt_mints_balance": false,
+    "refund_exceeds_capture": false,
+    "release_refund_net_money": false,
+    "payout_duplicate_transfer": false,
+    "stock1_two_valid_sales": false,
+    "stock1_two_net_captures": "NOT_PROVEN",
+    "capacity_bypass": false,
+    "cross_user_financial": false,
+    "cross_user_sensitive": false,
+    "buyer_as_seller_admin": false,
+    "seller_as_buyer_admin": false,
+    "reviews_forged": false,
+    "dangerous_security_definer": false,
+    "critical_rls_broken": false,
+    "edge_trusts_client": false,
+    "critical_unproven": true,
+    "functional_regression": false,
+    "last_pass_new_p0_p1": false,
+    "saturation": true,
+    "production_touched": false,
+    "fase4": false
+  },
+  "findings": [
+    {
+      "id": "RT1752-P3-01",
+      "severity": "P3",
+      "title": "Seller resolve email to UUID",
+      "actor": "seller JWT",
+      "pre": "EXECUTE batata_find_user_id_by_email",
+      "repro": "POST /rpc/batata_find_user_id_by_email {p_email: lab buyer}",
+      "impact": "Account enumeration, rate 5/h",
+      "estado": "ABERTO",
+      "evidence": "200 uuid of lab buyer"
+    },
+    {
+      "id": "RT1752-P3-02",
+      "severity": "P3",
+      "title": "Anon can invoke batata_admin_resolve_dispute",
+      "actor": "anon",
+      "pre": "GRANT EXECUTE",
+      "repro": "POST /rpc/batata_admin_resolve_dispute",
+      "impact": "Fail-closed: Apenas administradores. Excess grant.",
+      "estado": "ABERTO"
+    }
+  ],
+  "false_positives_discarded": [
+    {
+      "id": "RT1752-P0-PATCH-seller_id",
+      "reason": "HTTP 200 echoed buyer_id; FINAL seller_id unchanged"
+    }
+  ],
+  "invariants": {
+    "A_stripe_charges_server_contract": "NOT_REFUTED",
+    "B_client_not_price_qty_authority": "NOT_REFUTED",
+    "C_no_over_distribution": "NOT_REFUTED",
+    "D_no_double_sale": "NOT_REFUTED",
+    "E_jwt_no_privileged_money": "NOT_REFUTED",
+    "F_offplatform_no_wallet_mint": "NOT_REFUTED",
+    "G_refund_le_capture": "NOT_REFUTED",
+    "H_parties_coherent": "NOT_REFUTED",
+    "I_one_intent_one_transfer": "NOT_REFUTED",
+    "J_two_intents_two_transfers": "CONFIRMED_EXPECTED",
+    "K_catalog_not_retroactive": "NOT_REFUTED",
+    "L_offer_bundle_reservation_authority": "NOT_REFUTED"
+  },
+  "races": {
+    "stock1_10x_insert": {"ok": 0, "n": 10, "product_qty_after": 1},
+    "checkout_10x_same_order": {"ok": 10, "unique_sessions": 1, "server_amount_cents": 1010},
+    "payout_6x_two_keys": {"unique_transfers": 2, "duplicate_same_key": false},
+    "refund_plus_release_paid_590": {
+      "stripe_refunds": 1,
+      "already_refunded": true,
+      "wallet_buyer_delta": 0,
+      "wallet_seller_delta": 0,
+      "final_status": "cancelado"
+    }
+  },
+  "stripe_test": {
+    "session_created_jwt": true,
+    "client_amount_1_ignored": true,
+    "server_amount_cents_examples": [1955, 1010, 1361],
+    "capture_real_test": "lab_fixture_setup_paid_order",
+    "capture_pi": "pi_3UACAOH7FWYUN3jh1mElVVHq",
+    "capture_cents": 590,
+    "jwt_4242_to_capture": false,
+    "net_permanent_after_refund": false
+  },
+  "rpc_inventory_count": 178,
+  "gaps": [
+    "JWT checkout session not paid with TEST card 4242",
+    "Two Sessions never obtained so two net captures on stock=1 not proven",
+    "Some internal RPC signatures 404",
+    "No valid seller device token for OCR/PS"
+  ],
+  "passes": ["pass1", "pass2", "pass3", "pass4", "pass5", "pass5b"],
+  "probes_dir": "tool/redteam_blind_indep_20260830T1752/"
+}

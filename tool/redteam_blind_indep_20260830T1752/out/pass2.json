@@ -1,0 +1,401 @@
+{
+  "project": "fxdknzrqjenzqcvnwqqq",
+  "pass": 2,
+  "matrix": [
+    {
+      "surface": "products",
+      "attack": "seller INSERT stock1",
+      "identity": "seller",
+      "result": "201 [{\"id\":\"b063b24e-e1bf-4d8a-ac56-84969acbdd0c\",\"created_at\":\"2026-08-30T17:02:00.410211+00:00\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"title\":\"RT1752-stock1\",\"price\":12.34,\"ref_code\":null,\"category\":null,\"clothing_size\":null,\"gen…",
+      "impact": "",
+      "severity": "",
+      "evidence": null
+    },
+    {
+      "surface": "orders",
+      "attack": "INSERT qty=1 pt=0.01 cuc=1",
+      "identity": "buyer",
+      "result": "201 [{\"id\":\"449efe60-163d-4c8f-872a-64dd548e6d9c\",\"created_at\":\"2026-08-30T17:02:00.626916+00:00\",\"product_id\":\"b063b24e-e1bf-4d8a-ac56-84969acbdd0c\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"price_total\":12.34,\"shipping_met…",
+      "impact": "",
+      "severity": "",
+      "evidence": null
+    },
+    {
+      "surface": "CHECKOUT",
+      "attack": "amount_1",
+      "identity": "buyer",
+      "result": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a15VP1TcSWzVzpLfdN03QppryPTxeOepAT5RP2aqYM3n9RpHmyS14019Xk#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21oYWlsUnxrVkRhQUQyNlJjSWBCN3BXNXVvVT1hamlcf3Fjd1dRMGJmREk9Yz09PH1CMzVTY0pBXD1kMU5HZl1da05gf0s1XGQ1NWA3bVFBNzNMJyknY3dqaFZ…",
+      "impact": "",
+      "severity": "",
+      "evidence": null
+    },
+    {
+      "surface": "CHECKOUT",
+      "attack": "amount_1 session",
+      "identity": "buyer",
+      "result": "keys=[checkoutUrl, checkoutSessionId, paidChatId, server_amount_cents, amount_total]",
+      "impact": "",
+      "severity": "",
+      "evidence": {
+        "checkoutSessionId": "cs_test_a15VP1TcSWzVzpLfdN03QppryPTxeOepAT5RP2aqYM3n9RpHmyS14019Xk",
+        "amount": null
+      }
+    },
+    {
+      "surface": "CHECKOUT",
+      "attack": "amount_match_catalog_minus",
+      "identity": "buyer",
+      "result": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a15VP1TcSWzVzpLfdN03QppryPTxeOepAT5RP2aqYM3n9RpHmyS14019Xk#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRXdjRpSE0yQ1JcUEs2b21oYWlsUnxrVkRhQUQyNlJjSWBCN3BXNXVvVT1hamlcf3Fjd1dRMGJmREk9Yz09PH1CMzVTY0pBXD1kMU5HZl1da05gf0s1XGQ1NWA3bVFBNzNMJyknY3dqaFZ…",
+      "impact": "",
+      "severity": "",
+      "evidence": null
+    },
+    {
+      "surface": "CHECKOUT",
+      "attack": "amount_match_catalog_minus session",
+      "identity": "buyer",
+      "result": "keys=[checkoutUrl, checkoutSessionId, paidChatId, server_amount_cents, amount_total, reused_session]",
+      "impact": "",
+      "severity": "",
+      "evidence": {
+        "checkoutSessionId": "cs_test_a15VP1TcSWzVzpLfdN03QppryPTxeOepAT5RP2aqYM3n9RpHmyS14019Xk",
+        "amount": null
+      }
+    },
+    {
+      "surface": "CHECKOUT",
+      "attack": "prize_shipping",
+      "identity": "buyer",
+      "result": "400 {\"error\":\"Checkout blocked: order is not a raffle prize.\"}",
+      "impact": "",
+      "severity": "",
+      "evidence": null
+    },
+    {
+      "surface": "orders",
+      "attack": "checkout amount FINAL vs catalog",
+      "identity": "observe",
+      "result": "catalog=12.34 before={id: 449efe60-163d-4c8f-872a-64dd548e6d9c, status: reserva_pendente, price_total: 12.34, contract_unit_cents: 1234, contract_qty: 1, quantity: 1, amount_paid_cents: null, stripe_payment_intent_id: null, stripe_checkout_session_id: null, stripe_refund_id: null, stock_units_applied: null, payment_method: Pagamento na app, shipping_method: hand, wallet_release_processed_at: null, wallet_refund_processed_at: null} after={id: 449efe60-163d-4c8f-872a-64dd548e6d9c, status: reserva_pendente, price_total: 13.61, contract_unit_cents: 1234, contract_qty: 1, quantity: 1, amount_paid_cents: null, stripe_payment_intent_id: null, stripe_checkout_session_id: cs_test_a15VP1TcSWzVzpLfdN03QppryPTxeOepAT5RP2aqYM3n9RpHmyS14019Xk, stripe_refund_id: null, stock_units_applied: null, payment_method: Pagamento na app, shipping_method: hand, wallet_release_processed_at: null, wallet_refund_processed_at: null}",
+      "impact": "",
+      "severity": "",
+      "evidence": {
+        "catalog": 12.34,
+        "before": {
+          "id": "449efe60-163d-4c8f-872a-64dd548e6d9c",
+          "status": "reserva_pendente",
+          "price_total": 12.34,
+          "contract_unit_cents": 1234,
+          "contract_qty": 1,
+          "quantity": 1,
+          "amount_paid_cents": null,
+          "stripe_payment_intent_id": null,
+          "stripe_checkout_session_id": null,
+          "stripe_refund_id": null,
+          "stock_units_applied": null,
+          "payment_method": "Pagamento na app",
+          "shipping_method": "hand",
+          "wallet_release_processed_at": null,
+          "wallet_refund_processed_at": null
+        },
+        "after": {
+          "id": "449efe60-163d-4c8f-872a-64dd548e6d9c",
+          "status": "reserva_pendente",
+          "price_total": 13.61,
+          "contract_unit_cents": 1234,
+          "contract_qty": 1,
+          "quantity": 1,
+          "amount_paid_cents": null,
+          "stripe_payment_intent_id": null,
+          "stripe_checkout_session_id": "cs_test_a15VP1TcSWzVzpLfdN03QppryPTxeOepAT5RP2aqYM3n9RpHmyS14019Xk",
+          "stripe_refund_id": null,
+          "stock_units_applied": null,
+          "payment_method": "Pagamento na app",
+          "shipping_method": "hand",
+          "wallet_release_processed_at": null,
+          "wallet_refund_processed_at": null
+        }
+      }
+    },
+    {
+      "surface": "orders",
+      "attack": "INSERT qty=99 pt=12.34 cuc=null",
+      "identity": "buyer",
+      "result": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"order_hold_exceeds_stock\"}",
+      "impact": "",
+      "severity": "",
+      "evidence": null
+    },
+    {
+      "surface": "STOCK",
+      "attack": "qty=99 insert",
+      "identity": "buyer",
+      "result": "blocked",
+      "impact": "",
+      "severity": "",
+      "evidence": null
+    },
+    {
+      "surface": "orders",
+      "attack": "INSERT qty=1 pt=12.34 cuc=null",
+      "identity": "buyer",
+      "result": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"order_hold_exceeds_stock\"}",
+      "impact": "",
+      "severity": "",
+      "evidence": null
+    },
+    {
+      "surface": "orders",
+      "attack": "INSERT qty=1 pt=null cuc=null",
+      "identity": "buyer",
+      "result": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"order_hold_exceeds_stock\"}",
+      "impact": "",
+      "severity": "",
+      "evidence": null
+    },
+    {
+      "surface": "STOCK",
+      "attack": "10 parallel INSERT qty=1 stock=1",
+      "identity": "buyer",
+      "result": "ok=0/10 ids=0",
+      "impact": "",
+      "severity": "",
+      "evidence": null
+    },
+    {
+      "surface": "STOCK",
+      "attack": "product qty after race",
+      "identity": "observe",
+      "result": "200 [{\"id\":\"b063b24e-e1bf-4d8a-ac56-84969acbdd0c\",\"quantity\":1}]",
+      "impact": "",
+      "severity": "",
+      "evidence": null
+    },
+    {
+      "surface": "orders",
+      "attack": "INSERT qty=1 pt=null cuc=null",
+      "identity": "buyer",
+      "result": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"order_hold_exceeds_stock\"}",
+      "impact": "",
+      "severity": "",
+      "evidence": null
+    },
+    {
+      "surface": "OFFERS",
+      "attack": "buyer INSERT 0.50",
+      "identity": "buyer",
+      "result": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"new row violates row-level security policy for table \\\"product_offers\\\"\"}",
+      "impact": "",
+      "severity": "",
+      "evidence": null
+    },
+    {
+      "surface": "WALLET",
+      "attack": "buyer release 449efe60-163d-4c8f-872a-64dd548e6d9c",
+      "identity": "buyer",
+      "result": "200 false",
+      "impact": "",
+      "severity": "",
+      "evidence": null
+    },
+    {
+      "surface": "WALLET",
+      "attack": "buyer refund-wallet 449efe60-163d-4c8f-872a-64dd548e6d9c",
+      "identity": "buyer",
+      "result": "200 false",
+      "impact": "",
+      "severity": "",
+      "evidence": null
+    },
+    {
+      "surface": "WALLET",
+      "attack": "seller release 449efe60-163d-4c8f-872a-64dd548e6d9c",
+      "identity": "seller",
+      "result": "200 false",
+      "impact": "",
+      "severity": "",
+      "evidence": null
+    },
+    {
+      "surface": "WALLET",
+      "attack": "buyer release d53273ec-7ab9-42db-a277-d7fcfc8b43d5",
+      "identity": "buyer",
+      "result": "200 false",
+      "impact": "",
+      "severity": "",
+      "evidence": null
+    },
+    {
+      "surface": "WALLET",
+      "attack": "buyer refund-wallet d53273ec-7ab9-42db-a277-d7fcfc8b43d5",
+      "identity": "buyer",
+      "result": "200 false",
+      "impact": "",
+      "severity": "",
+      "evidence": null
+    },
+    {
+      "surface": "WALLET",
+      "attack": "seller release d53273ec-7ab9-42db-a277-d7fcfc8b43d5",
+      "identity": "seller",
+      "result": "200 false",
+      "impact": "",
+      "severity": "",
+      "evidence": null
+    },
+    {
+      "surface": "WALLET",
+      "attack": "buyer release b63e6a76-94e4-4472-a091-51840f27011a",
+      "identity": "buyer",
+      "result": "200 false",
+      "impact": "",
+      "severity": "",
+      "evidence": null
+    },
+    {
+      "surface": "WALLET",
+      "attack": "buyer refund-wallet b63e6a76-94e4-4472-a091-51840f27011a",
+      "identity": "buyer",
+      "result": "200 false",
+      "impact": "",
+      "severity": "",
+      "evidence": null
+    },
+    {
+      "surface": "WALLET",
+      "attack": "seller release b63e6a76-94e4-4472-a091-51840f27011a",
+      "identity": "seller",
+      "result": "200 false",
+      "impact": "",
+      "severity": "",
+      "evidence": null
+    },
+    {
+      "surface": "PAYOUT",
+      "attack": "parallel 100 cents two keys",
+      "identity": "seller",
+      "result": "200 {\"success\":true,\"transferId\":\"tr_1UAC7QH7FWYUN3jhmChJZHmp\",\"balance\":36.39}",
+      "impact": "",
+      "severity": "",
+      "evidence": null
+    },
+    {
+      "surface": "PAYOUT",
+      "attack": "parallel 100 cents two keys",
+      "identity": "seller",
+      "result": "200 {\"success\":true,\"transferId\":\"tr_1UAC7QH7FWYUN3jhgFi8MlmW\",\"balance\":37.39}",
+      "impact": "",
+      "severity": "",
+      "evidence": null
+    },
+    {
+      "surface": "PAYOUT",
+      "attack": "parallel 100 cents two keys",
+      "identity": "seller",
+      "result": "200 {\"success\":true,\"transferId\":\"tr_1UAC7QH7FWYUN3jhmChJZHmp\",\"balance\":36.39}",
+      "impact": "",
+      "severity": "",
+      "evidence": null
+    },
+    {
+      "surface": "PAYOUT",
+      "attack": "parallel 100 cents two keys",
+      "identity": "seller",
+      "result": "200 {\"success\":true,\"transferId\":\"tr_1UAC7QH7FWYUN3jhgFi8MlmW\",\"balance\":37.39}",
+      "impact": "",
+      "severity": "",
+      "evidence": null
+    },
+    {
+      "surface": "PAYOUT",
+      "attack": "parallel 100 cents two keys",
+      "identity": "seller",
+      "result": "200 {\"success\":true,\"transferId\":\"tr_1UAC7QH7FWYUN3jhmChJZHmp\",\"balance\":36.39}",
+      "impact": "",
+      "severity": "",
+      "evidence": null
+    },
+    {
+      "surface": "PAYOUT",
+      "attack": "parallel 100 cents two keys",
+      "identity": "seller",
+      "result": "400 {\"error\":\"Não foi possível concluir o levantamento. Tenta outra vez.\",\"code\":\"idempotency_key_in_use\"}",
+      "impact": "",
+      "severity": "",
+      "evidence": null
+    },
+    {
+      "surface": "REVIEWS",
+      "attack": "parallel insert",
+      "identity": "buyer",
+      "result": "400 {\"code\":\"PGRST204\",\"details\":null,\"hint\":null,\"message\":\"Could not find the 'author_id' column of 'reviews' in the schema cache\"}",
+      "impact": "",
+      "severity": "",
+      "evidence": null
+    },
+    {
+      "surface": "REVIEWS",
+      "attack": "parallel insert",
+      "identity": "buyer",
+      "result": "400 {\"code\":\"PGRST204\",\"details\":null,\"hint\":null,\"message\":\"Could not find the 'author_id' column of 'reviews' in the schema cache\"}",
+      "impact": "",
+      "severity": "",
+      "evidence": null
+    },
+    {
+      "surface": "REVIEWS",
+      "attack": "parallel insert",
+      "identity": "buyer",
+      "result": "400 {\"code\":\"PGRST204\",\"details\":null,\"hint\":null,\"message\":\"Could not find the 'author_id' column of 'reviews' in the schema cache\"}",
+      "impact": "",
+      "severity": "",
+      "evidence": null
+    },
+    {
+      "surface": "REVIEWS",
+      "attack": "parallel insert",
+      "identity": "buyer",
+      "result": "400 {\"code\":\"PGRST204\",\"details\":null,\"hint\":null,\"message\":\"Could not find the 'author_id' column of 'reviews' in the schema cache\"}",
+      "impact": "",
+      "severity": "",
+      "evidence": null
+    },
+    {
+      "surface": "REVIEWS",
+      "attack": "dup count",
+      "identity": "buyer",
+      "result": "ok=0/4",
+      "impact": "",
+      "severity": "",
+      "evidence": null
+    },
+    {
+      "surface": "WEBHOOK",
+      "attack": "forged signature",
+      "identity": "anon",
+      "result": "400 {\"ok\":false,\"error\":\"invalid_signature\"}",
+      "impact": "",
+      "severity": "",
+      "evidence": null
+    },
+    {
+      "surface": "orders",
+      "attack": "INSERT qty=1 pt=null cuc=null",
+      "identity": "buyer",
+      "result": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"order_hold_exceeds_stock\"}",
+      "impact": "",
+      "severity": "",
+      "evidence": null
+    },
+    {
+      "surface": "ORDERS",
+      "attack": "off-platform INSERT status pago",
+      "identity": "buyer",
+      "result": "status=null paid=null",
+      "impact": "",
+      "severity": "",
+      "evidence": null
+    }
+  ],
+  "findings": [],
+  "gaps": []
+}

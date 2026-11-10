@@ -1,0 +1,134 @@
+{
+  "probes": [
+    {
+      "id": "state",
+      "fm": {
+        "status": "accepted",
+        "source": "facebook_manual",
+        "live_item_id": "fb9614ac-da94-4c26-adf6-db216d2bfce6",
+        "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96"
+      },
+      "ord": {
+        "status": "pago",
+        "amount_paid_cents": null,
+        "stripe_payment_intent_id": null,
+        "live_item_id": "fb9614ac-da94-4c26-adf6-db216d2bfce6",
+        "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96"
+      }
+    },
+    {
+      "id": "AG1-convert-after-fake-pago-no-cents",
+      "patch_http": 403,
+      "patch_body": {
+        "code": "42501",
+        "details": null,
+        "hint": null,
+        "message": "convert_requires_paid_order"
+      },
+      "rpc_http": 200,
+      "rpc_body": {
+        "ok": false,
+        "error": "convert_requires_paid_order"
+      },
+      "fm_after": {
+        "status": "accepted"
+      },
+      "open": false
+    },
+    {
+      "id": "AG8-wallet-after-fake-pago",
+      "wallet": {
+        "id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+        "balance": 18.97
+      }
+    },
+    {
+      "id": "AG8-pi-on-ghost-order-reserved-full",
+      "http": 400,
+      "raw": "{\"error\":\"Missing payment metadata.\"}"
+    },
+    {
+      "id": "AG8-pi-on-fake-pago-order",
+      "http": 400,
+      "raw": "{\"error\":\"Missing payment metadata.\"}"
+    },
+    {
+      "id": "AG6-accept-one-pending-qty1",
+      "p1": "831620c7-8088-412b-9670-976abec10496",
+      "http": 200,
+      "body": {
+        "ok": true,
+        "item_qty": 1,
+        "request_id": "831620c7-8088-412b-9670-976abec10496",
+        "item_status": "reserved_full",
+        "reserved_qty": 1
+      },
+      "status": {
+        "status": "accepted"
+      }
+    },
+    {
+      "id": "ef19e651-5c04-4be6-ba66-2ffea729443c",
+      "http": 201,
+      "status": "pending"
+    },
+    {
+      "id": "AG6-waitlist-freeze-accept",
+      "a": "35cb0263-b5a2-49d3-bb9c-216a1fa7b027",
+      "b": "561416f2-8844-4be5-a4d2-c69369eb196a",
+      "b_http": 201,
+      "rpc_http": 403,
+      "rpc_body": {
+        "code": "42501",
+        "details": null,
+        "hint": null,
+        "message": "live_item_qty_below_reservations"
+      },
+      "patch_http": 200,
+      "patch_body": [
+        {
+          "id": "35cb0263-b5a2-49d3-bb9c-216a1fa7b027",
+          "live_id": "49d884bc-c199-4fd9-a367-421668d00b12",
+          "live_item_id": "756e3895-074b-45e2-a3d2-68a212bd8e9f",
+          "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+          "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+          "requested_qty": 1,
+          "queue_position": 1,
+          "source": "fleaber_live",
+          "status": "accepted",
+          "notes": null,
+          "processed_by_user_id": null,
+          "expires_at": "2026-09-01T19:13:28.587619+00:00",
+          "created_at": "2026-09-01T18:28:28.587619+00:00",
+          "updated_at": "2026-09-01T18:28:29.239768+00:00",
+          "effective_at": "2026-09-01T18:28:28.587619+00:00",
+          "detected_at": null,
+          "external_display_name": null,
+          "external_buyer_ref": null,
+          "chat_sequence": null,
+          "avatar_phash": null,
+          "ocr_raw_line": null,
+          "ingest_channel": null,
+          "ingest_confidence": null,
+          "ingest_status": null,
+          "idempotency_key": null,
+          "ocr_confidence": null,
+          "parser_confidence": null,
+          "item_match_confidence": null,
+          "identity_confidence": null,
+          "resolved_ref_slug": null,
+          "resolved_match_type": null,
+          "parser_intent": null,
+          "device_id": null
+        }
+      ],
+      "a_status": {
+        "status": "accepted"
+      },
+      "b_status": {
+        "status": "pending"
+      },
+      "open_frozen": false
+    }
+  ]
+}

@@ -1,0 +1,301 @@
+{
+  "stamp": "20260902T1006",
+  "prefix": "RTAP-20260902T1006",
+  "lenses": [
+    "AP1",
+    "AP3",
+    "AP7",
+    "AP8"
+  ],
+  "findings": [
+    {
+      "id": "AP1-11b",
+      "lens": "AP1",
+      "severity": "P2",
+      "title": "Buyer injeta system «comprou» no chat da live sem PI",
+      "actor": "buyer JWT",
+      "pre": "sem order paga, sem convert",
+      "repro": "rpc batata_live_purchase_broadcast",
+      "expected": "só após convert com PI (seller/staff)",
+      "obtained": {
+        "rpc": "200 true",
+        "msgs": [
+          {
+            "id": "13bff377-f7f6-48ed-87d8-bea9f00515e9",
+            "live_id": "64acdcb0-805f-42d1-869a-defccef7fa7b",
+            "user_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+            "kind": "system",
+            "body": "✅ Maestro Buyer comprou RTAP-20260902T1006 p2 itemA",
+            "sender_label": "Maestro Buyer",
+            "created_at": "2026-09-02T09:18:59.727818+00:00"
+          }
+        ]
+      },
+      "proven": true,
+      "evidence": {
+        "walletDelta": 0.0
+      }
+    },
+    {
+      "id": "AP7-09",
+      "lens": "AP7",
+      "severity": "P2",
+      "title": "Buyer planta «comprou» na live de outro vendedor",
+      "actor": "buyer JWT",
+      "pre": "live S2",
+      "repro": "purchase_broadcast live_id alheio",
+      "expected": "not_allowed / só owner",
+      "obtained": {
+        "rpc": "200 true",
+        "msgs": [
+          {
+            "id": "e12ea67b-1664-4770-9be5-fc0b81784c21",
+            "kind": "system",
+            "body": "✅ Maestro Buyer comprou RTAP-20260902T1006 p2 itemS2",
+            "user_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96"
+          }
+        ]
+      },
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "AP3-06e",
+      "lens": "AP3",
+      "severity": "P2",
+      "title": "Pending criada em ended é aceite depois de reabrir o directo",
+      "actor": "seller JWT",
+      "pre": "INSERT while ended → live de novo",
+      "repro": "accept após PATCH live=live",
+      "expected": "pending de ended expirada / recusada",
+      "obtained": {
+        "hit": "200 {\"ok\": true, \"item_qty\": 1, \"request_id\": \"89778d38-3310-4310-8a14-80dbeb5193c6\", \"item_status\": \"reserved_full\", \"reserved_qty\": 1}",
+        "res": {
+          "id": "89778d38-3310-4310-8a14-80dbeb5193c6",
+          "status": "accepted",
+          "requested_qty": 1,
+          "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+          "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+          "live_item_id": "2fcc1c87-56b6-4896-bf87-75b676acbd12",
+          "live_id": "d096fabb-7f3b-429b-87f6-0537f2e03e94",
+          "source": "fleaber_live",
+          "processed_by_user_id": "980f4fa1-0004-42f9-abca-69f1a9c29588"
+        }
+      },
+      "proven": true,
+      "evidence": {}
+    }
+  ],
+  "blocked": [
+    {
+      "id": "AP8-p2-fixture",
+      "lens": "AP8",
+      "title": "fixture pago não mexeu wallet",
+      "ev": {
+        "before": 24.97,
+        "after": 24.97
+      }
+    },
+    {
+      "id": "AP1-11c",
+      "lens": "AP1",
+      "title": "spoof p_buyer_id",
+      "ev": {
+        "rpc": "200 false",
+        "msgs": "200 [{\"id\":\"13bff377-f7f6-48ed-87d8-bea9f00515e9\",\"user_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"body\":\"✅ Maestro Buyer comprou RTAP-20260902T1006 p2 itemA\",\"sender_label\":\"Maestro Buyer\"}]"
+      }
+    },
+    {
+      "id": "AP3-06b",
+      "lens": "AP3",
+      "title": "accept em ended",
+      "ev": {
+        "hit": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"live_ended\"}",
+        "res": {
+          "id": "89778d38-3310-4310-8a14-80dbeb5193c6",
+          "status": "pending",
+          "requested_qty": 1,
+          "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+          "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+          "live_item_id": "2fcc1c87-56b6-4896-bf87-75b676acbd12",
+          "live_id": "d096fabb-7f3b-429b-87f6-0537f2e03e94",
+          "source": "fleaber_live",
+          "processed_by_user_id": ""
+        },
+        "item": {
+          "id": "2fcc1c87-56b6-4896-bf87-75b676acbd12",
+          "live_id": "d096fabb-7f3b-429b-87f6-0537f2e03e94",
+          "status": "available",
+          "quantity": 1,
+          "is_active": true,
+          "item_kind": "live_only",
+          "product_id": "",
+          "checkout_product_id": "",
+          "price": 9.0,
+          "title": "RTAP-20260902T1006 p2 ended item"
+        }
+      }
+    },
+    {
+      "id": "AP3-06c",
+      "lens": "AP3",
+      "title": "Convert reserva de live ended sem PI",
+      "ev": "200 {\"ok\": false, \"error\": \"convert_requires_paid_order\"}"
+    },
+    {
+      "id": "AP3-06d",
+      "lens": "AP3",
+      "title": "mark_sold ended",
+      "ev": {
+        "hit": "200 {\"ok\": true, \"price\": 9.0, \"live_id\": \"d096fabb-7f3b-429b-87f6-0537f2e03e94\", \"ref_code\": \"AP417344\", \"item_kind\": \"live_only\", \"total_qty\": 1, \"product_id\": null, \"blocked_qty\": 0, \"live_status\": \"ended\", \"live_item_id\": \"2fcc1c87-56b6-489…",
+        "item": {
+          "id": "2fcc1c87-56b6-4896-bf87-75b676acbd12",
+          "live_id": "d096fabb-7f3b-429b-87f6-0537f2e03e94",
+          "status": "available",
+          "quantity": 1,
+          "is_active": true,
+          "item_kind": "live_only",
+          "product_id": "",
+          "checkout_product_id": "",
+          "price": 9.0,
+          "title": "RTAP-20260902T1006 p2 ended item"
+        }
+      }
+    },
+    {
+      "id": "AP3-07",
+      "lens": "AP3",
+      "title": "stock ended available",
+      "ev": "200 {\"ok\": true, \"price\": 9.0, \"live_id\": \"d096fabb-7f3b-429b-87f6-0537f2e03e94\", \"ref_code\": \"AP417344\", \"item_kind\": \"live_only\", \"total_qty\": 1, \"product_id\": null, \"blocked_qty\": 0, \"live_status\": \"ended\", \"live_item_id\": \"2fcc1c87-56b6-489…"
+    }
+  ],
+  "skipped": [],
+  "notes": [
+    {
+      "id": "AP8.tx.recent",
+      "lens": "AP8",
+      "title": "últimos movimentos seller",
+      "ev": []
+    },
+    {
+      "id": "AP8.delta.sku",
+      "lens": "AP8",
+      "title": "após createProduct",
+      "ev": {
+        "before": 24.97,
+        "after": 24.97
+      }
+    },
+    {
+      "id": "AP8.delta.paidFixture",
+      "lens": "AP8",
+      "title": "insertPaidOrder service_role",
+      "ev": {
+        "oid": "96ac2417-bdaa-405d-8f4b-f0817c011036",
+        "before": 24.97,
+        "after": 24.97,
+        "delta": 0.0,
+        "tx": []
+      }
+    },
+    {
+      "id": "AP1.broadcast.msgs",
+      "lens": "AP1",
+      "title": "mensagens após buyer broadcast",
+      "ev": {
+        "rpc": "200 true",
+        "walletDelta": 0.0,
+        "msgs": [
+          {
+            "id": "13bff377-f7f6-48ed-87d8-bea9f00515e9",
+            "live_id": "64acdcb0-805f-42d1-869a-defccef7fa7b",
+            "user_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+            "kind": "system",
+            "body": "✅ Maestro Buyer comprou RTAP-20260902T1006 p2 itemA",
+            "sender_label": "Maestro Buyer",
+            "created_at": "2026-09-02T09:18:59.727818+00:00"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AP3.ended.insert",
+      "lens": "AP3",
+      "title": "INSERT pending em ended",
+      "ev": {
+        "hit": "201 [{\"id\":\"89778d38-3310-4310-8a14-80dbeb5193c6\",\"live_id\":\"d096fabb-7f3b-429b-87f6-0537f2e03e94\",\"live_item_id\":\"2fcc1c87-56b6-4896-bf87-75b676acbd12\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0…",
+        "row": {
+          "id": "89778d38-3310-4310-8a14-80dbeb5193c6",
+          "status": "pending",
+          "requested_qty": 1,
+          "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+          "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+          "live_item_id": "2fcc1c87-56b6-4896-bf87-75b676acbd12",
+          "live_id": "d096fabb-7f3b-429b-87f6-0537f2e03e94",
+          "source": "fleaber_live",
+          "processed_by_user_id": ""
+        }
+      }
+    },
+    {
+      "id": "AP3.ended.stock.p2",
+      "lens": "AP3",
+      "title": "anon stock ended",
+      "ev": {
+        "ok": true,
+        "price": 9.0,
+        "live_id": "d096fabb-7f3b-429b-87f6-0537f2e03e94",
+        "ref_code": "AP417344",
+        "item_kind": "live_only",
+        "total_qty": 1,
+        "product_id": "",
+        "blocked_qty": 0,
+        "live_status": "ended",
+        "live_item_id": "2fcc1c87-56b6-4896-bf87-75b676acbd12",
+        "available_qty": 0,
+        "pending_bag_qty": 0,
+        "sold_converted_qty": 0,
+        "checkout_product_id": "",
+        "reserved_accepted_qty": 1
+      }
+    },
+    {
+      "id": "AP8.tx.end",
+      "lens": "AP8",
+      "title": "wallet fim pass2",
+      "ev": {
+        "balance": 24.97,
+        "tx": []
+      }
+    }
+  ],
+  "actors": {
+    "buyer": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+    "seller": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+    "buyer2": "53a79fb1-33c1-470d-ab00-244190ea3556",
+    "seller2": "58076b08-ce3a-4a09-afc6-db4bfacc1948",
+    "helper": null
+  },
+  "created": {
+    "lives": [
+      "64acdcb0-805f-42d1-869a-defccef7fa7b",
+      "cd7bc171-0079-425c-9266-2c7e3891e2ba",
+      "d096fabb-7f3b-429b-87f6-0537f2e03e94"
+    ],
+    "items": [
+      "d8684424-9168-40a7-b486-3af7da64eb57",
+      "ac07bf08-bbd9-4c8b-a2a1-a204bcac8a10",
+      "2fcc1c87-56b6-4896-bf87-75b676acbd12"
+    ],
+    "orders": [
+      "96ac2417-bdaa-405d-8f4b-f0817c011036"
+    ],
+    "products": [
+      "4d0c99c4-df73-4a6a-a8df-8b6fee5c6314"
+    ],
+    "reservations": [
+      "89778d38-3310-4310-8a14-80dbeb5193c6"
+    ],
+    "helpers": []
+  }
+}

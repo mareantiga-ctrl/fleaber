@@ -1,0 +1,478 @@
+{
+  "auditor": "REDTEAM_BLIND_S_IDENTIDADE_STAFF_v1",
+  "stamp": "20260901T0657",
+  "production_touched": false,
+  "fase4": false,
+  "corrections_applied": false,
+  "actors": {
+    "buyer": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+    "seller": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+    "buyer2": "28b2cffd-5075-415e-9c29-dfe965663c9f",
+    "seller2": "657afa6c-98f1-4bdc-a70f-a7fc1183cbfc"
+  },
+  "findings": [
+    {
+      "id": "RTS-S6-001",
+      "lens": "S6",
+      "severity": "P1",
+      "title": "Conta nova (não loja) emite seller device_token OCR",
+      "actor": "signup JWT",
+      "pre": "trigger força user_type=vendedor; token amarra a auth.uid()",
+      "repro": "rpc batata_create_seller_device_token",
+      "expected": "not_seller",
+      "obtained": "200 {\"ok\": true, \"label\": \"rts\", \"token\": \"b80a2eb8d3b750facdfe767d1bf0160ecad5c382f0348738c0d711b94f2d6561\", \"device_id\": \"rts-new-device\"}",
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "RTS-S6-005",
+      "lens": "S6",
+      "severity": "P1",
+      "title": "buyer2 (não vendedor de loja) emite device_token OCR",
+      "actor": "buyer2 JWT",
+      "pre": "user_type após fixture",
+      "repro": "rpc batata_create_seller_device_token",
+      "expected": "not_seller",
+      "obtained": "200 {\"ok\": true, \"label\": \"rts\", \"token\": \"cf7ed6b2146740d0a5c8703b7da0ec423f227e6c0c9ad7c40036c9afb11c534a\", \"device_id\": \"rts-b2-dev\"}",
+      "proven": true,
+      "evidence": {}
+    }
+  ],
+  "notes": [
+    {
+      "id": "actors",
+      "lens": "S1",
+      "title": "two real UUIDs",
+      "ev": {
+        "buyer": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+        "seller": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+        "buyer2": "28b2cffd-5075-415e-9c29-dfe965663c9f",
+        "seller2": "657afa6c-98f1-4bdc-a70f-a7fc1183cbfc"
+      }
+    },
+    {
+      "id": "s1.own",
+      "lens": "S1",
+      "title": "buyer lê o próprio perfil",
+      "ev": {
+        "http": "400 {\"code\":\"42703\",\"details\":null,\"hint\":null,\"message\":\"column profiles.email does not exist\"}",
+        "pii": "{}",
+        "user_type": null
+      }
+    },
+    {
+      "id": "s1.other.rest",
+      "lens": "S1",
+      "title": "buyer GET profiles seller",
+      "ev": "400 {\"code\":\"42703\",\"details\":null,\"hint\":null,\"message\":\"column profiles.email does not exist\"}"
+    },
+    {
+      "id": "s1.other.star",
+      "lens": "S1",
+      "title": "buyer GET profiles * seller",
+      "ev": "200 []"
+    },
+    {
+      "id": "s1.anon",
+      "lens": "S1",
+      "title": "anon GET profiles seller",
+      "ev": "400 {\"code\":\"42703\",\"details\":null,\"hint\":null,\"message\":\"column profiles.email does not exist\"}"
+    },
+    {
+      "id": "s1.dir",
+      "lens": "S1",
+      "title": "directory autenticada",
+      "ev": {
+        "http": 200,
+        "n": 3,
+        "has_seller": true,
+        "has_buyer2_unpub": false
+      }
+    },
+    {
+      "id": "s1.find_email",
+      "lens": "S1",
+      "title": "find_user_id_by_email seller",
+      "ev": "200 null"
+    },
+    {
+      "id": "s1.paydet",
+      "lens": "S1",
+      "title": "IBAN/MB WAY sem order (buyer2→seller)",
+      "ev": "200 []"
+    },
+    {
+      "id": "s1.admin_list",
+      "lens": "S1",
+      "title": "admin_list_profiles buyer",
+      "ev": "400 {\"code\":\"P0001\",\"details\":null,\"hint\":null,\"message\":\"Acesso negado.\"}"
+    },
+    {
+      "id": "s1.embed",
+      "lens": "S1",
+      "title": "embed profiles via products",
+      "ev": "400 {\"code\":\"PGRST200\",\"details\":\"Searched for a foreign key relationship between 'products' and 'profiles' in the schema 'public', but no matches were found.\",\"hint\":\"Perhaps you meant 'favorites' instead of 'profiles'.\",\"m…"
+    },
+    {
+      "id": "s1.auth.admin",
+      "lens": "S1",
+      "title": "Auth admin users com JWT",
+      "ev": "403 {\"code\":403,\"error_code\":\"not_admin\",\"msg\":\"User not allowed\"}"
+    },
+    {
+      "id": "s2.is_admin",
+      "lens": "S2",
+      "title": "batata_is_admin",
+      "ev": {
+        "buyer": "200 false",
+        "seller": "200 false",
+        "anon": "200 false"
+      }
+    },
+    {
+      "id": "s2.patch.admin",
+      "lens": "S2",
+      "title": "buyer PATCH user_type=admin",
+      "ev": {
+        "http": "200 [{\"created_at\":\"2026-08-26T11:42:16.950611+00:00\",\"full_name\":\"Maestro Buyer\",\"user_type\":\"comprador\",\"phone\":null,\"id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"photo_url\":null,\"is_live\":false,\"next_live\":null,\"last_live\"…",
+        "user_type_after": null
+      }
+    },
+    {
+      "id": "s2.patch.other",
+      "lens": "S2",
+      "title": "buyer PATCH perfil seller",
+      "ev": "200 []"
+    },
+    {
+      "id": "s2.insert.alien",
+      "lens": "S2",
+      "title": "buyer INSERT profile id=seller2",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"new row violates row-level security policy for table \\\"profiles\\\"\"}"
+    },
+    {
+      "id": "s2.signup",
+      "lens": "S2",
+      "title": "signup metadata user_type=admin",
+      "ev": 200
+    },
+    {
+      "id": "s2.signup.profile",
+      "lens": "S2",
+      "title": "perfil após signup",
+      "ev": "200 [{\"id\":\"5bbe0ea5-5266-4b6a-8299-433044b4691b\",\"user_type\":\"vendedor\",\"full_name\":\"RTS-20260901T0657-NEW\"}]"
+    },
+    {
+      "id": "s2.del.own",
+      "lens": "S2",
+      "title": "DELETE próprio perfil",
+      "ev": "200 []"
+    },
+    {
+      "id": "s2.new.device",
+      "lens": "S6",
+      "title": "new user mint OCR token",
+      "ev": "200 {\"ok\": true, \"label\": \"rts\", \"token\": \"b80a2eb8d3b750facdfe767d1bf0160ecad5c382f0348738c0d711b94f2d6561\", \"device_id\": \"rts-new-device\"}"
+    },
+    {
+      "id": "s2.resolve",
+      "lens": "S2",
+      "title": "admin_resolve_dispute buyer",
+      "ev": "400 {\"code\":\"P0001\",\"details\":null,\"hint\":null,\"message\":\"Apenas administradores podem resolver disputas.\"}"
+    },
+    {
+      "id": "s2.kill",
+      "lens": "S2",
+      "title": "director kill switch buyer",
+      "ev": "404 {\"code\":\"PGRST202\",\"details\":\"Searched for the function public.batata_director_activate_kill_switch with parameters p_reason, p_scope or with a single unnamed json/jsonb parameter, but no matches were found in the schema…"
+    },
+    {
+      "id": "s2.director.insert",
+      "lens": "S6",
+      "title": "INSERT live_director_scripts",
+      "ev": "404 {\"code\":\"PGRST205\",\"details\":null,\"hint\":\"Perhaps you meant the table 'public.live_raffle_actions'\",\"message\":\"Could not find the table 'public.live_director_scripts' in the schema cache\"}"
+    },
+    {
+      "id": "s2.helper.insert",
+      "lens": "S2",
+      "title": "buyer2 INSERT helper na loja seller",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"new row violates row-level security policy for table \\\"seller_helpers\\\"\"}"
+    },
+    {
+      "id": "s2.invite",
+      "lens": "S2",
+      "title": "seller convite buyer2 analytics-only",
+      "ev": "200 {\"ok\": true}"
+    },
+    {
+      "id": "s2.helper.row",
+      "lens": "S2",
+      "title": "linha convite",
+      "ev": "200 [{\"id\":\"9b53de46-6d63-4ec5-8d6d-7f9175d4a283\",\"invitation_status\":\"pending\",\"active\":false,\"permissions\":{\"can_view_analytics\": true}}]"
+    },
+    {
+      "id": "s2.helper.esc",
+      "lens": "S2",
+      "title": "buyer2 aceita + alarga perms",
+      "ev": {
+        "patch": "200 [{\"id\":\"9b53de46-6d63-4ec5-8d6d-7f9175d4a283\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"helper_user_id\":\"28b2cffd-5075-415e-9c29-dfe965663c9f\",\"display_name\":\"RTS-B2\",\"active\":true,\"permissions\":{\"can_view_anal…",
+        "after": "200 [{\"id\":\"9b53de46-6d63-4ec5-8d6d-7f9175d4a283\",\"invitation_status\":\"accepted\",\"active\":true,\"permissions\":{\"can_view_analytics\": true}}]"
+      }
+    },
+    {
+      "id": "s2.staff.has",
+      "lens": "S2",
+      "title": "buyer2 can_manage_reservations na loja seller",
+      "ev": "200 false"
+    },
+    {
+      "id": "s2.staff.stranger",
+      "lens": "S2",
+      "title": "buyer1 staff na loja seller?",
+      "ev": "200 false"
+    },
+    {
+      "id": "s2.invite.oracle",
+      "lens": "S1",
+      "title": "anti-oracle invite",
+      "ev": {
+        "ghost": "200 {\"ok\": true}",
+        "known_again": "409 {\"code\":\"23505\",\"details\":null,\"hint\":null,\"message\":\"already_member\"}"
+      }
+    },
+    {
+      "id": "s3.list.chat_media",
+      "lens": "S3",
+      "title": "list bucket",
+      "ev": {
+        "anon": "200 []",
+        "buyer": "200 [{\"name\":\"product_photos\",\"id\":null,\"updated_at\":null,\"created_at\":null,\"last_accessed_at\":null,\"metadata\":null}]",
+        "buyer2_prefix_seller": "200 []"
+      }
+    },
+    {
+      "id": "s3.list.fleaber_private",
+      "lens": "S3",
+      "title": "list bucket",
+      "ev": {
+        "anon": "200 []",
+        "buyer": "200 [{\"name\":\"chat_uploads\",\"id\":null,\"updated_at\":null,\"created_at\":null,\"last_accessed_at\":null,\"metadata\":null},{\"name\":\"order_disputes\",\"id\":null,\"updated_at\":null,\"created_at\":null,\"last_accessed_at\":null,\"metadata\":nul…",
+        "buyer2_prefix_seller": "200 []"
+      }
+    },
+    {
+      "id": "s3.list.proof_photos",
+      "lens": "S3",
+      "title": "list bucket",
+      "ev": {
+        "anon": "200 []",
+        "buyer": "200 []",
+        "buyer2_prefix_seller": "200 []"
+      }
+    },
+    {
+      "id": "s3.objects.rest",
+      "lens": "S3",
+      "title": "storage.objects via rest",
+      "ev": "406 {\"code\":\"PGRST106\",\"details\":null,\"hint\":\"Only the following schemas are exposed: public, graphql_public\",\"message\":\"Invalid schema: storage\"}"
+    },
+    {
+      "id": "s3.svc.priv",
+      "lens": "S3",
+      "title": "service_role list fleaber_private (observação)",
+      "ev": {
+        "http": 200,
+        "n": 3
+      }
+    },
+    {
+      "id": "s3.svc.chat.profile",
+      "lens": "S3",
+      "title": "profile_photos seller",
+      "ev": "200 []"
+    },
+    {
+      "id": "s3.up.seller",
+      "lens": "S3",
+      "title": "seller upload fleaber_private",
+      "ev": "400 {\"statusCode\":\"415\",\"error\":\"invalid_mime_type\",\"message\":\"mime type text/plain is not supported\",\"code\":\"InvalidMimeType\"}"
+    },
+    {
+      "id": "s3.no.victim.path",
+      "lens": "S3",
+      "title": "sem objecto alheio observável nesta ronda",
+      "ev": "will retry pass2"
+    },
+    {
+      "id": "s3.up.alien",
+      "lens": "S3",
+      "title": "buyer2 upload prefixo seller",
+      "ev": "400 {\"statusCode\":\"415\",\"error\":\"invalid_mime_type\",\"message\":\"mime type text/plain is not supported\",\"code\":\"InvalidMimeType\"}"
+    },
+    {
+      "id": "s3.rest.objects",
+      "lens": "S3",
+      "title": "JWT GET storage.objects",
+      "ev": "406 {\"code\":\"PGRST106\",\"details\":null,\"hint\":\"Only the following schemas are exposed: public, graphql_public\",\"message\":\"Invalid schema: storage\"}"
+    },
+    {
+      "id": "s5.sel.other",
+      "lens": "S5",
+      "title": "buyer2 SELECT reviews do seller (não target)",
+      "ev": {
+        "http": 200,
+        "n": 0
+      }
+    },
+    {
+      "id": "s5.public",
+      "lens": "S5",
+      "title": "reviews_public_ratings",
+      "ev": {
+        "http": 400,
+        "n": 0,
+        "has_buyer_id": true
+      }
+    },
+    {
+      "id": "s5.ins.spoof",
+      "lens": "S5",
+      "title": "INSERT review buyer_id alheio",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"review_order_not_yours\"}"
+    },
+    {
+      "id": "s7.orders.other",
+      "lens": "S7",
+      "title": "buyer2 GET orders do buyer1",
+      "ev": {
+        "http": 200,
+        "n": 0
+      }
+    },
+    {
+      "id": "s7.order.byid",
+      "lens": "S7",
+      "title": "buyer2 GET order por ID leak",
+      "ev": "200 []"
+    },
+    {
+      "id": "s7.order.patch",
+      "lens": "S7",
+      "title": "buyer2 PATCH order alheia",
+      "ev": "200 []"
+    },
+    {
+      "id": "s7.chats",
+      "lens": "S7",
+      "title": "buyer2 GET chats do buyer1",
+      "ev": {
+        "http": 200,
+        "n": 0
+      }
+    },
+    {
+      "id": "s7.msgs",
+      "lens": "S7",
+      "title": "buyer2 GET messages de thread alheia",
+      "ev": {
+        "http": 400,
+        "n": 0
+      }
+    },
+    {
+      "id": "s7.chat.join",
+      "lens": "S7",
+      "title": "buyer2 PATCH participantes",
+      "ev": "200 []"
+    },
+    {
+      "id": "s7.wallet",
+      "lens": "S7",
+      "title": "buyer2 GET wallet seller",
+      "ev": "200 []"
+    },
+    {
+      "id": "s7.disp",
+      "lens": "S7",
+      "title": "buyer2 GET disputes",
+      "ev": {
+        "http": 200,
+        "n": 0
+      }
+    },
+    {
+      "id": "s6.pair.tbl",
+      "lens": "S6",
+      "title": "buyer2 GET ps_pairing_sessions",
+      "ev": {
+        "http": 200,
+        "n": 0
+      }
+    },
+    {
+      "id": "s6.pair.create",
+      "lens": "S6",
+      "title": "buyer2 cria pairing na live do seller",
+      "ev": "404 {\"code\":\"PGRST202\",\"details\":\"Searched for the function public.batata_ps_create_pairing with parameters p_live_id, p_role or with a single unnamed json/jsonb parameter, but no matches were found in the schema cache.\",\"hi…"
+    },
+    {
+      "id": "s6.tok.b2",
+      "lens": "S6",
+      "title": "buyer2 mint device token",
+      "ev": "200 {\"ok\": true, \"label\": \"rts\", \"token\": \"cf7ed6b2146740d0a5c8703b7da0ec423f227e6c0c9ad7c40036c9afb11c534a\", \"device_id\": \"rts-b2-dev\"}"
+    },
+    {
+      "id": "s6.sim",
+      "lens": "S6",
+      "title": "buyer2 GET live_director_sim_profiles",
+      "ev": "404 {\"code\":\"PGRST205\",\"details\":null,\"hint\":\"Perhaps you meant the table 'public.live_vendor_studio_logs'\",\"message\":\"Could not find the table 'public.live_director_sim_profiles' in the schema cache\"}"
+    },
+    {
+      "id": "s4.hold",
+      "lens": "S4",
+      "title": "buyer2 hold no seller (mesma pessoa hipotética)",
+      "ev": "201 [{\"id\":\"8352836c-2200-4ad5-894a-8e90b28a20f4\",\"created_at\":\"2026-09-01T06:07:21.912248+00:00\",\"product_id\":\"5216dfc2-2a75-40e2-bb07-bc39961a0627\",\"buyer_id\":\"28b2cffd-5075-415e-9c29-dfe965663c9f\",\"seller_id\":\"980f4fa1-00…"
+    },
+    {
+      "id": "s4.self.review",
+      "lens": "S4",
+      "title": "seller review a si próprio",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"review_order_not_yours\"}"
+    },
+    {
+      "id": "s4.raffle",
+      "lens": "S4",
+      "title": "dois UUIDs claim tickets",
+      "ev": {
+        "b1": "200 {\"ok\": true, \"duplicate\": false, \"ticket_balance\": 2}",
+        "b2": "200 {\"ok\": false, \"error\": \"join_required\"}"
+      }
+    },
+    {
+      "id": "s8.credit",
+      "lens": "S8",
+      "title": "JWT credit wallet",
+      "ev": "404 {\"code\":\"PGRST202\",\"details\":\"Searched for the function public.batata_credit_wallet_once with parameters p_amount, p_idempotency_key, p_type, p_wallet_id or with a single unnamed json/jsonb parameter, but no matches were…"
+    },
+    {
+      "id": "s8.wallets",
+      "lens": "S8",
+      "title": "saldos observação",
+      "ev": {
+        "buyer2": 0,
+        "seller": 0.0
+      }
+    },
+    {
+      "id": "s2.openapi.admin",
+      "lens": "S2",
+      "title": "RPCs admin/staff no OpenAPI JWT",
+      "ev": []
+    }
+  ],
+  "admin_rpcs_visible": [],
+  "victim_storage": {
+    "bucket": null,
+    "path": null
+  }
+}

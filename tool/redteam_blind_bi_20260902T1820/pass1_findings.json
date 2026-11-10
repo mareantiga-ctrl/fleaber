@@ -1,0 +1,1013 @@
+{
+  "stamp": "20260902T1820",
+  "prefix": "RTBI-20260902T1820",
+  "lenses": [
+    "BI1",
+    "BI2",
+    "BI3",
+    "BI4",
+    "BI5",
+    "BI6",
+    "BI7"
+  ],
+  "findings": [
+    {
+      "id": "P2-BI1/BI7-disc-sched-vod",
+      "lens": "BI1",
+      "severity": "P2",
+      "title": "hub_lives_discovery_public lista scheduled+active com mux_vod_playback_id cru (vitrine pública já anula)",
+      "actor": "anon",
+      "pre": "S2 hub_published; live scheduled is_active=true com VOD real copiado",
+      "repro": "GET hub_lives_discovery_public?id=eq.6ac5b129-d5cc-4a54-bb2c-26a4cb57d400&select=mux_vod_playback_id",
+      "expected": "scheduled não publica VOD; playback só via Edge em broadcasting/ended público",
+      "obtained": {
+        "discovery_listed": true,
+        "mux_vod": "8cje21NKdUUro21jGdEv2UlfmWLD7TAMIWi2W01H5Gb8",
+        "mux_playback": "Cap7U300PcqvBmbZj01cL92AT01k401ntf97eCUWynvj9Pc",
+        "hub_lives_public_vod": "",
+        "cdn": "200 loc=- acao=- #EXTM3U\n#EXT-X-VERSION:5\n#EXT-X-INDEPENDENT-SEGMENTS\n\n#EXT-X-STREAM-INF:BANDWIDTH=2493700,AVERAGE-BANDWIDTH=2493700,CODECS=\"mp4a.40.2,avc1.640020\",RESOLUTION=1280x720,CLOSED-CAPTIONS=NONE\nhttps://mani…",
+        "cdn_extm3u": true
+      },
+      "proven": true,
+      "evidence": {
+        "live_id": "6ac5b129-d5cc-4a54-bb2c-26a4cb57d400",
+        "cdn_status": 200
+      }
+    },
+    {
+      "id": "P2-BI2-connect-decimal",
+      "lens": "BI2",
+      "severity": "P2",
+      "title": "Connect GET web_return_origin=https://2130706433 → Location https://127.0.0.1/wallet",
+      "actor": "anon/browser",
+      "pre": "GET create-connect-account?web_return_origin=",
+      "repro": "GET functions/v1/create-connect-account?web_return_origin=https://2130706433",
+      "expected": "HTML app / sem Location hostil; IP decimal não canonicaliza para loopback allowlisted",
+      "obtained": "303 loc=https://127.0.0.1/wallet acao=* ",
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "P2-BI2-connect-127.1",
+      "lens": "BI2",
+      "severity": "P2",
+      "title": "Connect GET web_return_origin=https://127.1 → Location https://127.0.0.1/wallet",
+      "actor": "anon/browser",
+      "pre": "GET create-connect-account?web_return_origin=",
+      "repro": "GET functions/v1/create-connect-account?web_return_origin=https://127.1",
+      "expected": "HTML app / sem Location hostil; IP decimal não canonicaliza para loopback allowlisted",
+      "obtained": "303 loc=https://127.0.0.1/wallet acao=* ",
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "P2-BI6-private-list",
+      "lens": "BI6",
+      "severity": "P2",
+      "title": "Listagem fleaber_private visível",
+      "actor": "buyer JWT",
+      "pre": "POST object/list/fleaber_private",
+      "repro": "POST /storage/v1/object/list/fleaber_private",
+      "expected": "[] / 400 RLS",
+      "obtained": {
+        "anon": "200 loc=- acao=* []",
+        "jwt": "200 loc=- acao=* [{\"name\":\"chat_uploads\",\"id\":null,\"updated_at\":null,\"created_at\":null,\"last_accessed_at\":null,\"metadata\":null},{\"name\":\"order_disputes\",\"id\":null,\"updated_at\":null,\"created_at\":null,\"last_accessed_at\"…"
+      },
+      "proven": true,
+      "evidence": {}
+    }
+  ],
+  "blocked": [
+    {
+      "id": "bi1.draft_grid",
+      "lens": "BI1",
+      "title": "draft+active fora de hub_lives_public",
+      "ev": {
+        "status": 200,
+        "n": 0,
+        "row": ""
+      }
+    },
+    {
+      "id": "bi1.error_grid",
+      "lens": "BI1",
+      "title": "error+active fora de hub_lives_public",
+      "ev": {
+        "status": 200,
+        "n": 0,
+        "row": ""
+      }
+    },
+    {
+      "id": "bi1.sched_vod_public",
+      "lens": "BI1",
+      "title": "hub_lives_public scheduled sem mux_vod",
+      "ev": "null"
+    },
+    {
+      "id": "bi1.fomo.sched",
+      "lens": "BI1",
+      "title": "FOMO scheduled recusado",
+      "ev": "200 loc=- acao=- {\"ok\": false, \"error\": \"live_not_public\"}"
+    },
+    {
+      "id": "bi1.total_qty",
+      "lens": "BI1",
+      "title": "anon total_qty recusado/revogado",
+      "ev": "401 loc=- acao=- {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_live_item_total_qty\"}"
+    },
+    {
+      "id": "bi1.handle.sug",
+      "lens": "BI1",
+      "title": "handle_suggested unpublished não resolve",
+      "ev": "200 loc=- acao=- {\"error\": \"not_found\", \"found\": false, \"http_status\": 404}"
+    },
+    {
+      "id": "bi1.lives_jwt_vod",
+      "lens": "BI7",
+      "title": "buyer JWT não lê VOD scheduled em lives",
+      "ev": "403 loc=- acao=- {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table lives\"}"
+    },
+    {
+      "id": "bi5.stream_key_rest",
+      "lens": "BI5",
+      "title": "stream_key REST omitido/denied",
+      "ev": {
+        "buyer": "403 loc=- acao=- {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table lives\"}",
+        "s2": "403 loc=- acao=- {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table lives\"}"
+      }
+    },
+    {
+      "id": "bi5.embed_keys",
+      "lens": "BI5",
+      "title": "embed sem stream keys",
+      "ev": {
+        "hub_lives_lives": "400 loc=- acao=- {\"code\":\"PGRST200\",\"details\":\"Searched for a foreign key relationship between 'hub_lives_public' and 'lives' in the schema 'public', but no matches were found.\",\"hint\":\"Perhaps you meant 'live_tips' i…",
+        "hub_items_li": "400 loc=- acao=- {\"code\":\"PGRST200\",\"details\":\"Searched for a foreign key relationship between 'hub_live_items_public' and 'live_items' in the schema 'public', but no matches were found.\",\"hint\":\"Perhaps you meant 'li…"
+      }
+    },
+    {
+      "id": "bi5.resolve.sched",
+      "lens": "BI5",
+      "title": "resolve-mux sched recusado",
+      "ev": "404 loc=- acao=* {\"error\":\"live_not_public\"}"
+    },
+    {
+      "id": "bi5.resolve.schedOff",
+      "lens": "BI5",
+      "title": "resolve-mux schedOff recusado",
+      "ev": "404 loc=- acao=* {\"error\":\"live_not_public\"}"
+    },
+    {
+      "id": "bi5.resolve.draftOn",
+      "lens": "BI5",
+      "title": "resolve-mux draftOn recusado",
+      "ev": "404 loc=- acao=* {\"error\":\"live_not_public\"}"
+    },
+    {
+      "id": "bi5.resolve.errorOn",
+      "lens": "BI5",
+      "title": "resolve-mux errorOn recusado",
+      "ev": "404 loc=- acao=* {\"error\":\"live_not_public\"}"
+    },
+    {
+      "id": "bi5.resolve.idle",
+      "lens": "BI5",
+      "title": "resolve-mux idle recusado",
+      "ev": "400 loc=- acao=* {\"error\":\"live_id obrigatório.\"}"
+    },
+    {
+      "id": "bi5.resolve.paused",
+      "lens": "BI5",
+      "title": "resolve-mux paused recusado",
+      "ev": "400 loc=- acao=* {\"error\":\"live_id obrigatório.\"}"
+    },
+    {
+      "id": "bi5.resolve.liveOff",
+      "lens": "BI5",
+      "title": "resolve-mux liveOff recusado",
+      "ev": "404 loc=- acao=* {\"error\":\"live_not_public\"}"
+    },
+    {
+      "id": "bi5.complete_mux",
+      "lens": "BI5",
+      "title": "complete-mux cruzado 401/403",
+      "ev": {
+        "buyer": "403 loc=- acao=* {\"error\":\"Sem permissão para esta live.\",\"step\":\"auth\"}",
+        "s1": "403 loc=- acao=* {\"error\":\"Sem permissão para esta live.\",\"step\":\"auth\"}",
+        "anon": "401 loc=- acao=* {\"error\":\"invalid claim: missing sub claim\",\"step\":\"auth\"}"
+      }
+    },
+    {
+      "id": "bi5.livekit",
+      "lens": "BI5",
+      "title": "LiveKit cruzado recusado",
+      "ev": {
+        "buyer": "403 loc=- acao=* {\"error\":\"Sem permissão para esta live.\",\"step\":\"auth\"}",
+        "s1": "403 loc=- acao=* {\"error\":\"Sem permissão para esta live.\",\"step\":\"auth\"}"
+      }
+    },
+    {
+      "id": "bi5.create_mux_buyer",
+      "lens": "BI5",
+      "title": "create-mux buyer recusado",
+      "ev": "403 loc=- acao=* {\"error\":\"Apenas contas de vendedor podem criar directos.\",\"step\":\"authz\"}"
+    },
+    {
+      "id": "bi2.cors_baseline",
+      "lens": "BI2",
+      "title": "CORS origins exercitados (ver notes)",
+      "ev": "https://evil.com,null,https://fleaber.pt.evil.com,https://attacker.fleaber.pt,https://fleaber.pt,http://127.0.0.1:4173,chrome-extension://abc"
+    },
+    {
+      "id": "bi3.tip_id",
+      "lens": "BI3",
+      "title": "tip_id cliente recusado",
+      "ev": "400 loc=- acao=* {\"error\":\"Client tip_id is not allowed.\"}"
+    },
+    {
+      "id": "bi3.tip_sched",
+      "lens": "BI3",
+      "title": "tip scheduled recusado",
+      "ev": "400 loc=- acao=* {\"error\":\"Tips only allowed while the live is broadcasting.\"}"
+    },
+    {
+      "id": "bi3.tip_ended",
+      "lens": "BI3",
+      "title": "tip ended recusado",
+      "ev": "400 loc=- acao=* {\"error\":\"Tips only allowed while the live is broadcasting.\"}"
+    },
+    {
+      "id": "bi3.tip_seller_swap",
+      "lens": "BI3",
+      "title": "seller swap recusado",
+      "ev": "400 loc=- acao=* {\"error\":\"Tip seller does not own this live.\"}"
+    },
+    {
+      "id": "bi3.settle_unpaid",
+      "lens": "BI3",
+      "title": "settle unpaid não captura",
+      "ev": {
+        "b2": "200 loc=- acao=* Pagamento ainda não confirmado. Se já pagaste, aguarda alguns segundos e volta à app Fleaber.",
+        "anon": "200 loc=- acao=* Pagamento ainda não confirmado. Se já pagaste, aguarda alguns segundos e volta à app Fleaber."
+      }
+    },
+    {
+      "id": "bi3.oracle",
+      "lens": "BI3",
+      "title": "GET settle forjado sem oráculo Stripe",
+      "ev": "400 loc=- acao=* Pagamento ainda não confirmado. Se já pagaste, aguarda alguns segundos e volta à app Fleaber."
+    },
+    {
+      "id": "bi4.tip_amount",
+      "lens": "BI4",
+      "title": "teto amount_eur",
+      "ev": "400 loc=- acao=* {\"error\":\"Tip amount too high.\"}"
+    }
+  ],
+  "skipped": [
+    {
+      "id": "bi3.pay",
+      "lens": "BI3",
+      "title": "sem sk_test — não paguei a Session",
+      "ev": "no_sk_test"
+    }
+  ],
+  "notes": [
+    {
+      "id": "actors",
+      "title": "jwt ready",
+      "ev": {
+        "b": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+        "s": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+        "b2": "8e708242-17c9-4f53-9047-460e0b0c7426",
+        "s2": "d32f786a-a621-4fe7-9eb2-6d1f2d801e25",
+        "s3": "a93d032e-dc83-460b-9928-e26b6ae84972"
+      }
+    },
+    {
+      "id": "mux.seed",
+      "lens": "BI5",
+      "title": "existing playback ids",
+      "ev": {
+        "vod": "8cje21NKdUUro21jGdEv2UlfmWLD7TAMIWi2W01H5Gb8",
+        "livePb": "Cap7U300PcqvBmbZj01cL92AT01k401ntf97eCUWynvj9Pc",
+        "n": 3
+      }
+    },
+    {
+      "id": "live.fail",
+      "title": "insertLive ao_vivo",
+      "ev": "400 loc=- acao=- {\"code\":\"23514\",\"details\":\"Failing row contains (62a0e0ae-9ea4-46cb-8324-92b326568ae3, 2026-09-02 17:28:26.080692+00, d32f786a-a621-4fe7-9eb2-6d1f2d801e25, null, null, null, t, RTBI-20260902T1820 AOVI…"
+    },
+    {
+      "id": "live.fail",
+      "title": "insertLive idle",
+      "ev": "400 loc=- acao=- {\"code\":\"23514\",\"details\":\"Failing row contains (114fa338-920a-462e-85c0-9e4d6a4f7cbf, 2026-09-02 17:28:26.186029+00, d32f786a-a621-4fe7-9eb2-6d1f2d801e25, null, null, null, t, RTBI-20260902T1820 IDLE…"
+    },
+    {
+      "id": "live.fail",
+      "title": "insertLive paused",
+      "ev": "400 loc=- acao=- {\"code\":\"23514\",\"details\":\"Failing row contains (3b529b86-2aec-4077-8fd1-2603982919fc, 2026-09-02 17:28:26.273674+00, d32f786a-a621-4fe7-9eb2-6d1f2d801e25, null, null, null, f, RTBI-20260902T1820 PAUS…"
+    },
+    {
+      "id": "bi1.hub_public",
+      "lens": "BI1",
+      "title": "hub_lives_public por estado",
+      "ev": {
+        "air": {
+          "status": 200,
+          "n": 0,
+          "row": ""
+        },
+        "sched": {
+          "status": 200,
+          "n": 0,
+          "row": ""
+        },
+        "schedOff": {
+          "status": 200,
+          "n": 0,
+          "row": ""
+        },
+        "ended": {
+          "status": 200,
+          "n": 0,
+          "row": ""
+        },
+        "draftOn": {
+          "status": 200,
+          "n": 0,
+          "row": ""
+        },
+        "errorOn": {
+          "status": 200,
+          "n": 0,
+          "row": ""
+        },
+        "aoVivo": {
+          "id": ""
+        },
+        "idle": {
+          "id": ""
+        },
+        "paused": {
+          "id": ""
+        },
+        "liveOff": {
+          "status": 200,
+          "n": 0,
+          "row": ""
+        }
+      }
+    },
+    {
+      "id": "bi1.hub_disc",
+      "lens": "BI1",
+      "title": "hub_lives_discovery_public por estado",
+      "ev": {
+        "air": {
+          "status": 200,
+          "n": 1,
+          "row": {
+            "id": "b26bd463-df58-4316-8764-a576409e13db",
+            "status": "live",
+            "is_active": true,
+            "mux_playback_id": "Cap7U300PcqvBmbZj01cL92AT01k401ntf97eCUWynvj9Pc",
+            "mux_vod_playback_id": "8cje21NKdUUro21jGdEv2UlfmWLD7TAMIWi2W01H5Gb8",
+            "title": "RTBI-20260902T1820 AIR",
+            "seller_handle": "rtbi-20260902t1820-s2"
+          }
+        },
+        "sched": {
+          "status": 200,
+          "n": 1,
+          "row": {
+            "id": "6ac5b129-d5cc-4a54-bb2c-26a4cb57d400",
+            "status": "scheduled",
+            "is_active": true,
+            "mux_playback_id": "Cap7U300PcqvBmbZj01cL92AT01k401ntf97eCUWynvj9Pc",
+            "mux_vod_playback_id": "8cje21NKdUUro21jGdEv2UlfmWLD7TAMIWi2W01H5Gb8",
+            "title": "RTBI-20260902T1820 SCHED",
+            "seller_handle": "rtbi-20260902t1820-s2"
+          }
+        },
+        "schedOff": {
+          "status": 200,
+          "n": 0,
+          "row": ""
+        },
+        "ended": {
+          "status": 200,
+          "n": 0,
+          "row": ""
+        },
+        "draftOn": {
+          "status": 200,
+          "n": 0,
+          "row": ""
+        },
+        "errorOn": {
+          "status": 200,
+          "n": 0,
+          "row": ""
+        },
+        "aoVivo": {
+          "id": ""
+        },
+        "idle": {
+          "id": ""
+        },
+        "paused": {
+          "id": ""
+        },
+        "liveOff": {
+          "status": 200,
+          "n": 0,
+          "row": ""
+        }
+      }
+    },
+    {
+      "id": "bi1.state.aoVivo",
+      "lens": "BI1",
+      "title": "listed pub=false disc=false",
+      "ev": {
+        "pub": {
+          "id": ""
+        },
+        "disc": {
+          "id": ""
+        }
+      }
+    },
+    {
+      "id": "bi1.state.idle",
+      "lens": "BI1",
+      "title": "listed pub=false disc=false",
+      "ev": {
+        "pub": {
+          "id": ""
+        },
+        "disc": {
+          "id": ""
+        }
+      }
+    },
+    {
+      "id": "bi1.state.liveOff",
+      "lens": "BI1",
+      "title": "listed pub=false disc=false",
+      "ev": {
+        "pub": {
+          "status": 200,
+          "n": 0,
+          "row": ""
+        },
+        "disc": {
+          "status": 200,
+          "n": 0,
+          "row": ""
+        }
+      }
+    },
+    {
+      "id": "bi1.state.paused",
+      "lens": "BI1",
+      "title": "listed pub=false disc=false",
+      "ev": {
+        "pub": {
+          "id": ""
+        },
+        "disc": {
+          "id": ""
+        }
+      }
+    },
+    {
+      "id": "bi1.fomo.sched",
+      "lens": "BI1",
+      "title": "FOMO anon scheduled",
+      "ev": "200 loc=- acao=- {\"ok\": false, \"error\": \"live_not_public\"}"
+    },
+    {
+      "id": "bi1.fomo.ended",
+      "lens": "BI1",
+      "title": "FOMO anon ended",
+      "ev": "200 loc=- acao=- {\"ok\": false, \"error\": \"live_not_public\"}"
+    },
+    {
+      "id": "bi1.fomo.air",
+      "lens": "BI1",
+      "title": "FOMO anon air",
+      "ev": "200 loc=- acao=- {\"ok\": false, \"error\": \"live_not_public\"}"
+    },
+    {
+      "id": "bi1.fomo.draft",
+      "lens": "BI1",
+      "title": "FOMO anon draft",
+      "ev": "200 loc=- acao=- {\"ok\": false, \"error\": \"live_not_public\"}"
+    },
+    {
+      "id": "bi1.fomo.ended.b",
+      "lens": "BI1",
+      "title": "FOMO buyer ended",
+      "ev": "200 loc=- acao=- {\"ok\": false, \"error\": \"live_not_public\"}"
+    },
+    {
+      "id": "bi1.fomo.ended.s2",
+      "lens": "BI1",
+      "title": "FOMO seller2 ended",
+      "ev": "200 loc=- acao=- {\"ok\": false, \"error\": \"live_not_public\"}"
+    },
+    {
+      "id": "bi1.stock.anon.air",
+      "lens": "BI1",
+      "title": "stock anon.air",
+      "ev": "200 loc=- acao=- {\"ok\": true, \"price\": 7.0, \"live_id\": \"b26bd463-df58-4316-8764-a576409e13db\", \"ref_code\": \"BI570981\", \"item_kind\": \"live_only\", \"total_qty\": 4, \"product_id\": null, \"blocked_qty\": 0, \"live_status\": \"li…"
+    },
+    {
+      "id": "bi1.stock.anon.sched",
+      "lens": "BI1",
+      "title": "stock anon.sched",
+      "ev": "200 loc=- acao=- {\"ok\": false, \"error\": \"live_item_not_found\"}"
+    },
+    {
+      "id": "bi1.stock.anon.ended",
+      "lens": "BI1",
+      "title": "stock anon.ended",
+      "ev": "200 loc=- acao=- {\"ok\": false, \"error\": \"live_item_not_found\"}"
+    },
+    {
+      "id": "bi1.stock.buyer.ended",
+      "lens": "BI1",
+      "title": "stock buyer.ended",
+      "ev": "200 loc=- acao=- {\"ok\": false, \"error\": \"live_item_not_found\"}"
+    },
+    {
+      "id": "bi1.stock.s2.ended",
+      "lens": "BI1",
+      "title": "stock s2.ended",
+      "ev": "200 loc=- acao=- {\"ok\": true, \"price\": 7.0, \"live_id\": \"1db0eed2-6e5b-497c-a253-475276ac3b40\", \"ref_code\": \"BI792262\", \"item_kind\": \"live_only\", \"total_qty\": 2, \"product_id\": null, \"blocked_qty\": 0, \"live_status\": \"en…"
+    },
+    {
+      "id": "bi1.stock.s1.ended_other",
+      "lens": "BI1",
+      "title": "stock s1.ended_other",
+      "ev": "200 loc=- acao=- {\"ok\": false, \"error\": \"live_item_not_found\"}"
+    },
+    {
+      "id": "bi1.total_qty.anon",
+      "lens": "BI1",
+      "title": "total_qty anon ended (exacto — não contar)",
+      "ev": "401 loc=- acao=- {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_live_item_total_qty\"}"
+    },
+    {
+      "id": "bi1.handle.sug",
+      "lens": "BI1",
+      "title": "resolve handle_suggested unpublished",
+      "ev": "200 loc=- acao=- {\"error\": \"not_found\", \"found\": false, \"http_status\": 404}"
+    },
+    {
+      "id": "bi1.handle.miss",
+      "lens": "BI1",
+      "title": "resolve missing",
+      "ev": "200 loc=- acao=- {\"error\": \"not_found\", \"found\": false, \"http_status\": 404}"
+    },
+    {
+      "id": "bi1.embed.hub_lives_lives",
+      "lens": "BI1",
+      "title": "hub_lives_lives",
+      "ev": "400 loc=- acao=- {\"code\":\"PGRST200\",\"details\":\"Searched for a foreign key relationship between 'hub_lives_public' and 'lives' in the schema 'public', but no matches were found.\",\"hint\":\"Perhaps you meant 'live_tips' i…"
+    },
+    {
+      "id": "bi1.embed.hub_items_lives",
+      "lens": "BI1",
+      "title": "hub_items_lives",
+      "ev": "401 loc=- acao=- {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table lives\"}"
+    },
+    {
+      "id": "bi1.embed.hub_items_li",
+      "lens": "BI1",
+      "title": "hub_items_li",
+      "ev": "400 loc=- acao=- {\"code\":\"PGRST200\",\"details\":\"Searched for a foreign key relationship between 'hub_live_items_public' and 'live_items' in the schema 'public', but no matches were found.\",\"hint\":\"Perhaps you meant 'li…"
+    },
+    {
+      "id": "bi1.embed.hub_profiles",
+      "lens": "BI1",
+      "title": "hub_profiles",
+      "ev": "400 loc=- acao=- {\"code\":\"PGRST200\",\"details\":\"Searched for a foreign key relationship between 'hub_profiles_public' and 'profiles' in the schema 'public', but no matches were found.\",\"hint\":\"Perhaps you meant 'profil…"
+    },
+    {
+      "id": "bi1.embed.lives_anon",
+      "lens": "BI1",
+      "title": "lives_anon",
+      "ev": "401 loc=- acao=- {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table lives\"}"
+    },
+    {
+      "id": "bi1.embed.lives_buyer_sched",
+      "lens": "BI1",
+      "title": "lives_buyer_sched",
+      "ev": "403 loc=- acao=- {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table lives\"}"
+    },
+    {
+      "id": "bi1.embed.lives_buyer_draft",
+      "lens": "BI1",
+      "title": "lives_buyer_draft",
+      "ev": "403 loc=- acao=- {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table lives\"}"
+    },
+    {
+      "id": "bi1.embed.lives_s2_own",
+      "lens": "BI1",
+      "title": "lives_s2_own",
+      "ev": "403 loc=- acao=- {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table lives\"}"
+    },
+    {
+      "id": "bi5.resolve.air",
+      "lens": "BI5",
+      "title": "resolve-mux air",
+      "ev": "200 loc=- acao=* {\"playback_id\":\"Cap7U300PcqvBmbZj01cL92AT01k401ntf97eCUWynvj9Pc\",\"playback_url\":\"https://stream.mux.com/Cap7U300PcqvBmbZj01cL92AT01k401ntf97eCUWynvj9Pc.m3u8?reduced_latency=true\",\"source\":\"live_active…"
+    },
+    {
+      "id": "bi5.resolve.sched",
+      "lens": "BI5",
+      "title": "resolve-mux sched",
+      "ev": "404 loc=- acao=* {\"error\":\"live_not_public\"}"
+    },
+    {
+      "id": "bi5.resolve.schedOff",
+      "lens": "BI5",
+      "title": "resolve-mux schedOff",
+      "ev": "404 loc=- acao=* {\"error\":\"live_not_public\"}"
+    },
+    {
+      "id": "bi5.resolve.ended",
+      "lens": "BI5",
+      "title": "resolve-mux ended",
+      "ev": "404 loc=- acao=* {\"error\":\"live_not_public\"}"
+    },
+    {
+      "id": "bi5.resolve.draftOn",
+      "lens": "BI5",
+      "title": "resolve-mux draftOn",
+      "ev": "404 loc=- acao=* {\"error\":\"live_not_public\"}"
+    },
+    {
+      "id": "bi5.resolve.errorOn",
+      "lens": "BI5",
+      "title": "resolve-mux errorOn",
+      "ev": "404 loc=- acao=* {\"error\":\"live_not_public\"}"
+    },
+    {
+      "id": "bi5.resolve.aoVivo",
+      "lens": "BI5",
+      "title": "resolve-mux aoVivo",
+      "ev": "400 loc=- acao=* {\"error\":\"live_id obrigatório.\"}"
+    },
+    {
+      "id": "bi5.resolve.idle",
+      "lens": "BI5",
+      "title": "resolve-mux idle",
+      "ev": "400 loc=- acao=* {\"error\":\"live_id obrigatório.\"}"
+    },
+    {
+      "id": "bi5.resolve.paused",
+      "lens": "BI5",
+      "title": "resolve-mux paused",
+      "ev": "400 loc=- acao=* {\"error\":\"live_id obrigatório.\"}"
+    },
+    {
+      "id": "bi5.resolve.liveOff",
+      "lens": "BI5",
+      "title": "resolve-mux liveOff",
+      "ev": "404 loc=- acao=* {\"error\":\"live_not_public\"}"
+    },
+    {
+      "id": "bi5.cm.buyer",
+      "lens": "BI5",
+      "title": "complete-mux buyer",
+      "ev": "403 loc=- acao=* {\"error\":\"Sem permissão para esta live.\",\"step\":\"auth\"}"
+    },
+    {
+      "id": "bi5.cm.s1",
+      "lens": "BI5",
+      "title": "complete-mux seller1 vs live S2",
+      "ev": "403 loc=- acao=* {\"error\":\"Sem permissão para esta live.\",\"step\":\"auth\"}"
+    },
+    {
+      "id": "bi5.cm.anon",
+      "lens": "BI5",
+      "title": "complete-mux anon",
+      "ev": "401 loc=- acao=* {\"error\":\"invalid claim: missing sub claim\",\"step\":\"auth\"}"
+    },
+    {
+      "id": "bi5.lk.buyer",
+      "lens": "BI5",
+      "title": "livekit token buyer",
+      "ev": "403 loc=- acao=* {\"error\":\"Sem permissão para esta live.\",\"step\":\"auth\"}"
+    },
+    {
+      "id": "bi5.lk.s1",
+      "lens": "BI5",
+      "title": "livekit token seller1",
+      "ev": "403 loc=- acao=* {\"error\":\"Sem permissão para esta live.\",\"step\":\"auth\"}"
+    },
+    {
+      "id": "bi5.create.buyer",
+      "lens": "BI5",
+      "title": "create-mux buyer",
+      "ev": "403 loc=- acao=* {\"error\":\"Apenas contas de vendedor podem criar directos.\",\"step\":\"authz\"}"
+    },
+    {
+      "id": "bi2.cors.https://evil.com",
+      "lens": "BI2",
+      "title": "CORS Origin=https://evil.com",
+      "ev": "404 loc=- acao=https://fleaber.pt {\"error\":\"live_not_public\"}"
+    },
+    {
+      "id": "bi2.cors.null",
+      "lens": "BI2",
+      "title": "CORS Origin=null",
+      "ev": "404 loc=- acao=https://fleaber.pt {\"error\":\"live_not_public\"}"
+    },
+    {
+      "id": "bi2.cors.https://fleaber.pt.evil.com",
+      "lens": "BI2",
+      "title": "CORS Origin=https://fleaber.pt.evil.com",
+      "ev": "404 loc=- acao=https://fleaber.pt {\"error\":\"live_not_public\"}"
+    },
+    {
+      "id": "bi2.cors.https://attacker.fleaber.pt",
+      "lens": "BI2",
+      "title": "CORS Origin=https://attacker.fleaber.pt",
+      "ev": "404 loc=- acao=https://fleaber.pt {\"error\":\"live_not_public\"}"
+    },
+    {
+      "id": "bi2.cors.https://fleaber.pt",
+      "lens": "BI2",
+      "title": "CORS Origin=https://fleaber.pt",
+      "ev": "404 loc=- acao=https://fleaber.pt {\"error\":\"live_not_public\"}"
+    },
+    {
+      "id": "bi2.cors.http://127.0.0.1:4173",
+      "lens": "BI2",
+      "title": "CORS Origin=http://127.0.0.1:4173",
+      "ev": "404 loc=- acao=http://127.0.0.1:4173 {\"error\":\"live_not_public\"}"
+    },
+    {
+      "id": "bi2.cors.chrome-extension://abc",
+      "lens": "BI2",
+      "title": "CORS Origin=chrome-extension://abc",
+      "ev": "404 loc=- acao=https://fleaber.pt {\"error\":\"live_not_public\"}"
+    },
+    {
+      "id": "bi2.connect.decimal",
+      "lens": "BI2",
+      "title": "Connect GET decimal loc=https://127.0.0.1/wallet",
+      "ev": "303 loc=https://127.0.0.1/wallet acao=* "
+    },
+    {
+      "id": "bi2.connect.127.1",
+      "lens": "BI2",
+      "title": "Connect GET 127.1 loc=https://127.0.0.1/wallet",
+      "ev": "303 loc=https://127.0.0.1/wallet acao=* "
+    },
+    {
+      "id": "bi2.connect.0x7f",
+      "lens": "BI2",
+      "title": "Connect GET 0x7f loc=https://127.0.0.1/wallet",
+      "ev": "303 loc=https://127.0.0.1/wallet acao=* "
+    },
+    {
+      "id": "bi2.connect.octal",
+      "lens": "BI2",
+      "title": "Connect GET octal loc=https://127.0.0.1/wallet",
+      "ev": "303 loc=https://127.0.0.1/wallet acao=* "
+    },
+    {
+      "id": "bi2.connect.ipv6",
+      "lens": "BI2",
+      "title": "Connect GET ipv6 loc=null",
+      "ev": "200 loc=- acao=* <!DOCTYPE html><html lang=\"pt\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Fleaber</title><script>window.setTimeout(function(){ window.locati…"
+    },
+    {
+      "id": "bi2.connect.localhost",
+      "lens": "BI2",
+      "title": "Connect GET localhost loc=https://localhost/wallet",
+      "ev": "303 loc=https://localhost/wallet acao=* "
+    },
+    {
+      "id": "bi2.connect.loop_https",
+      "lens": "BI2",
+      "title": "Connect GET loop_https loc=https://127.0.0.1/wallet",
+      "ev": "303 loc=https://127.0.0.1/wallet acao=* "
+    },
+    {
+      "id": "bi2.connect.evil",
+      "lens": "BI2",
+      "title": "Connect GET evil loc=null",
+      "ev": "200 loc=- acao=* <!DOCTYPE html><html lang=\"pt\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Fleaber</title><script>window.setTimeout(function(){ window.locati…"
+    },
+    {
+      "id": "bi2.connect.sub",
+      "lens": "BI2",
+      "title": "Connect GET sub loc=null",
+      "ev": "200 loc=- acao=* <!DOCTYPE html><html lang=\"pt\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Fleaber</title><script>window.setTimeout(function(){ window.locati…"
+    },
+    {
+      "id": "bi2.connect.userinfo",
+      "lens": "BI2",
+      "title": "Connect GET userinfo loc=null",
+      "ev": "200 loc=- acao=* <!DOCTYPE html><html lang=\"pt\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Fleaber</title><script>window.setTimeout(function(){ window.locati…"
+    },
+    {
+      "id": "bi2.connect.dot",
+      "lens": "BI2",
+      "title": "Connect GET dot loc=null",
+      "ev": "200 loc=- acao=* <!DOCTYPE html><html lang=\"pt\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Fleaber</title><script>window.setTimeout(function(){ window.locati…"
+    },
+    {
+      "id": "bi2.connect.post",
+      "lens": "BI2",
+      "title": "Connect POST evil origin + user_id alheio",
+      "ev": "400 loc=- acao=* {\"error\":\"Cannot create another user Stripe account.\",\"code\":\"payout_failed\"}"
+    },
+    {
+      "id": "bi3.tip.tip_id",
+      "lens": "BI3",
+      "title": "tip com tip_id cliente",
+      "ev": "400 loc=- acao=* {\"error\":\"Client tip_id is not allowed.\"}"
+    },
+    {
+      "id": "bi3.tip.ok",
+      "lens": "BI3",
+      "title": "tip 1€ broadcasting + decimal origin",
+      "ev": "200 loc=- acao=* {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1DGIaMQC4mPqOMIyLuJObv9yw8gQPyOg1peFQ5BLnLUEjj5N47ZLs3zCs#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gf…"
+    },
+    {
+      "id": "bi3.tip.sched",
+      "lens": "BI3",
+      "title": "tip scheduled",
+      "ev": "400 loc=- acao=* {\"error\":\"Tips only allowed while the live is broadcasting.\"}"
+    },
+    {
+      "id": "bi3.tip.ended",
+      "lens": "BI3",
+      "title": "tip ended",
+      "ev": "400 loc=- acao=* {\"error\":\"Tips only allowed while the live is broadcasting.\"}"
+    },
+    {
+      "id": "bi3.tip.wrong_seller",
+      "lens": "BI3",
+      "title": "tip seller ≠ owner",
+      "ev": "400 loc=- acao=* {\"error\":\"Tip seller does not own this live.\"}"
+    },
+    {
+      "id": "bi3.settle.b2",
+      "lens": "BI3",
+      "title": "GET settle unpaid B2",
+      "ev": "200 loc=- acao=* Pagamento ainda não confirmado. Se já pagaste, aguarda alguns segundos e volta à app Fleaber."
+    },
+    {
+      "id": "bi3.settle.anon",
+      "lens": "BI3",
+      "title": "GET settle unpaid anon",
+      "ev": "200 loc=- acao=* Pagamento ainda não confirmado. Se já pagaste, aguarda alguns segundos e volta à app Fleaber."
+    },
+    {
+      "id": "bi3.settle.fake",
+      "lens": "BI3",
+      "title": "GET settle session forjada",
+      "ev": "400 loc=- acao=* Pagamento ainda não confirmado. Se já pagaste, aguarda alguns segundos e volta à app Fleaber."
+    },
+    {
+      "id": "bi4.tip.high",
+      "lens": "BI4",
+      "title": "amount_eur enorme",
+      "ev": "400 loc=- acao=* {\"error\":\"Tip amount too high.\"}"
+    },
+    {
+      "id": "bi6.buckets.anon",
+      "lens": "BI6",
+      "title": "list buckets anon",
+      "ev": "200 loc=- acao=* []"
+    },
+    {
+      "id": "bi6.buckets.buyer",
+      "lens": "BI6",
+      "title": "list buckets buyer",
+      "ev": "200 loc=- acao=* []"
+    },
+    {
+      "id": "bi6.list.chat_media.anon",
+      "lens": "BI6",
+      "title": "list chat_media anon",
+      "ev": "200 loc=- acao=* []"
+    },
+    {
+      "id": "bi6.list.chat_media.jwt",
+      "lens": "BI6",
+      "title": "list chat_media jwt",
+      "ev": "200 loc=- acao=* [{\"name\":\"product_photos\",\"id\":null,\"updated_at\":null,\"created_at\":null,\"last_accessed_at\":null,\"metadata\":null}]"
+    },
+    {
+      "id": "bi6.list.fleaber_private.anon",
+      "lens": "BI6",
+      "title": "list fleaber_private anon",
+      "ev": "200 loc=- acao=* []"
+    },
+    {
+      "id": "bi6.list.fleaber_private.jwt",
+      "lens": "BI6",
+      "title": "list fleaber_private jwt",
+      "ev": "200 loc=- acao=* [{\"name\":\"chat_uploads\",\"id\":null,\"updated_at\":null,\"created_at\":null,\"last_accessed_at\":null,\"metadata\":null},{\"name\":\"order_disputes\",\"id\":null,\"updated_at\":null,\"created_at\":null,\"last_accessed_at\"…"
+    },
+    {
+      "id": "bi6.list.product-images.anon",
+      "lens": "BI6",
+      "title": "list product-images anon",
+      "ev": "200 loc=- acao=* []"
+    },
+    {
+      "id": "bi6.list.product-images.jwt",
+      "lens": "BI6",
+      "title": "list product-images jwt",
+      "ev": "200 loc=- acao=* []"
+    },
+    {
+      "id": "bi6.list.avatars.anon",
+      "lens": "BI6",
+      "title": "list avatars anon",
+      "ev": "200 loc=- acao=* []"
+    },
+    {
+      "id": "bi6.list.avatars.jwt",
+      "lens": "BI6",
+      "title": "list avatars jwt",
+      "ev": "200 loc=- acao=* []"
+    },
+    {
+      "id": "bi6.public.chat",
+      "lens": "BI6",
+      "title": "GET public chat_media path alheio",
+      "ev": "400 loc=- acao=* {\"statusCode\":\"404\",\"error\":\"not_found\",\"message\":\"Object not found\",\"code\":\"NoSuchKey\"}"
+    },
+    {
+      "id": "bi4.refund",
+      "lens": "BI4",
+      "title": "refund-order buyer + evil origin",
+      "ev": "404 loc=- acao=https://fleaber.pt {\"ok\":false,\"error\":\"Encomenda não encontrada.\"}"
+    },
+    {
+      "id": "bi4.ocr",
+      "lens": "BI4",
+      "title": "ocr body spoof",
+      "ev": "401 loc=- acao=* {\"ok\":false,\"error\":\"missing_device_token\"}"
+    },
+    {
+      "id": "bi4.cpi",
+      "lens": "BI4",
+      "title": "payment-intent buyer_id alheio + decimal origin",
+      "ev": "400 loc=- acao=* {\"error\":\"Missing payment metadata.\"}"
+    },
+    {
+      "id": "bi1.bc.anon.air",
+      "lens": "BI1",
+      "title": "broadcasting anon air",
+      "ev": "200 loc=- acao=- true"
+    },
+    {
+      "id": "bi1.bc.anon.draft",
+      "lens": "BI1",
+      "title": "broadcasting anon draft",
+      "ev": "200 loc=- acao=- false"
+    }
+  ],
+  "actors": {
+    "buyer": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+    "seller": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+    "buyer2": "8e708242-17c9-4f53-9047-460e0b0c7426",
+    "seller2": "d32f786a-a621-4fe7-9eb2-6d1f2d801e25",
+    "seller3": "a93d032e-dc83-460b-9928-e26b6ae84972"
+  },
+  "created": {
+    "lives": [
+      "b26bd463-df58-4316-8764-a576409e13db",
+      "6ac5b129-d5cc-4a54-bb2c-26a4cb57d400",
+      "9c725332-4887-41ae-a374-c45af3acde88",
+      "1db0eed2-6e5b-497c-a253-475276ac3b40",
+      "21bc3c42-b6cd-4408-ab96-42bfb0195426",
+      "57e11144-7e0a-4406-a505-43d134d366cb",
+      "48ad9e20-1035-4181-8f43-9e1bb7b4ba9a"
+    ],
+    "items": [
+      "a3ad10cf-0931-48d7-a8f7-e09029ac115d",
+      "62ed736e-c1b4-422a-a1c5-9539e364e107",
+      "aa89096e-a508-4588-aa44-0790bf037866"
+    ],
+    "products": [],
+    "tips": [
+      "2bb2ee06-9605-4f38-8764-11fa353fb49c"
+    ]
+  }
+}

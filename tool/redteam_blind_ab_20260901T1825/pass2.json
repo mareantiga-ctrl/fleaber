@@ -1,0 +1,267 @@
+{
+  "stamp": "20260901T1825",
+  "pass": 2,
+  "findings": [
+    {
+      "id": "RTAB-AB3-currency-jpy",
+      "lens": "AB3",
+      "severity": "P0",
+      "title": "Checkout Session aceite com currency=jpy (zero-decimal)",
+      "actor": "buyer JWT",
+      "pre": "order nova sem Session prévia",
+      "repro": "POST create-payment-intent currency=jpy",
+      "expected": "recusar",
+      "obtained": {
+        "sid": "cs_test_a1G5n98ciVUJAwOkaNOsT7ta4qXDCQpbEE7b0QHLRjX8xYRPPc9Ws2jdi0",
+        "server": 1850,
+        "amount_total": 1850,
+        "page": "{currency_json: [], amount_total_hits: [], money_display: [$., $,, $., $,, $., $,, $1, $.], len: 551983}"
+      },
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "RTAB-AB3-currency-gbp",
+      "lens": "AB3",
+      "severity": "P0",
+      "title": "Checkout Session aceite com currency=gbp",
+      "actor": "buyer JWT",
+      "pre": "order nova",
+      "repro": "currency=gbp",
+      "expected": "recusar / forçar eur",
+      "obtained": {
+        "sid": "cs_test_a1tkDbUQDWaO11Cp8UwVxn77c1hlz5K6guJlUjJMd0TV8GtOcNsQioHpsH",
+        "amount_total": 1850,
+        "page": {
+          "currency_json": [],
+          "amount_total_hits": [],
+          "money_display": [
+            "$.",
+            "$,",
+            "$.",
+            "$,",
+            "$.",
+            "$,",
+            "$1",
+            "$."
+          ],
+          "len": 551983
+        }
+      },
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "RTAB-AB3-usd-poisons-eur-reuse",
+      "lens": "AB3",
+      "severity": "P0",
+      "title": "1ª Session USD é reutilizada no 2º POST currency=eur",
+      "actor": "buyer JWT",
+      "pre": "order sem cs_; POST usd; POST eur",
+      "repro": "checkout currency=usd → checkout currency=eur (mesmo amount)",
+      "expected": "2ª chamada cria Session EUR ou recusa reuse se currency ≠ eur",
+      "obtained": {
+        "sid": "cs_test_a1Chw4jyy1lrfPwkQ3NXibukklfcql5lHIP9OmUzWicQ14fsdHPcsV5fBm",
+        "eur_reused": true,
+        "page": {
+          "currency_json": [],
+          "amount_total_hits": [],
+          "money_display": [
+            "$.",
+            "$,",
+            "$.",
+            "$,",
+            "$.",
+            "$,",
+            "$1",
+            "$."
+          ],
+          "len": 551983
+        }
+      },
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "RTAB-AB3-bag-reuse-no-amount-check",
+      "lens": "AB3",
+      "severity": "P1",
+      "title": "Saco: reuse Session ignora amount_total (2 SKUs vs 3)",
+      "actor": "buyer JWT",
+      "pre": "Session aberta A+B; 2º POST A+B+E",
+      "repro": "bag 2 linhas → bag 3 linhas overlap",
+      "expected": "nova Session se o quote mudou, ou recusar",
+      "obtained": {
+        "sid": "cs_test_a11DG2kJSzFIN6PZs2MmKD5b0ArxvtIc3kbuh2QMDUz1ttr6P2aMghceRw",
+        "stripe_amount_total_q3": 4685,
+        "server_amount_cents_q3": 8885,
+        "q2_server": 4685,
+        "same_sid": true,
+        "reused": true
+      },
+      "proven": true,
+      "evidence": {}
+    }
+  ],
+  "blocked": [],
+  "notes": [
+    {
+      "id": "p2.usd.edge",
+      "lens": "AB3",
+      "title": "fresh usd",
+      "ev": {
+        "ok": true,
+        "sid": "cs_test_a1MuuSoDEU1U5pVMQvdWm1OywLe9mZdFKPL6LaG4tcO3S0nBvNQQswHqUG",
+        "server": 1850,
+        "amount_total": 1850,
+        "reused": null
+      }
+    },
+    {
+      "id": "p2.usd.extract",
+      "lens": "AB3",
+      "title": "currency json na página",
+      "ev": {
+        "currency_json": [],
+        "amount_total_hits": [],
+        "money_display": [
+          "$.",
+          "$,",
+          "$.",
+          "$,",
+          "$.",
+          "$,",
+          "$1",
+          "$."
+        ],
+        "len": 551983
+      }
+    },
+    {
+      "id": "P2.usd_not_in_page",
+      "lens": "AB3",
+      "closed": true,
+      "title": "página sem prova USD",
+      "ev": {
+        "currency_json": [],
+        "amount_total_hits": [],
+        "money_display": [
+          "$.",
+          "$,",
+          "$.",
+          "$,",
+          "$.",
+          "$,",
+          "$1",
+          "$."
+        ],
+        "len": 551983
+      }
+    },
+    {
+      "id": "p2.jpy.edge",
+      "lens": "AB3",
+      "title": "fresh jpy",
+      "ev": {
+        "ok": true,
+        "sid": "cs_test_a1G5n98ciVUJAwOkaNOsT7ta4qXDCQpbEE7b0QHLRjX8xYRPPc9Ws2jdi0",
+        "server": 1850,
+        "amount_total": 1850,
+        "reused": null
+      }
+    },
+    {
+      "id": "p2.jpy.extract",
+      "lens": "AB3",
+      "title": "jpy page",
+      "ev": {
+        "currency_json": [],
+        "amount_total_hits": [],
+        "money_display": [
+          "$.",
+          "$,",
+          "$.",
+          "$,",
+          "$.",
+          "$,",
+          "$1",
+          "$."
+        ],
+        "len": 551983
+      }
+    },
+    {
+      "id": "p2.gbp",
+      "lens": "AB3",
+      "title": "fresh gbp",
+      "ev": {
+        "ok": true,
+        "sid": "cs_test_a1tkDbUQDWaO11Cp8UwVxn77c1hlz5K6guJlUjJMd0TV8GtOcNsQioHpsH",
+        "amount_total": 1850
+      }
+    },
+    {
+      "id": "p2.gbp.extract",
+      "lens": "AB3",
+      "title": "gbp page",
+      "ev": {
+        "currency_json": [],
+        "amount_total_hits": [],
+        "money_display": [
+          "$.",
+          "$,",
+          "$.",
+          "$,",
+          "$.",
+          "$,",
+          "$1",
+          "$."
+        ],
+        "len": 551983
+      }
+    },
+    {
+      "id": "p2.poison",
+      "lens": "AB3",
+      "title": "usd depois eur",
+      "ev": {
+        "usd_sid": "cs_test_a1Chw4jyy1lrfPwkQ3NXibukklfcql5lHIP9OmUzWicQ14fsdHPcsV5fBm",
+        "eur_sid": "cs_test_a1Chw4jyy1lrfPwkQ3NXibukklfcql5lHIP9OmUzWicQ14fsdHPcsV5fBm",
+        "usd_reused": null,
+        "eur_reused": true,
+        "same": true,
+        "usd_amt": 1955,
+        "eur_amt": 1955
+      }
+    },
+    {
+      "id": "p2.bag",
+      "lens": "AB3",
+      "title": "reuse amount fields",
+      "ev": {
+        "q2": {
+          "sid": "cs_test_a11DG2kJSzFIN6PZs2MmKD5b0ArxvtIc3kbuh2QMDUz1ttr6P2aMghceRw",
+          "server": 4685,
+          "amount_total": 4685,
+          "reused": null
+        },
+        "q3": {
+          "sid": "cs_test_a11DG2kJSzFIN6PZs2MmKD5b0ArxvtIc3kbuh2QMDUz1ttr6P2aMghceRw",
+          "server": 8885,
+          "amount_total": 4685,
+          "reused": true
+        }
+      }
+    },
+    {
+      "id": "p2.ab8.note",
+      "lens": "AB8",
+      "title": "não completar pagamento da Session reuse (Stripe TEST)",
+      "ev": "webhook settle usa metadata da Session original (2 linhas), não o 2º bag"
+    }
+  ],
+  "lenses": [
+    "AB3",
+    "AB8"
+  ]
+}

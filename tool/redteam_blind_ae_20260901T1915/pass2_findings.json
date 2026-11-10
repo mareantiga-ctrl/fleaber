@@ -1,0 +1,363 @@
+{
+  "stamp": "20260901T1915",
+  "prefix": "RTAE-20260901T1915",
+  "lenses": [
+    "AE1",
+    "AE2",
+    "AE3",
+    "AE8"
+  ],
+  "findings": [
+    {
+      "id": "AE3-BUNDLE-QTY2-CHECKOUT",
+      "lens": "AE3",
+      "severity": "P1",
+      "title": "Checkout cobra 2 unidades numa linha de conjunto aceite",
+      "actor": "buyer JWT",
+      "pre": "bundle accepted; order quantity=2",
+      "repro": "POST create-payment-intent order qty=2",
+      "expected": "qty=1 ou recusa bundle_order_quantity_must_be_one",
+      "obtained": {
+        "amount_total": 1745,
+        "session": "cs_test_a11k6p3vfquNuZ55jnl57sRCs26fm0fO72cPYo85Zoq0rf6yOYKScBshsW",
+        "order": {
+          "id": "106a762e-ea1e-42ef-be4d-f11fd4605311",
+          "status": "reserva_pendente",
+          "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+          "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+          "product_id": "0a456cf0-af2a-4e1b-bc89-85ed6e893485",
+          "quantity": 2,
+          "price_total": 16.0,
+          "amount_paid_cents": "",
+          "payment_method": "Pagamento na app",
+          "shipping_method": "entrega em mão",
+          "stripe_payment_intent_id": "",
+          "stripe_checkout_session_id": "",
+          "stripe_refund_id": "",
+          "live_item_id": "",
+          "live_id": "",
+          "stock_units_applied": "",
+          "contract_unit_cents": 800,
+          "contract_qty": 2,
+          "bundle_id": "05a60f77-4f39-4aaf-90cd-1ad6ed4e7e2e",
+          "product_offer_id": ""
+        }
+      },
+      "proven": true,
+      "evidence": {}
+    }
+  ],
+  "blocked": [
+    {
+      "id": "AE3-DISC-NO-WRITE",
+      "lens": "AE3",
+      "title": "PATCH 200 mas 0 rows / valores intactos — P0 pass1 falso",
+      "ev": {
+        "http": 200,
+        "repr": 0,
+        "tier_before": 10.0,
+        "tier_after": 10.0
+      }
+    },
+    {
+      "id": "AE3-BUNDLE-REWRITE",
+      "lens": "AE3",
+      "title": "trigger reescreveu total_eur",
+      "ev": {
+        "id": "25a5db88-ef3d-41d2-b031-3e6a2d6c929a",
+        "status": "pending",
+        "total_eur": 38.0,
+        "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+        "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+        "product_ids": [
+          "0a456cf0-af2a-4e1b-bc89-85ed6e893485",
+          "9fa7adec-b9cf-4bc9-8fc9-c028e312fa94"
+        ]
+      }
+    },
+    {
+      "id": "AE1-BUYER-LI",
+      "lens": "AE1",
+      "title": "buyer não cria live_item",
+      "ev": "null"
+    }
+  ],
+  "skipped": [
+    {
+      "id": "AE8-STALE-PAY",
+      "lens": "AE8",
+      "title": "sem sk_test_ local",
+      "ev": "no key"
+    }
+  ],
+  "notes": [
+    {
+      "id": "boot2",
+      "title": "pass2",
+      "ev": {
+        "stripe": false,
+        "b1": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96"
+      }
+    },
+    {
+      "id": "p2.disc",
+      "lens": "AE3",
+      "title": "buyer PATCH vs row",
+      "ev": {
+        "patch_http": 200,
+        "patch_len": 0,
+        "before": {
+          "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+          "enabled": false,
+          "tier_2_pct": 10.0,
+          "tier_3_pct": 50.0,
+          "tier_5_pct": 50.0,
+          "custom_tiers": []
+        },
+        "after": {
+          "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+          "enabled": false,
+          "tier_2_pct": 10.0,
+          "tier_3_pct": 50.0,
+          "tier_5_pct": 50.0,
+          "custom_tiers": []
+        }
+      }
+    },
+    {
+      "id": "p2.bundle.forged",
+      "lens": "AE3",
+      "title": "bundle buyer total_eur",
+      "ev": {
+        "id": "25a5db88-ef3d-41d2-b031-3e6a2d6c929a",
+        "status": "pending",
+        "total_eur": 38.0,
+        "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+        "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+        "product_ids": [
+          "0a456cf0-af2a-4e1b-bc89-85ed6e893485",
+          "9fa7adec-b9cf-4bc9-8fc9-c028e312fa94"
+        ]
+      }
+    },
+    {
+      "id": "p2.qty2.row",
+      "lens": "AE3",
+      "title": "order bundle qty=2",
+      "ev": {
+        "id": "106a762e-ea1e-42ef-be4d-f11fd4605311",
+        "status": "reserva_pendente",
+        "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+        "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+        "product_id": "0a456cf0-af2a-4e1b-bc89-85ed6e893485",
+        "quantity": 2,
+        "price_total": 16.0,
+        "amount_paid_cents": "",
+        "payment_method": "Pagamento na app",
+        "shipping_method": "entrega em mão",
+        "stripe_payment_intent_id": "",
+        "stripe_checkout_session_id": "",
+        "stripe_refund_id": "",
+        "live_item_id": "",
+        "live_id": "",
+        "stock_units_applied": "",
+        "contract_unit_cents": 800,
+        "contract_qty": 2,
+        "bundle_id": "05a60f77-4f39-4aaf-90cd-1ad6ed4e7e2e",
+        "product_offer_id": ""
+      }
+    },
+    {
+      "id": "p2.stale.sess",
+      "lens": "AE8",
+      "title": "Stripe session stale",
+      "ev": {
+        "http": 0,
+        "amount": "",
+        "currency": "",
+        "status": "",
+        "pay": "",
+        "pi": "",
+        "meta": ""
+      }
+    },
+    {
+      "id": "p2.stale.settle",
+      "lens": "AE8",
+      "title": "GET settle",
+      "ev": {
+        "http": 402,
+        "loc": "",
+        "body": "Pagamento ainda não confirmado. Se já pagaste, aguarda alguns segundos e volta à app Fleaber."
+      }
+    },
+    {
+      "id": "p2.stale.after",
+      "lens": "AE8",
+      "title": "BD pós-settle",
+      "ev": {
+        "order0": {
+          "id": "7714f95a-608a-4d2f-8da4-681abe110cbc",
+          "status": "reserva_pendente",
+          "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+          "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+          "product_id": "90048de5-4d3e-4295-8643-8a19d14b1262",
+          "quantity": 1,
+          "price_total": 5.9,
+          "amount_paid_cents": "",
+          "payment_method": "Pagamento na app",
+          "shipping_method": "entrega em mão",
+          "stripe_payment_intent_id": "",
+          "stripe_checkout_session_id": "cs_test_a1CPJ7RKEUbL7zBMy2ROuMjikFEjqFptdjaYztsAwhp5y5mUEvjalBSGXd",
+          "stripe_refund_id": "",
+          "live_item_id": "2e73acdf-1c0f-4013-b3ee-d416b7f00db1",
+          "live_id": "c5f5865b-c3f2-48bc-8348-e95c8b46360c",
+          "stock_units_applied": "",
+          "contract_unit_cents": 500,
+          "contract_qty": 1,
+          "bundle_id": "",
+          "product_offer_id": ""
+        },
+        "order1": {
+          "id": "7714f95a-608a-4d2f-8da4-681abe110cbc",
+          "status": "reserva_pendente",
+          "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+          "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+          "product_id": "90048de5-4d3e-4295-8643-8a19d14b1262",
+          "quantity": 1,
+          "price_total": 5.9,
+          "amount_paid_cents": "",
+          "payment_method": "Pagamento na app",
+          "shipping_method": "entrega em mão",
+          "stripe_payment_intent_id": "",
+          "stripe_checkout_session_id": "cs_test_a1CPJ7RKEUbL7zBMy2ROuMjikFEjqFptdjaYztsAwhp5y5mUEvjalBSGXd",
+          "stripe_refund_id": "",
+          "live_item_id": "2e73acdf-1c0f-4013-b3ee-d416b7f00db1",
+          "live_id": "c5f5865b-c3f2-48bc-8348-e95c8b46360c",
+          "stock_units_applied": "",
+          "contract_unit_cents": 500,
+          "contract_qty": 1,
+          "bundle_id": "",
+          "product_offer_id": ""
+        },
+        "prod0": {
+          "id": "90048de5-4d3e-4295-8643-8a19d14b1262",
+          "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+          "title": "RTAE-20260901T1915-ae1-stale",
+          "price": 40.0,
+          "quantity": 2,
+          "is_sold": false,
+          "list_on_marketplace": true
+        },
+        "prod1": {
+          "id": "90048de5-4d3e-4295-8643-8a19d14b1262",
+          "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+          "title": "RTAE-20260901T1915-ae1-stale",
+          "price": 40.0,
+          "quantity": 2,
+          "is_sold": false,
+          "list_on_marketplace": true
+        },
+        "w0": {
+          "buyer": 61.1,
+          "seller": 18.97,
+          "buyer2": 0,
+          "seller2": 0
+        },
+        "w1": {
+          "buyer": 61.1,
+          "seller": 18.97,
+          "buyer2": 0,
+          "seller2": 0
+        }
+      }
+    },
+    {
+      "id": "p2.stale.fresh",
+      "lens": "AE1",
+      "title": "replay ended live price",
+      "ev": {
+        "amt": 590,
+        "sid": "cs_test_a1pVKzQ7CUBd3EtACfU5zCr01d4M6GXvJZR2TFIkb47UQho2Nd9iUeYhIt",
+        "want40": 4265,
+        "want5": 590
+      }
+    },
+    {
+      "id": "p2.ctrl.40",
+      "lens": "AE1",
+      "title": "sem live_item",
+      "ev": {
+        "amt": 4265,
+        "want": 4265
+      }
+    },
+    {
+      "id": "p2.buyer.li",
+      "lens": "AE1",
+      "title": "buyer INSERT live_item price=1",
+      "ev": ""
+    },
+    {
+      "id": "p2.live.active",
+      "lens": "AE1",
+      "title": "live ACTIVA price 5 vs cat 40",
+      "ev": {
+        "amt": 590,
+        "want5": 590,
+        "want40": 4265
+      }
+    },
+    {
+      "id": "p2.bag.meta",
+      "lens": "AE2",
+      "title": "metadata Session reutilizada A+B vs A+C",
+      "ev": {
+        "http": 0,
+        "meta": "",
+        "amount": ""
+      }
+    },
+    {
+      "id": "p2.qty2.ck",
+      "lens": "AE3",
+      "title": "checkout bundle line qty=2",
+      "ev": {
+        "qty": 2,
+        "cq": 2,
+        "amt": 1745,
+        "want1": 905,
+        "want2": 1745,
+        "http": 200,
+        "err": ""
+      }
+    }
+  ],
+  "actors": {
+    "buyer": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+    "seller": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+    "buyer2": "7ab10764-2a67-42ae-b55d-fe580f4e9362",
+    "seller2": null
+  },
+  "created": {
+    "lives": [
+      "4cf09c5f-2ab4-4806-9427-da5c3641c4da",
+      "d5dc6ba4-dca5-4629-81ea-2b53efd8f9fa"
+    ],
+    "items": [
+      "6aab5f4a-9975-498f-ac5b-83abb6638c80",
+      "4cc53dfc-90ce-4d93-920d-d6259248342a"
+    ],
+    "orders": [
+      "eb19aee8-4ec5-4f61-9e50-cf0549fe7f68",
+      "4acd4d6a-bc9b-45da-b23d-536be4003ae4",
+      "c95e296e-2669-4edc-bd5c-706cc4703775"
+    ],
+    "products": [
+      "112929ba-bc13-420d-9aee-22e9f3e38588",
+      "de788ca5-9537-4967-8952-ecabd0b655f5",
+      "9f5ad35d-e5df-4497-ad77-ba4d528e96c7"
+    ],
+    "bundles": []
+  }
+}

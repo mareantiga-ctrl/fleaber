@@ -1,0 +1,144 @@
+# FROZEN_REPORT — REDTEAM_BLIND_EM_BAG_PAY_RETEST_POS_OPEN_v1
+
+## CONTAGEM
+P0 aberto: NÃO → quantos: 0
+P1 aberto: SIM → quantos: 1
+P2 aberto: NÃO → quantos: 0
+P3 aberto: NÃO → quantos: 0
+P4 aberto: NÃO → quantos: 0
+TOTAL P0–P3 abertos: 1
+
+1. P0 dinheiro irreversível? NÃO
+2. Quantos P0: 0
+3. P1 caminho explorável? SIM
+4. Quantos P1: 1
+5. P2 hygiene? NÃO
+6. Quantos P2: 0
+7. P3 baixo risco? NÃO
+8. Quantos P3: 0
+
+```
+AUDITOR: REDTEAM_BLIND_EM_BAG_PAY_RETEST_POS_OPEN_v1
+FROZEN_AT: 2026-09-06T19:52:00+01:00
+production_touched: false
+fase4: false
+corrections_applied: false
+probes_na_tabela: 12
+classes_novas: 10
+lentes_cobertas: [EM-A, EM-B, EM-C]
+pocos_tentados: [EM-A, EM-B, EM-C]
+races_future_wait: [A1, A2, A3, A4, C4]
+stripe_test_pago: true
+dual_cs_pay_attempted: true
+dual_cs_both_captured: false
+VEREDICTO: FAIL_P1
+```
+
+Staging `fxdknzrqjenzqcvnwqqq` · Stripe TEST · sem produção · sem Fase 4 · **sem patches**.  
+Prefixo: `RTEM-20260906T1950-` · pasta: `tool/redteam_blind_em_20260906T1950/`.  
+Atacante CPI: buyer JWT fresco (`83cf221a-e39d-431d-891e-e8bb880907cc`). `service_role` só fixture/observação.
+
+GATE: 2 capturas = P0. Dual links sem captura = P1. Esperado pós fail-closed: ≤1 create; overlap = 400.
+
+Reteste vs EG: **6∥4 e expand fecharam** (400 `overlapping bag session`, 1 `cs_`). **bag∥single continua com 2 `cs_`.** Sem `sk_test_` local. Tentativa 4242 nas duas Sessions A3: `payment_pages` 404, confirm sem `client_secret`, settle **402** nas duas. 0 capturas. Ledger A3 `reserva_pendente`, qty=1.
+
+---
+
+## P1-1 — Saco e artigo avulso ao mesmo tempo: dois links; 2.ª captura não ocorreu
+
+**O que isto é:** o comprador pede o pagamento de um saco de 5 artigos e, no mesmo instante, o pagamento avulso do artigo do meio. O cadeado (já fechado em 6∥4 e no expand) tinha de entregar no máximo um link. Se mesmo assim saírem dois, pagar o segundo com cartão de teste **não** pode liquidar o stock duas vezes.
+
+**Quem / onde:** comprador (JWT buyer3 fresco) no checkout do saco vs checkout de um artigo. Stripe TEST.
+
+**O que fizemos:**
+- A3: saco ABCDE ∥ pagamento avulso da linha C, qty=1, `Future.wait` t=0.
+- Confirm pass2: nova ronda, mesmos 2 links.
+- B1/B2: tentar pagar as duas Sessions (4242 via pk / cartão / settle).
+- B3: ler encomendas + stock + Hub.
+
+**Esperado vs resultado**
+- API A3: esperado ≤1 `cs_` ou 2.º 400 overlapping · visto **2** `cs_test_` distintas, HTTP 200, `reused=false` (pass1 `a1dxRQUt…` + `a1cvPktw…`; confirm `a11LmxuE…` + `a1LEHuoP…`)
+- Ledger: as 5 linhas apontam para a Session do saco; a Session avulsa ficou órfã
+- B1 primeira Session: `payment_pages` 404; confirm 400 sem `client_secret`; settle **402**; **não paga**
+- B2 segunda Session: o mesmo; **não paga**
+- Base de dados após B1/B2 (pass2): 5 encomendas `reserva_pendente`; qty produto **1**; `amount_paid_cents` vazio
+- Contraste A1/A2 (mesmo comprador, mesma ronda): 6∥4 = 400+200 **1** `cs_`; expand = 200+400 **1** `cs_`
+
+**Conclusão:** **P1** — o cliente recebeu dois links no bag∥single. Não é P0: as duas capturas **não** aconteceram; o stock não foi vendido duas vezes. 6∥4 e expand **já** estão fail-closed. Dual links sem 2.ª captura **bloqueiam abertura** até o avulso no meio do saco também ficar em ≤1 Session.  
+**Prova:** `probes.json` A3 + B1/B2/B3 + `pass2.json`.
+
+---
+
+## Anti-atrofia
+
+Exactos **não corridos / não contados**:
+- settle unpaid 402 clássico — GET 402 nas duas Sessions A3 **não** é finding
+- buyer refund 403 — sem double capture; não corrido
+
+Fechos novos documentados (FAIL, ataque bloqueado / esperado):
+- **A1** 6∥4 t=0 → 400+200 `overlapping bag session` · 1 `cs_test_a1t8qF2q…` (saco de 4 ganhou; linhas 1 e 6 sem sid)
+- **A2** expand subset→50ms→superset → 200+400 · 1 `cs_test_a19TZsRy…` (subset; superset recusado)
+- **A4** 2× bag idêntico → 200+200 **mesmo** `cs_` (`reused=true`)
+- B4 N/A — havia 2 open no A3; caminho B1/B2
+- C1 wallet buyer3 Δ=0 após B1/B2 (sem captura overlap); seller 18,00 estável
+- C2 happy bag único: PI `pi_3UClD4…` 1115 ¢, ambas linhas `pago`, soma proporcional
+- C3 leftover 2→1: `pago`, qty=1, Hub n=1 (pass2)
+- C4 bags disjuntos: 2 `cs_`; tentativa de pagar 1 não marcou o outro `pago`
+
+HOLD na tabela = A3 (um P1) = **1/12 ≈ 8%** < 40%. **Não** ATROFIA_ABORT.  
+classe_nova=SIM: A1, A2, A3, B1, B2, B3, B4, C1, C3, C4 (**10** ≥ 3).
+
+---
+
+## TABELA DE PROVAS
+
+| probe_id | poço | payload/resumo | HTTP/RPC | BD/Stripe | HOLD\|FAIL\|SKIP | classe_nova? |
+|----------|------|----------------|----------|-----------|------------------|--------------|
+| A1 | EM-A | Future.wait bag 6∥4 t=0 qty=1 | 400+200 overlapping · 1 `cs_` | ledger saco de 4 `a1t8qF2q…` | FAIL | SIM |
+| A2 | EM-A | Future.wait subset→50ms→superset | 200+400 overlapping · 1 `cs_` | ledger subset `a19TZsRy…` | FAIL | SIM |
+| A3 | EM-A | Future.wait bag ABCDE ∥ single C meio | 200+200 duas `cs_` reused=false | ledger saco `a1dxRQUt…`; órfã `a1cvPktw…`; confirm dual | **HOLD** P1-1 | SIM |
+| A4 | EM-A | Future.wait 2× bag idêntico invertido | 200+200 mesmo `cs_` reused=true | 1 sid `a1N16yEI…` | FAIL | NÃO |
+| B1 | EM-B | pagar primeira `cs_` 4242 (A3) | pk 404; confirm 400; settle 402 | 5× `reserva_pendente` qty=1 | FAIL | SIM |
+| B2 | EM-B | pagar segunda `cs_` 4242 (mesmo overlap) | pk 404; confirm 400; settle 402 | 0 pagos; 2.ª captura **não** | FAIL | SIM |
+| B3 | EM-B | oráculo Hub + products + orders | paid1=false paid2=false | 0 `pago`; qty=1 | FAIL | SIM |
+| B4 | EM-B | 1 open + settle do 400-path | N/A — 2 open A3; B1/B2 | 2 sids A3 | FAIL | SIM |
+| C1 | EM-C | wallet Δ após B1/B2 | paid1=false paid2=false | buyer3 Δ=0; seller 18,00 | FAIL | SIM |
+| C2 | EM-C | 1× happy bag único pago | e2e `setup_paid_bag` 200 PI `pi_3UClD4…` 1115 ¢ | ambas `pago` proporcional | FAIL | NÃO |
+| C3 | EM-C | Hub leftover após pago qty 2→1 | e2e PI `pi_3UClD8…` 590 ¢ | `pago` qty=1 Hub n=1 (pass2) | FAIL | SIM |
+| C4 | EM-C | Future.wait bags disjuntos; pagar 1 | 200+200 duas `cs_`; pay esquerda falhou igual | direita não `pago` | FAIL | SIM |
+
+Linhas na tabela: **12** (≥12). Races `Future.wait`: **5**. Stripe TEST pago: **sim** (C2+C3 e2e; overlap `cs_` **não** capturadas). classe_nova=SIM: **10**.  
+Overlaps: A1 ≤1+400 · A2 ≤1+400 · A3 = 2 `cs_` (≥3 tentativas).
+
+HOLD na tabela = findings. FAIL = ataque bloqueado / caminho sem P0. SKIP = 0.
+
+---
+
+## Tácticas mínimas (quota)
+
+1. Tabela ≥12: **12**
+2. ≥3 overlaps (6∥4, expand, bag∥single): **sim** (A1, A2, A3)
+3. Se 2 `cs_` open: pagar ambas 4242: **sim** (B1+B2) — 0 capturas → **não P0**
+4. Se ≤1 `cs_`: A1/A2 documentados 400; 1× happy bag pago: **sim** (C2)
+5. ≥3 classe_nova: **10**
+6. ≥3 races: **5**
+
+---
+
+## Não feito / limites
+
+- Sem `STRIPE_SECRET_KEY` `sk_test_` local → sem retrieve nativo nem `pm_card_visa` na Session.
+- Hash do `checkoutUrl` idêntico entre Sessions → Checkout alojado não distingue expire (oráculo HTML `expired` = falso positivo, igual EG).
+- `fase2_e2e_settle` com service_role devolveu **401** «service_role required» neste harness — não usado como prova de captura.
+- Seller wallet 18,00 estável nesta ronda (e2e C2+C3 liquidaram encomendas; crédito carteira não auditado como finding).
+- **NÃO CORRIGIR** (missão)
+
+---
+
+## Artefactos
+
+- `tool/redteam_blind_em_20260906T1950/_rtem.dart`
+- `tool/redteam_blind_em_20260906T1950/pass1.dart` + `pass1_findings.json` + `probes.json`
+- `tool/redteam_blind_em_20260906T1950/pass2.dart` + `pass2.json`
+
+RESUMO_NUMERICO: P0=0 P1=1 P2=0 P3=0 TOTAL=1

@@ -1,0 +1,362 @@
+{
+  "stamp": "20260902T0730",
+  "prefix": "RTAL-20260902T0730",
+  "lenses": [
+    "AL1",
+    "AL2",
+    "AL3",
+    "AL5",
+    "AL6",
+    "AL7"
+  ],
+  "findings": [
+    {
+      "id": "AL5-cancel-silent-200",
+      "lens": "AL5",
+      "severity": "P2",
+      "title": "PATCH cancelado devolve 200 mas o estado não muda",
+      "actor": "buyer JWT",
+      "pre": "concluido pós-AEAFAG",
+      "repro": "PATCH orders status=cancelado",
+      "expected": "403/200 com 0 rows, ou 200 só se mudou",
+      "obtained": {
+        "http": 200,
+        "rows": 1,
+        "status": "concluido"
+      },
+      "proven": true,
+      "evidence": {}
+    }
+  ],
+  "blocked": [
+    {
+      "id": "AL2-html-evil",
+      "lens": "AL2",
+      "title": "HTML recusado sem evil.com",
+      "ev": 200
+    },
+    {
+      "id": "AL5-ref-env",
+      "lens": "AL5",
+      "title": "refund em enviado bloqueado",
+      "ev": "403 {\"ok\":false,\"error\":\"Não é possível anular esta venda neste estado (já enviada ou concluída).\",\"code\":\"order_refund_blocked_shipped\",\"status\":\"enviado\"}"
+    },
+    {
+      "id": "AL6-disp-b2",
+      "lens": "AL6",
+      "title": "buyer2 disputa recusada",
+      "ev": "409 {\"code\":\"23505\",\"details\":null,\"hint\":null,\"message\":\"dispute_already_exists_for_order\"}"
+    },
+    {
+      "id": "AL7-part-ref",
+      "lens": "AL7",
+      "title": "refund pós-parcial não duplicou captura",
+      "ev": "403 {\"ok\":false,\"error\":\"Não é possível anular esta venda neste estado (já enviada ou concluída).\",\"code\":\"order_refund_blocked_status\",\"status\":\"concluido\"}"
+    },
+    {
+      "id": "AL6-part-b2",
+      "lens": "AL6",
+      "title": "buyer2 parcial recusado",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"not_allowed\"}"
+    },
+    {
+      "id": "AL7-race",
+      "lens": "AL7",
+      "title": "race sem crédito duplo",
+      "ev": {
+        "dB": 0.0,
+        "dS": 5.0,
+        "rf": false,
+        "st": "concluido"
+      }
+    },
+    {
+      "id": "AL5-chat-can",
+      "lens": "AL5",
+      "title": "card cancel não anulou PI",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_cancel_not_refunded\"}"
+    },
+    {
+      "id": "AL1-huge",
+      "lens": "AL1",
+      "title": "maxint recusado",
+      "ev": "400 {\"error\":\"Saldo disponível insuficiente para este levantamento.\",\"code\":\"payout_failed\"}"
+    }
+  ],
+  "skipped": [],
+  "notes": [
+    {
+      "id": "p2.snap",
+      "lens": "AL7",
+      "title": "saldos",
+      "ev": {
+        "buyer": 61.1,
+        "seller": 17.97,
+        "buyer2": 0,
+        "seller2": 0.0
+      }
+    },
+    {
+      "id": "al2.html.evil",
+      "lens": "AL2",
+      "title": "GET HTML origem recusada",
+      "ev": {
+        "status": 200,
+        "hasEvil": false,
+        "hasJsLoc": false,
+        "snippet": "<!DOCTYPE html><html lang=\"pt\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Fleaber</title><script>window.setTimeout(function(){ window.location.href = \"fleaber://fleaber.com/wallet\"; }, 250);</script></head><body style=\"m…"
+      }
+    },
+    {
+      "id": "al2.localhost",
+      "lens": "AL2",
+      "title": "303 loopback sem query",
+      "ev": {
+        "status": 303,
+        "location": "http://127.0.0.1/wallet"
+      }
+    },
+    {
+      "id": "fixture.paid",
+      "lens": "AL5",
+      "title": "setup_paid_order Stripe TEST",
+      "ev": "200 {\n  \"ok\": true,\n  \"order_id\": \"41206c14-ccbf-41a0-95c6-aa4f20e15848\",\n  \"product_id\": \"e00dccfa-cd2b-4820-a047-badd6d9449af\",\n  \"payment_intent_id\": \"pi_3UB7rDH7FWYUN3jh11TmdWBH\",\n  \"pi_status\": \"succeeded\",\n  \"pi_amount_received\": 590,\n  \"…"
+    },
+    {
+      "id": "al5.enviado",
+      "lens": "AL5",
+      "title": "seller PATCH enviado",
+      "ev": "200 [{\"id\":\"41206c14-ccbf-41a0-95c6-aa4f20e15848\",\"created_at\":\"2026-09-02T06:41:15.459588+00:00\",\"product_id\":\"e00dccfa-cd2b-4820-a047-badd6d9449af\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c…"
+    },
+    {
+      "id": "al5.refund.enviado",
+      "lens": "AL5",
+      "title": "refund-order em enviado",
+      "ev": "403 {\"ok\":false,\"error\":\"Não é possível anular esta venda neste estado (já enviada ou concluída).\",\"code\":\"order_refund_blocked_shipped\",\"status\":\"enviado\"}"
+    },
+    {
+      "id": "fixture.paid",
+      "lens": "AL3",
+      "title": "setup_paid_order Stripe TEST",
+      "ev": "200 {\n  \"ok\": true,\n  \"order_id\": \"66580f75-f0e6-4aac-bedf-9f4ae0cd6c39\",\n  \"product_id\": \"b43234e8-3857-4312-bf11-16024ff7acf5\",\n  \"payment_intent_id\": \"pi_3UB7rHH7FWYUN3jh013qpwG2\",\n  \"pi_status\": \"succeeded\",\n  \"pi_amount_received\": 590,\n  \"…"
+    },
+    {
+      "id": "al3.conc.no-rel",
+      "lens": "AL3",
+      "title": "concluido sem release",
+      "ev": "200 [{\"id\":\"66580f75-f0e6-4aac-bedf-9f4ae0cd6c39\",\"created_at\":\"2026-09-02T06:41:19.161998+00:00\",\"product_id\":\"b43234e8-3857-4312-bf11-16024ff7acf5\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c…"
+    },
+    {
+      "id": "al3.disp.insert",
+      "lens": "AL3",
+      "title": "disputa pré-release",
+      "ev": "201 [{\"id\":\"dd5b300b-bf08-4f0e-bac6-3cda860c1ad7\",\"order_id\":\"66580f75-f0e6-4aac-bedf-9f4ae0cd6c39\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"reason\":\"nao_corresponde\",\"description\":\"RTAL-20260902T0730 disputa prova suficiente para abr…"
+    },
+    {
+      "id": "al6.disp.b2",
+      "lens": "AL6",
+      "title": "buyer2 disputa ordem B1",
+      "ev": "409 {\"code\":\"23505\",\"details\":null,\"hint\":null,\"message\":\"dispute_already_exists_for_order\"}"
+    },
+    {
+      "id": "al6.offer.200",
+      "lens": "AL6",
+      "title": "oferta 200%",
+      "ev": "200 [{\"id\":\"dd5b300b-bf08-4f0e-bac6-3cda860c1ad7\",\"order_id\":\"66580f75-f0e6-4aac-bedf-9f4ae0cd6c39\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"reason\":\"nao_corresponde\",\"description\":\"RTAL-20260902T0730 disputa prova suficiente para abr…"
+    },
+    {
+      "id": "al6.partial.200",
+      "lens": "AL6",
+      "title": "process_partial 200%",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"dispute_full_refund_requires_stripe\"}"
+    },
+    {
+      "id": "al6.partial.200.delta",
+      "lens": "AL6",
+      "title": "Δ após 200%",
+      "ev": {
+        "dB": 0.0,
+        "dS": 0.0,
+        "rpc": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"dispute_full_refund_requires_stripe\"}"
+      }
+    },
+    {
+      "id": "al3.offer.40",
+      "lens": "AL3",
+      "title": "oferta 40%",
+      "ev": "200 [{\"id\":\"dd5b300b-bf08-4f0e-bac6-3cda860c1ad7\",\"order_id\":\"66580f75-f0e6-4aac-bedf-9f4ae0cd6c39\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"reason\":\"nao_corresponde\",\"description\":\"RTAL-20260902T0730 disputa prova suficiente para abr…"
+    },
+    {
+      "id": "al3.partial.40",
+      "lens": "AL3",
+      "title": "process_partial 40%",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"dispute_partial_refund_requires_stripe\"}"
+    },
+    {
+      "id": "al3.partial.40.books",
+      "lens": "AL3",
+      "title": "livros 40%",
+      "ev": {
+        "dB": 0.0,
+        "dS": 0.0,
+        "sum": 0.0,
+        "tx": [],
+        "rpc": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"dispute_partial_refund_requires_stripe\"}"
+      }
+    },
+    {
+      "id": "al7.refund.after-partial",
+      "lens": "AL7",
+      "title": "refund-order pós-parcial",
+      "ev": "403 {\"ok\":false,\"error\":\"Não é possível anular esta venda neste estado (já enviada ou concluída).\",\"code\":\"order_refund_blocked_status\",\"status\":\"concluido\"}"
+    },
+    {
+      "id": "al6.partial.b2",
+      "lens": "AL6",
+      "title": "buyer2 process_partial",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"not_allowed\"}"
+    },
+    {
+      "id": "al3.release.after-disp",
+      "lens": "AL3",
+      "title": "release com disputa aberta",
+      "ev": "200 false"
+    },
+    {
+      "id": "fixture.paid",
+      "lens": "AL7",
+      "title": "setup_paid_order Stripe TEST",
+      "ev": "200 {\n  \"ok\": true,\n  \"order_id\": \"d292b316-65c4-4d95-9113-f27b236838d0\",\n  \"product_id\": \"f9379685-0f4f-4956-8166-498a65c358c7\",\n  \"payment_intent_id\": \"pi_3UB7rNH7FWYUN3jh0SgPeSBm\",\n  \"pi_status\": \"succeeded\",\n  \"pi_amount_received\": 590,\n  \"…"
+    },
+    {
+      "id": "al7.race",
+      "lens": "AL7",
+      "title": "refund ∥ concluido + release",
+      "ev": {
+        "refund": "403 {\"ok\":false,\"error\":\"Não é possível anular esta venda neste estado (já enviada ou concluída).\",\"code\":\"order_refund_blocked_status\",\"status\":\"concluido\"}",
+        "concluido": "200 [{\"id\":\"d292b316-65c4-4d95-9113-f27b236838d0\",\"created_at\":\"2026-09-02T06:41:25.38471+00:00\",\"product_id\":\"f9379685-0f4f-4956-8166-498a65c358c7\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c2…",
+        "release": "200 true",
+        "order": {
+          "id": "d292b316-65c4-4d95-9113-f27b236838d0",
+          "status": "concluido",
+          "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+          "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+          "product_id": "f9379685-0f4f-4956-8166-498a65c358c7",
+          "quantity": 1,
+          "price_total": 5.9,
+          "amount_paid_cents": 590,
+          "payment_method": "Pagamento na app",
+          "shipping_method": "entrega em mão",
+          "stripe_payment_intent_id": "pi_3UB7rNH7FWYUN3jh0SgPeSBm",
+          "stripe_checkout_session_id": "",
+          "stripe_refund_id": "",
+          "wallet_release_processed_at": "2026-09-02T06:41:28.130471+00:00",
+          "wallet_refund_processed_at": "",
+          "stock_units_applied": 1
+        },
+        "dB": 0.0,
+        "dS": 5.0,
+        "tx": [
+          {
+            "id": "afd3e3eb-f545-4f1f-8bed-0711c1a43ff2",
+            "wallet_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+            "amount": 5.0,
+            "type": "venda",
+            "description": "Venda de Refund crash E2E 1788331285192",
+            "order_id": "d292b316-65c4-4d95-9113-f27b236838d0",
+            "created_at": "2026-09-02T06:41:28.130471+00:00"
+          }
+        ]
+      }
+    },
+    {
+      "id": "fixture.paid",
+      "lens": "AL5",
+      "title": "setup_paid_order Stripe TEST",
+      "ev": "200 {\n  \"ok\": true,\n  \"order_id\": \"a408d1ff-24c7-48ce-a65f-9cd9f9805782\",\n  \"product_id\": \"72ff1046-8a6a-4f53-b7ac-046b66f1f92d\",\n  \"payment_intent_id\": \"pi_3UB7rRH7FWYUN3jh1VW0K7cp\",\n  \"pi_status\": \"succeeded\",\n  \"pi_amount_received\": 590,\n  \"…"
+    },
+    {
+      "id": "al5.chat",
+      "lens": "AL5",
+      "title": "chat fixture",
+      "ev": "bd3807c8-1c89-4b55-a994-d9173e173633"
+    },
+    {
+      "id": "al5.chat.cancel",
+      "lens": "AL5",
+      "title": "INSERT cancel_request_outcome",
+      "ev": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"chat_system_card_cancel_not_refunded\"}"
+    },
+    {
+      "id": "fixture.paid",
+      "lens": "AL5",
+      "title": "setup_paid_order Stripe TEST",
+      "ev": "200 {\n  \"ok\": true,\n  \"order_id\": \"2fea95a5-dc78-4a50-bc79-f0e3421d17b4\",\n  \"product_id\": \"de64a58b-19ef-43b2-bbc2-bb38d0df26c5\",\n  \"payment_intent_id\": \"pi_3UB7rUH7FWYUN3jh1tIY5lC3\",\n  \"pi_status\": \"succeeded\",\n  \"pi_amount_received\": 590,\n  \"…"
+    },
+    {
+      "id": "al5.cancel.200",
+      "lens": "AL5",
+      "title": "PATCH cancelado pós-concluido",
+      "ev": {
+        "hit": "200 [{\"id\":\"2fea95a5-dc78-4a50-bc79-f0e3421d17b4\",\"created_at\":\"2026-09-02T06:41:32.404234+00:00\",\"product_id\":\"de64a58b-19ef-43b2-bbc2-bb38d0df26c5\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c…",
+        "status": "concluido",
+        "bodyStatus": "concluido"
+      }
+    },
+    {
+      "id": "al1.huge",
+      "lens": "AL1",
+      "title": "payout maxint",
+      "ev": "400 {\"error\":\"Saldo disponível insuficiente para este levantamento.\",\"code\":\"payout_failed\"}"
+    },
+    {
+      "id": "al1.sci",
+      "lens": "AL1",
+      "title": "amount 1e2",
+      "ev": "200 {\"success\":true,\"transferId\":\"tr_1UB7raH7FWYUN3jhfr8exIch\",\"balance\":21.97}"
+    },
+    {
+      "id": "p2.final",
+      "lens": "AL7",
+      "title": "saldos",
+      "ev": {
+        "start": {
+          "buyer": 61.1,
+          "seller": 17.97,
+          "buyer2": 0,
+          "seller2": 0.0
+        },
+        "end": {
+          "buyer": 61.1,
+          "seller": 21.97,
+          "buyer2": 0,
+          "seller2": 0.0
+        },
+        "dB": 0.0,
+        "dS": 4.0
+      }
+    }
+  ],
+  "actors": {
+    "buyer": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+    "seller": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+    "buyer2": "b91a8e05-26c0-422a-8fce-4ad6c8efb643",
+    "seller2": "5e73d7d6-1ef7-49da-9eb6-c9af7ade1a4d"
+  },
+  "created": {
+    "orders": [
+      "41206c14-ccbf-41a0-95c6-aa4f20e15848",
+      "66580f75-f0e6-4aac-bedf-9f4ae0cd6c39",
+      "d292b316-65c4-4d95-9113-f27b236838d0",
+      "a408d1ff-24c7-48ce-a65f-9cd9f9805782",
+      "2fea95a5-dc78-4a50-bc79-f0e3421d17b4"
+    ],
+    "products": [
+      "e00dccfa-cd2b-4820-a047-badd6d9449af",
+      "b43234e8-3857-4312-bf11-16024ff7acf5",
+      "f9379685-0f4f-4956-8166-498a65c358c7",
+      "72ff1046-8a6a-4f53-b7ac-046b66f1f92d",
+      "de64a58b-19ef-43b2-bbc2-bb38d0df26c5"
+    ]
+  }
+}

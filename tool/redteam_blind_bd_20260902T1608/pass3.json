@@ -1,0 +1,279 @@
+{
+  "stamp": "20260902T1608",
+  "prefix": "RTBD-20260902T1608",
+  "lentes": [
+    "BD1",
+    "BD6",
+    "BD7"
+  ],
+  "findings": [],
+  "blocked": [
+    {
+      "id": "BD7.clean.twice",
+      "lens": "BD7",
+      "title": "2º release Δ=0",
+      "ev": "200 false"
+    },
+    {
+      "id": "BD7.clean.refund",
+      "lens": "BD7",
+      "title": "refund pós-release 403/clawback/idempotente",
+      "ev": {
+        "refund": "403 {\"ok\":false,\"error\":\"Não é possível anular esta venda neste estado (já enviada ou concluída).\",\"code\":\"order_refund_blocked_shipped\",\"status\":\"concluido\"}",
+        "claw": 0.0
+      }
+    },
+    {
+      "id": "BD6.race",
+      "lens": "BD6",
+      "title": "paralelo sem overdraft líquido",
+      "ev": {
+        "ok": 5,
+        "uniqueTr": 5,
+        "wAfter": 8.97
+      }
+    },
+    {
+      "id": "BD6.unicode",
+      "lens": "BD6",
+      "title": "key unicode sem mint extra",
+      "ev": "200 {\"success\":true,\"transferId\":\"tr_1UBFsAH7FWYUN3jhuvsDcxjS\",\"balance\":7.97}"
+    },
+    {
+      "id": "BD6.samekey",
+      "lens": "BD6",
+      "title": "mesma key sem 2 Transfers",
+      "ev": {
+        "a": "tr_1UBFsDH7FWYUN3jhR7YQ4wtw",
+        "b": "tr_1UBFsDH7FWYUN3jhR7YQ4wtw"
+      }
+    },
+    {
+      "id": "BD1.buyer.payout",
+      "lens": "BD1",
+      "title": "buyer payout sem Transfer",
+      "ev": "400 {\"error\":\"Falta associar a conta bancária no Stripe. Abre outra vez Configurar conta bancária e adiciona o IBAN de teste.\",\"code\":\"payout_failed\"}"
+    },
+    {
+      "id": "BD1.anon.payout",
+      "lens": "BD1",
+      "title": "anon payout recusado",
+      "ev": "400 {\"error\":\"Invalid user.\",\"code\":\"payout_failed\"}"
+    },
+    {
+      "id": "BD7.conc_mid",
+      "lens": "BD7",
+      "title": "concluido durante return bloqueado",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"order_concluido_denied_during_return\"}"
+    },
+    {
+      "id": "BD7.release.return",
+      "lens": "BD7",
+      "title": "release durante return = false",
+      "ev": "200 false"
+    }
+  ],
+  "skipped": [],
+  "notes": [
+    {
+      "id": "p3.w0",
+      "lens": "BD6",
+      "title": "saldos",
+      "ev": {
+        "buyer": 61.1,
+        "seller": 29.97,
+        "buyer2": 0,
+        "seller2": 0
+      }
+    },
+    {
+      "id": "fixture.paid",
+      "lens": "BD7",
+      "title": "setup_paid_order Stripe TEST",
+      "ev": "200 {\n  \"ok\": true,\n  \"order_id\": \"fa300ee6-bbd8-403c-a2d0-1a3d3ff4c580\",\n  \"product_id\": \"10725c5d-87fc-4f9a-8239-92a5ace78b64\",\n  \"payment_intent_id\": \"pi_3UBFrxH7FWYUN3jh1oaiVCXv\",\n  \"pi_status\": \"succeeded\",\n  \"pi_amount_received\": 590,\n  \"…"
+    },
+    {
+      "id": "bd7.clean.enviado",
+      "lens": "BD7",
+      "title": "enviado",
+      "ev": "200 [{\"id\":\"fa300ee6-bbd8-403c-a2d0-1a3d3ff4c580\",\"created_at\":\"2026-09-02T15:14:33.690522+00:00\",\"product_id\":\"10725c5d-87fc-4f9a-8239-92a5ace78b64\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c…"
+    },
+    {
+      "id": "bd7.clean.row",
+      "lens": "BD7",
+      "title": "pré-release",
+      "ev": {
+        "id": "fa300ee6-bbd8-403c-a2d0-1a3d3ff4c580",
+        "status": "concluido",
+        "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+        "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+        "product_id": "10725c5d-87fc-4f9a-8239-92a5ace78b64",
+        "quantity": 1,
+        "price_total": 5.9,
+        "amount_paid_cents": 590,
+        "payment_method": "Pagamento na app",
+        "shipping_method": "",
+        "stripe_payment_intent_id": "pi_3UBFrxH7FWYUN3jh1oaiVCXv",
+        "stripe_checkout_session_id": "",
+        "stripe_refund_id": "",
+        "wallet_release_processed_at": "",
+        "wallet_refund_processed_at": "",
+        "stock_units_applied": 1,
+        "shipped_at": "2026-09-02T15:14:36.058252+00:00"
+      }
+    },
+    {
+      "id": "bd7.clean.release",
+      "lens": "BD7",
+      "title": "release esperado crédito",
+      "ev": {
+        "rpc": "200 true",
+        "dSeller": 5.0
+      }
+    },
+    {
+      "id": "bd7.clean.payout",
+      "lens": "BD7",
+      "title": "payout 100¢ pós-release",
+      "ev": "200 {\"success\":true,\"transferId\":\"tr_1UBFs3H7FWYUN3jhiw9jpRF6\",\"balance\":33.97}"
+    },
+    {
+      "id": "bd7.clean.refund",
+      "lens": "BD7",
+      "title": "refund pós-release+payout",
+      "ev": {
+        "refund": "403 {\"ok\":false,\"error\":\"Não é possível anular esta venda neste estado (já enviada ou concluída).\",\"code\":\"order_refund_blocked_shipped\",\"status\":\"concluido\"}",
+        "claw": 0.0,
+        "wPre": {
+          "buyer": 61.1,
+          "seller": 33.97,
+          "buyer2": 0,
+          "seller2": 0
+        },
+        "wPost": {
+          "buyer": 61.1,
+          "seller": 33.97,
+          "buyer2": 0,
+          "seller2": 0
+        }
+      }
+    },
+    {
+      "id": "bd6.race",
+      "lens": "BD6",
+      "title": "N payouts paralelo keys distintas",
+      "ev": {
+        "n": 5,
+        "each": 500,
+        "balCents": 2997,
+        "ok": 5,
+        "uniqueTr": 5,
+        "briefs": [
+          "200 {\"success\":true,\"transferId\":\"tr_1UBFs7H7FWYUN3jhMUNmw7Nr\",\"balance\":8.97}",
+          "200 {\"success\":true,\"transferId\":\"tr_1UBFs7H7FWYUN3jh56G8GH3f\",\"balance\":28.97}",
+          "200 {\"success\":true,\"transferId\":\"tr_1UBFs7H7FWYUN3jhZ053C6A1\",\"balance\":13.97}",
+          "200 {\"success\":true,\"transferId\":\"tr_1UBFs7H7FWYUN3jhbYcB5UuC\",\"balance\":18.97}",
+          "200 {\"success\":true,\"transferId\":\"tr_1UBFs7H7FWYUN3jhxiWOGQlX\",\"balance\":23.97}"
+        ]
+      }
+    },
+    {
+      "id": "bd6.unicode.key",
+      "lens": "BD6",
+      "title": "idempotency unicode/newline/NUL",
+      "ev": "200 {\"success\":true,\"transferId\":\"tr_1UBFsAH7FWYUN3jhuvsDcxjS\",\"balance\":7.97}"
+    },
+    {
+      "id": "bd6.samekey",
+      "lens": "BD6",
+      "title": "mesma key 2×",
+      "ev": {
+        "a": "200 {\"success\":true,\"transferId\":\"tr_1UBFsDH7FWYUN3jhR7YQ4wtw\",\"balance\":6.97}",
+        "b": "200 {\"success\":true,\"transferId\":\"tr_1UBFsDH7FWYUN3jhR7YQ4wtw\",\"balance\":6.97,\"idempotent\":true}"
+      }
+    },
+    {
+      "id": "bd1.buyer.payout",
+      "lens": "BD1",
+      "title": "buyer tenta levantamento",
+      "ev": "400 {\"error\":\"Falta associar a conta bancária no Stripe. Abre outra vez Configurar conta bancária e adiciona o IBAN de teste.\",\"code\":\"payout_failed\"}"
+    },
+    {
+      "id": "bd1.anon.payout",
+      "lens": "BD1",
+      "title": "anon payout",
+      "ev": "400 {\"error\":\"Invalid user.\",\"code\":\"payout_failed\"}"
+    },
+    {
+      "id": "fixture.paid",
+      "lens": "BD7",
+      "title": "setup_paid_order Stripe TEST",
+      "ev": "200 {\n  \"ok\": true,\n  \"order_id\": \"812518ae-7f17-4316-8b23-2794a4bc737e\",\n  \"product_id\": \"694d97ad-cd2e-41f9-b751-1acbe225cb99\",\n  \"payment_intent_id\": \"pi_3UBFsIH7FWYUN3jh0xQFAjim\",\n  \"pi_status\": \"succeeded\",\n  \"pi_amount_received\": 590,\n  \"…"
+    },
+    {
+      "id": "bd7.ret.conc",
+      "lens": "BD7",
+      "title": "concluido para return",
+      "ev": "200 [{\"id\":\"812518ae-7f17-4316-8b23-2794a4bc737e\",\"created_at\":\"2026-09-02T15:14:53.843146+00:00\",\"product_id\":\"694d97ad-cd2e-41f9-b751-1acbe225cb99\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c…"
+    },
+    {
+      "id": "bd7.ret.disp",
+      "lens": "BD7",
+      "title": "disputa",
+      "ev": "201 [{\"id\":\"f8051d7f-58b8-42b6-9ed0-bba1d6349c34\",\"order_id\":\"812518ae-7f17-4316-8b23-2794a4bc737e\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"reason\":\"nao_corresponde\",\"description\":\"RTBD-20260902T1608 disputa prova suficiente para abr…"
+    },
+    {
+      "id": "bd7.ret.ped",
+      "lens": "BD7",
+      "title": "pedido_devolucao",
+      "ev": "200 [{\"id\":\"812518ae-7f17-4316-8b23-2794a4bc737e\",\"created_at\":\"2026-09-02T15:14:53.843146+00:00\",\"product_id\":\"694d97ad-cd2e-41f9-b751-1acbe225cb99\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c…"
+    },
+    {
+      "id": "bd7.ret.conc_mid",
+      "lens": "BD7",
+      "title": "buyer concluido durante return",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"order_concluido_denied_during_return\"}"
+    },
+    {
+      "id": "bd7.ret.release",
+      "lens": "BD7",
+      "title": "release durante return",
+      "ev": "200 false"
+    },
+    {
+      "id": "p3.w1",
+      "lens": "BD7",
+      "title": "saldos finais",
+      "ev": {
+        "before": {
+          "buyer": 61.1,
+          "seller": 29.97,
+          "buyer2": 0,
+          "seller2": 0
+        },
+        "after": {
+          "buyer": 61.1,
+          "seller": 6.97,
+          "buyer2": 0,
+          "seller2": 0
+        }
+      }
+    }
+  ],
+  "actors": {
+    "buyer": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+    "seller": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+    "buyer2": null,
+    "seller2": "8bd92729-5797-440e-b9fe-fda969655a17"
+  },
+  "created": {
+    "orders": [
+      "fa300ee6-bbd8-403c-a2d0-1a3d3ff4c580",
+      "812518ae-7f17-4316-8b23-2794a4bc737e"
+    ],
+    "products": [
+      "10725c5d-87fc-4f9a-8239-92a5ace78b64",
+      "694d97ad-cd2e-41f9-b751-1acbe225cb99"
+    ]
+  }
+}

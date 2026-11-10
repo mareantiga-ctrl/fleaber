@@ -1,0 +1,1691 @@
+{
+  "stamp": "20260906T1317",
+  "prefix": "RTCN-20260906T1317",
+  "auditor": "REDTEAM_BLIND_CN_PAYOUT_POS_CDCI_v1",
+  "lenses": [
+    "CN1",
+    "CN4",
+    "CN7"
+  ],
+  "probes": [
+    {
+      "id": "CN-B-DEST",
+      "lens": "CN4",
+      "payload": "destination=acct_1UB7nWHKe5ETfHI5 currency=usd amount=100",
+      "http_bd": "200 {\"success\":true,\"transferId\":\"tr_1UCf78H7FWYUN3jh5Etqkm6y\",\"balance\":89} loc=\"\"",
+      "result": "HOLD"
+    },
+    {
+      "id": "CN-B-OVERBAL",
+      "lens": "CN7",
+      "payload": "amount=99999999 vs saldo 89.0",
+      "http_bd": "400 {\"error\":\"Saldo disponível insuficiente para este levantamento.\",\"code\":\"payout_failed\"} loc=\"\" Δ=0.0",
+      "result": "HOLD"
+    },
+    {
+      "id": "CN-B-AMT-arr",
+      "lens": "CN4",
+      "payload": "amount=[100]",
+      "http_bd": "400 {\"error\":\"Valor de levantamento inválido.\",\"code\":\"payout_failed\"} loc=\"\"",
+      "result": "HOLD"
+    },
+    {
+      "id": "CN-B-AMT-neg",
+      "lens": "CN4",
+      "payload": "amount=-100",
+      "http_bd": "400 {\"error\":\"Valor de levantamento inválido.\",\"code\":\"payout_failed\"} loc=\"\"",
+      "result": "HOLD"
+    },
+    {
+      "id": "CN-B-AMT-usdobj",
+      "lens": "CN4",
+      "payload": "amount={cents: 100, currency: usd}",
+      "http_bd": "400 {\"error\":\"Valor de levantamento inválido.\",\"code\":\"payout_failed\"} loc=\"\"",
+      "result": "HOLD"
+    },
+    {
+      "id": "CN-C-WH-NOSIG",
+      "lens": "CN4",
+      "payload": "POST stripe-webhook transfer.created sem Stripe-Signature",
+      "http_bd": "400 {\"ok\":false,\"error\":\"missing_signature\"} loc=\"\"",
+      "result": "HOLD"
+    },
+    {
+      "id": "CN-C-CRASH-RETRY",
+      "lens": "CN4",
+      "payload": "crash after_debit_before_stripe + retry mesma key",
+      "http_bd": "crash=500 {\"success\":false,\"error\":\"crash_inject:after_debit_before_stripe\",\"code\":\"payout_pending_reconcile\",\"needs_reconcile\":true,\"idempotency_key\":\"p_9a5aaff738cfba9ad6f6de5d9c37712db088f0109033a677e11061931ec619\",\"crash_injec… loc=\"\" retry=200 {\"success\":true,\"transferId\":\"tr_1UCf7HH7FWYUN3jhUMDnwsps\",\"balance\":88} loc=\"\" tids={tr_1UCf7HH7FWYUN3jhUMDnwsps}",
+      "result": "HOLD"
+    },
+    {
+      "id": "CN-A-COPTIC-O",
+      "lens": "CN1",
+      "payload": "amount=100 keyA=rtcnoCopt01 keyB=rtcnⲟCopt01",
+      "http_bd": "n_tr=2 tids=tr_1UCf7NH7FWYUN3jhpebflx4H,tr_1UCf7KH7FWYUN3jhlxCOPuLh Δ=-2.0 A=200 {\"success\":true,\"transferId\":\"tr_1UCf7KH7FWYUN3jhlxCOPuLh\",\"balance\":87} loc=\"\" B=200 {\"success\":true,\"transferId\":\"tr_1UCf7NH7FWYUN3jhpebflx4H\",\"balance\":86} loc=\"\"",
+      "result": "FAIL"
+    },
+    {
+      "id": "CN-A-COPTIC-A",
+      "lens": "CN1",
+      "payload": "amount=100 keyA=rtcnaCopt02 keyB=rtcnⲁCopt02",
+      "http_bd": "n_tr=2 tids=tr_1UCf7TH7FWYUN3jh9MessCQx,tr_1UCf7QH7FWYUN3jhPs3aVFic Δ=-2.0 A=200 {\"success\":true,\"transferId\":\"tr_1UCf7QH7FWYUN3jhPs3aVFic\",\"balance\":85} loc=\"\" B=200 {\"success\":true,\"transferId\":\"tr_1UCf7TH7FWYUN3jh9MessCQx\",\"balance\":84} loc=\"\"",
+      "result": "FAIL"
+    },
+    {
+      "id": "CN-A-COPTIC-P",
+      "lens": "CN1",
+      "payload": "amount=100 keyA=rtcnpCopt03 keyB=rtcnⲣCopt03",
+      "http_bd": "n_tr=2 tids=tr_1UCf7aH7FWYUN3jhE1rI4WLR,tr_1UCf7XH7FWYUN3jh1xgiiE7p Δ=-2.0 A=200 {\"success\":true,\"transferId\":\"tr_1UCf7XH7FWYUN3jh1xgiiE7p\",\"balance\":83} loc=\"\" B=200 {\"success\":true,\"transferId\":\"tr_1UCf7aH7FWYUN3jhE1rI4WLR\",\"balance\":82} loc=\"\"",
+      "result": "FAIL"
+    },
+    {
+      "id": "CN-A-COPTIC-E",
+      "lens": "CN1",
+      "payload": "amount=100 keyA=rtcneCopt04 keyB=rtcnⲉCopt04",
+      "http_bd": "n_tr=2 tids=tr_1UCf7fH7FWYUN3jh9Zsy2V1O,tr_1UCf7dH7FWYUN3jhvgX163mM Δ=-2.0 A=200 {\"success\":true,\"transferId\":\"tr_1UCf7dH7FWYUN3jhvgX163mM\",\"balance\":81} loc=\"\" B=200 {\"success\":true,\"transferId\":\"tr_1UCf7fH7FWYUN3jh9Zsy2V1O\",\"balance\":80} loc=\"\"",
+      "result": "FAIL"
+    },
+    {
+      "id": "CN-A-COPTIC-I",
+      "lens": "CN1",
+      "payload": "amount=100 keyA=rtcniCopt05 keyB=rtcnⲓCopt05",
+      "http_bd": "n_tr=2 tids=tr_1UCf7lH7FWYUN3jh0DmBc3vc,tr_1UCf7jH7FWYUN3jh3LpbjAK0 Δ=-2.0 A=200 {\"success\":true,\"transferId\":\"tr_1UCf7jH7FWYUN3jh3LpbjAK0\",\"balance\":79} loc=\"\" B=200 {\"success\":true,\"transferId\":\"tr_1UCf7lH7FWYUN3jh0DmBc3vc\",\"balance\":78} loc=\"\"",
+      "result": "FAIL"
+    },
+    {
+      "id": "CN-A-COPTIC-K",
+      "lens": "CN1",
+      "payload": "amount=100 keyA=rtcnkCopt06 keyB=rtcnⲕCopt06",
+      "http_bd": "n_tr=2 tids=tr_1UCf7rH7FWYUN3jhnUI5nlBQ,tr_1UCf7pH7FWYUN3jhSmJesflT Δ=-2.0 A=200 {\"success\":true,\"transferId\":\"tr_1UCf7pH7FWYUN3jhSmJesflT\",\"balance\":77} loc=\"\" B=200 {\"success\":true,\"transferId\":\"tr_1UCf7rH7FWYUN3jhnUI5nlBQ\",\"balance\":76} loc=\"\"",
+      "result": "FAIL"
+    },
+    {
+      "id": "CN-A-CHEROKEE-O",
+      "lens": "CN1",
+      "payload": "amount=100 keyA=rtcnoCher07 keyB=rtcnᎾCher07",
+      "http_bd": "n_tr=2 tids=tr_1UCf7xH7FWYUN3jhUjMjHFw2,tr_1UCf7vH7FWYUN3jhICWQKBpW Δ=-2.0 A=200 {\"success\":true,\"transferId\":\"tr_1UCf7vH7FWYUN3jhICWQKBpW\",\"balance\":75} loc=\"\" B=200 {\"success\":true,\"transferId\":\"tr_1UCf7xH7FWYUN3jhUjMjHFw2\",\"balance\":74} loc=\"\"",
+      "result": "FAIL"
+    },
+    {
+      "id": "CN-A-CHEROKEE-A",
+      "lens": "CN1",
+      "payload": "amount=100 keyA=rtcnACher08 keyB=rtcnᎪCher08",
+      "http_bd": "n_tr=2 tids=tr_1UCf83H7FWYUN3jhEUwhSl69,tr_1UCf80H7FWYUN3jhtISLMf6B Δ=-2.0 A=200 {\"success\":true,\"transferId\":\"tr_1UCf80H7FWYUN3jhtISLMf6B\",\"balance\":73} loc=\"\" B=200 {\"success\":true,\"transferId\":\"tr_1UCf83H7FWYUN3jhEUwhSl69\",\"balance\":72} loc=\"\"",
+      "result": "FAIL"
+    },
+    {
+      "id": "CN-HOLD-ARMENIAN",
+      "lens": "CN1",
+      "payload": "amount=100 keyA=rtcnoArmR01 keyB=rtcnօArmR01",
+      "http_bd": "n_tr=1 tids=tr_1UCf87H7FWYUN3jh0rnRJe5x Δ=-1.0 A=200 {\"success\":true,\"transferId\":\"tr_1UCf87H7FWYUN3jh0rnRJe5x\",\"balance\":71} loc=\"\" B=200 {\"success\":true,\"transferId\":\"tr_1UCf87H7FWYUN3jh0rnRJe5x\",\"balance\":71,\"idempotent\":true} loc=\"\"",
+      "result": "HOLD"
+    },
+    {
+      "id": "CN-HOLD-GREEK-ALPHA",
+      "lens": "CN1",
+      "payload": "amount=100 keyA=rtcnaGRkR02 keyB=rtcnαGRkR02",
+      "http_bd": "n_tr=1 tids=tr_1UCf8CH7FWYUN3jhRw1WTjCk Δ=-1.0 A=200 {\"success\":true,\"transferId\":\"tr_1UCf8CH7FWYUN3jhRw1WTjCk\",\"balance\":70} loc=\"\" B=200 {\"success\":true,\"transferId\":\"tr_1UCf8CH7FWYUN3jhRw1WTjCk\",\"balance\":70,\"idempotent\":true} loc=\"\"",
+      "result": "HOLD"
+    },
+    {
+      "id": "CN-HOLD-CASE-Ii",
+      "lens": "CN1",
+      "payload": "amount=100 keyA=rtcnIcaseR3 keyB=rtcnicaseR3",
+      "http_bd": "n_tr=1 tids=tr_1UCf8IH7FWYUN3jhFjZ49rpI Δ=-1.0 A=200 {\"success\":true,\"transferId\":\"tr_1UCf8IH7FWYUN3jhFjZ49rpI\",\"balance\":69} loc=\"\" B=200 {\"success\":true,\"transferId\":\"tr_1UCf8IH7FWYUN3jhFjZ49rpI\",\"balance\":69,\"idempotent\":true} loc=\"\"",
+      "result": "HOLD"
+    },
+    {
+      "id": "CN-A-ZWSP-VS-ASCII",
+      "lens": "CN1",
+      "payload": "rtcnzwsp088 vs 8×U+200B",
+      "http_bd": {
+        "keyA": "rtcnzwsp088",
+        "keyB": "​​​​​​​​",
+        "keyA_units": [
+          114,
+          116,
+          99,
+          110,
+          122,
+          119,
+          115,
+          112,
+          48,
+          56,
+          56
+        ],
+        "keyB_units": [
+          8203,
+          8203,
+          8203,
+          8203,
+          8203,
+          8203,
+          8203,
+          8203
+        ],
+        "hitA": "200 {\"success\":true,\"transferId\":\"tr_1UCf8MH7FWYUN3jhyKuYFpbV\",\"balance\":68} loc=\"\"",
+        "hitB": "200 {\"success\":true,\"transferId\":\"tr_1UCeP2H7FWYUN3jhv3iqLRAW\",\"balance\":44.33,\"idempotent\":true} loc=\"\"",
+        "tidA": "tr_1UCf8MH7FWYUN3jhyKuYFpbV",
+        "tidB": "tr_1UCeP2H7FWYUN3jhv3iqLRAW",
+        "new_transfer_ids": [
+          "tr_1UCf8MH7FWYUN3jhyKuYFpbV"
+        ],
+        "new_transfer_count": 1,
+        "wallet_before": 69.0,
+        "wallet_after": 68.0,
+        "delta_eur": -1.0,
+        "payoutOkA": true,
+        "payoutOkB": true,
+        "idempotentB": true
+      },
+      "result": "HOLD"
+    },
+    {
+      "id": "CN-A-LEN-MAX-1",
+      "lens": "CN1",
+      "payload": "key_len=254 sample=RTCN-20260906T1317_L254_xxxxxxxxxxxxxxxx…",
+      "http_bd": "200 {\"success\":true,\"transferId\":\"tr_1UCf8QH7FWYUN3jhJVe9pHUs\",\"balance\":67} loc=\"\"",
+      "result": "HOLD"
+    },
+    {
+      "id": "CN-A-LEN-MAX",
+      "lens": "CN1",
+      "payload": "key_len=255 sample=RTCN-20260906T1317_L255_xxxxxxxxxxxxxxxx…",
+      "http_bd": "200 {\"success\":true,\"transferId\":\"tr_1UCf8TH7FWYUN3jhJIhbpXya\",\"balance\":66} loc=\"\"",
+      "result": "HOLD"
+    },
+    {
+      "id": "CN-A-LEN-MAX+1",
+      "lens": "CN1",
+      "payload": "key_len=256 sample=RTCN-20260906T1317_L256_xxxxxxxxxxxxxxxx…",
+      "http_bd": "200 {\"success\":true,\"transferId\":\"tr_1UCf8VH7FWYUN3jhs3YrlcFj\",\"balance\":65} loc=\"\"",
+      "result": "HOLD"
+    },
+    {
+      "id": "CN-A-LEN-EMPTY",
+      "lens": "CN1",
+      "payload": "key_len=0 sample=",
+      "http_bd": "400 {\"error\":\"idempotency_key em falta. Reinicia o levantamento na app.\",\"code\":\"payout_failed\"} loc=\"\"",
+      "result": "HOLD"
+    },
+    {
+      "id": "CN-A-LEN-ZWSP",
+      "lens": "CN1",
+      "payload": "key_len=8 sample=​​​​​​​​",
+      "http_bd": "200 {\"success\":true,\"transferId\":\"tr_1UCeP2H7FWYUN3jhv3iqLRAW\",\"balance\":44.33,\"idempotent\":true} loc=\"\"",
+      "result": "HOLD"
+    },
+    {
+      "id": "CN-A-PAR-EQ-FOLD",
+      "lens": "CN1",
+      "payload": "Future.wait rtcnaFoldP9 vs rtcnαFoldP9",
+      "http_bd": "tids={tr_1UCf8aH7FWYUN3jhSHAew0Di} hits=[200 {\"success\":true,\"transferId\":\"tr_1UCf8aH7FWYUN3jhSHAew0Di\",\"balance\":64} loc=\"\", 200 {\"success\":true,\"transferId\":\"tr_1UCf8aH7FWYUN3jhSHAew0Di\",\"balance\":64} loc=\"\"]",
+      "result": "HOLD"
+    },
+    {
+      "id": "CN-A-PAR-NE-FOLD",
+      "lens": "CN1",
+      "payload": "Future.wait rtcnoPar10x vs rtcnⲟPar10x",
+      "http_bd": "tids={tr_1UCf8dH7FWYUN3jhulFCXVEA, tr_1UCf8dH7FWYUN3jh8Tf3cHOw} hits=[200 {\"success\":true,\"transferId\":\"tr_1UCf8dH7FWYUN3jhulFCXVEA\",\"balance\":62} loc=\"\", 200 {\"success\":true,\"transferId\":\"tr_1UCf8dH7FWYUN3jh8Tf3cHOw\",\"balance\":63} loc=\"\"]",
+      "result": "FAIL"
+    }
+  ],
+  "findings": [
+    {
+      "id": "CN-A-COPTIC-O",
+      "lens": "CN1",
+      "severity": "P2",
+      "title": "Coptic ⲟ vs o → 2 Transfers",
+      "actor": "seller JWT",
+      "pre": "fold CDCI sem Coptic; catch-all apaga ⲟ ≠ o",
+      "repro": "rtcnoCopt01 vs rtcnⲟCopt01 (U+2C9F)",
+      "expected": "1 Transfer (fold CDCI) OU desenho documentado",
+      "obtained": {
+        "keyA": "rtcnoCopt01",
+        "keyB": "rtcnⲟCopt01",
+        "keyA_units": [
+          114,
+          116,
+          99,
+          110,
+          111,
+          67,
+          111,
+          112,
+          116,
+          48,
+          49
+        ],
+        "keyB_units": [
+          114,
+          116,
+          99,
+          110,
+          11423,
+          67,
+          111,
+          112,
+          116,
+          48,
+          49
+        ],
+        "hitA": "200 {\"success\":true,\"transferId\":\"tr_1UCf7KH7FWYUN3jhlxCOPuLh\",\"balance\":87} loc=\"\"",
+        "hitB": "200 {\"success\":true,\"transferId\":\"tr_1UCf7NH7FWYUN3jhpebflx4H\",\"balance\":86} loc=\"\"",
+        "tidA": "tr_1UCf7KH7FWYUN3jhlxCOPuLh",
+        "tidB": "tr_1UCf7NH7FWYUN3jhpebflx4H",
+        "new_transfer_ids": [
+          "tr_1UCf7NH7FWYUN3jhpebflx4H",
+          "tr_1UCf7KH7FWYUN3jhlxCOPuLh"
+        ],
+        "new_transfer_count": 2,
+        "wallet_before": 88.0,
+        "wallet_after": 86.0,
+        "delta_eur": -2.0,
+        "payoutOkA": true,
+        "payoutOkB": true,
+        "idempotentB": false
+      },
+      "proven": true,
+      "count": true,
+      "evidence": {}
+    },
+    {
+      "id": "CN-A-COPTIC-A",
+      "lens": "CN1",
+      "severity": "P2",
+      "title": "Coptic ⲁ vs a → 2 Transfers",
+      "actor": "seller JWT",
+      "pre": "fold CDCI sem Coptic ⲁ",
+      "repro": "rtcnaCopt02 vs rtcnⲁCopt02 (U+2C81)",
+      "expected": "1 Transfer (fold CDCI) OU desenho documentado",
+      "obtained": {
+        "keyA": "rtcnaCopt02",
+        "keyB": "rtcnⲁCopt02",
+        "keyA_units": [
+          114,
+          116,
+          99,
+          110,
+          97,
+          67,
+          111,
+          112,
+          116,
+          48,
+          50
+        ],
+        "keyB_units": [
+          114,
+          116,
+          99,
+          110,
+          11393,
+          67,
+          111,
+          112,
+          116,
+          48,
+          50
+        ],
+        "hitA": "200 {\"success\":true,\"transferId\":\"tr_1UCf7QH7FWYUN3jhPs3aVFic\",\"balance\":85} loc=\"\"",
+        "hitB": "200 {\"success\":true,\"transferId\":\"tr_1UCf7TH7FWYUN3jh9MessCQx\",\"balance\":84} loc=\"\"",
+        "tidA": "tr_1UCf7QH7FWYUN3jhPs3aVFic",
+        "tidB": "tr_1UCf7TH7FWYUN3jh9MessCQx",
+        "new_transfer_ids": [
+          "tr_1UCf7TH7FWYUN3jh9MessCQx",
+          "tr_1UCf7QH7FWYUN3jhPs3aVFic"
+        ],
+        "new_transfer_count": 2,
+        "wallet_before": 86.0,
+        "wallet_after": 84.0,
+        "delta_eur": -2.0,
+        "payoutOkA": true,
+        "payoutOkB": true,
+        "idempotentB": false
+      },
+      "proven": true,
+      "count": true,
+      "evidence": {}
+    },
+    {
+      "id": "CN-A-COPTIC-P",
+      "lens": "CN1",
+      "severity": "P2",
+      "title": "Coptic ⲣ vs p → 2 Transfers",
+      "actor": "seller JWT",
+      "pre": "fold CDCI sem Coptic ⲣ",
+      "repro": "rtcnpCopt03 vs rtcnⲣCopt03 (U+2CA3)",
+      "expected": "1 Transfer (fold CDCI) OU desenho documentado",
+      "obtained": {
+        "keyA": "rtcnpCopt03",
+        "keyB": "rtcnⲣCopt03",
+        "keyA_units": [
+          114,
+          116,
+          99,
+          110,
+          112,
+          67,
+          111,
+          112,
+          116,
+          48,
+          51
+        ],
+        "keyB_units": [
+          114,
+          116,
+          99,
+          110,
+          11427,
+          67,
+          111,
+          112,
+          116,
+          48,
+          51
+        ],
+        "hitA": "200 {\"success\":true,\"transferId\":\"tr_1UCf7XH7FWYUN3jh1xgiiE7p\",\"balance\":83} loc=\"\"",
+        "hitB": "200 {\"success\":true,\"transferId\":\"tr_1UCf7aH7FWYUN3jhE1rI4WLR\",\"balance\":82} loc=\"\"",
+        "tidA": "tr_1UCf7XH7FWYUN3jh1xgiiE7p",
+        "tidB": "tr_1UCf7aH7FWYUN3jhE1rI4WLR",
+        "new_transfer_ids": [
+          "tr_1UCf7aH7FWYUN3jhE1rI4WLR",
+          "tr_1UCf7XH7FWYUN3jh1xgiiE7p"
+        ],
+        "new_transfer_count": 2,
+        "wallet_before": 84.0,
+        "wallet_after": 82.0,
+        "delta_eur": -2.0,
+        "payoutOkA": true,
+        "payoutOkB": true,
+        "idempotentB": false
+      },
+      "proven": true,
+      "count": true,
+      "evidence": {}
+    },
+    {
+      "id": "CN-A-COPTIC-E",
+      "lens": "CN1",
+      "severity": "P2",
+      "title": "Coptic ⲉ vs e → 2 Transfers",
+      "actor": "seller JWT",
+      "pre": "fold CDCI sem Coptic ⲉ",
+      "repro": "rtcneCopt04 vs rtcnⲉCopt04 (U+2C89)",
+      "expected": "1 Transfer (fold CDCI) OU desenho documentado",
+      "obtained": {
+        "keyA": "rtcneCopt04",
+        "keyB": "rtcnⲉCopt04",
+        "keyA_units": [
+          114,
+          116,
+          99,
+          110,
+          101,
+          67,
+          111,
+          112,
+          116,
+          48,
+          52
+        ],
+        "keyB_units": [
+          114,
+          116,
+          99,
+          110,
+          11401,
+          67,
+          111,
+          112,
+          116,
+          48,
+          52
+        ],
+        "hitA": "200 {\"success\":true,\"transferId\":\"tr_1UCf7dH7FWYUN3jhvgX163mM\",\"balance\":81} loc=\"\"",
+        "hitB": "200 {\"success\":true,\"transferId\":\"tr_1UCf7fH7FWYUN3jh9Zsy2V1O\",\"balance\":80} loc=\"\"",
+        "tidA": "tr_1UCf7dH7FWYUN3jhvgX163mM",
+        "tidB": "tr_1UCf7fH7FWYUN3jh9Zsy2V1O",
+        "new_transfer_ids": [
+          "tr_1UCf7fH7FWYUN3jh9Zsy2V1O",
+          "tr_1UCf7dH7FWYUN3jhvgX163mM"
+        ],
+        "new_transfer_count": 2,
+        "wallet_before": 82.0,
+        "wallet_after": 80.0,
+        "delta_eur": -2.0,
+        "payoutOkA": true,
+        "payoutOkB": true,
+        "idempotentB": false
+      },
+      "proven": true,
+      "count": true,
+      "evidence": {}
+    },
+    {
+      "id": "CN-A-COPTIC-I",
+      "lens": "CN1",
+      "severity": "P2",
+      "title": "Coptic ⲓ vs i → 2 Transfers",
+      "actor": "seller JWT",
+      "pre": "quota 16 keys; ⲓ fora do fold",
+      "repro": "rtcniCopt05 vs rtcnⲓCopt05 (U+2C93)",
+      "expected": "1 Transfer (fold CDCI) OU desenho documentado",
+      "obtained": {
+        "keyA": "rtcniCopt05",
+        "keyB": "rtcnⲓCopt05",
+        "keyA_units": [
+          114,
+          116,
+          99,
+          110,
+          105,
+          67,
+          111,
+          112,
+          116,
+          48,
+          53
+        ],
+        "keyB_units": [
+          114,
+          116,
+          99,
+          110,
+          11411,
+          67,
+          111,
+          112,
+          116,
+          48,
+          53
+        ],
+        "hitA": "200 {\"success\":true,\"transferId\":\"tr_1UCf7jH7FWYUN3jh3LpbjAK0\",\"balance\":79} loc=\"\"",
+        "hitB": "200 {\"success\":true,\"transferId\":\"tr_1UCf7lH7FWYUN3jh0DmBc3vc\",\"balance\":78} loc=\"\"",
+        "tidA": "tr_1UCf7jH7FWYUN3jh3LpbjAK0",
+        "tidB": "tr_1UCf7lH7FWYUN3jh0DmBc3vc",
+        "new_transfer_ids": [
+          "tr_1UCf7lH7FWYUN3jh0DmBc3vc",
+          "tr_1UCf7jH7FWYUN3jh3LpbjAK0"
+        ],
+        "new_transfer_count": 2,
+        "wallet_before": 80.0,
+        "wallet_after": 78.0,
+        "delta_eur": -2.0,
+        "payoutOkA": true,
+        "payoutOkB": true,
+        "idempotentB": false
+      },
+      "proven": true,
+      "count": true,
+      "evidence": {}
+    },
+    {
+      "id": "CN-A-COPTIC-K",
+      "lens": "CN1",
+      "severity": "P2",
+      "title": "Coptic ⲕ vs k → 2 Transfers",
+      "actor": "seller JWT",
+      "pre": "quota 16 keys; ⲕ fora do fold",
+      "repro": "rtcnkCopt06 vs rtcnk ⲕ (U+2C95)",
+      "expected": "1 Transfer (fold CDCI) OU desenho documentado",
+      "obtained": {
+        "keyA": "rtcnkCopt06",
+        "keyB": "rtcnⲕCopt06",
+        "keyA_units": [
+          114,
+          116,
+          99,
+          110,
+          107,
+          67,
+          111,
+          112,
+          116,
+          48,
+          54
+        ],
+        "keyB_units": [
+          114,
+          116,
+          99,
+          110,
+          11413,
+          67,
+          111,
+          112,
+          116,
+          48,
+          54
+        ],
+        "hitA": "200 {\"success\":true,\"transferId\":\"tr_1UCf7pH7FWYUN3jhSmJesflT\",\"balance\":77} loc=\"\"",
+        "hitB": "200 {\"success\":true,\"transferId\":\"tr_1UCf7rH7FWYUN3jhnUI5nlBQ\",\"balance\":76} loc=\"\"",
+        "tidA": "tr_1UCf7pH7FWYUN3jhSmJesflT",
+        "tidB": "tr_1UCf7rH7FWYUN3jhnUI5nlBQ",
+        "new_transfer_ids": [
+          "tr_1UCf7rH7FWYUN3jhnUI5nlBQ",
+          "tr_1UCf7pH7FWYUN3jhSmJesflT"
+        ],
+        "new_transfer_count": 2,
+        "wallet_before": 78.0,
+        "wallet_after": 76.0,
+        "delta_eur": -2.0,
+        "payoutOkA": true,
+        "payoutOkB": true,
+        "idempotentB": false
+      },
+      "proven": true,
+      "count": true,
+      "evidence": {}
+    },
+    {
+      "id": "CN-A-CHEROKEE-O",
+      "lens": "CN1",
+      "severity": "P2",
+      "title": "Cherokee Ꮎ vs o → 2 Transfers",
+      "actor": "seller JWT",
+      "pre": "fold CDCI sem Cherokee; strip Ꮎ ≠ o",
+      "repro": "rtcnoCher07 vs rtcnᎾCher07 (U+13BE)",
+      "expected": "1 Transfer (fold CDCI) OU desenho documentado",
+      "obtained": {
+        "keyA": "rtcnoCher07",
+        "keyB": "rtcnᎾCher07",
+        "keyA_units": [
+          114,
+          116,
+          99,
+          110,
+          111,
+          67,
+          104,
+          101,
+          114,
+          48,
+          55
+        ],
+        "keyB_units": [
+          114,
+          116,
+          99,
+          110,
+          5054,
+          67,
+          104,
+          101,
+          114,
+          48,
+          55
+        ],
+        "hitA": "200 {\"success\":true,\"transferId\":\"tr_1UCf7vH7FWYUN3jhICWQKBpW\",\"balance\":75} loc=\"\"",
+        "hitB": "200 {\"success\":true,\"transferId\":\"tr_1UCf7xH7FWYUN3jhUjMjHFw2\",\"balance\":74} loc=\"\"",
+        "tidA": "tr_1UCf7vH7FWYUN3jhICWQKBpW",
+        "tidB": "tr_1UCf7xH7FWYUN3jhUjMjHFw2",
+        "new_transfer_ids": [
+          "tr_1UCf7xH7FWYUN3jhUjMjHFw2",
+          "tr_1UCf7vH7FWYUN3jhICWQKBpW"
+        ],
+        "new_transfer_count": 2,
+        "wallet_before": 76.0,
+        "wallet_after": 74.0,
+        "delta_eur": -2.0,
+        "payoutOkA": true,
+        "payoutOkB": true,
+        "idempotentB": false
+      },
+      "proven": true,
+      "count": true,
+      "evidence": {}
+    },
+    {
+      "id": "CN-A-CHEROKEE-A",
+      "lens": "CN1",
+      "severity": "P2",
+      "title": "Cherokee Ꭺ vs A → 2 Transfers",
+      "actor": "seller JWT",
+      "pre": "toLowerCase A→a; Ꭺ stripped",
+      "repro": "rtcnACher08 vs rtcnᎪCher08 (U+13AA)",
+      "expected": "1 Transfer (fold CDCI) OU desenho documentado",
+      "obtained": {
+        "keyA": "rtcnACher08",
+        "keyB": "rtcnᎪCher08",
+        "keyA_units": [
+          114,
+          116,
+          99,
+          110,
+          65,
+          67,
+          104,
+          101,
+          114,
+          48,
+          56
+        ],
+        "keyB_units": [
+          114,
+          116,
+          99,
+          110,
+          5034,
+          67,
+          104,
+          101,
+          114,
+          48,
+          56
+        ],
+        "hitA": "200 {\"success\":true,\"transferId\":\"tr_1UCf80H7FWYUN3jhtISLMf6B\",\"balance\":73} loc=\"\"",
+        "hitB": "200 {\"success\":true,\"transferId\":\"tr_1UCf83H7FWYUN3jhEUwhSl69\",\"balance\":72} loc=\"\"",
+        "tidA": "tr_1UCf80H7FWYUN3jhtISLMf6B",
+        "tidB": "tr_1UCf83H7FWYUN3jhEUwhSl69",
+        "new_transfer_ids": [
+          "tr_1UCf83H7FWYUN3jhEUwhSl69",
+          "tr_1UCf80H7FWYUN3jhtISLMf6B"
+        ],
+        "new_transfer_count": 2,
+        "wallet_before": 74.0,
+        "wallet_after": 72.0,
+        "delta_eur": -2.0,
+        "payoutOkA": true,
+        "payoutOkB": true,
+        "idempotentB": false
+      },
+      "proven": true,
+      "count": true,
+      "evidence": {}
+    },
+    {
+      "id": "CN-A-PAR-COPTIC",
+      "lens": "CN1",
+      "severity": "P2",
+      "title": "Future.wait o vs Coptic ⲟ → 2 Transfers",
+      "actor": "seller JWT paralelo",
+      "pre": "mesma classe Coptic; prova race",
+      "repro": "Future.wait latin o + Coptic ⲟ",
+      "expected": "1 Transfer se fold confusable",
+      "obtained": {
+        "tids": [
+          "tr_1UCf8dH7FWYUN3jhulFCXVEA",
+          "tr_1UCf8dH7FWYUN3jh8Tf3cHOw"
+        ],
+        "hits": [
+          "200 {\"success\":true,\"transferId\":\"tr_1UCf8dH7FWYUN3jhulFCXVEA\",\"balance\":62} loc=\"\"",
+          "200 {\"success\":true,\"transferId\":\"tr_1UCf8dH7FWYUN3jh8Tf3cHOw\",\"balance\":63} loc=\"\""
+        ]
+      },
+      "proven": true,
+      "count": false,
+      "evidence": {}
+    }
+  ],
+  "blocked": [
+    {
+      "id": "dest.body",
+      "lens": "CN4",
+      "title": "Transfer própria; dest/currency ignorados",
+      "ev": "200 {\"success\":true,\"transferId\":\"tr_1UCf78H7FWYUN3jh5Etqkm6y\",\"balance\":89} loc=\"\""
+    },
+    {
+      "id": "mint.huge",
+      "lens": "CN7",
+      "title": "payout>balance recusado Δ≈0",
+      "ev": "400 {\"error\":\"Saldo disponível insuficiente para este levantamento.\",\"code\":\"payout_failed\"} loc=\"\""
+    },
+    {
+      "id": "cn4.amt.arr",
+      "lens": "CN4",
+      "title": "amount=[100] criou Transfer",
+      "ev": "400 {\"error\":\"Valor de levantamento inválido.\",\"code\":\"payout_failed\"} loc=\"\""
+    },
+    {
+      "id": "cn4.amt.neg",
+      "lens": "CN4",
+      "title": "amount=-100 criou Transfer",
+      "ev": "400 {\"error\":\"Valor de levantamento inválido.\",\"code\":\"payout_failed\"} loc=\"\""
+    },
+    {
+      "id": "cn4.amt.usdobj",
+      "lens": "CN4",
+      "title": "amount={cents: 100, currency: usd} criou Transfer",
+      "ev": "400 {\"error\":\"Valor de levantamento inválido.\",\"code\":\"payout_failed\"} loc=\"\""
+    },
+    {
+      "id": "wh.nosig",
+      "lens": "CN4",
+      "title": "webhook recusou sem assinatura",
+      "ev": "400 {\"ok\":false,\"error\":\"missing_signature\"} loc=\"\""
+    },
+    {
+      "id": "crash.debit",
+      "lens": "CN4",
+      "title": "retry após debit não duplicou",
+      "ev": {
+        "crash": "500 {\"success\":false,\"error\":\"crash_inject:after_debit_before_stripe\",\"code\":\"payout_pending_reconcile\",\"needs_reconcile\":true,\"idempotency_key\":\"p_9a5aaff738cfba9ad6f6de5d9c37712db088f0109033a677e11061931ec619\",\"crash_injec… loc=\"\"",
+        "retry": "200 {\"success\":true,\"transferId\":\"tr_1UCf7HH7FWYUN3jhUMDnwsps\",\"balance\":88} loc=\"\"",
+        "tids": [
+          "tr_1UCf7HH7FWYUN3jhUMDnwsps"
+        ]
+      }
+    },
+    {
+      "id": "CN-HOLD-ARMENIAN",
+      "lens": "CN1",
+      "title": "residual CDCI arménio օ vs o — n_tr=1",
+      "ev": {
+        "keyA": "rtcnoArmR01",
+        "keyB": "rtcnօArmR01",
+        "keyA_units": [
+          114,
+          116,
+          99,
+          110,
+          111,
+          65,
+          114,
+          109,
+          82,
+          48,
+          49
+        ],
+        "keyB_units": [
+          114,
+          116,
+          99,
+          110,
+          1413,
+          65,
+          114,
+          109,
+          82,
+          48,
+          49
+        ],
+        "hitA": "200 {\"success\":true,\"transferId\":\"tr_1UCf87H7FWYUN3jh0rnRJe5x\",\"balance\":71} loc=\"\"",
+        "hitB": "200 {\"success\":true,\"transferId\":\"tr_1UCf87H7FWYUN3jh0rnRJe5x\",\"balance\":71,\"idempotent\":true} loc=\"\"",
+        "tidA": "tr_1UCf87H7FWYUN3jh0rnRJe5x",
+        "tidB": "tr_1UCf87H7FWYUN3jh0rnRJe5x",
+        "new_transfer_ids": [
+          "tr_1UCf87H7FWYUN3jh0rnRJe5x"
+        ],
+        "new_transfer_count": 1,
+        "wallet_before": 72.0,
+        "wallet_after": 71.0,
+        "delta_eur": -1.0,
+        "payoutOkA": true,
+        "payoutOkB": true,
+        "idempotentB": true
+      }
+    },
+    {
+      "id": "CN-HOLD-GREEK-ALPHA",
+      "lens": "CN1",
+      "title": "residual CDCI grego α vs a — n_tr=1",
+      "ev": {
+        "keyA": "rtcnaGRkR02",
+        "keyB": "rtcnαGRkR02",
+        "keyA_units": [
+          114,
+          116,
+          99,
+          110,
+          97,
+          71,
+          82,
+          107,
+          82,
+          48,
+          50
+        ],
+        "keyB_units": [
+          114,
+          116,
+          99,
+          110,
+          945,
+          71,
+          82,
+          107,
+          82,
+          48,
+          50
+        ],
+        "hitA": "200 {\"success\":true,\"transferId\":\"tr_1UCf8CH7FWYUN3jhRw1WTjCk\",\"balance\":70} loc=\"\"",
+        "hitB": "200 {\"success\":true,\"transferId\":\"tr_1UCf8CH7FWYUN3jhRw1WTjCk\",\"balance\":70,\"idempotent\":true} loc=\"\"",
+        "tidA": "tr_1UCf8CH7FWYUN3jhRw1WTjCk",
+        "tidB": "tr_1UCf8CH7FWYUN3jhRw1WTjCk",
+        "new_transfer_ids": [
+          "tr_1UCf8CH7FWYUN3jhRw1WTjCk"
+        ],
+        "new_transfer_count": 1,
+        "wallet_before": 71.0,
+        "wallet_after": 70.0,
+        "delta_eur": -1.0,
+        "payoutOkA": true,
+        "payoutOkB": true,
+        "idempotentB": true
+      }
+    },
+    {
+      "id": "CN-HOLD-CASE-Ii",
+      "lens": "CN1",
+      "title": "residual CDCI I vs i toLowerCase — n_tr=1",
+      "ev": {
+        "keyA": "rtcnIcaseR3",
+        "keyB": "rtcnicaseR3",
+        "keyA_units": [
+          114,
+          116,
+          99,
+          110,
+          73,
+          99,
+          97,
+          115,
+          101,
+          82,
+          51
+        ],
+        "keyB_units": [
+          114,
+          116,
+          99,
+          110,
+          105,
+          99,
+          97,
+          115,
+          101,
+          82,
+          51
+        ],
+        "hitA": "200 {\"success\":true,\"transferId\":\"tr_1UCf8IH7FWYUN3jhFjZ49rpI\",\"balance\":69} loc=\"\"",
+        "hitB": "200 {\"success\":true,\"transferId\":\"tr_1UCf8IH7FWYUN3jhFjZ49rpI\",\"balance\":69,\"idempotent\":true} loc=\"\"",
+        "tidA": "tr_1UCf8IH7FWYUN3jhFjZ49rpI",
+        "tidB": "tr_1UCf8IH7FWYUN3jhFjZ49rpI",
+        "new_transfer_ids": [
+          "tr_1UCf8IH7FWYUN3jhFjZ49rpI"
+        ],
+        "new_transfer_count": 1,
+        "wallet_before": 70.0,
+        "wallet_after": 69.0,
+        "delta_eur": -1.0,
+        "payoutOkA": true,
+        "payoutOkB": true,
+        "idempotentB": true
+      }
+    },
+    {
+      "id": "zwsp.ascii",
+      "lens": "CN1",
+      "title": "ZWSP vs ASCII n_tr=1",
+      "ev": {
+        "keyA": "rtcnzwsp088",
+        "keyB": "​​​​​​​​",
+        "keyA_units": [
+          114,
+          116,
+          99,
+          110,
+          122,
+          119,
+          115,
+          112,
+          48,
+          56,
+          56
+        ],
+        "keyB_units": [
+          8203,
+          8203,
+          8203,
+          8203,
+          8203,
+          8203,
+          8203,
+          8203
+        ],
+        "hitA": "200 {\"success\":true,\"transferId\":\"tr_1UCf8MH7FWYUN3jhyKuYFpbV\",\"balance\":68} loc=\"\"",
+        "hitB": "200 {\"success\":true,\"transferId\":\"tr_1UCeP2H7FWYUN3jhv3iqLRAW\",\"balance\":44.33,\"idempotent\":true} loc=\"\"",
+        "tidA": "tr_1UCf8MH7FWYUN3jhyKuYFpbV",
+        "tidB": "tr_1UCeP2H7FWYUN3jhv3iqLRAW",
+        "new_transfer_ids": [
+          "tr_1UCf8MH7FWYUN3jhyKuYFpbV"
+        ],
+        "new_transfer_count": 1,
+        "wallet_before": 69.0,
+        "wallet_after": 68.0,
+        "delta_eur": -1.0,
+        "payoutOkA": true,
+        "payoutOkB": true,
+        "idempotentB": true
+      }
+    },
+    {
+      "id": "par.eq",
+      "lens": "CN1",
+      "title": "race α vs a ≤1 Transfer",
+      "ev": [
+        "tr_1UCf8aH7FWYUN3jhSHAew0Di"
+      ]
+    }
+  ],
+  "skipped": [],
+  "notes": [
+    {
+      "id": "wallet0",
+      "lens": "CN7",
+      "title": "seller wallet before",
+      "ev": {
+        "id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+        "balance": 54.33,
+        "stripe_account_id": "acct_1U5mYbQeUNx8ar08",
+        "updated_at": "2026-09-06T12:05:30.751503+00:00"
+      }
+    },
+    {
+      "id": "wallet.funded",
+      "lens": "CN7",
+      "title": "seller after fixture",
+      "ev": {
+        "id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+        "balance": 90.0,
+        "stripe_account_id": "acct_1U5mYbQeUNx8ar08",
+        "updated_at": "2026-09-06T12:24:00.255314+00:00"
+      }
+    },
+    {
+      "id": "dest.others",
+      "lens": "CN4",
+      "title": "outras contas Connect",
+      "ev": [
+        {
+          "id": "5e73d7d6-1ef7-49da-9eb6-c9af7ade1a4d",
+          "stripe_account_id": "acct_1UB7nWHKe5ETfHI5",
+          "balance": 0.0
+        },
+        {
+          "id": "fa58848b-e162-44ea-a30f-2def5dc4232a",
+          "stripe_account_id": "acct_1UAOwtH17a42yGGt",
+          "balance": 0.0
+        },
+        {
+          "id": "a4d4733b-8ce3-4cfc-b5c8-00e35a0e6fe1",
+          "stripe_account_id": "acct_1UA7LFQcPjx6VmjJ",
+          "balance": 0.0
+        },
+        {
+          "id": "4449ca94-ea14-4a8e-949a-b20ef6a1f44e",
+          "stripe_account_id": "acct_1UAXuBHqvLlXvegU",
+          "balance": 0.0
+        },
+        {
+          "id": "f54fd65e-de27-4eb0-92f5-2dabd71c6d63",
+          "stripe_account_id": "acct_1UAksGHuOIuiqZfv",
+          "balance": 0.0
+        },
+        {
+          "id": "d5e59f63-ba22-4a82-b136-ed44985e3bef",
+          "stripe_account_id": "acct_1UBFutQZ7WEeImMX",
+          "balance": 0.0
+        },
+        {
+          "id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+          "stripe_account_id": "acct_1U8gAFQglI7kZRfq",
+          "balance": 61.1
+        }
+      ]
+    },
+    {
+      "id": "dest.body",
+      "lens": "CN4",
+      "title": "destination alheio + currency usd",
+      "ev": "200 {\"success\":true,\"transferId\":\"tr_1UCf78H7FWYUN3jh5Etqkm6y\",\"balance\":89} loc=\"\""
+    },
+    {
+      "id": "pair.CN-A-COPTIC-O",
+      "lens": "CN1",
+      "title": "pair CN-A-COPTIC-O",
+      "ev": {
+        "keyA": "rtcnoCopt01",
+        "keyB": "rtcnⲟCopt01",
+        "keyA_units": [
+          114,
+          116,
+          99,
+          110,
+          111,
+          67,
+          111,
+          112,
+          116,
+          48,
+          49
+        ],
+        "keyB_units": [
+          114,
+          116,
+          99,
+          110,
+          11423,
+          67,
+          111,
+          112,
+          116,
+          48,
+          49
+        ],
+        "hitA": "200 {\"success\":true,\"transferId\":\"tr_1UCf7KH7FWYUN3jhlxCOPuLh\",\"balance\":87} loc=\"\"",
+        "hitB": "200 {\"success\":true,\"transferId\":\"tr_1UCf7NH7FWYUN3jhpebflx4H\",\"balance\":86} loc=\"\"",
+        "tidA": "tr_1UCf7KH7FWYUN3jhlxCOPuLh",
+        "tidB": "tr_1UCf7NH7FWYUN3jhpebflx4H",
+        "new_transfer_ids": [
+          "tr_1UCf7NH7FWYUN3jhpebflx4H",
+          "tr_1UCf7KH7FWYUN3jhlxCOPuLh"
+        ],
+        "new_transfer_count": 2,
+        "wallet_before": 88.0,
+        "wallet_after": 86.0,
+        "delta_eur": -2.0,
+        "payoutOkA": true,
+        "payoutOkB": true,
+        "idempotentB": false
+      }
+    },
+    {
+      "id": "pair.CN-A-COPTIC-A",
+      "lens": "CN1",
+      "title": "pair CN-A-COPTIC-A",
+      "ev": {
+        "keyA": "rtcnaCopt02",
+        "keyB": "rtcnⲁCopt02",
+        "keyA_units": [
+          114,
+          116,
+          99,
+          110,
+          97,
+          67,
+          111,
+          112,
+          116,
+          48,
+          50
+        ],
+        "keyB_units": [
+          114,
+          116,
+          99,
+          110,
+          11393,
+          67,
+          111,
+          112,
+          116,
+          48,
+          50
+        ],
+        "hitA": "200 {\"success\":true,\"transferId\":\"tr_1UCf7QH7FWYUN3jhPs3aVFic\",\"balance\":85} loc=\"\"",
+        "hitB": "200 {\"success\":true,\"transferId\":\"tr_1UCf7TH7FWYUN3jh9MessCQx\",\"balance\":84} loc=\"\"",
+        "tidA": "tr_1UCf7QH7FWYUN3jhPs3aVFic",
+        "tidB": "tr_1UCf7TH7FWYUN3jh9MessCQx",
+        "new_transfer_ids": [
+          "tr_1UCf7TH7FWYUN3jh9MessCQx",
+          "tr_1UCf7QH7FWYUN3jhPs3aVFic"
+        ],
+        "new_transfer_count": 2,
+        "wallet_before": 86.0,
+        "wallet_after": 84.0,
+        "delta_eur": -2.0,
+        "payoutOkA": true,
+        "payoutOkB": true,
+        "idempotentB": false
+      }
+    },
+    {
+      "id": "pair.CN-A-COPTIC-P",
+      "lens": "CN1",
+      "title": "pair CN-A-COPTIC-P",
+      "ev": {
+        "keyA": "rtcnpCopt03",
+        "keyB": "rtcnⲣCopt03",
+        "keyA_units": [
+          114,
+          116,
+          99,
+          110,
+          112,
+          67,
+          111,
+          112,
+          116,
+          48,
+          51
+        ],
+        "keyB_units": [
+          114,
+          116,
+          99,
+          110,
+          11427,
+          67,
+          111,
+          112,
+          116,
+          48,
+          51
+        ],
+        "hitA": "200 {\"success\":true,\"transferId\":\"tr_1UCf7XH7FWYUN3jh1xgiiE7p\",\"balance\":83} loc=\"\"",
+        "hitB": "200 {\"success\":true,\"transferId\":\"tr_1UCf7aH7FWYUN3jhE1rI4WLR\",\"balance\":82} loc=\"\"",
+        "tidA": "tr_1UCf7XH7FWYUN3jh1xgiiE7p",
+        "tidB": "tr_1UCf7aH7FWYUN3jhE1rI4WLR",
+        "new_transfer_ids": [
+          "tr_1UCf7aH7FWYUN3jhE1rI4WLR",
+          "tr_1UCf7XH7FWYUN3jh1xgiiE7p"
+        ],
+        "new_transfer_count": 2,
+        "wallet_before": 84.0,
+        "wallet_after": 82.0,
+        "delta_eur": -2.0,
+        "payoutOkA": true,
+        "payoutOkB": true,
+        "idempotentB": false
+      }
+    },
+    {
+      "id": "pair.CN-A-COPTIC-E",
+      "lens": "CN1",
+      "title": "pair CN-A-COPTIC-E",
+      "ev": {
+        "keyA": "rtcneCopt04",
+        "keyB": "rtcnⲉCopt04",
+        "keyA_units": [
+          114,
+          116,
+          99,
+          110,
+          101,
+          67,
+          111,
+          112,
+          116,
+          48,
+          52
+        ],
+        "keyB_units": [
+          114,
+          116,
+          99,
+          110,
+          11401,
+          67,
+          111,
+          112,
+          116,
+          48,
+          52
+        ],
+        "hitA": "200 {\"success\":true,\"transferId\":\"tr_1UCf7dH7FWYUN3jhvgX163mM\",\"balance\":81} loc=\"\"",
+        "hitB": "200 {\"success\":true,\"transferId\":\"tr_1UCf7fH7FWYUN3jh9Zsy2V1O\",\"balance\":80} loc=\"\"",
+        "tidA": "tr_1UCf7dH7FWYUN3jhvgX163mM",
+        "tidB": "tr_1UCf7fH7FWYUN3jh9Zsy2V1O",
+        "new_transfer_ids": [
+          "tr_1UCf7fH7FWYUN3jh9Zsy2V1O",
+          "tr_1UCf7dH7FWYUN3jhvgX163mM"
+        ],
+        "new_transfer_count": 2,
+        "wallet_before": 82.0,
+        "wallet_after": 80.0,
+        "delta_eur": -2.0,
+        "payoutOkA": true,
+        "payoutOkB": true,
+        "idempotentB": false
+      }
+    },
+    {
+      "id": "pair.CN-A-COPTIC-I",
+      "lens": "CN1",
+      "title": "pair CN-A-COPTIC-I",
+      "ev": {
+        "keyA": "rtcniCopt05",
+        "keyB": "rtcnⲓCopt05",
+        "keyA_units": [
+          114,
+          116,
+          99,
+          110,
+          105,
+          67,
+          111,
+          112,
+          116,
+          48,
+          53
+        ],
+        "keyB_units": [
+          114,
+          116,
+          99,
+          110,
+          11411,
+          67,
+          111,
+          112,
+          116,
+          48,
+          53
+        ],
+        "hitA": "200 {\"success\":true,\"transferId\":\"tr_1UCf7jH7FWYUN3jh3LpbjAK0\",\"balance\":79} loc=\"\"",
+        "hitB": "200 {\"success\":true,\"transferId\":\"tr_1UCf7lH7FWYUN3jh0DmBc3vc\",\"balance\":78} loc=\"\"",
+        "tidA": "tr_1UCf7jH7FWYUN3jh3LpbjAK0",
+        "tidB": "tr_1UCf7lH7FWYUN3jh0DmBc3vc",
+        "new_transfer_ids": [
+          "tr_1UCf7lH7FWYUN3jh0DmBc3vc",
+          "tr_1UCf7jH7FWYUN3jh3LpbjAK0"
+        ],
+        "new_transfer_count": 2,
+        "wallet_before": 80.0,
+        "wallet_after": 78.0,
+        "delta_eur": -2.0,
+        "payoutOkA": true,
+        "payoutOkB": true,
+        "idempotentB": false
+      }
+    },
+    {
+      "id": "pair.CN-A-COPTIC-K",
+      "lens": "CN1",
+      "title": "pair CN-A-COPTIC-K",
+      "ev": {
+        "keyA": "rtcnkCopt06",
+        "keyB": "rtcnⲕCopt06",
+        "keyA_units": [
+          114,
+          116,
+          99,
+          110,
+          107,
+          67,
+          111,
+          112,
+          116,
+          48,
+          54
+        ],
+        "keyB_units": [
+          114,
+          116,
+          99,
+          110,
+          11413,
+          67,
+          111,
+          112,
+          116,
+          48,
+          54
+        ],
+        "hitA": "200 {\"success\":true,\"transferId\":\"tr_1UCf7pH7FWYUN3jhSmJesflT\",\"balance\":77} loc=\"\"",
+        "hitB": "200 {\"success\":true,\"transferId\":\"tr_1UCf7rH7FWYUN3jhnUI5nlBQ\",\"balance\":76} loc=\"\"",
+        "tidA": "tr_1UCf7pH7FWYUN3jhSmJesflT",
+        "tidB": "tr_1UCf7rH7FWYUN3jhnUI5nlBQ",
+        "new_transfer_ids": [
+          "tr_1UCf7rH7FWYUN3jhnUI5nlBQ",
+          "tr_1UCf7pH7FWYUN3jhSmJesflT"
+        ],
+        "new_transfer_count": 2,
+        "wallet_before": 78.0,
+        "wallet_after": 76.0,
+        "delta_eur": -2.0,
+        "payoutOkA": true,
+        "payoutOkB": true,
+        "idempotentB": false
+      }
+    },
+    {
+      "id": "pair.CN-A-CHEROKEE-O",
+      "lens": "CN1",
+      "title": "pair CN-A-CHEROKEE-O",
+      "ev": {
+        "keyA": "rtcnoCher07",
+        "keyB": "rtcnᎾCher07",
+        "keyA_units": [
+          114,
+          116,
+          99,
+          110,
+          111,
+          67,
+          104,
+          101,
+          114,
+          48,
+          55
+        ],
+        "keyB_units": [
+          114,
+          116,
+          99,
+          110,
+          5054,
+          67,
+          104,
+          101,
+          114,
+          48,
+          55
+        ],
+        "hitA": "200 {\"success\":true,\"transferId\":\"tr_1UCf7vH7FWYUN3jhICWQKBpW\",\"balance\":75} loc=\"\"",
+        "hitB": "200 {\"success\":true,\"transferId\":\"tr_1UCf7xH7FWYUN3jhUjMjHFw2\",\"balance\":74} loc=\"\"",
+        "tidA": "tr_1UCf7vH7FWYUN3jhICWQKBpW",
+        "tidB": "tr_1UCf7xH7FWYUN3jhUjMjHFw2",
+        "new_transfer_ids": [
+          "tr_1UCf7xH7FWYUN3jhUjMjHFw2",
+          "tr_1UCf7vH7FWYUN3jhICWQKBpW"
+        ],
+        "new_transfer_count": 2,
+        "wallet_before": 76.0,
+        "wallet_after": 74.0,
+        "delta_eur": -2.0,
+        "payoutOkA": true,
+        "payoutOkB": true,
+        "idempotentB": false
+      }
+    },
+    {
+      "id": "pair.CN-A-CHEROKEE-A",
+      "lens": "CN1",
+      "title": "pair CN-A-CHEROKEE-A",
+      "ev": {
+        "keyA": "rtcnACher08",
+        "keyB": "rtcnᎪCher08",
+        "keyA_units": [
+          114,
+          116,
+          99,
+          110,
+          65,
+          67,
+          104,
+          101,
+          114,
+          48,
+          56
+        ],
+        "keyB_units": [
+          114,
+          116,
+          99,
+          110,
+          5034,
+          67,
+          104,
+          101,
+          114,
+          48,
+          56
+        ],
+        "hitA": "200 {\"success\":true,\"transferId\":\"tr_1UCf80H7FWYUN3jhtISLMf6B\",\"balance\":73} loc=\"\"",
+        "hitB": "200 {\"success\":true,\"transferId\":\"tr_1UCf83H7FWYUN3jhEUwhSl69\",\"balance\":72} loc=\"\"",
+        "tidA": "tr_1UCf80H7FWYUN3jhtISLMf6B",
+        "tidB": "tr_1UCf83H7FWYUN3jhEUwhSl69",
+        "new_transfer_ids": [
+          "tr_1UCf83H7FWYUN3jhEUwhSl69",
+          "tr_1UCf80H7FWYUN3jhtISLMf6B"
+        ],
+        "new_transfer_count": 2,
+        "wallet_before": 74.0,
+        "wallet_after": 72.0,
+        "delta_eur": -2.0,
+        "payoutOkA": true,
+        "payoutOkB": true,
+        "idempotentB": false
+      }
+    },
+    {
+      "id": "pair.CN-HOLD-ARMENIAN",
+      "lens": "CN1",
+      "title": "pair CN-HOLD-ARMENIAN",
+      "ev": {
+        "keyA": "rtcnoArmR01",
+        "keyB": "rtcnօArmR01",
+        "keyA_units": [
+          114,
+          116,
+          99,
+          110,
+          111,
+          65,
+          114,
+          109,
+          82,
+          48,
+          49
+        ],
+        "keyB_units": [
+          114,
+          116,
+          99,
+          110,
+          1413,
+          65,
+          114,
+          109,
+          82,
+          48,
+          49
+        ],
+        "hitA": "200 {\"success\":true,\"transferId\":\"tr_1UCf87H7FWYUN3jh0rnRJe5x\",\"balance\":71} loc=\"\"",
+        "hitB": "200 {\"success\":true,\"transferId\":\"tr_1UCf87H7FWYUN3jh0rnRJe5x\",\"balance\":71,\"idempotent\":true} loc=\"\"",
+        "tidA": "tr_1UCf87H7FWYUN3jh0rnRJe5x",
+        "tidB": "tr_1UCf87H7FWYUN3jh0rnRJe5x",
+        "new_transfer_ids": [
+          "tr_1UCf87H7FWYUN3jh0rnRJe5x"
+        ],
+        "new_transfer_count": 1,
+        "wallet_before": 72.0,
+        "wallet_after": 71.0,
+        "delta_eur": -1.0,
+        "payoutOkA": true,
+        "payoutOkB": true,
+        "idempotentB": true
+      }
+    },
+    {
+      "id": "pair.CN-HOLD-GREEK-ALPHA",
+      "lens": "CN1",
+      "title": "pair CN-HOLD-GREEK-ALPHA",
+      "ev": {
+        "keyA": "rtcnaGRkR02",
+        "keyB": "rtcnαGRkR02",
+        "keyA_units": [
+          114,
+          116,
+          99,
+          110,
+          97,
+          71,
+          82,
+          107,
+          82,
+          48,
+          50
+        ],
+        "keyB_units": [
+          114,
+          116,
+          99,
+          110,
+          945,
+          71,
+          82,
+          107,
+          82,
+          48,
+          50
+        ],
+        "hitA": "200 {\"success\":true,\"transferId\":\"tr_1UCf8CH7FWYUN3jhRw1WTjCk\",\"balance\":70} loc=\"\"",
+        "hitB": "200 {\"success\":true,\"transferId\":\"tr_1UCf8CH7FWYUN3jhRw1WTjCk\",\"balance\":70,\"idempotent\":true} loc=\"\"",
+        "tidA": "tr_1UCf8CH7FWYUN3jhRw1WTjCk",
+        "tidB": "tr_1UCf8CH7FWYUN3jhRw1WTjCk",
+        "new_transfer_ids": [
+          "tr_1UCf8CH7FWYUN3jhRw1WTjCk"
+        ],
+        "new_transfer_count": 1,
+        "wallet_before": 71.0,
+        "wallet_after": 70.0,
+        "delta_eur": -1.0,
+        "payoutOkA": true,
+        "payoutOkB": true,
+        "idempotentB": true
+      }
+    },
+    {
+      "id": "pair.CN-HOLD-CASE-Ii",
+      "lens": "CN1",
+      "title": "pair CN-HOLD-CASE-Ii",
+      "ev": {
+        "keyA": "rtcnIcaseR3",
+        "keyB": "rtcnicaseR3",
+        "keyA_units": [
+          114,
+          116,
+          99,
+          110,
+          73,
+          99,
+          97,
+          115,
+          101,
+          82,
+          51
+        ],
+        "keyB_units": [
+          114,
+          116,
+          99,
+          110,
+          105,
+          99,
+          97,
+          115,
+          101,
+          82,
+          51
+        ],
+        "hitA": "200 {\"success\":true,\"transferId\":\"tr_1UCf8IH7FWYUN3jhFjZ49rpI\",\"balance\":69} loc=\"\"",
+        "hitB": "200 {\"success\":true,\"transferId\":\"tr_1UCf8IH7FWYUN3jhFjZ49rpI\",\"balance\":69,\"idempotent\":true} loc=\"\"",
+        "tidA": "tr_1UCf8IH7FWYUN3jhFjZ49rpI",
+        "tidB": "tr_1UCf8IH7FWYUN3jhFjZ49rpI",
+        "new_transfer_ids": [
+          "tr_1UCf8IH7FWYUN3jhFjZ49rpI"
+        ],
+        "new_transfer_count": 1,
+        "wallet_before": 70.0,
+        "wallet_after": 69.0,
+        "delta_eur": -1.0,
+        "payoutOkA": true,
+        "payoutOkB": true,
+        "idempotentB": true
+      }
+    },
+    {
+      "id": "pair.zwsp-vs-ascii",
+      "lens": "CN1",
+      "title": "pair zwsp-vs-ascii",
+      "ev": {
+        "keyA": "rtcnzwsp088",
+        "keyB": "​​​​​​​​",
+        "keyA_units": [
+          114,
+          116,
+          99,
+          110,
+          122,
+          119,
+          115,
+          112,
+          48,
+          56,
+          56
+        ],
+        "keyB_units": [
+          8203,
+          8203,
+          8203,
+          8203,
+          8203,
+          8203,
+          8203,
+          8203
+        ],
+        "hitA": "200 {\"success\":true,\"transferId\":\"tr_1UCf8MH7FWYUN3jhyKuYFpbV\",\"balance\":68} loc=\"\"",
+        "hitB": "200 {\"success\":true,\"transferId\":\"tr_1UCeP2H7FWYUN3jhv3iqLRAW\",\"balance\":44.33,\"idempotent\":true} loc=\"\"",
+        "tidA": "tr_1UCf8MH7FWYUN3jhyKuYFpbV",
+        "tidB": "tr_1UCeP2H7FWYUN3jhv3iqLRAW",
+        "new_transfer_ids": [
+          "tr_1UCf8MH7FWYUN3jhyKuYFpbV"
+        ],
+        "new_transfer_count": 1,
+        "wallet_before": 69.0,
+        "wallet_after": 68.0,
+        "delta_eur": -1.0,
+        "payoutOkA": true,
+        "payoutOkB": true,
+        "idempotentB": true
+      }
+    },
+    {
+      "id": "CN-A-LEN-MAX-1",
+      "lens": "CN1",
+      "title": "key length 254 payoutOk=true",
+      "ev": "200 {\"success\":true,\"transferId\":\"tr_1UCf8QH7FWYUN3jhJVe9pHUs\",\"balance\":67} loc=\"\""
+    },
+    {
+      "id": "CN-A-LEN-MAX",
+      "lens": "CN1",
+      "title": "key length 255 payoutOk=true",
+      "ev": "200 {\"success\":true,\"transferId\":\"tr_1UCf8TH7FWYUN3jhJIhbpXya\",\"balance\":66} loc=\"\""
+    },
+    {
+      "id": "CN-A-LEN-MAX+1",
+      "lens": "CN1",
+      "title": "key length 256 payoutOk=true",
+      "ev": "200 {\"success\":true,\"transferId\":\"tr_1UCf8VH7FWYUN3jhs3YrlcFj\",\"balance\":65} loc=\"\""
+    },
+    {
+      "id": "CN-A-LEN-EMPTY",
+      "lens": "CN1",
+      "title": "key length 0 payoutOk=false",
+      "ev": "400 {\"error\":\"idempotency_key em falta. Reinicia o levantamento na app.\",\"code\":\"payout_failed\"} loc=\"\""
+    },
+    {
+      "id": "CN-A-LEN-ZWSP",
+      "lens": "CN1",
+      "title": "key length 8 payoutOk=true",
+      "ev": "200 {\"success\":true,\"transferId\":\"tr_1UCeP2H7FWYUN3jhv3iqLRAW\",\"balance\":44.33,\"idempotent\":true} loc=\"\""
+    },
+    {
+      "id": "wallet.end.p1",
+      "lens": "CN7",
+      "title": "seller wallet end pass1",
+      "ev": {
+        "id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+        "balance": 62.0,
+        "stripe_account_id": "acct_1U5mYbQeUNx8ar08",
+        "updated_at": "2026-09-06T12:25:34.961913+00:00"
+      }
+    }
+  ],
+  "actors": {
+    "buyer": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+    "seller": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+    "buyer2": null,
+    "seller2": "50ed3315-89c2-4144-8521-58e17d9b843b"
+  },
+  "created": {
+    "orders": [],
+    "products": []
+  }
+}

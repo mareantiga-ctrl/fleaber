@@ -1,0 +1,920 @@
+{
+  "stamp": "20260902T0730",
+  "prefix": "RTAL-20260902T0730",
+  "lenses": [
+    "AL1",
+    "AL2",
+    "AL3",
+    "AL4",
+    "AL5",
+    "AL6",
+    "AL7"
+  ],
+  "findings": [],
+  "blocked": [
+    {
+      "id": "AL1-ensure",
+      "lens": "AL1",
+      "title": "ensure_wallet cross-user sem Δsaldo",
+      "ev": 18.97
+    },
+    {
+      "id": "AL1-debit-self",
+      "lens": "AL1",
+      "title": "debit JWT self recusado",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_wallet_payout_debit\"}"
+    },
+    {
+      "id": "AL1-patch-bal",
+      "lens": "AL1",
+      "title": "PATCH balance sem efeito",
+      "ev": "200 []"
+    },
+    {
+      "id": "AL2-patch-acct",
+      "lens": "AL2",
+      "title": "PATCH Connect id sem efeito",
+      "ev": "200 []"
+    },
+    {
+      "id": "AL1-ins-txn",
+      "lens": "AL1",
+      "title": "INSERT txn recusado",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"new row violates row-level security policy for table \\\"wallet_transactions\\\"\"}"
+    },
+    {
+      "id": "AL1-ins-led",
+      "lens": "AL1",
+      "title": "INSERT ledger recusado",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"new row violates row-level security policy for table \\\"wallet_payout_ledger\\\"\"}"
+    },
+    {
+      "id": "AL2-onboard-cross",
+      "lens": "AL2",
+      "title": "onboard cross-user recusado",
+      "ev": "400 {\"error\":\"Cannot create another user Stripe account.\",\"code\":\"payout_failed\"}"
+    },
+    {
+      "id": "AL4-wh-transfer.created",
+      "lens": "AL4",
+      "title": "unsigned transfer.created recusado",
+      "ev": "400 {\"ok\":false,\"error\":\"missing_signature\"}"
+    },
+    {
+      "id": "AL4-wh-payout.paid",
+      "lens": "AL4",
+      "title": "unsigned payout.paid recusado",
+      "ev": "400 {\"ok\":false,\"error\":\"missing_signature\"}"
+    },
+    {
+      "id": "AL4-wh-charge.refunded",
+      "lens": "AL4",
+      "title": "unsigned charge.refunded recusado",
+      "ev": "400 {\"ok\":false,\"error\":\"missing_signature\"}"
+    },
+    {
+      "id": "AL4-wh-account.updated",
+      "lens": "AL4",
+      "title": "unsigned account.updated recusado",
+      "ev": "400 {\"ok\":false,\"error\":\"missing_signature\"}"
+    },
+    {
+      "id": "AL6-finalize-jwt",
+      "lens": "AL6",
+      "title": "finalize JWT recusado",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_finalize_stripe_order_refund\"}"
+    },
+    {
+      "id": "AL6-buyer-ref",
+      "lens": "AL6",
+      "title": "buyer refund recusado",
+      "ev": "403 {\"ok\":false,\"error\":\"Sem permissão.\"}"
+    },
+    {
+      "id": "AL6-b2-ref",
+      "lens": "AL6",
+      "title": "buyer2 refund recusado",
+      "ev": "403 {\"ok\":false,\"error\":\"Sem permissão.\"}"
+    },
+    {
+      "id": "AL6-patch-rf",
+      "lens": "AL6",
+      "title": "PATCH refund id sem efeito",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"order_money_fields_immutable\"}"
+    },
+    {
+      "id": "AL3-dbl-rel",
+      "lens": "AL3",
+      "title": "2.º release sem crédito extra",
+      "ev": "200 false"
+    },
+    {
+      "id": "AL5-patch-dev",
+      "lens": "AL5",
+      "title": "PATCH devolvida/cancelado bloqueado",
+      "ev": {
+        "dev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"order_concluido_immutable_for_seller\"}",
+        "can": "200 [{\"id\":\"b2a1c4ed-544d-456c-838b-a5cb96540424\",\"created_at\":\"2026-09-02T06:37:08.379893+00:00\",\"product_id\":\"0b3f4308-cc30-44a5-8183-0010498dd70e\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c…"
+      }
+    },
+    {
+      "id": "AL4-samekey-diffamt",
+      "lens": "AL4",
+      "title": "mesma key amount≠ não criou 2.ª Transfer",
+      "ev": "200 {\"success\":true,\"transferId\":\"tr_1UB7nKH7FWYUN3jhdT2MqTd0\",\"balance\":21.97,\"idempotent\":true}"
+    },
+    {
+      "id": "AL1-neg",
+      "lens": "AL1",
+      "title": "amount negativo recusado",
+      "ev": "400 {\"error\":\"Valor de levantamento inválido.\",\"code\":\"payout_failed\"}"
+    },
+    {
+      "id": "AL1-eur",
+      "lens": "AL1",
+      "title": "amount 5.90 recusado",
+      "ev": "400 {\"error\":\"O valor do levantamento tem de ser em cêntimos.\",\"code\":\"payout_failed\"}"
+    },
+    {
+      "id": "AL1-crash",
+      "lens": "AL1",
+      "title": "crash_inject sem secret ignorado",
+      "ev": "200 {\"success\":true,\"transferId\":\"tr_1UB7nVH7FWYUN3jhFEh8Ggwr\",\"balance\":17.97}"
+    },
+    {
+      "id": "AL4-s2-key",
+      "lens": "AL4",
+      "title": "seller2 não herdou Transfer",
+      "ev": "400 {\"error\":\"Falta associar a conta bancária no Stripe. Abre outra vez Configurar conta bancária e adiciona o IBAN de teste.\",\"code\":\"payout_failed\"}"
+    },
+    {
+      "id": "AL6-reuse-rf",
+      "lens": "AL6",
+      "title": "reuse refund_id JWT recusado",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_finalize_stripe_order_refund\"}"
+    }
+  ],
+  "skipped": [],
+  "notes": [
+    {
+      "id": "snap.wallets",
+      "lens": "AL7",
+      "title": "saldos iniciais",
+      "ev": {
+        "buyer": 61.1,
+        "seller": 18.97,
+        "buyer2": 0,
+        "seller2": 0
+      }
+    },
+    {
+      "id": "snap.seller.acct",
+      "lens": "AL2",
+      "title": "Connect seller",
+      "ev": "acct_1U5mYbQeUNx8ar08"
+    },
+    {
+      "id": "snap.ledger",
+      "lens": "AL4",
+      "title": "payout ledger seller",
+      "ev": [
+        {
+          "idempotency_key": "RTR-20260901T0700-crash-nosecret-xx",
+          "user_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+          "amount_cents": 100,
+          "amount_eur": 1.0,
+          "status": "transferred",
+          "stripe_transfer_id": "tr_1UAksTH7FWYUN3jhQfYs5F4h",
+          "balance_after": 4.0,
+          "created_at": "2026-09-01T06:09:01.258375+00:00",
+          "updated_at": "2026-09-01T06:09:02.190717+00:00"
+        },
+        {
+          "idempotency_key": "RTR-20260901T0700-postclaw-drain-6047281f-xx",
+          "user_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+          "amount_cents": 764,
+          "amount_eur": 7.64,
+          "status": "transferred",
+          "stripe_transfer_id": "tr_1UAkr9H7FWYUN3jhvdwA2eL2",
+          "balance_after": 0.0,
+          "created_at": "2026-09-01T06:07:38.849077+00:00",
+          "updated_at": "2026-09-01T06:07:39.654816+00:00"
+        },
+        {
+          "idempotency_key": "RTR-20260901T0700-full-a-a35dfc25-xx",
+          "user_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+          "amount_cents": 1000,
+          "amount_eur": 10.0,
+          "status": "transferred",
+          "stripe_transfer_id": "tr_1UAkqlH7FWYUN3jhsn013sZn",
+          "balance_after": 0.0,
+          "created_at": "2026-09-01T06:07:15.492507+00:00",
+          "updated_at": "2026-09-01T06:07:16.380703+00:00"
+        },
+        {
+          "idempotency_key": "RTR-20260901T0700-drain2-eda407f7-xx",
+          "user_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+          "amount_cents": 500,
+          "amount_eur": 5.0,
+          "status": "transferred",
+          "stripe_transfer_id": "tr_1UAkoAH7FWYUN3jhRAadqhkW",
+          "balance_after": 0.0,
+          "created_at": "2026-09-01T06:04:34.28338+00:00",
+          "updated_at": "2026-09-01T06:04:35.141111+00:00"
+        },
+        {
+          "idempotency_key": "RTR-20260901T0700-pay-b-eda407f7-xx",
+          "user_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+          "amount_cents": 500,
+          "amount_eur": 5.0,
+          "status": "transferred",
+          "stripe_transfer_id": "tr_1UAko4H7FWYUN3jh1Xk0SAib",
+          "balance_after": 5.0,
+          "created_at": "2026-09-01T06:04:26.753662+00:00",
+          "updated_at": "2026-09-01T06:04:28.957406+00:00"
+        },
+        {
+          "idempotency_key": "RTR-20260901T0700-pay-a-eda407f7-xx",
+          "user_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+          "amount_cents": 500,
+          "amount_eur": 5.0,
+          "status": "transferred",
+          "stripe_transfer_id": "tr_1UAko4H7FWYUN3jhnUBXobRU",
+          "balance_after": 10.0,
+          "created_at": "2026-09-01T06:04:26.569943+00:00",
+          "updated_at": "2026-09-01T06:04:29.102103+00:00"
+        },
+        {
+          "idempotency_key": "RTK-20260831T1802-payout-e4ef5d03-ba15-4749-92c7-d6a994f8d877",
+          "user_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+          "amount_cents": 500,
+          "amount_eur": 5.0,
+          "status": "transferred",
+          "stripe_transfer_id": "tr_1UAYifH7FWYUN3jhIHGnI8Tf",
+          "balance_after": 0.0,
+          "created_at": "2026-08-31T17:10:04.968468+00:00",
+          "updated_at": "2026-08-31T17:10:05.884856+00:00"
+        },
+        {
+          "idempotency_key": "RTI-20260831T1706_full_7a02b4e4",
+          "user_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+          "amount_cents": 25610,
+          "amount_eur": 256.1,
+          "status": "transferred",
+          "stripe_transfer_id": "tr_1UAXviH7FWYUN3jhsgouM4qN",
+          "balance_after": 0.0,
+          "created_at": "2026-08-31T16:19:28.31898+00:00",
+          "updated_at": "2026-08-31T16:19:31.014435+00:00"
+        }
+      ]
+    },
+    {
+      "id": "rpc.batata_wallet_payout_debit",
+      "lens": "AL1",
+      "title": "JWT sweep",
+      "ev": {
+        "buyer": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_wallet_payout_debit\"}",
+        "seller": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_wallet_payout_debit\"}",
+        "anon": "401 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_wallet_payout_debit\"}"
+      }
+    },
+    {
+      "id": "rpc.batata_wallet_payout_finish",
+      "lens": "AL1",
+      "title": "JWT sweep",
+      "ev": {
+        "buyer": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_wallet_payout_finish\"}",
+        "seller": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_wallet_payout_finish\"}",
+        "anon": "401 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_wallet_payout_finish\"}"
+      }
+    },
+    {
+      "id": "rpc.batata_clawback_seller_wallet_for_order",
+      "lens": "AL1",
+      "title": "JWT sweep",
+      "ev": {
+        "buyer": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_clawback_seller_wallet_for_order\"}",
+        "seller": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_clawback_seller_wallet_for_order\"}",
+        "anon": "401 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_clawback_seller_wallet_for_order\"}"
+      }
+    },
+    {
+      "id": "rpc.batata_credit_wallet_once",
+      "lens": "AL1",
+      "title": "JWT sweep",
+      "ev": {
+        "buyer": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_credit_wallet_once\"}",
+        "seller": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_credit_wallet_once\"}",
+        "anon": "401 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_credit_wallet_once\"}"
+      }
+    },
+    {
+      "id": "rpc.batata_refund_buyer_wallet_for_order",
+      "lens": "AL1",
+      "title": "JWT sweep",
+      "ev": {
+        "buyer": "200 false",
+        "seller": "200 false",
+        "anon": "401 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_refund_buyer_wallet_for_order\"}"
+      }
+    },
+    {
+      "id": "rpc.batata_finalize_stripe_order_refund",
+      "lens": "AL1",
+      "title": "JWT sweep",
+      "ev": {
+        "buyer": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_finalize_stripe_order_refund\"}",
+        "seller": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_finalize_stripe_order_refund\"}",
+        "anon": "401 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_finalize_stripe_order_refund\"}"
+      }
+    },
+    {
+      "id": "rpc.batata_process_partial_refund_dispute",
+      "lens": "AL1",
+      "title": "JWT sweep",
+      "ev": {
+        "buyer": "200 false",
+        "seller": "200 false",
+        "anon": "401 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_process_partial_refund_dispute\"}"
+      }
+    },
+    {
+      "id": "rpc.batata_ensure_wallet",
+      "lens": "AL1",
+      "title": "JWT sweep",
+      "ev": {
+        "buyer": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_ensure_wallet\"}",
+        "seller": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_ensure_wallet\"}",
+        "anon": "401 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_ensure_wallet\"}"
+      }
+    },
+    {
+      "id": "rest.patch.balance",
+      "lens": "AL1",
+      "title": "PATCH wallets.balance",
+      "ev": {
+        "hit": "200 []",
+        "bal": 18.97
+      }
+    },
+    {
+      "id": "rest.patch.acct",
+      "lens": "AL2",
+      "title": "PATCH stripe_account_id",
+      "ev": {
+        "hit": "200 []",
+        "acct": "acct_1U5mYbQeUNx8ar08"
+      }
+    },
+    {
+      "id": "rest.insert.txn",
+      "lens": "AL1",
+      "title": "INSERT wallet_transactions",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"new row violates row-level security policy for table \\\"wallet_transactions\\\"\"}"
+    },
+    {
+      "id": "rest.insert.led",
+      "lens": "AL1",
+      "title": "INSERT wallet_payout_ledger",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"new row violates row-level security policy for table \\\"wallet_payout_ledger\\\"\"}"
+    },
+    {
+      "id": "al2.get",
+      "lens": "AL2",
+      "title": "GET Connect origin",
+      "ev": {
+        "origin": "https://evil.com",
+        "status": 200,
+        "location": ""
+      }
+    },
+    {
+      "id": "al2.get",
+      "lens": "AL2",
+      "title": "GET Connect origin",
+      "ev": {
+        "origin": "https://fleaber.pt.evil.com",
+        "status": 200,
+        "location": ""
+      }
+    },
+    {
+      "id": "al2.get",
+      "lens": "AL2",
+      "title": "GET Connect origin",
+      "ev": {
+        "origin": "https://evil.com/fleaber.pt",
+        "status": 200,
+        "location": ""
+      }
+    },
+    {
+      "id": "al2.get",
+      "lens": "AL2",
+      "title": "GET Connect origin",
+      "ev": {
+        "origin": "https://fleaber.pt%2e%2eevil.com",
+        "status": 200,
+        "location": ""
+      }
+    },
+    {
+      "id": "al2.get",
+      "lens": "AL2",
+      "title": "GET Connect origin",
+      "ev": {
+        "origin": "javascript:alert(1)",
+        "status": 403,
+        "location": ""
+      }
+    },
+    {
+      "id": "al2.get",
+      "lens": "AL2",
+      "title": "GET Connect origin",
+      "ev": {
+        "origin": "https://fleaber.pt.attacker.tld",
+        "status": 200,
+        "location": ""
+      }
+    },
+    {
+      "id": "al2.get",
+      "lens": "AL2",
+      "title": "GET Connect origin",
+      "ev": {
+        "origin": "http://127.0.0.1",
+        "status": 303,
+        "location": "http://127.0.0.1/wallet"
+      }
+    },
+    {
+      "id": "al2.get",
+      "lens": "AL2",
+      "title": "GET Connect origin",
+      "ev": {
+        "origin": "http://localhost",
+        "status": 303,
+        "location": "http://localhost/wallet"
+      }
+    },
+    {
+      "id": "al2.get",
+      "lens": "AL2",
+      "title": "GET Connect origin",
+      "ev": {
+        "origin": "https://localhost",
+        "status": 303,
+        "location": "https://localhost/wallet"
+      }
+    },
+    {
+      "id": "al2.get",
+      "lens": "AL2",
+      "title": "GET Connect origin",
+      "ev": {
+        "origin": "https://fleaber.pt",
+        "status": 303,
+        "location": "https://fleaber.pt/wallet"
+      }
+    },
+    {
+      "id": "al2.get",
+      "lens": "AL2",
+      "title": "GET Connect origin",
+      "ev": {
+        "origin": "https://www.fleaber.pt",
+        "status": 303,
+        "location": "https://www.fleaber.pt/wallet"
+      }
+    },
+    {
+      "id": "al2.get",
+      "lens": "AL2",
+      "title": "GET Connect origin",
+      "ev": {
+        "origin": "https://user:pass@fleaber.pt",
+        "status": 200,
+        "location": ""
+      }
+    },
+    {
+      "id": "al2.get",
+      "lens": "AL2",
+      "title": "GET Connect origin",
+      "ev": {
+        "origin": "https://fleaber.pt/wallet?next=https://evil.com",
+        "status": 303,
+        "location": "https://fleaber.pt/wallet"
+      }
+    },
+    {
+      "id": "al2.get",
+      "lens": "AL2",
+      "title": "GET Connect origin",
+      "ev": {
+        "origin": "//evil.com",
+        "status": 200,
+        "location": ""
+      }
+    },
+    {
+      "id": "al2.get",
+      "lens": "AL2",
+      "title": "GET Connect origin",
+      "ev": {
+        "origin": "https://fleaber.pt./wallet",
+        "status": 200,
+        "location": ""
+      }
+    },
+    {
+      "id": "al2.onboard.cross",
+      "lens": "AL2",
+      "title": "buyer cria Connect do seller",
+      "ev": "400 {\"error\":\"Cannot create another user Stripe account.\",\"code\":\"payout_failed\"}"
+    },
+    {
+      "id": "al2.payout.dest",
+      "lens": "AL2",
+      "title": "payout com destination hostil",
+      "ev": "200 {\"success\":true,\"transferId\":\"tr_1UB7n4H7FWYUN3jhhGwUl9H6\",\"balance\":17.97}"
+    },
+    {
+      "id": "al4.webhook",
+      "lens": "AL4",
+      "title": "unsigned transfer.created",
+      "ev": "400 {\"ok\":false,\"error\":\"missing_signature\"}"
+    },
+    {
+      "id": "al4.webhook",
+      "lens": "AL4",
+      "title": "unsigned payout.paid",
+      "ev": "400 {\"ok\":false,\"error\":\"missing_signature\"}"
+    },
+    {
+      "id": "al4.webhook",
+      "lens": "AL4",
+      "title": "unsigned charge.refunded",
+      "ev": "400 {\"ok\":false,\"error\":\"missing_signature\"}"
+    },
+    {
+      "id": "al4.webhook",
+      "lens": "AL4",
+      "title": "unsigned account.updated",
+      "ev": "400 {\"ok\":false,\"error\":\"missing_signature\"}"
+    },
+    {
+      "id": "fixture.paid",
+      "lens": "AL6",
+      "title": "setup_paid_order Stripe TEST",
+      "ev": "200 {\n  \"ok\": true,\n  \"order_id\": \"e7604510-49c2-4d97-8396-e851af928cff\",\n  \"product_id\": \"4c0cfdfb-3b7b-432c-8f54-dddd7b455065\",\n  \"payment_intent_id\": \"pi_3UB7n7H7FWYUN3jh1jqlutCi\",\n  \"pi_status\": \"succeeded\",\n  \"pi_amount_received\": 590,\n  \"…"
+    },
+    {
+      "id": "paid1.row",
+      "lens": "AL6",
+      "title": "order pago",
+      "ev": {
+        "id": "e7604510-49c2-4d97-8396-e851af928cff",
+        "status": "pago",
+        "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+        "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+        "product_id": "4c0cfdfb-3b7b-432c-8f54-dddd7b455065",
+        "quantity": 1,
+        "price_total": 5.9,
+        "amount_paid_cents": 590,
+        "payment_method": "Pagamento na app",
+        "shipping_method": "",
+        "stripe_payment_intent_id": "pi_3UB7n7H7FWYUN3jh1jqlutCi",
+        "stripe_checkout_session_id": "",
+        "stripe_refund_id": "",
+        "wallet_release_processed_at": "",
+        "wallet_refund_processed_at": "",
+        "stock_units_applied": 1
+      }
+    },
+    {
+      "id": "al6.finalize.jwt",
+      "lens": "AL6",
+      "title": "finalize fake refund JWT",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_finalize_stripe_order_refund\"}"
+    },
+    {
+      "id": "al6.refund.buyer",
+      "lens": "AL6",
+      "title": "buyer refund-order alheio",
+      "ev": "403 {\"ok\":false,\"error\":\"Sem permissão.\"}"
+    },
+    {
+      "id": "al6.refund.b2",
+      "lens": "AL6",
+      "title": "buyer2 refund-order",
+      "ev": "403 {\"ok\":false,\"error\":\"Sem permissão.\"}"
+    },
+    {
+      "id": "al6.refund.amt",
+      "lens": "AL6",
+      "title": "seller refund amount extra",
+      "ev": "200 {\"ok\":true,\"already_refunded\":true,\"idempotent\":true,\"refund_id\":\"re_3UB7n7H7FWYUN3jh1ihnoCtX\",\"status\":\"cancelado\",\"stock_units_applied\":null,\"amount_cents\":590,\"payment_intent\":\"pi_3UB7n7H7FWYUN3jh1jqlutCi\",\"status_stripe\":\"succeeded\"}"
+    },
+    {
+      "id": "al6.refund.amt.ok",
+      "lens": "AL6",
+      "title": "amount extra ignorado; refund ≤ captura",
+      "ev": {
+        "amt": 590,
+        "paid": 590
+      }
+    },
+    {
+      "id": "al6.patch.refundid",
+      "lens": "AL6",
+      "title": "PATCH stripe_refund_id",
+      "ev": {
+        "hit": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"order_money_fields_immutable\"}",
+        "id": "re_3UB7n7H7FWYUN3jh1ihnoCtX"
+      }
+    },
+    {
+      "id": "fixture.paid",
+      "lens": "AL3",
+      "title": "setup_paid_order Stripe TEST",
+      "ev": "200 {\n  \"ok\": true,\n  \"order_id\": \"b2a1c4ed-544d-456c-838b-a5cb96540424\",\n  \"product_id\": \"0b3f4308-cc30-44a5-8183-0010498dd70e\",\n  \"payment_intent_id\": \"pi_3UB7nEH7FWYUN3jh1l4Y53lt\",\n  \"pi_status\": \"succeeded\",\n  \"pi_amount_received\": 590,\n  \"…"
+    },
+    {
+      "id": "release.concluido",
+      "lens": "AL3",
+      "title": "buyer PATCH concluido",
+      "ev": "200 [{\"id\":\"b2a1c4ed-544d-456c-838b-a5cb96540424\",\"created_at\":\"2026-09-02T06:37:08.379893+00:00\",\"product_id\":\"0b3f4308-cc30-44a5-8183-0010498dd70e\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c…"
+    },
+    {
+      "id": "release.rpc",
+      "lens": "AL3",
+      "title": "buyer JWT release",
+      "ev": "200 true"
+    },
+    {
+      "id": "al3.release.delta",
+      "lens": "AL3",
+      "title": "Δwallet pós-release",
+      "ev": {
+        "released": true,
+        "dSeller": 5.0,
+        "dBuyer": 0.0,
+        "w": {
+          "buyer": 61.1,
+          "seller": 22.97,
+          "buyer2": 0,
+          "seller2": 0
+        }
+      }
+    },
+    {
+      "id": "al3.release.replay",
+      "lens": "AL3",
+      "title": "2.º release buyer",
+      "ev": "200 false"
+    },
+    {
+      "id": "al3.release.b2",
+      "lens": "AL3",
+      "title": "release buyer2",
+      "ev": "200 false"
+    },
+    {
+      "id": "al3.dispute.after-rel",
+      "lens": "AL3",
+      "title": "disputa pós-release",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"new row violates row-level security policy for table \\\"order_disputes\\\"\"}"
+    },
+    {
+      "id": "al5.refund.after-rel",
+      "lens": "AL5",
+      "title": "seller refund-order pós-release",
+      "ev": "403 {\"ok\":false,\"error\":\"Não é possível anular esta venda neste estado (já enviada ou concluída).\",\"code\":\"order_refund_blocked_status\",\"status\":\"concluido\"}"
+    },
+    {
+      "id": "al5.patch.devolvida",
+      "lens": "AL5",
+      "title": "seller PATCH devolvida",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"order_concluido_immutable_for_seller\"}"
+    },
+    {
+      "id": "al5.patch.cancel",
+      "lens": "AL5",
+      "title": "buyer PATCH cancelado",
+      "ev": "200 [{\"id\":\"b2a1c4ed-544d-456c-838b-a5cb96540424\",\"created_at\":\"2026-09-02T06:37:08.379893+00:00\",\"product_id\":\"0b3f4308-cc30-44a5-8183-0010498dd70e\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c…"
+    },
+    {
+      "id": "al4.payout.100",
+      "lens": "AL4",
+      "title": "payout 100¢ key A",
+      "ev": "200 {\"success\":true,\"transferId\":\"tr_1UB7nKH7FWYUN3jhdT2MqTd0\",\"balance\":21.97}"
+    },
+    {
+      "id": "al4.payout.samekey.diffamt",
+      "lens": "AL4",
+      "title": "mesma key amount 500",
+      "ev": "200 {\"success\":true,\"transferId\":\"tr_1UB7nKH7FWYUN3jhdT2MqTd0\",\"balance\":21.97,\"idempotent\":true}"
+    },
+    {
+      "id": "al4.payout.par",
+      "lens": "AL4",
+      "title": "2 keys // 100¢",
+      "ev": {
+        "a": "200 {\"success\":true,\"transferId\":\"tr_1UB7nPH7FWYUN3jhsK5J5n2l\",\"balance\":19.97}",
+        "b": "200 {\"success\":true,\"transferId\":\"tr_1UB7nPH7FWYUN3jhM7nmfg5z\",\"balance\":20.97}"
+      }
+    },
+    {
+      "id": "al1.payout.neg",
+      "lens": "AL1",
+      "title": "amount -100",
+      "ev": "400 {\"error\":\"Valor de levantamento inválido.\",\"code\":\"payout_failed\"}"
+    },
+    {
+      "id": "al1.payout.zero",
+      "lens": "AL1",
+      "title": "amount 0",
+      "ev": "400 {\"error\":\"Valor de levantamento inválido.\",\"code\":\"payout_failed\"}"
+    },
+    {
+      "id": "al1.payout.str",
+      "lens": "AL1",
+      "title": "amount string 100",
+      "ev": "200 {\"success\":true,\"transferId\":\"tr_1UB7nSH7FWYUN3jhwcuc4MVO\",\"balance\":18.97}"
+    },
+    {
+      "id": "al1.payout.eur",
+      "lens": "AL1",
+      "title": "amount 5.90 (não inteiro)",
+      "ev": "400 {\"error\":\"O valor do levantamento tem de ser em cêntimos.\",\"code\":\"payout_failed\"}"
+    },
+    {
+      "id": "al1.payout.crash",
+      "lens": "AL1",
+      "title": "crash_inject sem secret",
+      "ev": "200 {\"success\":true,\"transferId\":\"tr_1UB7nVH7FWYUN3jhFEh8Ggwr\",\"balance\":17.97}"
+    },
+    {
+      "id": "al4.s2.reuse-key",
+      "lens": "AL4",
+      "title": "seller2 reusa key seller1",
+      "ev": "400 {\"error\":\"Falta associar a conta bancária no Stripe. Abre outra vez Configurar conta bancária e adiciona o IBAN de teste.\",\"code\":\"payout_failed\"}"
+    },
+    {
+      "id": "al7.refund.after-pay",
+      "lens": "AL7",
+      "title": "refund-order pós-payout",
+      "ev": "403 {\"ok\":false,\"error\":\"Não é possível anular esta venda neste estado (já enviada ou concluída).\",\"code\":\"order_refund_blocked_status\",\"status\":\"concluido\"}"
+    },
+    {
+      "id": "al7.claw.jwt",
+      "lens": "AL7",
+      "title": "clawback JWT",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_clawback_seller_wallet_for_order\"}"
+    },
+    {
+      "id": "al7.refund-wallet.jwt",
+      "lens": "AL7",
+      "title": "refund buyer wallet JWT",
+      "ev": "200 false"
+    },
+    {
+      "id": "al7.books",
+      "lens": "AL7",
+      "title": "contabilidade fechada order#2",
+      "ev": {
+        "wBeforeSale": {
+          "buyer": 61.1,
+          "seller": 17.97,
+          "buyer2": 0,
+          "seller2": 0
+        },
+        "wAfterRel": {
+          "buyer": 61.1,
+          "seller": 22.97,
+          "buyer2": 0,
+          "seller2": 0
+        },
+        "wMid": {
+          "buyer": 61.1,
+          "seller": 17.97,
+          "buyer2": 0,
+          "seller2": 0.0
+        },
+        "wEnd": {
+          "buyer": 61.1,
+          "seller": 17.97,
+          "buyer2": 0,
+          "seller2": 0.0
+        },
+        "order": {
+          "id": "b2a1c4ed-544d-456c-838b-a5cb96540424",
+          "status": "concluido",
+          "buyer_id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+          "seller_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+          "product_id": "0b3f4308-cc30-44a5-8183-0010498dd70e",
+          "quantity": 1,
+          "price_total": 5.9,
+          "amount_paid_cents": 590,
+          "payment_method": "Pagamento na app",
+          "shipping_method": "entrega em mão",
+          "stripe_payment_intent_id": "pi_3UB7nEH7FWYUN3jh1l4Y53lt",
+          "stripe_checkout_session_id": "",
+          "stripe_refund_id": "",
+          "wallet_release_processed_at": "2026-09-02T06:37:11.002234+00:00",
+          "wallet_refund_processed_at": "",
+          "stock_units_applied": 1
+        },
+        "txBuyer": [],
+        "txSeller": [
+          {
+            "id": "ba0ad535-9043-472f-99c0-eb0b7f6e8da5",
+            "wallet_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+            "amount": 5.0,
+            "type": "venda",
+            "description": "Venda de Refund crash E2E 1788331028079",
+            "order_id": "b2a1c4ed-544d-456c-838b-a5cb96540424",
+            "created_at": "2026-09-02T06:37:11.002234+00:00"
+          }
+        ],
+        "dBuyerTotal": 0.0,
+        "dSellerTotal": 0.0
+      }
+    },
+    {
+      "id": "al4.orphan-debit",
+      "lens": "AL4",
+      "title": "ledger debited sem transfer",
+      "ev": []
+    },
+    {
+      "id": "fixture.paid",
+      "lens": "AL6",
+      "title": "setup_paid_order Stripe TEST",
+      "ev": "200 {\n  \"ok\": true,\n  \"order_id\": \"4532a7a4-6136-45d8-97db-d647feed65ec\",\n  \"product_id\": \"57db24d7-47d6-4fe4-b811-4ec1c0748a85\",\n  \"payment_intent_id\": \"pi_3UB7ncH7FWYUN3jh0RJLm8Xw\",\n  \"pi_status\": \"succeeded\",\n  \"pi_amount_received\": 590,\n  \"…"
+    },
+    {
+      "id": "fixture.paid",
+      "lens": "AL6",
+      "title": "setup_paid_order Stripe TEST",
+      "ev": "200 {\n  \"ok\": true,\n  \"order_id\": \"894fa4f4-780c-4504-8b42-56c4f558b9d3\",\n  \"product_id\": \"605e8c94-9757-47df-8788-949ae311e645\",\n  \"payment_intent_id\": \"pi_3UB7nfH7FWYUN3jh1qxPqOHg\",\n  \"pi_status\": \"succeeded\",\n  \"pi_amount_received\": 590,\n  \"…"
+    },
+    {
+      "id": "al6.refund.legit",
+      "lens": "AL6",
+      "title": "seller refund-order em pago (controlo)",
+      "ev": "200 {\"ok\":true,\"already_refunded\":true,\"idempotent\":true,\"refund_id\":\"re_3UB7ncH7FWYUN3jh0n7EtOKb\",\"status\":\"cancelado\",\"stock_units_applied\":null,\"amount_cents\":590,\"payment_intent\":\"pi_3UB7ncH7FWYUN3jh0RJLm8Xw\",\"status_stripe\":\"succeeded\"}"
+    },
+    {
+      "id": "al6.finalize.reuse-id",
+      "lens": "AL6",
+      "title": "finalize order4 com refund de order3",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_finalize_stripe_order_refund\"}"
+    },
+    {
+      "id": "snap.wallets.final",
+      "lens": "AL7",
+      "title": "saldos finais",
+      "ev": {
+        "start": {
+          "buyer": 61.1,
+          "seller": 18.97,
+          "buyer2": 0,
+          "seller2": 0
+        },
+        "end": {
+          "buyer": 61.1,
+          "seller": 17.97,
+          "buyer2": 0,
+          "seller2": 0.0
+        },
+        "dBuyer": 0.0,
+        "dSeller": -1.0,
+        "dBuyer2": 0,
+        "dSeller2": 0.0
+      }
+    }
+  ],
+  "actors": {
+    "buyer": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+    "seller": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+    "buyer2": "b91a8e05-26c0-422a-8fce-4ad6c8efb643",
+    "seller2": "5e73d7d6-1ef7-49da-9eb6-c9af7ade1a4d"
+  },
+  "created": {
+    "orders": [
+      "e7604510-49c2-4d97-8396-e851af928cff",
+      "b2a1c4ed-544d-456c-838b-a5cb96540424",
+      "4532a7a4-6136-45d8-97db-d647feed65ec",
+      "894fa4f4-780c-4504-8b42-56c4f558b9d3"
+    ],
+    "products": [
+      "4c0cfdfb-3b7b-432c-8f54-dddd7b455065",
+      "0b3f4308-cc30-44a5-8183-0010498dd70e",
+      "57db24d7-47d6-4fe4-b811-4ec1c0748a85",
+      "605e8c94-9757-47df-8788-949ae311e645"
+    ]
+  }
+}

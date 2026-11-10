@@ -1,0 +1,708 @@
+{
+  "auditor": "REDTEAM_BLIND_CR_LIVE_POS_ALLOW_v1",
+  "prefix": "RTCR-20260906T1411",
+  "liveFomo": "42a6beeb-7e0a-43ee-8cab-776f82e62095",
+  "table": [
+    {
+      "probe_id": "A1.welcome",
+      "poco": "CR-A",
+      "payload": "Bem-vindos ao directo!",
+      "rpc_http": "200 {\"ok\": true}",
+      "buyer_get": "HUB VISIBLE kind=system",
+      "verdict": "HOLD",
+      "lens": "CR1",
+      "extra": {
+        "ok": true,
+        "actor": "seller JWT",
+        "residual": false
+      }
+    },
+    {
+      "probe_id": "A2.neutro.comecar",
+      "poco": "CR-A",
+      "payload": "O directo está a começar",
+      "rpc_http": "200 {\"ok\": true}",
+      "buyer_get": "HUB VISIBLE kind=system",
+      "verdict": "HOLD",
+      "lens": "CR1",
+      "extra": {
+        "ok": true,
+        "actor": "seller JWT",
+        "residual": false
+      }
+    },
+    {
+      "probe_id": "B1.es.ultimo_disponible",
+      "poco": "CR-B",
+      "payload": "último disponible",
+      "rpc_http": "200 {\"ok\": false, \"error\": \"purchase_announce_via_broadcast_only\"}",
+      "buyer_get": "NOT VISIBLE hub=200/2 rest=200/0",
+      "verdict": "HOLD",
+      "lens": "CR2",
+      "extra": {
+        "ok": false,
+        "actor": "seller JWT",
+        "residual": false
+      }
+    },
+    {
+      "probe_id": "B1.ptbr.ja_foi",
+      "poco": "CR-B",
+      "payload": "já foi",
+      "rpc_http": "200 {\"ok\": true}",
+      "buyer_get": "HUB VISIBLE kind=system",
+      "verdict": "FAIL",
+      "lens": "CR3",
+      "extra": {
+        "ok": true,
+        "actor": "seller JWT",
+        "residual": false
+      }
+    },
+    {
+      "probe_id": "B2.nl.uitverkocht",
+      "poco": "CR-B",
+      "payload": "uitverkocht",
+      "rpc_http": "200 {\"ok\": true}",
+      "buyer_get": "HUB VISIBLE kind=system",
+      "verdict": "FAIL",
+      "lens": "CR2",
+      "extra": {
+        "ok": true,
+        "actor": "seller JWT",
+        "residual": false
+      }
+    },
+    {
+      "probe_id": "B2.pl.wyprzedane",
+      "poco": "CR-B",
+      "payload": "wyprzedane",
+      "rpc_http": "200 {\"ok\": true}",
+      "buyer_get": "HUB VISIBLE kind=system",
+      "verdict": "FAIL",
+      "lens": "CR2",
+      "extra": {
+        "ok": true,
+        "actor": "seller JWT",
+        "residual": false
+      }
+    },
+    {
+      "probe_id": "B2.ro.epuizat",
+      "poco": "CR-B",
+      "payload": "epuizat",
+      "rpc_http": "200 {\"ok\": true}",
+      "buyer_get": "HUB VISIBLE kind=system",
+      "verdict": "FAIL",
+      "lens": "CR2",
+      "extra": {
+        "ok": true,
+        "actor": "seller JWT",
+        "residual": false
+      }
+    },
+    {
+      "probe_id": "B3.emoji.fire_one",
+      "poco": "CR-B",
+      "payload": "🔥1️⃣",
+      "rpc_http": "200 {\"ok\": true}",
+      "buyer_get": "HUB VISIBLE kind=system",
+      "verdict": "FAIL",
+      "lens": "CR3",
+      "extra": {
+        "ok": true,
+        "actor": "seller JWT",
+        "residual": false
+      }
+    },
+    {
+      "probe_id": "B4.control.esaurito_spaced",
+      "poco": "CR-B",
+      "payload": "e s a u r i t o",
+      "rpc_http": "200 {\"ok\": false, \"error\": \"purchase_announce_via_broadcast_only\"}",
+      "buyer_get": "NOT VISIBLE hub=200/7 rest=200/0",
+      "verdict": "HOLD",
+      "lens": "CR2",
+      "extra": {
+        "ok": false,
+        "actor": "seller JWT",
+        "residual": true
+      }
+    },
+    {
+      "probe_id": "B4.new.corre_que_some",
+      "poco": "CR-B",
+      "payload": "corre que some",
+      "rpc_http": "200 {\"ok\": true}",
+      "buyer_get": "HUB VISIBLE kind=system",
+      "verdict": "FAIL",
+      "lens": "CR3",
+      "extra": {
+        "ok": true,
+        "actor": "seller JWT",
+        "residual": false
+      }
+    },
+    {
+      "probe_id": "B4.new.sumiu",
+      "poco": "CR-B",
+      "payload": "sumiu",
+      "rpc_http": "200 {\"ok\": true}",
+      "buyer_get": "HUB VISIBLE kind=system",
+      "verdict": "FAIL",
+      "lens": "CR3",
+      "extra": {
+        "ok": true,
+        "actor": "seller JWT",
+        "residual": false
+      }
+    },
+    {
+      "probe_id": "B5.buyer.insert.system",
+      "poco": "CR-B",
+      "payload": "POST live_messages kind=system body=já foi",
+      "rpc_http": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"new row violates row-level security policy for table \\\"live_messages\\\"\"}",
+      "buyer_get": "HUB VISIBLE kind=system",
+      "verdict": "HOLD",
+      "lens": "CR3"
+    },
+    {
+      "probe_id": "B6.helper0.scarcity",
+      "poco": "CR-B",
+      "payload": "helper0 RPC uitverkocht",
+      "rpc_http": "200 {\"ok\": false, \"error\": \"not_allowed\"}",
+      "buyer_get": "HUB VISIBLE kind=system",
+      "verdict": "HOLD",
+      "lens": "CR2"
+    },
+    {
+      "probe_id": "C1.hitch.qty_stock",
+      "poco": "CR-C",
+      "payload": "hitch marketplace+live_only qty=1 two accepts",
+      "rpc_http": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"qty_exceeds_stock\"}",
+      "buyer_get": "n/a (reserva)",
+      "verdict": "HOLD",
+      "lens": "CR4",
+      "extra": {
+        "r1": {
+          "id": "ecaaa511-3e85-4df2-b5f4-bd49fe94b422",
+          "status": "accepted",
+          "requested_qty": 1
+        },
+        "r2": {
+          "id": "bd8588a5-d732-4a1a-b8e6-634a29e22b31",
+          "status": "pending",
+          "requested_qty": 1
+        }
+      }
+    },
+    {
+      "probe_id": "C2.convert.nopi",
+      "poco": "CR-C",
+      "payload": "stripe_convert accepted sem PI",
+      "rpc_http": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_live_reservation_stripe_convert\"}",
+      "buyer_get": "n/a",
+      "verdict": "HOLD",
+      "lens": "CR5",
+      "extra": {
+        "status": "accepted"
+      }
+    },
+    {
+      "probe_id": "C2.convert.pi_alheio",
+      "poco": "CR-C",
+      "payload": "reconcile PI liveA → res liveB",
+      "rpc_http": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"convert_requires_paid_order\"}",
+      "buyer_get": "n/a",
+      "verdict": "HOLD",
+      "lens": "CR5"
+    },
+    {
+      "probe_id": "C3.end_parallel_accept",
+      "poco": "CR-C",
+      "payload": "end_live ∥ PATCH accepted",
+      "rpc_http": "200 [{\"id\":\"5c379750-d542-4509-82f1-edd833c5d409\",\"live_id\":\"9dcef9ef-0f96-4567-808a-f09750e62479\",\"live_item_id\":\"1e012a99-f4b2-42a5-b6b5-96e678086f01\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"buyer_id\":\"bfcbeeee… | 200 [{\"id\":\"9dcef9ef-0f96-4567-808a-f09750e62479\",\"created_at\":\"2026-09-06T13:16:59.934238+00:00\",\"vendedor_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"mux_live_id\":null,\"stream_key\":null,\"playback_id\":null,\"is_active\":false… | 200 [{\"id\":\"5c379750-d542-4509-82f1-edd833c5d409\",\"live_id\":\"9dcef9ef-0f96-4567-808a-f09750e62479\",\"live_item_id\":\"1e012a99-f4b2-42a5-b6b5-96e678086f01\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"buyer_id\":\"bfcbeeee…",
+      "buyer_get": "n/a",
+      "verdict": "HOLD",
+      "lens": "CR6",
+      "extra": {
+        "res": {
+          "id": "5c379750-d542-4509-82f1-edd833c5d409",
+          "status": "accepted"
+        },
+        "live": {
+          "id": "9dcef9ef-0f96-4567-808a-f09750e62479",
+          "status": "ended",
+          "is_active": false
+        }
+      }
+    },
+    {
+      "probe_id": "C4.mux.live_id.unpub",
+      "poco": "CR-C",
+      "payload": "GET lives select=mux_live_id unpublished (buyer)",
+      "rpc_http": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table lives\"}",
+      "buyer_get": "empty/403",
+      "verdict": "HOLD",
+      "lens": "CR7"
+    }
+  ],
+  "findings": [
+    {
+      "id": "B1.ptbr.ja_foi",
+      "lens": "CR3",
+      "severity": "P2",
+      "title": "FOMO stem-bypass persistiu: já foi",
+      "actor": "seller JWT",
+      "pre": "fora da stem list allowlist; sem convert pago",
+      "repro": "rpc batata_live_system_message p_body=já foi",
+      "expected": "ok=false purchase_announce_via_broadcast_only",
+      "obtained": {
+        "rpc": "200 {\"ok\": true}",
+        "buyer": {
+          "label": "HUB VISIBLE kind=system",
+          "hub": true,
+          "rest": false,
+          "hub_n": 3,
+          "rest_n": 0,
+          "hub_http": "200 [{\"id\":\"122d044b-b8ce-4aae-853c-79edd879fd0b\",\"kind\":\"system\",\"body\":\"já foi\",\"sender_label\":\"Sistema\"}, \n {\"id\":\"547970cd-6927-4b7e-af8b-d6b69857f2ee\",\"kind\":\"system\",\"body\":\"O directo está a começar\",\"sender_label\":\"Si…"
+        }
+      },
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "B2.nl.uitverkocht",
+      "lens": "CR2",
+      "severity": "P2",
+      "title": "FOMO stem-bypass persistiu: uitverkocht",
+      "actor": "seller JWT",
+      "pre": "fora da stem list allowlist; sem convert pago",
+      "repro": "rpc batata_live_system_message p_body=uitverkocht",
+      "expected": "ok=false purchase_announce_via_broadcast_only",
+      "obtained": {
+        "rpc": "200 {\"ok\": true}",
+        "buyer": {
+          "label": "HUB VISIBLE kind=system",
+          "hub": true,
+          "rest": false,
+          "hub_n": 4,
+          "rest_n": 0,
+          "hub_http": "200 [{\"id\":\"48ccf477-4c43-4023-b91a-293849327e81\",\"kind\":\"system\",\"body\":\"uitverkocht\",\"sender_label\":\"Sistema\"}, \n {\"id\":\"122d044b-b8ce-4aae-853c-79edd879fd0b\",\"kind\":\"system\",\"body\":\"já foi\",\"sender_label\":\"Sistema\"}, \n {\"…"
+        }
+      },
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "B2.pl.wyprzedane",
+      "lens": "CR2",
+      "severity": "P2",
+      "title": "FOMO stem-bypass persistiu: wyprzedane",
+      "actor": "seller JWT",
+      "pre": "fora da stem list allowlist; sem convert pago",
+      "repro": "rpc batata_live_system_message p_body=wyprzedane",
+      "expected": "ok=false purchase_announce_via_broadcast_only",
+      "obtained": {
+        "rpc": "200 {\"ok\": true}",
+        "buyer": {
+          "label": "HUB VISIBLE kind=system",
+          "hub": true,
+          "rest": false,
+          "hub_n": 5,
+          "rest_n": 0,
+          "hub_http": "200 [{\"id\":\"fce90022-1d09-4437-a1e2-aecc65a5361b\",\"kind\":\"system\",\"body\":\"wyprzedane\",\"sender_label\":\"Sistema\"}, \n {\"id\":\"48ccf477-4c43-4023-b91a-293849327e81\",\"kind\":\"system\",\"body\":\"uitverkocht\",\"sender_label\":\"Sistema\"}, …"
+        }
+      },
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "B2.ro.epuizat",
+      "lens": "CR2",
+      "severity": "P2",
+      "title": "FOMO stem-bypass persistiu: epuizat",
+      "actor": "seller JWT",
+      "pre": "fora da stem list allowlist; sem convert pago",
+      "repro": "rpc batata_live_system_message p_body=epuizat",
+      "expected": "ok=false purchase_announce_via_broadcast_only",
+      "obtained": {
+        "rpc": "200 {\"ok\": true}",
+        "buyer": {
+          "label": "HUB VISIBLE kind=system",
+          "hub": true,
+          "rest": false,
+          "hub_n": 6,
+          "rest_n": 0,
+          "hub_http": "200 [{\"id\":\"582db166-151c-412d-a3a1-714c2d93ff74\",\"kind\":\"system\",\"body\":\"epuizat\",\"sender_label\":\"Sistema\"}, \n {\"id\":\"fce90022-1d09-4437-a1e2-aecc65a5361b\",\"kind\":\"system\",\"body\":\"wyprzedane\",\"sender_label\":\"Sistema\"}, \n {\"…"
+        }
+      },
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "B3.emoji.fire_one",
+      "lens": "CR3",
+      "severity": "P2",
+      "title": "FOMO stem-bypass persistiu: 🔥1️⃣",
+      "actor": "seller JWT",
+      "pre": "fora da stem list allowlist; sem convert pago",
+      "repro": "rpc batata_live_system_message p_body=🔥1️⃣",
+      "expected": "ok=false purchase_announce_via_broadcast_only",
+      "obtained": {
+        "rpc": "200 {\"ok\": true}",
+        "buyer": {
+          "label": "HUB VISIBLE kind=system",
+          "hub": true,
+          "rest": false,
+          "hub_n": 7,
+          "rest_n": 0,
+          "hub_http": "200 [{\"id\":\"b622fa25-daca-422f-ba7b-dd69bced1b3d\",\"kind\":\"system\",\"body\":\"🔥1️⃣\",\"sender_label\":\"Sistema\"}, \n {\"id\":\"582db166-151c-412d-a3a1-714c2d93ff74\",\"kind\":\"system\",\"body\":\"epuizat\",\"sender_label\":\"Sistema\"}, \n {\"id\":\"…"
+        }
+      },
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "B4.new.corre_que_some",
+      "lens": "CR3",
+      "severity": "P2",
+      "title": "FOMO stem-bypass persistiu: corre que some",
+      "actor": "seller JWT",
+      "pre": "fora da stem list allowlist; sem convert pago",
+      "repro": "rpc batata_live_system_message p_body=corre que some",
+      "expected": "ok=false purchase_announce_via_broadcast_only",
+      "obtained": {
+        "rpc": "200 {\"ok\": true}",
+        "buyer": {
+          "label": "HUB VISIBLE kind=system",
+          "hub": true,
+          "rest": false,
+          "hub_n": 8,
+          "rest_n": 0,
+          "hub_http": "200 [{\"id\":\"864617ad-e169-40dd-bc3a-ea5c6b29d192\",\"kind\":\"system\",\"body\":\"corre que some\",\"sender_label\":\"Sistema\"}, \n {\"id\":\"b622fa25-daca-422f-ba7b-dd69bced1b3d\",\"kind\":\"system\",\"body\":\"🔥1️⃣\",\"sender_label\":\"Sistema\"}, \n …"
+        }
+      },
+      "proven": true,
+      "evidence": {}
+    },
+    {
+      "id": "B4.new.sumiu",
+      "lens": "CR3",
+      "severity": "P2",
+      "title": "FOMO stem-bypass persistiu: sumiu",
+      "actor": "seller JWT",
+      "pre": "fora da stem list allowlist; sem convert pago",
+      "repro": "rpc batata_live_system_message p_body=sumiu",
+      "expected": "ok=false purchase_announce_via_broadcast_only",
+      "obtained": {
+        "rpc": "200 {\"ok\": true}",
+        "buyer": {
+          "label": "HUB VISIBLE kind=system",
+          "hub": true,
+          "rest": false,
+          "hub_n": 9,
+          "rest_n": 0,
+          "hub_http": "200 [{\"id\":\"65ecd50f-a569-4267-a231-9f12d4e5bda4\",\"kind\":\"system\",\"body\":\"Bem-vindos ao directo!\",\"sender_label\":\"Sistema\"}, \n {\"id\":\"547970cd-6927-4b7e-af8b-d6b69857f2ee\",\"kind\":\"system\",\"body\":\"O directo está a começar\",\"s…"
+        }
+      },
+      "proven": true,
+      "evidence": {}
+    }
+  ],
+  "blocked": [
+    {
+      "id": "A1.welcome",
+      "lens": "CR1",
+      "title": "legítimo OK (welcome/neutro)",
+      "ev": "200 {\"ok\": true}"
+    },
+    {
+      "id": "A2.neutro.comecar",
+      "lens": "CR1",
+      "title": "legítimo OK (welcome/neutro)",
+      "ev": "200 {\"ok\": true}"
+    },
+    {
+      "id": "B1.es.ultimo_disponible",
+      "lens": "CR2",
+      "title": "FOMO recusado",
+      "ev": "purchase_announce_via_broadcast_only"
+    },
+    {
+      "id": "B4.control.esaurito_spaced",
+      "lens": "CR2",
+      "title": "residual stem recusado (não contar)",
+      "ev": "purchase_announce_via_broadcast_only"
+    },
+    {
+      "id": "B5.buyer.insert.system",
+      "lens": "CR3",
+      "title": "buyer INSERT system recusado",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"new row violates row-level security policy for table \\\"live_messages\\\"\"}"
+    },
+    {
+      "id": "B6.helper0.scarcity",
+      "lens": "CR2",
+      "title": "helper0 recusado",
+      "ev": "200 {\"ok\": false, \"error\": \"not_allowed\"}"
+    },
+    {
+      "id": "C1.hitch.qty_stock",
+      "lens": "CR4",
+      "title": "2º accept recusado (HOLD hitch)",
+      "ev": {
+        "r1": {
+          "id": "ecaaa511-3e85-4df2-b5f4-bd49fe94b422",
+          "status": "accepted",
+          "requested_qty": 1
+        },
+        "r2": {
+          "id": "bd8588a5-d732-4a1a-b8e6-634a29e22b31",
+          "status": "pending",
+          "requested_qty": 1
+        },
+        "a2": "400 {\"code\":\"23514\",\"details\":null,\"hint\":null,\"message\":\"qty_exceeds_stock\"}"
+      }
+    },
+    {
+      "id": "C2.convert.nopi",
+      "lens": "CR5",
+      "title": "convert sem PI recusado",
+      "ev": {
+        "rpc": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_live_reservation_stripe_convert\"}",
+        "status": "accepted"
+      }
+    },
+    {
+      "id": "C2.convert.pi_alheio",
+      "lens": "CR5",
+      "title": "PI alheio recusado",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"convert_requires_paid_order\"}"
+    },
+    {
+      "id": "C3.end_parallel_accept",
+      "lens": "CR6",
+      "title": "end/accept race sem accept pós-end",
+      "ev": {
+        "res": {
+          "id": "5c379750-d542-4509-82f1-edd833c5d409",
+          "status": "accepted"
+        },
+        "live": {
+          "id": "9dcef9ef-0f96-4567-808a-f09750e62479",
+          "status": "ended",
+          "is_active": false
+        },
+        "late": "200 [{\"id\":\"5c379750-d542-4509-82f1-edd833c5d409\",\"live_id\":\"9dcef9ef-0f96-4567-808a-f09750e62479\",\"live_item_id\":\"1e012a99-f4b2-42a5-b6b5-96e678086f01\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"buyer_id\":\"bfcbeeee…"
+      }
+    },
+    {
+      "id": "C4.mux.live_id.unpub",
+      "lens": "CR7",
+      "title": "buyer não lê mux_live_id",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for table lives\"}"
+    }
+  ],
+  "notes": [
+    {
+      "id": "stock.before",
+      "lens": "CR3",
+      "title": "stock antes FOMO",
+      "ev": {
+        "ok": true,
+        "price": 9.0,
+        "live_id": "42a6beeb-7e0a-43ee-8cab-776f82e62095",
+        "ref_code": "RTCR-FOMO",
+        "item_kind": "live_only",
+        "total_qty": 2,
+        "product_id": null,
+        "blocked_qty": 0,
+        "live_status": "live",
+        "live_item_id": "56e8e88c-e86b-4fad-b829-eed65d806c86",
+        "available_qty": 2,
+        "pending_bag_qty": 0,
+        "sold_converted_qty": 0,
+        "checkout_product_id": "9e8cc6eb-d7e8-4a39-8a57-387412dc2d78",
+        "reserved_accepted_qty": 0
+      }
+    },
+    {
+      "id": "seller.hub",
+      "lens": "CR1",
+      "title": "seller hub_published",
+      "ev": {
+        "id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+        "hub_published": true,
+        "handle": "fleahub-demo-ux"
+      }
+    },
+    {
+      "id": "stock.after",
+      "lens": "CR3",
+      "title": "stock depois FOMO",
+      "ev": {
+        "ok": true,
+        "price": 9.0,
+        "live_id": "42a6beeb-7e0a-43ee-8cab-776f82e62095",
+        "ref_code": "RTCR-FOMO",
+        "item_kind": "live_only",
+        "total_qty": 2,
+        "product_id": null,
+        "blocked_qty": 0,
+        "live_status": "live",
+        "live_item_id": "56e8e88c-e86b-4fad-b829-eed65d806c86",
+        "available_qty": 2,
+        "pending_bag_qty": 0,
+        "sold_converted_qty": 0,
+        "checkout_product_id": "9e8cc6eb-d7e8-4a39-8a57-387412dc2d78",
+        "reserved_accepted_qty": 0
+      }
+    },
+    {
+      "id": "fomo.caixa",
+      "lens": "CR3",
+      "title": "orders pagas nesta live FOMO",
+      "ev": {
+        "n": 0,
+        "paid": 0
+      }
+    }
+  ],
+  "lenses": [
+    "CR1",
+    "CR2",
+    "CR3",
+    "CR4",
+    "CR5",
+    "CR6",
+    "CR7"
+  ],
+  "fomo_persisted": [
+    {
+      "id": "B1.ptbr.ja_foi",
+      "body": "já foi",
+      "vis": {
+        "label": "HUB VISIBLE kind=system",
+        "hub": true,
+        "rest": false,
+        "hub_n": 3,
+        "rest_n": 0,
+        "hub_http": "200 [{\"id\":\"122d044b-b8ce-4aae-853c-79edd879fd0b\",\"kind\":\"system\",\"body\":\"já foi\",\"sender_label\":\"Sistema\"}, \n {\"id\":\"547970cd-6927-4b7e-af8b-d6b69857f2ee\",\"kind\":\"system\",\"body\":\"O directo está a começar\",\"sender_label\":\"Si…"
+      }
+    },
+    {
+      "id": "B2.nl.uitverkocht",
+      "body": "uitverkocht",
+      "vis": {
+        "label": "HUB VISIBLE kind=system",
+        "hub": true,
+        "rest": false,
+        "hub_n": 4,
+        "rest_n": 0,
+        "hub_http": "200 [{\"id\":\"48ccf477-4c43-4023-b91a-293849327e81\",\"kind\":\"system\",\"body\":\"uitverkocht\",\"sender_label\":\"Sistema\"}, \n {\"id\":\"122d044b-b8ce-4aae-853c-79edd879fd0b\",\"kind\":\"system\",\"body\":\"já foi\",\"sender_label\":\"Sistema\"}, \n {\"…"
+      }
+    },
+    {
+      "id": "B2.pl.wyprzedane",
+      "body": "wyprzedane",
+      "vis": {
+        "label": "HUB VISIBLE kind=system",
+        "hub": true,
+        "rest": false,
+        "hub_n": 5,
+        "rest_n": 0,
+        "hub_http": "200 [{\"id\":\"fce90022-1d09-4437-a1e2-aecc65a5361b\",\"kind\":\"system\",\"body\":\"wyprzedane\",\"sender_label\":\"Sistema\"}, \n {\"id\":\"48ccf477-4c43-4023-b91a-293849327e81\",\"kind\":\"system\",\"body\":\"uitverkocht\",\"sender_label\":\"Sistema\"}, …"
+      }
+    },
+    {
+      "id": "B2.ro.epuizat",
+      "body": "epuizat",
+      "vis": {
+        "label": "HUB VISIBLE kind=system",
+        "hub": true,
+        "rest": false,
+        "hub_n": 6,
+        "rest_n": 0,
+        "hub_http": "200 [{\"id\":\"582db166-151c-412d-a3a1-714c2d93ff74\",\"kind\":\"system\",\"body\":\"epuizat\",\"sender_label\":\"Sistema\"}, \n {\"id\":\"fce90022-1d09-4437-a1e2-aecc65a5361b\",\"kind\":\"system\",\"body\":\"wyprzedane\",\"sender_label\":\"Sistema\"}, \n {\"…"
+      }
+    },
+    {
+      "id": "B3.emoji.fire_one",
+      "body": "🔥1️⃣",
+      "vis": {
+        "label": "HUB VISIBLE kind=system",
+        "hub": true,
+        "rest": false,
+        "hub_n": 7,
+        "rest_n": 0,
+        "hub_http": "200 [{\"id\":\"b622fa25-daca-422f-ba7b-dd69bced1b3d\",\"kind\":\"system\",\"body\":\"🔥1️⃣\",\"sender_label\":\"Sistema\"}, \n {\"id\":\"582db166-151c-412d-a3a1-714c2d93ff74\",\"kind\":\"system\",\"body\":\"epuizat\",\"sender_label\":\"Sistema\"}, \n {\"id\":\"…"
+      }
+    },
+    {
+      "id": "B4.new.corre_que_some",
+      "body": "corre que some",
+      "vis": {
+        "label": "HUB VISIBLE kind=system",
+        "hub": true,
+        "rest": false,
+        "hub_n": 8,
+        "rest_n": 0,
+        "hub_http": "200 [{\"id\":\"864617ad-e169-40dd-bc3a-ea5c6b29d192\",\"kind\":\"system\",\"body\":\"corre que some\",\"sender_label\":\"Sistema\"}, \n {\"id\":\"b622fa25-daca-422f-ba7b-dd69bced1b3d\",\"kind\":\"system\",\"body\":\"🔥1️⃣\",\"sender_label\":\"Sistema\"}, \n …"
+      }
+    },
+    {
+      "id": "B4.new.sumiu",
+      "body": "sumiu",
+      "vis": {
+        "label": "HUB VISIBLE kind=system",
+        "hub": true,
+        "rest": false,
+        "hub_n": 9,
+        "rest_n": 0,
+        "hub_http": "200 [{\"id\":\"65ecd50f-a569-4267-a231-9f12d4e5bda4\",\"kind\":\"system\",\"body\":\"Bem-vindos ao directo!\",\"sender_label\":\"Sistema\"}, \n {\"id\":\"547970cd-6927-4b7e-af8b-d6b69857f2ee\",\"kind\":\"system\",\"body\":\"O directo está a começar\",\"s…"
+      }
+    }
+  ],
+  "residual_control_rows": 1,
+  "stock_before": {
+    "ok": true,
+    "price": 9.0,
+    "live_id": "42a6beeb-7e0a-43ee-8cab-776f82e62095",
+    "ref_code": "RTCR-FOMO",
+    "item_kind": "live_only",
+    "total_qty": 2,
+    "product_id": null,
+    "blocked_qty": 0,
+    "live_status": "live",
+    "live_item_id": "56e8e88c-e86b-4fad-b829-eed65d806c86",
+    "available_qty": 2,
+    "pending_bag_qty": 0,
+    "sold_converted_qty": 0,
+    "checkout_product_id": "9e8cc6eb-d7e8-4a39-8a57-387412dc2d78",
+    "reserved_accepted_qty": 0
+  },
+  "stock_after": {
+    "ok": true,
+    "price": 9.0,
+    "live_id": "42a6beeb-7e0a-43ee-8cab-776f82e62095",
+    "ref_code": "RTCR-FOMO",
+    "item_kind": "live_only",
+    "total_qty": 2,
+    "product_id": null,
+    "blocked_qty": 0,
+    "live_status": "live",
+    "live_item_id": "56e8e88c-e86b-4fad-b829-eed65d806c86",
+    "available_qty": 2,
+    "pending_bag_qty": 0,
+    "sold_converted_qty": 0,
+    "checkout_product_id": "9e8cc6eb-d7e8-4a39-8a57-387412dc2d78",
+    "reserved_accepted_qty": 0
+  },
+  "paid_fomo": [],
+  "seller_hub": {
+    "id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+    "hub_published": true,
+    "handle": "fleahub-demo-ux"
+  }
+}

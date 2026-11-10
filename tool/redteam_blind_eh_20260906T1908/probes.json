@@ -1,0 +1,341 @@
+{
+  "auditor": "REDTEAM_BLIND_EH_PAYMETHOD_POS_OPEN_v1",
+  "prefix": "RTEH-20260906T1908",
+  "n": 16,
+  "classe_nova": 16,
+  "residual": 0,
+  "findings": [
+    {
+      "id": "P2-A7-align",
+      "lens": "EH-A",
+      "severity": "P2",
+      "title": "array/notes mismatch resultado inesperado",
+      "actor": "buyer JWT",
+      "pre": "array + notes + body",
+      "repro": "CPI trio",
+      "expected": "off 400 / App cs_",
+      "obtained": {
+        "arrOpen": false,
+        "notesOpen": false,
+        "bodyDenied": true,
+        "raw": "201 [{\"id\":\"f4335d85-be74-478c-8c4a-779e098a7b71\",\"created_at\":\"2026-09-06T18:12:39.24147+00:00\",\"product_id\":\"79d577b8-8b98-4bd7-b22d-5f8ba3979a79\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-000…",
+        "cpiArr": "400 {\"error\":\"Checkout blocked: order is off-platform payment (no Stripe Session).\"}",
+        "cpiNotes": "400 {\"error\":\"Checkout blocked: order claim contention.\"}",
+        "cpiBody": "400 {\"error\":\"Checkout blocked: order is off-platform payment (no Stripe Session).\"}"
+      },
+      "proven": true
+    },
+    {
+      "id": "P1-B1",
+      "lens": "EH-B",
+      "severity": "P1",
+      "title": "App/card Pagamento na App não abriu Session",
+      "actor": "buyer JWT",
+      "pre": "order payment_method=Pagamento na App",
+      "repro": "create-payment-intent",
+      "expected": "CPI 200 cs_ · RPC false",
+      "obtained": {
+        "sql": false,
+        "cpi": "400 {\"error\":\"Checkout blocked: order claim contention.\"}",
+        "sid": "",
+        "killed": false
+      },
+      "proven": true
+    },
+    {
+      "id": "P1-B2",
+      "lens": "EH-B",
+      "severity": "P1",
+      "title": "App/card card não abriu Session",
+      "actor": "buyer JWT",
+      "pre": "order payment_method=card",
+      "repro": "create-payment-intent",
+      "expected": "CPI 200 cs_ · RPC false",
+      "obtained": {
+        "sql": false,
+        "cpi": "400 {\"error\":\"Checkout blocked: order claim contention.\"}",
+        "sid": "",
+        "killed": false
+      },
+      "proven": true
+    },
+    {
+      "id": "P1-B3",
+      "lens": "EH-B",
+      "severity": "P1",
+      "title": "applepay/googlepay não abriu Session",
+      "actor": "buyer JWT",
+      "pre": "payment_method applepay e googlepay",
+      "repro": "RPC + CPI",
+      "expected": "RPC false · CPI cs_ nos dois",
+      "obtained": {
+        "applepay": {
+          "sql": false,
+          "cpi": "400 {\"error\":\"Checkout blocked: order claim contention.\"}",
+          "sid": ""
+        },
+        "googlepay": {
+          "sql": false,
+          "cpi": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1HeB7tzdozYzJObd358ADadaCiPMauCTWa8eQFIsJlu5B7ddlIkLa40qA#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDR…",
+          "sid": "cs_test_a1HeB7tzdozYzJObd358ADadaCiPMauCTWa8eQFIsJlu5B7ddlIkLa40qA"
+        }
+      },
+      "proven": true
+    },
+    {
+      "id": "P2-C5",
+      "lens": "EH-C",
+      "severity": "P2",
+      "title": "JSON hostil payment_method abriu Session Stripe",
+      "actor": "buyer JWT",
+      "pre": "payment_method={\"psp\":\"paysafe\",\"x\":1}",
+      "repro": "RPC + CPI",
+      "expected": "JSON hostil fail-closed 400 sem cs_",
+      "obtained": {
+        "paysafe": {
+          "label": "Paysafe",
+          "sql": false,
+          "cpi": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1P2xfwLoRZzq8XFdwPmy73tltK0scCjtFaMkashQRo1KR9lmugDvuI3D8#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDR…",
+          "sid": "cs_test_a1P2xfwLoRZzq8XFdwPmy73tltK0scCjtFaMkashQRo1KR9lmugDvuI3D8",
+          "open": true,
+          "denied": false,
+          "aligned": true
+        },
+        "junk": {
+          "label": "asdfghjklpay",
+          "sql": false,
+          "cpi": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1Viz1M3AwOSdJa3YrG7UiJTulmIZkl3L1Lq4dYxEBrWmygJTWFmDeyBqb#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDR…",
+          "sid": "cs_test_a1Viz1M3AwOSdJa3YrG7UiJTulmIZkl3L1Lq4dYxEBrWmygJTWFmDeyBqb",
+          "open": true,
+          "denied": false,
+          "aligned": true
+        },
+        "json": {
+          "label": "{\"psp\":\"paysafe\",\"x\":1}",
+          "sql": false,
+          "cpi": "200 {\"checkoutUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1gsqCZA5zBUtWthCC0sODhf5YFxiSTzV34OSeLQJVsy8eEWswvfxPy3ZF#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDR…",
+          "sid": "cs_test_a1gsqCZA5zBUtWthCC0sODhf5YFxiSTzV34OSeLQJVsy8eEWswvfxPy3ZF",
+          "open": true,
+          "denied": false,
+          "aligned": true
+        }
+      },
+      "proven": true
+    }
+  ],
+  "paid": {
+    "oid": "ab1f4713-c9fc-4f03-858f-3079f75d2749",
+    "pid": "e1a2e812-5662-4107-b719-aed2f408680e",
+    "pi": "pi_3UCkZQH7FWYUN3jh1ISdSCkT"
+  },
+  "probes": [
+    {
+      "probe_id": "A1",
+      "poco": "EH-A",
+      "surfaces": "orders.payment_method + CPI + RPC",
+      "action": "multibanco exact",
+      "http": "{\"cpi\":\"400 {\\\"error\\\":\\\"Checkout blocked: order is off-platform payment (no Stripe Session).\\\"}\",\"sql\":true}",
+      "oracles": "{\"pm\":\"multibanco\",\"sid\":\"\",\"sql\":true}",
+      "result": "FAIL",
+      "lens": "EH-A",
+      "residual": false,
+      "count_finding": false,
+      "classe_nova": true
+    },
+    {
+      "probe_id": "A2",
+      "poco": "EH-A",
+      "surfaces": "orders + CPI + RPC",
+      "action": "ifthenpay + JSON {\"psp\":\"ifthenpay\"}",
+      "http": "{\"cpiA\":\"400 {\\\"error\\\":\\\"Checkout blocked: order is off-platform payment (no Stripe Session).\\\"}\",\"cpiB\":\"400 {\\\"error\\\":\\\"Checkout blocked: order is off-platform payment (no Stripe Session).\\\"}\",\"raw\":\"201 [{\\\"id\\\":\\\"0d9620bb-c6e1-4336-ab61-a48f2e18f3d5\\\",\\\"created_at\\\":\\\"2026-09-06T18:12:30.770492+00:00\\\",\\\"product_id\\\":\\\"3bf2b1fb-17cd-42ee-b4a7-2d34e8e353fa\\\",\\\"buyer_id\\\":\\\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\\\",…",
+      "oracles": "{\"sqlA\":true,\"sqlB\":true,\"pmA\":\"ifthenpay\",\"pmB\":\"{\\\"psp\\\":\\\"ifthenpay\\\"}\"}",
+      "result": "FAIL",
+      "lens": "EH-A",
+      "residual": false,
+      "count_finding": false,
+      "classe_nova": true
+    },
+    {
+      "probe_id": "A3",
+      "poco": "EH-A",
+      "surfaces": "orders + CPI + RPC",
+      "action": "contra reembolso / contra_reembolso / COD",
+      "http": "{\"contra reembolso\":{\"sql\":true,\"cpi\":\"400 {\\\"error\\\":\\\"Checkout blocked: order is off-platform payment (no Stripe Session).\\\"}\",\"sid\":\"\",\"pm\":\"contra reembolso\"},\"contra_reembolso\":{\"sql\":true,\"cpi\":\"400 {\\\"error\\\":\\\"Checkout blocked: order is off-platform payment (no Stripe Session).\\\"}\",\"sid\":\"\",\"pm\":\"contra_reembolso\"},\"COD\":{\"sql\":true,\"cpi\":\"400 {\\\"error\\\":\\\"Checkout blocked: order is off-platform payment (no S…",
+      "oracles": "{\"contra reembolso\":{\"sql\":true,\"cpi\":\"400 {\\\"error\\\":\\\"Checkout blocked: order is off-platform payment (no Stripe Session).\\\"}\",\"sid\":\"\",\"pm\":\"contra reembolso\"},\"contra_reembolso\":{\"sql\":true,\"cpi\":\"400 {\\\"error\\\":\\\"Checkout blocked: order is off-platform payment (no Stripe Session).\\\"}\",\"sid\":\"\",\"pm\":\"contra_reembolso\"},\"COD\":{\"sql\":true,\"cpi\":\"400 {\\\"error\\\":\\\"Checkout blocked: order is off-platform payment (no Stripe Session).\\\"}\",\"sid\":\"\",\"pm\":\"COD\"}}",
+      "result": "FAIL",
+      "lens": "EH-A",
+      "residual": false,
+      "count_finding": false,
+      "classe_nova": true
+    },
+    {
+      "probe_id": "A4",
+      "poco": "EH-A",
+      "surfaces": "orders + CPI + RPC",
+      "action": "sibs / Referência Multibanco / referência",
+      "http": "{\"sibs\":{\"label\":\"sibs\",\"sql\":true,\"cpi\":\"400 {\\\"error\\\":\\\"Checkout blocked: order is off-platform payment (no Stripe Session).\\\"}\",\"sid\":\"\",\"pm\":\"sibs\",\"open\":false,\"good\":true},\"ref_mb\":{\"label\":\"Referência Multibanco\",\"sql\":true,\"cpi\":\"400 {\\\"error\\\":\\\"Checkout blocked: order is off-platform payment (no Stripe Session).\\\"}\",\"sid\":\"\",\"pm\":\"Referência Multibanco\",\"open\":false,\"good\":true},\"referencia\":{\"label\":\"refe…",
+      "oracles": "{\"sibs\":{\"label\":\"sibs\",\"sql\":true,\"cpi\":\"400 {\\\"error\\\":\\\"Checkout blocked: order is off-platform payment (no Stripe Session).\\\"}\",\"sid\":\"\",\"pm\":\"sibs\",\"open\":false,\"good\":true},\"ref_mb\":{\"label\":\"Referência Multibanco\",\"sql\":true,\"cpi\":\"400 {\\\"error\\\":\\\"Checkout blocked: order is off-platform payment (no Stripe Session).\\\"}\",\"sid\":\"\",\"pm\":\"Referência Multibanco\",\"open\":false,\"good\":true},\"referencia\":{\"label\":\"referência\",\"sql\":true,\"cpi\":\"400 {\\\"error\\\":\\\"Checkout blocked:…",
+      "result": "FAIL",
+      "lens": "EH-A",
+      "residual": false,
+      "count_finding": false,
+      "classe_nova": true
+    },
+    {
+      "probe_id": "A5",
+      "poco": "EH-A",
+      "surfaces": "orders.payment_method + CPI + RPC",
+      "action": "MB WAY (MBNet) ref — wrap novo",
+      "http": "{\"cpi\":\"400 {\\\"error\\\":\\\"Checkout blocked: order is off-platform payment (no Stripe Session).\\\"}\",\"sql\":true}",
+      "oracles": "{\"pm\":\"MB WAY (MBNet) ref 88321\",\"sid\":\"\",\"sql\":true}",
+      "result": "FAIL",
+      "lens": "EH-A",
+      "residual": false,
+      "count_finding": false,
+      "classe_nova": true
+    },
+    {
+      "probe_id": "A6",
+      "poco": "EH-A",
+      "surfaces": "orders.payment_method + CPI + RPC",
+      "action": "transferência bancária IBAN PT50",
+      "http": "{\"cpi\":\"400 {\\\"error\\\":\\\"Checkout blocked: order is off-platform payment (no Stripe Session).\\\"}\",\"sql\":true}",
+      "oracles": "{\"pm\":\"transferência bancária IBAN PT50\",\"sid\":\"\",\"sql\":true}",
+      "result": "FAIL",
+      "lens": "EH-A",
+      "residual": false,
+      "count_finding": false,
+      "classe_nova": true
+    },
+    {
+      "probe_id": "A7",
+      "poco": "EH-A",
+      "surfaces": "orders + CPI body/notes",
+      "action": "array [multibanco] + notes ifthenpay em App + body card em sibs",
+      "http": "{\"raw\":\"201 [{\\\"id\\\":\\\"f4335d85-be74-478c-8c4a-779e098a7b71\\\",\\\"created_at\\\":\\\"2026-09-06T18:12:39.24147+00:00\\\",\\\"product_id\\\":\\\"79d577b8-8b98-4bd7-b22d-5f8ba3979a79\\\",\\\"buyer_id\\\":\\\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\\\",\\\"seller_id\\\":\\\"980f4fa1-000…\",\"arr\":\"400 {\\\"error\\\":\\\"Checkout blocked: order is off-platform payment (no Stripe Session).\\\"}\",\"notes\":\"400 {\\\"error\\\":\\\"Checkout blocked: order claim contention.\\\"…",
+      "oracles": "{\"pmArr\":\"[\\\"multibanco\\\"]\",\"pmApp\":\"Pagamento na App\",\"sqlArr\":true}",
+      "result": "HOLD",
+      "lens": "EH-A",
+      "residual": false,
+      "count_finding": true,
+      "classe_nova": true
+    },
+    {
+      "probe_id": "B1",
+      "poco": "EH-B",
+      "surfaces": "orders.payment_method + CPI + RPC",
+      "action": "Pagamento na App → cs_",
+      "http": "{\"cpi\":\"400 {\\\"error\\\":\\\"Checkout blocked: order claim contention.\\\"}\",\"sql\":false}",
+      "oracles": "{\"sid\":\"\",\"sql\":false,\"pm\":\"Pagamento na App\"}",
+      "result": "HOLD",
+      "lens": "EH-B",
+      "residual": false,
+      "count_finding": true,
+      "classe_nova": true
+    },
+    {
+      "probe_id": "B2",
+      "poco": "EH-B",
+      "surfaces": "orders.payment_method + CPI + RPC",
+      "action": "card → cs_",
+      "http": "{\"cpi\":\"400 {\\\"error\\\":\\\"Checkout blocked: order claim contention.\\\"}\",\"sql\":false}",
+      "oracles": "{\"sid\":\"\",\"sql\":false,\"pm\":\"card\"}",
+      "result": "HOLD",
+      "lens": "EH-B",
+      "residual": false,
+      "count_finding": true,
+      "classe_nova": true
+    },
+    {
+      "probe_id": "B3",
+      "poco": "EH-B",
+      "surfaces": "orders + CPI + RPC",
+      "action": "applepay / googlepay labels",
+      "http": "{\"applepay\":{\"sql\":false,\"cpi\":\"400 {\\\"error\\\":\\\"Checkout blocked: order claim contention.\\\"}\",\"sid\":\"\"},\"googlepay\":{\"sql\":false,\"cpi\":\"200 {\\\"checkoutUrl\\\":\\\"https://checkout.stripe.com/c/pay/cs_test_a1HeB7tzdozYzJObd358ADadaCiPMauCTWa8eQFIsJlu5B7ddlIkLa40qA#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDR…\",\"sid\":\"cs_test_a1HeB7tzdozYzJObd358ADadaCiPMauCTWa8eQ…",
+      "oracles": "{\"applepay\":{\"sql\":false,\"cpi\":\"400 {\\\"error\\\":\\\"Checkout blocked: order claim contention.\\\"}\",\"sid\":\"\"},\"googlepay\":{\"sql\":false,\"cpi\":\"200 {\\\"checkoutUrl\\\":\\\"https://checkout.stripe.com/c/pay/cs_test_a1HeB7tzdozYzJObd358ADadaCiPMauCTWa8eQFIsJlu5B7ddlIkLa40qA#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDR…\",\"sid\":\"cs_test_a1HeB7tzdozYzJObd358ADadaCiPMauCTWa8eQFIsJlu5B7ddlIkLa40qA\"}}",
+      "result": "HOLD",
+      "lens": "EH-B",
+      "residual": false,
+      "count_finding": true,
+      "classe_nova": true
+    },
+    {
+      "probe_id": "B4",
+      "poco": "EH-B",
+      "surfaces": "orders + products + Stripe TEST",
+      "action": "1× pago 4242 Pagamento na App",
+      "http": "200 {\n  \"ok\": true,\n  \"order_id\": \"ab1f4713-c9fc-4f03-858f-3079f75d2749\",\n  \"product_id\": \"e1a2e812-5662-4107-b719-aed2f408680e\",\n  \"payment_intent_id\": \"pi_3UCkZQH7FWYUN3jh1ISdSCkT\",\n  \"pi_status\": \"succeeded\",\n  \"pi_amount…",
+      "oracles": "{\"oid\":\"ab1f4713-c9fc-4f03-858f-3079f75d2749\",\"pid\":\"e1a2e812-5662-4107-b719-aed2f408680e\",\"status\":\"pago\",\"pi\":\"pi_3UCkZQH7FWYUN3jh1ISdSCkT\",\"cents\":590,\"qty\":1,\"applied\":1,\"pm\":\"Pagamento na app\"}",
+      "result": "FAIL",
+      "lens": "EH-B",
+      "residual": false,
+      "count_finding": false,
+      "classe_nova": true
+    },
+    {
+      "probe_id": "C1",
+      "poco": "EH-C",
+      "surfaces": "orders PATCH + CPI",
+      "action": "PATCH ifthenpay após cs_ open (buyer+seller)",
+      "http": "{\"open\":\"200 {\\\"checkoutUrl\\\":\\\"https://checkout.stripe.com/c/pay/cs_test_a174KE50evmFfVFQm780Vq4QyaBuvyqeesYbT6g7NSeLD8C8iruiOgAsO9#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDR…\",\"patchB\":\"403 {\\\"code\\\":\\\"42501\\\",\\\"details\\\":null,\\\"hint\\\":null,\\\"message\\\":\\\"order_money_fields_immutable\\\"}\",\"patchS\":\"403 {\\\"code\\\":\\\"42501\\\",\\\"details\\\":null,\\\"hint\\\":null,\\\"me…",
+      "oracles": "{\"pmBefore\":\"Pagamento na App\",\"pmAfterB\":\"Pagamento na App\",\"pmAfterS\":\"Pagamento na App\",\"sid\":\"cs_test_a174KE50evmFfVFQm780Vq4QyaBuvyqeesYbT6g7NSeLD8C8iruiOgAsO9\",\"flipped\":false}",
+      "result": "FAIL",
+      "lens": "EH-C",
+      "residual": false,
+      "count_finding": false,
+      "classe_nova": true
+    },
+    {
+      "probe_id": "C2",
+      "poco": "EH-C",
+      "surfaces": "CPI cross-buyer",
+      "action": "buyer2 CPI order multibanco alheia",
+      "http": "{\"own\":\"400 {\\\"error\\\":\\\"Checkout blocked: order is off-platform payment (no Stripe Session).\\\"}\",\"b2\":\"400 {\\\"error\\\":\\\"Checkout blocked: order does not belong to buyer.\\\"}\"}",
+      "oracles": "{\"buyer\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"b2\":\"963c529d-97ff-49e1-8c7d-61e7d1f39bcb\",\"pm\":\"multibanco\"}",
+      "result": "FAIL",
+      "lens": "EH-C",
+      "residual": false,
+      "count_finding": false,
+      "classe_nova": true
+    },
+    {
+      "probe_id": "C3",
+      "poco": "EH-C",
+      "surfaces": "RPC batata_is_off_platform_payment vs CPI",
+      "action": "multibanco/ifthenpay/sibs vs App/card/applepay",
+      "http": "{\"multibanco\":{\"sql\":true,\"cpi\":\"400 {\\\"error\\\":\\\"Checkout blocked: order is off-platform payment (no Stripe Session).\\\"}\",\"open\":false,\"denied\":true,\"aligned\":true},\"ifthenpay\":{\"sql\":true,\"cpi\":\"400 {\\\"error\\\":\\\"Checkout blocked: order is off-platform payment (no Stripe Session).\\\"}\",\"open\":false,\"denied\":true,\"aligned\":true},\"sibs\":{\"sql\":true,\"cpi\":\"400 {\\\"error\\\":\\\"Checkout blocked: order is off-platform payment…",
+      "oracles": "{\"multibanco\":{\"sql\":true,\"cpi\":\"400 {\\\"error\\\":\\\"Checkout blocked: order is off-platform payment (no Stripe Session).\\\"}\",\"open\":false,\"denied\":true,\"aligned\":true},\"ifthenpay\":{\"sql\":true,\"cpi\":\"400 {\\\"error\\\":\\\"Checkout blocked: order is off-platform payment (no Stripe Session).\\\"}\",\"open\":false,\"denied\":true,\"aligned\":true},\"sibs\":{\"sql\":true,\"cpi\":\"400 {\\\"error\\\":\\\"Checkout blocked: order is off-platform payment (no Stripe Session).\\\"}\",\"open\":false,\"denied\":true,\"aligne…",
+      "result": "FAIL",
+      "lens": "EH-C",
+      "residual": false,
+      "count_finding": false,
+      "classe_nova": true
+    },
+    {
+      "probe_id": "C4",
+      "poco": "EH-C",
+      "surfaces": "orders insert empty/null + RPC + CPI",
+      "action": "empty string / null payment_method",
+      "http": "{\"empty\":\"201 [{\\\"id\\\":\\\"626c3034-cf87-4b5b-8960-b8c50dc0a7b9\\\",\\\"created_at\\\":\\\"2026-09-06T18:13:50.076667+00:00\\\",\\\"product_id\\\":\\\"5d7caf8b-2e6f-4bff-ba6c-f0075ca16f32\\\",\\\"buyer_id\\\":\\\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\\\",\\\"seller_id\\\":\\\"980f4fa1-00…\",\"null\":\"201 [{\\\"id\\\":\\\"9bda5df6-030f-4938-b1c9-1a5e6d302ac3\\\",\\\"created_at\\\":\\\"2026-09-06T18:13:51.583812+00:00\\\",\\\"product_id\\\":\\\"5d7caf8b-2e6f-4bff-ba6c-f0075ca16…",
+      "oracles": "{\"sqlE\":false,\"sqlN\":false,\"pmE\":\"\",\"pmN\":null,\"nullInserted\":true,\"emptyOpen\":true}",
+      "result": "FAIL",
+      "lens": "EH-C",
+      "residual": false,
+      "count_finding": false,
+      "classe_nova": true
+    },
+    {
+      "probe_id": "C5",
+      "poco": "EH-C",
+      "surfaces": "orders + CPI + RPC",
+      "action": "Paysafe / lixo ASCII / JSON {\"psp\":\"paysafe\"}",
+      "http": "{\"paysafe\":{\"label\":\"Paysafe\",\"sql\":false,\"cpi\":\"200 {\\\"checkoutUrl\\\":\\\"https://checkout.stripe.com/c/pay/cs_test_a1P2xfwLoRZzq8XFdwPmy73tltK0scCjtFaMkashQRo1KR9lmugDvuI3D8#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDR…\",\"sid\":\"cs_test_a1P2xfwLoRZzq8XFdwPmy73tltK0scCjtFaMkashQRo1KR9lmugDvuI3D8\",\"open\":true,\"denied\":false,\"aligned\":true},\"junk\":{\"label\":\"asdfgh…",
+      "oracles": "{\"paysafe\":{\"label\":\"Paysafe\",\"sql\":false,\"cpi\":\"200 {\\\"checkoutUrl\\\":\\\"https://checkout.stripe.com/c/pay/cs_test_a1P2xfwLoRZzq8XFdwPmy73tltK0scCjtFaMkashQRo1KR9lmugDvuI3D8#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDR…\",\"sid\":\"cs_test_a1P2xfwLoRZzq8XFdwPmy73tltK0scCjtFaMkashQRo1KR9lmugDvuI3D8\",\"open\":true,\"denied\":false,\"aligned\":true},\"junk\":{\"label\":\"asdfghjklpay\",\"sql\":false,\"cpi\":\"200 {\\\"checkoutUrl\\\":\\\"https://ch…",
+      "result": "HOLD",
+      "lens": "EH-C",
+      "residual": false,
+      "count_finding": true,
+      "classe_nova": true
+    }
+  ]
+}

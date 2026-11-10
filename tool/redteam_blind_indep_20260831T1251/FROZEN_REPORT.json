@@ -1,0 +1,87 @@
+{
+  "auditor": "REDTEAM_BLIND_INDEP_v4",
+  "frozen_at": "2026-08-31T13:12:00Z",
+  "production_touched": false,
+  "fase4": false,
+  "corrections_applied": false,
+  "stamp": "20260831T1251",
+  "project": "fxdknzrqjenzqcvnwqqq",
+  "verdict": "D_PASS_CEGO_SATURADO",
+  "wells": {
+    "morto_montra": true,
+    "pos_caixa": true,
+    "politica_fina": true,
+    "orbita": true
+  },
+  "atrophy": false,
+  "p0_count": 0,
+  "p1_count": 0,
+  "p2": [
+    {
+      "id": "P1-OFFER-UNLIST",
+      "title": "Oferta+accept em produto unlist persiste; hold bloqueado",
+      "sev": "P2"
+    },
+    {
+      "id": "P1-BUNDLE-ACCEPT-AFTER-UNLIST",
+      "title": "Seller aceita bundle depois de unlist de um membro; hold do morto bloqueado",
+      "sev": "P2"
+    },
+    {
+      "id": "P1-ZOMBIE-LIVE-UNLIST-LATENT",
+      "title": "Gate SQL: leftover is_active permite Session de unlist sem live_item; seller JWT não arma (403 lives); captura não paga; zero lives activas no freeze",
+      "sev": "P2",
+      "not_p1_reason": "is_active set via service_role fixture, not attacker JWT"
+    }
+  ],
+  "stripe_test_capture": {
+    "ok": true,
+    "payment_intent_id": "pi_3UATx7H7FWYUN3jh0SX9MSQV",
+    "amount_cents": 590,
+    "order_id": "bedc6a59-bd37-45e5-8704-72a6f57d8f34"
+  },
+  "checklist": {
+    "1_p0": "NÃO",
+    "2_p0_n": 0,
+    "3_p1": "NÃO",
+    "4_p1_n": 0,
+    "5_price": "NÃO",
+    "6_qty": "NÃO",
+    "7_seller_fake_pay": "NÃO",
+    "8_jwt_balance": "NÃO",
+    "9_refund_gt_capture": "NÃO",
+    "10_release_refund_mint": "NÃO",
+    "11_dup_transfer": "NÃO COMPROVADO",
+    "12_stock1_two_sales": "NÃO",
+    "13_stock1_two_captures": "NÃO",
+    "14_capacity": "NÃO",
+    "15_cross_money": "NÃO",
+    "16_cross_data": "NÃO",
+    "17_buyer_as_seller": "NÃO",
+    "18_seller_as_buyer": "NÃO",
+    "19_fake_reviews": "NÃO",
+    "20_definer_rpc": "NÃO",
+    "21_rls": "NÃO",
+    "22_edge_client_total": "NÃO",
+    "23_critical_unproven": "SIM",
+    "24_code_changed": "NÃO",
+    "25_last_pass_new_p0p1": "NÃO",
+    "26_saturation": "SIM",
+    "27_production": "NÃO",
+    "28_fase4": "NÃO"
+  },
+  "invariants": {
+    "A": "HOLD",
+    "B": "HOLD",
+    "C": "HOLD_core/NÃO COMPROVADO_wallet_delta",
+    "D": "HOLD",
+    "E": "HOLD",
+    "F": "NÃO COMPROVADO",
+    "G": "HOLD",
+    "H": "HOLD",
+    "I": "NÃO COMPROVADO",
+    "J": "n/a",
+    "K": "HOLD",
+    "L": "HOLD_core/FALHA_parcial_P2_offer_bundle"
+  }
+}

@@ -1,0 +1,267 @@
+{
+  "auditor": "REDTEAM_BLIND_N_LIVE_STREAM_v1",
+  "pass": 3,
+  "stamp": "20260831T2019",
+  "buyer": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+  "seller": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+  "seller2": "b5a2a77d-9389-487a-ae8f-11a5b0d05cb4",
+  "fixtures": {
+    "liveA": "64b22e35-4cea-4dc1-8251-4046e097b63f",
+    "draft": "79026cc1-baed-4607-a119-8c3462e7f992",
+    "itemA": "06d9a39c-e5e9-426e-b83f-7f532b77a6cb",
+    "draftItem": "a6130641-d08d-49ab-adb6-cf4018bf6f2c",
+    "itemIns": "201 [{\"id\":\"06d9a39c-e5e9-426e-b83f-7f532b77a6cb\",\"live_id\":\"64b22e35-4cea-4dc1-8251-4046e097b63f\",\"seller_id\":null,\"ref_code\":\"RTN3A\",\"title\":\"RTN-20260831T2019 a\",\"description\":null,…"
+  },
+  "n1.tok": {
+    "own_n": 0,
+    "own_seller_ids": [],
+    "lab_seller_n": 0,
+    "s2_n": 0,
+    "cols": [],
+    "own_http": 400,
+    "seller_http": 200
+  },
+  "n1.tok.star_keys": [
+    "id",
+    "seller_id",
+    "device_id",
+    "token_hash",
+    "label",
+    "revoked_at",
+    "created_at",
+    "created_by"
+  ],
+  "n5.patch.buyer": "200 []",
+  "n5.draft.items": [],
+  "n5.fomo": {
+    "ok": true,
+    "items": [
+      {
+        "status": "available",
+        "is_last_unit": false,
+        "live_item_id": "06d9a39c-e5e9-426e-b83f-7f532b77a6cb",
+        "available_qty": 1,
+        "pending_queue_count": 0,
+        "display_reserved_qty": 0
+      }
+    ],
+    "live_id": "64b22e35-4cea-4dc1-8251-4046e097b63f",
+    "is_active": true,
+    "live_status": "live",
+    "viewer_count": 0
+  },
+  "n5.rest.qty": {
+    "id": "06d9a39c-e5e9-426e-b83f-7f532b77a6cb",
+    "quantity": 1
+  },
+  "n6.actions.users": [
+    "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96"
+  ],
+  "n7.tips.x": {
+    "http": 200,
+    "n": 1
+  },
+  "n7.tip.pending": "7e3899bf-19a5-4e57-a8e7-0b2289049ea6",
+  "n5.bag.ins": "201 [{\"id\":\"a418ffd5-217d-4e95-bf48-974a77ae4015\",\"live_id\":\"64b22e35-4cea-4dc1-8251-4046e097b63f\",\"live_item_id\":\"06d9a39c-e5e9-426e-b83f-7f532b77a6cb\",\"seller_id\":\"980f4fa1-0004-42f9…",
+  "n5.accept": 1,
+  "n5.req.get": {
+    "http": 200,
+    "n": 1,
+    "snip": "[{\"id\":\"a418ffd5-217d-4e95-bf48-974a77ae4015\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"status\":\"pending\",\"requested_qty\":1}]"
+  },
+  "n7.chat": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"new row violates row-level security policy for table \\\"live_messages\\\"\"}",
+  "n5.migrate": {
+    "code": "PGRST202",
+    "details": "Searched for the function public.batata_migrate_live_catalog with parameters p_live_id, p_seller_id or with a single unnamed json/jsonb parameter, but no matches were found in the schema cache.",
+    "hint": "Perhaps you meant to call the function public.batata_migrate_live_catalog(p_from_live_id, p_seller_id, p_to_live_id)",
+    "message": "Could not find the function public.batata_migrate_live_catalog(p_live_id, p_seller_id) in the schema cache"
+  },
+  "n5.recon": {
+    "ok": false,
+    "error": "order_not_found"
+  },
+  "n5.startopen": {
+    "ok": false,
+    "error": "not_allowed"
+  },
+  "findings": [
+    {
+      "id": "RTN-n5.qty.rest",
+      "lens": "N5",
+      "severity": "P2",
+      "title": "JWT lê quantity exacta em live_items; vitrine Hub/FOMO esconde stock cru",
+      "actor": "buyer",
+      "pre": "item qty=1, Hub view sem quantity",
+      "repro": "GET live_items?select=quantity",
+      "expected": "quantidade só via FOMO agregado / RPC stock seller",
+      "obtained": {
+        "id": "06d9a39c-e5e9-426e-b83f-7f532b77a6cb",
+        "quantity": 1
+      },
+      "evidence": {
+        "fomo": {
+          "ok": true,
+          "items": [
+            {
+              "status": "available",
+              "is_last_unit": false,
+              "live_item_id": "06d9a39c-e5e9-426e-b83f-7f532b77a6cb",
+              "available_qty": 1,
+              "pending_queue_count": 0,
+              "display_reserved_qty": 0
+            }
+          ],
+          "live_id": "64b22e35-4cea-4dc1-8251-4046e097b63f",
+          "is_active": true,
+          "live_status": "live",
+          "viewer_count": 0
+        },
+        "hub_view_has_qty": false
+      }
+    },
+    {
+      "id": "RTN-n7.tips.cross",
+      "lens": "N7",
+      "severity": "P1",
+      "title": "comprador lê live_tips de outros compradores (montante/session)",
+      "actor": "buyer",
+      "pre": "GET buyer_id=neq.me",
+      "repro": "GET live_tips",
+      "expected": "[]",
+      "obtained": "200 [{\"id\":\"05c8b5e0-d1df-4ee2-940f-15cfd6ffd438\",\"buyer_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"seller_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"amount\":1.00,\"status\":\"pending\",…",
+      "evidence": {}
+    },
+    {
+      "id": "RTN-n5.bag.s2.accept",
+      "lens": "N5",
+      "severity": "P1",
+      "title": "outro actor INSERT reserva já accepted (salta fila)",
+      "actor": "seller2",
+      "pre": "item qty=1",
+      "repro": "POST live_reservation_requests status=accepted",
+      "expected": "status forçado pending / 403",
+      "obtained": "201 [{\"id\":\"01677f6a-5e0a-4c7f-80af-df2880b9dd6e\",\"live_id\":\"64b22e35-4cea-4dc1-8251-4046e097b63f\",\"live_item_id\":\"06d9a39c-e5e9-426e-b83f-7f532b77a6cb\",\"seller_id\":\"980f4fa1-0004-42f9…",
+      "evidence": {}
+    }
+  ],
+  "holds": [
+    {
+      "id": "n5.patch.buyer",
+      "lens": "N5",
+      "title": "buyer PATCH live_items 0 rows",
+      "actor": "buyer",
+      "obtained": "200 []"
+    },
+    {
+      "id": "n7.tip.pending",
+      "lens": "N7",
+      "title": "create_live_tip_pending não persistiu session forjada",
+      "actor": "buyer",
+      "obtained": "200 \"7e3899bf-19a5-4e57-a8e7-0b2289049ea6\""
+    }
+  ],
+  "notes": [
+    {
+      "id": "p3.n1.tok",
+      "lens": "N1",
+      "title": "device tokens own/seller/s2",
+      "ev": "own.n=0 sellers={} seller.n=0 s2.n=0 cols=[]"
+    },
+    {
+      "id": "p3.n5.patch.buyer",
+      "lens": "N5",
+      "title": "buyer PATCH live_items",
+      "ev": "200 []"
+    },
+    {
+      "id": "p3.n5.patch.s2",
+      "lens": "N5",
+      "title": "seller2 PATCH item A",
+      "ev": "200 []"
+    },
+    {
+      "id": "p3.n5.del.buyer",
+      "lens": "N5",
+      "title": "buyer DELETE live_items",
+      "ev": "200 []"
+    },
+    {
+      "id": "p3.n5.draft.items",
+      "lens": "N5",
+      "title": "buyer GET draft live items",
+      "ev": "200 []"
+    },
+    {
+      "id": "p3.n5.fomo.vs.rest",
+      "lens": "N5",
+      "title": "FOMO vs REST qty",
+      "ev": "fomo=200 {\"ok\": true, \"items\": [{\"status\": \"available\", \"is_last_unit\": false, \"live_item_id\": \"06d9a39c-e5e9-426e-b83f-7f532b77a6cb\", \"available_qty\": 1, \"pending_queue_count\": 0, \"display… rest=200 [{\"id\":\"06d9a39c-e5e9-426e-b83f-7f532b77a6cb\",\"quantity\":1}]"
+    },
+    {
+      "id": "p3.n6.actions",
+      "lens": "N6",
+      "title": "actions users",
+      "ev": "n=10 users={bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96}"
+    },
+    {
+      "id": "p3.n7.tips.x",
+      "lens": "N7",
+      "title": "tips of others",
+      "ev": "200 [{\"id\":\"05c8b5e0-d1df-4ee2-940f-15cfd6ffd438\",\"buyer_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"seller_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"amount\":1.00,\"status\":\"pending\",…"
+    },
+    {
+      "id": "p3.n7.tip.pending",
+      "lens": "N7",
+      "title": "create pending + forged cs",
+      "ev": "200 \"7e3899bf-19a5-4e57-a8e7-0b2289049ea6\""
+    },
+    {
+      "id": "p3.n5.bag.ins",
+      "lens": "N5",
+      "title": "buyer INSERT reservation",
+      "ev": "201 [{\"id\":\"a418ffd5-217d-4e95-bf48-974a77ae4015\",\"live_id\":\"64b22e35-4cea-4dc1-8251-4046e097b63f\",\"live_item_id\":\"06d9a39c-e5e9-426e-b83f-7f532b77a6cb\",\"seller_id\":\"980f4fa1-0004-42f9…"
+    },
+    {
+      "id": "p3.n5.bag.s2",
+      "lens": "N5",
+      "title": "seller2 INSERT accepted on A qty=1",
+      "ev": "201 [{\"id\":\"01677f6a-5e0a-4c7f-80af-df2880b9dd6e\",\"live_id\":\"64b22e35-4cea-4dc1-8251-4046e097b63f\",\"live_item_id\":\"06d9a39c-e5e9-426e-b83f-7f532b77a6cb\",\"seller_id\":\"980f4fa1-0004-42f9…"
+    },
+    {
+      "id": "p3.n5.accept",
+      "lens": "N5",
+      "title": "buyer accept_available",
+      "ev": "200 1"
+    },
+    {
+      "id": "p3.n5.req.get",
+      "lens": "N5",
+      "title": "buyer GET reservations of live",
+      "ev": "200 [{\"id\":\"a418ffd5-217d-4e95-bf48-974a77ae4015\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"status\":\"pending\",\"requested_qty\":1}]"
+    },
+    {
+      "id": "p3.n7.chat",
+      "lens": "N7",
+      "title": "buyer chat no user_id",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"new row violates row-level security policy for table \\\"live_messages\\\"\"}"
+    },
+    {
+      "id": "p3.n5.migrate",
+      "lens": "N5",
+      "title": "buyer migrate catalog",
+      "ev": "404 {\"code\":\"PGRST202\",\"details\":\"Searched for the function public.batata_migrate_live_catalog with parameters p_live_id, p_seller_id or with a single unnamed json/jsonb parameter, but…"
+    },
+    {
+      "id": "p3.n5.recon",
+      "lens": "N5",
+      "title": "buyer reconcile fake order",
+      "ev": "200 {\"ok\": false, \"error\": \"order_not_found\"}"
+    },
+    {
+      "id": "p3.n5.startopen",
+      "lens": "N5",
+      "title": "buyer start open reservations check",
+      "ev": "200 {\"ok\": false, \"error\": \"not_allowed\"}"
+    }
+  ]
+}

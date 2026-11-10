@@ -1,0 +1,126 @@
+{
+  "auditor": "REDTEAM_BLIND_INDEP_v4",
+  "stamp": "20260831T0816",
+  "project": "fxdknzrqjenzqcvnwqqq",
+  "production_touched": false,
+  "fase4": false,
+  "corrections_applied": false,
+  "fresh_id": "9f2c9d56-dbd8-4463-9c20-32ce32e6414f",
+  "findings": [],
+  "holds": [
+    {
+      "id": "p1c.race.dead1",
+      "title": "≤1 hold qty=1 unlist+live",
+      "well": "1",
+      "evidence": "ok=1"
+    }
+  ],
+  "notes": [
+    {
+      "id": "p2b.accounting",
+      "title": "wallet+txs after release",
+      "well": "2",
+      "detail": {
+        "seller": {
+          "id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+          "stripe_account_id": "acct_1U5mYbQeUNx8ar08",
+          "balance": 229.6,
+          "updated_at": "2026-08-31T07:31:42.26217+00:00"
+        },
+        "buyer": {
+          "id": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+          "stripe_account_id": "acct_1U8gAFQglI7kZRfq",
+          "balance": 22.75,
+          "updated_at": "2026-08-31T07:29:53.157718+00:00"
+        },
+        "txs": [
+          {
+            "id": "3317e685-922b-433f-ab1d-857e8783e46b",
+            "wallet_id": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+            "amount": 5.0,
+            "type": "venda",
+            "description": "Venda de Refund crash E2E 1788161498714",
+            "created_at": "2026-08-31T07:31:42.26217+00:00",
+            "order_id": "7a85e038-c1f6-4df3-a4ef-a0ccd9a86837",
+            "tip_id": null
+          }
+        ]
+      }
+    },
+    {
+      "id": "p1c.fresh.edge",
+      "title": "fresh edge unlist+live",
+      "well": "1",
+      "detail": "400 {\"error\":\"Checkout blocked: order does not belong to buyer.\"}"
+    },
+    {
+      "id": "p1c.race.dead1",
+      "title": "unlist qty=1 + live N=6",
+      "well": "1",
+      "detail": "ok=1 codes=[400, 400, 400, 201, 400, 400]"
+    },
+    {
+      "id": "p2b.paid2",
+      "title": "second paid fixture",
+      "well": "2",
+      "detail": "200 { \"ok\": true, \"order_id\": \"6bbd82e3-1606-4493-a460-cc84f36f6c15\", \"product_id\": \"6eb2799a-21e8-4534-81ca-5ec1687117ae\", \"payment_intent_id\": \"pi_3UAPiNH7FWYUN3jh1eOvZrWy\", \"pi_status\": \"succeeded\", \"pi_amount_received\": 590, \"initial_qty\": 1, \"settle_http\": 200, \"settle_body\": { …"
+    },
+    {
+      "id": "p2b.enviado",
+      "title": "seller enviado paid2",
+      "well": "2",
+      "detail": "200 [{\"id\":\"6bbd82e3-1606-4493-a460-cc84f36f6c15\",\"created_at\":\"2026-08-31T07:33:11.46517+00:00\",\"product_id\":\"6eb2799a-21e8-4534-81ca-5ec1687117ae\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"price_total\":5.9,\"shipping_method… after=enviado"
+    },
+    {
+      "id": "p2b.refund.enviado",
+      "title": "seller refund enviado",
+      "well": "2",
+      "detail": "403 {\"ok\":false,\"error\":\"Não é possível anular esta venda neste estado (já enviada ou concluída).\",\"code\":\"order_refund_blocked_status\",\"status\":\"enviado\"}"
+    },
+    {
+      "id": "p2b.disp.enviado",
+      "title": "buyer dispute from enviado",
+      "well": "2",
+      "detail": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"new row violates row-level security policy for table \\\"order_disputes\\\"\"}"
+    },
+    {
+      "id": "p2b.confirm.disp",
+      "title": "buyer concluido with/after dispute",
+      "well": "2",
+      "detail": "200 [{\"id\":\"6bbd82e3-1606-4493-a460-cc84f36f6c15\",\"created_at\":\"2026-08-31T07:33:11.46517+00:00\",\"product_id\":\"6eb2799a-21e8-4534-81ca-5ec1687117ae\",\"buyer_id\":\"bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96\",\"seller_id\":\"980f4fa1-0004-42f9-abca-69f1a9c29588\",\"price_total\":5.9,\"shipping_method… after=concluido"
+    },
+    {
+      "id": "p2b.release.after.disp",
+      "title": "release after dispute/refund",
+      "well": "2",
+      "detail": {
+        "rpc": "200 true",
+        "order": {
+          "id": "6bbd82e3-1606-4493-a460-cc84f36f6c15",
+          "status": "enviado",
+          "stripe_refund_id": null,
+          "amount_paid_cents": 590
+        },
+        "status": "concluido"
+      }
+    },
+    {
+      "id": "p4.livekit.jwt",
+      "title": "egress cleanup buyer",
+      "well": "4",
+      "detail": "401 {\"error\":\"Unauthorized.\"}"
+    },
+    {
+      "id": "p4.livekit.anon",
+      "title": "egress cleanup anon",
+      "well": "4",
+      "detail": "401 {\"error\":\"Unauthorized.\"}"
+    },
+    {
+      "id": "p4.webhook.unsigned",
+      "title": "stripe-webhook no sig",
+      "well": "4",
+      "detail": "400 {\"ok\":false,\"error\":\"missing_signature\"}"
+    }
+  ]
+}

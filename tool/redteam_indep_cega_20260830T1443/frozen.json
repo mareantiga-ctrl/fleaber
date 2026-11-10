@@ -1,0 +1,133 @@
+{
+  "frozen_at": "2026-08-30T14:00:00+01:00",
+  "project": "fxdknzrqjenzqcvnwqqq",
+  "stripe": "TEST",
+  "production_touched": false,
+  "fase4_started": false,
+  "corrections_applied": false,
+  "verdict": "FAIL_P0",
+  "saturation": false,
+  "findings": [
+    {
+      "id": "RTI-P0-001",
+      "severity": "P0",
+      "title": "Buyer seals arbitrary price via payment_method proposta without accepted offer; Edge creates payable Stripe Session",
+      "actor": "buyer_jwt",
+      "pre": "Seller catalog product; authenticated buyer",
+      "repro": "POST /rest/v1/orders payment_method=proposta price_total=<low> status=reserva_pendente shipping_method=mao; POST create-payment-intent {order_id, buyer_id:self, shipping_method:mao}",
+      "impact": "Stripe Session amount_total 118 cents vs control 4475 cents on 42 EUR catalog; 149 cents vs 55 EUR catalog",
+      "estado": "CONFIRMADO",
+      "capture_status": "SESSION_CREATED_PAYABLE",
+      "capture_real_test": false,
+      "evidence": [
+        {
+          "catalog_eur": 42.0,
+          "contract_unit_cents": 50,
+          "product_offer_id": null,
+          "amount_total": 118,
+          "session": "cs_test_a1cotEbJicntISQI6eUfmBGdSFbHaNtzgQQf5RO6jtTix3bbCTR7Ih8jws"
+        },
+        {
+          "catalog_eur": 42.0,
+          "shipping": "ctt",
+          "amount_total": 485,
+          "session": "cs_test_a1XHDPkp8pdwyk1Z7Rqzq9bBwpTndlc4U0PZcSZpmpgLkFESPKhXT6FVOa"
+        },
+        {
+          "catalog_eur": 42.0,
+          "control_amount_total": 4475,
+          "session": "cs_test_a1NutY920THnvq3CYPN5i5EKJgUxyToCOlBn6lho2QNSyGvsJYg1Lx4BTQ"
+        },
+        {
+          "catalog_eur": 55.0,
+          "contract_unit_cents": 80,
+          "amount_total": 149,
+          "order_id": "2f692dda-03ae-4213-97e2-f2925b8ab3d6",
+          "session": "cs_test_a1eE0RvVZjtwpiEjLTjc8TGTZhfP2y6zWiuX7X7YQSib6dngvHA9PeWrEx"
+        }
+      ]
+    },
+    {
+      "id": "RTI-P2-001",
+      "severity": "P2",
+      "title": "JWT INSERT persists contract_unit_cents=1; checkout rejects as item without price",
+      "actor": "buyer_jwt",
+      "pre": "Authenticated buyer",
+      "repro": "INSERT orders payment_method='pagamento na app' contract_unit_cents=1 status=reserva_pendente",
+      "impact": "DB contract poisoned; not payable at 1 cent",
+      "estado": "CONFIRMADO"
+    }
+  ],
+  "invariants": {
+    "A_stripe_charges_legitimate_contract": "REFUTED",
+    "B_buyer_cannot_set_price_qty_authority": "REFUTED_PRICE",
+    "C_release_refund_payout_le_funds": "NOT_REFUTED",
+    "D_one_unit_two_sales": "NOT_REFUTED",
+    "E_jwt_cannot_mint_wallet_stripe": "NOT_REFUTED",
+    "F_off_platform_mints_balance": "NOT_PROVEN",
+    "G_refund_le_capture": "NOT_REFUTED",
+    "H_parties_coherent": "NOT_REFUTED",
+    "I_payout_one_intent_one_transfer": "NOT_REFUTED",
+    "J_two_intents_two_transfers": "OBSERVED_EXPECTED",
+    "K_catalog_mutation_retro_contract": "NOT_FULLY_TESTED",
+    "L_offer_authority": "REFUTED"
+  },
+  "races": {
+    "stock1_10x_insert": {"ok": 1, "attempts": 10},
+    "stock1_second_order": "order_hold_exceeds_stock",
+    "dual_refund_unpaid": ["422", "422"],
+    "dual_payout_distinct_keys": "two_test_transfers_1eur",
+    "dual_payout_same_key": "same_transfer_id",
+    "tip_session_bind": "unique_violation_409",
+    "live_reservation_last_unit": "NOT_PROVEN_ref_code_nn"
+  },
+  "stripe_test": {
+    "session_created_underpay": true,
+    "capture_real_test": false,
+    "net_permanent_capture": false
+  },
+  "gaps": [
+    "Stripe TEST capture of underpay session not completed",
+    "Bag multi-seller",
+    "Live reservation race (ref_code)",
+    "Paid oversell dual capture",
+    "Dispute+refund with capture"
+  ],
+  "checklist": {
+    "p0_open": true,
+    "p0_count": 1,
+    "p1_open": false,
+    "p1_count": 0,
+    "buyer_manipulates_authoritative_price": true,
+    "buyer_manipulates_authoritative_qty": true,
+    "seller_fakes_platform_payment": false,
+    "jwt_mints_balance": false,
+    "refund_exceeds_capture": false,
+    "release_plus_refund_mints": "NOT_PROVEN",
+    "payout_duplicate_transfer": false,
+    "stock1_two_valid_sales": false,
+    "stock1_two_permanent_captures": "NOT_PROVEN",
+    "capacity_bypass": false,
+    "cross_user_financial": false,
+    "cross_user_sensitive_data": false,
+    "buyer_assumes_seller_admin": false,
+    "seller_assumes_buyer_admin": false,
+    "reviews_forged_duplicated": false,
+    "dangerous_security_definer": true,
+    "critical_rls_broken": false,
+    "edge_trusts_client_authority": "indirect_via_poisoned_contract_row",
+    "critical_unproven": true,
+    "functional_regression": "NOT_EVALUATED",
+    "last_pass_new_p0_p1_class": false,
+    "saturation": false,
+    "production_touched": false,
+    "fase4_started": false
+  },
+  "probes": [
+    "tool/redteam_indep_cega_20260830T1443.dart",
+    "tool/redteam_indep_cega_20260830T1443_pass4.dart",
+    "tool/redteam_indep_cega_20260830T1443_pass5.dart",
+    "tool/redteam_indep_cega_20260830T1443_pass6.dart",
+    "tool/redteam_indep_cega_20260830T1443_pass7.dart"
+  ]
+}

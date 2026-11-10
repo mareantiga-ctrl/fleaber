@@ -1,0 +1,495 @@
+{
+  "stamp": "20260902T0906",
+  "prefix": "RTAR-20260902T0906",
+  "lentes": [
+    "AR1",
+    "AR2",
+    "AR4",
+    "AR7"
+  ],
+  "findings": [
+    {
+      "id": "AR1-amount-array",
+      "lens": "AR1",
+      "severity": "P1",
+      "title": "amount:[100] criou Transfer",
+      "actor": "seller JWT",
+      "pre": "body amount array",
+      "repro": "POST create-connect-account amount=[100]",
+      "expected": "400 valor inválido",
+      "obtained": "200 {\"success\":true,\"transferId\":\"tr_1UBAIoH7FWYUN3jhDIxyF822\",\"balance\":28.97}",
+      "proven": true,
+      "evidence": {}
+    }
+  ],
+  "blocked": [
+    {
+      "id": "AR1.batata_wallet_payout_debit",
+      "lens": "AR1",
+      "title": "JWT batata_wallet_payout_debit",
+      "ev": {
+        "buyer": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_wallet_payout_debit\"}",
+        "seller": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_wallet_payout_debit\"}"
+      }
+    },
+    {
+      "id": "AR1.batata_wallet_payout_finish",
+      "lens": "AR1",
+      "title": "JWT batata_wallet_payout_finish",
+      "ev": {
+        "buyer": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_wallet_payout_finish\"}",
+        "seller": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_wallet_payout_finish\"}"
+      }
+    },
+    {
+      "id": "AR1.batata_credit_wallet_once",
+      "lens": "AR1",
+      "title": "JWT batata_credit_wallet_once",
+      "ev": {
+        "buyer": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_credit_wallet_once\"}",
+        "seller": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_credit_wallet_once\"}"
+      }
+    },
+    {
+      "id": "AR1.batata_finalize_stripe_order_refund",
+      "lens": "AR1",
+      "title": "JWT batata_finalize_stripe_order_refund",
+      "ev": {
+        "buyer": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_finalize_stripe_order_refund\"}",
+        "seller": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_finalize_stripe_order_refund\"}"
+      }
+    },
+    {
+      "id": "AR1.delta",
+      "lens": "AR1",
+      "title": "sweep JWT Δwallet 0",
+      "ev": {
+        "dBuyer": 0.0,
+        "dSeller": 0.0
+      }
+    },
+    {
+      "id": "AR1.stripe-acct-hdr",
+      "lens": "AR1",
+      "title": "Stripe-Account header",
+      "ev": "200 {\"stripeAccountId\":\"acct_1U5mYbQeUNx8ar08\",\"url\":\"https://connect.stripe.com/setup/e/acct_1U5mYbQeUNx8ar08/OEoAtSQ8YlsK\"}"
+    },
+    {
+      "id": "AR1.insert-txn",
+      "lens": "AR1",
+      "title": "INSERT txn",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"new row violates row-level security policy for table \\\"wallet_transactions\\\"\"}"
+    },
+    {
+      "id": "AR1.mass-wallets",
+      "lens": "AR1",
+      "title": "mass PATCH wallets",
+      "ev": "200 []"
+    },
+    {
+      "id": "AR2.trailing-dot",
+      "lens": "AR2",
+      "title": "origem trailing-dot",
+      "ev": 200
+    },
+    {
+      "id": "AR2.crlf",
+      "lens": "AR2",
+      "title": "origem crlf",
+      "ev": 200
+    },
+    {
+      "id": "AR2.at-userinfo",
+      "lens": "AR2",
+      "title": "origem at-userinfo",
+      "ev": 303
+    },
+    {
+      "id": "AR2.cyrillic-a",
+      "lens": "AR2",
+      "title": "origem cyrillic-a",
+      "ev": 200
+    },
+    {
+      "id": "AR2.ipv6",
+      "lens": "AR2",
+      "title": "origem ipv6",
+      "ev": 200
+    },
+    {
+      "id": "AR2.fwd-host",
+      "lens": "AR2",
+      "title": "origem fwd-host",
+      "ev": 403
+    },
+    {
+      "id": "AR2.scheme-fleaber",
+      "lens": "AR2",
+      "title": "origem scheme-fleaber",
+      "ev": 200
+    },
+    {
+      "id": "AR2.data",
+      "lens": "AR2",
+      "title": "origem data",
+      "ev": 200
+    },
+    {
+      "id": "AR2.onboard-evil",
+      "lens": "AR2",
+      "title": "AccountLink sem evil",
+      "ev": 200
+    },
+    {
+      "id": "AR2.cross-user",
+      "lens": "AR2",
+      "title": "user_id cruzado",
+      "ev": "400 {\"error\":\"Cannot create another user Stripe account.\",\"code\":\"payout_failed\"}"
+    },
+    {
+      "id": "AR4.wh.transfer.created",
+      "lens": "AR4",
+      "title": "transfer.created assinatura lixo",
+      "ev": "400 {\"ok\":false,\"error\":\"invalid_signature\"}"
+    },
+    {
+      "id": "AR4.wh.payout.paid",
+      "lens": "AR4",
+      "title": "payout.paid assinatura lixo",
+      "ev": "400 {\"ok\":false,\"error\":\"invalid_signature\"}"
+    },
+    {
+      "id": "AR4.wh.charge.refunded",
+      "lens": "AR4",
+      "title": "charge.refunded assinatura lixo",
+      "ev": "400 {\"ok\":false,\"error\":\"invalid_signature\"}"
+    },
+    {
+      "id": "AR4.wh.account.updated",
+      "lens": "AR4",
+      "title": "account.updated assinatura lixo",
+      "ev": "400 {\"ok\":false,\"error\":\"invalid_signature\"}"
+    },
+    {
+      "id": "AR1.graphql",
+      "lens": "AR1",
+      "title": "GraphQL wallets",
+      "ev": 200
+    }
+  ],
+  "skipped": [],
+  "notes": [
+    {
+      "id": "snap.wallets",
+      "lens": "AR7",
+      "title": "saldos iniciais",
+      "ev": {
+        "buyer": 61.1,
+        "seller": 29.97,
+        "buyer2": 0,
+        "seller2": 0
+      }
+    },
+    {
+      "id": "snap.seller.acct",
+      "lens": "AR2",
+      "title": "Connect seller",
+      "ev": "acct_1U5mYbQeUNx8ar08"
+    },
+    {
+      "id": "rpc.batata_wallet_payout_debit",
+      "lens": "AR1",
+      "title": "JWT sweep",
+      "ev": {
+        "buyer": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_wallet_payout_debit\"}",
+        "seller": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_wallet_payout_debit\"}"
+      }
+    },
+    {
+      "id": "rpc.batata_wallet_payout_finish",
+      "lens": "AR1",
+      "title": "JWT sweep",
+      "ev": {
+        "buyer": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_wallet_payout_finish\"}",
+        "seller": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_wallet_payout_finish\"}"
+      }
+    },
+    {
+      "id": "rpc.batata_clawback_seller_wallet_for_order",
+      "lens": "AR1",
+      "title": "JWT sweep",
+      "ev": {
+        "buyer": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_clawback_seller_wallet_for_order\"}",
+        "seller": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_clawback_seller_wallet_for_order\"}"
+      }
+    },
+    {
+      "id": "rpc.batata_credit_wallet_once",
+      "lens": "AR1",
+      "title": "JWT sweep",
+      "ev": {
+        "buyer": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_credit_wallet_once\"}",
+        "seller": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_credit_wallet_once\"}"
+      }
+    },
+    {
+      "id": "rpc.batata_refund_buyer_wallet_for_order",
+      "lens": "AR1",
+      "title": "JWT sweep",
+      "ev": {
+        "buyer": "200 false",
+        "seller": "200 false"
+      }
+    },
+    {
+      "id": "rpc.batata_finalize_stripe_order_refund",
+      "lens": "AR1",
+      "title": "JWT sweep",
+      "ev": {
+        "buyer": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_finalize_stripe_order_refund\"}",
+        "seller": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_finalize_stripe_order_refund\"}"
+      }
+    },
+    {
+      "id": "rpc.batata_process_partial_refund_dispute",
+      "lens": "AR1",
+      "title": "JWT sweep",
+      "ev": {
+        "buyer": "200 false",
+        "seller": "200 false"
+      }
+    },
+    {
+      "id": "rpc.batata_wallet_apply_tip_once",
+      "lens": "AR1",
+      "title": "JWT sweep",
+      "ev": {
+        "buyer": "404 {\"code\":\"PGRST202\",\"details\":\"Searched for the function public.batata_wallet_apply_tip_once with parameter p_tip_id or with a single unnamed json/jsonb parameter, but no matches were found in the schema cache.\",\"hint\":null,\"message\":\"Could …",
+        "seller": "404 {\"code\":\"PGRST202\",\"details\":\"Searched for the function public.batata_wallet_apply_tip_once with parameter p_tip_id or with a single unnamed json/jsonb parameter, but no matches were found in the schema cache.\",\"hint\":null,\"message\":\"Could …"
+      }
+    },
+    {
+      "id": "rpc.batata_ensure_wallet",
+      "lens": "AR1",
+      "title": "JWT sweep",
+      "ev": {
+        "buyer": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_ensure_wallet\"}",
+        "seller": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_ensure_wallet\"}"
+      }
+    },
+    {
+      "id": "rpc.batata_order_allows_seller_stripe_refund",
+      "lens": "AR1",
+      "title": "JWT sweep",
+      "ev": {
+        "buyer": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_order_allows_seller_stripe_refund\"}",
+        "seller": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"permission denied for function batata_order_allows_seller_stripe_refund\"}"
+      }
+    },
+    {
+      "id": "rpc.batata_order_wallet_reembolso_cents",
+      "lens": "AR1",
+      "title": "JWT sweep",
+      "ev": {
+        "buyer": "200 0",
+        "seller": "200 0"
+      }
+    },
+    {
+      "id": "ar1.stripe-account-hdr",
+      "lens": "AR1",
+      "title": "payout Stripe-Account + currency usd",
+      "ev": "200 {\"stripeAccountId\":\"acct_1U5mYbQeUNx8ar08\",\"url\":\"https://connect.stripe.com/setup/e/acct_1U5mYbQeUNx8ar08/OEoAtSQ8YlsK\"}"
+    },
+    {
+      "id": "ar1.put",
+      "lens": "AR1",
+      "title": "PUT create-connect-account (sem amount)",
+      "ev": "200 {\"stripeAccountId\":\"acct_1U5mYbQeUNx8ar08\",\"url\":\"https://connect.stripe.com/setup/e/acct_1U5mYbQeUNx8ar08/szf5KrneHpRq\"}"
+    },
+    {
+      "id": "ar1.refund.get",
+      "lens": "AR1",
+      "title": "GET refund-order",
+      "ev": "405 {\"ok\":false,\"error\":\"Method not allowed\"}"
+    },
+    {
+      "id": "ar1.amount-array",
+      "lens": "AR1",
+      "title": "amount como array",
+      "ev": "200 {\"success\":true,\"transferId\":\"tr_1UBAIoH7FWYUN3jhDIxyF822\",\"balance\":28.97}"
+    },
+    {
+      "id": "ar1.prefix.keys",
+      "lens": "AR1",
+      "title": "keys truncadas",
+      "ev": {
+        "kA8": "PPPPPPPP",
+        "same64": true,
+        "len": 71
+      }
+    },
+    {
+      "id": "ar1.patch.bal.cross",
+      "lens": "AR1",
+      "title": "buyer PATCH seller balance",
+      "ev": "200 []"
+    },
+    {
+      "id": "ar1.insert.txn",
+      "lens": "AR1",
+      "title": "INSERT wallet_transactions",
+      "ev": "403 {\"code\":\"42501\",\"details\":null,\"hint\":null,\"message\":\"new row violates row-level security policy for table \\\"wallet_transactions\\\"\"}"
+    },
+    {
+      "id": "ar1.mass.wallets",
+      "lens": "AR1",
+      "title": "PATCH wallets id=in buyer+seller",
+      "ev": "200 []"
+    },
+    {
+      "id": "ar2.get.trailing-dot",
+      "lens": "AR2",
+      "title": "GET Connect origem trailing-dot",
+      "ev": {
+        "status": 200,
+        "location": "",
+        "hasEvil": false,
+        "snippet": "<!DOCTYPE html><html lang=\"pt\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Fleaber</title><script>win…"
+      }
+    },
+    {
+      "id": "ar2.get.crlf",
+      "lens": "AR2",
+      "title": "GET Connect origem crlf",
+      "ev": {
+        "status": 200,
+        "location": "",
+        "hasEvil": false,
+        "snippet": "<!DOCTYPE html><html lang=\"pt\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Fleaber</title><script>win…"
+      }
+    },
+    {
+      "id": "ar2.get.at-userinfo",
+      "lens": "AR2",
+      "title": "GET Connect origem at-userinfo",
+      "ev": {
+        "status": 303,
+        "location": "https://fleaber.pt/wallet",
+        "hasEvil": false,
+        "snippet": ""
+      }
+    },
+    {
+      "id": "ar2.get.cyrillic-a",
+      "lens": "AR2",
+      "title": "GET Connect origem cyrillic-a",
+      "ev": {
+        "status": 200,
+        "location": "",
+        "hasEvil": false,
+        "snippet": "<!DOCTYPE html><html lang=\"pt\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Fleaber</title><script>win…"
+      }
+    },
+    {
+      "id": "ar2.get.ipv6",
+      "lens": "AR2",
+      "title": "GET Connect origem ipv6",
+      "ev": {
+        "status": 200,
+        "location": "",
+        "hasEvil": false,
+        "snippet": "<!DOCTYPE html><html lang=\"pt\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Fleaber</title><script>win…"
+      }
+    },
+    {
+      "id": "ar2.get.fwd-host",
+      "lens": "AR2",
+      "title": "GET Connect origem fwd-host",
+      "ev": {
+        "status": 403,
+        "location": "",
+        "hasEvil": false,
+        "snippet": "<html>\r\n<head><title>403 Forbidden</title></head>\r\n<body>\r\n<center><h1>403 Forbidden</h1></center>\r\n<hr><center>cloudflare</center>\r\n</body>\r\n</html>\r\n"
+      }
+    },
+    {
+      "id": "ar2.get.scheme-fleaber",
+      "lens": "AR2",
+      "title": "GET Connect origem scheme-fleaber",
+      "ev": {
+        "status": 200,
+        "location": "",
+        "hasEvil": false,
+        "snippet": "<!DOCTYPE html><html lang=\"pt\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Fleaber</title><script>win…"
+      }
+    },
+    {
+      "id": "ar2.get.data",
+      "lens": "AR2",
+      "title": "GET Connect origem data",
+      "ev": {
+        "status": 200,
+        "location": "",
+        "hasEvil": false,
+        "snippet": "<!DOCTYPE html><html lang=\"pt\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Fleaber</title><script>win…"
+      }
+    },
+    {
+      "id": "ar2.onboard.evil",
+      "lens": "AR2",
+      "title": "POST onboarding return_url hostil",
+      "ev": {
+        "status": 200,
+        "url": "https://connect.stripe.com/setup/e/acct_1U5mYbQeUNx8ar08/BHs3WCOvRKBY",
+        "hasEvil": false
+      }
+    },
+    {
+      "id": "ar2.cross.user",
+      "lens": "AR2",
+      "title": "buyer cria Connect de seller2",
+      "ev": "400 {\"error\":\"Cannot create another user Stripe account.\",\"code\":\"payout_failed\"}"
+    },
+    {
+      "id": "ar4.wh.transfer.created",
+      "lens": "AR4",
+      "title": "webhook transfer.created assinatura lixo",
+      "ev": "400 {\"ok\":false,\"error\":\"invalid_signature\"}"
+    },
+    {
+      "id": "ar4.wh.payout.paid",
+      "lens": "AR4",
+      "title": "webhook payout.paid assinatura lixo",
+      "ev": "400 {\"ok\":false,\"error\":\"invalid_signature\"}"
+    },
+    {
+      "id": "ar4.wh.charge.refunded",
+      "lens": "AR4",
+      "title": "webhook charge.refunded assinatura lixo",
+      "ev": "400 {\"ok\":false,\"error\":\"invalid_signature\"}"
+    },
+    {
+      "id": "ar4.wh.account.updated",
+      "lens": "AR4",
+      "title": "webhook account.updated assinatura lixo",
+      "ev": "400 {\"ok\":false,\"error\":\"invalid_signature\"}"
+    },
+    {
+      "id": "ar1.graphql",
+      "lens": "AR1",
+      "title": "GraphQL update wallets",
+      "ev": "200 {\"errors\": [{\"message\": \"pg_graphql extension is not enabled.\"}]}"
+    }
+  ],
+  "actors": {
+    "buyer": "bfcbeeee-7dc1-4cd1-b2a7-d3a0a6cf7c96",
+    "seller": "980f4fa1-0004-42f9-abca-69f1a9c29588",
+    "buyer2": "5c9a7709-28ff-4539-9bde-fc0f736f7d75",
+    "seller2": "fd4d692d-3256-471d-bc95-486db8a34d0a"
+  },
+  "created": {
+    "orders": [],
+    "products": []
+  }
+}

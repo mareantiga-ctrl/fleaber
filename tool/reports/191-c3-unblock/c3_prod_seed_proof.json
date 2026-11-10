@@ -1,0 +1,61 @@
+{
+  "precheck": {
+    "auth_users": 19,
+    "profiles": 18,
+    "c3_emails": 11
+  },
+  "accounts": [
+    {
+      "email": "c3.buyer.a@fleaber.test",
+      "user_id": "96ac51b3-e887-46a6-a53e-6c31bcba1cd6",
+      "role": "buyer",
+      "ensure": "created",
+      "profile": "profiles_fail:RuntimeError",
+      "product": null
+    },
+    {
+      "email": "c3.buyer.b@fleaber.test",
+      "user_id": "e9e6bba9-8b6c-4529-b450-819d6725ecfd",
+      "role": "buyer",
+      "ensure": "created",
+      "profile": "profiles_fail:RuntimeError",
+      "product": null
+    },
+    {
+      "email": "c3.seller.a@fleaber.test",
+      "user_id": "5daa663e-f80a-446a-9764-8652eea75737",
+      "role": "seller",
+      "ensure": "created",
+      "profile": "profiles_fail:RuntimeError",
+      "product": "product_skip:RuntimeError:sql 400: {'message': 'Failed to run sql query: ERROR:  42703: column \"stock_qty\" of relation \"products\" does not exist\\n"
+    },
+    {
+      "email": "c3.seller.b@fleaber.test",
+      "user_id": "67e638e1-eab4-4f75-b5fb-521360e604e3",
+      "role": "seller",
+      "ensure": "created",
+      "profile": "profiles_fail:RuntimeError",
+      "product": "product_skip:RuntimeError:sql 400: {'message': 'Failed to run sql query: ERROR:  42703: column \"stock_qty\" of relation \"products\" does not exist\\n"
+    },
+    {
+      "login_test": "c3.buyer.a@fleaber.test",
+      "http": 200,
+      "has_access": true
+    },
+    {
+      "login_test": "c3.buyer.b@fleaber.test",
+      "http": 200,
+      "has_access": true
+    }
+  ],
+  "notes": [],
+  "creds_path": "C:\\Users\\Casa\\AppData\\Local\\Temp\\fleaber_c3_prod_creds.json",
+  "creds_in_git": false,
+  "tag": "C3_AUDIT",
+  "limits": {
+    "stripe_live": false,
+    "dpd_create": false,
+    "sms_mass": false,
+    "ops_sms_permanent": true
+  }
+}

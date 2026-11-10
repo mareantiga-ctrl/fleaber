@@ -153,7 +153,8 @@ class _PhoneVerifySheetState extends State<_PhoneVerifySheet> {
           ),
           const SizedBox(height: 8),
           Text(
-            'Enviámos um código SMS para ${widget.phoneE164}. Introduz-o abaixo.',
+            'Enviámos um código SMS para ${widget.phoneE164}. '
+            'Introduz os 6 dígitos abaixo (válido cerca de 10 minutos).',
             style: GoogleFonts.inter(
               fontSize: 14,
               color: const Color(0xFF57636C),

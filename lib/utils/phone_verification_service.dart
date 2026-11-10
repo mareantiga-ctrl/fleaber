@@ -50,9 +50,19 @@ class PhoneVerificationService {
 
   static String _friendlyAuthError(AuthException e) {
     final raw = e.message.toLowerCase();
-    // Log técnico para diagnóstico (nunca no SnackBar).
+    // Log técnico para diagnóstico (nunca no SnackBar / sem OTP).
     // ignore: avoid_print
     print('SMS_AUTH_ERR: ${e.message}');
+    if (raw.contains('otp_expired') ||
+        raw.contains('token has expired') ||
+        (raw.contains('expired') && raw.contains('token'))) {
+      return 'O código expirou. Pede um novo SMS e introdu-lo de seguida.';
+    }
+    if (raw.contains('temporariamente desactivado') ||
+        raw.contains('temporariamente desativado') ||
+        raw.contains('ops_sms_send_enabled')) {
+      return 'O envio de SMS está temporariamente indisponível. Tenta mais tarde.';
+    }
     if (raw.contains('missing phone or otp in hook payload') ||
         raw.contains('hook secret') ||
         raw.contains('invalid payload sent to hook') ||
@@ -60,11 +70,17 @@ class PhoneVerificationService {
       return 'Não foi possível enviar o SMS de verificação. '
           'Tenta novamente dentro de momentos ou contacta o suporte.';
     }
-    if (raw.contains('rate limit') || raw.contains('too many')) {
-      return 'Demasiados pedidos. Aguarda alguns minutos e tenta outra vez.';
+    if (raw.contains('rate limit') ||
+        raw.contains('too many') ||
+        raw.contains('for security purposes') ||
+        raw.contains('only request this after')) {
+      return 'Demasiados pedidos. Aguarda cerca de 1 minuto e tenta outra vez.';
     }
     if (raw.contains('invalid') && raw.contains('phone')) {
       return 'Número de telemóvel inválido. Confirma o formato (+351…).';
+    }
+    if (raw.contains('invalid') && (raw.contains('otp') || raw.contains('token'))) {
+      return 'Código incorrecto. Confirma os 6 dígitos do SMS.';
     }
     return 'Não foi possível verificar o telemóvel. Tenta novamente.';
   }

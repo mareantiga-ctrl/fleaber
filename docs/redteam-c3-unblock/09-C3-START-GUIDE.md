@@ -20,16 +20,27 @@ flutter test test/fee_calculator_test.dart test/live_checkout_fees_test.dart `
 
 Esperado: PASS (prova C1: 33 testes).
 
-## 3. TEST Supabase
+## 3. TEST Supabase (local)
 
-**Ainda bloqueado** — ver `04-TEST-ENV.md`. Sem GO TEST, não há contas/dados cloud.
+**Bloqueado nesta máquina até Docker Engine** — ver `11-DOCKER-BLOCKER.md`.
 
-Quando existir TEST:
+Pré-requisito Admin (uma vez):
 
-1. Apontar dart-defines / `.env` local (fora do git) para o ref TEST.
-2. Correr seed (`tool/c3_test_seed/`).
-3. Login com Buyer A / Seller A (credenciais locais).
-4. Cleanup só com `90_cleanup_c3_test.sql`.
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File tool/c3_fix_docker_admin.ps1
+```
+
+Depois (C1 / C3):
+
+```powershell
+npx supabase start
+npx supabase db reset   # aplica migrations locais
+# seed: tool/c3_test_seed/ (após GO concluído pelo C1)
+```
+
+1. Apontar dart-defines / `.env` local (fora do git) para URL local (`http://127.0.0.1:54321`).
+2. Login Buyer A / Seller A (credenciais locais).
+3. Cleanup só com `90_cleanup_c3_test.sql`.
 
 ## 4. Limites de segurança
 

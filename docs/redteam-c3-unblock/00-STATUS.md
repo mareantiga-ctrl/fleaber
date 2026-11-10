@@ -6,10 +6,10 @@
 
 | ID | Item | Estado |
 |----|------|--------|
-| A | BulkGate prep + pedido GO SMS | **PENDENTE GO** (técnico OK; SMS off) |
+| A | GO SMS …5912 | **RESOLVIDO (envio aceite)** — confirmação humana OTP pendente; `OPS_SMS=0` |
 | B1 | `flutter_webrtc` bootstrap | **RESOLVIDO** (script + prova `flutter test`) |
 | B2 | Testes portes Célia | **RESOLVIDO** (testes actualizados; app OK) |
-| B3 | Supabase TEST isolado | **BLOQUEADO** (falta GO: Docker engine ou projecto TEST novo) |
+| B3 | Supabase TEST isolado | **BLOQUEADO** — Docker/WSL precisa Admin (`11-DOCKER-BLOCKER.md`) |
 | B4 | Contas TEST | **PENDENTE** (scripts prontos; não criadas em cloud) |
 | B5 | Dados TEST | **PENDENTE** (SQL seed/cleanup prontos; não aplicados) |
 | B6 | Integrações simuladas | **RESOLVIDO** (matriz documentada) |

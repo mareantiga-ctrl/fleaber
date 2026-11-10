@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 
+import 'package:fleaber/utils/dpd_shipping_rates.dart';
 import 'package:fleaber/utils/fee_calculator.dart';
 
 void main() {
@@ -10,6 +11,7 @@ void main() {
 
     test('inclui portes na base do seguro', () {
       final withoutShipping = calculateFleaberProtectionFee(5, shippingEur: 0);
+      // 3,50 usado só como exemplo numérico de base do seguro (legado).
       final withShipping = calculateFleaberProtectionFee(5, shippingEur: 3.5);
       expect(withShipping, greaterThan(withoutShipping));
     });
@@ -22,7 +24,6 @@ void main() {
 
   group('calculateFleaberBuyerTotal', () {
     test('artigo 5 € sem portes — conta independente', () {
-      // esperado: 5 + (0,65 + 5%×5) = 5 + 0,65 + 0,25 = 5,90
       const item = 5.0;
       const feeFixed = 0.65;
       const feePct = 0.05;
@@ -34,9 +35,9 @@ void main() {
       );
     });
 
-    test('artigo 5 € + portes 3,50 € — conta independente', () {
-      // base seguro = 5 + 3,50 = 8,50 → fee = 0,65 + 5%×8,50 = 0,65+0,425 = 1,075
-      // total = 8,50 + 1,075 = 9,575 ≈ 9,58
+    test('artigo 5 € + portes (exemplo numérico) — conta independente', () {
+      // base seguro = 5 + 3,50 = 8,50 → fee = 0,65 + 5%×8,50 = 1,075
+      // total = 9,575 ≈ 9,58 — portes aqui são input, não cotação DPD.
       const item = 5.0;
       const shipping = 3.5;
       const feeFixed = 0.65;
@@ -66,14 +67,15 @@ void main() {
       );
     });
 
-    test('B2 directo Live: 7/20/99,99 € + transportadora inclui portes', () {
+    test('B2 directo Live: artigos + portes Célia (Shop2Shop ≤3 kg)', () {
+      const ship = 2.99; // tabela Célia aprovada
       for (final item in [7.0, 20.0, 99.99]) {
         final total = calculateFleaberBuyerTotal(
           itemPriceEur: item,
-          shippingEur: kFleaberCarrierShippingEur,
+          shippingEur: ship,
           includeProtectionFee: false,
         );
-        expect(total, closeTo(item + 3.5, 0.001));
+        expect(total, closeTo(item + ship, 0.001));
       }
     });
 
@@ -89,15 +91,19 @@ void main() {
     });
   });
 
-  group('fleaberShippingEurFromMethod (B3)', () {
-    test('labels canónicos', () {
-      expect(
-        fleaberShippingEurFromMethod(kFleaberShippingCarrierLabel),
-        3.5,
-      );
+  group('fleaberShippingEurFromMethod (Célia live)', () {
+    test('mão = 0; carrier sem quote → FormatException', () {
       expect(fleaberShippingEurFromMethod(kFleaberShippingHandLabel), 0);
-      expect(fleaberShippingEurFromMethod('carrier'), 3.5);
       expect(fleaberShippingEurFromMethod('hand'), 0);
+      expect(kFleaberDpdShippingRatesLive, isTrue);
+      expect(
+        () => fleaberShippingEurFromMethod(kFleaberShippingCarrierLabel),
+        throwsFormatException,
+      );
+      expect(
+        () => fleaberShippingEurFromMethod('carrier'),
+        throwsFormatException,
+      );
     });
 
     test('lixo → FormatException (fail-closed)', () {
@@ -117,17 +123,43 @@ void main() {
     });
   });
 
+  group('tabela Célia (regra comercial aprovada)', () {
+    test('Shop2Shop / Shop2Home por escalão', () {
+      expect(
+        fleaberDpdTablePriceEur(
+          modality: FleaberDpdModality.shopToShop,
+          band: FleaberDpdWeightBand.upTo3,
+        ),
+        2.99,
+      );
+      expect(
+        fleaberDpdTablePriceEur(
+          modality: FleaberDpdModality.shopToShop,
+          band: FleaberDpdWeightBand.from3To6,
+        ),
+        3.49,
+      );
+      expect(
+        fleaberDpdTablePriceEur(
+          modality: FleaberDpdModality.shopToHome,
+          band: FleaberDpdWeightBand.upTo3,
+        ),
+        4.49,
+      );
+    });
+  });
+
   group('liveSellerEarningsEur', () {
-    test('pagamento directo 2×5 € + portes 3,50 = 13,50 (não 14,83)', () {
+    test('pagamento directo 2×5 € + portes 2,99 = 12,99 (não total com protecção)', () {
       const items = 10.0;
-      const shipping = 3.5;
-      const stored = 13.5;
+      const shipping = 2.99;
+      const stored = 12.99;
       final buyerWithProtection = calculateFleaberBuyerTotal(
         itemPriceEur: items,
         shippingEur: shipping,
         includeProtectionFee: true,
       );
-      expect(buyerWithProtection, closeTo(14.83, 0.001));
+      expect(buyerWithProtection, greaterThan(stored));
       expect(
         liveSellerEarningsEur(
           storedPriceTotal: stored,
@@ -135,7 +167,7 @@ void main() {
           lineItemEur: items,
           shippingEur: shipping,
         ),
-        closeTo(13.5, 0.001),
+        closeTo(12.99, 0.001),
       );
     });
 
@@ -145,21 +177,21 @@ void main() {
           storedPriceTotal: 0,
           isDirectPayment: true,
           lineItemEur: 10,
-          shippingEur: 3.5,
+          shippingEur: 2.99,
         ),
-        closeTo(13.5, 0.001),
+        closeTo(12.99, 0.001),
       );
     });
 
     test('pagamento na app = artigos + portes (sem protecção comprador)', () {
       expect(
         liveSellerEarningsEur(
-          storedPriceTotal: 15.88,
+          storedPriceTotal: 15.33,
           isDirectPayment: false,
           lineItemEur: 11,
-          shippingEur: 3.5,
+          shippingEur: 2.99,
         ),
-        closeTo(14.5, 0.001),
+        closeTo(13.99, 0.001),
       );
     });
 

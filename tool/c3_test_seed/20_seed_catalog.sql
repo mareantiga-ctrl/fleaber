@@ -1,0 +1,14 @@
+-- TEMPLATE — adjust to real schema before apply on TEST only.
+-- Inserts must be tagged so 90_cleanup can remove them.
+-- Example pattern (commented until TEST GO):
+--
+-- insert into products (id, seller_id, title, price, stock_qty, metadata)
+-- values (
+--   gen_random_uuid(),
+--   '<seller_a_uuid>',
+--   'C3_TEST Casaco Azul',
+--   12.50,
+--   5,
+--   jsonb_build_object('c3_test','1')
+-- );
+SELECT 'C3_TEST_CATALOG_TEMPLATE_NOT_APPLIED' AS status;

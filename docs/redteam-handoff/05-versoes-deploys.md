@@ -6,10 +6,11 @@
 |------|-------------------------------|
 | Remoto | `https://github.com/mareantiga-ctrl/fleaber.git` (privado) |
 | Branch handoff | `c1/190-redteam-handoff` |
+| Commit handoff | `5a2159a7d71cc372f085fdd572b3e6a6846f2b06` (e commits seguintes nesta branch) |
 | Base | `origin/master` @ `3489865` («Stabilize Maestro prep chain…») |
+| Pasta | `docs/redteam-handoff/` |
+| URL pasta | `https://github.com/mareantiga-ctrl/fleaber/tree/c1/190-redteam-handoff/docs/redteam-handoff` |
 | Nota | A máquina C1 tem WIP local noutras branches (incl. C2). **Não** uses WIP C2 como base de auditoria sem instrução. |
-
-O SHA exacto do commit que contém estes docs será o do push — o relatório C1 no chat confirma-o.
 
 ## Android
 
